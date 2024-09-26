@@ -3,8 +3,7 @@
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.x.x.
 
 #Deployed Test Amplify
-https://main.d32fkh3rv0ile.amplifyapp.com/manage-user
-
+https://main.d171psdgt7n0kh.amplifyapp.com/dashboard
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
