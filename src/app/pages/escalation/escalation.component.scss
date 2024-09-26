@@ -1,0 +1,17 @@
+.card-custom {
+    border: 1px solid #dee2e6; /* Custom border */
+    border-radius: 10px; /* Custom border radius */
+  }
+
+
+
+  .btn:hover{
+    transform: translateY(-2px);
+    transition: 0.5s;
+} 
+
+.w-100 {
+  width: 100% !important; /* Use !important to override any inline styles */
+}
+
+

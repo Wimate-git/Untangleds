@@ -1,0 +1,323 @@
+<div class="card mb-5 mb-xl-8 card-custom">
+    <div class="card-header border-0 pt-5 ">
+        <h3 class="card-title align-items-start flex-column">
+            <span class="card-label fw-bolder fs-3 mb-1">
+                Company Configuration</span>
+        </h3>
+        <div class="card-toolbar">
+
+            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#companyModal" (click)="openModal('')">
+                New
+            </button>
+        </div>
+    </div>
+
+
+    <div class="card-body pt-0">
+        <app-crud-company [datatableConfig]="datatableConfig" route="/company" (deleteEvent)="delete($event)" (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent" ></app-crud-company>
+    </div>
+
+
+
+</div>
+
+
+<div class="modal fade" id="companyModal" tabindex="-1" aria-labelledby="companyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width:1200px;transform: translate(-27%, 0px);">
+            <div class="modal-header">
+                <h2 class="modal-title" *ngIf="showHeading">Add Company Configuration</h2>
+                <h2 class="modal-title" *ngIf="!showHeading">Edit Company Configuration</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="fv-row" [formGroup]="createCompanyField">
+                <div class="card-body border-top p-9">
+                    <div class="container">
+                        <div class="row">
+
+                            <div class="col-lg-4 ">
+                                <!-- <div class="form-group image-input image-input-outline ">
+                                    <label class="col-lg-12 col-form-label fw-bold fs-6 ">Company Logo 1</label>
+ 
+                                    <input id="file" type="file" class="form-control" 
+                                        (change)="firstLogoCompany($event)" required>
+                                       
+                                    <br>
+                                    <img class="btn btn-icon btn-box image-input-wrapper 
+                                    w-125px h-125px btn-active-color-primary 
+                                    w-25px h-25px bg-body shadow" src={{base64textString_temp}}>
+
+                                </div> -->
+                                <div class="col-lg-12 form-group image-input image-input-outline">
+                                    <label class="col-lg-12 col-form-label fw-bold fs-6" for="imageInput">Company Logo 1</label>
+                                    <input type="file" id="imageInput" title="Click to add/update image" class="form-control visually-hidden"  
+                                    (change)="firstLogoCompany($event)">
+                                    <label for="imageInput" class="form-control form-control-lg form-control-solid" style="padding-left: 115px;">Upload Image</label>
+                                    <br>
+                                    <img class="btn btn-icon btn-box image-input-wrapper w-125px h-125px btn-active-color-primary w-25px h-25px bg-body shadow"
+                                        src="{{base64textString_temp}}" *ngIf="base64textString_temp">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 ">
+                                <div class="col-lg-12 form-group image-input image-input-outline">
+                                    <label class="col-lg-12 col-form-label fw-bold fs-6" for="imageInput1">Company Logo 2</label>
+                                    <input type="file" id="imageInput1" title="Click to add/update image" class="form-control visually-hidden"  
+                                    (change)="secondLogoCompany($event)">
+                                    <label for="imageInput1" class="form-control form-control-lg form-control-solid" style="padding-left: 115px;">Upload Image</label>
+                                    <br>
+                                    <img class="btn btn-icon btn-box image-input-wrapper w-125px h-125px btn-active-color-primary w-25px h-25px bg-body shadow"
+                                        src="{{base64textString_temp_logo1}}" *ngIf="base64textString_temp_logo1">
+                                </div>
+                                <!-- <div class="form-group image-input image-input-outline">
+                                    <label class="col-lg-12 col-form-label fw-bold fs-6" >Company Logo 2</label>
+
+                                    <input id="file" type="file" class="form-control"
+                                        (change)="secondLogoCompany($event)" required>
+                                    <br>
+                                    <img class="btn btn-icon btn-box image-input-wrapper 
+                                    w-125px h-125px btn-active-color-primary 
+                                    w-25px h-25px bg-body shadow" src={{base64textString_temp_logo1}}>
+
+                                </div> -->
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Company ID</label>
+
+                                <input type="text" class="
+                                form-control form-control-lg form-control-solid
+                                mb-3 mb-lg-0
+                              " placeholder="Enter company ID" name="companyID" formControlName="companyID" required 
+                              (keyup)="checkUniqueIdentifier($event)">
+
+                              <span style="color: #fc1900;">{{errorForUniqueID}}</span>
+                                <div *ngIf="
+                                createCompanyField.get('companyID')?.hasError('required') &&
+                                createCompanyField.get('companyID')?.touched
+                              " class="fv-plugins-message-container invalid-feedback">
+                                    Company ID is required
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="container">
+                        <div class="row">
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Client ID
+                                </label>
+                                <select
+                                class="form-select form-select-solid form-select-lg fw-bold"
+                                placeholder="select client ID" name="clientID" formControlName="clientID" required >
+
+                                <option *ngFor="let item of listofClientIDs" [value]="item">
+                                    {{ item }}
+                                </option>
+                            </select>
+
+                                <div *ngIf="
+                                createCompanyField.get('clientID')?.hasError('required') &&
+                                createCompanyField.get('clientID')?.touched
+                              " class="fv-plugins-message-container invalid-feedback">
+                                    clientID is required
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Company Name</label>
+
+                                <input type="text" class="
+                                form-control form-control-lg form-control-solid
+                                mb-3 mb-lg-0
+                              " placeholder="Enter company name" name="companyName" formControlName="companyName"
+                                    required>
+
+                                <div *ngIf="
+                             createCompanyField.get('companyName')?.hasError('required') &&
+                             createCompanyField.get('companyName')?.touched
+                          " class="fv-plugins-message-container invalid-feedback">
+                                    Company Name is required
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 required">Company
+                                    Description</label>
+
+                                <input type="text" class="
+                                  form-control form-control-lg form-control-solid
+                                  mb-3 mb-lg-0
+                                " placeholder="Enter company Description" name="companydesc"
+                                    formControlName="companydesc" required>
+                                <div *ngIf="
+                                     createCompanyField.get('companydesc')?.hasError('required') &&
+                                     createCompanyField.get('companydesc')?.touched
+                                " class="fv-plugins-message-container invalid-feedback">
+                                    Company Desc is required
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <div class="container">
+                        <div class="row">
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Mobile</label>
+
+                                <input type="text" class="
+                                    form-control form-control-lg form-control-solid
+                                    mb-3 mb-lg-0
+                                  " placeholder="Enter mobile number" name="mobile" formControlName="mobile"
+                                  minlength=10 maxlength=10 (keyup)="keyPress($event)" required>
+
+                                  <span style="color: #fc1900;">{{errorForMobile}}</span>
+                                <div *ngIf="
+                                       createCompanyField.get('mobile')?.hasError('required') &&
+                                       createCompanyField.get('mobile')?.touched
+                                  " class="fv-plugins-message-container invalid-feedback">
+                                    Mobile number is required
+                                </div> 
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Email
+                                </label>
+
+                                <input type="email" class="
+                              form-control form-control-lg form-control-solid
+                              mb-3 mb-lg-0
+                            " placeholder="Enter email" name="email" formControlName="email"
+                                   required  (keyup)="checkMail($event)">
+
+                                   <span style="color: #fc1900;">{{errorForInvalidEmail}}</span>
+                                <div *ngIf="
+                              createCompanyField.get('email')?.hasError('required') &&
+                              createCompanyField.get('email')?.touched
+                            " class="fv-plugins-message-container invalid-feedback">
+                                    Email is required
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 "> Telegram Channel ID
+                                </label>
+
+                                <input type="number" class="
+                                  form-control form-control-lg form-control-solid
+                                  mb-3 mb-lg-0
+                                " placeholder="Enter Telegram ID" name="telegramID" formControlName="telegramID">
+
+                                <!-- <div *ngIf="
+                                    createCompanyField.get('telegramID')?.hasError('required') &&
+                                    createCompanyField.get('telegramID')?.touched
+                                  " class="fv-plugins-message-container invalid-feedback">
+                                    Telegram ID is required
+                                </div> -->
+
+                            </div>                
+
+                        </div>
+                    </div>
+
+                    <div class="container">
+                        <div class="row">
+                          
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 ">Company Permission</label>
+                                <label class="form-check form-check-inline form-check-solid me-5"><input
+                                        class="form-check-input" name="email_permi" type="checkbox"
+                                        formControlName="email_permission" /><span class="fw-bold ps-2 fs-6">Email
+                                    </span></label>
+
+                                <label class="form-check form-check-inline form-check-solid me-5"><input
+                                        class="form-check-input" name="sms" type="checkbox"
+                                        formControlName="sms_permission" /><span class="fw-bold ps-2 fs-6">SMS
+                                    </span></label>
+
+                                <label class="form-check form-check-inline form-check-solid me-5"><input
+                                        class="form-check-input" name="telegram_permission" type="checkbox"
+                                        formControlName="telegram_permission" /><span class="fw-bold ps-2 fs-6">Telegram
+                                    </span></label>
+
+                            </div>
+
+                          
+
+                            <div class="col-md-4 form-check form-switch">
+                                <div class="col-lg-12" style="padding-top: 45px;">
+                                    <input class="col-lg-6 form-check-input" formControlName="enableCompany"
+                                        type="checkbox">
+                                    <label class="col-lg-6 col-form-label fw-bold fs-6" style="padding-top: 0px;">
+                                        <b>Enable Company</b>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- <div class="container">
+                        <label class="col-lg-12 col-form-label fw-bold fs-6">Metadata</label>
+                        <ng-container formArrayName="metadata">
+                            <ng-container *ngFor="let getvalue of metadata().controls; let metaIndex = index">
+                                <div [formGroupName]="metaIndex">
+                                    &nbsp;
+                                    <input style="margin: 2px;" type="text" formControlName="key" placeholder="key" />
+                                    &nbsp;
+
+                                    <input type="text" formControlName="value" placeholder="value" />
+                                    &nbsp;
+                                    
+                                    <button type="button" class="btn btn-sm btn-icon btn-danger " style="font-size: 5px;"
+                                        (click)="remove(metaIndex)" ngbTooltip="Delete Carefully!!!">
+                                        <span [inlineSVG]="'./assets/media/icons/duotune/arrows/arr061.svg'"
+                                            class="svg-icon svg-icon-1"></span>
+                                    </button>
+                                    &nbsp;
+                                </div>
+                            </ng-container>
+                        </ng-container>
+                        <button type="button" class="btn btn-sm btn-icon btn-primary " style="font-size: 5px;" (click)="add()"
+                            ngbTooltip="Add Carefully!!!">
+                            <span [inlineSVG]="'./assets/media/icons/duotune/arrows/arr075.svg'"
+                                class="svg-icon svg-icon-3"></span>
+                        </button>
+
+                    </div> -->
+
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal"
+                            #closeCompany>Cancel</button>
+                       
+                            <button [hidden]= "hideUpdateButton"  type="submit" class="btn btn-sm btn-primary"
+                                (click)="updateCompany(createCompanyField.value,'editCompany')" *ngIf="showModal"
+                                [disabled]="createCompanyField.invalid
+                        || errorForUniqueID =='Company ID already exists' ||
+                        errorForInvalidEmail == 'Invalid Email Address'"
+                        [disabled]="!(createCompanyField.dirty) || createCompanyField.invalid">
+                                Update
+                            </button>
+                        <button type="button" class="btn btn-sm btn-primary not-allowed" *ngIf="!showModal" 
+                        [disabled]="createCompanyField.invalid || errorForUniqueID =='Company ID already exists' ||
+                        errorForInvalidEmail == 'Invalid Email Address'" (click)="createNewCompany('')">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+</div>
+
+
+<!-- (click)="openModal('')" -->
