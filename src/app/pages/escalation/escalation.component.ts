@@ -8,8 +8,15 @@ import Swal from 'sweetalert2';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { ApiSearch, Config } from 'datatables.net';
 import { APIService } from 'src/app/API.service';
+import { SharedService } from '../shared.service';
 
-
+interface ListItem {
+  [key: string]: {
+    P1: any;
+    P2: any;
+    P3: any;
+  };
+}
 
 //Pushing to Github
 
@@ -86,11 +93,15 @@ export class EscalationComponent implements OnInit {
     ["User3",'label3',1726640928]
   ]
   deviceDateTable: any;
+  lookup_data_user: any [] = [];
+  lookup_data_notification: any = [];
+  seletedPK: any;
+  lookup_users: any = [];
 
 
   constructor(private fb: FormBuilder,
     public router: Router,private toast: MatSnackBar,
-    private cd: ChangeDetectorRef,private api:APIService) { 
+    private cd: ChangeDetectorRef,private api:APIService,private notifyConfig:SharedService) { 
       this.initializeDeviceFields()
     }
 
@@ -101,16 +112,18 @@ export class EscalationComponent implements OnInit {
 
   async ngOnInit() {
     //this.initializeDeviceFields();
+
+    this.getLoggedUser = this.notifyConfig.getLoggedUserDetails()
+
+    this.SK_clientID = this.getLoggedUser.clientID;
+
     this.Lookupdata=[]
-
-
-    this.api.GetMaster('Asad#user#main',1).then((result)=>{
-      console.log(result);
-    })
     
     this.addFromService()
 
-    this.showDatatable(this.tableData)
+    this.showTable()
+
+    
    
   }
 
@@ -118,7 +131,7 @@ export class EscalationComponent implements OnInit {
 
   delete(id: number) {
     console.log("Deleted username will be", id);
-    // this.deleteUser(id, 'delete');
+    this.deleteNM(id);
   }
 
   create() {
@@ -128,15 +141,19 @@ export class EscalationComponent implements OnInit {
 
   edit(P1: any) {
     console.log("Edited username is here ", P1);
-    // $('#openModal1').modal('show');
-    // this.openModalHelpher(P1)
+    $('#exampleModal').modal('show');
+    this.openModal(P1)
   }
 
 
 
-  addFromService() {
+  async addFromService() {
 
- 
+    await this.fetchAllUsers(1,this.SK_clientID+"#user"+"#lookup")
+
+    this.clientNames = this.lookup_users.map((item:any)=>{
+      return {PK:item.P1}
+    })
    
   }
 
@@ -277,14 +294,174 @@ console.log("PARRAY3:",permissionsArray)
 }  
 
   createNewNM(getValue: any) {
-    
+    var l=this.notificationForm.controls.levels
+    var escalationTime=[]
+    var comments=[]
+    var final_levels=[]
+    for(let i=0;i<l.controls.length;i++){
+      var level=l.controls[i]
+      console.log(level)
+      escalationTime.push(level.value['escalationTime'])
+      comments.push(level.value['comments'])
+      var users=level.value['userIDs']
+      var permisions=level.controls['permissions']
+      console.log(permisions)
+      console.log(escalationTime)
+      console.log(comments)
+      var fin_perms=[]
+      for(let j=0;j<permisions.controls.length;j++){
+        var perm=permisions.controls[j]
+        fin_perms.push(perm.value)
+      }
+      final_levels.push({
+        'users': users,
+        'permissions': fin_perms,
+        'escalationTime': level.value['escalationTime'],
+        'comments': level.value['comments']
+      })
+    }
+    this.allDatas = {
+      label: this.notificationForm.value.label,
+      createdTime: `${Math.ceil(((new Date()).getTime())/1000)}`,
+      updatedTime: `${Math.ceil(((new Date()).getTime())/1000)}`,
+      totalEscalationLevels: this.notificationForm.value.totalEscalationLevels,
+      levels: JSON.stringify(final_levels),
+      escalationTime: escalationTime,
+      comments: JSON.stringify(comments),
+      others: null,
+      target:this.notificationForm.value.target
+    };
+
+    const tempObj = {
+      PK: this.SK_clientID+"#notification#"+this.notificationForm.value.PK+"#main",
+      SK: 1,
+      metadata:JSON.stringify(this.allDatas)
+    }
+
+    console.log("Notification matrix data is here ",this.notificationForm.value);
+
+    console.log('alldata',this.allDatas)
+    this.submitted = true;
+    console.log('config creation',this.allDatas);
+    this.closeModal.nativeElement.click();
+    this.api.CreateMaster(tempObj).then(async (value: any)=>{
+      console.log("Sending Data")
+      // this.auditTrialServices.audit_trail('2.1', "Notification Matrix", "Add", "Creating new Notification Matrix Config in the Main Table", "1")
+
+      if (value) {
+
+        // this.addFromService();
+
+        //Addition to Lookup Table Dream Board
+        var item={
+          P1:this.notificationForm.value.PK,
+          P2:this.allDatas.label,
+          P3:Math.ceil(((new Date()).getTime())/1000)
+      }
+
+        // var element={
+        //   PK:this.allDatas.PK,
+        //   label:this.allDatas.label,
+        //   createdTime: Math.ceil(((new Date()).getTime())/1000)
+        // }
+
+        await this.createLookUpRdt(item,1,this.SK_clientID+"#notification"+"#lookup")
+        // this.auditTrialServices.audit_trail('2.1', "Notification Matrix", "Add", "Creating new Notification Matrix Config in the Lookup Table", "1")
+
+        this.reloadEvent.next(true)
+        
+        this.toast.open("New Notification Matrix Configuration created successfully", " ", {
+
+          duration: 2000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top',
+        })
+
+      }
+      else {
+        alert('Error in Creating Dashboard Configuration');
+      }
+    }).catch((err: any) => {
+      console.log('err for creation', err);
+      this.toast.open("Error in Creating New Notification Matrix Configuration ", "Check again", {
+        duration: 5000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+      })
+    })
+  }
+
+
+  async createLookUpRdt(item: any, pageNumber: number,tempclient:any){
+    try {
+      console.log("iam a calleddd dude", item, pageNumber);
+      const response = await this.api.GetMaster(tempclient, pageNumber);
+  
+      let checklength: any[] = [];
+      if (response != null && response.options && typeof response.options === 'string') {
+        checklength = JSON.parse(response.options);
+      }
+  
+      if (response != null && checklength.length < this.maxlength) {
+        let newdata: any[] = [];
+        if (response.options && typeof response.options === 'string') {
+          const parsedData = JSON.parse(response.options);
+  
+          parsedData.forEach((item: any) => {
+            for (const key in item) {
+              if (Object.prototype.hasOwnProperty.call(item, key)) {
+                newdata.push(item[key]);
+              }
+            }
+          });
+        }
+  
+        newdata.unshift(item);
+        newdata = newdata.map((data, index) => {
+          return { [`L${index + 1}`]: data };
+        });
+  
+        console.log('newdata 11111111 :>> ', newdata);
+  
+        let Look_data: any = {
+          PK: tempclient,
+          SK: response.SK,
+          options: JSON.stringify(newdata),
+        };
+  
+        const createResponse = await this.api.UpdateMaster(Look_data);
+        console.log('createResponse :>> ', createResponse);
+      } else if (response == null) {
+        let newdata: any[] = [];
+        newdata.push(item);
+        newdata = newdata.map((data, index) => {
+          return { [`L${index + 1}`]: data };
+        });
+  
+        let Look_data = {
+          SK: pageNumber,
+          PK: tempclient,
+          options: JSON.stringify(newdata),
+        };
+  
+        console.log(Look_data);
+  
+        const createResponse = await this.api.CreateMaster(Look_data);
+        console.log(createResponse);
+      } else {
+        await this.createLookUpRdt(item, pageNumber + 1,tempclient);
+      }
+    } catch (err) {
+      console.log('err :>> ', err);
+      // Handle errors appropriately, e.g., show an error message to the user
+    }
   }
 
   async openModal(getValues: any) {
     this.totEscLvl=0
     this.multiselectModule = [];
     this.notificationForm.reset()
-    console.log("notificationForm:",this.notificationForm)
+    console.log("CreateNewField:",this.notificationForm)
     //new device configuration (changing of buttons(submit))
     if (getValues == "") {
       console.log("GET VALUES:",getValues)
@@ -302,13 +479,40 @@ console.log("PARRAY3:",permissionsArray)
       this.showModal = true;
       this.showHeading = false;
       console.log('values',getValues)
-      var pk=getValues.PK
+      var pk=getValues
       console.log("PK:",pk)
-      //this.notificationForm.reset()
+      //this.createNewField.reset()
       this.initializeDeviceFields()
       console.log("CLEARED:", this.notificationForm)
       
+
+      await this.api.GetMaster(this.SK_clientID+"#notification#"+pk+"#main",1).then(result=>{
+        // this.auditTrialServices.audit_trail('2.1', "Notification Matrix", "View", "Get Specifc NM Info from Main Table (From UI Table)", "1")
+        if (result && result !== undefined) {
+          this.data_temp = result;
+          console.log('after sending request,fetched from dynamoDB', this.data_temp);
+          console.log("RIGHT BEFORE ONCLICK")
+          const metaData = JSON.parse(this.data_temp.metadata);
+          const levelsData = JSON.parse(metaData.levels);
+          this.seletedPK = pk
+          this.initializeForm(levelsData, metaData)
+          this.duplicate = JSON.parse(JSON.stringify(this.notificationForm.value));
+          delete this.duplicate['PK']
+          console.log("edit field:",this.notificationForm)
+          this.notificationForm.get('PK')?.disable();
+          this.changeDetection();
+        }
+      }).catch((err) => {
+        console.log('cant fetch', err);
+      })
     }
+  }
+
+
+  changeDetection() {
+    setTimeout(() => {
+      this.cd.detectChanges()
+    }, 500);
   }
 
   checkUniqueID(getLabel: any) {
@@ -333,8 +537,186 @@ console.log("PARRAY3:",permissionsArray)
     check= check || this.notificationForm.invalid
     return check
   }
+
+
+
   updateConfiguration(value: any, getKey: any) {
+     var l=this.notificationForm.controls.levels
+    var escalationTime=[]
+    var comments=[]
+    var final_levels=[]
+    for(let i=0;i<l.controls.length;i++){
+      var level=l.controls[i]
+      console.log(level)
+      escalationTime.push(level.value['escalationTime'])
+      comments.push(level.value['comments'])
+      var users=level.value['userIDs']
+      var permisions=level.controls['permissions']
+      console.log(permisions)
+      console.log(escalationTime)
+      console.log(comments)
+      var fin_perms=[]
+      for(let j=0;j<permisions.controls.length;j++){
+        var perm=permisions.controls[j]
+        fin_perms.push(perm.value)
+      }
+      final_levels.push({
+        'users': users,
+        'permissions': fin_perms,
+        'escalationTime': level.value['escalationTime'],
+        'comments': level.value['comments']
+      })
+    }
+    console.log(this.notificationForm)
+    this.allDatas = {
+      label: this.notificationForm.value.label,
+      updatedTime: `${Math.ceil(((new Date()).getTime())/1000)}`,
+      totalEscalationLevels: this.notificationForm.value.totalEscalationLevels,
+      levels: JSON.stringify(final_levels),
+      escalationTime: escalationTime,
+      comments: JSON.stringify(comments),
+      others: null,
+    };
+
+    const tempObj = {
+      PK:this.SK_clientID+"#notification#"+this.notificationForm.controls.PK.value+"#main",
+      SK:1,
+      metadata:JSON.stringify(this.allDatas)
+    }
+
+    console.log("Update tempObj ",tempObj);
+
+  
+
+    this.closeModal.nativeElement.click();
     
+    this.api.UpdateMaster(tempObj).then(async (value: any) => {
+      if (value) {
+        
+        console.log("VALUE:",value)
+        this.cd.detectChanges()
+        this.toast.open("Notification Matrix configuration updated successfully", " ", {
+
+          duration: 2000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top',
+
+        })
+        // this.addFromService();
+
+        var item={
+          P1:this.notificationForm.controls.PK.value,
+          P2:this.allDatas.label,
+          P3:Math.ceil(((new Date()).getTime())/1000)
+        }
+
+        console.log("lookup data ",item);
+    
+        await this.fetchTimeMachineById(1,this.notificationForm.controls.PK.value, 'update', item);
+        // this.auditTrialServices.audit_trail('2.1', "Notification Matrix", "Update", "Updating the Lookup Table", "1")
+        this.cd.detectChanges()
+        this.reloadEvent.next(true)
+
+      }
+      else {
+        alert('Error in Updating Configuration');
+      }
+
+    }).catch(err=>{
+      console.log(err)
+      this.toast.open("Error in Updating Configuration ", "Check again", {
+  
+        duration: 5000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+
+      })
+    })
+  }
+
+
+
+  async   fetchTimeMachineById(sk: any, id: any, type: any, item: any) {
+    const tempClient = this.SK_clientID+'#notification'+"#lookup";
+    console.log("Temp client is ",tempClient);
+    console.log("Type of client",typeof tempClient);
+    try {
+      const response = await this.api.GetMaster(tempClient, sk);
+      
+      if (response && response.options) {
+        let data: ListItem[] = await JSON.parse(response.options);
+  
+        // Find the index of the item with the matching id
+        let findIndex = data.findIndex((obj) => obj[Object.keys(obj)[0]].P1 === id);
+  
+        if (findIndex !== -1) { // If item found
+          if (type === 'update') {
+            data[findIndex][`L${findIndex + 1}`] = item;
+  
+            // Create a new array to store the re-arranged data without duplicates
+            const newData = [];
+          
+            // Loop through each object in the data array
+            for (let i = 0; i < data.length; i++) {
+              const originalKey = Object.keys(data[i])[0]; // Get the original key (e.g., L1, L2, ...)
+              const newKey = `L${i + 1}`; // Generate the new key based on the current index
+          
+              // Check if the original key exists before renaming
+              if (originalKey) {
+                // Create a new object with the new key and the data from the original object
+                const newObj = { [newKey]: data[i][originalKey] };
+          
+                // Check if the new key already exists in the newData array
+                const existingIndex = newData.findIndex(obj => Object.keys(obj)[0] === newKey);
+          
+                if (existingIndex !== -1) {
+                  // Merge the properties of the existing object with the new object
+                  Object.assign(newData[existingIndex][newKey], data[i][originalKey]);
+                } else {
+                  // Add the new object to the newData array
+                  newData.push(newObj);
+                }
+              } else {
+                console.error(`Original key not found for renaming in data[${i}].`);
+                // Handle the error or log a message accordingly
+              }
+            }
+          
+            // Replace the original data array with the newData array
+            data = newData;
+                  
+          } else if (type === 'delete') {
+            // Remove the item at the found index
+            data.splice(findIndex, 1);
+          }
+  
+          // Prepare the updated data for API update
+          let updateData = {
+            PK: tempClient,
+            SK: response.SK,
+            options: JSON.stringify(data)
+          };
+  
+          // Update the data in the API
+          await this.api.UpdateMaster(updateData);
+  
+        } else { // If item not found
+          await new Promise(resolve => setTimeout(resolve, 500)); // Wait before retrying
+          await this.fetchTimeMachineById(sk + 1, id, type, item); // Retry with next SK
+  
+        }
+      } else { // If response or listOfItems is null
+        Swal.fire({
+          position: "top-right",
+          icon: "error",
+          title: `ID ${id} not found`,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   }
  
 
@@ -378,107 +760,169 @@ console.log("PARRAY3:",permissionsArray)
   
   onSelectAll(levelIndex: number, modules: any) {
     // Map the modules to their IDs and set it to the userIDs control
-
-    console.log("modules ",modules);
-    const userIDs = this.clientNames.map((module: { PK: any; }) => module.PK);
-    console.log("userIDs", userIDs)
-    this.updateUserPermissions(levelIndex, userIDs);
+    if(modules.checked == false){
+      this.updateUserPermissions(levelIndex, []);
+    }
+    else{
+      console.log("modules ",modules);
+      const userIDs = this.clientNames.map((module: { PK: any; }) => module.PK);
+      console.log("userIDs", userIDs)
+      this.updateUserPermissions(levelIndex, userIDs);
+    }
   }
   
   onDeSelectAll(levelIndex: number) {
+
+    console.log("On deselection is here ");
     // Clear the userIDs control at this level
     this.levels.at(levelIndex).get('userIDs')?.setValue([]);
     this.updateUserPermissions(levelIndex, []);
   }
 
-  showDatatable(getVaues: any) {
+  async showTable() {
 
+    console.log("Show DataTable is called BTW");
+
+    this.datatableConfig = {}
+    this.lookup_data_notification = []
+    this.datatableConfig = {
+      serverSide: true,
+      ajax: (dataTablesParameters:any, callback) => {
+        this.datatableConfig = {}
+        this.lookup_data_notification = []
+        this.fetchUserLookupdata(1,this.SK_clientID + "#notification" + "#lookup")
+          .then((resp:any) => {
+            const responseData = resp || []; // Default to an empty array if resp is null
+  
+            // Prepare the response structure expected by DataTables
+            callback({
+              draw: dataTablesParameters.draw, // Echo the draw parameter
+              recordsTotal: responseData.length, // Total number of records
+              recordsFiltered: responseData.length, // Filtered records (you may want to adjust this)
+              data: responseData // The actual data array
+            });
+  
+            console.log("Response is in this form ", responseData);
+          })
+          .catch((error: any) => {
+            console.error('Error fetching user lookup data:', error);
+            // Provide an empty dataset in case of an error
+            callback({
+              draw: dataTablesParameters.draw,
+              recordsTotal: 0,
+              recordsFiltered: 0,
+              data: []
+            });
+          });
+      },
+      columns: [
+        {
+          title: 'Notification Matrix ID', 
+          data: 'P1', 
+          render: function (data, type, full) {
+            const colorClasses = ['success', 'info', 'warning', 'danger'];
+            const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
+            
+            const initials = data[0].toUpperCase();
+            const symbolLabel = `
+              <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
+                ${initials}
+              </div>
+            `;
+  
+            const nameAndEmail = `
+              <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
+                <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
+                <span>${full.P2}</span> <!-- Assuming P3 is the email -->
+              </div>
+            `;
+  
+            return `
+              <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
+                <a href="javascript:;">
+                  ${symbolLabel}
+                </a>
+              </div>
+              ${nameAndEmail}
+            `;
+          }
+        },
+        {
+          title: 'Label', data: 'P2' // Added a new column for phone numbers
+        },
+        {
+          title: 'Updated', data: 'P3', render: function (data) {
+            const date = new Date(data * 1000);
+            return `${date.toDateString()} ${date.toLocaleTimeString()}`; // Format the date and time
+          }
+        }
+      ],
+      createdRow: (row, data, dataIndex) => {
+        $('td:eq(0)', row).addClass('d-flex align-items-center');
+      },
+    };
+  
   }
 
-  // deleteNM(value: any) {
-  //   console.log('inside delete',value);
-  //   this.allPB_details = value;
+  deleteNM(value: any) {
+    console.log('inside delete',value);
+    this.allPB_details = value;
     
 
-  //   if (this.allPB_details && this.allPB_details.PK) {
+    if (this.allPB_details) {
 
-  //     let temp = {
-  //       PK: this.allPB_details.PK,
-  //       SK: this.SK_clientID
-  //     }
+      let temp = {
+        PK: this.SK_clientID+"#notification#"+this.allPB_details+"#main",
+        SK: 1
+      }
 
-  //     var item=[
-  //       this.allPB_details.PK,
-  //       this.allPB_details.label,
-  //       Math.ceil(((new Date()).getTime())/1000)
-  //     ]
-
-  //     Swal.fire({
-  //       position: 'center',
-  //       title: 'Are you sure?',
-  //       text: 'You wont get these details back again',
-  //       icon: 'warning',
-  //       showCancelButton: true,
-  //       allowOutsideClick: false,////prevents outside click
-  //       confirmButtonText: 'Yes, go ahead.',
-  //       cancelButtonText: 'No, let me think'
-  //     }).then(async (result) => {
+      var item={
+        P1:this.allPB_details,
+        P2:this.allPB_details.label,
+        P3:Math.ceil(((new Date()).getTime())/1000)
+      }
 
 
-  //       if (result.dismiss !== Swal.DismissReason.cancel) {
-
-  //         console.log("Inside the deletion:")
-  //         await this.fetchNMById(1, this.allPB_details.PK, 'delete', item)
-  //         this.auditTrialServices.audit_trail('2.1', "Notification Matrix", "Delete", "Deleting the NM in the Lookup Table", "1")
-  //         console.log("DELETING FROM LOOKUP TABLE DONE")
-  //         console.log('NM id', temp);
+          console.log("Inside the deletion:")
           
-  //         this.api.DeleteNotificationMatrix(temp).then(value => {
-  //           this.auditTrialServices.audit_trail('2.1', "Notification Matrix", "Delete", "Deleting the NM in the Main Table", "1")
-  //           this.addFromService();
-  //           this.loading()
-  //           console.log(value," REMOVED FROM MAIN TABLE")
-  //           if (value) {
-  //             console.log('confirmButtonText', value);
-  //             Swal.fire(
-  //               'Removed!',
-  //               'Notification Matrix Entry Removed Successfully.',
-  //               'success'
-  //             )
-  //           }
+          try{
+             // this.auditTrialServices.audit_trail('2.1', "Notification Matrix", "Delete", "Deleting the NM in the Lookup Table", "1")
+          console.log("DELETING FROM LOOKUP TABLE DONE")
+          console.log('NM id', temp);
+          
+          this.api.DeleteMaster(temp).then(async value => {
+            // this.auditTrialServices.audit_trail('2.1', "Notification Matrix", "Delete", "Deleting the NM in the Main Table", "1")
 
-  //         }).catch(err => {
-  //           //console.log('error for deleting', err);
-  //         })
-  //       }
-  //       else if (result.dismiss === Swal.DismissReason.cancel) {
-  //         //console.log('confirmButtonText ');
-  //         Swal.fire(
-  //           'Cancelled',
-  //           'Notification Matrix Entry Not Removed',
-  //           'error'
-  //         )
-  //       }
-  //     })
-  //   }
+            await this.fetchTimeMachineById(1, this.allPB_details, 'delete', item)
 
-  // }
-  // hide_edit_delete(key: any) {
-  //   if (key === 'from_html') {
-  //     this.edit_delete = !this.edit_delete;
-  //   }
-  //   else if (key === 'from_TS') {
-  //     //view
-  //     if (this.hideDeleteButton === false) {
-  //       this.edit_delete = false;
-  //     }
-  //     //update
-  //     else if (this.hideDeleteButton === true) {
-  //       this.edit_delete = true;
 
-  //     }
-  //   }
-  // }
+            this.reloadEvent.next(true)
+          })
+        
+        
+      
+    }
+    catch(err){
+      console.log("Error Deleting",err);
+    }
+    }
+  }
+  hide_edit_delete(key: any) {
+    if (key === 'from_html') {
+      this.edit_delete = !this.edit_delete;
+    }
+    else if (key === 'from_TS') {
+      //view
+      if (this.hideDeleteButton === false) {
+        this.edit_delete = false;
+      }
+      //update
+      else if (this.hideDeleteButton === true) {
+        this.edit_delete = true;
+
+      }
+    }
+  }
   // showSpinner() {
   //   this.spinner.show();
   //   if (this.stopTimer) {
@@ -599,7 +1043,7 @@ console.log("PARRAY3:",permissionsArray)
       this.cd.detectChanges()
       // Set or patch other values as necessary
       this.notificationForm.patchValue({
-          PK: dataFromDb.PK,
+          PK: this.seletedPK,
           SK: dataFromDb.SK,
           label: dataFromDb.label,
           target: dataFromDb.target,
@@ -611,4 +1055,137 @@ console.log("PARRAY3:",permissionsArray)
       });
       this.cd.detectChanges()
   }
+
+
+
+  fetchUserLookupdata(sk:any,pkValue:any):any {
+    console.log("I am called Bro");
+    
+    return new Promise((resolve, reject) => {
+      this.api.GetMaster(pkValue, sk)
+        .then(response => {
+          if (response && response.options) {
+            // Check if response.options is a string
+            if (typeof response.options === 'string') {
+              let data = JSON.parse(response.options);
+              console.log("d1 =", data);
+              
+              if (Array.isArray(data)) {
+                const promises = []; // Array to hold promises for recursive calls
+  
+                for (let index = 0; index < data.length; index++) {
+                  const element = data[index];
+  
+                  if (element !== null && element !== undefined) {
+                    // Extract values from each element and push them to lookup_data_user
+                    const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
+                    const { P1, P2, P3 } = element[key]; // Extract values from the nested object
+                    this.lookup_data_notification.push({ P1, P2, P3 }); // Push an array containing P1, P2, P3, P4, P5, P6
+                    console.log("d2 =", this.lookup_data_notification);
+                  } else {
+                    break;
+                  }
+                }
+  
+                // Sort the lookup_data_user array based on P5 values in descending order
+                this.lookup_data_notification.sort((a: { P5: number; }, b: { P5: number; }) => b.P5 - a.P5);
+                console.log("Lookup sorting", this.lookup_data_notification);
+  
+                // Continue fetching recursively
+                promises.push(this.fetchUserLookupdata(sk + 1,pkValue)); // Store the promise for the recursive call
+                
+                // Wait for all promises to resolve
+                Promise.all(promises)
+                  .then(() => resolve(this.lookup_data_notification)) // Resolve with the final lookup data
+                  .catch(reject); // Handle any errors from the recursive calls
+              } else {
+                console.error('Invalid data format - not an array.');
+                reject(new Error('Invalid data format - not an array.'));
+              }
+            } else {
+              console.error('response.options is not a string.');
+              reject(new Error('response.options is not a string.'));
+            }
+          } else {
+            console.log("All the users are here", this.lookup_data_notification);
+
+            this.listofNMIds = this.lookup_data_notification.map((item:any)=>item.P1)
+
+           console.log("All the unique id are here ",this.listofNMIds);
+
+            resolve(this.lookup_data_notification); // Resolve with the current lookup data
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          reject(error); // Reject the promise on error
+        });
+    });
+  }
+
+
+
+  fetchAllUsers(sk:any,pkValue:any):any {
+    console.log("I am called Bro");
+    
+    return new Promise((resolve, reject) => {
+      this.api.GetMaster(pkValue, sk)
+        .then(response => {
+          if (response && response.options) {
+            // Check if response.options is a string
+            if (typeof response.options === 'string') {
+              let data = JSON.parse(response.options);
+              console.log("d1 =", data);
+              
+              if (Array.isArray(data)) {
+                const promises = []; // Array to hold promises for recursive calls
+  
+                for (let index = 0; index < data.length; index++) {
+                  const element = data[index];
+  
+                  if (element !== null && element !== undefined) {
+                    // Extract values from each element and push them to lookup_data_user
+                    const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
+                    const { P1, P2, P3 } = element[key]; // Extract values from the nested object
+                    this.lookup_users.push({ P1, P2, P3 }); // Push an array containing P1, P2, P3, P4, P5, P6
+                    console.log("d2 =", this.lookup_users);
+                  } else {
+                    break;
+                  }
+                }
+  
+                // Sort the lookup_data_user array based on P5 values in descending order
+                this.lookup_users.sort((a: { P5: number; }, b: { P5: number; }) => b.P5 - a.P5);
+                console.log("Lookup sorting", this.lookup_users);
+  
+                // Continue fetching recursively
+                promises.push(this.fetchUserLookupdata(sk + 1,pkValue)); // Store the promise for the recursive call
+                
+                // Wait for all promises to resolve
+                Promise.all(promises)
+                  .then(() => resolve(this.lookup_users)) // Resolve with the final lookup data
+                  .catch(reject); // Handle any errors from the recursive calls
+              } else {
+                console.error('Invalid data format - not an array.');
+                reject(new Error('Invalid data format - not an array.'));
+              }
+            } else {
+              console.error('response.options is not a string.');
+              reject(new Error('response.options is not a string.'));
+            }
+          } else {
+            console.log("All the users are here", this.lookup_users);
+            
+
+            resolve(this.lookup_users); // Resolve with the current lookup data
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          reject(error); // Reject the promise on error
+        });
+    });
+  }
+
+
 }
