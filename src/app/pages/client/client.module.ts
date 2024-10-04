@@ -6,6 +6,7 @@ import { CommonModule } from "@angular/common";
 import { NgMultiSelectDropDownModule } from "ng-multiselect-dropdown";
 import { ClientComponent } from "./client.component";
 import { InlineSVGModule } from "ng-inline-svg-2";
+import { Crud2Module } from "src/app/modules/crud2/crud.module";
 
 
 
@@ -23,6 +24,7 @@ import { InlineSVGModule } from "ng-inline-svg-2";
     SharedModule,
     ReactiveFormsModule,
     CommonModule,
+    Crud2Module,
     FormsModule,
     NgMultiSelectDropDownModule,
     InlineSVGModule.forRoot(),

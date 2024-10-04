@@ -15,7 +15,7 @@
     </div>
 
 
-    <div>
+    <!-- <div>
         <div class="card-body py-3">
             <div class="table-responsive">
                 <table id="client_lookup_table" class="table table-bordered table-responsive-sm">
@@ -35,8 +35,11 @@
                 </table>
             </div>
         </div>
-    </div>
+    </div> -->
 
+    <div class="card-body pt-0">
+        <app-crud-user [datatableConfig]="datatableConfig" route="/manage-user" (deleteEvent)="delete($event)" (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent" ></app-crud-user>
+    </div>
 
 </div>
 

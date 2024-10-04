@@ -11,3 +11,41 @@
     }
   }
 }
+
+
+
+.btn-primary:hover{
+  transform: translateY(-2px);
+  transition: 0.8s;
+}
+
+
+.large-input {
+  width: 100%; /* Adjust the width as needed */
+  height: 45px; /* Adjust the height as needed */
+  padding: 10px; /* Optional: Add some padding */
+}
+
+
+//New code for login Continue is here
+.button {
+  padding: 15px 25px;
+  font-size: 14px;
+  font-weight: bolder;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: #1DA1F2;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;
+}
+
+.button:hover {transform: translateY(-2px);}
+
+.button:active {
+  background-color: #1DA1F2;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}

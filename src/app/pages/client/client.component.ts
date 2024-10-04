@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from "@angular/core";
+import { ChangeDetectorRef, Component, EventEmitter, OnInit, ViewChild } from "@angular/core";
 import { AbstractControl, AsyncValidatorFn, FormArray, FormGroup, UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { SafeResourceUrl } from "@angular/platform-browser";
@@ -7,6 +7,7 @@ import { Observable, catchError, debounceTime, map, of } from "rxjs";
 import { APIService } from "src/app/API.service";
 import Swal from "sweetalert2";
 import { SharedService } from "../shared.service";
+import { Config } from "datatables.net";
 
 
 
@@ -26,6 +27,10 @@ interface ListItem {
   styleUrls: ['./client.component.scss']
 })
 export class ClientComponent implements OnInit {
+
+  datatableConfig: Config = {};
+  // Reload emitter inside datatable
+  reloadEvent: EventEmitter<boolean> = new EventEmitter();
 
   createClientField: UntypedFormGroup;
   showModal: any = false;
@@ -102,7 +107,9 @@ export class ClientComponent implements OnInit {
     
       this.initializeClientFields();
       this.addFromService();
-      this.loading()
+      // this.loading()
+
+      this.showTable()
     }
 
     
@@ -111,35 +118,116 @@ export class ClientComponent implements OnInit {
     }
   
 
-//   constructor(private fb: UntypedFormBuilder, private clientConfiguration: SharedService,
-//     private api: APIService, private toast: MatSnackBar,private sanitizer: DomSanitizer,
-//     private router: Router,private cd:ChangeDetectorRef,private spinner: NgxSpinnerService,private rdtConfig : SharedService) {
+    async showTable() {
+
+      console.log("Show DataTable is called BTW");
+  
+      this.datatableConfig = {}
+      this.lookup_data_user = []
+      this.datatableConfig = {
+        serverSide: true,
+        ajax: (dataTablesParameters:any, callback) => {
+          this.datatableConfig = {}
+          this.lookup_data_user = []
+          this.fetchTMLookupData(1)
+            .then((resp:any) => {
+              const responseData = resp || []; // Default to an empty array if resp is null
+    
+              // Prepare the response structure expected by DataTables
+              callback({
+                draw: dataTablesParameters.draw, // Echo the draw parameter
+                recordsTotal: responseData.length, // Total number of records
+                recordsFiltered: responseData.length, // Filtered records (you may want to adjust this)
+                data: responseData // The actual data array
+              });
+    
+              console.log("Response is in this form ", responseData);
+            })
+            .catch((error: any) => {
+              console.error('Error fetching user lookup data:', error);
+              // Provide an empty dataset in case of an error
+              callback({
+                draw: dataTablesParameters.draw,
+                recordsTotal: 0,
+                recordsFiltered: 0,
+                data: []
+              });
+            });
+        },
+        columns: [
+          {
+            title: 'Client ID', 
+            data: 'P1', 
+            render: function (data, type, full) {
+              const colorClasses = ['success', 'info', 'warning', 'danger'];
+              const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
+              
+              const initials = data[0].toUpperCase();
+              const symbolLabel = `
+                <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
+                  ${initials}
+                </div>
+              `;
+    
+              const nameAndEmail = `
+                <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
+                  <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
+                  <span>${full.P3}</span> <!-- Assuming P3 is the email -->
+                </div>
+              `;
+    
+              return `
+                <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
+                  <a href="javascript:;">
+                    ${symbolLabel}
+                  </a>
+                </div>
+                ${nameAndEmail}
+              `;
+            }
+          },
+          {
+            title: 'Client Name', data: 'P2' // Added a new column for phone numbers
+          },
+          {
+            title: 'Mobile', data: 'P3' // Added a new column for email
+          },
+          {
+            title: 'Email', data: 'P4' // Assuming P4 is the role
+          },
+          {
+            title: 'Updated', data: 'P5', render: function (data) {
+              const date = new Date(data * 1000);
+              return `${date.toDateString()} ${date.toLocaleTimeString()}`; // Format the date and time
+            }
+          }
+        ],
+        createdRow: (row, data, dataIndex) => {
+          $('td:eq(0)', row).addClass('d-flex align-items-center');
+        },
+      };
+    
+    }
 
 
-     
-//      }
 
-  // ngOnInit() {
+  delete(id: number) {
+    console.log("Deleted username will be", id);
+    this.deleteClient(id);
+  }
 
-  //   this.getLoggedUser = this.clientConfiguration.getLoggedUserDetails();
-
-  //   this.SK_clientID = this.getLoggedUser.attributes["custom:clientID"];
-
-  //   this.clientID = this.getLoggedUser.attributes["custom:clientID"]+'#client';
-
-
-  //   this.allPermissions_user = JSON.parse(JSON.parse(JSON.stringify(localStorage.getItem("permissionDetails"))));
-
-  //   console.log("Client ID is ,"+this.clientID);
+  create() {
+    // this.userModel = { P1: '', P2: '', P3: '',P4:0,P5:'' };
+  }
 
 
-  //   // this.addFromService();
+  edit(P1: any) {
+    console.log("Edited username is here ", P1);
+    $('#clientModal').modal('show');
+    // this.openModalHelpher(P1)
+    this.openModalHelpher(P1);
+  }
 
-
-  //   this.initializeClientFields();
-
-  //   // this.loading()
-  // }
 
 
 
@@ -224,63 +312,76 @@ export class ClientComponent implements OnInit {
   }
 
 
-
   async fetchTMLookupData(sk: any) {
-
-    console.log("Iam called Bro");
-    try {
-      const response = await this.api.GetMaster("client"+"#lookup", sk);
    
-      if (response && response.options) {
-        // Check if response.listOfItems is a string
-        if (typeof response.options === 'string') {
-          let data = JSON.parse(response.options);
-          console.log("d1 =",data)
-          if (Array.isArray(data)) {
-            for (let index = 0; index < data.length; index++) {
-              const element = data[index];
-  
-              if (element !== null && element !== undefined) {
-                // Extract values from each element and push them to lookup_data_temp1
-                const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
-                const { P1, P2, P3,P4 ,P5,P6} = element[key]; // Extract values from the nested object
-                this.lookup_data_user.push({P1, P2, P3,P4,P5,P6 }); // Push an array containing P1, P2, and P3 values
-                console.log("d2 =",this.lookup_data_user)
-              } else {
-                break;
-              }
-            }
-            //this.lookup_data_temp1.sort((a, b) => b.P5 - a.P5);
-            this.lookup_data_user.sort((a:any, b:any) => {
-              return b.P5 - a.P5; // Compare P5 values in descending order
-            });
-            console.log("Lookup sorting",this.lookup_data_user);
-            // Continue fetching recursively
-            await this.fetchTMLookupData(sk + 1);
-          } else {
-            console.error('Invalid data format - not an array.');
-          }
-        } else {
-          console.error('response.listOfItems is not a string.');
-        }
-      } else {
-        // Sort the lookup_data_temp1 array based on the third element (P3)
-      console.log()
+    console.log("I am called Bro");
     
-        
-        console.log("Lookup to be displayed",this.lookup_data_user);
+    return new Promise((resolve, reject) => {
+      this.api.GetMaster("client"+"#lookup", sk)
+        .then(response => {
+          if (response && response.options) {
+            // Check if response.options is a string
+            if (typeof response.options === 'string') {
+              let data = JSON.parse(response.options);
+              console.log("d1 =", data);
+              
+              if (Array.isArray(data)) {
+                const promises = []; // Array to hold promises for recursive calls
+  
+                for (let index = 0; index < data.length; index++) {
+                  const element = data[index];
+  
+                  if (element !== null && element !== undefined) {
+                    // Extract values from each element and push them to lookup_data_user
+                    const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
+                    const { P1, P2, P3, P4, P5, P6 } = element[key]; // Extract values from the nested object
+                    this.lookup_data_user.push({ P1, P2, P3, P4, P5, P6 }); // Push an array containing P1, P2, P3, P4, P5, P6
+                    console.log("d2 =", this.lookup_data_user);
+                  } else {
+                    break;
+                  }
+                }
+  
+                // Sort the lookup_data_user array based on P5 values in descending order
+                this.lookup_data_user.sort((a: { P5: number; }, b: { P5: number; }) => b.P5 - a.P5);
+                console.log("Lookup sorting", this.lookup_data_user);
+  
+                // Continue fetching recursively
+                promises.push(this.fetchTMLookupData(sk + 1)); // Store the promise for the recursive call
+                
+                // Wait for all promises to resolve
+                Promise.all(promises)
+                  .then(() => resolve(this.lookup_data_user)) // Resolve with the final lookup data
+                  .catch(reject); // Handle any errors from the recursive calls
+              } else {
+                console.error('Invalid data format - not an array.');
+                reject(new Error('Invalid data format - not an array.'));
+              }
+            } else {
+              console.error('response.options is not a string.');
+              reject(new Error('response.options is not a string.'));
+            }
+          } else {
+            console.log("All the users are here", this.lookup_data_user);
+            console.log("Lookup to be displayed",this.lookup_data_user);
 
-        if(this.SK_clientID != 'WIMATE_ADMIN'){
-          this.lookup_data_user = this.lookup_data_user.filter((item:any)=>item.P1 == this.SK_clientID)
-        }
+            var tempLookup
 
-        this.getTableUser(this.lookup_data_user,'main');
-       
-      }
-    } catch (error) {
-      console.error('Error:', error);
-     
-    }
+            this.uniqueEmail = this.lookup_data_user.map((item:any)=>item.P4)
+            if(this.SK_clientID != 'WIMATE_ADMIN'){
+              this.lookup_data_user = this.lookup_data_user.filter((item:any)=>item.P1 == this.SK_clientID)
+            }   
+
+
+            resolve(this.lookup_data_user); // Resolve with the current lookup data
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          reject(error); // Reject the promise on error
+        });
+    });
+          
   }
 
 
@@ -428,7 +529,7 @@ export class ClientComponent implements OnInit {
 
       
       this.api
-        .GetMaster(getData.clientID+"#client"+"#main",1)
+        .GetMaster(getData+"#client"+"#main",1)
         .then((result :any) => {
           if (result && result !== undefined) {
             
@@ -782,7 +883,7 @@ export class ClientComponent implements OnInit {
 
         await this.createLookUpRdt(items,1,"client"+"#lookup")
 
-        await this.loading()
+        this.reloadEvent.next(true);
 
         this.toast.open("New Client Configuration created successfully", " ", {
           //panelClass: 'error-alert-snackbar',
@@ -949,7 +1050,7 @@ async createLookUpRdt(item: any, pageNumber: number,tempclient:any){
 
         await this.fetchTimeMachineById(1,items.P1, 'update', items);
 
-        await this.loading()
+        this.reloadEvent.next(true)
 
         //alert('Configuration updated successfully');
         this.toast.open("Client Configuration updated successfully", "", {
@@ -1095,34 +1196,21 @@ async createLookUpRdt(item: any, pageNumber: number,tempclient:any){
 
     console.log('deleteuser is called', value);
 
-    if (this.clientSK && this.clientSK.clientID) {
+    if (this.clientSK) {
 
       this.allClientDetails = {
-        PK: value.clientID+"#client#main",
+        PK: value+"#client#main",
         SK: 1
       }
 
-      console.log('before deleting user', this.allClientDetails);
-
-      Swal.fire({
-        position: 'center',
-        title: 'Are you sure?',
-        text: 'You wont get these details back again',
-        icon: 'warning',
-        showCancelButton: true,
-        allowOutsideClick: false,////prevents outside click
-        confirmButtonText: 'Yes, go ahead.',
-        cancelButtonText: 'No, let me think'
-      }).then((result) => {
-
-        console.log('inside sweetalert', result);
 
         const date = Math.ceil(((new Date()).getTime()) / 1000)
         const items ={
-        P1: value.clientID,
+        P1: value,
         }
 
-        if (result.dismiss !== Swal.DismissReason.cancel) {
+        
+        try{
           this.api.DeleteMaster(this.allClientDetails).then(async (value: any) => {
 
             this.addFromService();
@@ -1133,30 +1221,17 @@ async createLookUpRdt(item: any, pageNumber: number,tempclient:any){
 
               await this.fetchTimeMachineById(1, items.P1, 'delete', items);
 
-              await this.loading()
+              this.reloadEvent.next(true)
 
-              //console.log('confirmButtonText', value);
-              Swal.fire(
-                'Removed!',
-                'Client configuration successfully.',
-                'success'
-              );
+            
             }
-
-          }).catch((err: any) => {
-            console.log('error for deleting', err);
-          })
+        })
         }
-        else if (result.dismiss === Swal.DismissReason.cancel) {
-          //console.log('confirmButtonText ');
-          Swal.fire(
-            'Cancelled',
-            'Client configuration not removed',
-            'error'
-          )
+        catch(err){
+          console.log("Deleting client error ",err);
         }
-
-      })
+        
+       
     }
 
   }

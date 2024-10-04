@@ -15,6 +15,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import bootstrap from 'bootstrap';
 import { environment } from 'src/environments/environment';
 import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
+import { DynamicApiService } from '../services/dynamic-api.service';
 
 interface ListItem {
   [key: string]: {
@@ -92,7 +93,7 @@ rdtListWorkAround :any =[{
   value: "None"
   }]
 
-  listofPermissionIDs:any = ["All"]
+  listofPermissionIDs:any = []
   listofReportingUsers:any = []
 
 
@@ -132,10 +133,11 @@ rdtListWorkAround :any =[{
   errorForUniquemobileID: string = '';
   listofMobileID: any = [];
   lookup_All_User: any = [];
+  permission_data: any = [];
 
 
   constructor(private apiService: UserService,private configService:SharedService,private fb:FormBuilder
-    ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal){}
+    ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal,private DynamicApi:DynamicApiService){}
 
 
 
@@ -151,8 +153,36 @@ rdtListWorkAround :any =[{
     this.initializeUserFields()
 
     this.showTable()
+
+
+    // this.testAPI()
   
     // await this.showTable(this.lookup_data_user)
+  }
+
+
+
+  testAPI(){
+    const body = { type: "userVerify", username:"Asad",name:"Asad",email:"asad@gmail.com"};
+
+
+    this.DynamicApi.sendData(body).subscribe(response => {
+      console.log('Response from Lambda:', response);
+
+
+      this.toast.open("Mail Sent Successfully", " ", {
+
+        duration: 2000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+        //   //panelClass: ['blue-snackbar']
+      })
+
+
+    }, error => {
+      console.error('Error calling dynamic lambda:', error);
+    });
+
   }
 
 
@@ -216,7 +246,64 @@ rdtListWorkAround :any =[{
     await this.getClientID()
     await this.fetchAllUsersData(1)
     await this.getAllUsers()
+
+    await this.getPermissionIDs(1)
   }
+
+
+  async getPermissionIDs(sk: any) {
+
+    console.log("Iam called Bro");
+    try {
+      const response = await this.api.GetMaster(this.SK_clientID+"#permission#lookup", sk);
+   
+      if (response && response.options) {
+        // Check if response.listOfItems is a string
+        if (typeof response.options === 'string') {
+          let data = JSON.parse(response.options);
+          console.log("d1 =",data)
+          if (Array.isArray(data)) {
+            for (let index = 0; index < data.length; index++) {
+              const element = data[index];
+  
+              if (element !== null && element !== undefined) {
+                // Extract values from each element and push them to lookup_data_temp1
+                const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
+                const { P1, P2, P3,P4 ,P5,P6} = element[key]; // Extract values from the nested object
+                this.permission_data.push({P1, P2, P3,P4,P5,P6 }); // Push an array containing P1, P2, and P3 values
+                console.log("d2 =",this.permission_data)
+              } else {
+                break;
+              }
+            }
+            //this.lookup_data_temp1.sort((a, b) => b.P5 - a.P5);
+            this.permission_data.sort((a:any, b:any) => {
+              return b.P5 - a.P5; // Compare P5 values in descending order
+            });
+            console.log("Lookup sorting",this.permission_data);
+            // Continue fetching recursively
+            await this.getPermissionIDs(sk + 1);
+          } else {
+            console.error('Invalid data format - not an array.');
+          }
+        } else {
+          console.error('response.listOfItems is not a string.');
+        }
+      } else {
+        // Sort the lookup_data_temp1 array based on the third element (P3)
+      console.log()
+        console.log("Permissions to be displayed",this.permission_data);  
+        
+        this.listofPermissionIDs = this.permission_data.map((item:any)=>item.P1)
+      }
+    } catch (error) {
+      console.error('Error:', error);
+     
+    }
+  }
+
+
+
 
 
   async getAllUsers(){
@@ -338,7 +425,7 @@ rdtListWorkAround :any =[{
       if(this.dataUser.userID == getUserID.target.value && this.editOperation){
 
       }
-      else if (getUserID.target.value == this.listofUserID[uniqueID]) {
+      else if ((getUserID.target.value).toLowerCase() == (this.listofUserID[uniqueID]).toLowerCase()) {
         this.errorForUniqueUserID = "User ID already exists";
       }
     }
@@ -967,7 +1054,7 @@ rdtListWorkAround :any =[{
 
 
     //without sending email, confimration needed for update,so just update attributes in cognito
-    let token = this.generateToken(this.createUserField.value.username, this.createUserField.value.clientID);
+    let token = this.generateToken((this.createUserField.value.username).toLowerCase(), this.createUserField.value.clientID);
     console.log('USER GENERTED ENCRIPTED KEY', token)
     console.log('clientID', this.createUserField.value.clientID);
 
@@ -977,7 +1064,7 @@ rdtListWorkAround :any =[{
 
      
       this.allUserDetails = {
-        userID: this.createUserField.value.userID,
+        userID: (this.createUserField.value.userID).toLowerCase(),
         name: this.createUserField.value.name,
         key: token,
         allowOtherClient: this.createUserField.value.allowOtherClient,
@@ -986,7 +1073,7 @@ rdtListWorkAround :any =[{
         allowNewCompanyID: this.createUserField.value.allowNewCompanyID,
         clientID: this.createUserField.value.clientID,
         companyID: this.createUserField.value.companyID,
-        username: this.createUserField.value.username,
+        username: (this.createUserField.value.username).toLowerCase(),
         description: this.createUserField.value.description,
         mobile: this.createUserField.value.mobile,
         mobile_privacy: this.createUserField.value.mobile_privacy,
@@ -1023,104 +1110,14 @@ rdtListWorkAround :any =[{
 
 
       tempObj = {
-        PK:this.createUserField.value.username+"#user"+"#main",
+        PK:(this.createUserField.value.username).toLowerCase()+"#user"+"#main",
         SK:1,
         metadata:JSON.stringify(this.allUserDetails)
       }
 
 
-
-      // if (this.allDeviceTypeValues.length > 0) {
-      //   this.allUserDetails.device_type_permission = this.allDeviceTypeValues
-      // }
-
-      // if (this.allDeviceValues.length > 0) {
-      //   this.allUserDetails.device_permission = this.allDeviceValues
-      // }
-
       console.log('this.allUserDetails update_delete :', this.createUserField.value);
 
-
-      // const checkAuthUser = await this.checkUsernameExists(this.createUserField.value.username)
-
-      // if(checkAuthUser){
-      //     return Swal.fire({
-      //       position: "center",
-      //       icon: "error",
-      //       title: `Username: ${this.createUserField.value.username} already exist`,
-      //       showConfirmButton: false,
-      //       timer: 1500,
-      //     });
-      // }
-
-
-      // let temp1 = this.allUserDetails.device_permission;
-      // let temp2 = '';
-
-      // const uniqueItems = new Set();
-      // temp1 = temp1.filter((item: { value: any; }) => {
-      //   const isDuplicate = uniqueItems.has(item.value);
-      //   uniqueItems.add(item.value);
-      //   return !isDuplicate;
-      // });
-
-      // if (temp1) {
-      //   // If temp1 is not null or undefined
-      //   if (temp1.length === 1) {
-      //     temp2 = temp1[0];
-      //   } else if (temp1.length > 1) {
-      //     temp2 = temp1[0] + '...(' + (temp1.length) + ')';
-      //   } else {
-      //     temp2 = '...(0)';
-      //   }
-      // } else {
-      //   // If temp1 is null or undefined
-      //   temp2 = '...(0)';
-      // }
-
-      // let temp3 = this.allUserDetails.location_permission;
-      // let temp4 = '';
-
-      // if (temp3) {
-      //   // If temp1 is not null or undefined
-      //   if (temp3.length === 1) {
-      //     temp4 = temp3[0];
-      //   } else if (temp3.length > 1) {
-      //     temp4 = temp3[0] + '...(' + (temp3.length) + ')';
-      //   } else {
-      //     temp4 = '...(0)';
-      //   }
-      // } else {
-      //   // If temp1 is null or undefined
-      //   temp4 = '...(0)';
-      // }
-
-    
-      
-      // let temp6 = '';
-
-   
-      // let temp5 = this.allUserDetails.device_type_permission.map((value: any) => {
-      //   let matchedItem = this.rdtListWorkAround.find((item: { value: any; }) => item.value === value);
-      //   return matchedItem ? matchedItem.text : null;
-      // }).filter((text: string | null) => text !== null);
-      
-
-      // if (temp5) {
-      //   // If temp1 is not null or undefined
-      //   if (temp5.length === 1) {
-      //     temp6 = temp5[0];
-      //   } else if (temp5.length > 1) {
-      //     temp6 = temp5[0] + '...(' + (temp5.length) + ')';
-      //   } else {
-      //     temp6 = '...(0)';
-      //   }
-      // } else {
-      //   // If temp1 is null or undefined
-      //   temp6 = '...(0)';
-      // }
-
- 
 
         const date = Math.ceil(((new Date()).getTime()) / 1000)
       const items ={
@@ -1220,7 +1217,7 @@ rdtListWorkAround :any =[{
 
         this.allUserDetails = {
           key: token,
-          userID: this.createUserField.value.userID,
+          userID: (this.createUserField.value.userID).toLowerCase(),
           password: this.createUserField.value.name,
           allowOtherClient: this.createUserField.value.allowOtherClient,
           allowNewClient: this.createUserField.value.allowNewClient,
@@ -1228,7 +1225,7 @@ rdtListWorkAround :any =[{
           allowNewCompanyID: this.createUserField.value.allowNewCompanyID,
           clientID: this.SK_clientID,
           companyID: companyidTemp,
-          username: this.createUserField.value.username,
+          username: (this.createUserField.value.username).toLowerCase(),
           description: this.createUserField.value.description,
           mobile: this.createUserField.value.mobile,
           mobile_privacy: this.createUserField.value.mobile_privacy,
@@ -1264,7 +1261,7 @@ rdtListWorkAround :any =[{
         }
 
         tempObj = {
-          PK:this.createUserField.value.username+"#user"+"#main",
+          PK:(this.createUserField.value.username).toLowerCase()+"#user"+"#main",
           SK:1,
           metadata:JSON.stringify(this.allUserDetails)
         }
@@ -1285,7 +1282,7 @@ rdtListWorkAround :any =[{
       else {
         this.allUserDetails = {
           key: token,
-          userID: this.createUserField.value.userID,
+          userID: (this.createUserField.value.userID).toLowerCase(),
           password: this.createUserField.value.name,
           allowOtherClient: this.createUserField.value.allowOtherClient,
           allowNewClient: this.createUserField.value.allowNewClient,
@@ -1293,7 +1290,7 @@ rdtListWorkAround :any =[{
           allowNewCompanyID: this.createUserField.value.allowNewCompanyID,
           clientID: this.createUserField.value.clientID,
           companyID:companyidTemp,
-          username: this.createUserField.value.username,
+          username: (this.createUserField.value.username).toLowerCase(),
           description: this.createUserField.value.description,
           mobile: this.createUserField.value.mobile,
           mobile_privacy: this.createUserField.value.mobile_privacy,
@@ -1331,7 +1328,7 @@ rdtListWorkAround :any =[{
 
 
         tempObj = {
-          PK:this.createUserField.value.username+"#user"+"#main",
+          PK:(this.createUserField.value.username).toLowerCase()+"#user"+"#main",
           SK:1,
           metadata:JSON.stringify(this.allUserDetails)
         }
@@ -1434,7 +1431,7 @@ rdtListWorkAround :any =[{
 
       const date = Math.ceil(((new Date()).getTime()) / 1000)
       const items ={
-      P1: this.createUserField.value.username,
+      P1: (this.createUserField.value.username).toLowerCase(),
       P2: this.allUserDetails.mobile,
       P3: this.allUserDetails.email,
       P4: this.allUserDetails.permission_ID,
@@ -1442,11 +1439,11 @@ rdtListWorkAround :any =[{
       }
 
       const masterUser = {
-        P1:this.createUserField.value.username,
+        P1:(this.createUserField.value.username).toLowerCase(),
         P2:this.allUserDetails.clientID,
         P3:this.allUserDetails.email,
         P4:this.allUserDetails.mobile,
-        P5:this.createUserField.value.userID
+        P5:(this.createUserField.value.userID).toLowerCase()
       }
 
 
@@ -1464,6 +1461,30 @@ rdtListWorkAround :any =[{
         this.addFromService();
 
         if (value) {
+
+          // const body = { type: "userVerify", username:masterUser.P1,name:masterUser.P5,email:masterUser.P3};
+
+
+          // this.DynamicApi.sendData(body).subscribe(response => {
+          //   console.log('Response from Lambda:', response);
+
+
+          //   this.toast.open("Mail Sent Successfully", " ", {
+
+          //     duration: 2000,
+          //     horizontalPosition: 'right',
+          //     verticalPosition: 'top',
+          //     //   //panelClass: ['blue-snackbar']
+          //   })
+
+
+          // }, error => {
+          //   console.error('Error calling dynamic lambda:', error);
+          // });
+
+
+
+
 
           await this.createLookUpRdt(items,1,tempClient+"#user"+"#lookup")
 
