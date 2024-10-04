@@ -15,7 +15,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import bootstrap from 'bootstrap';
 import { environment } from 'src/environments/environment';
 import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
-import { DynamicApiService } from '../services/dynamic-api.service';
 
 interface ListItem {
   [key: string]: {
@@ -137,7 +136,7 @@ rdtListWorkAround :any =[{
 
 
   constructor(private apiService: UserService,private configService:SharedService,private fb:FormBuilder
-    ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal,private DynamicApi:DynamicApiService){}
+    ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal){}
 
 
 
@@ -161,29 +160,6 @@ rdtListWorkAround :any =[{
   }
 
 
-
-  testAPI(){
-    const body = { type: "userVerify", username:"Asad",name:"Asad",email:"asad@gmail.com"};
-
-
-    this.DynamicApi.sendData(body).subscribe(response => {
-      console.log('Response from Lambda:', response);
-
-
-      this.toast.open("Mail Sent Successfully", " ", {
-
-        duration: 2000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top',
-        //   //panelClass: ['blue-snackbar']
-      })
-
-
-    }, error => {
-      console.error('Error calling dynamic lambda:', error);
-    });
-
-  }
 
 
   logAndDismiss(modal:any) {
