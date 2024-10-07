@@ -60,8 +60,8 @@ export class CrudcompanyComponent implements OnInit, AfterViewInit, OnDestroy{
 
     this.dtOptions = {
      
-      dom: "<'row'<'col-sm-12'tr>>" +
-        "<'d-flex justify-content-between'<'col-sm-12 col-md-5'i><'d-flex justify-content-between'p>>",
+      dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>"+"<'row'<'col-sm-12'tr>>" + // Main table
+      "<'row'<'col-sm-12'p>>", // Pagination
       processing: true,
       language: {
         processing: '<span class="spinner-border spinner-border-sm align-middle"></span> Loading...'

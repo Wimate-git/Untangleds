@@ -57,17 +57,17 @@ export class Crud2Component implements OnInit, AfterViewInit, OnDestroy{
 
 
   ngOnInit(): void {
-
     this.dtOptions = {
-     
-      dom: "<'row'<'col-sm-12'tr>>" +
-        "<'d-flex justify-content-between'<'col-sm-12 col-md-5'i><'d-flex justify-content-between'p>>",
+      dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>"+"<'row'<'col-sm-12'tr>>" + // Main table
+           "<'row'<'col-sm-12'p>>", // Pagination
       processing: true,
       language: {
         processing: '<span class="spinner-border spinner-border-sm align-middle"></span> Loading...'
-      }, ...this.datatableConfig,
-
-       buttons: [
+      },
+      search: true,
+      ...this.datatableConfig,
+    
+      buttons: [
         {
           extend: 'colvis', // Column visibility button
           text: 'Column Visibility',
@@ -80,16 +80,17 @@ export class Crud2Component implements OnInit, AfterViewInit, OnDestroy{
         }
       ],
     };
+    
     this.renderActionColumn();
-
     this.setupSweetAlert();
-
+    
     if (this.reload) {
       this.reload.subscribe(data => {
         this.modalService.dismissAll();
         this.datatableElement.dtInstance.then((dtInstance: Api) => dtInstance.ajax.reload());
       });
     }
+    
   }
 
 

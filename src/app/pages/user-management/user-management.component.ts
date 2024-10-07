@@ -2107,7 +2107,6 @@ rdtListWorkAround :any =[{
     this.datatableConfig = {}
     this.lookup_data_user = []
     this.datatableConfig = {
-      serverSide: true,
       ajax: (dataTablesParameters:any, callback) => {
         this.datatableConfig = {}
         this.lookup_data_user = []
