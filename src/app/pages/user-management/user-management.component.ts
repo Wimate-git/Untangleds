@@ -15,6 +15,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import bootstrap from 'bootstrap';
 import { environment } from 'src/environments/environment';
 import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
+import { DynamicApiService } from '../services/dynamic-api.service';
 
 interface ListItem {
   [key: string]: {
@@ -136,7 +137,7 @@ rdtListWorkAround :any =[{
 
 
   constructor(private apiService: UserService,private configService:SharedService,private fb:FormBuilder
-    ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal){}
+    ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal,private DynamicApi:DynamicApiService){}
 
 
 
@@ -152,14 +153,32 @@ rdtListWorkAround :any =[{
     this.initializeUserFields()
 
     this.showTable()
-
-
-    // this.testAPI()
-  
-    // await this.showTable(this.lookup_data_user)
   }
 
 
+
+  testAPI(){
+    const body = { type: "userVerify", username:"Asad",name:"Asad",email:"asad@gmail.com"};
+
+
+    this.DynamicApi.sendData(body).subscribe(response => {
+      console.log('Response from Lambda:', response);
+
+
+      this.toast.open("Mail Sent Successfully", " ", {
+
+        duration: 2000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+        //   //panelClass: ['blue-snackbar']
+      })
+
+
+    }, error => {
+      console.error('Error calling dynamic lambda:', error);
+    });
+
+  }
 
 
   logAndDismiss(modal:any) {
@@ -1438,25 +1457,25 @@ rdtListWorkAround :any =[{
 
         if (value) {
 
-          // const body = { type: "userVerify", username:masterUser.P1,name:masterUser.P5,email:masterUser.P3};
+          const body = { type: "userVerify", username:masterUser.P1,name: this.createUserField.value.name,email:masterUser.P3};
 
 
-          // this.DynamicApi.sendData(body).subscribe(response => {
-          //   console.log('Response from Lambda:', response);
+          this.DynamicApi.sendData(body).subscribe(response => {
+            console.log('Response from Lambda:', response);
 
 
-          //   this.toast.open("Mail Sent Successfully", " ", {
+            this.toast.open("Mail Sent Successfully", " ", {
 
-          //     duration: 2000,
-          //     horizontalPosition: 'right',
-          //     verticalPosition: 'top',
-          //     //   //panelClass: ['blue-snackbar']
-          //   })
+              duration: 2000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top',
+              //   //panelClass: ['blue-snackbar']
+            })
 
 
-          // }, error => {
-          //   console.error('Error calling dynamic lambda:', error);
-          // });
+          }, error => {
+            console.error('Error calling dynamic lambda:', error);
+          });
 
 
 
