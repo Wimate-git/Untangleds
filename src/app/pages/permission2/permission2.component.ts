@@ -73,6 +73,9 @@ export class Permission2Component {
   allPermissions_user: any;
   dateTypeList:any[] =[]
   hideUpdateButton: any = false;
+
+  dreamBoardIDs: any[]=[];
+
   modulesList: any[]= [
   
     { value1: "Device - View", text: 'Device ' ,id:1 , value2: "Device - Update", value3: "Device - xlsx View" ,value4: "Device - xlsx Update"},
@@ -159,6 +162,8 @@ export class Permission2Component {
     this.SK_clientID = this.getLoggedUser.clientID;
 
     this.initializePermissionFields();
+
+    this.fetchTMData(1)
 
     this.addFromService()
 
@@ -375,7 +380,8 @@ export class Permission2Component {
       user_grade: ["", Validators.required],
       api_enable: [false,Validators.required],
       //'allowOtherClient':'',
-      formList: [[], Validators.required]
+      formList: [[], Validators.required],
+      dreamBoardIDs:[[],Validators.required]
     });
   }
 
@@ -442,7 +448,8 @@ export class Permission2Component {
           size: getValues.size,
           settings: getValues.settings,
           user_grade: getValues.user_grade,
-          formList: [[]]
+          formList: [[]],
+          dreamBoardIDs:[[]]
           //'allowOtherClient':getValues.allowOtherClient
         });
         // Call read back function to check checkboxes
@@ -464,6 +471,7 @@ export class Permission2Component {
           user_grade: getValues.user_grade,
           formList:[getValues.formList],
           settings: getValues.other_settings,
+          dreamBoardIDs:getValues && getValues.dreamBoardIDs?[getValues.dreamBoardIDs]:[]
         });
 
         this.cd.detectChanges()
@@ -476,9 +484,9 @@ export class Permission2Component {
   }
 
 
-  addFromService() {
+  async addFromService() {
     try{
-      this.api.GetMaster(this.SK_clientID+"#dynamic_form#lookup",1).then((result:any)=>{
+      await this.api.GetMaster(this.SK_clientID+"#dynamic_form#lookup",1).then((result:any)=>{
         if(result){
           const helpherObj = JSON.parse(result.options)
 
@@ -491,6 +499,10 @@ export class Permission2Component {
     }
    
   }
+
+
+
+
 
 
   checkUniqueIdentifier(getID: any) {
@@ -515,6 +527,7 @@ export class Permission2Component {
       api_enable: this.createPermissionField.value.api_enable,
       Time: this.createPermissionField.value.time,
       formIDs:this.createPermissionField.value.formList,
+      dreamBoardIDs:this.createPermissionField.value.dreamBoardIDs,
       numberOfRequest: this.createPermissionField.value.no_of_request,
       numberOfRecords: this.createPermissionField.value.no_of_records,
       size: this.createPermissionField.value.size,
@@ -765,6 +778,7 @@ export class Permission2Component {
         size: this.createPermissionField.value.size,
         user_grade: this.createPermissionField.value.user_grade,
         formIDs:this.createPermissionField.value.formList,
+        dreamBoardIDs:this.createPermissionField.value.dreamBoardIDs,
         other_settings: JSON.stringify(this.createPermissionField.value.settings),
         //allowOtherClient:this.createPermissionField.value.allowOtherClient
       };
@@ -1145,63 +1159,54 @@ export class Permission2Component {
 
 
 async fetchTMData(sk: any) {
-  // console.log("iam trying to fetch",this.clientID)
-  // try {
-  //   const response = await this.api.GetLookupMasterTable(this.clientID, sk);
+  console.log("iam trying to fetch",this.clientID)
+  try {
+    const response = await this.api.GetMaster(this.SK_clientID+"#dreamboard#lookup", sk);
  
-  //   if (response && response.items) {
-  //     // Check if response.listOfItems is a string
-  //     if (typeof response.items === 'string') {
-  //       let data = JSON.parse(response.items);
-  //       console.log("d1 =",data)
-  //       if (Array.isArray(data)) {
-  //         for (let index = 0; index < data.length; index++) {
-  //           const element = data[index];
+    if (response && response.options) {
+      // Check if response.listOfItems is a string
+      if (typeof response.options === 'string') {
+        let data = JSON.parse(response.options);
+        console.log("d1 =",data)
+        if (Array.isArray(data)) {
+          for (let index = 0; index < data.length; index++) {
+            const element = data[index];
 
-  //           if (element !== null && element !== undefined) {
-  //             // Extract values from each element and push them to lookup_data_temp1
-  //             const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
-  //             const { P1, P2, P3,P4 } = element[key]; // Extract values from the nested object
-  //             this.lookup_data_temp1.push({P1, P2, P3,P4 }); // Push an array containing P1, P2, and P3 values
-  //             console.log("d2 =",this.lookup_data_temp1)
-  //           } else {
-  //             break;
-  //           }
-  //         }
-  //         //this.lookup_data_temp1.sort((a, b) => b.P5 - a.P5);
-  //         this.lookup_data_temp1.sort((a:any, b:any) => {
-  //           return b.P4 - a.P4; // Compare P5 values in descending order
-  //         });
-  //         console.log("Lookup sorting",this.lookup_data_temp1);
-  //         // Continue fetching recursively
-  //         await this.fetchTMData(sk + 1);
-  //       } else {
-  //         console.error('Invalid data format - not an array.');
-  //       }
-  //     } else {
-  //       console.error('response.listOfItems is not a string.');
-  //     }
-  //   } else {
-  //     // Sort the lookup_data_temp1 array based on the third element (P3)
-  //   console.log()
-   
-  //     // Extract the IDs and display the datatable
-  //     // this.listofPowerboardIds = this.lookup_data_temp1.map((item: any) => item[0]);
-  //     // this.showDatatable(this.lookup_data_temp1);
+            if (element !== null && element !== undefined) {
+              // Extract values from each element and push them to lookup_data_temp1
+              const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
+              const { P1, P2, P3,P4 } = element[key]; // Extract values from the nested object
+              this.dreamBoardIDs.push({P1, P2, P3,P4 }); // Push an array containing P1, P2, and P3 values
+              console.log("d2 =",this.dreamBoardIDs)
+            } else {
+              break;
+            }
+          }
+          //this.lookup_data_temp1.sort((a, b) => b.P5 - a.P5);
+          this.dreamBoardIDs.sort((a:any, b:any) => {
+            return b.P4 - a.P4; // Compare P5 values in descending order
+          });
+          console.log("Lookup sorting",this.dreamBoardIDs);
+          // Continue fetching recursively
+          await this.fetchTMData(sk + 1);
+        } else {
+          console.error('Invalid data format - not an array.');
+        }
+      } else {
+        console.error('response.listOfItems is not a string.');
+      }
+    } else {
       
-  //     console.log("Permissions to be displayed",this.lookup_data_temp1);
-  //     this.getTablePermission(this.lookup_data_temp1);
-     
-      
-  //     // for(let i = 0;i<this.lookup_data_temp1.length;i++){
-  //     //   this.paramsBasedOnRDT.push(this.lookup_data_temp1[i].P2);
-  //     // }
-  //     // this.getDatatable(this.lookup_data_temp1);
-  //   }
-  // } catch (error) {
-  //   console.error('Error:', error);
-  //   // Handle the error as needed
-  // }
+
+      this.dreamBoardIDs  = this.dreamBoardIDs.map((item:any)=>item.P1)
+
+      console.log("All the dreamboard id are here ",this.dreamBoardIDs);
+
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    // Handle the error as needed
+  }
 }
 
 
@@ -1242,6 +1247,7 @@ async fetchTMData(sk: any) {
         let other_settings = JSON.parse(this.data_temp [allData].other_settings);
         let user_grade = this.data_temp [allData].user_grade;
         let formList = this.data_temp [allData].formIDs;
+        let dreamBoardIDs = this.data_temp[allData].dreamBoardIDs;
         //let allowOtherClient= this.data_temp [allData].allowOtherClient
         
         let date_type = this.data_temp [allData].Date_type
@@ -1257,7 +1263,8 @@ async fetchTMData(sk: any) {
           date_type: date_type,
           user_grade: user_grade,
           other_settings: other_settings,
-          formList:formList
+          formList:formList,
+          dreamBoardIDs:dreamBoardIDs
           // allowOtherClient:allowOtherClient
         });
 
