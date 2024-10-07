@@ -94,7 +94,7 @@ rdtListWorkAround :any =[{
   }]
 
   listofPermissionIDs:any = []
-  listofReportingUsers:any = []
+  listofReportingUsers:any = ["All"]
 
 
   createUserField: UntypedFormGroup;

@@ -3,6 +3,7 @@ import { Observable, Subscription } from 'rxjs';
 import { TranslationService } from '../../../../../../modules/i18n';
 import { AuthService, UserType } from '../../../../../../modules/auth';
 import { signOut } from 'aws-amplify/auth';
+import { SharedService } from 'src/app/pages/shared.service';
 
 @Component({
   selector: 'app-user-inner',
@@ -17,15 +18,26 @@ export class UserInnerComponent implements OnInit, OnDestroy {
   user$: Observable<UserType>;
   langs = languages;
   private unsubscribe: Subscription[] = [];
+  getLoggedUser: any;
+  username: any;
+  email: any;
 
   constructor(
     private auth: AuthService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private shared:SharedService
   ) {}
 
   ngOnInit(): void {
     this.user$ = this.auth.currentUserSubject.asObservable();
     this.setLanguage(this.translationService.getSelectedLanguage());
+
+
+    this.getLoggedUser = this.shared.getLoggedUserDetails()
+
+    this.username = this.getLoggedUser.username;
+
+    this.email = this.getLoggedUser.email;
   }
 
   logout() {

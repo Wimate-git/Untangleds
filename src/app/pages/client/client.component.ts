@@ -367,6 +367,8 @@ export class ClientComponent implements OnInit {
 
             var tempLookup
 
+            this.listofSK = this.lookup_data_user.map((item:any)=>item.P1)
+
             this.uniqueEmail = this.lookup_data_user.map((item:any)=>item.P4)
             if(this.SK_clientID != 'WIMATE_ADMIN'){
               this.lookup_data_user = this.lookup_data_user.filter((item:any)=>item.P1 == this.SK_clientID)
@@ -1279,6 +1281,8 @@ async createLookUpRdt(item: any, pageNumber: number,tempclient:any){
       }
       //updated device congifuration(update)
       else if (getValues) {
+
+        console.log("All the values are here to be polpulated ",getValues);
 
         // const tempParsemetadata = JSON.parse(getValues.metadata)
 
