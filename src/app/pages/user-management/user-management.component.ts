@@ -15,7 +15,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import bootstrap from 'bootstrap';
 import { environment } from 'src/environments/environment';
 import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
-import { DynamicApiService } from '../services/dynamic-api.service';
+import { DynamicApiService } from '../dynamic-api.service';
 
 interface ListItem {
   [key: string]: {
