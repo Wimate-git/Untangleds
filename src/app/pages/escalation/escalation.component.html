@@ -216,12 +216,7 @@
     
     <!-- Alert PopUp -->
     
-    
-    
-    
-    
-    
-    <div class="card mb-5 mb-xl-8">
+    <div class="card mb-5 mb-xl-8 card-custom">
     
         <div class="card-header border-0 pt-5 ">
             <h3 class="card-title align-items-start flex-column">
@@ -242,6 +237,14 @@
  
 
         <div class="card-body pt-0">
+            <!-- <div class="card-title">
+             
+                <div class="d-flex align-items-center position-relative my-1">
+                  <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
+                  <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12" placeholder="Search notification ID">
+                </div>
+           
+              </div> -->
             <app-crud-user [datatableConfig]="datatableConfig" route="/manage-user" (deleteEvent)="delete($event)" (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent" ></app-crud-user>
         </div>
 

@@ -15,6 +15,79 @@
     </div>
 
 
+    <div class="menu-item">
+      <a class="menu-link without-sub" routerLink="/dreamboard" routerLinkActive="active">
+        <span class="menu-icon">
+          <app-keenicon name="bi bi-hypnotize" class="fs-2"></app-keenicon>
+        </span>
+        <span class="menu-title">Dream Board</span>
+      </a>
+
+      <!-- <div class="menu-item menu-accordion" *ngFor="let item of menuItems" [attr.data-kt-menu-trigger]="item.subMenu ? 'click' : null" routerLinkActive="here show">
+        <span class="menu-link">
+          <span class="menu-icon">
+            <app-keenicon [name]="item.icon ?? 'default-icon'" class="fs-2"></app-keenicon>
+          </span>
+          <span class="menu-title">{{ item.title }}</span>
+          <span *ngIf="item.subMenu" class="menu-arrow"></span>
+        </span>
+        
+        <div class="menu-sub menu-sub-accordion" *ngIf="item.subMenu" routerLinkActive="menu-active-bg">
+          <div class="menu-item menu-accordion" *ngFor="let subItem of item.subMenu" [attr.data-kt-menu-trigger]="subItem.subMenu ? 'click' : null" routerLinkActive="here show">
+            <span class="menu-link" *ngIf="!subItem.subMenu" [routerLink]="subItem.link">
+              <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+              <span class="menu-title">{{ subItem.title }}</span>
+            </span>
+      
+            <span class="menu-link" *ngIf="subItem.subMenu">
+              <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+              <span class="menu-title">{{ subItem.title }}</span>
+              <span class="menu-arrow"></span>
+            </span>
+            
+          </div>
+        </div>
+      </div> -->
+
+      <div class="menu-item menu-accordion" *ngFor="let item of menuItems" [attr.data-kt-menu-trigger]="item.subMenu?.length ? 'click' : null" routerLinkActive="here show">
+        <span class="menu-link">
+          <span class="menu-icon">
+            <app-keenicon [name]="item.icon ?? 'default-icon'" class="fs-2"></app-keenicon>
+          </span>
+          <span class="menu-title">{{ item.title }}</span>
+          <span *ngIf="item.subMenu?.length" class="menu-arrow"></span>
+        </span>
+      
+        
+        <div class="menu-sub menu-sub-accordion" *ngIf="item.subMenu?.length" routerLinkActive="menu-active-bg">
+          <div class="menu-item menu-accordion" *ngFor="let subItem of item.subMenu ?? []" [attr.data-kt-menu-trigger]="subItem.subMenu?.length ? 'click' : null" routerLinkActive="here show">
+            
+            
+            <span class="menu-link" *ngIf="!subItem.subMenu?.length" [routerLink]="subItem.link">
+              <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+              <span class="menu-title">{{ subItem.title }}</span>
+            </span>
+      
+           
+            <span class="menu-link" *ngIf="subItem.subMenu?.length">
+              <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+              <span class="menu-title">{{ subItem.title }}</span>
+              <span class="menu-arrow"></span>
+            </span>
+            
+            
+            <div class="menu-sub menu-sub-accordion" *ngIf="subItem.subMenu?.length" routerLinkActive="menu-active-bg">
+              <div class="menu-item" *ngFor="let nestedItem of subItem.subMenu ?? []">
+                <a class="menu-link without-sub" routerLinkActive="active" [routerLink]="nestedItem.link">
+                  <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                  <span class="menu-title">{{ nestedItem.title }}</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
 
     <div class="menu-item">
       <a class="menu-link without-sub" routerLinkActive="active"

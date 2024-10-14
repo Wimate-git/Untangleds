@@ -65,7 +65,9 @@ export class CrudcompanyComponent implements OnInit, AfterViewInit, OnDestroy{
       processing: true,
       language: {
         processing: '<span class="spinner-border spinner-border-sm align-middle"></span> Loading...'
-      }, ...this.datatableConfig,
+      },
+      search:true,
+      ...this.datatableConfig,
 
        buttons: [
         {

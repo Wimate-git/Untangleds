@@ -41,21 +41,21 @@
   <div class="fv-row mb-3">
     <label class="form-label fw-bolder text-gray-900 fs-6 mb-0">Password</label>
 
-    <div  style="padding-right: 0px;border-right: 0px;position: relative;">
+    <div style="position: relative;">
+      
+            <input class="large-input" pInputText [type]="showPassword ? 'text' : 'password'" 
+                   name="password" 
+                   autocomplete="off"
+                   formControlName="password" 
+                   style="padding-right: 40px;" /> <!-- Added right padding -->
+      
 
-
-      <p-inputGroup>
-        <input class="large-input" pInputText [type]="showPassword ? 'text' : 'password'" 
-        name="password" 
-        autocomplete="off"
-        formControlName="password"  />
-    </p-inputGroup>
-
-           <span style="position: absolute; right: 10px; margin-top: -31px; cursor: pointer;" (click)="onClick()">
+        <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;" (click)="onClick()">
             <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
         </span>
-      </div>
+    </div>
 </div>
+
 
   <!--end::Form group-->
 

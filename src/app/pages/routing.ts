@@ -10,6 +10,14 @@ const Routing: Routes = [
     loadChildren: () => import('./builder/builder.module').then((m) => m.BuilderModule),
   },
   {
+    path: 'dreamboard',
+    loadChildren:() => import('./dreamboard/dreamboard.module').then((m) =>m.DreamboardModule),
+  },
+  {
+    path: 'view-dreamboard/:id',
+    loadChildren:() => import('./dream-id/dream-id.module').then((m) =>m.DreamIdModule),
+  },
+  {
     path: 'crafted/pages/profile',
     loadChildren: () => import('../modules/profile/profile.module').then((m) => m.ProfileModule),
     // data: { layout: 'light-sidebar' },

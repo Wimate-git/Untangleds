@@ -9,13 +9,13 @@ import { SweetAlertOptions } from 'sweetalert2';
 import { Api, Config } from 'datatables.net';
 
 @Component({
-  selector: 'app-crud',
+  selector: 'app-crud-dreamboard',
   templateUrl: './crud.component.html',
   styleUrls: ['./crud.component.scss'],
 })
 export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  @Input() datatableConfig: Config = {};
+  @Input() datatableConfig: any = {};
 
   @Input() route: string = '/';
 
@@ -55,12 +55,26 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.dtOptions = {
-      dom: "<'row'<'col-sm-12'tr>>" +
-        "<'d-flex justify-content-between'<'col-sm-12 col-md-5'i><'d-flex justify-content-between'p>>",
+     
+      dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>"+"<'row'<'col-sm-12'tr>>" + // Main table
+      "<'row'<'col-sm-12'p>>", // Pagination
       processing: true,
       language: {
         processing: '<span class="spinner-border spinner-border-sm align-middle"></span> Loading...'
-      }, ...this.datatableConfig
+      }, ...this.datatableConfig,
+
+       buttons: [
+        {
+          extend: 'colvis', // Column visibility button
+          text: 'Column Visibility',
+          className: 'btn btn-secondary'
+        },
+        {
+          extend: 'excel', // Export button
+          text: 'Export to Excel',
+          className: 'btn btn-success'
+        }
+      ],
     };
     this.renderActionColumn();
 
@@ -80,12 +94,12 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
       title: 'Actions',
       render: (data: any, type: any, full: any) => {
         const editButton = `
-          <button class="btn btn-icon btn-active-light-primary w-30px h-30px me-3" data-action="edit" data-id="${full.P1}">
+          <button class="btn btn-icon btn-active-light-primary w-30px h-30px me-3" data-action="edit" data-id="${full.id}">
             <i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i>
           </button>`;
 
         const deleteButton = `
-          <button class="btn btn-icon btn-active-light-primary w-30px h-30px" data-action="delete" data-id="${full.P1}">
+          <button class="btn btn-icon btn-active-light-primary w-30px h-30px" data-action="delete" data-id="${full.id}">
             <i class="ki-duotone ki-trash fs-3">
               <span class="path1"></span><span class="path2"></span>
               <span class="path3"></span><span class="path4"></span><span class="path5"></span>
@@ -116,6 +130,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
       const closestBtn = event.target.closest('.btn');
       if (closestBtn) {
         const { action, id } = closestBtn.dataset;
+        console.log("Dataset data is here ",closestBtn.dataset);
         this.idInAction = id;
 
         switch (action) {

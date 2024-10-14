@@ -107,13 +107,14 @@ export class AuthService implements OnDestroy {
                 cognitoUser.signOut();
                
                 document.location.reload()
+                this.router.navigate(['auth/login'])
            
             }
         });
     }
     else{
       this.logout()
-     
+      this.router.navigate(['auth/login'])
       document.location.reload()
     }
   }
@@ -289,8 +290,6 @@ refreshSession() {
     this.router.navigate(['/auth/login'], {
       queryParams: {},
     });
-
-
 
 
     // ToastrModule.forRoot({
