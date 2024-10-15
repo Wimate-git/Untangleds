@@ -55,9 +55,11 @@ export class SidebarMenuComponent implements OnInit {
 
     console.log("PERMISSION RESPONSE SIDE MENU:", permisson_response)
 
-    this.permission_data = JSON.parse(JSON.parse(JSON.stringify(permisson_response.metadata)))
+    if(permisson_response && permisson_response.metadata){
+      this.permission_data = JSON.parse(JSON.parse(JSON.stringify(permisson_response.metadata)))
+    }
 
-    console.log("SIDE MENU GET PERMISSION DATA RESPONSE:", this.permission_data.dreamBoardIDs)
+    // console.log("SIDE MENU GET PERMISSION DATA RESPONSE:", this.permission_data.dreamBoardIDs)
 
     this.generatedreamboard()
 
@@ -70,8 +72,6 @@ export class SidebarMenuComponent implements OnInit {
 
         this.authService.checkSession(); // Call your session check method
       });
-
-   
 
   }
 
@@ -148,7 +148,7 @@ async generatedreamboard() {
     console.log("Path Array:", pathArray);
 
     // Ensure permission_data.dreamBoardIDs has data
-    if (Array.isArray(this.permission_data.dreamBoardIDs) && this.permission_data.dreamBoardIDs.length > 0) {
+    if (this.permission_data &&  Array.isArray(this.permission_data.dreamBoardIDs) &&  this.permission_data.dreamBoardIDs && this.permission_data.dreamBoardIDs.length > 0) {
       for (const pathValue of pathArray) {
         if (this.permission_data.dreamBoardIDs.includes(pathValue)) {
           submenu.push({

@@ -159,11 +159,17 @@ export class LoginComponent implements OnInit, OnDestroy {
       localStorage.setItem('userAttributes','{}')
 
 
+
+
       try {
         const result:any = await this.api.GetMaster(`${(this.f.email.value).toLowerCase()}#user#main`, 1);
         if (result) {
           console.log("Result is here ", result);
           localStorage.setItem('userAttributes', JSON.stringify(JSON.parse(result.metadata)));
+
+          if (result && result.metadata && result.metadata.profile_picture) {
+            localStorage.setItem('profileImage', result.metadata.profile_picture)
+          }
         }
       } catch (err) {
         console.error("Error in fetching the user ", user);

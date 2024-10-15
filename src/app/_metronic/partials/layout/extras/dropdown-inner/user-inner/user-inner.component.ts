@@ -1,5 +1,5 @@
-import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { ChangeDetectorRef, Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
+import { interval, Observable, Subscription, takeWhile } from 'rxjs';
 import { TranslationService } from '../../../../../../modules/i18n';
 import { AuthService, UserType } from '../../../../../../modules/auth';
 import { signOut } from 'aws-amplify/auth';
@@ -11,7 +11,7 @@ import { SharedService } from 'src/app/pages/shared.service';
 })
 export class UserInnerComponent implements OnInit, OnDestroy {
   @HostBinding('class')
-  class = `menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg menu-state-primary fw-bold py-4 fs-6 w-275px`;
+  class = `menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg menu-state-primary fw-bold py-4 fs-6 w-auto`;
   @HostBinding('attr.data-kt-menu') dataKtMenu = 'true';
 
   language: LanguageFlag;
@@ -21,11 +21,13 @@ export class UserInnerComponent implements OnInit, OnDestroy {
   getLoggedUser: any;
   username: any;
   email: any;
+  imageUrlData: any;
 
   constructor(
     private auth: AuthService,
     private translationService: TranslationService,
-    private shared:SharedService
+    private shared:SharedService,
+    private cd:ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -38,7 +40,33 @@ export class UserInnerComponent implements OnInit, OnDestroy {
     this.username = this.getLoggedUser.username;
 
     this.email = this.getLoggedUser.email;
+
+    this.getLocalStorage()
   }
+
+
+
+
+  // private intervalSubscription: Subscription;
+	// getLocalStorage() {
+	//   console.log("profile picture")
+	//   this.intervalSubscription = interval(1000)
+	// 	.pipe(
+	// 	  takeWhile(() => !this.imageUrlData)
+	// 	)
+	// 	.subscribe(() => this.checkLocalStorageData('profileImage'));
+	// }
+  
+  
+	// private checkLocalStorageData(key: string): void {
+	//   const item = localStorage.getItem(key);
+	//   if (item) {
+	// 	this.imageUrlData = item;
+  //     console.log("image is here ",this.imageUrlData);
+  
+	//   }
+	// }
+  
 
   logout() {
     this.auth.logout();
@@ -67,9 +95,54 @@ export class UserInnerComponent implements OnInit, OnDestroy {
     });
   }
 
+  // ngOnDestroy() {
+  //   this.unsubscribe.forEach((sb) => sb.unsubscribe());
+  // }
+
+
+  private intervalSubscription: Subscription;
+
+
+
   ngOnDestroy() {
-    this.unsubscribe.forEach((sb) => sb.unsubscribe());
+    // Unsubscribe to prevent memory leaks
+    if (this.intervalSubscription) {
+      this.intervalSubscription.unsubscribe();
+    }
   }
+
+  getLocalStorage() {
+    
+    
+    console.log("Checking for profile picture...",this.getLoggedUser);
+    console.log("Image url is ",this.imageUrlData);
+    this.intervalSubscription = interval(1000)
+      .pipe(takeWhile(() => !this.imageUrlData))
+      .subscribe(() => this.checkLocalStorageData('profileImage'));
+  }
+
+  private checkLocalStorageData(key: string): void {
+
+    this.getLoggedUser = this.shared.getLoggedUserDetails()
+    this.imageUrlData = this.getLoggedUser.profile_picture
+
+    this.username = this.getLoggedUser.username;
+
+    this.email = this.getLoggedUser.email;
+    
+    // const item = this.getLoggedUser.profile_picture
+    // console.log("Iamge is here ",item);
+    // if (item) {
+    //   this.imageUrlData = item;
+    //   console.log("Image is here:", this.imageUrlData);
+    // } else {
+    //   console.log("No image found in local storage.");
+    // }
+    this.cd.detectChanges()
+  }
+
+
+
 }
 
 interface LanguageFlag {
@@ -111,3 +184,5 @@ const languages = [
     flag: './assets/media/flags/france.svg',
   },
 ];
+
+

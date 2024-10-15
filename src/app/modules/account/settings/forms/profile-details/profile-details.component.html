@@ -2,53 +2,129 @@
   <div
     class="card-header border-0 cursor-pointer"
     role="button"
-    data-bs-toggle="collapse"
-    data-bs-target="#kt_account_profile_details"
-    aria-expanded="true"
-    aria-controls="kt_account_profile_details"
+   
   >
     <div class="card-title m-0">
       <h3 class="fw-bolder m-0">Profile Details</h3>
     </div>
   </div>
-  <div id="kt_account_profile_details" class="collapse show">
+  <div id="kt_account_profile_details">
     <form novalidate="" class="form">
       <div class="card-body border-top p-9">
         <div class="row mb-6">
           <label class="col-lg-4 col-form-label fw-bold fs-6">Avatar</label>
           <div class="col-lg-8">
-            <div
-              class="image-input image-input-outline"
-              data-kt-image-input="true"
-              [style.background-image]="'url(./assets/media/avatars/blank.png'"
-            >
-              <div
-                class="image-input-wrapper w-125px h-125px"
-                [style.background-image]="
-                  'url(./assets/media/avatars/300-1.jpg'
-                "
-              ></div>
+            <div class="image-input image-input-outline" data-kt-image-input="true"
+            [ngStyle]="{'background-image': 'url(' + imageUrlData + ')'}" >
+              <div class="image-input-wrapper w-125px h-125px" 
+              [ngStyle]="{'background-image': 'url(' + imageUrlData + ')'}"></div>
             </div>
           </div>
         </div>
-        <div class="row mb-6">
+
+        <div *ngFor="let key of getKeys(getLoggedUser)">
+          <ng-container *ngIf="key != 'key' && key != 'profile_picture' && getLoggedUser[key] !== null && getLoggedUser[key] !== undefined && getLoggedUser[key] !== '' &&   !isArray(getLoggedUser[key])">
+            <div class="row mb-6">
+              <label class="col-lg-4 col-form-label fw-bold fs-6">
+                {{ formatLabel(key) }}
+              </label>
+              <div class="col-lg-8 fv-row">
+                <ng-container *ngIf="isTextInput(getLoggedUser[key]) &&  key != 'password'; else otherInputs">
+                  <input
+                    type="text"
+                    class="form-control form-control-lg form-control-solid"
+                    [name]="key"
+                    [value]="getLoggedUser[key]"
+                    readonly
+                  />
+                </ng-container>
+                <ng-template #otherInputs>
+                  <ng-container *ngIf="isTextInput(key) &&  isPasswordInput(key); else emailInput">
+                    <input
+                      type="password"
+                      class="form-control form-control-lg form-control-solid"
+                      [name]="key"
+                      [value]="getLoggedUser[key]"
+                      readonly
+                    />
+                  </ng-container>
+                  <ng-template #emailInput>
+                    <ng-container *ngIf=" isTextInput(key) && isEmailInput(key); else phoneInput">
+                      <input
+                        type="email"
+                        class="form-control form-control-lg form-control-solid"
+                        [name]="key"
+                        [value]="getLoggedUser[key]"
+                        readonly
+                      />
+                    </ng-container>
+                    <ng-template #phoneInput>
+                      <ng-container *ngIf="isTextInput(key) && isPhoneInput(key); else booleanInput">
+                        <input
+                          type="tel"
+                          class="form-control form-control-lg form-control-solid"
+                          [name]="key"
+                          [value]="getLoggedUser[key]"
+                          readonly
+                        />
+                      </ng-container>
+                      <ng-template #booleanInput>
+                        <ng-container *ngIf="isBooleanInput(getLoggedUser[key])">
+                          <label>
+                            <input
+                              class="form-check-input w-45px h-30px"
+                              type="checkbox"
+                              [name]="key"
+                              [checked]="getLoggedUser[key]"
+                              disabled
+                            />
+                            <!-- {{ formatLabel(key) }} -->
+                          </label>
+                        </ng-container>
+                      </ng-template>
+                    </ng-template>
+                  </ng-template>
+                </ng-template>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+        
+        
+
+
+
+
+
+        <!-- <div class="row mb-6">
           <label class="col-lg-4 col-form-label required fw-bold fs-6"
-            >Full Name</label
+            >Username</label
+          >
+          <div class="col-lg-8 fv-row">
+            <input
+              type="text"
+              class="form-control form-control-lg form-control-solid"
+              placeholder="First name"
+              name="fName"
+              [value]="getLoggedUser.username"
+            />
+          </div>
+        </div> -->
+        <!-- <div class="row mb-6">
+          <label class="col-lg-4 col-form-label required fw-bold fs-6"
+            >Username</label
           >
           <div class="col-lg-8">
-            <div class="row">
-              <div class="col-lg-6 fv-row">
+      
+              <div class="col-lg-8 fv-row">
                 <input
                   type="text"
-                  class="
-                    form-control form-control-lg form-control-solid
-                    mb-3 mb-lg-0
-                  "
+                  class="form-control form-control-lg form-control-solid"
                   placeholder="First name"
                   name="fName"
                   value="Max"
                 />
-              </div>
+      
               <div class="col-lg-6 fv-row">
                 <input
                   type="text"
@@ -60,8 +136,8 @@
               </div>
             </div>
           </div>
-        </div>
-        <div class="row mb-6">
+        </div> -->
+        <!-- <div class="row mb-6">
           <label class="col-lg-4 col-form-label required fw-bold fs-6"
             >Company</label
           >
@@ -71,7 +147,7 @@
               class="form-control form-control-lg form-control-solid"
               placeholder="Company name"
               name="company"
-              value="Keenthemes"
+              [value]="getLoggedUser.companyID"
             />
           </div>
         </div>
@@ -85,13 +161,13 @@
               class="form-control form-control-lg form-control-solid"
               placeholder="Phone number"
               name="contactPhone"
-              value="044 3276 454 935"
+              [value]="getLoggedUser.mobile"
             />
           </div>
         </div>
         <div class="row mb-6">
           <label class="col-lg-4 col-form-label fw-bold fs-6"
-            ><span class="required">Company Site</span></label
+            ><span class="required">Telegram ID</span></label
           >
           <div class="col-lg-8 fv-row">
             <input
@@ -99,12 +175,37 @@
               class="form-control form-control-lg form-control-solid"
               placeholder="Company website"
               name="companySite"
-              value="keenthemes.com"
+              [value]="getLoggedUser.telegramID"
             />
           </div>
         </div>
+
+
+
         <div class="row mb-6">
           <label class="col-lg-4 col-form-label fw-bold fs-6"
+            ><span class="required">Email</span></label
+          >
+          <div class="col-lg-8 fv-row">
+            <input
+              type="tel"
+              class="form-control form-control-lg form-control-solid"
+              placeholder="Phone number"
+              name="email"
+              [value]="getLoggedUser.email"
+            />
+          </div>
+        </div> -->
+
+
+
+
+
+
+
+
+        <!-- <div class="row mb-6"> -->
+          <!-- <label class="col-lg-4 col-form-label fw-bold fs-6"
             ><span class="required">Country</span></label
           >
           <div class="col-lg-8 fv-row">
@@ -367,12 +468,10 @@
               <option value="ZM">Zambia</option>
               <option value="ZW">Zimbabwe</option>
             </select>
-            <!-- <div class="fv-plugins-message-container">
-              <div class="fv-help-block">Country is required</div>
-            </div> -->
-          </div>
-        </div>
-        <div class="row mb-6">
+          
+          </div> -->
+        <!-- </div> -->
+        <!-- <div class="row mb-6">
           <label class="col-lg-4 col-form-label required fw-bold fs-6"
             >Language</label
           >
@@ -434,8 +533,8 @@
               number formatting.
             </div>
           </div>
-        </div>
-        <div class="row mb-6">
+        </div> -->
+        <!-- <div class="row mb-6">
           <label class="col-lg-4 col-form-label required fw-bold fs-6"
             >Time Zone</label
           >
@@ -608,8 +707,8 @@
               <option value="Nuku'alofa">(GMT+13:00) Nuku'alofa</option>
             </select>
           </div>
-        </div>
-        <div class="row mb-6">
+        </div> -->
+        <!-- <div class="row mb-6">
           <label class="col-lg-4 col-form-label required fw-bold fs-6"
             >Currency</label
           >
@@ -628,8 +727,8 @@
               <option value="CHF">CHF - Swiss franc</option>
             </select>
           </div>
-        </div>
-        <div class="row mb-6">
+        </div> -->
+        <!-- <div class="row mb-6">
           <label class="col-lg-4 col-form-label fw-bold fs-6"
             >Communication</label
           >
@@ -650,8 +749,8 @@
               >
             </div>
           </div>
-        </div>
-        <div class="row mb-0">
+        </div> -->
+        <!-- <div class="row mb-0">
           <label class="col-lg-4 col-form-label fw-bold fs-6"
             >Allow Marketing</label
           >
@@ -664,9 +763,9 @@
               /><label class="form-check-label"></label>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
-      <div class="card-footer d-flex justify-content-end py-6 px-9">
+      <!-- <div class="card-footer d-flex justify-content-end py-6 px-9">
         <button
           type="button"
           class="btn btn-primary"
@@ -683,7 +782,7 @@
             </span>
           </ng-container>
         </button>
-      </div>
+      </div> -->
     </form>
   </div>
 </div>
