@@ -1,0 +1,45 @@
+// .vakata-context {
+//     z-index: 1100
+//  }
+
+// body .modal { z-index: -1; }
+
+// .modal-backdrop {
+//     background-color: transparent;
+//  }
+
+// div .modal-content{
+//     	-webkit-box-shadow: none;
+//          -moz-box-shadow: none;
+            
+//     	box-shadow: none;
+//    }
+
+
+// body.modal-open { overflow: auto; }
+// .modal.in { pointer-events: none; }
+// .modal-content { pointer-events:all; }
+// .modal-backdrop { display: none; }
+
+// .modal-backdrop {
+//     /* bug fix - no overlay */    
+//     display: none;    
+// }
+// .modal{
+//     /* bug fix - custom overlay */   
+//     background-color: rgba(10,10,10,0.45);
+// }
+
+.btn-close{
+    background-color: #F1416C
+}
+
+
+.custom-primary{
+    background-color:  #ffc700; 
+    color: #fff; 
+}
+.custom-success{
+    background-color: #17c653;
+    color: white;
+}

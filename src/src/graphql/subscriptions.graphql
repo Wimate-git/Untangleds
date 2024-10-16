@@ -1,0 +1,115 @@
+# this is an auto generated file. This will be overwritten
+
+subscription OnCreateMaster(
+  $PK: String
+  $SK: Int
+  $options: AWSJSON
+  $metadata: AWSJSON
+) {
+  onCreateMaster(PK: $PK, SK: $SK, options: $options, metadata: $metadata) {
+    PK
+    SK
+    options
+    metadata
+    __typename
+  }
+}
+
+subscription OnUpdateMaster(
+  $PK: String
+  $SK: Int
+  $options: AWSJSON
+  $metadata: AWSJSON
+) {
+  onUpdateMaster(PK: $PK, SK: $SK, options: $options, metadata: $metadata) {
+    PK
+    SK
+    options
+    metadata
+    __typename
+  }
+}
+
+subscription OnDeleteMaster(
+  $PK: String
+  $SK: Int
+  $options: AWSJSON
+  $metadata: AWSJSON
+) {
+  onDeleteMaster(PK: $PK, SK: $SK, options: $options, metadata: $metadata) {
+    PK
+    SK
+    options
+    metadata
+    __typename
+  }
+}
+
+subscription OnCreateUser(
+  $PK: String
+  $SK: String
+  $email: String
+  $phone: Long
+  $userID: String
+) {
+  onCreateUser(
+    PK: $PK
+    SK: $SK
+    email: $email
+    phone: $phone
+    userID: $userID
+  ) {
+    PK
+    SK
+    email
+    phone
+    userID
+    __typename
+  }
+}
+
+subscription OnUpdateUser(
+  $PK: String
+  $SK: String
+  $email: String
+  $phone: Long
+  $userID: String
+) {
+  onUpdateUser(
+    PK: $PK
+    SK: $SK
+    email: $email
+    phone: $phone
+    userID: $userID
+  ) {
+    PK
+    SK
+    email
+    phone
+    userID
+    __typename
+  }
+}
+
+subscription OnDeleteUser(
+  $PK: String
+  $SK: String
+  $email: String
+  $phone: Long
+  $userID: String
+) {
+  onDeleteUser(
+    PK: $PK
+    SK: $SK
+    email: $email
+    phone: $phone
+    userID: $userID
+  ) {
+    PK
+    SK
+    email
+    phone
+    userID
+    __typename
+  }
+}
