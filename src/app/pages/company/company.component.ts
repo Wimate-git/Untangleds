@@ -1016,6 +1016,64 @@ export class CompanyComponent implements OnInit{
         //   })
         // })
 
+
+        const temp:any=[
+          {
+            tree: JSON.stringify(this.jsondata)
+          }
+        ]
+        const obj = {
+          PK: this.SK_clientID +"#"+ this.createCompanyField.value.companyID + "#location" + "#main",
+          SK: 1,
+          metadata: JSON.stringify(temp)
+        };
+        
+        
+                
+        
+                this.api.CreateMaster(obj).then((value: any) => {
+        
+                  //need to refresh table so this is called 
+                  //this.addFromService();
+        
+                  if (value) {
+        
+                    this.toast.open("New Location Configuration created successfully", " ", {
+                      //panelClass: 'error-alert-snackbar',
+        
+                      duration: 2000,
+                      horizontalPosition: 'right',
+                      verticalPosition: 'top',
+                    })
+        
+        
+        
+                  }
+                  else {
+                    Swal.fire({
+                      customClass: {
+                        container: 'swal2-container'
+                      },
+                      position: 'center',
+                      icon: 'warning',
+                      title: 'Error in adding Location Configuration',
+                      showCancelButton: true,
+                      allowOutsideClick: false,////prevents outside click
+                    })
+                  }
+        
+                }).catch((err: any) => {
+                  console.log('err for creation', err);
+                  this.toast.open("Error in adding new Location Configuration ", "Check again", {
+                    //panelClass: 'error-alert-snackbar',
+        
+                    duration: 5000,
+                    horizontalPosition: 'right',
+                    verticalPosition: 'top',
+                    //   //panelClass: ['blue-snackbar']
+                  })
+                })
+
       }
       else {
         Swal.fire({

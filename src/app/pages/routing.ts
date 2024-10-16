@@ -78,6 +78,10 @@ const Routing: Routes = [
     path: 'permission',
     loadChildren: () => import('./permission2/permission2.module').then((m) => m.Permission2Module),
   },
+  {
+    path: 'location-management',
+    loadChildren: () => import('./location-management/location-management.module').then((m) => m.LocationManagementModule),
+  },
 
   {
     path: '',
