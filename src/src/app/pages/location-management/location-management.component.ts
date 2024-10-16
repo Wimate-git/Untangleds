@@ -7,6 +7,7 @@ import { ListItem } from 'ng-multiselect-dropdown/multiselect.model';
 import { APIService, GetMasterQuery } from 'src/app/API.service';
 import Swal from 'sweetalert2';
 import { SharedService } from '../shared.service';
+
 interface TreeNode {
   id: string;         // Assuming 'id' is a string
   text: string;       // Assuming 'text' is a string
