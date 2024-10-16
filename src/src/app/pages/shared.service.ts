@@ -29,6 +29,10 @@ export class SharedService {
   }
 
 
+
+
+
+ 
   public getMultiSelectSettings() {
     return this.dropdownSettings = {
       singleSelection: false,
@@ -82,6 +86,7 @@ export class SharedService {
       limitSelection: 1
     };
   }
+
 
 
   public getLoggedUserDetails() {

@@ -9,7 +9,6 @@ import { NgxSelectModule } from 'ngx-select-ex';
 
 
 
-
 @NgModule({
   declarations: [LocationManagementComponent],
   imports: [
