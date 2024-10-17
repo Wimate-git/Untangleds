@@ -65,20 +65,7 @@ export class Crud2Component implements OnInit, AfterViewInit, OnDestroy{
         processing: '<span class="spinner-border spinner-border-sm align-middle"></span> Loading...'
       },
       search: true,
-      ...this.datatableConfig,
-    
-      buttons: [
-        {
-          extend: 'colvis', // Column visibility button
-          text: 'Column Visibility',
-          className: 'btn btn-secondary'
-        },
-        {
-          extend: 'excel', // Export button
-          text: 'Export to Excel',
-          className: 'btn btn-success'
-        }
-      ],
+      ...this.datatableConfig
     };
     
     this.renderActionColumn();

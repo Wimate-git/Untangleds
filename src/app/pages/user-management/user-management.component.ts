@@ -60,7 +60,7 @@ export class UserManagementComponent implements OnInit{
   errorForUniqueUserID:any = ''
   errorForInvalidName:any = ''
   listofClientIDs:any = []
-  listofCompanyIDs:any = ["tempCompany"]
+  listofCompanyIDs:any = []
   disabled_CLientID_textField: any = true;
   disabled_companyID_textField: boolean = true;
   errorForUniqueID:any = ''
@@ -77,11 +77,7 @@ export class UserManagementComponent implements OnInit{
   switchBetweenDropdown_company_id: boolean = false;
   switchBetweenDropdown_textField:boolean = false
 
-  locationPermissionArray :any =[{
-    text: "None",
-    value: "None"
-  }
-]
+  locationPermissionArray :any =['All']
 
 deviceListWorkAround :any =[{
   text: "None",
@@ -99,7 +95,7 @@ rdtListWorkAround :any =[{
 
   createUserField: UntypedFormGroup;
   dropdownSettings: any = {};
-  startNode:any
+  startNode:any = []
   hideUpdateButton:any
   showModal:any
   listofUserID: any = [];
@@ -134,6 +130,8 @@ rdtListWorkAround :any =[{
   listofMobileID: any = [];
   lookup_All_User: any = [];
   permission_data: any = [];
+  company_data: any = [];
+  formList: any = ["All"];
 
 
   constructor(private apiService: UserService,private configService:SharedService,private fb:FormBuilder
@@ -153,6 +151,64 @@ rdtListWorkAround :any =[{
     this.initializeUserFields()
 
     this.showTable()
+  }
+
+
+
+
+
+
+
+
+  async getTreeData(){
+    try{
+      await this.api.GetMaster(`${this.SK_clientID}#${this.user_companyID}#location#main`,1).then((result)=>{
+        if(result && result.metadata){
+
+          // console.log("tree result is here ",result);
+
+          const tree = JSON.parse(result.metadata)
+          const modifiedJson = JSON.parse(tree[0].tree)
+          console.log("modifiied data is here ",modifiedJson);
+
+          if(Array.isArray(modifiedJson) && modifiedJson.length > 0){
+            this.locationPermissionArray = []
+          }
+
+          for(let i = 0;i<modifiedJson.length;i++){
+
+            if(modifiedJson[i].node_type == "location"){
+              if (i == 0) {
+                this.locationPermissionArray.push("All")
+              }
+    
+              // if (i !== 0) {
+                //substracting -1 becas of binding list first 2 consist of All,none
+                this.locationPermissionArray.push(
+                  modifiedJson[i].text
+                )
+              // }
+  
+              
+              this.startNode.push(modifiedJson[i].text)
+              // this.defaultlocation.push(this.temp[i].text+"-"+this.temp[i].node_type)
+            }
+            // else if(this.temp[i].node_type == "device"){
+            //   this.startNode.push(this.temp[i].text+"-"+this.temp[i].node_type)
+            //   this.defaultlocation.push(this.temp[i].text+"-"+this.temp[i].node_type)
+            // }
+
+                       
+          }
+          console.log("Tree data is",this.locationPermissionArray); 
+
+          this.cd.detectChanges()
+        }
+      })
+    }
+    catch(error){
+      console.log("Error getting the tree data ",error);
+    }
   }
 
 
@@ -217,6 +273,7 @@ rdtListWorkAround :any =[{
       'location_permission': ['', Validators.required],
       'device_type_permission': ['', Validators.required],
       'device_permission': ['', Validators.required],
+      'form_permission': ['', Validators.required],
       'default_dev': [''],
       'default_loc': [''],
       'default_type': ['', Validators.required],
@@ -241,10 +298,79 @@ rdtListWorkAround :any =[{
     await this.getClientID()
     await this.fetchAllUsersData(1)
     await this.getAllUsers()
-
     await this.getPermissionIDs(1)
+    await this.getCompanyIDs(1);
+    await this.getTreeData();
+
+
+    try {
+      await this.api.GetMaster(this.SK_clientID + "#dynamic_form#lookup", 1).then((result: any) => {
+        if (result) {
+          const helpherObj = JSON.parse(result.options);
+    
+          // Corrected the map function
+          this.formList = helpherObj.map((item: any) => (item[0]));
+
+          this.formList.unshift('All')
+        }
+      });
+    } catch (err) {
+      console.log("Error fetching the dynamic form data ", err);
+    }
   }
 
+
+
+  async getCompanyIDs(sk: any){
+    console.log("Iam called Bro");
+    try {
+      const response = await this.api.GetMaster(this.SK_clientID+"#company#lookup", sk);
+
+   
+      if (response && response.options) {
+        // Check if response.listOfItems is a string
+        if (typeof response.options === 'string') {
+          let data = JSON.parse(response.options);
+          console.log("d1 =",data)
+          if (Array.isArray(data)) {
+            for (let index = 0; index < data.length; index++) {
+              const element = data[index];
+  
+              if (element !== null && element !== undefined) {
+                // Extract values from each element and push them to lookup_data_temp1
+                const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
+                const { P1, P2, P3,P4 ,P5,P6} = element[key]; // Extract values from the nested object
+                this.company_data.push({P1, P2, P3,P4,P5,P6 }); // Push an array containing P1, P2, and P3 values
+                console.log("d2 =",this.company_data)
+              } else {
+                break;
+              }
+            }
+            //this.lookup_data_temp1.sort((a, b) => b.P5 - a.P5);
+            this.company_data.sort((a:any, b:any) => {
+              return b.P5 - a.P5; // Compare P5 values in descending order
+            });
+            console.log("Lookup sorting",this.company_data);
+            // Continue fetching recursively
+            await this.getCompanyIDs(sk + 1);
+          } else {
+            console.error('Invalid data format - not an array.');
+          }
+        } else {
+          console.error('response.listOfItems is not a string.');
+        }
+      } else {
+        // Sort the lookup_data_temp1 array based on the third element (P3)
+      console.log()
+        console.log("companies to be displayed",this.company_data);  
+        
+        this.listofCompanyIDs = this.company_data.map((item:any)=>item.P1)
+      }
+    } catch (error) {
+      console.error('Error:', error);
+     
+    }
+  }
 
   async getPermissionIDs(sk: any) {
 
@@ -753,7 +879,8 @@ rdtListWorkAround :any =[{
         escalation_telegram: this.createUserField.value.escalation_telegram == null ? false : this.createUserField.value.escalation_telegram,
         email: this.createUserField.value.email,
         telegramID: this.createUserField.value.telegramID,
-        location_permission: updateLocation,
+        location_permission: this.createUserField.get('location_permission')?.value,
+        form_permission:this.createUserField.get('form_permission')?.value,
         device_type_permission: updateDevice_type,
         device_permission: updateDevice,
         default_dev: this.createUserField.value.default_dev,
@@ -786,41 +913,41 @@ rdtListWorkAround :any =[{
     console.log("temp obj is here ",tempObj);
 
 
-    // let temp1 = this.allUserDetails.device_permission;
-    // let temp2 = '';
+    let temp1 = this.allUserDetails.form_permission;
+    let temp2 = '';
 
-    // if (temp1) {
-    //   // If temp1 is not null or undefined
-    //   if (temp1.length === 1) {
-    //     temp2 = temp1[0];
-    //   } else if (temp1.length > 1) {
-    //     temp2 = temp1[0] + '...(' + (temp1.length) + ')';
-    //   } else {
-    //     temp2 = '...(0)';
-    //   }
-    // } else {
-    //   // If temp1 is null or undefined
-    //   temp2 = '...(0)';
-    // }
+    if (temp1) {
+      // If temp1 is not null or undefined
+      if (temp1.length === 1) {
+        temp2 = temp1[0];
+      } else if (temp1.length > 1) {
+        temp2 = temp1[0] + '...(' + (temp1.length) + ')';
+      } else {
+        temp2 = '...(0)';
+      }
+    } else {
+      // If temp1 is null or undefined
+      temp2 = '...(0)';
+    }
 
 
 
-    // let temp3 = this.allUserDetails.location_permission;
-    // let temp4 = '';
+    let temp3 = this.allUserDetails.location_permission;
+    let temp4 = '';
 
-    // if (temp3) {
-    //   // If temp1 is not null or undefined
-    //   if (temp3.length === 1) {
-    //     temp4 = temp3[0];
-    //   } else if (temp3.length > 1) {
-    //     temp4 = temp3[0] + '...(' + (temp3.length) + ')';
-    //   } else {
-    //     temp4 = '...(0)';
-    //   }
-    // } else {
-    //   // If temp1 is null or undefined
-    //   temp4 = '...(0)';
-    // }
+    if (temp3) {
+      // If temp1 is not null or undefined
+      if (temp3.length === 1) {
+        temp4 = temp3[0];
+      } else if (temp3.length > 1) {
+        temp4 = temp3[0] + '...(' + (temp3.length) + ')';
+      } else {
+        temp4 = '...(0)';
+      }
+    } else {
+      // If temp1 is null or undefined
+      temp4 = '...(0)';
+    }
 
 
     // let temp5 = this.allUserDetails.device_type_permission.map((value: any) => {
@@ -854,7 +981,9 @@ rdtListWorkAround :any =[{
   P2: this.allUserDetails.mobile,
   P3: this.allUserDetails.email,
   P4: this.allUserDetails.permission_ID,
-  P5:date
+  P5:temp4,
+  P6:temp2,
+  P7:date
 
   }
   console.log("Items to add on lookup are ",items);
@@ -1234,10 +1363,10 @@ rdtListWorkAround :any =[{
           escalation_telegram: this.createUserField.value.escalation_telegram == null ? false : this.createUserField.value.escalation_telegram,
           email: this.createUserField.value.email,
           telegramID: this.createUserField.value.telegramID,
-          // location_permission: this.multiselectLocation,
+          location_permission: this.createUserField.get('location_permission')?.value,
           default_module:this.createUserField.value.default_module,
           // device_type_permission: this.multiselectDeviceType_permission,
-          // device_permission: this.multiselectDevice_permission,
+          form_permission: this.createUserField.get('form_permission')?.value,
           default_dev: this.multiselectDevice_dev,
           default_loc: this.createUserField.value.default_loc,
           default_type: this.createUserField.value.default_type,
@@ -1299,10 +1428,10 @@ rdtListWorkAround :any =[{
           escalation_telegram: this.createUserField.value.escalation_telegram == null ? false : this.createUserField.value.escalation_telegram,
           email: this.createUserField.value.email,
           telegramID: this.createUserField.value.telegramID,
-          // location_permission: this.multiselectLocation,
+          location_permission:this.createUserField.get('location_permission')?.value,
           // device_type_permission: this.multiselectDeviceType_permission,
           default_module:this.createUserField.value.default_module,
-          // device_permission: this.multiselectDevice_permission,
+          form_permission:this.createUserField.get('form_permission')?.value,
           default_dev: this.createUserField.value.default_dev,
           default_loc: this.createUserField.value.default_loc,
           default_type: this.createUserField.value.default_type,
@@ -1358,8 +1487,8 @@ rdtListWorkAround :any =[{
       const tempClient = this.allUserDetails.clientID
       
 
-      // let temp1 = this.allUserDetails.device_permission;
-      // let temp2 = '';
+      let temp1 = this.allUserDetails.form_permission;
+      let temp2 = '';
 
       // const uniqueItems = new Set();
       // temp1 = temp1.filter((item: { value: any; }) => {
@@ -1368,57 +1497,38 @@ rdtListWorkAround :any =[{
       //   return !isDuplicate;
       // });
 
-      // if (temp1) {
-      //   // If temp1 is not null or undefined
-      //   if (temp1.length === 1) {
-      //     temp2 = temp1[0];
-      //   } else if (temp1.length > 1) {
-      //     temp2 = temp1[0] + '...(' + (temp1.length) + ')';
-      //   } else {
-      //     temp2 = '...(0)';
-      //   }
-      // } else {
-      //   // If temp1 is null or undefined
-      //   temp2 = '...(0)';
-      // }
+      if (temp1) {
+        // If temp1 is not null or undefined
+        if (temp1.length === 1) {
+          temp2 = temp1[0];
+        } else if (temp1.length > 1) {
+          temp2 = temp1[0] + '...(' + (temp1.length) + ')';
+        } else {
+          temp2 = '...(0)';
+        }
+      } else {
+        // If temp1 is null or undefined
+        temp2 = '...(0)';
+      }
 
 
 
-      // let temp3 = this.allUserDetails.location_permission;
-      // let temp4 = '';
+      let temp3 = this.allUserDetails.location_permission;
+      let temp4 = '';
 
-      // if (temp3) {
-      //   // If temp1 is not null or undefined
-      //   if (temp3.length === 1) {
-      //     temp4 = temp3[0];
-      //   } else if (temp3.length > 1) {
-      //     temp4 = temp3[0] + '...(' + (temp3.length) + ')';
-      //   } else {
-      //     temp4 = '...(0)';
-      //   }
-      // } else {
-      //   // If temp1 is null or undefined
-      //   temp4 = '...(0)';
-      // }
-
-
-      // let temp5 = this.allUserDetails.device_type_permission;
-      // let temp6 = '';
-
-      // if (temp5) {
-      //   // If temp1 is not null or undefined
-      //   if (temp5.length === 1) {
-      //     temp6 = temp5[0];
-      //   } else if (temp5.length > 1) {
-      //     temp6 = temp5[0] + '...(' + (temp5.length) + ')';
-      //   } else {
-      //     temp6 = '...(0)';
-      //   }
-      // } else {
-      //   // If temp1 is null or undefined
-      //   temp6 = '...(0)';
-      // }
-
+      if (temp3) {
+        // If temp1 is not null or undefined
+        if (temp3.length === 1) {
+          temp4 = temp3[0];
+        } else if (temp3.length > 1) {
+          temp4 = temp3[0] + '...(' + (temp3.length) + ')';
+        } else {
+          temp4 = '...(0)';
+        }
+      } else {
+        // If temp1 is null or undefined
+        temp4 = '...(0)';
+      }
 
 
      
@@ -1430,7 +1540,9 @@ rdtListWorkAround :any =[{
       P2: this.allUserDetails.mobile,
       P3: this.allUserDetails.email,
       P4: this.allUserDetails.permission_ID,
-      P5:date
+      P5:temp4,
+      P6:temp2,
+      P7:date
       }
 
       const masterUser = {
@@ -1447,6 +1559,8 @@ rdtListWorkAround :any =[{
 
       //console.log('newly added user', this.allUserDetails);
       console.log('newly added user', this.createUserField);
+
+      console.log("Items are here ",items);
 
       this.spinner.show()
 
@@ -1712,6 +1826,7 @@ rdtListWorkAround :any =[{
           'location_permission': getValues.location_permission,
           'device_type_permission': getValues.device_type_permission,
           'device_permission': getValues.device_permission,
+          'form_permission': getValues.form_permission,
           'default_dev': getValues.default_dev,
           'default_loc': getValues.default_loc,
           'default_type': getValues.default_type,
@@ -1796,6 +1911,7 @@ rdtListWorkAround :any =[{
           'location_permission': [getValues.location_permission],
           'device_type_permission': [getValues.device_type_permission],
           'device_permission': [getValues.device_permission],
+          'form_permission': [getValues.form_permission],
           'default_loc': getValues.default_loc,
           'default_dev': getValues.default_dev,
           'default_type': getValues.default_type,
@@ -1863,8 +1979,8 @@ rdtListWorkAround :any =[{
                   if (element !== null && element !== undefined) {
                     // Extract values from each element and push them to lookup_data_user
                     const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
-                    const { P1, P2, P3, P4, P5, P6 } = element[key]; // Extract values from the nested object
-                    this.lookup_data_user.push({ P1, P2, P3, P4, P5, P6 }); // Push an array containing P1, P2, P3, P4, P5, P6
+                    const { P1, P2, P3, P4, P5, P6,P7 } = element[key]; // Extract values from the nested object
+                    this.lookup_data_user.push({ P1, P2, P3, P4, P5, P6,P7 }); // Push an array containing P1, P2, P3, P4, P5, P6
                     console.log("d2 =", this.lookup_data_user);
                   } else {
                     break;
@@ -1872,7 +1988,7 @@ rdtListWorkAround :any =[{
                 }
   
                 // Sort the lookup_data_user array based on P5 values in descending order
-                this.lookup_data_user.sort((a: { P5: number; }, b: { P5: number; }) => b.P5 - a.P5);
+                this.lookup_data_user.sort((a: { P7: number; }, b: { P7: number; }) => b.P7 - a.P7);
                 console.log("Lookup sorting", this.lookup_data_user);
   
                 // Continue fetching recursively
@@ -2177,7 +2293,17 @@ rdtListWorkAround :any =[{
           title: 'Permission', data: 'P4' // Assuming P4 is the role
         },
         {
-          title: 'Updated', data: 'P5', render: function (data) {
+          title: 'Location Permission',
+          data: 'P5',
+          render: (data) => data || 'update required' // Handle undefined
+        },
+        {
+          title: 'FormID Permission',
+          data: 'P6',
+          render: (data) => data || 'update required' // Handle undefined
+        },
+        {
+          title: 'Updated', data: 'P7', render: function (data) {
             const date = new Date(data * 1000);
             return `${date.toDateString()} ${date.toLocaleTimeString()}`; // Format the date and time
           }
@@ -2228,6 +2354,7 @@ rdtListWorkAround :any =[{
                 let default_type = this.data_temp [allData].default_type;
                 let description = this.data_temp [allData].description
                 let device_permission = this.data_temp [allData].device_permission;
+                let form_permission = this.data_temp [allData].form_permission;
                 let device_type_permission = this.data_temp [allData].device_type_permission;
                 let disable_user = this.data_temp [allData].disable_user;
                 let email = this.data_temp [allData].email;
@@ -2275,6 +2402,7 @@ rdtListWorkAround :any =[{
                   default_type: default_type,
                   description: description,
                   device_permission: device_permission,
+                  form_permission: form_permission,
                   device_type_permission: device_type_permission,
                   disable_user: disable_user,
                   email: email,
@@ -2516,20 +2644,110 @@ rdtListWorkAround :any =[{
     //just delete and add new
     else if (key === 'update_delete') {
       this.allUserDetails = {
-        PK: this.userSK.PK,
-        SK: this.SK_clientID,
+        PK: `${value.username}#user#main`,
+        SK: 1,
+        metadata:JSON.stringify(value)
       }
 
 
+      let temp1 = value.form_permission;
+      let temp2 = '';
+  
+      if (temp1) {
+        // If temp1 is not null or undefined
+        if (temp1.length === 1) {
+          temp2 = temp1[0];
+        } else if (temp1.length > 1) {
+          temp2 = temp1[0] + '...(' + (temp1.length) + ')';
+        } else {
+          temp2 = '...(0)';
+        }
+      } else {
+        // If temp1 is null or undefined
+        temp2 = '...(0)';
+      }
+  
+  
+  
+      let temp3 = value.location_permission;
+      let temp4 = '';
+  
+      if (temp3) {
+        // If temp1 is not null or undefined
+        if (temp3.length === 1) {
+          temp4 = temp3[0];
+        } else if (temp3.length > 1) {
+          temp4 = temp3[0] + '...(' + (temp3.length) + ')';
+        } else {
+          temp4 = '...(0)';
+        }
+      } else {
+        // If temp1 is null or undefined
+        temp4 = '...(0)';
+      }
+  
+  
       const date = Math.ceil(((new Date()).getTime()) / 1000)
-      const items ={
-      P1: this.userSK.PK,
-      P8: date
-      }
+    const items ={
+    P1: value.username,
+    P2: value.mobile,
+    P3: value.email,
+    P4: value.permission_ID,
+    P5:temp4,
+    P6:temp2,
+    P7:date
+  
+    }
+
+
+    const masterUser = {
+      P1:value.username,
+      P2:value.clientID,
+      P3:value.email,
+      P5:value.userID,
+      P4:value.mobile
+    }
+     
+  
+      console.log("master table data is here ",masterUser);
 
       console.log('before deleting user on update_delete :', this.allUserDetails);
 
       console.log("Items to be deleted :",items);
+
+
+        this.api.UpdateMaster(this.allUserDetails).then(async (value: any) => {
+
+        if (value) {
+
+          await this.fetchTimeMachineById(1,masterUser.P1, 'delete', items);
+
+          await this.createLookUpRdt(items,1,masterUser.P2+"#user"+"#lookup")
+          
+          await this.fetchAllusersData(1,masterUser.P1,'update',masterUser)
+
+          // this.createNewUser(this.allUserDetails, 'update');
+
+          // await this.loading()
+
+          this.toast.open("User configuration updated successfully", " ", {
+            //panelClass: 'error-alert-snackbar',
+  
+              duration: 2000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top',
+            })
+
+            this.reloadEvent.next(true)
+  
+            this.closeUser.nativeElement.click();
+
+          this.addFromService();
+        }
+
+      }).catch((err: any) => {
+        console.log('error for deleting', err);
+      })
 
   }
   }
@@ -2663,6 +2881,24 @@ rdtListWorkAround :any =[{
       Swal.fire('User not confirmed' + '' + 'and User configuration not removed');
     }
   };
+
+
+
+
+
+
+
+
+
+  onModuleSelect(option: any) {
+
+    const selectedValues = this.createUserField.get('location_permission')?.value;
+    console.log('Selected Location Permissions:', selectedValues);
+
+    
+  }
+  
+  
 
 
 } 

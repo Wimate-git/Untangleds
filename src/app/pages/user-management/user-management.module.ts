@@ -8,6 +8,7 @@ import { NgbCollapseModule, NgbDropdownModule, NgbModule, NgbNavModule, NgbToolt
 import { UserManagementComponent } from "./user-management.component";
 import { NgxSpinner, NgxSpinnerModule } from "ngx-spinner";
 import { Crud2Module } from "src/app/modules/crud2/crud.module";
+import { MultiSelectModule } from "primeng/multiselect";
 
 
 
@@ -33,7 +34,10 @@ import { Crud2Module } from "src/app/modules/crud2/crud.module";
     NgbCollapseModule,
     NgbTooltipModule,
     NgbModule,
-    NgxSpinnerModule
+    NgxSpinnerModule,
+
+  
+    MultiSelectModule
     
     
 ]

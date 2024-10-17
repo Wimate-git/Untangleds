@@ -58,9 +58,12 @@ export class SidebarMenuComponent implements OnInit {
 
     console.log("PERMISSION RESPONSE SIDE MENU:", permisson_response)
 
-    this.permission_data = JSON.parse(JSON.parse(JSON.stringify(permisson_response.metadata)))
+    if(permisson_response && permisson_response.metadata){
+      this.permission_data = JSON.parse(JSON.parse(JSON.stringify(permisson_response.metadata)))
+    }
+    
 
-    console.log("SIDE MENU GET PERMISSION DATA RESPONSE:", this.permission_data.dreamBoardIDs)
+    // console.log("SIDE MENU GET PERMISSION DATA RESPONSE:", this.permission_data.dreamBoardIDs)
 
     this.generatedreamboard()
 

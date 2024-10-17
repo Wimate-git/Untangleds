@@ -1,4 +1,4 @@
-<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true"><p style="color: white" > Loading... </p></ngx-spinner>
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true"><p style="color: white" >Loading… please enjoy this virtual cup of coffee! ☕ </p></ngx-spinner>
   
 
 
@@ -120,7 +120,7 @@
                     <div class="container" style="padding-top: 25px">
                         <div class="row">
 
-                            <div class="col-md-4 form-check form-switch" *ngIf="!disableFields">
+                            <div class="col-md-4 form-check form-switch">
                                 <div class="col-lg-12">
                                     <input class="col-lg-6 form-check-input" formControlName="allowOtherClient"
                                         type="checkbox" (change)="switchInputs($event)">
@@ -153,7 +153,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-4 form-check form-switch" *ngIf="!disableFields">
+                            <div class="col-md-4 form-check form-switch" >
                                 <div class="col-lg-12">
                                     <input class="col-lg-6 form-check-input" formControlName="allowNewCompanyID"
                                         type="checkbox" (change)="switchCompanyID($event)">
@@ -362,9 +362,45 @@
                         </div>
                     </div>
 
-                    <div class="container" style="display: none;">
-                        <div class="row mb-7">
-                            <div class="col-md-4" *ngIf="locationPermissionArray.length>0">
+                    <div class="container">
+
+
+                    <div class="row mb-7">
+                        <div class="col-md-4" *ngIf="locationPermissionArray.length>0">
+                            <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Location
+                                Permission</label>
+                            <div class="custom-multiselect">
+    
+                                <p-multiSelect
+                                [options]="locationPermissionArray" 
+                                value ="value"
+                                placeholder="select Location"
+                                (onChange)="onModuleSelect($event)"
+                                formControlName="location_permission"
+                                required>
+                                </p-multiSelect>
+                            </div>
+                        </div>
+                       
+
+
+                        <!-- (onChange)="onModuleSelect(i, $event)"
+                        (onSelectAllChange)="onSelectAll(i, $event)" -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+                       
+                            <!-- <div class="col-md-4" *ngIf="locationPermissionArray.length>0">
                                 <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Location
                                     Permission</label>
 
@@ -389,62 +425,36 @@
                                     [formControl]="$any(createUserField.controls['location_permission'])">
                                 </ng-multiselect-dropdown>
         
-                            </div>
+                            </div> -->
 
-                                <div *ngIf="
+                                <!-- <div *ngIf="
                                     createUserField.get('location_permission')?.hasError('required') &&
                                     createUserField.get('location_permission')?.touched
                               " class="fv-plugins-message-container invalid-feedback">
                                     Location Permission is required
                                 </div>
-                            </div>
+                            </div> -->
 
 
-                            
-
-
-                           
-
-
-
-                            <div class="col-md-4" *ngIf="rdtListWorkAround.length>0">
-                                <label class="col-lg-12 col-form-label fw-bold fs-6 required">Reading Device Type
-                                    Permission</label>
-
-                            <div class="custom-multiselect">
-
-                                <ng-multiselect-dropdown style="
-                                    display: inline-block; 
-                                    width: 100%;
-                                    padding: 0px ;
-                                    margin-bottom: 0;
-                                    font-weight: 0px;
-                                    line-height: 1.52857143;
-                                    text-align: left;
-                                    vertical-align: middle;
-                                    cursor: pointer;
-                                    background-image: none;
-                                    border-radius: 4px;
-                                  
-                                " class="form-select form-select-solid form-select-lg fw-bold"
-                                    [placeholder]="'select devicetype permission'" [settings]="dropdownSettings"
-                                    [data]="rdtListWorkAround" (onSelect)="onDeviceTypeSelect($event)"
-                                    (onSelectAll)="onSelectAll($event)"
-                                    [formControl]="$any(createUserField.controls['device_type_permission'])">
-                                </ng-multiselect-dropdown>
-
-                            </div>
-
-                                <div *ngIf="
-                                    createUserField.get('device_type_permission')?.hasError('required') &&
-                                    createUserField.get('device_type_permission')?.touched
-                              " class="fv-plugins-message-container invalid-feedback">
-                                    Device Type Permission is required
+                            <div class="col-md-4" *ngIf="formList.length>0">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 required">FormID Permission</label>
+                                <div class="custom-multiselect">
+        
+                                    <p-multiSelect
+                                    [options]="formList" 
+                                    placeholder="select formID permission"
+                                    value ="value"
+                                    formControlName="form_permission"
+                                    required>
+                                    </p-multiSelect>
                                 </div>
                             </div>
 
-                            <div class="col-md-4" *ngIf="deviceListWorkAround.length>0">
-                                <label class="col-lg-12 col-form-label fw-bold fs-6 required">Device Permission</label>
+
+                        
+
+                            <!-- <div class="col-md-4" *ngIf="formList.length>0">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 required">FormID Permission</label>
 
                             <div class="custom-multiselect">
                                 <ng-multiselect-dropdown style="
@@ -461,8 +471,8 @@
                                 border-radius: 4px;
                               
                             " class="form-select form-select-solid form-select-lg fw-bold"
-                                    [placeholder]="'select device permission'" [settings]="dropdownSettings"
-                                    [data]="deviceListWorkAround" (onSelect)="onDeviceSelect($event)"
+                                    [placeholder]="'select formID permission'" [settings]="dropdownSettings"
+                                    [data]="formList" (onSelect)="onDeviceSelect($event)"
                                     (onSelectAll)="onSelectAllDevices($event)"
                                     [formControl]="$any(createUserField.controls['device_permission'])">
                                 </ng-multiselect-dropdown>
@@ -475,7 +485,7 @@
                               " class="fv-plugins-message-container invalid-feedback">
                                     Device Permission is required
                                 </div>
-                            </div>
+                            </div> -->
 
 
                         </div>
@@ -678,7 +688,7 @@
                             #closeUser>Cancel</button>
                          
                         <button [hidden]="hideUpdateButton" type="submit" class="btn btn-sm btn-primary"
-                            [disabled]="createUserField.invalid
+                            [disabled]="!createUserField.dirty || createUserField.invalid
                         || errorForUniqueID !='' || errorForUniqueEmail == 'Email already exists' || errorForInvalidEmail == 'Invalid Email Address' 
                         ||errorForInvalidName == 'Field must contains at least 1 numeric character,at least 1 lowercase letter,at least 1 uppercase letter,at least 1 special character,minimum 6 of length'"
                             (click)="updateUser(createUserField.value,'editUser')" *ngIf="showModal"
