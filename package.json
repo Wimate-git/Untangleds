@@ -107,5 +107,13 @@
   "description": "This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.x.x.",
   "main": "karma.conf.js",
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Wimate-git/Untangleds.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Wimate-git/Untangleds/issues"
+  },
+  "homepage": "https://github.com/Wimate-git/Untangleds#readme"
 }

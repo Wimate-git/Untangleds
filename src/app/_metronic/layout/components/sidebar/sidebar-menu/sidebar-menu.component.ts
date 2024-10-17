@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit ,ChangeDetectorRef} from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { APIService } from 'src/app/API.service';
 import { filter } from 'rxjs';
@@ -32,10 +32,13 @@ export class SidebarMenuComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private apiService: APIService,
+    private cdRef: ChangeDetectorRef
   ) {
   }
 
   async ngOnInit(): Promise<void> {
+
+    setTimeout(async () => {
 
     this.login_detail = localStorage.getItem('userAttributes')
 
@@ -45,7 +48,7 @@ export class SidebarMenuComponent implements OnInit {
     console.log("AFTER JSON STRINGIFY", this.loginDetail_string)
 
     this.client = this.loginDetail_string.clientID
-    this.user = this.loginDetail_string.userID
+    this.user = this.loginDetail_string.username
     this.permission_data = this.loginDetail_string.permission_ID
 
     this.loginDetail_string = JSON.parse(this.login_detail)
@@ -55,11 +58,9 @@ export class SidebarMenuComponent implements OnInit {
 
     console.log("PERMISSION RESPONSE SIDE MENU:", permisson_response)
 
-    if(permisson_response && permisson_response.metadata){
-      this.permission_data = JSON.parse(JSON.parse(JSON.stringify(permisson_response.metadata)))
-    }
+    this.permission_data = JSON.parse(JSON.parse(JSON.stringify(permisson_response.metadata)))
 
-    // console.log("SIDE MENU GET PERMISSION DATA RESPONSE:", this.permission_data.dreamBoardIDs)
+    console.log("SIDE MENU GET PERMISSION DATA RESPONSE:", this.permission_data.dreamBoardIDs)
 
     this.generatedreamboard()
 
@@ -72,7 +73,7 @@ export class SidebarMenuComponent implements OnInit {
 
         this.authService.checkSession(); // Call your session check method
       });
-
+    }, 1000); 
   }
 
   dreamboardLookupData(sk: number): Promise<[string, string, string, number][]> {
@@ -148,7 +149,7 @@ async generatedreamboard() {
     console.log("Path Array:", pathArray);
 
     // Ensure permission_data.dreamBoardIDs has data
-    if (this.permission_data &&  Array.isArray(this.permission_data.dreamBoardIDs) &&  this.permission_data.dreamBoardIDs && this.permission_data.dreamBoardIDs.length > 0) {
+    if (Array.isArray(this.permission_data.dreamBoardIDs) && this.permission_data.dreamBoardIDs.length > 0) {
       for (const pathValue of pathArray) {
         if (this.permission_data.dreamBoardIDs.includes(pathValue)) {
           submenu.push({
@@ -168,6 +169,8 @@ async generatedreamboard() {
       ];
     }
     console.log("Updated menuItems:", this.menuItems);
+
+    this.cdRef.detectChanges();
 
   } catch (error) {
     console.error('Error while generating dreamboard:', error);
