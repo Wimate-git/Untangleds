@@ -5,6 +5,7 @@
 <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">
     Open modal
   </button> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
 
   <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#myModal" style="margin-left: 30px;">
     <span class="svg-icon svg-icon-2">
@@ -32,7 +33,7 @@
             <div class="container">
                 <input type="search" id="search" value="" class="col-md-12 input"
                     style="margin:0em auto 1em auto; padding:4px; border-radius:4px; border:1px solid silver;"
-                    placeholder="Search For Devices">
+                    placeholder="Search For Form">
             </div>
 
             <div class="container scroll-y h-300px" id="SimpleJSTree"></div>
@@ -42,98 +43,99 @@
                     <div class="row">
 
                         <div class="col-md-6">
-                            <button  type="button" class="btn btn-sm custom-success  fw-bold"
-                                data-bs-toggle="modal" data-bs-target="#myModal2" [disabled]="!enableLocationButton || All_button_permissions"
-                                (click)="addLocation()">
-                                <span class="svg-icon svg-icon-primary svg-icon-2x">
-                                    <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo1/dist/../src/media/svg/icons/Map/Marker1.svg--><svg
-                                        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                        width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
-                                        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                            <rect x="0" y="0" width="24" height="24" />
-                                            <path
-                                                d="M5,10.5 C5,6 8,3 12.5,3 C17,3 20,6.75 20,10.5 C20,12.8325623 17.8236613,16.03566 13.470984,20.1092932 C12.9154018,20.6292577 12.0585054,20.6508331 11.4774555,20.1594925 C7.15915182,16.5078313 5,13.2880005 5,10.5 Z M12.5,12 C13.8807119,12 15,10.8807119 15,9.5 C15,8.11928813 13.8807119,7 12.5,7 C11.1192881,7 10,8.11928813 10,9.5 C10,10.8807119 11.1192881,12 12.5,12 Z"
-                                                fill="#000000" fill-rule="nonzero" />
-                                        </g>
-                                    </svg>
-                                    <!--end::Svg Icon-->
-                                </span>
-                                Add Location
-                            </button>
+                            <button type="button" class="btn btn-sm fw-bold"
+                            style="background-color: #007bff; color: white; border: none;" 
+                            data-bs-toggle="modal" data-bs-target="#myModal2" 
+                            [disabled]="!enableLocationButton || All_button_permissions"
+                            (click)="addLocation()">
+                            <span class="svg-icon svg-icon-primary svg-icon-2x">
+                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                        <rect x="0" y="0" width="24" height="24" />
+                                        <path d="M5,10.5 C5,6 8,3 12.5,3 C17,3 20,6.75 20,10.5 C20,12.8325623 17.8236613,16.03566 13.470984,20.1092932 C12.9154018,20.6292577 12.0585054,20.6508331 11.4774555,20.1594925 C7.15915182,16.5078313 5,13.2880005 5,10.5 Z M12.5,12 C13.8807119,12 15,10.8807119 15,9.5 C15,8.11928813 13.8807119,7 12.5,7 C11.1192881,7 10,8.11928813 10,9.5 C10,10.8807119 11.1192881,12 12.5,12 Z" fill="#000000" fill-rule="nonzero" />
+                                    </g>
+                                </svg>
+                            </span>
+                            Add Location
+                        </button>
+                        
                         </div>
 
                         <div class="col-md-6">
-                            <button type="button" class="btn btn-sm custom-primary fw-bold" data-bs-toggle="modal"
-                                data-bs-target="#myModal2" (click)="editLocation()" [disabled]="!enableLocationButton|| All_button_permissions">
+                            <button type="button" class="btn btn-sm fw-bold" 
+                                style="background-color: #28a745; color: white; border: none;" 
+                                data-bs-toggle="modal" data-bs-target="#myModal2" 
+                                (click)="editLocation()" 
+                                [disabled]="!enableLocationButton || All_button_permissions">
                                 <span class="svg-icon svg-icon-primary svg-icon-2x">
-                                    <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo1/dist/../src/media/svg/icons/Design/Edit.svg--><svg
-                                        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                        width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
                                         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                                             <rect x="0" y="0" width="24" height="24" />
-                                            <path
-                                                d="M8,17.9148182 L8,5.96685884 C8,5.56391781 8.16211443,5.17792052 8.44982609,4.89581508 L10.965708,2.42895648 C11.5426798,1.86322723 12.4640974,1.85620921 13.0496196,2.41308426 L15.5337377,4.77566479 C15.8314604,5.0588212 16,5.45170806 16,5.86258077 L16,17.9148182 C16,18.7432453 15.3284271,19.4148182 14.5,19.4148182 L9.5,19.4148182 C8.67157288,19.4148182 8,18.7432453 8,17.9148182 Z"
-                                                fill="#000000" fill-rule="nonzero"
-                                                transform="translate(12.000000, 10.707409) rotate(-135.000000) translate(-12.000000, -10.707409) " />
-                                            <rect fill="#000000" opacity="0.3" x="5" y="20" width="15" height="2"
-                                                rx="1" />
+                                            <path d="M8,17.9148182 L8,5.96685884 C8,5.56391781 8.16211443,5.17792052 8.44982609,4.89581508 L10.965708,2.42895648 C11.5426798,1.86322723 12.4640974,1.85620921 13.0496196,2.41308426 L15.5337377,4.77566479 C15.8314604,5.0588212 16,5.45170806 16,5.86258077 L16,17.9148182 C16,18.7432453 15.3284271,19.4148182 14.5,19.4148182 L9.5,19.4148182 C8.67157288,19.4148182 8,18.7432453 8,17.9148182 Z" fill="#000000" fill-rule="nonzero" transform="translate(12.000000, 10.707409) rotate(-135.000000) translate(-12.000000, -10.707409) " />
+                                            <rect fill="#000000" opacity="0.3" x="5" y="20" width="15" height="2" rx="1" />
                                         </g>
                                     </svg>
-                                    <!--end::Svg Icon-->
                                 </span>
                                 Edit Location
                             </button>
                         </div>
+                        
                         <!-- <br><br> -->
                     </div>
                 </div>
                 <div class="container" style="margin-left: 30px;">
                     <div class="row">
                         <div class="col-md-6">
-                            <button  class="btn btn-sm custom-success  fw-bold" data-bs-toggle="modal" style="width: 142.38px !important;"
-                                data-bs-target="#myModal3" (click)="addDevice()" [disabled]="!enableLocationButton ||  this.All_button_permissions">
-                                <span class="svg-icon svg-icon-primary svg-icon-2x">
-                                    <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo1/dist/../src/media/svg/icons/Devices/Hard-drive.svg--><svg
-                                        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                        width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
-                                        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                            <rect x="0" y="0" width="24" height="24" />
-                                            <path
-                                                d="M2,13 L22,13 L22,18 C22,19.1045695 21.1045695,20 20,20 L4,20 C2.8954305,20 2,19.1045695 2,18 L2,13 Z M18.5,18 C19.3284271,18 20,17.3284271 20,16.5 C20,15.6715729 19.3284271,15 18.5,15 C17.6715729,15 17,15.6715729 17,16.5 C17,17.3284271 17.6715729,18 18.5,18 Z M13.5,18 C14.3284271,18 15,17.3284271 15,16.5 C15,15.6715729 14.3284271,15 13.5,15 C12.6715729,15 12,15.6715729 12,16.5 C12,17.3284271 12.6715729,18 13.5,18 Z"
-                                                fill="#000000" />
-                                            <path
-                                                d="M5.79268604,8 L18.207314,8 C18.5457897,8 18.8612922,8.17121884 19.0457576,8.45501165 L22,13 L2,13 L4.95424243,8.45501165 C5.13870775,8.17121884 5.45421032,8 5.79268604,8 Z"
-                                                fill="#000000" opacity="0.3" />
+                            <button class="btn btn-sm fw-bold" 
+                                style="width: 142.38px !important; background-color: #007bff; color: white; border: none; border-radius: 0.25rem;" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#myModal3" 
+                                (click)="addDevice()" 
+                                [disabled]="!enableLocationButton || this.All_button_permissions">
+                                <span class="svg-icon svg-icon-primary svg-icon-2x" style="margin-right: 5px;"> <!-- Adjusted margin -->
+                                    <!-- Digital Form Icon -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24">
+                                        <g fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                            <line x1="3" y1="7" x2="21" y2="7"/>
+                                            <line x1="3" y1="11" x2="21" y2="11"/>
+                                            <line x1="3" y1="15" x2="21" y2="15"/>
+                                            <line x1="3" y1="19" x2="21" y2="19"/>
+                                            <path d="M9 3V1h6v2"/>
                                         </g>
                                     </svg>
-                                    <!--end::Svg Icon-->
                                 </span>
                                 Add Form
                             </button>
                         </div>
+                        
+                        
+                        
 
                         <div class="col-md-6">
-                            <button type="button" class="btn btn-sm custom-primary  fw-bold" data-bs-target="#myModal3" style="width: 142.38px !important;"
-                                data-bs-toggle="modal" (click)="editDevice()" [disabled]="!enableDeviceButton ||  this.All_button_permissions">
-                                <span class="svg-icon svg-icon-primary svg-icon-2x">
-                                    <!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo1/dist/../src/media/svg/icons/Design/Edit.svg--><svg
-                                        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                        width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                            <button type="button" class="btn btn-sm btn-success fw-bold" 
+                                data-bs-target="#myModal3" 
+                                style="width: 142.38px !important;" 
+                                data-bs-toggle="modal" 
+                                (click)="editDevice()" 
+                                [disabled]="!enableDeviceButton || this.All_button_permissions">
+                                <span class="svg-icon svg-icon-primary svg-icon-2x" style="margin-right: 5px;">
+                                    <!-- Edit Icon -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24">
                                         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                                             <rect x="0" y="0" width="24" height="24" />
-                                            <path
-                                                d="M8,17.9148182 L8,5.96685884 C8,5.56391781 8.16211443,5.17792052 8.44982609,4.89581508 L10.965708,2.42895648 C11.5426798,1.86322723 12.4640974,1.85620921 13.0496196,2.41308426 L15.5337377,4.77566479 C15.8314604,5.0588212 16,5.45170806 16,5.86258077 L16,17.9148182 C16,18.7432453 15.3284271,19.4148182 14.5,19.4148182 L9.5,19.4148182 C8.67157288,19.4148182 8,18.7432453 8,17.9148182 Z"
-                                                fill="#000000" fill-rule="nonzero"
+                                            <path d="M8,17.9148182 L8,5.96685884 C8,5.56391781 8.16211443,5.17792052 8.44982609,4.89581508 L10.965708,2.42895648 C11.5426798,1.86322723 12.4640974,1.85620921 13.0496196,2.41308426 L15.5337377,4.77566479 C15.8314604,5.0588212 16,5.45170806 16,5.86258077 L16,17.9148182 C16,18.7432453 15.3284271,19.4148182 14.5,19.4148182 L9.5,19.4148182 C8.67157288,19.4148182 8,18.7432453 8,17.9148182 Z"
+                                                fill="black" fill-rule="nonzero" 
                                                 transform="translate(12.000000, 10.707409) rotate(-135.000000) translate(-12.000000, -10.707409) " />
-                                            <rect fill="#000000" opacity="0.3" x="5" y="20" width="15" height="2"
-                                                rx="1" />
+                                            <rect fill="black" opacity="0.3" x="5" y="20" width="15" height="2" rx="1" />
                                         </g>
                                     </svg>
-                                    <!--end::Svg Icon-->
                                 </span>
                                 Edit Form
                             </button>
                         </div>
+                        
+                        
                     </div>
 
                 </div>
@@ -535,7 +537,7 @@
         background-image: none;
         border-radius: 4px;
       
-    " class="form-select form-select-solid form-select-lg fw-bold" [placeholder]="'Select Devices'"
+    " class="form-select form-select-solid form-select-lg fw-bold" [placeholder]="'Select Form'"
                 [settings]="dropdownSettings" [data]="listofDeviceIds"  (onDeSelect)="onDeviceDeSelect($event)"
                 (onSelect)="onDeviceSelect($event)" (onSelectAll)="onSelectAllDevices($event)"
                 [formControl]="$any(createDeviceField.controls['name'])" required>
@@ -745,21 +747,14 @@
 
                             <div class="col-md-4">
                                 <label class="col-lg-12 col-form-label fw-bold fs-6 ">Icon</label>
-
-                                <select class="form-select form-select-solid form-select-lg fw-bold"
-                                    placeholder="select report to" name="icon" formControlName="icon">
-                                    <!-- <option value="fa fa-hdd-o">Device</option> -->
-                                    <option value="fa fa-cube">Cube</option>
-                                    <option value="fa fa-cubes">Cubes</option>
-                                    <option value="fa fa-bolt">Bolt</option>
-                                    <option value="fa fa-inbox">Inbox</option>
-                                    <option value="fa fa-rocket">Rocket</option>
-                                    <option value="fa fa-wifi">WiFi</option>
-                                    <option value="fa fa-mobile">Mobile</option>
-                                    <option value="fa fa-laptop">Laptop</option>
-                                    <option value="fa fa-desktop">Desktop</option>
-                                    <option value="fa fa-car">Car</option>
-                                </select>
+                                <ngx-select 
+                                name="icon" formControlName="icon"  
+                                [allowClear]="true" 
+                                [items]="listofIconsIds"
+                                optionValueField="value" 
+                                optionTextField="text" 
+                                placeholder="Select DreamboardID">
+                            </ngx-select>
                             </div>
 
                             <div class="col-md-4">

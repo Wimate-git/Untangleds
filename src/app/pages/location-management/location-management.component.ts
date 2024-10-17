@@ -7,6 +7,7 @@ import { ListItem } from 'ng-multiselect-dropdown/multiselect.model';
 import { APIService, GetMasterQuery } from 'src/app/API.service';
 import Swal from 'sweetalert2';
 import { SharedService } from '../shared.service';
+import { LocationPermissionService } from 'src/app/location-permission.service';
 interface TreeNode {
   id: string;         // Assuming 'id' is a string
   text: string;       // Assuming 'text' is a string
@@ -27,6 +28,11 @@ export class LocationManagementComponent implements OnInit {
   trees: any;
   jsondata: { id: string; text: string; node_type: string; parent: string; dashboard_view: { id: null; }; leadership_view: { id: null; }; mobile_view: { id: null; }; area: null; summary_enable: null; summary_types: null; }[];
   formList: any;
+  listofIconsIds: { value: string; text: string; }[];
+  userdetails: any;
+  userClient: string;
+  metadataObject: any;
+
 
 
   onDeviceDeSelect($event: ListItem) {
@@ -120,7 +126,7 @@ export class LocationManagementComponent implements OnInit {
       constructor(private fb: UntypedFormBuilder, private companyConfiguration: SharedService,
         private powerboardConfiguration: SharedService,
         private devicesList: SharedService, private api: APIService, private toast: MatSnackBar, private crn: ChangeDetectorRef,
-        private router: Router,
+        private router: Router,private locationPermissionService:LocationPermissionService
       ) 
       
       {  
@@ -148,7 +154,8 @@ export class LocationManagementComponent implements OnInit {
         console.log('this.companyId check',this.companyId)
         this.tempClient = this.SK_clientID+"#"+this.companyId+"#location" + "#main";
         console.log('tempClient check',this.tempClient)
-        this.addFromService()
+        // this.addFromService()
+        this.populateDreamboardOptions();
      
 
         // this.SK_clientID = this.userClientIDCognito.attributes["custom:clientID"];
@@ -394,6 +401,108 @@ export class LocationManagementComponent implements OnInit {
               // this.createJSTree(this.trees);
     
       }
+
+      populateDreamboardOptions() {
+        this.listofIconsIds = [
+          { value: 'bi bi-tools', text: 'Tools' },
+    { value: 'bi bi-wrench', text: 'Wrench' },
+    { value: 'bi bi-hammer', text: 'Hammer' },
+    { value: 'bi bi-screwdriver', text: 'Screwdriver' },
+    { value: 'bi bi-gear', text: 'Gear' },
+    { value: 'bi bi-clipboard', text: 'Clipboard' },
+    { value: 'bi bi-battery', text: 'Battery' },
+    { value: 'bi bi-box', text: 'Box' },
+    { value: 'bi bi-archive', text: 'Archive' },
+    { value: 'bi bi-minecart-loaded', text: 'Minecart Loaded' },
+          { value: 'bi bi-table', text: 'Data Table' },
+          { value: 'bi bi-graph-up', text: 'Growth Graph' },
+          { value: 'bi bi-graph-down', text: 'Decline Graph' },
+          { value: 'bi bi-pie-chart', text: 'Pie Chart' },
+          { value: 'bi bi-bar-chart', text: 'Bar Chart' },
+          { value: 'bi bi-file-earmark-spreadsheet', text: 'Spreadsheet File' },
+          { value: 'bi bi-file-earmark-text', text: 'Text File' },
+          { value: 'bi bi-clipboard-data', text: 'Clipboard Data' },
+          { value: 'bi bi-cloud-upload', text: 'Upload Data' },
+          { value: 'bi bi-cloud-download', text: 'Download Data' },
+          { value: 'bi-file-earmark-text', text: 'Document' },
+          { value: 'bi-file-earmark-zip', text: 'Zip File' },
+          { value: 'bi-file-earmark-person', text: 'Contract' },
+          { value: 'bi-file-earmark-rupee', text: 'Invoice' },
+          { value: 'bi-file-earmark-check', text: 'Approved Document' },
+          { value: 'bi-file-earmark-spreadsheet', text: 'Spreadsheet' },
+          { value: 'bi-file-earmark-pdf', text: 'PDF Document' },
+          { value: 'bi-file-earmark-lock', text: 'Secure Document' },
+          { value: 'bi-file-earmark-plus', text: 'New Document' },
+          { value: 'bi-file-earmark-earmark-minus', text: 'Delete Document' },
+          { value: 'bi-pencil', text: 'Edit Document' },
+          { value: 'bi-printer', text: 'Print Document' },
+          { value: 'bi-download', text: 'Download Document' },
+          { value: 'bi-upload', text: 'Upload Document' },
+          { value: 'bi-hand-thumbs-up', text: 'Approve' },
+          { value: 'bi-hand-thumbs-down', text: 'Reject' },
+          { value: 'bi-calendar-check', text: 'Scheduled Meeting' },
+          { value: 'bi-chat-dots', text: 'Comments/Discussions' },
+          { value: 'bi-shield-lock', text: 'Secure Contract' },
+          { value: 'bi-check-circle', text: 'Confirmation' },
+          { value: 'bi-person', text: 'Person' },
+          { value: 'bi-person-fill', text: 'Filled Person' },
+          { value: 'bi-file-earmark-text', text: 'Text Document' },
+          { value: 'bi-file-earmark-person', text: 'Personal Document' },
+          { value: 'bi-envelope', text: 'Email' },
+          { value: 'bi-phone', text: 'Phone' },
+          { value: 'bi-calendar', text: 'Date of Birth' },
+          { value: 'bi-geo-alt', text: 'Location' },
+          { value: 'bi-birthday-cake', text: 'Birthday' },
+          { value: 'bi-card-text', text: 'ID Card' },
+          { value: 'bi-chat', text: 'Chat' },
+          { value: 'bi-file-earmark-image', text: 'Profile Picture' },
+          { value: 'bi-briefcase', text: 'Job Title' },
+          { value: 'bi-person-check', text: 'Verified Person' },
+          { value: 'bi-file-earmark-pdf', text: 'PDF Document' },
+          { value: 'bi-upload', text: 'Upload Document' },
+          { value: 'bi-download', text: 'Download Document' },
+          { value: 'bi-shield-lock', text: 'Secure Information' },
+          { value: 'bi-check-circle', text: 'Confirmation' },
+          { value: 'bi-check-circle', text: 'Success' },
+          { value: 'bi-x-circle', text: 'Error' },
+          { value: 'bi-exclamation-circle', text: 'Warning' },
+          { value: 'bi-info-circle', text: 'Information' },
+          { value: 'bi-check-square', text: 'Validated' },
+          { value: 'bi-x-square', text: 'Invalid' },
+          { value: 'bi-exclamation-square', text: 'Caution' },
+          { value: 'bi-file-earmark-excel', text: 'Excel Validation' },
+          { value: 'bi-file-earmark-pdf', text: 'PDF Validation' },
+          { value: 'bi-file-earmark-text', text: 'Text Document' },
+          { value: 'bi-shield-check', text: 'Security Check' },
+          { value: 'bi-lock', text: 'Locked Field' },
+          { value: 'bi-unlock', text: 'Unlocked Field' },
+          { value: 'bi-pencil', text: 'Edit' },
+          { value: 'bi-archive', text: 'Archive' },
+          { value: 'fa fa-file-contract', text: 'Contract' },
+          { value: 'fa fa-signature', text: 'Signature' },
+          { value: 'fa fa-file-signature', text: 'File Signature' },
+          { value: 'fa fa-file-alt', text: 'File' },
+          { value: 'fa fa-file-invoice', text: 'Invoice' },
+          { value: 'fa fa-file-invoice-dollar', text: 'Invoice Dollar' },
+          { value: 'fa fa-clipboard-list', text: 'Checklist' },
+          { value: 'fa fa-paperclip', text: 'Paperclip' },
+          { value: 'fa fa-stamp', text: 'Stamp' },
+          { value: 'fa fa-handshake', text: 'Handshake' },
+          { value: 'fa fa-shield-alt', text: 'Shield' },
+          { value: 'fa fa-calendar-check', text: 'Calendar Check' },
+          { value: 'fa fa-pencil-alt', text: 'Edit' },
+          { value: 'fa fa-trash', text: 'Delete' },
+          { value: 'fa fa-print', text: 'Print' },
+          { value: 'fa fa-arrow-circle-right', text: 'Proceed' },
+          { value: 'fa fa-download', text: 'Download' },
+          { value: 'fa fa-upload', text: 'Upload' },
+          { value: 'fa fa-user-check', text: 'User Check' },
+          { value: 'fa fa-users-cog', text: 'Users Cog' },
+          { value: 'fa fa-chart-line', text: 'Chart Line' },
+        ];
+      }
+    
+    
     
       initializeDeviceFields() {
     
@@ -517,6 +626,8 @@ export class LocationManagementComponent implements OnInit {
     
         //   });
       }
+
+
       
       // async getMagicBoardList() {
     
@@ -731,35 +842,36 @@ export class LocationManagementComponent implements OnInit {
       //   }, 0);
       // }
       ngAfterViewInit() {
-        this.api.GetMaster(this.tempClient, 1).then((result: GetMasterQuery) => {
-          if (result) {
-            this.temp_TemplateID_Label = [];
-            const templates = result; 
-            console.log('templates check', templates);
+        this.addFromService()
+    //     this.api.GetMaster(this.tempClient, 1).then((result: GetMasterQuery) => {
+    //       if (result) {
+    //         this.temp_TemplateID_Label = [];
+    //         const templates = result; 
+    //         console.log('templates check', templates);
             
-            // Parse the metadata 
-            if (templates.metadata) {
-              const parsedMetadata = JSON.parse(templates.metadata);
-              console.log('Parsed Metadata:', parsedMetadata);
+    //         // Parse the metadata 
+    //         if (templates.metadata) {
+    //           const parsedMetadata = JSON.parse(templates.metadata);
+    //           console.log('Parsed Metadata:', parsedMetadata);
               
-              // Assuming the parsed metadata contains an array of trees
-              this.trees = JSON.parse(parsedMetadata[0].tree);
-              console.log('trees check', this.trees);
-              this.temp =  this.trees
-              // Prepare the jstree data
-              const jstreeData = this.trees.map((treeNode: TreeNode) => ({
-                id: treeNode.id, // Use 'id' for jstree node ID
-                text: treeNode.text, // Use 'text' for jstree node display
-                parent: treeNode.parent || "#", // Set parent, or use "#" for root
-                node_type: treeNode.node_type // You can add additional properties as needed
-              }));
-     this.createJSTree(jstreeData);
+    //           // Assuming the parsed metadata contains an array of trees
+    //           this.trees = JSON.parse(parsedMetadata[0].tree);
+    //           console.log('trees check', this.trees);
+    //           this.temp =  this.trees
+    //           // Prepare the jstree data
+    //           const jstreeData = this.trees.map((treeNode: TreeNode) => ({
+    //             id: treeNode.id, // Use 'id' for jstree node ID
+    //             text: treeNode.text, // Use 'text' for jstree node display
+    //             parent: treeNode.parent || "#", // Set parent, or use "#" for root
+    //             node_type: treeNode.node_type // You can add additional properties as needed
+    //           }));
+    //  this.createJSTree(jstreeData);
               
-            }
-          }
-        }).catch(err => {
-          console.log('Error fetching template IDs', err);
-        });
+    //         }
+    //       }
+    //     }).catch(err => {
+    //       console.log('Error fetching template IDs', err);
+    //     });
       }
 
 
@@ -1330,136 +1442,111 @@ export class LocationManagementComponent implements OnInit {
     
       deleteDevice() {
         let nodeID = $("#SimpleJSTree").jstree(true).get_selected()[0];
+        console.log('nodeID check', nodeID);
         let children = $("#SimpleJSTree").jstree(true).get_node(nodeID);
-        // $("#SimpleJSTree").jstree(true).delete_node(children);
-        // console.log('delete child nodeID', nodeID);
-        //console.log('inisde delete', children);
     
         if (children !== false) {
+            // Check if the selected node is a root node
+            if (children.parent === "#") {
+                return Swal.fire({
+                    customClass: {
+                        container: 'swal2-container'
+                    },
+                    position: 'center',
+                    icon: 'warning',
+                    title: 'Don\'t delete root node',
+                    showCancelButton: true,
+                    allowOutsideClick: false, // prevents outside click
+                });
+            }
     
-          for (let nodesList = 0; nodesList < this.temp.length; nodesList++) {
+            // Check if the node has children that need to be deleted first
+            for (let nodesList = 0; nodesList < this.temp.length; nodesList++) {
+                if (children.id === this.temp[nodesList].parent) {
+                    return Swal.fire({
+                        customClass: {
+                            container: 'swal2-container'
+                        },
+                        position: 'center',
+                        icon: 'warning',
+                        title: 'Delete child node first',
+                        showCancelButton: true,
+                        allowOutsideClick: false, // prevents outside click
+                    });
+                }
+            }
     
-            if (children.parent == "#") {
-              return Swal.fire({
+            // Remove the selected node from the temp array
+            for (let nodesList = 0; nodesList < this.temp.length; nodesList++) {
+                if (this.temp[nodesList].id === children.id) {
+                    this.temp.splice(nodesList, 1);
+                    break;
+                }
+            }
+    
+            // Immediately update the jstree data
+            $('#SimpleJSTree').jstree(true).settings.core.data = this.temp; // Update tree data
+            $('#SimpleJSTree').jstree(true).refresh(true); // Refresh the tree
+    
+            // Prepare data for updating the server
+            const temp = [
+                {
+                    tree: JSON.stringify(this.temp)
+                }
+            ];
+            this.allLocationDetails = {
+                PK: this.tempClient,
+                SK: 1,
+                metadata: JSON.stringify(temp)
+            };
+    
+            // Call the API to delete from the server
+            this.api.UpdateMaster(this.allLocationDetails).then(value => {
+                console.log('API response:', value); // Inspect the entire response object
+    
+                if (value && value.metadata) {
+                    // Optionally, you can parse the response if needed
+                    this.toast.open("Location Configuration deleted successfully", " ", {
+                        duration: 2000,
+                        horizontalPosition: 'right',
+                        verticalPosition: 'top',
+                    });
+                    this.multiselectDevice = [];
+                } else {
+                    console.error('Invalid response structure:', value);
+                    Swal.fire({
+                        customClass: {
+                            container: 'swal2-container'
+                        },
+                        position: 'center',
+                        icon: 'warning',
+                        title: 'Error in deleting Location Configuration',
+                        showCancelButton: true,
+                        allowOutsideClick: false,
+                    });
+                }
+            }).catch(err => {
+                console.error('Error during API update:', err);
+                this.toast.open("Error in deleting Location Configuration ", "Check again", {
+                    duration: 5000,
+                    horizontalPosition: 'right',
+                    verticalPosition: 'top',
+                });
+            });
+        } else {
+            return Swal.fire({
                 customClass: {
-                  container: 'swal2-container'
+                    container: 'swal2-container'
                 },
                 position: 'center',
                 icon: 'warning',
-                title: 'Dont delete root node ',
+                title: 'Select any Location or Device',
                 showCancelButton: true,
-                allowOutsideClick: false,////prevents outside click
-              })
-            }
-    
-            if (children.id === this.temp[nodesList].parent) {
-              return Swal.fire({
-                customClass: {
-                  container: 'swal2-container'
-                },
-                position: 'center',
-                icon: 'warning',
-                title: 'Delete child node first',
-                showCancelButton: true,
-                allowOutsideClick: false,////prevents outside click
-              })
-            }
-    
-          }
-    
-          for (let nodesList = 0; nodesList < this.temp.length; nodesList++) {
-            //else if (this.temp[nodesList].id == children.id) {
-            if (this.temp[nodesList].id == children.id) {
-              this.temp.splice(nodesList, 1);
-              break;
-            }
-    
-          }
-          const temp:any=[
-            {
-              tree: JSON.stringify(this.temp)
-            }
-          ]
-           this.allLocationDetails = {
-            PK: this.tempClient,
-            SK: 1,
-            metadata: JSON.stringify(temp)
-          };
-
-    
-          this.api.UpdateMaster(this.allLocationDetails).then(value => {
-    
-            //need to refresh table so this is called 
-            //this.addFromService();
-
-    
-            if (value&&value.metadata&&value.metadata) {
-    
-              let tempTree = JSON.parse(JSON.stringify(value?.metadata))
-              const parsedOuter = JSON.parse( this.tempTree);
-  
-              // Now parse the inner string contained in the "tree" property
-              const innerJsonString = parsedOuter[0].tree;
-    
-              $('#SimpleJSTree').jstree(true).settings.core.data = JSON.parse(innerJsonString);
-              $('#SimpleJSTree').jstree(true).refresh(true);
-    
-              this.toast.open("Location Configuration deleted successfully", " ", {
-                //panelClass: 'error-alert-snackbar',
-    
-                duration: 2000,
-                horizontalPosition: 'right',
-                verticalPosition: 'top',
-              })
-    
-              this.multiselectDevice = [];
-    
-    
-            }
-            else {
-              Swal.fire({
-                customClass: {
-                  container: 'swal2-container'
-                },
-                position: 'center',
-                icon: 'warning',
-                title: 'Error in deleting Location Configuration',
-                showCancelButton: true,
-                allowOutsideClick: false,////prevents outside click
-              })
-              //alert('Error in adding User Configuration');
-            }
-    
-          }).catch(err => {
-            //console.log('err for updation', err);
-            this.toast.open("Error in deleting Location Configuration ", "Check again", {
-              //panelClass: 'error-alert-snackbar',
-    
-              duration: 5000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top',
-              //   //panelClass: ['blue-snackbar']
-            })
-          })
+                allowOutsideClick: false,
+            });
         }
+    }
     
-        else {
-    
-          return Swal.fire({
-            customClass: {
-              container: 'swal2-container'
-            },
-            position: 'center',
-            icon: 'warning',
-            title: 'Select any Location or Device',
-            showCancelButton: true,
-            allowOutsideClick: false,////prevents outside click
-          })
-    
-        }
-    
-    
-      }
 
 
       async addFromService() {
@@ -1475,6 +1562,73 @@ export class LocationManagementComponent implements OnInit {
         } catch (err) {
           console.log("Error fetching the dynamic form data", err);
         }
+
+ this.userdetails = this.getLoggedUser.username;
+      this.userClient = this.userdetails +"#user"+"#main"
+        console.log('this.tempClient from form service check',this.userClient)
+        this.All_button_permissions =  await this.api.GetMaster(this.userClient,1).then(data =>{
+          // const metadataString: string | null | undefined = data.metadata;
+
+          // // Check if metadataString is a valid string before parsing
+          // if (typeof metadataString === 'string') {
+          //     try {
+          //         // Parse the JSON string into a JavaScript object
+          //         this.metadataObject = JSON.parse(metadataString);
+          //         console.log('Parsed Metadata Object:', this.metadataObject);
+          //     } catch (error) {
+          //         console.error('Error parsing JSON:', error);
+          //     }
+          // } else {
+          //     console.log('Metadata is not a valid string:', metadataString);
+          // }
+          if(data){
+            console.log('data checking from add form',data)
+                      const metadataString: string | null | undefined = data.metadata;
+
+          // Check if metadataString is a valid string before parsing
+          if (typeof metadataString === 'string') {
+              try {
+                  // Parse the JSON string into a JavaScript object
+                  this.metadataObject = JSON.parse(metadataString);
+                  console.log('Parsed Metadata Object from location', this.metadataObject);
+              } catch (error) {
+                  console.error('Error parsing JSON:', error);
+              }
+          } else {
+              console.log('Metadata is not a valid string:', this.metadataObject);
+          }
+            // console.log("userPermissions iside",this.modifyList(data.location_permission,data.device_type_permission,data.device_permission))
+           return  this.modifyList(this.metadataObject.locationpermission,this.metadataObject.formpermission)==="All-All"?false:true
+          
+          }
+          
+          })
+    
+          console.log("this.All_button_permissions",this.All_button_permissions )
+        this.locationPermissionService.fetchGlobalLocationTree()
+        .then((jsonModified:any) => {
+          if (!jsonModified) {
+            throw new Error("No data returned");
+          }
+    
+          console.log("Data from location: check", jsonModified);
+          this.temp = jsonModified
+          const jstreeData = jsonModified.map((treeNode: TreeNode) => ({
+            id: treeNode.id, // Use 'id' for jstree node ID
+            text: treeNode.text, // Use 'text' for jstree node display
+            parent: treeNode.parent || "#", // Set parent, or use "#" for root
+            node_type: treeNode.node_type // You can add additional properties as needed
+          }));
+          setTimeout(() => {
+            this.createJSTree(jstreeData);
+          }, 1000);
+ 
+          // Proceed with creating the JSTree
+         
+          // this.createJSTree(jsonModified);
+          // this.getAllDevices();
+        }
+      )
       }
       
     
@@ -1641,35 +1795,42 @@ export class LocationManagementComponent implements OnInit {
       //     // Handle the error as needed
       //   }
       // }
-      modifyList(locationPermission: any, deviceTypePermissions: any, devicePermissions: any): string {
-        // Determine the permission type for location, device type, and device
-        const keyLocation = locationPermission.length === 1 && locationPermission[0] === "All" ? "All" : "Not all";
-        const keyReadingDeviceType = deviceTypePermissions.length === 1 && deviceTypePermissions[0] === "All" ? "All" : "Not all";
-        const keyDevices = devicePermissions.length === 1 && devicePermissions[0] === "All" ? "All" : "Not all";
-     console.log("moodify",`${keyLocation}-${keyReadingDeviceType}-${keyDevices}`)
-        // Concatenate data based on the keys
-        switch (`${keyLocation}-${keyReadingDeviceType}-${keyDevices}`) {
-            case "All-All-All":
-               //  return [...deviceTypePermissions, ...devicePermissions];
-               return "All-All-All";
+      modifyList(locationpermission: any, formpermissions: any): string {
+        // Check if locationPermission and devicePermissions are defined and are arrays
+        if (!Array.isArray(locationpermission) || !Array.isArray(formpermissions)) {
+            console.error("Invalid input: locationPermission and devicePermissions must be arrays.");
+            return ''; // Return early if inputs are not valid
+        }
     
+        // Determine the permission type for location and device
+        const keyLocation = locationpermission.length === 1 && locationpermission[0] === "All" ? "All" : "Not all";
+        const keyDevices = formpermissions.length === 1 && formpermissions[0] === "All" ? "All" : "Not all";
+    
+        console.log("modify", `${keyLocation}--${keyDevices}`);
+    
+        // Concatenate data based on the keys
+        switch (`${keyLocation}-${keyDevices}`) {
+            case "All-All":
+                // return [...deviceTypePermissions, ...devicePermissions]; // Assuming deviceTypePermissions is defined
+                return "All-All";
     
             default:
                 console.log("Unrecognized case");
                 return '';
         }
-       }
-       get RDT(){
-        if(this.RDT_ID!==""&&this.RDT_ID!==undefined){
-    return this.RDT_ID
-        }else if(this.final_list?.original?.RDT!==""){
-    return this.final_list?.original?.RDT
+    }
     
-        }else{
-          return "rdt is empty"
-        }
-    // return this.RDT_ID!==""||this.RDT_ID!==undefined?this.RDT_ID:this.final_list?.original?.RDT!==""?this.final_list?.original?.RDT:"rdt is empty"
-       }
+    //    get RDT(){
+    //     if(this.RDT_ID!==""&&this.RDT_ID!==undefined){
+    // return this.RDT_ID
+    //     }else if(this.final_list?.original?.RDT!==""){
+    // return this.final_list?.original?.RDT
+    
+    //     }else{
+    //       return "rdt is empty"
+    //     }
+    // // return this.RDT_ID!==""||this.RDT_ID!==undefined?this.RDT_ID:this.final_list?.original?.RDT!==""?this.final_list?.original?.RDT:"rdt is empty"
+    //    }
 
 }
 function ngAfterViewInit() {
