@@ -70,9 +70,9 @@ export class LocationPermissionService implements OnInit {
           console.log('Metadata is not a valid string:', metadataString);
       }
       if (this.metadataObject) {
-        const keyLocation = this.metadataObject.locationpermission?.length === 1 && this.metadataObject.locationpermission[0] === "All" ? "All" : "Not all";
+        const keyLocation = this.metadataObject.location_permission?.length === 1 && this.metadataObject.location_permission[0] === "All" ? "All" : "Not all";
         // const keyReadingDeviceType = data.device_type_permission?.length === 1 && data.device_type_permission[0] === "All" ? "All" : "Not all";
-        const keyDevices = this.metadataObject.formpermission?.length === 1 && this.metadataObject.formpermission[0] === "All" ? "All" : "Not all";
+        const keyDevices = this.metadataObject.form_permission?.length === 1 && this.metadataObject.form_permission[0] === "All" ? "All" : "Not all";
 
         // Fetch location configuration
         const result: any = await this.api.GetMaster(this.tempClient, 1);
@@ -95,7 +95,7 @@ export class LocationPermissionService implements OnInit {
           // Modify list if necessary
           if (`${keyLocation}-${keyDevices}` !== "All-All") {
             try {
-              returnValue = await this.modifyList(this.metadataObject.locationpermission, this.metadataObject.formpermission, this.treeData);
+              returnValue = await this.modifyList(this.metadataObject.location_permission, this.metadataObject.form_permission, this.treeData);
               console.log("jsonModified in service", returnValue);
             } catch (modifyError) {
               console.error('Error modifying JSON data', modifyError);
@@ -117,10 +117,10 @@ export class LocationPermissionService implements OnInit {
   }
 
 
-  async modifyList(locationpermission: any, formpermissions: any, original_array: any): Promise<any> {
+  async modifyList(location_permission: any, form_permissions: any, original_array: any): Promise<any> {
     // Determine the permission type for location and devices
-    const keyLocation = locationpermission.length === 1 && locationpermission[0] === "All" ? "All" : "Not all";
-    const keyDevices = formpermissions.length === 1 && formpermissions[0] === "All" ? "All" : "Not all";
+    const keyLocation = location_permission.length === 1 && location_permission[0] === "All" ? "All" : "Not all";
+    const keyDevices = form_permissions.length === 1 && form_permissions[0] === "All" ? "All" : "Not all";
     
     console.log("modify", `${keyLocation}-${keyDevices}`);
 
@@ -131,17 +131,17 @@ export class LocationPermissionService implements OnInit {
 
         case "Not all-All":
             // If location is not all but devices are all, filter based on location
-            return await this.calculateNodesToShow(locationpermission, original_array);
+            return await this.calculateNodesToShow(location_permission, original_array);
 
         case "All-Not all":
             // If locations are all but devices are not, filter based on devices
-            return await this.calculateNodesToShow(formpermissions, original_array);
+            return await this.calculateNodesToShow(form_permissions, original_array);
 
         case "Not all-Not all":
             // Filter based on both location and device permissions
-            const data_tempA1 = await this.calculateNodesToShow(locationpermission, original_array);
+            const data_tempA1 = await this.calculateNodesToShow(location_permission, original_array);
             console.log("data_tempA1", data_tempA1);
-            const data_tempA2 = await this.calculateNodesToShow(formpermissions, data_tempA1);
+            const data_tempA2 = await this.calculateNodesToShow(form_permissions, data_tempA1);
             console.log("data_tempA2", data_tempA2);
             return data_tempA2;
 

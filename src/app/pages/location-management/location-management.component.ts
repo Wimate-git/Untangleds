@@ -32,6 +32,7 @@ export class LocationManagementComponent implements OnInit {
   userdetails: any;
   userClient: string;
   metadataObject: any;
+  originalData: any;
 
 
 
@@ -877,98 +878,119 @@ export class LocationManagementComponent implements OnInit {
 
 
                     // Initialize jstree with the fetched data
-              createJSTree(jsondata: any) {
-                // Transform the data to match jstree's expected format
-         
-            
-                $('#SimpleJSTree').jstree({
-                  "core": {
-                    "check_callback": true,
-                    'data': jsondata,
-                    'multiple': false,
-                  },
-                  'search': {
-                    'show_only_matches': true,
-                  },
-                  "plugins": ["contextmenu", "dnd", "search"],
-                  "contextmenu": {
-                    "items": (node: any) => {
-                      let tree = $("#SimpleJSTree").jstree(true);
-                      return {
-                        "Create": {
-                          "separator_before": false,
-                          "separator_after": true,
-                          "label": "Add Location",
-                          "action": false,
-                          "submenu": {
-                            "Child": {
-                              "separator_before": false,
-                              "separator_after": false,
-                              "label": "Child",
-                              action: () => {
-                                let newNode = tree.create_node(node, { text: 'New Child', type: 'file', icon: 'glyphicon glyphicon-file' });
-                                tree.deselect_all();
-                                tree.select_node(newNode);
-                              }
-                            },
-                            "Parent": {
-                              "separator_before": false,
-                              "separator_after": false,
-                              "label": "Parent",
-                              action: () => {
-                                let newNode = tree.create_node(node, { text: 'New Parent', type: 'default' });
-                                tree.deselect_all();
-                                tree.select_node(newNode);
-                              }
+                    createJSTree(jsondata: any) {
+                      // Store the original data to reinitialize the tree when needed
+                      this.originalData = jsondata;
+                    
+                      const initializeTree = (data: any) => {
+                        $('#SimpleJSTree').jstree({
+                          "core": {
+                            "check_callback": true,
+                            'data': data,
+                            'multiple': false,
+                          },
+                          'search': {
+                            'show_only_matches': true, // Only show nodes that match the search
+                          },
+                          "plugins": ["contextmenu", "dnd", "search"],
+                          "contextmenu": {
+                            "items": (node: any) => {
+                              let tree = $("#SimpleJSTree").jstree(true);
+                              return {
+                                "Create": {
+                                  "separator_before": false,
+                                  "separator_after": true,
+                                  "label": "Add Location",
+                                  "action": false,
+                                  "submenu": {
+                                    "Child": {
+                                      "separator_before": false,
+                                      "separator_after": false,
+                                      "label": "Child",
+                                      action: () => {
+                                        let newNode = tree.create_node(node, { text: 'New Child', type: 'file', icon: 'glyphicon glyphicon-file' });
+                                        tree.deselect_all();
+                                        tree.select_node(newNode);
+                                      }
+                                    },
+                                    "Parent": {
+                                      "separator_before": false,
+                                      "separator_after": false,
+                                      "label": "Parent",
+                                      action: () => {
+                                        let newNode = tree.create_node(node, { text: 'New Parent', type: 'default' });
+                                        tree.deselect_all();
+                                        tree.select_node(newNode);
+                                      }
+                                    }
+                                  }
+                                },
+                                "Rename": {
+                                  "separator_before": false,
+                                  "separator_after": false,
+                                  "label": "Edit Location",
+                                  "action": () => {
+                                    tree.edit(node);
+                                  }
+                                },
+                                "Remove": {
+                                  "separator_before": false,
+                                  "separator_after": false,
+                                  "label": "Remove Location",
+                                  "action": () => {
+                                    tree.delete_node(node);
+                                  }
+                                }
+                              };
                             }
                           }
-                        },
-                        "Rename": {
-                          "separator_before": false,
-                          "separator_after": false,
-                          "label": "Edit Location",
-                          "action": () => {
-                            tree.edit(node);
+                        })
+                        .on("changed.jstree", (e: any, data: any) => {
+                          if (data && data.node && data.node.text) {
+                            this.parentID_selected_node = data.node.parent;
+                            this.final_list = data.instance.get_node(data.selected[0]);
+                    
+                            if (this.final_list.original.node_type === 'location') {
+                              this.enableLocationButton = true;
+                              this.enableDeviceButton = false;
+                            } else if (this.final_list.original.node_type === 'device') {
+                              this.enableLocationButton = false;
+                              this.enableDeviceButton = true;
+                            }
                           }
-                        },
-                        "Remove": {
-                          "separator_before": false,
-                          "separator_after": false,
-                          "label": "Remove Location",
-                          "action": () => {
-                            tree.delete_node(node);
-                          }
-                        }
+                        });
                       };
+                    
+                      // Initialize the tree with the original data
+                      initializeTree(this.originalData);
+                    
+                      let to: any = false;
+                      $('#search').keyup(() => {
+                        if (to) {
+                          clearTimeout(to);
+                        }
+                        to = setTimeout(() => {
+                          let searchTerm = $('#search').val();
+                    
+                          if (searchTerm && searchTerm.length > 0) {
+                            // Perform the search if there's input
+                            $('#SimpleJSTree').jstree(true).search(searchTerm);
+                          } else {
+                            // Clear the search and reset the tree when input is empty
+                            $('#SimpleJSTree').jstree(true).clear_search();
+                    
+                            // Destroy the current tree instance
+                            $('#SimpleJSTree').jstree(true).destroy();
+                    
+                            // Reinitialize the tree with the original data
+                            initializeTree(this.originalData);
+                          }
+                        }, 250);
+                      });
                     }
-                  }
-                })
-                .on("changed.jstree", (e: any, data: any) => {
-                  if (data && data.node && data.node.text) {
-                    this.parentID_selected_node = data.node.parent;
-                    this.final_list = data.instance.get_node(data.selected[0]);
-            
-                    if (this.final_list.original.node_type === 'location') {
-                      this.enableLocationButton = true;
-                      this.enableDeviceButton = false;
-                    } else if (this.final_list.original.node_type === 'device') {
-                      this.enableLocationButton = false;
-                      this.enableDeviceButton = true;
-                    }
-                  }
-                });
-            
-                let to: any = false;
-                $('#search').keyup(() => {
-                  if (to) {
-                    clearTimeout(to);
-                  }
-                  to = setTimeout(() => {
-                    let v = $('#search').val();
-                    $('#SimpleJSTree').jstree(true).search(v);
-                  }, 250);
-                });
-              }
+                    
+                    
+                    
     
       onDashboardViewSelect(option: any) {
         
@@ -1441,103 +1463,14 @@ export class LocationManagementComponent implements OnInit {
       }
     
       deleteDevice() {
+        // Get the selected node ID
         let nodeID = $("#SimpleJSTree").jstree(true).get_selected()[0];
-        console.log('nodeID check', nodeID);
-        let children = $("#SimpleJSTree").jstree(true).get_node(nodeID);
-    
-        if (children !== false) {
-            // Check if the selected node is a root node
-            if (children.parent === "#") {
-                return Swal.fire({
-                    customClass: {
-                        container: 'swal2-container'
-                    },
-                    position: 'center',
-                    icon: 'warning',
-                    title: 'Don\'t delete root node',
-                    showCancelButton: true,
-                    allowOutsideClick: false, // prevents outside click
-                });
-            }
-    
-            // Check if the node has children that need to be deleted first
-            for (let nodesList = 0; nodesList < this.temp.length; nodesList++) {
-                if (children.id === this.temp[nodesList].parent) {
-                    return Swal.fire({
-                        customClass: {
-                            container: 'swal2-container'
-                        },
-                        position: 'center',
-                        icon: 'warning',
-                        title: 'Delete child node first',
-                        showCancelButton: true,
-                        allowOutsideClick: false, // prevents outside click
-                    });
-                }
-            }
-    
-            // Remove the selected node from the temp array
-            for (let nodesList = 0; nodesList < this.temp.length; nodesList++) {
-                if (this.temp[nodesList].id === children.id) {
-                    this.temp.splice(nodesList, 1);
-                    break;
-                }
-            }
-    
-            // Immediately update the jstree data
-            $('#SimpleJSTree').jstree(true).settings.core.data = this.temp; // Update tree data
-            $('#SimpleJSTree').jstree(true).refresh(true); // Refresh the tree
-    
-            // Prepare data for updating the server
-            const temp = [
-                {
-                    tree: JSON.stringify(this.temp)
-                }
-            ];
-            this.allLocationDetails = {
-                PK: this.tempClient,
-                SK: 1,
-                metadata: JSON.stringify(temp)
-            };
-    
-            // Call the API to delete from the server
-            this.api.UpdateMaster(this.allLocationDetails).then(value => {
-                console.log('API response:', value); // Inspect the entire response object
-    
-                if (value && value.metadata) {
-                    // Optionally, you can parse the response if needed
-                    this.toast.open("Location Configuration deleted successfully", " ", {
-                        duration: 2000,
-                        horizontalPosition: 'right',
-                        verticalPosition: 'top',
-                    });
-                    this.multiselectDevice = [];
-                } else {
-                    console.error('Invalid response structure:', value);
-                    Swal.fire({
-                        customClass: {
-                            container: 'swal2-container'
-                        },
-                        position: 'center',
-                        icon: 'warning',
-                        title: 'Error in deleting Location Configuration',
-                        showCancelButton: true,
-                        allowOutsideClick: false,
-                    });
-                }
-            }).catch(err => {
-                console.error('Error during API update:', err);
-                this.toast.open("Error in deleting Location Configuration ", "Check again", {
-                    duration: 5000,
-                    horizontalPosition: 'right',
-                    verticalPosition: 'top',
-                });
-            });
-        } else {
+        console.log('Selected node ID:', nodeID);
+        
+        // Check if a node is selected
+        if (!nodeID) {
             return Swal.fire({
-                customClass: {
-                    container: 'swal2-container'
-                },
+                customClass: { container: 'swal2-container' },
                 position: 'center',
                 icon: 'warning',
                 title: 'Select any Location or Device',
@@ -1545,7 +1478,108 @@ export class LocationManagementComponent implements OnInit {
                 allowOutsideClick: false,
             });
         }
+    
+        // Get the selected node
+        let children = $("#SimpleJSTree").jstree(true).get_node(nodeID);
+        console.log('Children object:', children);
+    
+        // Check if the children object is defined
+        if (!children) {
+            console.error('No children found for node ID:', nodeID);
+            return Swal.fire({
+                customClass: { container: 'swal2-container' },
+                position: 'center',
+                icon: 'warning',
+                title: 'Invalid node selected',
+                showCancelButton: true,
+                allowOutsideClick: false,
+            });
+        }
+    
+        // Check if the selected node is a root node
+        if (children.parent === "#") {
+            return Swal.fire({
+                customClass: { container: 'swal2-container' },
+                position: 'center',
+                icon: 'warning',
+                title: 'Don\'t delete root node',
+                showCancelButton: true,
+                allowOutsideClick: false,
+            });
+        }
+    
+        // Check if the node has children that need to be deleted first
+        for (let nodesList = 0; nodesList < this.temp.length; nodesList++) {
+            if (children.id === this.temp[nodesList].parent) {
+                return Swal.fire({
+                    customClass: { container: 'swal2-container' },
+                    position: 'center',
+                    icon: 'warning',
+                    title: 'Delete child node first',
+                    showCancelButton: true,
+                    allowOutsideClick: false,
+                });
+            }
+        }
+    
+        // Remove the selected node from the temp array
+        for (let nodesList = 0; nodesList < this.temp.length; nodesList++) {
+            if (this.temp[nodesList].id === children.id) {
+                this.temp.splice(nodesList, 1);
+                break;
+            }
+        }
+    
+        // Immediately update the jstree data
+        $('#SimpleJSTree').jstree(true).settings.core.data = this.temp; // Update tree data
+        $('#SimpleJSTree').jstree(true).refresh(true); // Refresh the tree
+   if(typeof this.temp =="string") {
+this.temp =JSON.parse(this.temp)
+   }
+   else{
+    this.temp = this.temp
+   }
+        // Prepare data for updating the server
+        const temp = [{ tree: JSON.stringify(this.temp) }];
+        this.allLocationDetails = {
+            PK: this.tempClient,
+            SK: 1,
+            metadata: JSON.stringify(temp),
+        };
+    
+        // Call the API to delete from the server
+        this.api.UpdateMaster(this.allLocationDetails).then(value => {
+            console.log('API response:', value); // Inspect the entire response object
+    
+            if (value && value.metadata) {
+                // Display success message
+                this.toast.open("Location Configuration deleted successfully", " ", {
+                    duration: 2000,
+                    horizontalPosition: 'right',
+                    verticalPosition: 'top',
+                });
+                this.multiselectDevice = [];
+            } else {
+                console.error('Invalid response structure:', value);
+                Swal.fire({
+                    customClass: { container: 'swal2-container' },
+                    position: 'center',
+                    icon: 'warning',
+                    title: 'Error in deleting Location Configuration',
+                    showCancelButton: true,
+                    allowOutsideClick: false,
+                });
+            }
+        }).catch(err => {
+            console.error('Error during API update:', err);
+            this.toast.open("Error in deleting Location Configuration", "Check again", {
+                duration: 5000,
+                horizontalPosition: 'right',
+                verticalPosition: 'top',
+            });
+        });
     }
+    
     
 
 
@@ -1598,7 +1632,7 @@ export class LocationManagementComponent implements OnInit {
               console.log('Metadata is not a valid string:', this.metadataObject);
           }
             // console.log("userPermissions iside",this.modifyList(data.location_permission,data.device_type_permission,data.device_permission))
-           return  this.modifyList(this.metadataObject.locationpermission,this.metadataObject.formpermission)==="All-All"?false:true
+           return  this.modifyList(this.metadataObject.location_permission,this.metadataObject.form_permission)==="All-All"?false:true
           
           }
           
@@ -1795,16 +1829,16 @@ export class LocationManagementComponent implements OnInit {
       //     // Handle the error as needed
       //   }
       // }
-      modifyList(locationpermission: any, formpermissions: any): string {
+      modifyList(location_permission: any, form_permissions: any): string {
         // Check if locationPermission and devicePermissions are defined and are arrays
-        if (!Array.isArray(locationpermission) || !Array.isArray(formpermissions)) {
+        if (!Array.isArray(location_permission) || !Array.isArray(form_permissions)) {
             console.error("Invalid input: locationPermission and devicePermissions must be arrays.");
             return ''; // Return early if inputs are not valid
         }
     
         // Determine the permission type for location and device
-        const keyLocation = locationpermission.length === 1 && locationpermission[0] === "All" ? "All" : "Not all";
-        const keyDevices = formpermissions.length === 1 && formpermissions[0] === "All" ? "All" : "Not all";
+        const keyLocation = location_permission.length === 1 && location_permission[0] === "All" ? "All" : "Not all";
+        const keyDevices = form_permissions.length === 1 && form_permissions[0] === "All" ? "All" : "Not all";
     
         console.log("modify", `${keyLocation}--${keyDevices}`);
     
