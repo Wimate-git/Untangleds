@@ -33,7 +33,7 @@
     </div>
     <!-- <div class="card-body pt-0"> -->
     <div class="card-body pt-0">
-        <app-crud [datatableConfig]="datatableConfig" route="/dreamboard" (deleteEvent)="delete($event)"
+        <app-crud [componentSource]="'dreamboard'" [datatableConfig]="datatableConfig" route="/dreamboard" (deleteEvent)="delete($event)"
             (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent" [modal]="formModal"></app-crud>
     </div>
 </div>
@@ -60,8 +60,10 @@
                         <label class="required fw-semibold fs-6 mb-2">Dreamboard Id</label>
                         <!--end::Label-->
                         <!--begin::Input-->
-                        <input type="text" class="form-control form-control-solid" name="dreamboardId" placeholder="Enter dreamboard Id"
+                        <input *ngIf="!update" type="text" class="form-control form-control-solid" name="dreamboardId" placeholder="Enter dreamboard Id"
                             formControlName="dreamboardId" (keyup)="checkUniqueUid($event)" data-bs-toggle="tooltip" data-bs-placement="top" title="Dreamboard Id and choose file name should be same" required />
+                        <input *ngIf="update" type="text" class="form-control form-control-solid" name="dreamboardId" placeholder="Enter dreamboard Id"
+                            formControlName="dreamboardId"  data-bs-toggle="tooltip" data-bs-placement="top" title="Dreamboard Id and choose file name should be same" readonly required />
                         <span style="color: #fc1900;">{{error}}</span>
                         <div *ngIf="dreamboardForm.controls['dreamboardId'].invalid && dreamboardForm.controls['dreamboardId'].touched"
                             class="invalid-feedback">
@@ -105,7 +107,7 @@
                     <div class="fv-row mb-7">
                         <label class="fw-semibold fs-6 mb-2" style="padding-right: 10px;">Manually Type HTML
                             Code</label>
-                        <input type="radio" name="devices" value="code" formControlName="devices">
+                        <input  type="radio" name="devices" value="code" formControlName="devices">
                         <label class="fw-semibold fs-6 mb-2" style="padding-left: 20px; padding-right: 10px;">Upload
                             your Application Folder</label>
                         <input type="radio" name="devices" value="file_up" formControlName="devices">

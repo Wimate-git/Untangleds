@@ -16,6 +16,7 @@ import { Api, Config } from 'datatables.net';
 export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() datatableConfig: Config = {};
+  @Input() componentSource: string = '';
 
   @Input() route: string = '/';
 
@@ -54,6 +55,20 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(private renderer: Renderer2, private router: Router, private modalService: NgbModal) { }
 
   ngOnInit(): void {
+    console.log('CrudComponent accessed by:', this.componentSource);
+
+    if(this.componentSource == 'dreamboard'){
+      this.modalConfig ={
+          modalDialogClass: 'modal-dialog modal-dialog-centered mw-650px ',
+          
+        };
+    }
+    if(this.componentSource == 'permission3'){
+      this.modalConfig ={
+          modalDialogClass: 'modal-dialog modal-dialog-centered mw-900px ',
+          
+        };
+    }
     this.dtOptions = {
       dom: "<'row'<'col-sm-12'tr>>" +
         "<'d-flex justify-content-between'<'col-sm-12 col-md-5'i><'d-flex justify-content-between'p>>",

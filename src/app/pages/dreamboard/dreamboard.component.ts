@@ -1,5 +1,4 @@
 import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
-// import { NgForm, UntypedFormGroup } from '@angular/forms';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { Observable } from 'rxjs';
 import { DataTablesResponse, IUserModel, UserService } from 'src/app/_fake/services/user-service';
@@ -125,7 +124,7 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log("AFTER JSON STRINGIFY",this.loginDetail_string)
 
     this.client=this.loginDetail_string.clientID
-    this.users=this.loginDetail_string.userID
+    this.users=this.loginDetail_string.username
 
      this.datatableConfig = {}
      this.lookup_data_user = []
@@ -158,9 +157,36 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
               });
         },
         columns: [
-          {
-            title: 'Dreamboard ID', data: 'P1',
-          },
+            {
+                title: 'Dreamboard ID',
+                data: 'P1',
+                render: function (data, type, full) {
+                  const colorClasses = ['success', 'info', 'warning', 'danger'];
+                  const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
+      
+                  const initials = data[0].toUpperCase();
+                  const symbolLabel = `
+                    <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
+                      ${initials}
+                    </div>
+                  `;
+      
+                  const nameAndEmail = `
+                    <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
+                      <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
+                    </div>
+                  `;
+      
+                  return `
+                    <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
+                      <a href="javascript:;">
+                        ${symbolLabel}
+                      </a>
+                    </div>
+                    ${nameAndEmail}
+                  `;
+                }
+              },
           {
             title: 'Name', data: 'P2', 
           },
@@ -267,7 +293,7 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
                     settings: [this.data_temp[0].setting],
                     rdt: [this.data_temp[0].rdt],
                     createdTime: [this.data_temp[0].createdTime],
-                    updatedTime: [this.data_temp[0].updatedTime],
+                    updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
                 }); 
            }
 
@@ -305,7 +331,7 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
         const successAlert: SweetAlertOptions = {
             icon: 'success',
             title: 'Success!',
-            text: this.match ? 'User updated successfully!' : 'User created successfully!',
+            text: this.match ? 'Dreamboard updated successfully!' : 'Dreamboard created successfully!',
         };
         const errorAlert: SweetAlertOptions = {
             icon: 'error',
