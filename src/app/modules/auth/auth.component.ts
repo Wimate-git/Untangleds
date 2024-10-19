@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { S3ServiceService } from './services/s3-service.service';
 
 // const BODY_CLASSES = ['bgi-size-cover', 'bgi-position-center', 'bgi-no-repeat'];
 
@@ -10,11 +11,30 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 })
 export class AuthComponent implements OnInit, OnDestroy {
   today: Date = new Date();
+  logoUrl: string;
+  untangledImage: string;
+  backgroundUrl: string;
+  htmlContent: string;
 
-  constructor() {}
+  constructor(private s3Service: S3ServiceService,private cd:ChangeDetectorRef) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
     // BODY_CLASSES.forEach((c) => document.body.classList.add(c));
+
+
+    this.logoUrl = 'https://assets-untangleds.s3.ap-south-1.amazonaws.com/Wimate_Logo.png';
+
+    this.untangledImage = 'https://assets-untangleds.s3.ap-south-1.amazonaws.com/untangled-project.png'
+
+    this.backgroundUrl = 'https://assets-untangleds.s3.ap-south-1.amazonaws.com/backgroundImage2.jpg'
+
+    this.s3Service.getHtmlContent('login-content.html').subscribe(content => {
+      this.htmlContent = content;
+      this.cd.detectChanges()
+    });
+
+
+    
   }
 
   ngOnDestroy() {

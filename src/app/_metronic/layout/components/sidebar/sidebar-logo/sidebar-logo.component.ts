@@ -11,7 +11,7 @@ import { LayoutService } from '../../../core/layout.service';
 export class SidebarLogoComponent implements OnInit, OnDestroy {
   private unsubscribe: Subscription[] = [];
   @Input() toggleButtonClass: string = '';
-  @Input() toggleEnabled: boolean;
+  @Input() toggleEnabled: boolean ;
   @Input() toggleType: string = '';
   @Input() toggleState: string = '';
   currentLayoutType: LayoutType | null;
@@ -21,6 +21,9 @@ export class SidebarLogoComponent implements OnInit, OnDestroy {
   constructor(private layout: LayoutService) {}
 
   ngOnInit(): void {
+
+      console.log("Sidebar executed");
+
     this.toggleAttr = `app-sidebar-${this.toggleType}`;
     const layoutSubscr = this.layout.currentLayoutTypeSubject
       .asObservable()
