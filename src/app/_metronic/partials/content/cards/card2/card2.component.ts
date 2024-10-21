@@ -8,6 +8,7 @@ import { DreamIdComponent } from 'src/app/pages/dream-id/dream-id.component';
   templateUrl: './card2.component.html',
 })
 export class Card2Component implements OnInit{
+  @Input() componentSource: string = '';
   @Input() icon: string = '';
   @Input() badgeColor: string = '';
   @Input() status: string = '';
@@ -25,6 +26,9 @@ export class Card2Component implements OnInit{
 
   ngOnInit(): void {
     console.log("CARD2 LOAD")
+
+
+
   }
 
 
@@ -32,10 +36,11 @@ export class Card2Component implements OnInit{
 
     this.id = 'Form Viewing'
 
-    localStorage.setItem('title',title.title)
+    // localStorage.setItem('title',title.title)
 
       console.log('NAVIGATE:',title)
-      this.router.navigate([`view-dreamboard/${this.id}/`]); // Customize your route as needed
+      // this.router.navigate([`view-dreamboard/${this.id}/?formId=${title.title}`]); // Customize your route as needed
+      this.router.navigate([`view-dreamboard/${this.id}/${title.title}`]);
     
   }
 

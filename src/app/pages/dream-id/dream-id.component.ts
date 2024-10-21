@@ -49,11 +49,20 @@ export class DreamIdComponent implements OnInit{
 
 
     this.theme = localStorage.getItem('kt_theme_mode_menu')    //theme code light or dark
-    
 
-    this.form_id = localStorage.getItem('title')
 
-    console.log("FORMID:",this.form_id)
+
+    // this.route.queryParams.subscribe(queryParams => {
+    //   console.log("QueryPARMA:",queryParams)
+    //   this.form_id = queryParams['formId'];
+    //   console.log('Form ID:', this.form_id);
+  
+    //   // Handle any additional logic with 'formId' here
+    // });
+
+    // this.form_id = localStorage.getItem('title')
+
+    // console.log("FORMID:",this.form_id)
 
     // formid 
 
@@ -86,6 +95,13 @@ export class DreamIdComponent implements OnInit{
     this.route.paramMap.subscribe(params => {
       console.log(this.route)
       this.id = params.get('id');
+      this.form_id = params.get('formId');
+
+      if((this.form_id == null)|| (this.form_id == undefined)){
+        this.form_id= 'All'
+      }
+
+      console.log(this.form_id)
       console.log(this.id)
     
       // this.loginDetail = JSON.parse(localStorage.getItem("currentUser"))
@@ -100,7 +116,12 @@ export class DreamIdComponent implements OnInit{
         console.log("URL RES")
         console.log(this.url_result,)
         const timestamp = new Date().getTime();
+        if(this.form_id == 'All'){
+          this.url=`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/`+this.url_result+`?t=${timestamp}`+`&loginDetail=${this.login_string}`+`&userPermissions=${userPermissions}`+`&theme=${this.theme}`
+        }
+        else{
         this.url=`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/`+this.url_result+`?t=${timestamp}`+`&loginDetail=${this.login_string}`+`&userPermissions=${userPermissions}`+`&theme=${this.theme}`+`&formId=${this.form_id}`
+        }
         this.send_data=this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
         console.log(this.send_data)
         this.changeDetection.detectChanges()

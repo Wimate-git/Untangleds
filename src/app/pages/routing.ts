@@ -14,7 +14,7 @@ const Routing: Routes = [
     loadChildren:() => import('./dreamboard/dreamboard.module').then((m) =>m.DreamboardModule),
   },
   {
-    path: 'view-dreamboard/:id',
+    path: 'view-dreamboard/:id/:formId',
     loadChildren:() => import('./dream-id/dream-id.module').then((m) =>m.DreamIdModule),
   },
   {

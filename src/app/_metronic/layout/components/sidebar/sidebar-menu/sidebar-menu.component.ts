@@ -157,7 +157,7 @@ async generatedreamboard() {
         if (this.permission_data.dreamBoardIDs.includes(pathValue)) {
           submenu.push({
             title: `${pathValue}`,
-            link: `view-dreamboard/${pathValue}`,
+            link: `view-dreamboard/${pathValue}/All`,
             icon: '',
             subMenu: [],
           });
