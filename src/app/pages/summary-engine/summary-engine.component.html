@@ -1,0 +1,163 @@
+<div class="card mb-5 mb-xl-8 card-custom">
+    <div class="card-header border-0 pt-5 ">
+        <h3 class="card-title align-items-start flex-column">
+            <span class="card-label fw-bolder fs-3 mb-1">
+                Summary </span>
+        </h3>
+        <div class="card-toolbar">
+
+            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#summaryModal" (click)="openModal('')">
+                New
+            </button>
+        </div>
+    </div>
+
+
+    <div class="card-body pt-0">
+    
+        <app-crud-company [datatableConfig]="datatableConfig" route="/summary-engine" (deleteEvent)="delete($event)" (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent" ></app-crud-company>
+    </div>
+
+
+
+</div>
+
+
+
+
+<div class="modal fade" id="summaryModal" tabindex="-1" aria-labelledby="summaryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" >
+            <div class="modal-header">
+                <h2 class="modal-title" *ngIf="showHeading">Add Summary </h2>
+                <h2 class="modal-title" *ngIf="!showHeading">Edit Summary </h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- <div class="fv-row" [formGroup]="createSummaryField"> -->
+                <div class="fv-row"  [formGroup]="createSummaryField">
+                <div class="card-body border-top p-9">
+                    <div class="container mb-10">
+                        <div class="row">
+
+
+
+
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 required">  ID</label>
+
+                                <input type="text" class="
+                                form-control form-control-lg form-control-solid
+                                mb-3 mb-lg-0
+                              " placeholder="Enter Summary ID" name="summaryID" formControlName="summaryID" required 
+                              (keyup)="checkUniqueIdentifier($event)">
+
+                              <span style="color: #fc1900;">{{errorForUniqueID}}</span>
+                                <div *ngIf="
+                                createSummaryField.get('summaryID')?.hasError('required') &&
+                                createSummaryField.get('summaryID')?.touched
+                              " class="fv-plugins-message-container invalid-feedback">
+                                    Company ID is required
+                                </div>
+
+                            </div>
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Name</label>
+
+                                <input type="text" class="
+                                form-control form-control-lg form-control-solid
+                                mb-3 mb-lg-0
+                              " placeholder="Enter Summary Name" name="summaryName" formControlName="summaryName"
+                                    required>
+
+                                <div *ngIf="
+                             createSummaryField.get('summaryName')?.hasError('required') &&
+                             createSummaryField.get('summaryName')?.touched
+                          " class="fv-plugins-message-container invalid-feedback">
+                                    Summary Name is required
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 required">
+                                    Description</label>
+
+                                <input type="text" class="
+                                  form-control form-control-lg form-control-solid
+                                  mb-3 mb-lg-0
+                                " placeholder="Enter summary Description" name="summarydesc"
+                                    formControlName="summarydesc" required>
+                                <div *ngIf="
+                                     createSummaryField.get('summarydesc')?.hasError('required') &&
+                                     createSummaryField.get('summarydesc')?.touched
+                                " class="fv-plugins-message-container invalid-feedback">
+                                    Company Desc is required
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <div class="row">
+                        <div class="col-md-12">
+                         
+                            <!-- Label for the input field -->
+                            <label for="jsonInputControl" class="col-lg-12 col-form-label fw-bold fs-6 required">Grids</label>
+                            <textarea id="jsonInputControl" class="   form-control form-control-lg form-control-solid
+                            mb-3 mb-lg-0
+                          " placeholder="Enter JSON data" formControlName="jsonInputControl"
+                                style="resize: both; min-width: 100%; min-height: 100px; max-height: 300px; overflow: auto;"></textarea>
+                            
+                            <!-- Error message if JSON validation fails -->
+                            <div *ngIf="createSummaryField.get('jsonInputControl')?.hasError('invalidJson') && createSummaryField.get('jsonInputControl')?.touched"
+                                 class="text-danger">
+                                Please enter valid JSON data.
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
+
+
+
+
+
+                    <div class="modal-footer">
+                        <div class="row w-100">
+                            <!-- Resizable Input for JSON Data with Heading "Grids" -->
+                            
+                            <!-- Buttons aligned to the right -->
+                            <div class="col-md-12 d-flex justify-content-end align-items-center">
+                                <button type="button" class="btn btn-sm btn-danger me-2" data-bs-dismiss="modal" #closeSummary>Cancel</button>
+                        
+                                <button [hidden]="hideUpdateButton" type="submit" class="btn btn-sm btn-primary me-2"
+                                        (click)="updateSummary(createSummaryField.value, 'editSummary')"
+                                        *ngIf="showModal" 
+                                        [disabled]="createSummaryField.invalid || errorForUniqueID == 'Summary ID already exists' || createSummaryField.get('jsonInputControl')?.invalid || !createSummaryField.dirty">
+                                    Update
+                                </button>
+                        
+                                <button type="button" class="btn btn-sm btn-primary not-allowed"
+                                        *ngIf="!showModal"
+                                        [disabled]="createSummaryField.invalid || createSummaryField.get('jsonInputControl')?.invalid"
+                                        (click)="createNewSummary('')">
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    
+                    
+                      
+                </div>
+            </div>
+        </div>
+</div>
+</div> 
+
+
+

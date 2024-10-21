@@ -88,6 +88,11 @@ const Routing: Routes = [
   },
 
   {
+    path: 'summary-engine',
+    loadChildren: () => import('./summary-engine/summary-engine.module').then((m) => m.SummaryEngineModule),
+  },
+
+  {
     path: '',
     redirectTo: '/dashboard',
     pathMatch: 'full',
