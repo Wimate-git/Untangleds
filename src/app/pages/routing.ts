@@ -79,7 +79,7 @@ const Routing: Routes = [
   //   loadChildren: () => import('./permission2/permission2.module').then((m) => m.Permission2Module),
   // },
   {
-    path: 'permission1',
+    path: 'permission',
     loadChildren: () => import('./permission3/permission3.module').then((m) => m.Permission3Module),
   },
   {

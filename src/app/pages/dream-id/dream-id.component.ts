@@ -25,6 +25,8 @@ export class DreamIdComponent implements OnInit{
   permission_data: any;
   id: string | null;
   login_string: string;
+  theme: string | null;
+  form_id: any;
   
   constructor(
 
@@ -44,6 +46,17 @@ export class DreamIdComponent implements OnInit{
 
     this.login_string = JSON.stringify(localStorage.getItem('userAttributes'))
     console.log("LOGIN DETAIL FROM LOCAL STORAGE:",this.login_detail)
+
+
+    this.theme = localStorage.getItem('kt_theme_mode_menu')    //theme code light or dark
+    
+
+    this.form_id = localStorage.getItem('title')
+
+    console.log("FORMID:",this.form_id)
+
+    // formid 
+
 
      this.loginDetail_string = JSON.parse(this.login_detail) 
     console.log("AFTER JSON STRINGIFY",this.loginDetail_string)
@@ -87,7 +100,7 @@ export class DreamIdComponent implements OnInit{
         console.log("URL RES")
         console.log(this.url_result,)
         const timestamp = new Date().getTime();
-        this.url=`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/`+this.url_result+`?t=${timestamp}`+`&loginDetail=${this.login_string}`+`&userPermissions=${userPermissions}`
+        this.url=`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/`+this.url_result+`?t=${timestamp}`+`&loginDetail=${this.login_string}`+`&userPermissions=${userPermissions}`+`&theme=${this.theme}`+`&formId=${this.form_id}`
         this.send_data=this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
         console.log(this.send_data)
         this.changeDetection.detectChanges()

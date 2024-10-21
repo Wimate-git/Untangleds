@@ -1,11 +1,13 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { IconUserModel } from '../icon-user.model';
+import { Router } from '@angular/router';
+import { DreamIdComponent } from 'src/app/pages/dream-id/dream-id.component';
 
 @Component({
   selector: 'app-card2',
   templateUrl: './card2.component.html',
 })
-export class Card2Component {
+export class Card2Component implements OnInit{
   @Input() icon: string = '';
   @Input() badgeColor: string = '';
   @Input() status: string = '';
@@ -16,6 +18,26 @@ export class Card2Component {
   @Input() budget: string = '';
   @Input() progress: number = 50;
   @Input() users: Array<IconUserModel> = [];
+  id: string;
 
-  constructor() {}
+  constructor(private router: Router) {}
+
+
+  ngOnInit(): void {
+    console.log("CARD2 LOAD")
+  }
+
+
+  onStatusClick(title: any) {
+
+    this.id = 'Form Viewing'
+
+    localStorage.setItem('title',title.title)
+
+      console.log('NAVIGATE:',title)
+      this.router.navigate([`view-dreamboard/${this.id}/`]); // Customize your route as needed
+    
+  }
+
+  
 }

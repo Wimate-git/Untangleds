@@ -1,4 +1,4 @@
-<div class="card-body d-flex flex-center flex-column p-9">
+<div class="card-body d-flex flex-center flex-column p-9" [ngStyle]="getCardGradientStyle(color)" class="card border border-2 border-primary-300 border-hover">
   <div class="mb-5">
     <div class="symbol symbol-75px symbol-circle">
       <ng-container *ngIf="color">
@@ -36,6 +36,7 @@
   >
     {{ name }}
   </a>
+  
 
   <div class="fw-bold text-gray-500 mb-6">{{ job }}</div>
 
@@ -51,8 +52,10 @@
         mb-3
       "
     >
-      <div class="fs-6 fw-bolder text-gray-700">{{ avgEarnings }}</div>
-      <div class="fw-bold text-gray-500">Avg. Earnings</div>
+      <!-- <div class="fs-6 fw-bolder text-gray-700">{{ avgEarnings }}</div> -->
+      <div class="fw-bolder text-gray-700">{{ avgEarnings }}</div>
+      <!-- <div class="fw-bold text-gray-500">Avg. Earnings</div> -->
+      <div class="fw-bold text-gray-500">Updated Date</div>
     </div>
 
     <div
@@ -66,13 +69,16 @@
         mb-3
       "
     >
-      <div class="fs-6 fw-bolder text-gray-700">{{ totalEarnings }}</div>
-      <div class="fw-bold text-gray-500">Total Sales</div>
+      <!-- <div class="fs-6 fw-bolder text-gray-700">{{ totalEarnings }}</div> -->
+      <div class="fw-bolder text-gray-700">{{ totalEarnings }}</div>
+      <!-- <div class="fw-bold text-gray-500">Total Sales</div> -->
+      <div class="fw-bold text-gray-500">Updated User</div>
     </div>
   </div>
 
   <a class="btn btn-sm btn-light cursor-pointer">
-    <app-keenicon name="plus" class="fs-3"></app-keenicon>
-    Connect
+    <!-- <app-keenicon name="plus" class="fs-3"></app-keenicon>
+    Connect -->
+    View
   </a>
 </div>

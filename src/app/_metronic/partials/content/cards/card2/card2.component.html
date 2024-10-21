@@ -1,25 +1,32 @@
 <a
   routerLink="/crafted/pages/profile/overview"
-  class="card border border-2 border-gray-300 border-hover"
+  class="card border border-2 border-gray-400 border-hover"
+
+  [ngStyle]="{
+    'background-image': 'linear-gradient(to top, #f3e7e9 0%, #e3eeff 99%, #e3eeff 100%)',
+  }"
 >
   <div class="card-header border-0 pt-9">
     <div class="card-title m-0">
-      <div class="symbol symbol-50px w-50px bg-light">
+      <div class="symbol symbol-70px w-50px">
         <img [src]="icon" alt="card2" class="p-3" />
       </div>
     </div>
 
     <div class="card-toolbar">
       <span
-        class="badge fw-bolder me-auto px-4 py-3"
+        class="badge fw-bolder me-auto px-4 py-3 cursor-pointer" 
         [ngClass]="'badge-light-' + badgeColor"
+        (click)="onStatusClick({ title: title })"
       >
         {{ status }}
       </span>
+     
     </div>
   </div>
 
-  <div class="card-body p-9">
+  <div class="card-body p-9" >
+    
     <div class="fs-3 fw-bolder text-gray-900">{{ title }}</div>
 
     <p class="text-gray-500 fw-bold fs-5 mt-1 mb-7">{{ description }}</p>
@@ -37,7 +44,7 @@
         "
       >
         <div class="fs-6 text-gray-800 fw-bolder">{{ date }}</div>
-        <div class="fw-bold text-gray-500">Due Date</div>
+        <div class="fw-bold text-gray-500">Updated Date</div>
       </div>
 
       <div
@@ -51,11 +58,11 @@
         "
       >
         <div class="fs-6 text-gray-800 fw-bolder">{{ budget }}</div>
-        <div class="fw-bold text-gray-500">Budget</div>
+        <div class="fw-bold text-gray-500">Updated by</div>
       </div>
     </div>
 
-    <div class="h-4px w-100 bg-light mb-5" ngbTooltip="This project completed">
+    <!-- <div class="h-4px w-100 bg-light mb-5" ngbTooltip="This project completed">
       <div
         class="rounded h-4px"
         [ngClass]="'bg-' + statusColor"
@@ -64,6 +71,6 @@
       ></div>
     </div>
 
-    <app-user-list [users]="users"></app-user-list>
+    <app-user-list [users]="users"></app-user-list> -->
   </div>
 </a>
