@@ -3,7 +3,7 @@ import { FormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Config } from 'datatables.net';
 import moment from 'moment';
 import { IUserModel, UserService, userInterface } from 'src/app/_fake/services/user-service';
-import Swal from 'sweetalert2';
+import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { SharedService } from '../shared.service';
 import { APIService } from 'src/app/API.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -12,10 +12,12 @@ import { AuthenticationDetails, CognitoUser, CognitoUserAttribute, CognitoUserPo
 import { NgxSpinner, NgxSpinnerService } from 'ngx-spinner';
 import { Observable } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
 import bootstrap from 'bootstrap';
 import { environment } from 'src/environments/environment';
 import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
 import { DynamicApiService } from '../dynamic-api.service';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 
 interface ListItem {
   [key: string]: {
@@ -45,6 +47,8 @@ interface ListItem {
 
 
 export class UserManagementComponent implements OnInit{
+
+  isCollapsed1 = false;
   @ViewChild('closeUser') closeUser: any;
   @ViewChild('openModal1') openModal1!: TemplateRef<any>;
   datatableConfig: Config = {};
@@ -66,6 +70,12 @@ export class UserManagementComponent implements OnInit{
   errorForUniqueID:any = ''
   errorForUniqueEmail:any = ''
   errorForInvalidEmail:any = ''
+
+
+  //Swal need to be added
+  @ViewChild('noticeSwal')
+  noticeSwal!: SwalComponent;
+  swalOptions: SweetAlertOptions = {};
 
 
   // Single model
@@ -117,7 +127,7 @@ rdtListWorkAround :any =[{
   maxlength: number = 500;
   userPool: any;
 
-  isLoading:boolean = true
+  isLoading:boolean = false
   data_temp: any = [];
   maskedNumber: any;
   userSK: any;
@@ -157,7 +167,33 @@ rdtListWorkAround :any =[{
 
 
 
+  onSubmit(event:any){
+     
+    console.log("Submitted is clicked ",event);
+    if(event.type == 'submit' && this.editOperation == false){
+      this.createNewUser('','html')
+    }
+    else{
+      this.updateUser(this.createUserField.value,'editUser')
+    }
+  }
 
+
+  showAlert(swalOptions: SweetAlertOptions) {
+    let style = swalOptions.icon?.toString() || 'success';
+    if (swalOptions.icon === 'error') {
+      style = 'danger';
+    }
+    this.swalOptions = Object.assign({
+      buttonsStyling: false,
+      confirmButtonText: "Ok, got it!",
+      customClass: {
+        confirmButton: "btn btn-" + style
+      }
+    }, swalOptions);
+    this.cd.detectChanges();
+    this.noticeSwal.fire();
+  }
 
 
   async getTreeData(){
@@ -454,13 +490,14 @@ rdtListWorkAround :any =[{
   }
 
   create() {
-    this.userModel = { P1: '', P2: '', P3: '',P4:0,P5:'' };
+    // this.userModel = { P1: '', P2: '', P3: '',P4:0,P5:'' };
+    console.log("Add is clicked");
+    this.openModal('','')
   }
 
 
   edit(P1: any) {
-    console.log("Edited username is here ", P1);
-    $('#openModal1').modal('show');
+    console.log("Edit is clicked ");
     this.openModalHelpher(P1)
   }
 
@@ -773,6 +810,18 @@ rdtListWorkAround :any =[{
   updateUser(value: any, key: any) {
     console.log("value",value)
 
+
+    const successAlert: SweetAlertOptions = {
+      icon: 'success',
+      title: 'Success!',
+      text: this.editOperation ? 'User updated successfully!' : 'User created successfully!',
+  };
+    const errorAlert: SweetAlertOptions = {
+        icon: 'error',
+        title: 'Error!',
+        text: '',
+    };
+
     //for editing reading Device type fields
 
     let updateDevice_type: any = [];
@@ -1033,22 +1082,24 @@ rdtListWorkAround :any =[{
           this.datatableConfig = {}
           this.lookup_data_user = []
 
+
+          this.showAlert(successAlert)
           this.reloadEvent.next(true)
 
           //alert('Configuration updated successfully');
-          this.toast.open("User Configuration updated successfully", "", {
-            //panelClass: 'error-alert-snackbar',
+          // this.toast.open("User Configuration updated successfully", "", {
+          //   //panelClass: 'error-alert-snackbar',
 
-            duration: 2000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top',
-            //   //panelClass: ['blue-snackbar']
-          })
+          //   duration: 2000,
+          //   horizontalPosition: 'right',
+          //   verticalPosition: 'top',
+          //   //   //panelClass: ['blue-snackbar']
+          // })
 
           //need to refresh table so updated value will be fetched
           this.addFromService();
           //modal closing based on viewchild
-          this.closeUser.nativeElement.click();
+          // this.closeUser.nativeElement.click();
 
 
           //___________________updating cutom attributes__________________________in aws cognito
@@ -1061,6 +1112,7 @@ rdtListWorkAround :any =[{
         }
 
       }).catch(err => {
+        this.showAlert(errorAlert)
         console.log('error for updating', err);
       })
     }
@@ -1175,6 +1227,17 @@ rdtListWorkAround :any =[{
 
 
   async createNewUser(getNewFields: any, key: any) {
+
+    const successAlert: SweetAlertOptions = {
+      icon: 'success',
+      title: 'Success!',
+      text: this.editOperation ? 'User updated successfully!' : 'User created successfully!',
+  };
+    const errorAlert: SweetAlertOptions = {
+        icon: 'error',
+        title: 'Error!',
+        text: '',
+    };
 
 
     //without sending email, confimration needed for update,so just update attributes in cognito
@@ -1602,24 +1665,29 @@ rdtListWorkAround :any =[{
           this.datatableConfig = {}
           this.lookup_data_user = []
 
+          this.showAlert(successAlert)
           this.reloadEvent.next(true)
 
           // await this.loading()
 
-          this.toast.open("New User configuration created successfully", " ", {
-            //panelClass: 'error-alert-snackbar',
+          // this.toast.open("New User configuration created successfully", " ", {
+          //   //panelClass: 'error-alert-snackbar',
 
-            duration: 2000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top',
-          })
+          //   duration: 2000,
+          //   horizontalPosition: 'right',
+          //   verticalPosition: 'top',
+          // })
 
-          this.closeUser.nativeElement.click();
-
-          //after adding to dynamodb,added to cognito table
           this.addtoCognitoTable(this.allUserDetails);
 
           this.spinner.hide()
+
+          // this.closeUser.nativeElement.click();
+
+          //after adding to dynamodb,added to cognito table
+        
+
+         
 
           
         }
@@ -1640,14 +1708,16 @@ rdtListWorkAround :any =[{
       }).catch(err => {
         this.spinner.hide()
         console.log('err for creation', err);
-        this.toast.open("Error in adding new user Configuration ", "Check again", {
-          //panelClass: 'error-alert-snackbar',
 
-          duration: 5000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top',
-          //   //panelClass: ['blue-snackbar']
-        })
+        this.showAlert(errorAlert)
+        // this.toast.open("Error in adding new user Configuration ", "Check again", {
+        //   //panelClass: 'error-alert-snackbar',
+
+        //   duration: 5000,
+        //   horizontalPosition: 'right',
+        //   verticalPosition: 'top',
+        //   //   //panelClass: ['blue-snackbar']
+        // })
       })
     }
   }
