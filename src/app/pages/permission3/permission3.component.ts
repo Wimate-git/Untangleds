@@ -135,6 +135,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
     this.form_permission =[
       'Create',
+      'Read',
       'Update',
       'Delete',
     ]
@@ -385,7 +386,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   delete(P1: any) {
     console.log("DELETE ID:", P1)
     const body = {
-      PK: this.client + '#' + 'permission3#' + P1 + '#main',
+      PK: this.client + '#' + 'permission#' + P1 + '#main',
       SK: 1,
     };
 
@@ -542,7 +543,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
         };
 
         console.log("LOOK UP DREAMBOARD DATA:", this.permissionItem);
-        await this.createLookuppermission(this.permissionItem, 1, 'Climaveneta#permission3#lookup');
+        await this.createLookuppermission(this.permissionItem, 1, this.client+'#permission#lookup');
         this.showAlert(successAlert);
         this.reloadEvent.emit(true);
 
@@ -835,7 +836,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
   async updatepermissionlookup(sk: any, id: any, type: any, item: any) {
 
-    const tempClient = this.client + '#permission3' + "#lookup";
+    const tempClient = this.client + '#permission' + "#lookup";
     // console.log("Temp client is ", tempClient);
     // console.log("Type of client", typeof tempClient);
     try {
