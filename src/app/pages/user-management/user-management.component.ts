@@ -905,12 +905,12 @@ rdtListWorkAround :any =[{
   }
 
   checkMail(event: any) {
-    // console.log('event', event);
-    // let Regex = /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i
-    // this.errorForInvalidEmail = '';
-    // if (Regex.test(event.target.value) == false) {
-    //   this.errorForInvalidEmail = "Invalid Email Address";
-    // }
+    console.log('event', event);
+    let Regex = /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i
+    this.errorForInvalidEmail = '';
+    if (Regex.test(event.target.value) == false) {
+      this.errorForInvalidEmail = "Invalid Email Address";
+    }
   }
 
   checkUniqueEmail(getMail: any) {

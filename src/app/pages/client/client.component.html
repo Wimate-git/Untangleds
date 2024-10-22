@@ -107,7 +107,7 @@
                                     form-control form-control-lg form-control-solid
                                     mb-3 mb-lg-0
                                   " placeholder="Enter client ID" name="clientID" formControlName="clientID" required
-                                        (keyup)="checkUniqueIdentifier($event)">
+                                        (keyup)="checkUniqueIdentifier($event);checkMail($event)">
     
                                     <span style="color: #fc1900;">{{errorForUniqueID}}</span>
     

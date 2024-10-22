@@ -740,188 +740,188 @@ export class CompanyComponent implements OnInit{
 
 
   firstLogoCompany(getFile: any) {
-    // console.log('image', getFile);
-    // //adding file to temp variable
-    // this.base64textString_temp = getFile;
-    // let files = getFile.target.files;
-    // let file = files[0];
-    // let fileExtension = file.type;
+    console.log('image', getFile);
+    //adding file to temp variable
+    this.base64textString_temp = getFile;
+    let files = getFile.target.files;
+    let file = files[0];
+    let fileExtension = file.type;
 
-    // //validating type
-    // if (fileExtension == "image/gif" || fileExtension == "image/png" || fileExtension == "image/bmp"
-    //   || fileExtension == "image/jpeg" || fileExtension == "image/jpg") {
+    //validating type
+    if (fileExtension == "image/gif" || fileExtension == "image/png" || fileExtension == "image/bmp"
+      || fileExtension == "image/jpeg" || fileExtension == "image/jpg") {
 
-    //   if (files && file) {
-    //     let reader = new FileReader();
+      if (files && file) {
+        let reader = new FileReader();
 
-    //     reader.onload = this.firstbase64.bind(this);
+        reader.onload = this.firstbase64.bind(this);
 
-    //     reader.readAsBinaryString(file);
+        reader.readAsBinaryString(file);
 
-    //   }
+      }
 
-    // }
+    }
 
-    // else {
+    else {
 
-    //   Swal.fire({
-    //     customClass: {
-    //       container: 'swal2-container'
-    //     },
-    //     position: 'center',
-    //     text: 'Image type should be only of GIF, PNG, JPG, JPEG and BMP',
-    //     icon: 'warning',
-    //     showCancelButton: true,
-    //     allowOutsideClick: false,////prevents outside click
-    //   })
+      Swal.fire({
+        customClass: {
+          container: 'swal2-container'
+        },
+        position: 'center',
+        text: 'Image type should be only of GIF, PNG, JPG, JPEG and BMP',
+        icon: 'warning',
+        showCancelButton: true,
+        allowOutsideClick: false,////prevents outside click
+      })
 
-    // }
+    }
   }
 
   secondLogoCompany(getFile: any) {
-    // console.log('image', getFile);
+    console.log('image', getFile);
 
-    // //adding file to temp variable
-    // this.base64textString_temp_logo1 = getFile;
-    // let files = getFile.target.files;
-    // let file = files[0];
-    // let fileExtension = file.type;
+    //adding file to temp variable
+    this.base64textString_temp_logo1 = getFile;
+    let files = getFile.target.files;
+    let file = files[0];
+    let fileExtension = file.type;
 
-    // //validating type
-    // if (fileExtension == "image/gif" || fileExtension == "image/png" || fileExtension == "image/bmp"
-    //   || fileExtension == "image/jpeg" || fileExtension == "image/jpg") {
+    //validating type
+    if (fileExtension == "image/gif" || fileExtension == "image/png" || fileExtension == "image/bmp"
+      || fileExtension == "image/jpeg" || fileExtension == "image/jpg") {
 
-    //   if (files && file) {
-    //     let reader = new FileReader();
+      if (files && file) {
+        let reader = new FileReader();
 
-    //     reader.onload = this.secondbase64.bind(this);
+        reader.onload = this.secondbase64.bind(this);
 
-    //     reader.readAsBinaryString(file);
+        reader.readAsBinaryString(file);
 
-    //   }
+      }
 
-    // }
+    }
 
-    // else {
+    else {
 
-    //   Swal.fire({
-    //     customClass: {
-    //       container: 'swal2-container'
-    //     },
-    //     position: 'center',
-    //     text: 'Image type should be only of GIF, PNG, JPG, JPEG and BMP',
-    //     icon: 'warning',
-    //     showCancelButton: true,
-    //     allowOutsideClick: false,////prevents outside click
-    //   })
+      Swal.fire({
+        customClass: {
+          container: 'swal2-container'
+        },
+        position: 'center',
+        text: 'Image type should be only of GIF, PNG, JPG, JPEG and BMP',
+        icon: 'warning',
+        showCancelButton: true,
+        allowOutsideClick: false,////prevents outside click
+      })
 
-    // }
+    }
   }
 
   firstbase64(readerEvt: any) {
-    // console.log('readerEvt', readerEvt);
-    // let binaryString = readerEvt.target.result;
+    console.log('readerEvt', readerEvt);
+    let binaryString = readerEvt.target.result;
 
-    // this.base64textString = btoa(binaryString);
-    // let files = this.base64textString_temp.target.files;
-    // let file = files[0];
-    // let fileExtension = file.type;
-    // let fileName = file.name;
-    // //console.log('filename',fileName);
-    // this.logo1_name = fileName;
+    this.base64textString = btoa(binaryString);
+    let files = this.base64textString_temp.target.files;
+    let file = files[0];
+    let fileExtension = file.type;
+    let fileName = file.name;
+    //console.log('filename',fileName);
+    this.logo1_name = fileName;
 
-    // let length = this.base64textString.length;
+    let length = this.base64textString.length;
 
-    // let y = 1;
-    // //console.log('this.base64textString[this.base64textString.length - 1]',this.base64textString[this.base64textString.length - 1]);
-    // if (('=' == this.base64textString[this.base64textString.length - 1]) && ('=' == this.base64textString[this.base64textString.length - 2])) {
-    //   y = 2;
-    // }
-    // let x = (length * (3 / 4)) - y;
-    // x = x / 1000;
-    // if (x < 200) {
-    //   // console.log('x inside kb xonversion',x);
+    let y = 1;
+    //console.log('this.base64textString[this.base64textString.length - 1]',this.base64textString[this.base64textString.length - 1]);
+    if (('=' == this.base64textString[this.base64textString.length - 1]) && ('=' == this.base64textString[this.base64textString.length - 2])) {
+      y = 2;
+    }
+    let x = (length * (3 / 4)) - y;
+    x = x / 1000;
+    if (x < 200) {
+      // console.log('x inside kb xonversion',x);
 
-    //   this.base64textString_temp = 'data:' + fileExtension + ';base64,' + this.base64textString;
+      this.base64textString_temp = 'data:' + fileExtension + ';base64,' + this.base64textString;
 
-    // }
-    // else {
-    //   //return alert('Image should be less than 500KB');
+    }
+    else {
+      //return alert('Image should be less than 500KB');
 
-    //   return Swal.fire({
-    //     customClass: {
-    //       container: 'swal2-container'
-    //     },
-    //     position: 'center',
-    //     text: 'Image should be less than 200KB',
-    //     icon: 'warning',
-    //     showCancelButton: true,
-    //     allowOutsideClick: false,////prevents outside click
-    //     //confirmButtonText: 'Ok',
-    //     //cancelButtonText: 'Cancel'
-    //   })
-    // }
+      return Swal.fire({
+        customClass: {
+          container: 'swal2-container'
+        },
+        position: 'center',
+        text: 'Image should be less than 200KB',
+        icon: 'warning',
+        showCancelButton: true,
+        allowOutsideClick: false,////prevents outside click
+        //confirmButtonText: 'Ok',
+        //cancelButtonText: 'Cancel'
+      })
+    }
 
   }
 
   secondbase64(readerEvt: any) {
-    // let binaryString = readerEvt.target.result;
-    // this.base64textString_logo1 = btoa(binaryString);
-    // let files = this.base64textString_temp_logo1.target.files;
-    // let file = files[0];
-    // let fileExtension = file.type;
+    let binaryString = readerEvt.target.result;
+    this.base64textString_logo1 = btoa(binaryString);
+    let files = this.base64textString_temp_logo1.target.files;
+    let file = files[0];
+    let fileExtension = file.type;
 
-    // let length = this.base64textString_logo1.length;
-    // //console.log('length of image',length);
-    // let y = 1;
-    // if (('=' == this.base64textString_logo1[this.base64textString_logo1.length - 1]) && ('=' == this.base64textString_logo1[this.base64textString_logo1.length - 2])) {
-    //   y = 2;
-    // }
-    // let x = (length * (3 / 4)) - y;
-    // x = x / 1000;
-    // if (x < 200) {
-    //   // console.log('x inside kb xonversion',x);
+    let length = this.base64textString_logo1.length;
+    //console.log('length of image',length);
+    let y = 1;
+    if (('=' == this.base64textString_logo1[this.base64textString_logo1.length - 1]) && ('=' == this.base64textString_logo1[this.base64textString_logo1.length - 2])) {
+      y = 2;
+    }
+    let x = (length * (3 / 4)) - y;
+    x = x / 1000;
+    if (x < 200) {
+      // console.log('x inside kb xonversion',x);
 
-    //   this.base64textString_temp_logo1 = 'data:' + fileExtension + ';base64,' + this.base64textString_logo1;
+      this.base64textString_temp_logo1 = 'data:' + fileExtension + ';base64,' + this.base64textString_logo1;
 
-    // }
-    // else {
-    //   //return alert('Image should be less than 500KB');
+    }
+    else {
+      //return alert('Image should be less than 500KB');
 
-    //   return Swal.fire({
-    //     customClass: {
-    //       container: 'swal2-container'
-    //     },
-    //     position: 'center',
-    //     text: 'Image should be less than 200KB',
-    //     icon: 'warning',
-    //     showCancelButton: true,
-    //     allowOutsideClick: false,////prevents outside click
-    //     //confirmButtonText: 'Ok',
-    //     //cancelButtonText: 'Cancel'
-    //   })
-    // }
+      return Swal.fire({
+        customClass: {
+          container: 'swal2-container'
+        },
+        position: 'center',
+        text: 'Image should be less than 200KB',
+        icon: 'warning',
+        showCancelButton: true,
+        allowOutsideClick: false,////prevents outside click
+        //confirmButtonText: 'Ok',
+        //cancelButtonText: 'Cancel'
+      })
+    }
 
   }
 
   keyPress(event: any) {
-    // const pattern = /[0-9\+\-\ ]/;
+    const pattern = /[0-9\+\-\ ]/;
 
-    // let inputChar = String.fromCharCode(event.charCode);
-    // console.log('inputChar', inputChar);
-    // if (event.keyCode != 8 && !pattern.test(inputChar)) {
-    //   event.preventDefault();
-    // }
+    let inputChar = String.fromCharCode(event.charCode);
+    console.log('inputChar', inputChar);
+    if (event.keyCode != 8 && !pattern.test(inputChar)) {
+      event.preventDefault();
+    }
   }
 
 
   checkMail(event: any) {
-    // console.log('event', event);
-    // let Regex = /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i
-    // this.errorForInvalidEmail = '';
-    // if (Regex.test(event.target.value) == false) {
-    //   this.errorForInvalidEmail = "Invalid Email Address";
-    // }
+    console.log('event', event);
+    let Regex = /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i
+    this.errorForInvalidEmail = '';
+    if (Regex.test(event.target.value) == false) {
+      this.errorForInvalidEmail = "Invalid Email Address";
+    }
   }
 
   getDatatable(data_temp: any) {
