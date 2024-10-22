@@ -4,11 +4,12 @@ import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Valida
 
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import Swal from 'sweetalert2';
+import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { ApiSearch, Config } from 'datatables.net';
 import { APIService } from 'src/app/API.service';
 import { SharedService } from '../shared.service';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 
 interface ListItem {
   [key: string]: {
@@ -61,6 +62,12 @@ export class EscalationComponent implements OnInit {
   
   };
   duplicate: any;
+  isCollapsed1 = false;
+
+
+  @ViewChild('noticeSwal')
+  noticeSwal!: SwalComponent;
+  swalOptions: SweetAlertOptions = {};
 
   errorForUniqueLabel: string;
   errorForUniqueID: string;
@@ -80,6 +87,7 @@ export class EscalationComponent implements OnInit {
   common_others: any='';
   selectedValues: any=[];
   totEscLvl: number=0;
+  isLoading:boolean = false
 
   clientNames:any =  [
     {  PK: 'Asad' },
@@ -97,6 +105,7 @@ export class EscalationComponent implements OnInit {
   lookup_data_notification: any = [];
   seletedPK: any;
   lookup_users: any = [];
+  editOperation: boolean = false;
 
 
   constructor(private fb: FormBuilder,
@@ -125,6 +134,19 @@ export class EscalationComponent implements OnInit {
 
     
    
+  }
+
+
+
+  onSubmit(event:any){
+     
+    console.log("Submitted is clicked ",event);
+    if(event.type == 'submit' && this.editOperation == false){
+      this.createNewNM('')
+    }
+    else{
+      this.updateConfiguration(this.notificationForm.value,'id')
+    }
   }
 
 
@@ -294,6 +316,20 @@ console.log("PARRAY3:",permissionsArray)
 }  
 
   createNewNM(getValue: any) {
+
+    const successAlert: SweetAlertOptions = {
+      icon: 'success',
+      title: 'Success!',
+      text: this.editOperation ? 'Notification Matrix updated successfully!' : 'Notification Matrix created successfully!',
+  };
+    const errorAlert: SweetAlertOptions = {
+        icon: 'error',
+        title: 'Error!',
+        text: '',
+    };
+
+
+
     var l=this.notificationForm.controls.levels
     var escalationTime=[]
     var comments=[]
@@ -343,7 +379,7 @@ console.log("PARRAY3:",permissionsArray)
     console.log('alldata',this.allDatas)
     this.submitted = true;
     console.log('config creation',this.allDatas);
-    this.closeModal.nativeElement.click();
+   
     this.api.CreateMaster(tempObj).then(async (value: any)=>{
       console.log("Sending Data")
       // this.auditTrialServices.audit_trail('2.1', "Notification Matrix", "Add", "Creating new Notification Matrix Config in the Main Table", "1")
@@ -369,13 +405,15 @@ console.log("PARRAY3:",permissionsArray)
         // this.auditTrialServices.audit_trail('2.1', "Notification Matrix", "Add", "Creating new Notification Matrix Config in the Lookup Table", "1")
 
         this.reloadEvent.next(true)
-        
-        this.toast.open("New Notification Matrix Configuration created successfully", " ", {
 
-          duration: 2000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top',
-        })
+        this.showAlert(successAlert)
+        
+        // this.toast.open("New Notification Matrix Configuration created successfully", " ", {
+
+        //   duration: 2000,
+        //   horizontalPosition: 'right',
+        //   verticalPosition: 'top',
+        // })
 
       }
       else {
@@ -383,11 +421,12 @@ console.log("PARRAY3:",permissionsArray)
       }
     }).catch((err: any) => {
       console.log('err for creation', err);
-      this.toast.open("Error in Creating New Notification Matrix Configuration ", "Check again", {
-        duration: 5000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top',
-      })
+      this.showAlert(errorAlert)
+      // this.toast.open("Error in Creating New Notification Matrix Configuration ", "Check again", {
+      //   duration: 5000,
+      //   horizontalPosition: 'right',
+      //   verticalPosition: 'top',
+      // })
     })
   }
 
@@ -464,6 +503,7 @@ console.log("PARRAY3:",permissionsArray)
     console.log("CreateNewField:",this.notificationForm)
     //new device configuration (changing of buttons(submit))
     if (getValues == "") {
+      this.editOperation = false
       console.log("GET VALUES:",getValues)
       this.notificationForm.get('PK')?.enable();
       this.showModal = false;
@@ -476,6 +516,7 @@ console.log("PARRAY3:",permissionsArray)
     //updated device congifuration(update)
     //else if (getValues && getValues.SK && getValues.SK == "untangleds") {
     else if (getValues) {
+      this.editOperation = true
       this.showModal = true;
       this.showHeading = false;
       console.log('values',getValues)
@@ -538,9 +579,40 @@ console.log("PARRAY3:",permissionsArray)
     return check
   }
 
+  showAlert(swalOptions: SweetAlertOptions) {
+    let style = swalOptions.icon?.toString() || 'success';
+    if (swalOptions.icon === 'error') {
+      style = 'danger';
+    }
+    this.swalOptions = Object.assign({
+      buttonsStyling: false,
+      confirmButtonText: "Ok, got it!",
+      customClass: {
+        confirmButton: "btn btn-" + style
+      }
+    }, swalOptions);
+    this.cd.detectChanges();
+    this.noticeSwal.fire();
+  }
+  
+
 
 
   updateConfiguration(value: any, getKey: any) {
+
+    const successAlert: SweetAlertOptions = {
+      icon: 'success',
+      title: 'Success!',
+      text: this.editOperation ? 'Notification Matrix updated successfully!' : 'Notification Matrix created successfully!',
+  };
+    const errorAlert: SweetAlertOptions = {
+        icon: 'error',
+        title: 'Error!',
+        text: '',
+    };
+
+
+
      var l=this.notificationForm.controls.levels
     var escalationTime=[]
     var comments=[]
@@ -588,20 +660,20 @@ console.log("PARRAY3:",permissionsArray)
 
   
 
-    this.closeModal.nativeElement.click();
+    // this.closeModal.nativeElement.click();
     
     this.api.UpdateMaster(tempObj).then(async (value: any) => {
       if (value) {
         
         console.log("VALUE:",value)
         this.cd.detectChanges()
-        this.toast.open("Notification Matrix configuration updated successfully", " ", {
+        // this.toast.open("Notification Matrix configuration updated successfully", " ", {
 
-          duration: 2000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top',
+        //   duration: 2000,
+        //   horizontalPosition: 'right',
+        //   verticalPosition: 'top',
 
-        })
+        // })
         // this.addFromService();
 
         var item={
@@ -614,23 +686,26 @@ console.log("PARRAY3:",permissionsArray)
     
         await this.fetchTimeMachineById(1,this.notificationForm.controls.PK.value, 'update', item);
         // this.auditTrialServices.audit_trail('2.1', "Notification Matrix", "Update", "Updating the Lookup Table", "1")
+        this.showAlert(successAlert)
         this.cd.detectChanges()
         this.reloadEvent.next(true)
 
       }
       else {
+        this.showAlert(errorAlert)
         alert('Error in Updating Configuration');
       }
 
     }).catch(err=>{
       console.log(err)
-      this.toast.open("Error in Updating Configuration ", "Check again", {
+      this.showAlert(errorAlert)
+      // this.toast.open("Error in Updating Configuration ", "Check again", {
   
-        duration: 5000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top',
+      //   duration: 5000,
+      //   horizontalPosition: 'right',
+      //   verticalPosition: 'top',
 
-      })
+      // })
     })
   }
 
@@ -792,17 +867,24 @@ console.log("PARRAY3:",permissionsArray)
         this.lookup_data_notification = []
         this.fetchUserLookupdata(1,this.SK_clientID + "#notification" + "#lookup")
           .then((resp:any) => {
-            const responseData = resp || []; // Default to an empty array if resp is null
+            var responseData = resp || []; // Default to an empty array if resp is null
+            responseData = Array.from(new Set(responseData))
+              // Example filtering for search
+              const searchValue = dataTablesParameters.search.value.toLowerCase();
+              const filteredData = Array.from(new Set(
+                responseData
+                  .filter((item: { P1: string }) => item.P1.toLowerCase().includes(searchValue.toLowerCase()))
+                  .map((item: any) => JSON.stringify(item)) // Stringify the object to make it unique
+              )).map((item: any) => JSON.parse(item)); // Parse back to object
   
-            // Prepare the response structure expected by DataTables
-            callback({
-              draw: dataTablesParameters.draw, // Echo the draw parameter
-              recordsTotal: responseData.length, // Total number of records
-              recordsFiltered: responseData.length, // Filtered records (you may want to adjust this)
-              data: responseData // The actual data array
+              callback({
+                draw: dataTablesParameters.draw,
+                recordsTotal: responseData.length,
+                recordsFiltered: filteredData.length,
+                data: filteredData // Return filtered data
             });
-  
-            console.log("Response is in this form ", responseData);
+   
+            console.log("Response is in this form ", filteredData);
           })
           .catch((error: any) => {
             console.error('Error fetching user lookup data:', error);
@@ -1108,6 +1190,7 @@ console.log("PARRAY3:",permissionsArray)
             }
           } else {
             console.log("All the users are here", this.lookup_data_notification);
+
 
             this.listofNMIds = this.lookup_data_notification.map((item:any)=>item.P1)
 

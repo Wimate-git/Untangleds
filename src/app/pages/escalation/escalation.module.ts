@@ -8,6 +8,7 @@ import { NgMultiSelectDropDownModule } from "ng-multiselect-dropdown";
 import { NgbCollapseModule, NgbDropdownModule, NgbModule, NgbNavModule, NgbTooltipModule } from "@ng-bootstrap/ng-bootstrap";
 import { Crud2Module } from "src/app/modules/crud2/crud.module";
 import { MultiSelectModule } from 'primeng/multiselect';
+import { SweetAlert2Module } from "@sweetalert2/ngx-sweetalert2";
 
 
 
@@ -33,7 +34,8 @@ import { MultiSelectModule } from 'primeng/multiselect';
     NgbTooltipModule,
     NgbModule,
     Crud2Module,
-    MultiSelectModule
+    MultiSelectModule,
+    SweetAlert2Module.forChild(),
 ]
 })
 export class EscalationModule { }

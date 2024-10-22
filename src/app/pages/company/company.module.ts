@@ -9,6 +9,7 @@ import { NgxSpinner, NgxSpinnerModule } from "ngx-spinner";
 import { Crud2Module } from "src/app/modules/crud2/crud.module";
 import { CompanyComponent } from "./company.component";
 import { CrudcompanyModule } from "./crud-company/crud.module";
+import { SweetAlert2Module } from "@sweetalert2/ngx-sweetalert2";
 
 
 
@@ -35,7 +36,7 @@ import { CrudcompanyModule } from "./crud-company/crud.module";
     NgbTooltipModule,
     NgbModule,
     NgxSpinnerModule,
-    
+    SweetAlert2Module.forChild(),
 ]
 })
 export class CompanyModule { }

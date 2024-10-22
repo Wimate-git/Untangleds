@@ -6,7 +6,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { APIService } from 'src/app/API.service';
 import { Router } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
-import Swal from 'sweetalert2';
+import Swal, { SweetAlertOptions } from 'sweetalert2';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 
 interface ListItem {
   [key: string]: {
@@ -25,6 +26,13 @@ interface ListItem {
 export class CompanyComponent implements OnInit{
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
   datatableConfig: Config = {};
+  swalOptions: SweetAlertOptions = {};
+  isLoading:boolean = false
+
+  @ViewChild('noticeSwal')
+  noticeSwal!: SwalComponent;
+
+  
 
 
   createCompanyField: UntypedFormGroup;
@@ -35,6 +43,7 @@ export class CompanyComponent implements OnInit{
   logo1_name: any;
   base64textString: any;
   base64textString_temp: any;
+  isCollapsed1 = false;
 
   base64textString_logo1: any;
   base64textString_temp_logo1: any;
@@ -77,6 +86,7 @@ export class CompanyComponent implements OnInit{
   lookup_data_client: any = [];
   listofClientIDs: any = [];
   lookup_data_company: any = [];
+  editOperation: boolean = false;
 
 
   constructor(private fb: UntypedFormBuilder, private companyConfiguration: SharedService,
@@ -104,14 +114,29 @@ export class CompanyComponent implements OnInit{
   }
 
   create() {
-    // this.userModel = { P1: '', P2: '', P3: '',P4:0,P5:'' };
+    console.log("Add is clicked");
+    this.openModal('')
   }
 
 
   edit(P1: any) {
-    console.log("Edited username is here ", P1);
-    $('#companyModal').modal('show');
+    // console.log("Edited username is here ", P1);
+    // $('#companyModal').modal('show');
     this.openModalHelpher(P1)
+  }
+
+
+
+
+  onSubmit(event:any){
+     
+    console.log("Submitted is clicked ",event);
+    if(event.type == 'submit' && this.editOperation == false){
+      this.createNewCompany('')
+    }
+    else{
+      this.updateCompany(this.createCompanyField.value,'editCompany')
+    }
   }
 
 
@@ -130,16 +155,23 @@ export class CompanyComponent implements OnInit{
         this.fetchCompanyLookupdata(1)
           .then((resp:any) => {
             const responseData = resp || []; // Default to an empty array if resp is null
-  
-            // Prepare the response structure expected by DataTables
-            callback({
-              draw: dataTablesParameters.draw, // Echo the draw parameter
-              recordsTotal: responseData.length, // Total number of records
-              recordsFiltered: responseData.length, // Filtered records (you may want to adjust this)
-              data: responseData // The actual data array
-            });
-  
-            console.log("Response is in this form ", responseData);
+             // Example filtering for search
+             const searchValue = dataTablesParameters.search.value.toLowerCase();
+             const filteredData = Array.from(new Set(
+              responseData
+                .filter((item: { P1: string }) => item.P1.toLowerCase().includes(searchValue.toLowerCase()))
+                .map((item: any) => JSON.stringify(item)) // Stringify the object to make it unique
+            )).map((item: any) => JSON.parse(item)); // Parse back to object
+
+             callback({
+                 draw: dataTablesParameters.draw,
+                 recordsTotal: responseData.length,
+                 recordsFiltered: filteredData.length,
+                 data: filteredData // Return filtered data
+             });
+
+             console.log("Response is in this form ", filteredData);
+                               
           })
           .catch((error: any) => {
             console.error('Error fetching user lookup data:', error);
@@ -266,166 +298,166 @@ export class CompanyComponent implements OnInit{
   }
   
 
-  async fetchTMLookupData(sk: any) {
+  // async fetchTMLookupData(sk: any) {
 
-    // console.log("Iam called Bro");
-    // try {
-    //   const response = await this.api.GetLookupMasterTable(this.clientID, sk);
+  //   // console.log("Iam called Bro");
+  //   // try {
+  //   //   const response = await this.api.GetLookupMasterTable(this.clientID, sk);
    
-    //   if (response && response.items) {
-    //     // Check if response.listOfItems is a string
-    //     if (typeof response.items === 'string') {
-    //       let data = JSON.parse(response.items);
-    //       console.log("d1 =",data)
-    //       if (Array.isArray(data)) {
-    //         for (let index = 0; index < data.length; index++) {
-    //           const element = data[index];
+  //   //   if (response && response.items) {
+  //   //     // Check if response.listOfItems is a string
+  //   //     if (typeof response.items === 'string') {
+  //   //       let data = JSON.parse(response.items);
+  //   //       console.log("d1 =",data)
+  //   //       if (Array.isArray(data)) {
+  //   //         for (let index = 0; index < data.length; index++) {
+  //   //           const element = data[index];
   
-    //           if (element !== null && element !== undefined) {
-    //             // Extract values from each element and push them to lookup_data_temp1
-    //             const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
-    //             const { P1, P2, P3} = element[key]; // Extract values from the nested object
-    //             this.lookup_data_user.push({P1, P2, P3 }); // Push an array containing P1, P2, and P3 values
-    //             console.log("d2 =",this.lookup_data_user)
-    //           } else {
-    //             break;
-    //           }
-    //         }
-    //         //this.lookup_data_temp1.sort((a, b) => b.P5 - a.P5);
-    //         this.lookup_data_user.sort((a:any, b:any) => {
-    //           return b.P3 - a.P3; // Compare P5 values in descending order
-    //         });
-    //         console.log("Lookup sorting",this.lookup_data_user);
-    //         // Continue fetching recursively
-    //         await this.fetchTMLookupData(sk + 1);
-    //       } else {
-    //         console.error('Invalid data format - not an array.');
-    //       }
-    //     } else {
-    //       console.error('response.listOfItems is not a string.');
-    //     }
-    //   } else {
-    //     // Sort the lookup_data_temp1 array based on the third element (P3)
-    //   console.log()
+  //   //           if (element !== null && element !== undefined) {
+  //   //             // Extract values from each element and push them to lookup_data_temp1
+  //   //             const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
+  //   //             const { P1, P2, P3} = element[key]; // Extract values from the nested object
+  //   //             this.lookup_data_user.push({P1, P2, P3 }); // Push an array containing P1, P2, and P3 values
+  //   //             console.log("d2 =",this.lookup_data_user)
+  //   //           } else {
+  //   //             break;
+  //   //           }
+  //   //         }
+  //   //         //this.lookup_data_temp1.sort((a, b) => b.P5 - a.P5);
+  //   //         this.lookup_data_user.sort((a:any, b:any) => {
+  //   //           return b.P3 - a.P3; // Compare P5 values in descending order
+  //   //         });
+  //   //         console.log("Lookup sorting",this.lookup_data_user);
+  //   //         // Continue fetching recursively
+  //   //         await this.fetchTMLookupData(sk + 1);
+  //   //       } else {
+  //   //         console.error('Invalid data format - not an array.');
+  //   //       }
+  //   //     } else {
+  //   //       console.error('response.listOfItems is not a string.');
+  //   //     }
+  //   //   } else {
+  //   //     // Sort the lookup_data_temp1 array based on the third element (P3)
+  //   //   console.log()
      
-    //     // Extract the IDs and display the datatable
-    //     // this.listofPowerboardIds = this.lookup_data_temp1.map((item: any) => item[0]);
-    //     // this.showDatatable(this.lookup_data_temp1);
+  //   //     // Extract the IDs and display the datatable
+  //   //     // this.listofPowerboardIds = this.lookup_data_temp1.map((item: any) => item[0]);
+  //   //     // this.showDatatable(this.lookup_data_temp1);
         
-    //     console.log("Permissions to be displayed",this.lookup_data_user);
-    //     this.getTableUser(this.lookup_data_user);
+  //   //     console.log("Permissions to be displayed",this.lookup_data_user);
+  //   //     this.getTableUser(this.lookup_data_user);
        
         
-    //     // for(let i = 0;i<this.lookup_data_temp1.length;i++){
-    //     //   this.paramsBasedOnRDT.push(this.lookup_data_temp1[i].P2);
-    //     // }
-    //     // this.getDatatable(this.lookup_data_temp1);
-    //   }
-    // } catch (error) {
-    //   console.error('Error:', error);
-    //   // Handle the error as needed
-    // }
-  }
+  //   //     // for(let i = 0;i<this.lookup_data_temp1.length;i++){
+  //   //     //   this.paramsBasedOnRDT.push(this.lookup_data_temp1[i].P2);
+  //   //     // }
+  //   //     // this.getDatatable(this.lookup_data_temp1);
+  //   //   }
+  //   // } catch (error) {
+  //   //   console.error('Error:', error);
+  //   //   // Handle the error as needed
+  //   // }
+  // }
 
 
 
-  getTableUser(getData: any) {
-    // let editButton = 'btn btn-sm btn-primary editclasscompany '
-    // let deleteButton = 'btn btn-sm btn-danger editclasscompany ';
+  // getTableUser(getData: any) {
+  //   // let editButton = 'btn btn-sm btn-primary editclasscompany '
+  //   // let deleteButton = 'btn btn-sm btn-danger editclasscompany ';
   
   
-    // if (typeof getData !== 'undefined') {
+  //   // if (typeof getData !== 'undefined') {
   
-    //   for (let allData = 0; allData < getData.length; allData++) {
+  //   //   for (let allData = 0; allData < getData.length; allData++) {
         
         
   
-    //       this.dataform.push({
-    //         company_id:getData[allData].P1,
-    //         client_id:getData[allData].P2,
-    //         updatedTime:new Date(getData[allData].P3*1000).toDateString() + " " + new Date(getData[allData].P3*1000).toLocaleTimeString(),
-    //         //grid_details: grid_details
-    //       })
-    //   }
+  //   //       this.dataform.push({
+  //   //         company_id:getData[allData].P1,
+  //   //         client_id:getData[allData].P2,
+  //   //         updatedTime:new Date(getData[allData].P3*1000).toDateString() + " " + new Date(getData[allData].P3*1000).toLocaleTimeString(),
+  //   //         //grid_details: grid_details
+  //   //       })
+  //   //   }
   
-    // }
-    // else {
-    //   this.dataform = [];
-    // }
-    // let temp = [];
+  //   // }
+  //   // else {
+  //   //   this.dataform = [];
+  //   // }
+  //   // let temp = [];
   
-    // if (typeof getData !== 'undefined') {
-    //   for (let formattedDate = 0; formattedDate < getData.length; formattedDate++) {
+  //   // if (typeof getData !== 'undefined') {
+  //   //   for (let formattedDate = 0; formattedDate < getData.length; formattedDate++) {
   
-    //     temp[formattedDate] = new Date(getData[formattedDate].updatedTime).toLocaleString();
-    //     getData[formattedDate].updatedTime = temp[formattedDate];
-    //   }
+  //   //     temp[formattedDate] = new Date(getData[formattedDate].updatedTime).toLocaleString();
+  //   //     getData[formattedDate].updatedTime = temp[formattedDate];
+  //   //   }
   
-    // }
+  //   // }
   
-    // else {
-    //   getData = []
-    // }
-  
-  
-    // //update
-    // if (this.hideDeleteButton === true) {
-    //   this.columnTableData.push(
-    //     {
-    //       defaultContent: "<button class='" + editButton + "' data-bs-target='#companyModal' data-bs-toggle='modal'><i class='fa fa-edit'></i></i></button>"
-    //     },
-    //     {
-    //       defaultContent: "<button class='" + deleteButton + "'><i class='fa fa-trash'></i></button>"
-    //     }
-  
-    //   )
+  //   // else {
+  //   //   getData = []
+  //   // }
   
   
-    // }
+  //   // //update
+  //   // if (this.hideDeleteButton === true) {
+  //   //   this.columnTableData.push(
+  //   //     {
+  //   //       defaultContent: "<button class='" + editButton + "' data-bs-target='#companyModal' data-bs-toggle='modal'><i class='fa fa-edit'></i></i></button>"
+  //   //     },
+  //   //     {
+  //   //       defaultContent: "<button class='" + deleteButton + "'><i class='fa fa-trash'></i></button>"
+  //   //     }
   
-    // //view
-    // else {
-    //   this.columnTableData.push(
-  
-    //     {
-    //       defaultContent: "<button class='" + editButton + "' data-bs-target='#companyModal' data-bs-toggle='modal''><i class='fa fa-edit'></i></i></button>"
-    //     }
-  
-    //   )
-  
-  
-    // }
-  
-    // console.log("columnDatatable",this.columnTableData);
-  
-    // console.log("dataform",this.dataform);
+  //   //   )
   
   
-    // $('#company_lookup_table').off('click');
-    // $('#company_lookup_table').on('click', '.editclasscompany', function () {
+  //   // }
   
-    //   //get row for data
-    //   let tr = $(this).closest('tr');
-    //   let row =_currClassRef.deviceTableData.row(tr);
+  //   // //view
+  //   // else {
+  //   //   this.columnTableData.push(
   
-    //   if (this.className == deleteButton) {
-    //     // _currClassRef.deleteUser(row.data(), 'delete');
-    //     _currClassRef.deleteCompany(row.data());
-    //   }
+  //   //     {
+  //   //       defaultContent: "<button class='" + editButton + "' data-bs-target='#companyModal' data-bs-toggle='modal''><i class='fa fa-edit'></i></i></button>"
+  //   //     }
   
-    //   if (this.className == editButton) {
-    //     _currClassRef.openModalHelpher(row.data());
+  //   //   )
   
-    //   }
   
-    // })
+  //   // }
+  
+  //   // console.log("columnDatatable",this.columnTableData);
+  
+  //   // console.log("dataform",this.dataform);
+  
+  
+  //   // $('#company_lookup_table').off('click');
+  //   // $('#company_lookup_table').on('click', '.editclasscompany', function () {
+  
+  //   //   //get row for data
+  //   //   let tr = $(this).closest('tr');
+  //   //   let row =_currClassRef.deviceTableData.row(tr);
+  
+  //   //   if (this.className == deleteButton) {
+  //   //     // _currClassRef.deleteUser(row.data(), 'delete');
+  //   //     _currClassRef.deleteCompany(row.data());
+  //   //   }
+  
+  //   //   if (this.className == editButton) {
+  //   //     _currClassRef.openModalHelpher(row.data());
+  
+  //   //   }
+  
+  //   // })
   
    
    
-    //   this.getLookupTableData(this.dataform,this.columnTableData)
-    //   this.addFromService();
-    //     let _currClassRef = this;
-    }
+  //   //   this.getLookupTableData(this.dataform,this.columnTableData)
+  //   //   this.addFromService();
+  //   //     let _currClassRef = this;
+  //   }
 
 
 
@@ -562,7 +594,7 @@ export class CompanyComponent implements OnInit{
             });
             console.log("Lookup sorting",this.lookup_data_client);
             // Continue fetching recursively
-            await this.fetchTMLookupData(sk + 1);
+            await this.fetchTMClientLookup(sk + 1);
           } else {
             console.error('Invalid data format - not an array.');
           }
@@ -629,6 +661,7 @@ export class CompanyComponent implements OnInit{
     let temp = "";
     //console.log('temp',temp);
     if (getValues == "") {
+      this.editOperation = false;
       this.showHeading = true;
       this.showModal = false;
       this.errorForUniqueID = '';
@@ -671,7 +704,7 @@ export class CompanyComponent implements OnInit{
 //           this.hideUpdateButton = true;
 //         }
 //       }
-
+    this.editOperation = true;
       this.showHeading = false;
       this.showModal = true;
       this.base64textString_temp = getValues.logo1;
@@ -896,6 +929,19 @@ export class CompanyComponent implements OnInit{
 
 
   createNewCompany(getNewFields: any) {
+
+
+    const successAlert: SweetAlertOptions = {
+      icon: 'success',
+      title: 'Success!',
+      text: this.editOperation ? 'Company updated successfully!' : 'Company created successfully!',
+  };
+    const errorAlert: SweetAlertOptions = {
+        icon: 'error',
+        title: 'Error!',
+        text: '',
+    };
+
     //console.log('allUserDetails', this.createCompanyField.value);
 
     let tempClient = this.createCompanyField.value.clientID+"#company"+"#lookup";
@@ -927,6 +973,8 @@ export class CompanyComponent implements OnInit{
       metadata:JSON.stringify(this.allCompanyDetails)
     }
 
+    console.log("Temp obj is here ",tempObj);
+
 
     const date = Math.ceil(((new Date()).getTime()) / 1000)
     const items ={
@@ -936,7 +984,10 @@ export class CompanyComponent implements OnInit{
     P4: date
     }
 
-    // console.log('newly added Company config', this.allCompanyDetails);
+
+    console.log("Items are here ",items);
+
+    console.log('newly added Company config', this.allCompanyDetails);
 
     this.api.CreateMaster(tempObj).then(async (value: any) => {
 
@@ -946,8 +997,6 @@ export class CompanyComponent implements OnInit{
       
       this.lookup_data_company = []
 
-      this.reloadEvent.next(true)
-
       // await this.loading()
 
       //need to refresh table so this is called 
@@ -956,15 +1005,15 @@ export class CompanyComponent implements OnInit{
       if (value) {
         //alert('New configuration created successfully');
 
-        this.toast.open("New Company Configuration created successfully", " ", {
-          //panelClass: 'error-alert-snackbar',
+        // this.toast.open("New Company Configuration created successfully", " ", {
+        //   //panelClass: 'error-alert-snackbar',
 
-          duration: 2000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top',
-        })
+        //   duration: 2000,
+        //   horizontalPosition: 'right',
+        //   verticalPosition: 'top',
+        // })
 
-        this.closeCompany.nativeElement.click();
+        // this.closeCompany.nativeElement.click();
 
         //adding default location
         this.defaultLocation = {
@@ -1038,13 +1087,17 @@ export class CompanyComponent implements OnInit{
         
                   if (value) {
         
-                    this.toast.open("New Location Configuration created successfully", " ", {
-                      //panelClass: 'error-alert-snackbar',
+                    // this.toast.open("New Location Configuration created successfully", " ", {
+                    //   //panelClass: 'error-alert-snackbar',
         
-                      duration: 2000,
-                      horizontalPosition: 'right',
-                      verticalPosition: 'top',
-                    })
+                    //   duration: 2000,
+                    //   horizontalPosition: 'right',
+                    //   verticalPosition: 'top',
+                    // })
+
+                    this.showAlert(successAlert)
+
+                    this.reloadEvent.next(true)
         
         
         
@@ -1063,41 +1116,47 @@ export class CompanyComponent implements OnInit{
                   }
         
                 }).catch((err: any) => {
+
+                  this.showAlert(errorAlert)
+
                   console.log('err for creation', err);
-                  this.toast.open("Error in adding new Location Configuration ", "Check again", {
-                    //panelClass: 'error-alert-snackbar',
+                  // this.toast.open("Error in adding new Location Configuration ", "Check again", {
+                  //   //panelClass: 'error-alert-snackbar',
         
-                    duration: 5000,
-                    horizontalPosition: 'right',
-                    verticalPosition: 'top',
-                    //   //panelClass: ['blue-snackbar']
-                  })
+                  //   duration: 5000,
+                  //   horizontalPosition: 'right',
+                  //   verticalPosition: 'top',
+                  //   //   //panelClass: ['blue-snackbar']
+                  // })
                 })
 
       }
       else {
-        Swal.fire({
-          customClass: {
-            container: 'swal2-container'
-          },
-          position: 'center',
-          icon: 'warning',
-          title: 'Error in adding Company Configuration',
-          showCancelButton: true,
-          allowOutsideClick: false,////prevents outside click
-        })
+        this.showAlert(errorAlert)
+        // Swal.fire({
+        //   customClass: {
+        //     container: 'swal2-container'
+        //   },
+        //   position: 'center',
+        //   icon: 'warning',
+        //   title: 'Error in adding Company Configuration',
+        //   showCancelButton: true,
+        //   allowOutsideClick: false,////prevents outside click
+        // })
       }
 
     }).catch(err => {
-      console.log('err for creation', err);
-      this.toast.open("Error in adding new company Configuration ", "Check again", {
-        //panelClass: 'error-alert-snackbar',
 
-        duration: 5000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top',
-        //   //panelClass: ['blue-snackbar']
-      })
+      this.showAlert(errorAlert)
+      console.log('err for creation', err);
+      // this.toast.open("Error in adding new company Configuration ", "Check again", {
+      //   //panelClass: 'error-alert-snackbar',
+
+      //   duration: 5000,
+      //   horizontalPosition: 'right',
+      //   verticalPosition: 'top',
+      //   //   //panelClass: ['blue-snackbar']
+      // })
     })
   }
 
@@ -1169,8 +1228,38 @@ export class CompanyComponent implements OnInit{
 
 
 
+  showAlert(swalOptions: SweetAlertOptions) {
+    let style = swalOptions.icon?.toString() || 'success';
+    if (swalOptions.icon === 'error') {
+      style = 'danger';
+    }
+    this.swalOptions = Object.assign({
+      buttonsStyling: false,
+      confirmButtonText: "Ok, got it!",
+      customClass: {
+        confirmButton: "btn btn-" + style
+      }
+    }, swalOptions);
+    this.cd.detectChanges();
+    this.noticeSwal.fire();
+  }
+
+
+
 
   updateCompany(value: any, key: any) {
+
+    const successAlert: SweetAlertOptions = {
+      icon: 'success',
+      title: 'Success!',
+      text: this.editOperation ? 'Company updated successfully!' : 'Comapany created successfully!',
+  };
+    const errorAlert: SweetAlertOptions = {
+        icon: 'error',
+        title: 'Error!',
+        text: '',
+    };
+
 
 
     //for editing reading Device type fields
@@ -1230,27 +1319,31 @@ export class CompanyComponent implements OnInit{
         this.reloadEvent.next(true)
 
         //alert('Configuration updated successfully');
-        this.toast.open("Company Configuration updated successfully", "", {
-          //panelClass: 'error-alert-snackbar',
+        // this.toast.open("Company Configuration updated successfully", "", {
+        //   //panelClass: 'error-alert-snackbar',
 
-          duration: 2000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top',
-          //   //panelClass: ['blue-snackbar']
-        })
+        //   duration: 2000,
+        //   horizontalPosition: 'right',
+        //   verticalPosition: 'top',
+        //   //   //panelClass: ['blue-snackbar']
+        // })
+
+        this.showAlert(successAlert)
 
         //need to refresh table so updated value will be fetched
         this.addFromService();
         //modal closing based on viewchild
-        this.closeCompany.nativeElement.click();
+        // this.closeCompany.nativeElement.click();
 
 
       }
       else {
+        this.showAlert(errorAlert)
         alert('Error in updating Company Configuration');
       }
 
     }).catch((err: any) => {
+      this.showAlert(errorAlert)
       console.log('error for updating', err);
     })
   }
@@ -1350,6 +1443,12 @@ export class CompanyComponent implements OnInit{
         SK: 1
       }
 
+
+      const locationObj = {
+        PK:`${this.SK_clientID}#${value}#location#main`,
+        SK:1
+      }
+
       console.log("All company Details :",this.allCompanyDetails);
 
           const date = Math.ceil(((new Date()).getTime()) / 1000)
@@ -1363,6 +1462,8 @@ export class CompanyComponent implements OnInit{
             if (value) {
 
               await this.fetchTimeMachineById(1,items.P1, 'delete', items);
+
+              await this.api.DeleteMaster(locationObj)
 
               this.reloadEvent.next(true)
 

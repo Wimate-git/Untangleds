@@ -16,6 +16,7 @@ import { Api, Config } from 'datatables.net';
 export class CrudcompanyComponent implements OnInit, AfterViewInit, OnDestroy{
 
   @Input() datatableConfig: any = {};
+  @Input() componentSource: string = '';
 
   @Input() route: string = '/';
 
@@ -27,6 +28,10 @@ export class CrudcompanyComponent implements OnInit, AfterViewInit, OnDestroy{
   @Output() deleteEvent = new EventEmitter<number>();
   @Output() editEvent = new EventEmitter<number>();
   @Output() createEvent = new EventEmitter<boolean>();
+
+  modalConfig: NgbModalOptions = {
+    modalDialogClass: 'modal-dialog modal-dialog-centered mw-1000px',
+  };
 
   dtOptions: Config = {};
 
@@ -60,27 +65,14 @@ export class CrudcompanyComponent implements OnInit, AfterViewInit, OnDestroy{
 
     this.dtOptions = {
      
-      dom: "<'row'<'col-sm-6'l><'col-sm-6'f>>"+"<'row'<'col-sm-12'tr>>" + // Main table
-      "<'row'<'col-sm-12'p>>", // Pagination
+      dom: `<'row'<'col-sm-12'tr>>` +
+      "<'d-flex justify-content-between'<'col-sm-12 col-md-5'i><'d-flex justify-content-between'p>>",
       processing: true,
       language: {
         processing: '<span class="spinner-border spinner-border-sm align-middle"></span> Loading...'
       },
       search:true,
       ...this.datatableConfig,
-
-       buttons: [
-        {
-          extend: 'colvis', // Column visibility button
-          text: 'Column Visibility',
-          className: 'btn btn-secondary'
-        },
-        {
-          extend: 'excel', // Export button
-          text: 'Export to Excel',
-          className: 'btn btn-success'
-        }
-      ],
       order:[4],
       ordering:true
     };
@@ -151,12 +143,12 @@ export class CrudcompanyComponent implements OnInit, AfterViewInit, OnDestroy{
 
           case 'create':
             this.createEvent.emit(true);
-            // this.modalRef = this.modalService.open(this.modal, this.modalConfig);
+            this.modalRef = this.modalService.open(this.modal, this.modalConfig);
             break;
 
           case 'edit':
             this.editEvent.emit(this.idInAction);
-            // this.modalRef = this.modalService.open(this.modal, this.modalConfig);
+            this.modalRef = this.modalService.open(this.modal, this.modalConfig);
             break;
 
           case 'delete':
@@ -190,18 +182,34 @@ export class CrudcompanyComponent implements OnInit, AfterViewInit, OnDestroy{
       .pipe(
         debounceTime(50),
         map(event => {
+          
+
           const target = event.target as HTMLElement;
           const action = target.getAttribute('data-action');
           const value = (target as HTMLInputElement).value?.trim().toLowerCase();
-
           return { action, value };
         })
       )
       .subscribe(({ action, value }) => {
-        if (action === 'filter') {
+
+        console.log("Data table value is here ",value);
+
+        if (action === 'company_filter') {
+          console.log("Data table instance is here ", this.datatableElement.dtInstance);
           this.datatableElement.dtInstance.then((dtInstance: Api) => dtInstance.search(value).draw());
         }
       });
+  }
+
+
+  private clearDataTable(): void {
+    if (this.datatableElement) {
+      this.datatableElement.dtInstance.then((dtInstance: Api) => {
+        dtInstance.destroy(); // Destroy the current DataTable instance
+      }).catch(error => {
+        console.error('Error destroying DataTable instance:', error);
+      });
+    }
   }
 
   setupSweetAlert() {

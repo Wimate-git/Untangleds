@@ -56,6 +56,7 @@ export class Crud2Component implements OnInit, AfterViewInit, OnDestroy{
   private modalRef: NgbModalRef;
 
   private clickListener: () => void;
+  filterSearch: string = 'filter';
 
   constructor(private renderer: Renderer2, private router: Router, private modalService: NgbModal,private cd:ChangeDetectorRef) { }
 
@@ -63,6 +64,20 @@ export class Crud2Component implements OnInit, AfterViewInit, OnDestroy{
 
 
   ngOnInit(): void {
+
+
+    if(this.componentSource == 'app-configuration'){
+      this.filterSearch = 'matrix_filter'
+    }
+    else if(this.componentSource == 'app-configuration'){
+      this.filterSearch = 'client_filter'
+    }
+
+
+
+
+
+
     this.dtOptions = {
       dom: "<'row'<'col-sm-12'tr>>" +
       "<'d-flex justify-content-between'<'col-sm-12 col-md-5'i><'d-flex justify-content-between'p>>",
@@ -188,8 +203,11 @@ export class Crud2Component implements OnInit, AfterViewInit, OnDestroy{
         })
       )
       .subscribe(({ action, value }) => {
-        if (action === 'filter') {
+        if (action === this.filterSearch) {
+          console.log("Data table for user ",this.datatableElement.dtInstance);
           this.datatableElement.dtInstance.then((dtInstance: Api) => dtInstance.search(value).draw());
+
+          console.log("After draw ",this.datatableElement.dtInstance.then((dtInstance: Api) => dtInstance.search(value).draw()));
         }
       });
   }

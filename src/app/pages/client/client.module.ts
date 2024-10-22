@@ -7,6 +7,8 @@ import { NgMultiSelectDropDownModule } from "ng-multiselect-dropdown";
 import { ClientComponent } from "./client.component";
 import { InlineSVGModule } from "ng-inline-svg-2";
 import { Crud2Module } from "src/app/modules/crud2/crud.module";
+import { SweetAlert2Module } from "@sweetalert2/ngx-sweetalert2";
+import { NgbCollapseModule } from "@ng-bootstrap/ng-bootstrap";
 
 
 
@@ -26,8 +28,10 @@ import { Crud2Module } from "src/app/modules/crud2/crud.module";
     CommonModule,
     Crud2Module,
     FormsModule,
+    NgbCollapseModule,
     NgMultiSelectDropDownModule,
     InlineSVGModule.forRoot(),
+    SweetAlert2Module.forChild(),
     
 ]
 })

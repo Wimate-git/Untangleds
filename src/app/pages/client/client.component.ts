@@ -5,9 +5,10 @@ import { SafeResourceUrl } from "@angular/platform-browser";
 import { getCurrentUser } from "aws-amplify/auth";
 import { Observable, catchError, debounceTime, map, of } from "rxjs";
 import { APIService } from "src/app/API.service";
-import Swal from "sweetalert2";
+import Swal, { SweetAlertOptions } from "sweetalert2";
 import { SharedService } from "../shared.service";
 import { Config } from "datatables.net";
+import { SwalComponent } from "@sweetalert2/ngx-sweetalert2";
 
 
 
@@ -31,6 +32,10 @@ export class ClientComponent implements OnInit {
   datatableConfig: Config = {};
   // Reload emitter inside datatable
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
+
+  @ViewChild('noticeSwal')
+  noticeSwal!: SwalComponent;
+  swalOptions: SweetAlertOptions = {};
 
   createClientField: UntypedFormGroup;
   showModal: any = false;
@@ -93,7 +98,9 @@ export class ClientComponent implements OnInit {
     validEmail: boolean = true;
   editedClientID: any;
 
+  isCollapsed1 = false;
 
+  isLoading:boolean = false
 
  
   
@@ -104,12 +111,25 @@ export class ClientComponent implements OnInit {
       this.getLoggedUser = this.companyconfig.getLoggedUserDetails()
 
       this.SK_clientID = this.getLoggedUser.clientID;
+      // this.SK_clientID = 'WIMATE_ADMIN';
     
       this.initializeClientFields();
       this.addFromService();
       // this.loading()
 
       this.showTable()
+    }
+
+
+    onSubmit(event:any){
+     
+      console.log("Submitted is clicked ",event);
+      if(event.type == 'submit' && this.editOperation == false){
+        this.createNewClient('')
+      }
+      else{
+        this.updateClient(this.createClientField.value,'editClient')
+      }
     }
 
     
@@ -131,15 +151,25 @@ export class ClientComponent implements OnInit {
           this.lookup_data_user = []
           this.fetchTMLookupData(1)
             .then((resp:any) => {
-              const responseData = resp || []; // Default to an empty array if resp is null
-    
-              // Prepare the response structure expected by DataTables
+              var responseData = resp || []; // Default to an empty array if resp is null
+              
+
+              responseData = Array.from(new Set(responseData))
+              // Example filtering for search
+              const searchValue = dataTablesParameters.search.value.toLowerCase();
+              const filteredData = Array.from(new Set(
+                responseData
+                  .filter((item: { P1: string }) => item.P1.toLowerCase().includes(searchValue.toLowerCase()))
+                  .map((item: any) => JSON.stringify(item)) // Stringify the object to make it unique
+              )).map((item: any) => JSON.parse(item)); // Parse back to object
+  
               callback({
-                draw: dataTablesParameters.draw, // Echo the draw parameter
-                recordsTotal: responseData.length, // Total number of records
-                recordsFiltered: responseData.length, // Filtered records (you may want to adjust this)
-                data: responseData // The actual data array
-              });
+                draw: dataTablesParameters.draw,
+                recordsTotal: responseData.length,
+                recordsFiltered: filteredData.length,
+                data: filteredData // Return filtered data
+            });
+   
     
               console.log("Response is in this form ", responseData);
             })
@@ -217,13 +247,13 @@ export class ClientComponent implements OnInit {
   }
 
   create() {
-    // this.userModel = { P1: '', P2: '', P3: '',P4:0,P5:'' };
+    this.openModal('','')
   }
 
 
   edit(P1: any) {
     console.log("Edited username is here ", P1);
-    $('#clientModal').modal('show');
+    // $('#clientModal').modal('show');
     // this.openModalHelpher(P1)
     this.openModalHelpher(P1);
   }
@@ -842,6 +872,17 @@ export class ClientComponent implements OnInit {
 
   createNewClient(getNewFields: any) {
 
+    const successAlert: SweetAlertOptions = {
+      icon: 'success',
+      title: 'Success!',
+      text: this.editOperation ? 'Client updated successfully!' : 'Client created successfully!',
+  };
+    const errorAlert: SweetAlertOptions = {
+        icon: 'error',
+        title: 'Error!',
+        text: '',
+    };
+
     const tempObj = {
       clientID: this.createClientField.value.clientID,
       clientName: this.createClientField.value.clientName,
@@ -885,44 +926,48 @@ export class ClientComponent implements OnInit {
 
         await this.createLookUpRdt(items,1,"client"+"#lookup")
 
+        this.showAlert(successAlert)
+
         this.reloadEvent.next(true);
 
-        this.toast.open("New Client Configuration created successfully", " ", {
-          //panelClass: 'error-alert-snackbar',
+        // this.toast.open("New Client Configuration created successfully", " ", {
+        //   //panelClass: 'error-alert-snackbar',
 
-          duration: 2000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top',
-        })
+        //   duration: 2000,
+        //   horizontalPosition: 'right',
+        //   verticalPosition: 'top',
+        // })
 
-        this.closeClient.nativeElement.click();
+        // this.closeClient.nativeElement.click();
 
 
       }
       else {
-        Swal.fire({
-          customClass: {
-            container: 'swal2-container'
-          },
-          position: 'center',
-          icon: 'warning',
-          title: 'Error in adding Client Configuration',
-          showCancelButton: true,
-          allowOutsideClick: false,////prevents outside click
-        })
+        this.showAlert(errorAlert)
+        // Swal.fire({
+        //   customClass: {
+        //     container: 'swal2-container'
+        //   },
+        //   position: 'center',
+        //   icon: 'warning',
+        //   title: 'Error in adding Client Configuration',
+        //   showCancelButton: true,
+        //   allowOutsideClick: false,////prevents outside click
+        // })
         //alert('Error in adding User Configuration');
       }
 
     }).catch((err: any) => {
       console.log('err for creation', err);
-      this.toast.open("Error in adding new client Configuration ", "Check again", {
-        //panelClass: 'error-alert-snackbar',
+      this.showAlert(errorAlert)
+      // this.toast.open("Error in adding new client Configuration ", "Check again", {
+      //   //panelClass: 'error-alert-snackbar',
 
-        duration: 5000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top',
-        //   //panelClass: ['blue-snackbar']
-      })
+      //   duration: 5000,
+      //   horizontalPosition: 'right',
+      //   verticalPosition: 'top',
+      //   //   //panelClass: ['blue-snackbar']
+      // })
     })
   }
 
@@ -995,7 +1040,36 @@ async createLookUpRdt(item: any, pageNumber: number,tempclient:any){
 
 
 
+showAlert(swalOptions: SweetAlertOptions) {
+  let style = swalOptions.icon?.toString() || 'success';
+  if (swalOptions.icon === 'error') {
+    style = 'danger';
+  }
+  this.swalOptions = Object.assign({
+    buttonsStyling: false,
+    confirmButtonText: "Ok, got it!",
+    customClass: {
+      confirmButton: "btn btn-" + style
+    }
+  }, swalOptions);
+  this.cd.detectChanges();
+  this.noticeSwal.fire();
+}
+
+
+
   updateClient(value: any, key: any) {
+
+    const successAlert: SweetAlertOptions = {
+      icon: 'success',
+      title: 'Success!',
+      text: this.editOperation ? 'Company updated successfully!' : 'Company created successfully!',
+  };
+    const errorAlert: SweetAlertOptions = {
+        icon: 'error',
+        title: 'Error!',
+        text: '',
+    };
 
     console.log('passing value on update', value);
 
@@ -1052,30 +1126,34 @@ async createLookUpRdt(item: any, pageNumber: number,tempclient:any){
 
         await this.fetchTimeMachineById(1,items.P1, 'update', items);
 
+        this.showAlert(successAlert)
+
         this.reloadEvent.next(true)
 
         //alert('Configuration updated successfully');
-        this.toast.open("Client Configuration updated successfully", "", {
-          //panelClass: 'error-alert-snackbar',
+        // this.toast.open("Client Configuration updated successfully", "", {
+        //   //panelClass: 'error-alert-snackbar',
 
-          duration: 2000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top',
-          //   //panelClass: ['blue-snackbar']
-        })
+        //   duration: 2000,
+        //   horizontalPosition: 'right',
+        //   verticalPosition: 'top',
+        //   //   //panelClass: ['blue-snackbar']
+        // })
 
         //need to refresh table so updated value will be fetched
         this.addFromService();
         //modal closing based on viewchild
-        this.closeClient.nativeElement.click();
+        // this.closeClient.nativeElement.click();
 
 
       }
       else {
+        this.showAlert(errorAlert)
         alert('Error in updating Client Configuration');
       }
 
     }).catch((err: any) => {
+      this.showAlert(errorAlert)
       console.log('error for updating', err);
     })
 
@@ -1255,6 +1333,8 @@ async createLookUpRdt(item: any, pageNumber: number,tempclient:any){
       //console.log('temp',temp);
       if (getValues == "") {
 
+        this.editOperation = false
+
         this.showHeading = true;
         this.showModal = false;
         this.errorForUniqueID = '';
@@ -1281,6 +1361,9 @@ async createLookUpRdt(item: any, pageNumber: number,tempclient:any){
       }
       //updated device congifuration(update)
       else if (getValues) {
+
+        this.editOperation = true
+
 
         console.log("All the values are here to be polpulated ",getValues);
 

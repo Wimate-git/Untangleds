@@ -4,6 +4,7 @@ import {  CrudcompanyComponent } from './crud.component';
 import { DataTablesModule } from 'angular-datatables';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { SharedModule } from "../../../_metronic/shared/shared.module";
 
 
 @NgModule({
@@ -12,7 +13,8 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     CommonModule, DataTablesModule,
     SweetAlert2Module.forChild(),
     NgbModalModule,
-  ],
+    SharedModule
+],
   exports: [CrudcompanyComponent]
 })
 export class CrudcompanyModule { }

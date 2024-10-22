@@ -13,11 +13,21 @@ import { NgxSpinner, NgxSpinnerService } from 'ngx-spinner';
 import { Observable } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
+
+
 import bootstrap from 'bootstrap';
 import { environment } from 'src/environments/environment';
 import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
 import { DynamicApiService } from '../dynamic-api.service';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { LocationPermissionService } from 'src/app/location-permission.service';
+
+interface TreeNode {
+  id: string;         // Assuming 'id' is a string
+  text: string;       // Assuming 'text' is a string
+  parent?: string;    // 'parent' can be a string or undefined
+  node_type?: string; // Optional property for node type
+}
 
 interface ListItem {
   [key: string]: {
@@ -142,10 +152,17 @@ rdtListWorkAround :any =[{
   permission_data: any = [];
   company_data: any = [];
   formList: any = ["All"];
+  temp: any;
+  originalData: any;
+  parentID_selected_node: any;
+  final_list: any;
+  enableLocationButton: boolean;
+  enableDeviceButton: boolean;
 
 
   constructor(private apiService: UserService,private configService:SharedService,private fb:FormBuilder
-    ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal,private DynamicApi:DynamicApiService){}
+    ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal,private DynamicApi:DynamicApiService,
+    private locationPermissionService:LocationPermissionService){}
 
 
 
@@ -161,9 +178,32 @@ rdtListWorkAround :any =[{
     this.initializeUserFields()
 
     this.showTable()
+
+    this.getTreeInputData()
   }
 
 
+  getTreeInputData(){
+    this.locationPermissionService.fetchGlobalLocationTree()
+        .then((jsonModified:any) => {
+          if (!jsonModified) {
+            throw new Error("No data returned");
+          }
+    
+          console.log("Data from location: check", jsonModified);
+          this.temp = jsonModified
+          const jstreeData = jsonModified.map((treeNode: TreeNode) => ({
+            id: treeNode.id, // Use 'id' for jstree node ID
+            text: treeNode.text, // Use 'text' for jstree node display
+            parent: treeNode.parent || "#", // Set parent, or use "#" for root
+            node_type: treeNode.node_type // You can add additional properties as needed
+          }));
+          setTimeout(() => {
+            this.createJSTree(jstreeData);
+          }, 1000);
+        }
+      )
+  }
 
 
 
@@ -176,6 +216,119 @@ rdtListWorkAround :any =[{
     else{
       this.updateUser(this.createUserField.value,'editUser')
     }
+  }
+
+  
+
+  createJSTree(jsondata: any) {
+    // Store the original data to reinitialize the tree when needed
+    this.originalData = jsondata;
+  
+    const initializeTree = (data: any) => {
+      (<any>$("#SimpleJSTree")).jstree({
+        "core": {
+          "check_callback": true,
+          'data': data,
+          'multiple': false,
+        },
+        'search': {
+          'show_only_matches': true, // Only show nodes that match the search
+        },
+        "plugins": ["contextmenu", "dnd", "search"],
+        "contextmenu": {
+          "items": (node: any) => {
+            let tree = (<any>$("#SimpleJSTree")).jstree(true);
+            return {
+              "Create": {
+                "separator_before": false,
+                "separator_after": true,
+                "label": "Add Location",
+                "action": false,
+                "submenu": {
+                  "Child": {
+                    "separator_before": false,
+                    "separator_after": false,
+                    "label": "Child",
+                    action: () => {
+                      let newNode = tree.create_node(node, { text: 'New Child', type: 'file', icon: 'glyphicon glyphicon-file' });
+                      tree.deselect_all();
+                      tree.select_node(newNode);
+                    }
+                  },
+                  "Parent": {
+                    "separator_before": false,
+                    "separator_after": false,
+                    "label": "Parent",
+                    action: () => {
+                      let newNode = tree.create_node(node, { text: 'New Parent', type: 'default' });
+                      tree.deselect_all();
+                      tree.select_node(newNode);
+                    }
+                  }
+                }
+              },
+              "Rename": {
+                "separator_before": false,
+                "separator_after": false,
+                "label": "Edit Location",
+                "action": () => {
+                  tree.edit(node);
+                }
+              },
+              "Remove": {
+                "separator_before": false,
+                "separator_after": false,
+                "label": "Remove Location",
+                "action": () => {
+                  tree.delete_node(node);
+                }
+              }
+            };
+          }
+        }
+      })
+      .on("changed.jstree", (e: any, data: any) => {
+        if (data && data.node && data.node.text) {
+          this.parentID_selected_node = data.node.parent;
+          this.final_list = data.instance.get_node(data.selected[0]);
+  
+          if (this.final_list.original.node_type === 'location') {
+            this.enableLocationButton = true;
+            this.enableDeviceButton = false;
+          } else if (this.final_list.original.node_type === 'device') {
+            this.enableLocationButton = false;
+            this.enableDeviceButton = true;
+          }
+        }
+      });
+    };
+  
+    // Initialize the tree with the original data
+    initializeTree(this.originalData);
+  
+    let to: any = false;
+    $('#search').keyup(() => {
+      if (to) {
+        clearTimeout(to);
+      }
+      to = setTimeout(() => {
+        let searchTerm:any = $('#search').val();
+  
+        if (searchTerm && searchTerm.length > 0) {
+          // Perform the search if there's input
+          (<any>$("#SimpleJSTree")).jstree(true).search(searchTerm);
+        } else {
+          // Clear the search and reset the tree when input is empty
+          (<any>$("#SimpleJSTree")).jstree(true).clear_search();
+  
+          // Destroy the current tree instance
+          (<any>$("#SimpleJSTree")).jstree(true).destroy();
+  
+          // Reinitialize the tree with the original data
+          initializeTree(this.originalData);
+        }
+      }, 250);
+    });
   }
 
 
