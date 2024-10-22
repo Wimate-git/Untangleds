@@ -62,7 +62,7 @@
                 <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
                    
 
-                    <div class="fv-row" [formGroup]="createUserField">
+                    
                         <div class="card-body border-top p-9">
                             <div class="container">
         
@@ -168,7 +168,7 @@
                                         <div class="col-lg-12">
                                             <input class="col-lg-6 form-check-input" formControlName="allowNewCompanyID"
                                                 type="checkbox" (change)="switchCompanyID($event)">
-                                            <label class="required fw-semibold fs-6 mb-2" style="padding-top: 0px;">
+                                            <label class="fw-semibold fs-6 mb-2" style="padding-top: 0px;">
                                                 <b>Allow User to add new Company</b>
                                             </label>
                                         </div>
@@ -286,7 +286,7 @@
         
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="fw-semibold fs-6 mb-2"> Description</label>
+                                        <label class="required fw-semibold fs-6 mb-2"> Description</label>
         
                                         <input type="text" class="
                                         form-control form-control-lg form-control-solid
@@ -549,7 +549,7 @@
                             <div class="container">
                                 <div class="row mb-7">
                                     <div class="col-md-4">
-                                        <label class="fw-semibold fs-6 mb-2"> Default
+                                        <label class="required fw-semibold fs-6 mb-2"> Default
                                             Type</label>
         
                                         <select class="form-select form-select-solid form-select-lg fw-bold"
@@ -569,7 +569,7 @@
                                     </div>
         
                                     <div class="col-md-4">
-                                        <label class="fw-semibold fs-6 mb-2">Start Node</label>
+                                        <label class="required fw-semibold fs-6 mb-2">Start Node</label>
         
                                         <select class="form-select form-select-solid form-select-lg fw-bold"
                                             placeholder="select start node" name="start_node" formControlName="start_node"
@@ -711,9 +711,7 @@
                     
                                 <!--begin::Button-->
                                 <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary"
-                                [disabled]="!createUserField.dirty || createUserField.invalid || errorForUniqueUserID != ''
-                                || errorForUniqueID !='' || errorForUniqueEmail == 'Email already exists' || errorForInvalidEmail == 'Invalid Email Address' 
-                                ||errorForInvalidName == 'Field must contains at least 1 numeric character,at least 1 lowercase letter,at least 1 uppercase letter,at least 1 special character,minimum 6 of length'" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+                                [disabled]="createUserField.invalid" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
                                     <span *ngIf="!editOperation" class="indicator-label">
                                         Submit
                                     </span>
@@ -751,7 +749,7 @@
                             </div> -->
                         </div>
                     </div>
-                </div>
+                
                     
                 </div>
                 <!--end::User form-->
