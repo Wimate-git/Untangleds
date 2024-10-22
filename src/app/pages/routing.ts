@@ -91,6 +91,10 @@ const Routing: Routes = [
     path: 'summary-engine',
     loadChildren: () => import('./summary-engine/summary-engine.module').then((m) => m.SummaryEngineModule),
   },
+  {
+    path: 'connection',
+    loadChildren: () => import('./connection-settings/connection-settings.module').then((m) => m.ConnectionModule),
+  },
 
   {
     path: '',

@@ -49,3 +49,11 @@
   box-shadow: 0 5px #666;
   transform: translateY(4px);
 }
+
+
+
+.mediaFordesk{
+  @media (min-width: 992px) {
+    min-width: 400px;
+  }
+}

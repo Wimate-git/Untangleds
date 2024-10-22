@@ -158,6 +158,7 @@ export class EscalationComponent implements OnInit {
 
   create() {
     // this.userModel = { P1: '', P2: '', P3: '',P4:0,P5:'' };
+    this.openModal('')
   }
 
 

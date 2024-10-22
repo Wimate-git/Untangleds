@@ -1,0 +1,94 @@
+<div class="card card-custom">
+    <div class="card-header border-0 pt-6">
+        <h2>Connection Configuration</h2>
+    </div>
+    <div class="card-header border-0 pt-0">
+
+        <!--begin::Card title-->
+        <div class="card-title">
+
+        <div class="d-flex align-items-center position-relative my-1">
+            <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
+            <input type="text" data-action="company_filter" class="form-control form-control-solid w-250px ps-12"
+                placeholder="Search Connection ID">
+        </div> 
+        
+    </div>
+        <!--begin::Card title-->
+
+        <!--begin::Card toolbar-->
+        <div class="card-toolbar">
+            <!--begin::Toolbar-->
+            <div class="d-flex justify-content-end">
+                <!--begin::Add user-->
+                <button type="button" class="btn btn-primary" data-action="create">
+                    Add
+                </button>
+                <!--end::Add user-->
+                </div>
+                <!--end::Toolbar-->
+            <!-- </div> -->
+            <!--end::Card toolbar-->
+        </div>
+    </div>
+    <!-- <div class="card-body pt-0"> -->
+    <div class="card-body pt-0">
+        <app-crud-user [componentSource]="'app-connection-settings'" [datatableConfig]="datatableConfig" route="/manage-user" (deleteEvent)="delete($event)" (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent" [modal]="companyModal"></app-crud-user>
+    </div>
+</div>
+
+<!-- swal is not yet implemented -->
+<swal #noticeSwal [swalOptions]="swalOptions">
+</swal>
+
+
+<ng-template #companyModal let-modal>
+    <form [formGroup]="createConnectionField" (ngSubmit)="onSubmit($event)">
+        <div class="modal-header">
+            <h4 *ngIf="editOperation" class="modal-title" id="modal-basic-title">Edit Connection Configuration</h4>
+            <h4 *ngIf="!editOperation" class="modal-title" id="modal-basic-title">Add Connection Configuration</h4>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+
+        <div class="modal-body">
+                <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-1000px" id="kt_modal_update_customer_scroll"
+                data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}"
+                data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_update_customer_header"
+                data-kt-scroll-wrappers="#kt_modal_update_customer_scroll" data-kt-scroll-offset="300px">
+                <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+                    
+
+
+
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Connection ID</label>
+        
+                                <input type="text" class="
+                                form-control form-control-lg form-control-solid
+                                mb-3 mb-lg-0
+                              " placeholder="Enter connection ID" name="contnID" formControlName="contnID" required 
+                              (keyup)="checkUniqueIdentifier($event)">
+        
+                              <span style="color: #fc1900;">{{errorForUniqueID}}</span>
+                                <div *ngIf="
+                                createConnectionField.get('contnID')?.hasError('required') &&
+                                createConnectionField.get('contnID')?.touched
+                              " class="fv-plugins-message-container invalid-feedback">
+                                    Company ID is required
+                                </div>
+        
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </form>
+</ng-template>
