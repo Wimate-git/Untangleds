@@ -52,8 +52,14 @@
 
 
 
-.mediaFordesk{
+.mediaFordesk {
+  min-width: 200px; /* Default for mobile devices */
+ 
+  @media (min-width: 300px) {
+    min-width: 325px; /* Set a different min-width for screens between 400px and 800px */
+  }
+
   @media (min-width: 992px) {
-    min-width: 400px;
+    min-width: 400px; /* 400px for screens wider than 992px */
   }
 }
