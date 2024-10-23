@@ -29,7 +29,7 @@ export class DashboardComponent implements OnInit{
   helpherObj: any;
   permissionForm: any;
   permissionFormgroup: any;
-  response: import("/Users/swapnil/Desktop/Swapnil Project/Untangleds Project/Untangleds working code/Untangleds/src/app/API.service").GetMasterQuery;
+  response: any
   image: any;
   url: any;
 
