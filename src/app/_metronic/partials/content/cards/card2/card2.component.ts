@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { IconUserModel } from '../icon-user.model';
 import { Router } from '@angular/router';
-import { DreamIdComponent } from 'src/app/pages/dream-id/dream-id.component';
 
 @Component({
   selector: 'app-card2',
@@ -18,6 +17,7 @@ export class Card2Component implements OnInit{
   @Input() date: string = '';
   @Input() budget: string = '';
   @Input() progress: number = 50;
+  @Input() formgroup: string = '';
   @Input() users: Array<IconUserModel> = [];
   id: string;
 
@@ -27,21 +27,29 @@ export class Card2Component implements OnInit{
   ngOnInit(): void {
     console.log("CARD2 LOAD")
 
-
+    console.log("COMPONENT:",this.componentSource)
 
   }
-
 
   onStatusClick(title: any) {
 
     this.id = 'Form Viewing'
 
-    // localStorage.setItem('title',title.title)
+
+    if(this.componentSource == 'dashboard'){
+
+      
+       this.router.navigate([`dashboard/dashboardFrom/${title.title}`]);
+
+    }
+    else if(this.componentSource == 'dashboardForm'){
+
+      this.router.navigate([`view-dreamboard/${this.id}/${title.title}`]);
+     
 
       console.log('NAVIGATE:',title)
-      // this.router.navigate([`view-dreamboard/${this.id}/?formId=${title.title}`]); // Customize your route as needed
-      this.router.navigate([`view-dreamboard/${this.id}/${title.title}`]);
-    
+    }
+
   }
 
   

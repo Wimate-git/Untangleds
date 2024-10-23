@@ -6,6 +6,10 @@ const Routing: Routes = [
     loadChildren: () => import('./dashboard/dashboard.module').then((m) => m.DashboardModule),
   },
   {
+    path: 'dashboard/dashboardFrom/:formgroup',
+    loadChildren: () => import('./dashbordForm/dashboardForm.module').then((m) =>m.DashboardFormModule),
+  },
+  {
     path: 'builder',
     loadChildren: () => import('./builder/builder.module').then((m) => m.BuilderModule),
   },
@@ -94,6 +98,10 @@ const Routing: Routes = [
   {
     path: 'connection',
     loadChildren: () => import('./connection-settings/connection-settings.module').then((m) => m.ConnectionModule),
+  },
+  {
+    path: 'formgroup',
+    loadChildren: () => import('./Formgroup/formgroup.module').then((m) => m.FormgroupModule),
   },
 
   {
