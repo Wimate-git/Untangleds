@@ -1,7 +1,8 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { LayoutType } from '../../../core/configs/config';
 import { LayoutService } from '../../../core/layout.service';
+import { ClientLogoService } from 'src/app/modules/auth/services/client-logo.service';
 
 @Component({
   selector: 'app-sidebar-logo',
@@ -17,10 +18,11 @@ export class SidebarLogoComponent implements OnInit, OnDestroy {
   currentLayoutType: LayoutType | null;
 
   toggleAttr: string;
+  clientLogo: any = '';
 
-  constructor(private layout: LayoutService) {}
+  constructor(private layout: LayoutService,private cd: ChangeDetectorRef,private getImage:ClientLogoService) {}
 
-  ngOnInit(): void {
+  async ngOnInit() {
 
       console.log("Sidebar executed");
 
@@ -31,6 +33,12 @@ export class SidebarLogoComponent implements OnInit, OnDestroy {
         this.currentLayoutType = layout;
       });
     this.unsubscribe.push(layoutSubscr);
+
+    this.clientLogo = await this.getImage.getClientLogo()
+
+    // this.clientLogo = ''
+
+    this.cd.detectChanges()
   }
 
   ngOnDestroy() {

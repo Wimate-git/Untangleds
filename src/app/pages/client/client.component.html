@@ -107,7 +107,7 @@
                                     form-control form-control-lg form-control-solid
                                     mb-3 mb-lg-0
                                   " placeholder="Enter client ID" name="clientID" formControlName="clientID" required
-                                        (keyup)="checkUniqueIdentifier($event);checkMail($event)">
+                                        (keyup)="checkUniqueIdentifier($event)">
     
                                     <span style="color: #fc1900;">{{errorForUniqueID}}</span>
     
@@ -223,51 +223,63 @@
     
     
                                 </div>
-    
-            
 
 
-                                <div class="col-md-4 mt-3">
-                                    <label class="fw-semibold fs-6 mb-2">Client Permission</label>
-                                    
-                                    <div style="display: flex;gap:5px">
-
-                                        <div class="mb-2">
-                                            <label class="fw-semibold fs-6 mb-2"><input
-                                                class="form-check-input" name="email_permi" type="checkbox"
-                                                formControlName="email_permission" /><span class="fw-bold ps-2 fs-6">Email
-                                            </span></label>
-                                        </div>
-                                    
-                                        <div class="mb-2">
-                                            <label class="fw-semibold fs-6 mb-2"><input
-                                                class="form-check-input" name="sms" type="checkbox"
-                                                formControlName="sms_permission" /><span class="fw-bold ps-2 fs-6">SMS
-                                            </span></label>
-                                        </div>
-                                    
-                                        <div class="mb-2">
-                                            <label class="fw-semibold fs-6 mb-2"><input
-                                                class="form-check-input" name="telegram_permission" type="checkbox"
-                                                formControlName="telegram_permission" /><span class="fw-bold ps-2 fs-6">Telegram
-                                            </span></label>
-                                        </div>
-
-
-                                    </div>
-                                   
+                                <div class="col-md-4">
+                                    <label class="fw-semibold fs-6 mb-2">
+                                        Custom Url
+                                    </label>
+                                    <input type="text" class="
+                                    form-control form-control-lg form-control-solid
+                                    mb-3 mb-lg-0
+                                  " placeholder="Enter custom url" name="customUrl" formControlName="customUrl"
+                                      >
+                                    <!-- (click)="showvaluemapping(createOSField.value.enableos)" -->
                                 </div>
-    
-    
-    
                             </div>
                         </div>
     
     
-                        <div class="container p-6">
-                            <div class="row">
+                        <div class="container mt-3">
+
+                            <div class="row" style="align-items: end;">    
+                            <div class="col-md-4 mt-3">
+                                <label class="fw-semibold fs-6 mb-2">Client Permission</label>
+                                
+                                <div style="display: flex;gap:5px">
+
+                                    <div class="mb-2">
+                                        <label class="fw-semibold fs-6 mb-2"><input
+                                            class="form-check-input" name="email_permi" type="checkbox"
+                                            formControlName="email_permission" /><span class="fw-bold ps-2 fs-6">Email
+                                        </span></label>
+                                    </div>
+                                
+                                    <div class="mb-2">
+                                        <label class="fw-semibold fs-6 mb-2"><input
+                                            class="form-check-input" name="sms" type="checkbox"
+                                            formControlName="sms_permission" /><span class="fw-bold ps-2 fs-6">SMS
+                                        </span></label>
+                                    </div>
+                                
+                                    <div class="mb-2">
+                                        <label class="fw-semibold fs-6 mb-2"><input
+                                            class="form-check-input" name="telegram_permission" type="checkbox"
+                                            formControlName="telegram_permission" /><span class="fw-bold ps-2 fs-6">Telegram
+                                        </span></label>
+                                    </div>
+
+
+                                </div>
+                               
+                            </div>
+
+
+
+
+                            
                                 <div class="col form-check form-switch">
-                                    <div class="col" style="padding-top: 20px;">
+                                    <div class="col">
                                         <input class="col-lg-6 form-check-input" formControlName="enableClient"
                                             type="checkbox">
                                         <label class="fw-semibold fs-6 mb-2" style="padding-top: 0px;">
@@ -275,7 +287,11 @@
                                         </label>
                                     </div>
                                 </div>
-                            </div>
+                            
+
+                                </div>
+
+
                         </div>
                          
 

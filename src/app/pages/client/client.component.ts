@@ -53,6 +53,8 @@ export class ClientComponent implements OnInit {
   loggedUser_Company: any;
   errorForInvalidEmail: any;
 
+  tempUrl: any = '';
+
   @ViewChild('closeClient') closeClient: any;
 
   data_temp: any = [];
@@ -667,6 +669,7 @@ export class ClientComponent implements OnInit {
       'logo2': [''],
       'clientID': ['', Validators.required],
       'clientName': ['', Validators.required],
+      'customUrl':['', Validators.required],
       'clientdesc': ['', Validators.required],
       'mobile': ['', Validators.required],
       'email_permission': ['', Validators.required],
@@ -886,6 +889,7 @@ export class ClientComponent implements OnInit {
     const tempObj = {
       clientID: this.createClientField.value.clientID,
       clientName: this.createClientField.value.clientName,
+      customUrl: this.createClientField.value.customUrl,
       clientDesc: this.createClientField.value.clientdesc,
       enableClient: this.createClientField.value.enableClient,
       mobile: this.createClientField.value.mobile,
@@ -914,6 +918,13 @@ export class ClientComponent implements OnInit {
     P5: date,
     }
 
+
+    let customUrl = ''
+    if(this.createClientField.value.customUrl != ''){
+      customUrl = this.createClientField.value.customUrl
+    }
+
+
     console.log('newly added Operational Schedule', this.allClientDetails);
 
     this.api.CreateMaster(this.allClientDetails).then(async (value: any) => {
@@ -925,6 +936,19 @@ export class ClientComponent implements OnInit {
         //alert('New configuration created successfully');
 
         await this.createLookUpRdt(items,1,"client"+"#lookup")
+
+        if(customUrl != ''){
+          const tempItems = {
+            PK: customUrl,
+            SK: 1,
+            metadata: JSON.stringify({clientID:this.allClientDetails.PK, clientLogo1: this.base64textString_temp,
+              clientLogo2: this.base64textString_temp_logo1,})
+          }
+          await this.api.CreateMaster(tempItems)
+        }
+
+
+
 
         this.showAlert(successAlert)
 
@@ -1060,6 +1084,12 @@ showAlert(swalOptions: SweetAlertOptions) {
 
   updateClient(value: any, key: any) {
 
+
+    let customUrl = ''
+    if(this.createClientField.value.customUrl != ''){
+      customUrl = this.createClientField.value.customUrl
+    }
+
     const successAlert: SweetAlertOptions = {
       icon: 'success',
       title: 'Success!',
@@ -1084,6 +1114,7 @@ showAlert(swalOptions: SweetAlertOptions) {
       tempObj = {
         clientID: this.editedClientID,
         clientName: this.createClientField.value.clientName,
+        customUrl:this.createClientField.value.customUrl,
         clientDesc: this.createClientField.value.clientdesc,
         enableClient: this.createClientField.value.enableClient,
         mobile: this.createClientField.value.mobile,
@@ -1126,7 +1157,51 @@ showAlert(swalOptions: SweetAlertOptions) {
 
         await this.fetchTimeMachineById(1,items.P1, 'update', items);
 
+           //URL update and delete logi is here 
+           if(this.tempUrl != customUrl){
+            const tempItems = {
+              PK: this.tempUrl,
+              SK: 1
+            }
+  
+            if(this.tempUrl){
+              await this.api.DeleteMaster(tempItems)
+            }
+            
+  
+  
+            if(customUrl != ''){
+              const tempItems = {
+                PK: customUrl,
+                SK: 1,
+                metadata: JSON.stringify({clientID:this.allClientDetails.PK, clientLogo1: this.base64textString_temp,
+                  clientLogo2: this.base64textString_temp_logo1,})
+              }
+              await this.api.CreateMaster(tempItems)
+            }
+  
+  
+          }
+          else{
+            if(customUrl != ''){
+              const tempItems = {
+                PK: customUrl,
+                SK: 1,
+                metadata: JSON.stringify({clientID:this.allClientDetails.PK, clientLogo1: this.base64textString_temp,
+                  clientLogo2: this.base64textString_temp_logo1,})
+              }
+              await this.api.UpdateMaster(tempItems)
+            }
+          }
+  
+
         this.showAlert(successAlert)
+
+        
+
+
+
+
 
         this.reloadEvent.next(true)
 
@@ -1324,6 +1399,7 @@ showAlert(swalOptions: SweetAlertOptions) {
   openModal(getValues: any, getKey: any) {
 
     this.devicesArray = []
+        this.tempUrl = ''
     this.errorForUniqueEmail = ''
 
     this.tempValueHolder = {};
@@ -1347,6 +1423,7 @@ showAlert(swalOptions: SweetAlertOptions) {
           'logo2': getValues.logo2,
           'clientID': getValues.clientID,
           'clientName': getValues.clientName,
+          'customUrl':getValues.customUrl,
           'clientdesc': getValues.clientDesc,
           'mobile': getValues.mobile,
           'email_permission': getValues.email,
@@ -1385,8 +1462,8 @@ showAlert(swalOptions: SweetAlertOptions) {
         // }
         this.showHeading = false;
         this.showModal = true;
-        this.base64textString_temp = getValues.logo1;
-        this.base64textString_temp_logo1 = getValues.logo2;
+        this.base64textString_temp = getValues.clientLogo1;
+        this.base64textString_temp_logo1 =getValues.clientLogo2;
         this.errorForUniqueID = '';
         this.errorForInvalidEmail = '';
         let parsed = '';
@@ -1401,6 +1478,8 @@ showAlert(swalOptions: SweetAlertOptions) {
         //   console.log("Get values subscription:",this.allSubscribed);
         // }
 
+        this.tempUrl = getValues.customUrl
+
         this.editedClientID = getValues.clientID
 
         this.createClientField = this.fb.group({
@@ -1408,6 +1487,7 @@ showAlert(swalOptions: SweetAlertOptions) {
           'logo2': getValues.logo2,
           'clientID': { value: getValues.clientID, disabled: true },
           'clientName': getValues.clientName,
+          'customUrl':getValues.customUrl,
           'clientdesc': getValues.clientDesc,
           'mobile': getValues.mobile,
           'email_permission': getValues.email,

@@ -1,5 +1,6 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { S3ServiceService } from './services/s3-service.service';
+import { ClientLogoService } from './services/client-logo.service';
 
 // const BODY_CLASSES = ['bgi-size-cover', 'bgi-position-center', 'bgi-no-repeat'];
 
@@ -15,12 +16,12 @@ export class AuthComponent implements OnInit, OnDestroy {
   untangledImage: string;
   backgroundUrl: string;
   htmlContent: string;
+  clientLogo: any= '';
 
-  constructor(private s3Service: S3ServiceService,private cd:ChangeDetectorRef) {}
+  constructor(private s3Service: S3ServiceService,private cd:ChangeDetectorRef,private getImage:ClientLogoService) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     // BODY_CLASSES.forEach((c) => document.body.classList.add(c));
-
 
     this.logoUrl = 'https://assets-untangleds.s3.ap-south-1.amazonaws.com/Wimate_Logo.png';
 
@@ -33,7 +34,9 @@ export class AuthComponent implements OnInit, OnDestroy {
       this.cd.detectChanges()
     });
 
+    this.clientLogo = await this.getImage.getClientLogo()
 
+    this.cd.detectChanges()
     
   }
 

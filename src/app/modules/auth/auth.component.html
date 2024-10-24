@@ -18,8 +18,18 @@
       <div class="<?php echo $params['wrapperClass']?> p-10">
         <router-outlet></router-outlet>
       </div>
+
+      <div class="text-muted fs-7 mt-2 bounce" style="font-weight: bold; color: #333; background: #f8f9fa; padding: 5px 10px; border-radius: 5px;">
+        <span>Powered by</span> <mark style="background: none; color: #007bff;">Wimate</mark>
+      </div>
+     
+
+
       <!--end::Wrapper-->
     </div>
+
+   
+
     <!--end::Form-->
 
     <!--begin::Footer-->
@@ -45,7 +55,7 @@
     <div class="d-flex flex-column flex-center py-15 px-5 px-md-15 w-100">
       <!--begin::Logo-->
       <a routerLink="/" class="mb-12">
-        <img alt="Logo" [src]="logoUrl" class="h-75px" style="background-color: white;border-radius: 10px;" />
+        <img alt="Logo" [src]="clientLogo == '' ? logoUrl : clientLogo" class="h-75px" [ngClass]="{'custom-style': clientLogo === ''}" />
       </a>
       <!--end::Logo-->
 
