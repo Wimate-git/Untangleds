@@ -152,7 +152,7 @@
                                 User Grade is required.
                             </div>
                         </div>
-                        <div class="col-md-4 mb-6">
+                        <!-- <div class="col-md-4 mb-6">
                             <label class="required fw-semibold fs-6 mb-2">Form ID</label>
                             <div class="custom-multiselect">
                                 <ng-multiselect-dropdown style="
@@ -173,7 +173,7 @@
                                     name="formList" [formControl]="$any(permissionForm.controls['formList'])">
                                 </ng-multiselect-dropdown>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="col-md-4 mb-6">
                             <label class="required fw-semibold fs-6 mb-2">Dreamboard ID</label>
                             <div class="custom-multiselect">
@@ -302,6 +302,12 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Toolbar' }"
+                                    (click)="setActiveTab('Toolbar')" role="tab">
+                                    Form Group
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Header' }"
                                     (click)="setActiveTab('Header')" role="tab">
                                     Dynamic Form
@@ -426,6 +432,40 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+                        <div *ngIf="activeTab === 'Toolbar'">
+
+                            <div class="row">
+                                <div class="col-md-5 mb-4">
+                                    <label class="required fw-semibold fs-6 mb-2">Form Group</label>
+                                    <!-- <input type="text" class="form-control form-control-solid" name="dynamicForm"
+                                        placeholder="Enter dynamic form" formControlName="dynamicForm" /> -->
+                                    <div class="custom-multiselect">
+                                        <ng-multiselect-dropdown style="
+                                                      display: inline-block; 
+                                                      width: 100%;
+                                                      padding: 0px ;
+                                                      margin-bottom: 0;
+                                                      font-weight: 0px;
+                                                      line-height: 1.52857143;
+                                                      text-align: left;
+                                                      vertical-align: middle;
+                                                      cursor: pointer;
+                                                      background-image: none;
+                                                      border-radius: 4px;
+                                                      " class="form-select form-select-solid form-select"
+                                            [placeholder]="'Select form group'" [settings]="dropdownSettings"
+                                            [data]="formgroupIDs " name="formgroup"
+                                            [formControl]="$any(permissionForm.controls['formgroup'])"
+                                            (onSelect)="onFormGroupSelect($event)"
+                                            (onDeSelect)="onFormGroupDeSelect($event)"
+                                            (onSelectAll)="onSelectAll($event)"
+                                            (onDeSelectAll)="onDeSelectAll($event)">
+                                        </ng-multiselect-dropdown>
+                                    </div>
+                                    <!-- <span style="color: #fc1900;">{{dynamicFormError}}</span> -->
+                                </div>
                             </div>
                         </div>
                     </div>

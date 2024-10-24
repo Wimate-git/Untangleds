@@ -91,6 +91,8 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   dynamicForm: any;
   dynamicFields: FormArray<any>;
   form_permission:any[] = [];
+  selectedRelatedValue: string | null = null;
+
 
   permissionsList = [
     
@@ -105,6 +107,8 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   ];
   dynamicFormError: string;
   permissionError: string;
+  formgroupIDs: any[] = [];
+  selectedFormGroups: any[]=[];
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -139,10 +143,6 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       'Update',
       'Delete',
     ]
-
-    this.getLoggedUser = this.getDiagnostics.getLoggedUserDetails()
-
-    this.SK_clientID = this.getLoggedUser.clientID;
 
     this.datatableConfig = {}
     this.lookup_data_user = []
@@ -229,8 +229,48 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
     await this.fetchmagicboardlookup(1)
 
+    await this.fetchFormgrouplookup(1)
+
     await this.addFromService()
   }
+
+
+onFormGroupSelect(selectedItem: any): void {
+    console.log("Selected Form Group:", selectedItem);
+    
+        this.selectedFormGroups.push(selectedItem); // Add selected item
+    
+    
+    console.log("Current Selected Form Groups:", this.selectedFormGroups);
+    this.handleFormGroupSelection(selectedItem);
+}
+
+onFormGroupDeSelect(deselectedItem: any): void {
+    console.log("Deselected Form Group:", deselectedItem);
+    
+    // Remove deselected item from the array
+    this.selectedFormGroups = this.selectedFormGroups.filter((item: any) => item !== deselectedItem);
+    
+    console.log("Current Selected Form Groups:", this.selectedFormGroups);
+}
+
+onSelectAll(selectedItems: any): void {
+  console.log("All selected Form Groups:", selectedItems);
+  // Handle logic for when all items are selected
+  selectedItems.forEach((item: any) => this.handleFormGroupSelection(item));
+}
+
+onDeSelectAll(deselectedItems: any): void {
+  console.log("All deselected Form Groups:", deselectedItems);
+  // Handle logic for when all items are deselected if needed
+}
+
+handleFormGroupSelection(value: any): void {
+  console.log("Handling selection for value:", value);
+  
+}
+
+  
 
   setActiveTab(tab: Tabs) {
     this.activeTab = tab;
@@ -255,13 +295,14 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       setting: ["", Validators.required],
       user_grade: ["", Validators.required],
       api_enable: [false, Validators.required],
-      formList: [[], Validators.required],
+      formgroup: [[], Validators.required],
       dreamBoardIDs: [[], Validators.required],
       advance_report: [[]],
       powerboardId: [[]],
       magicboardId: [[]],
       permissionsList: this.fb.array([]),
       dynamicEntries: this.fb.array([]),
+      formgroupEntries: this.fb.array([]),
       dynamicForm:[[]],
       permission:[[]],
       createdTime: [Math.ceil(((new Date()).getTime()) / 1000)],
@@ -272,7 +313,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     this.addPermissions();
   }
 
-
+  
   addDynamicData() {
 
     // this.addbutton = false
@@ -437,7 +478,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
               setting: [this.data_temp[0].setting],
               user_grade: [this.data_temp[0].user_grade],
               api_enable: [this.data_temp[0].api_enable],
-              formList: [this.data_temp[0].formList],
+              formgroup: [this.data_temp[0].formgroup],
               dreamBoardIDs: [this.data_temp[0].dreamBoardIDs],
               advance_report: [this.data_temp[0].advance_report],
               powerboardId: [this.data_temp[0].powerboardId],
@@ -588,7 +629,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       this.permissionItem = {
           P1: this.updateResponse.permissionID,
           P2: this.updateResponse.label,
-          P3: this.updateResponse.updatedTime,
+          P3: [Math.ceil(((new Date()).getTime()) / 1000)],
       }
 
       await this.updatepermissionlookup(1, matchingRecord.P1, 'update', this.permissionItem)
@@ -726,6 +767,55 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
         this.dreamBoardIDs = this.dreamBoardIDs.map((item: any) => item.P1)
 
         console.log("All the dreamboard id are here ", this.dreamBoardIDs);
+
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle the error as needed
+    }
+  }
+  async fetchFormgrouplookup(sk: any) {
+    try {
+      const response = await this.api.GetMaster(this.client + "#formgroup#lookup", sk);
+
+      if (response && response.options) {
+        // Check if response.listOfItems is a string
+        if (typeof response.options === 'string') {
+          let data = JSON.parse(response.options);
+          console.log("d1 =", data)
+          if (Array.isArray(data)) {
+            for (let index = 0; index < data.length; index++) {
+              const element = data[index];
+
+              if (element !== null && element !== undefined) {
+                // Extract values from each element and push them to lookup_data_temp1
+                const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
+                const { P1, P2, P3, P4 } = element[key]; // Extract values from the nested object
+                this.formgroupIDs.push({ P1, P2, P3, P4 }); // Push an array containing P1, P2, and P3 values
+                console.log("d2 =", this.formgroupIDs)
+              } else {
+                break;
+              }
+            }
+            //this.lookup_data_temp1.sort((a, b) => b.P5 - a.P5);
+            this.formgroupIDs.sort((a: any, b: any) => {
+              return b.P4 - a.P4; // Compare P5 values in descending order
+            });
+            console.log("Lookup sorting", this.formgroupIDs);
+            // Continue fetching recursively
+            await this.fetchFormgrouplookup(sk + 1);
+          } else {
+            console.error('Invalid data format - not an array.');
+          }
+        } else {
+          console.error('response.listOfItems is not a string.');
+        }
+      } else {
+
+
+        this.formgroupIDs = this.formgroupIDs.map((item: any) => item.P1)
+
+        console.log("All the dreamboard id are here ", this.formgroupIDs);
 
       }
     } catch (error) {
@@ -977,6 +1067,8 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
           const helpherObj = JSON.parse(result.options)
 
           this.formList = helpherObj.map((item: any) => item[0])
+
+          this.formList.unshift("All");
         }
       })
     }
