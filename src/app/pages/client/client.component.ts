@@ -1402,6 +1402,9 @@ showAlert(swalOptions: SweetAlertOptions) {
         this.tempUrl = ''
     this.errorForUniqueEmail = ''
 
+    this.base64textString_temp = getValues.clientLogo1;
+    this.base64textString_temp_logo1 =getValues.clientLogo2;
+
     this.tempValueHolder = {};
     
     if (getKey == 'edit' || getKey == '') {
