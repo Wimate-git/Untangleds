@@ -562,7 +562,7 @@ console.log("PARRAY3:",permissionsArray)
     //console.log(this.listofNMIds)
     this.errorForUniqueLabel = '';
     for (let uniqueID = 0; uniqueID < this.listofNMIds.length; uniqueID++) {
-      if (getLabel == this.listofNMIds[uniqueID]) {
+      if (getLabel.toLowerCase() == this.listofNMIds[uniqueID].toLowerCase()) {
         this.errorForUniqueID='id already exists'
         this.errorForUniqueLabel = "ID already exists";
         break

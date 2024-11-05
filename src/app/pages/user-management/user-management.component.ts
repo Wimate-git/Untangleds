@@ -893,7 +893,7 @@ rdtListWorkAround :any =[{
       if(this.dataUser.username == tempUser && this.editOperation){
 
       }
-      else if (tempUser == this.listofSK[uniqueID]) {
+      else if (tempUser.toLowerCase() == this.listofSK[uniqueID].toLowerCase()) {
         this.errorForUniqueID = "User Name already exists";
       }
     }
@@ -2081,6 +2081,7 @@ rdtListWorkAround :any =[{
       else if (getValues) {
 
         this.disabled_CLientID_textField = true
+       
 
         console.log('edit of user', getValues);
         this.showHeading = false;
@@ -2118,7 +2119,7 @@ rdtListWorkAround :any =[{
           'allowOtherClient': false,
           'allowNewClient': [{value:getValues.allowNewClient}],
           'allowOtherCompanyID': getValues.allowOtherCompanyID,
-          'allowNewCompanyID': getValues.allowNewCompanyID,
+          'allowNewCompanyID': false,
           'companyID': getValues.companyID,
           'username': getValues.username,
           'description': getValues.description,
@@ -2514,9 +2515,9 @@ rdtListWorkAround :any =[{
         {
           title: 'Phone', data: 'P2' // Added a new column for phone numbers
         },
-        {
-          title: 'Email', data: 'P3' // Added a new column for email
-        },
+        // {
+        //   title: 'Email', data: 'P3' // Added a new column for email
+        // },
         {
           title: 'Permission', data: 'P4' // Assuming P4 is the role
         },

@@ -690,7 +690,7 @@ export class ClientComponent implements OnInit {
 
     for (let uniqueID = 0; uniqueID < this.listofSK.length; uniqueID++) {
        
-        if (getID.target.value.toLowerCase() === this.listofSK[uniqueID]) {
+        if (getID.target.value.toLowerCase() === this.listofSK[uniqueID].toLowerCase()) {
             this.errorForUniqueID = "Client ID already exists";
             return; 
         }

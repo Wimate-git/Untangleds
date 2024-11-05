@@ -649,7 +649,7 @@ export class CompanyComponent implements OnInit{
     console.log('getID', getID);
     this.errorForUniqueID = '';
     for (let uniqueID = 0; uniqueID < this.listofSK.length; uniqueID++) {
-      if (getID.target.value == this.listofSK[uniqueID]) {
+      if (getID.target.value.toLowerCase() == this.listofSK[uniqueID].toLowerCase()) {
         this.errorForUniqueID = "Company ID already exists";
       }
     }
