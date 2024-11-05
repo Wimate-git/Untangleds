@@ -1,4 +1,4 @@
-import { ChangeDetectorRef,Component, OnInit } from '@angular/core';
+mport { ChangeDetectorRef,Component, OnInit } from '@angular/core';
 import { APIService } from 'src/app/API.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Route } from "@angular/router";
@@ -25,9 +25,12 @@ export class DreamIdComponent implements OnInit{
   permission_data: any;
   id: string | null;
   login_string: string;
-  theme: string | null;
-  form_id: any;
-  
+
+  //prem 04/11/2024
+  formId: string | null;
+  recordId: string | null;
+  //prem 04/11/2024
+
   constructor(
 
     private apiService: APIService,
@@ -47,35 +50,15 @@ export class DreamIdComponent implements OnInit{
     this.login_string = JSON.stringify(localStorage.getItem('userAttributes'))
     console.log("LOGIN DETAIL FROM LOCAL STORAGE:",this.login_detail)
 
-
-    this.theme = localStorage.getItem('kt_theme_mode_menu')    //theme code light or dark
-
-
-
-    // this.route.queryParams.subscribe(queryParams => {
-    //   console.log("QueryPARMA:",queryParams)
-    //   this.form_id = queryParams['formId'];
-    //   console.log('Form ID:', this.form_id);
-  
-    //   // Handle any additional logic with 'formId' here
-    // });
-
-    // this.form_id = localStorage.getItem('title')
-
-    // console.log("FORMID:",this.form_id)
-
-    // formid 
-
-
-     this.loginDetail_string = JSON.parse(this.login_detail) 
+     this.loginDetail_string = JSON.parse(this.login_detail)
     console.log("AFTER JSON STRINGIFY",this.loginDetail_string)
-    // this.loginDetail = JSON.parse(localStorage.getItem("currentUser")) 
+    // this.loginDetail = JSON.parse(localStorage.getItem("currentUser"))
       this.client=this.loginDetail_string.clientID
-      this.user=this.loginDetail_string.username
+      this.user=this.loginDetail_string.userID
 
     console.log("CLIENT ID",this.client)
     console.log("USER ID",this.user)
-    
+
     const test = await this.apiService.GetMaster(this.user+'#user#main',1);
     this.permission_data = JSON.parse(JSON.parse(JSON.stringify(test.metadata)))
 
@@ -95,17 +78,24 @@ export class DreamIdComponent implements OnInit{
     this.route.paramMap.subscribe(params => {
       console.log(this.route)
       this.id = params.get('id');
-      this.form_id = params.get('formId');
-
-      if((this.form_id == null)|| (this.form_id == undefined)){
-        this.form_id= 'All'
-      }
-
-      console.log(this.form_id)
       console.log(this.id)
-    
+
+      this.route.queryParamMap.subscribe(queryParams => {//prem
+
+      //prem 04/11/2024
+      //qr operation
+      this.formId = queryParams.get('formId');
+      this.recordId = queryParams.get('recordId');
+      var params_url = ''
+      if(this.formId && this.formId.length > 0)
+      params_url = '&formId='+ this.formId;
+      if(params_url && params_url.length > 0 && this.recordId && this.recordId.length > 0)
+      params_url = params_url + '&recordId='+this.recordId;
+      //qr operation
+      //prem 04/11/2024
+
       // this.loginDetail = JSON.parse(localStorage.getItem("currentUser"))
-     
+
       // this.client=this.loginDetail.client
       // this.user=this.loginDetail.id
       var x= this.apiService.GetMaster(this.client+"#dreamboard#"+this.id+"#main",1).then((res:any)=>{
@@ -116,17 +106,16 @@ export class DreamIdComponent implements OnInit{
         console.log("URL RES")
         console.log(this.url_result,)
         const timestamp = new Date().getTime();
-        if(this.form_id == 'All'){
-          this.url=`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/`+this.url_result+`?t=${timestamp}`+`&loginDetail=${this.login_string}`+`&userPermissions=${userPermissions}`+`&theme=${this.theme}`
-        }
-        else{
-        this.url=`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/`+this.url_result+`?t=${timestamp}`+`&loginDetail=${this.login_string}`+`&userPermissions=${userPermissions}`+`&theme=${this.theme}`+`&formId=${this.form_id}`
-        }
+        //prem 04/11/2024
+        //this.url=`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/`+this.url_result+`?t=${timestamp}`+`&loginDetail=${this.login_string}`+`&userPermissions=${userPermissions}`
+        this.url=`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/`+this.url_result+`?t=${timestamp}`+`&loginDetail=${this.login_string}`+`&userPermissions=${userPermissions}`+params_url
         this.send_data=this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
         console.log(this.send_data)
         this.changeDetection.detectChanges()
       })
+
+    });//prem
+
     });
   }
 }
-
