@@ -1,4 +1,4 @@
-mport { ChangeDetectorRef,Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef,Component, OnInit } from '@angular/core';
 import { APIService } from 'src/app/API.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Route } from "@angular/router";
