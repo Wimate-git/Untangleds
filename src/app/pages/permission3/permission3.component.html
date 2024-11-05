@@ -1,0 +1,493 @@
+<div class="card">
+    <div class="card-header border-0 pt-6">
+        <h2>Permission Configuration</h2>
+    </div>
+    <div class="card-header border-0 pt-0">
+
+        <!--begin::Card title-->
+        <div class="card-title">
+
+            <div class="d-flex align-items-center position-relative my-1">
+                <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
+                <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12"
+                    placeholder="Search Users">
+            </div>
+
+        </div>
+        <!--begin::Card title-->
+
+        <!--begin::Card toolbar-->
+        <div class="card-toolbar">
+            <!--begin::Toolbar-->
+            <div class="d-flex justify-content-end">
+                <!--begin::Add user-->
+                <button type="button" class="btn btn-primary" data-action="create">
+                    Add
+                </button>
+                <!--end::Add user-->
+            </div>
+            <!--end::Toolbar-->
+            <!-- </div> -->
+            <!--end::Card toolbar-->
+        </div>
+    </div>
+    <!-- <div class="card-body pt-0"> -->
+    <div class="card-body pt-0">
+        <app-crud [componentSource]="'permission3'" [datatableConfig]="datatableConfig" route="/permission1"
+            (deleteEvent)="delete($event)" (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent"
+            [modal]="formModal"></app-crud>
+    </div>
+</div>
+
+<swal #noticeSwal [swalOptions]="swalOptions">
+</swal>
+
+<ng-template #formModal let-modal>
+    <form [formGroup]="permissionForm" (ngSubmit)="onSubmit($event)">
+        <div class="modal-header">
+            <h4 *ngIf="!update" class="modal-title" id="modal-basic-title">Add Permission</h4>
+            <h4 *ngIf="update" class="modal-title" id="modal-basic-title">Update Permission</h4>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div class="modal-body">
+            <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-900px" id="kt_modal_update_customer_scroll"
+                data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}"
+                data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_update_customer_header"
+                data-kt-scroll-wrappers="#kt_modal_update_customer_scroll" data-kt-scroll-offset="300px">
+                <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+                    <!--begin::Input group-->
+                    <div class="row">
+                        <!-- Permission Id -->
+                        <div class="col-md-4 mb-4">
+                            <label class="required fw-semibold fs-6 mb-2">Permission Id</label>
+                            <input *ngIf="!update" type="text" class="form-control form-control-solid mb-3 mb-lg-0"
+                                name="permissionID" placeholder="Enter permission Id" formControlName="permissionID"
+                                (keyup)="checkUniqueUid($event)" required />
+                            <input *ngIf="update" type="text" class="form-control form-control-solid mb-3 mb-lg-0"
+                                name="permissionID" placeholder="Enter permission Id" formControlName="permissionID"
+                                readonly required />
+                                <span style="color: #fc1900;">{{error}}</span>
+                            <div *ngIf="permissionForm.controls['permissionID'].invalid && permissionForm.controls['permissionID'].touched"
+                                class="invalid-feedback">
+                                Permission Id is required.
+                            </div>
+                        </div>
+
+                        <!-- Label -->
+                        <div class="col-md-4 mb-4">
+                            <label class="required fw-semibold fs-6 mb-2">Label</label>
+                            <input type="text" class="form-control form-control-solid" name="label"
+                                formControlName="label" placeholder="Enter label" />
+                            <div *ngIf="permissionForm.controls['label'].invalid && permissionForm.controls['label'].touched"
+                                class="invalid-feedback">
+                                Label is required.
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-md-4 mb-4">
+                            <label class="required fw-semibold fs-6 mb-2">Description</label>
+                            <input type="text" class="form-control form-control-solid" name="description"
+                                placeholder="Enter description" formControlName="description" />
+                            <div *ngIf="permissionForm.controls['description'].invalid && permissionForm.controls['description'].touched"
+                                class="invalid-feedback">
+                                Description is required.
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <label class="required fw-semibold fs-6 mb-2">Time</label>
+                            <input type="number" class="form-control form-control-solid" name="time"
+                                placeholder="Enter time" formControlName="time" />
+                            <div *ngIf="permissionForm.controls['time'].invalid && permissionForm.controls['time'].touched"
+                                class="invalid-feedback">
+                                Time is required.
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-6">
+                            <label class="required fw-semibold fs-6 mb-2">Number Of Request</label>
+                            <input type="number" class="form-control form-control-solid" name="no_of_request"
+                                placeholder="Enter no of request" formControlName="no_of_request" />
+                            <div *ngIf="permissionForm.controls['no_of_request'].invalid && permissionForm.controls['no_of_request'].touched"
+                                class="invalid-feedback">
+                                Number Of Request is required.
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-6">
+                            <label class="required fw-semibold fs-6 mb-2">Number Of Records</label>
+                            <input type="number" class="form-control form-control-solid" name="no_of_records"
+                                placeholder="Enter no of records" formControlName="no_of_records" />
+                            <div *ngIf="permissionForm.controls['no_of_records'].invalid && permissionForm.controls['no_of_records'].touched"
+                                class="invalid-feedback">
+                                Number Of Records is required.
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-6">
+                            <label class="required fw-semibold fs-6 mb-2">Size</label>
+                            <input type="number" class="form-control form-control-solid" name="size"
+                                placeholder="Enter size" formControlName="size" />
+                            <div *ngIf="permissionForm.controls['size'].invalid && permissionForm.controls['size'].touched"
+                                class="invalid-feedback">
+                                Size is required.
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-6">
+                            <label class="required fw-semibold fs-6 mb-2">User Grade</label>
+                            <select type="number" class="form-select form-select-solid form-select-lg" name="user_grade"
+                                placeholder="Enter size" formControlName="user_grade">
+                                <option value="null" disabled="true" [selected]="true">Select User Grade </option>
+                                <option value="l0">L0</option>
+                                <option value="l1">L1</option>
+                                <option value="l2">L2</option>
+                                <option value="l3">L3</option>
+                                <option value="l4">L4</option>
+                                <option value="l5">L5</option>
+                                <option value="l6">L6</option>
+                                <option value="l7">L7</option>
+                                <option value="l8">L8</option>
+                                <option value="l9">L9</option>
+                                <option value="l10">L10</option>
+                            </select>
+                            <div *ngIf="permissionForm.controls['user_grade'].invalid && permissionForm.controls['user_grade'].touched"
+                                class="invalid-feedback">
+                                User Grade is required.
+                            </div>
+                        </div>
+                        <!-- <div class="col-md-4 mb-6">
+                            <label class="required fw-semibold fs-6 mb-2">Form ID</label>
+                            <div class="custom-multiselect">
+                                <ng-multiselect-dropdown style="
+                                          display: inline-block; 
+                                          width: 100%;
+                                          padding: 0px ;
+                                          margin-bottom: 0;
+                                          font-weight: 0px;
+                                          line-height: 1.52857143;
+                                          text-align: left;
+                                          vertical-align: middle;
+                                          cursor: pointer;
+                                          background-image: none;
+                                          border-radius: 4px;
+                                          
+                                          " class="form-select form-select-solid form-select"
+                                    [placeholder]="'Select form Id'" [settings]="dropdownSettings" [data]="formList"
+                                    name="formList" [formControl]="$any(permissionForm.controls['formList'])">
+                                </ng-multiselect-dropdown>
+                            </div>
+                        </div> -->
+                        <div class="col-md-4 mb-6">
+                            <label class="required fw-semibold fs-6 mb-2">Dreamboard ID</label>
+                            <div class="custom-multiselect">
+                                <ng-multiselect-dropdown style="
+                                          display: inline-block; 
+                                          width: 100%;
+                                          padding: 0px ;
+                                          margin-bottom: 0;
+                                          font-weight: 0px;
+                                          line-height: 1.52857143;
+                                          text-align: left;
+                                          vertical-align: middle;
+                                          cursor: pointer;
+                                          background-image: none;
+                                          border-radius: 4px;
+                                          
+                                          " class="form-select form-select-solid form-select"
+                                    [placeholder]="'Select dreamboard Id'" [settings]="dropdownSettings"
+                                    [data]="dreamBoardIDs" name="dreamBoardIDs"
+                                    [formControl]="$any(permissionForm.controls['dreamBoardIDs'])">
+                                </ng-multiselect-dropdown>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-6">
+                            <label class="fw-semibold fs-6 mb-2">Advance Report Permission</label>
+                            <div class="custom-multiselect">
+                                <ng-multiselect-dropdown style="
+                                          display: inline-block; 
+                                          width: 100%;
+                                          padding: 0px ;
+                                          margin-bottom: 0;
+                                          font-weight: 0px;
+                                          line-height: 1.52857143;
+                                          text-align: left;
+                                          vertical-align: middle;
+                                          cursor: pointer;
+                                          background-image: none;
+                                          border-radius: 4px;
+                                          
+                                          " class="form-select form-select-solid form-select"
+                                    [placeholder]="'Select report permission'" [settings]="dropdownSettings"
+                                    [data]="advance_report" name="advance_report"
+                                    [formControl]="$any(permissionForm.controls['advance_report'])">
+                                </ng-multiselect-dropdown>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-6">
+                            <label class="fw-semibold fs-6 mb-2">Powerboard ID</label>
+                            <div class="custom-multiselect">
+                                <ng-multiselect-dropdown style="
+                                          display: inline-block; 
+                                          width: 100%;
+                                          padding: 0px ;
+                                          margin-bottom: 0;
+                                          font-weight: 0px;
+                                          line-height: 1.52857143;
+                                          text-align: left;
+                                          vertical-align: middle;
+                                          cursor: pointer;
+                                          background-image: none;
+                                          border-radius: 4px;
+                                          
+                                          " class="form-select form-select-solid form-select"
+                                    [placeholder]="'Select powerboard Id'" [settings]="dropdownSettings"
+                                    [data]="powerboardId" name="powerboardId"
+                                    [formControl]="$any(permissionForm.controls['powerboardId'])">
+                                </ng-multiselect-dropdown>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-6">
+                            <label class="fw-semibold fs-6 mb-2">Magicboard ID</label>
+                            <div class="custom-multiselect">
+                                <ng-multiselect-dropdown style="
+                                          display: inline-block; 
+                                          width: 100%;
+                                          padding: 0px ;
+                                          margin-bottom: 0;
+                                          font-weight: 0px;
+                                          line-height: 1.52857143;
+                                          text-align: left;
+                                          vertical-align: middle;
+                                          cursor: pointer;
+                                          background-image: none;
+                                          border-radius: 4px;
+                                          
+                                          " class="form-select form-select-solid form-select"
+                                    [placeholder]="'Select magicboard Id'" [settings]="dropdownSettings"
+                                    [data]="magicboardId" name="magicboardId"
+                                    [formControl]="$any(permissionForm.controls['magicboardId'])">
+                                </ng-multiselect-dropdown>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-6 form-check form-check-custom form-check-solid form-check-success form-switch
+                        " style="float: right; padding-left: 20px;">
+                            <input class="form-check-input" type="checkbox" name="api_enable"
+                                formControlName="api_enable" />
+                            <label class="form-check-label text-gray-700 fw-bold" data-bs-toggle="tooltip">Api
+                                Enable</label>
+                        </div>
+                        <div class="col-md-12 mb-12">
+                            <label class="required fw-semibold fs-6 mb-2">Other Setting</label>
+                            <textarea class="form-control form-control-solid" name="setting" placeholder="Enter setting"
+                                formControlName="setting"></textarea>
+                            <div *ngIf="permissionForm.controls['setting'].invalid && permissionForm.controls['setting'].touched"
+                                class="invalid-feedback">
+                                Setting is required.
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="card card-custom">
+
+                    <div class="card-header card-header-stretch overflow-auto">
+                        <ul class="
+                          nav nav-stretch nav-line-tabs
+                          fw-bold
+                          border-transparent
+                          flex-nowrap w-100
+                        " role="tablist">
+
+                            <li class="nav-item">
+                                <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Sidebar' }"
+                                    (click)="setActiveTab('Sidebar')" role="tab">
+                                    Configuration
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Toolbar' }"
+                                    (click)="setActiveTab('Toolbar')" role="tab">
+                                    Form Group
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Header' }"
+                                    (click)="setActiveTab('Header')" role="tab">
+                                    Dynamic Form
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div *ngIf="activeTab === 'Sidebar'">
+                            <div class="table-responsive">
+                                <table class="table align-middle table-row-dashed">
+                                    <thead>
+                                        <tr>
+                                            <th class="fw-bold">Permission</th>
+                                            <th class="fw-bold">View</th>
+                                            <th class="fw-bold">Update</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody formArrayName="permissionsList">
+                                        <tr *ngFor="let permission of permissionsArray.controls; let i = index"
+                                            [formGroupName]="i">
+                                            <td>{{ permission.get('name')?.value }}</td>
+                                            <td><label class="
+                                                          form-check form-check-custom form-check-solid
+                                                          align-items-start
+                                                        "><input class="form-check-input me-3" type="checkbox"
+                                                        formControlName="view"></label></td>
+                                            <td><label class="
+                                                          form-check form-check-custom form-check-solid
+                                                          align-items-start
+                                                        "><input class="form-check-input me-3" type="checkbox"
+                                                        formControlName="update"></label></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div *ngIf="activeTab === 'Header'">
+
+                            <div class="row">
+                                <div class="col-md-5 mb-4">
+                                    <label class="fw-semibold fs-6 mb-2">Dynamic Form</label>
+                                    <!-- <input type="text" class="form-control form-control-solid" name="dynamicForm"
+                                        placeholder="Enter dynamic form" formControlName="dynamicForm" /> -->
+                                    <div class="custom-multiselect">
+                                        <ng-multiselect-dropdown style="
+                                                      display: inline-block; 
+                                                      width: 100%;
+                                                      padding: 0px ;
+                                                      margin-bottom: 0;
+                                                      font-weight: 0px;
+                                                      line-height: 1.52857143;
+                                                      text-align: left;
+                                                      vertical-align: middle;
+                                                      cursor: pointer;
+                                                      background-image: none;
+                                                      border-radius: 4px;
+                                                      " class="form-select form-select-solid form-select"
+                                            [placeholder]="'Select dynamic form'" [settings]="dropdownSettings_"
+                                            [data]="formList" name="dynamicForm"
+                                            [formControl]="$any(permissionForm.controls['dynamicForm'])">
+                                        </ng-multiselect-dropdown>
+                                    </div>
+                                    
+                                    <span style="color: #fc1900;">{{dynamicFormError}}</span>
+                                </div>
+                                
+                                <div class="col-md-5 mb-4">
+                                    <label class="fw-semibold fs-6 mb-2">Permission</label>
+                                    <!-- <input type="text" class="form-control form-control-solid" name="permission"
+                                        placeholder="Enter permission" formControlName="permission" /> -->
+                                    <div class="custom-multiselect">
+                                        <ng-multiselect-dropdown style="
+                                                      display: inline-block; 
+                                                      width: 100%;
+                                                      padding: 0px ;
+                                                      margin-bottom: 0;
+                                                      font-weight: 0px;
+                                                      line-height: 1.52857143;
+                                                      text-align: left;
+                                                      vertical-align: middle;
+                                                      cursor: pointer;
+                                                      background-image: none;
+                                                      border-radius: 4px;
+                                                      " class="form-select form-select-solid form-select"
+                                            [placeholder]="'Select permission'" [settings]="dropdownSettings"
+                                            [data]="form_permission" name="permission"
+                                            [formControl]="$any(permissionForm.controls['permission'])">
+                                        </ng-multiselect-dropdown>
+                                    </div>
+                                    <span style="color: #fc1900;">{{permissionError}}</span>
+                                </div>
+                                <div class="col-md-2 mb-4 d-flex align-items-end">
+                                    <button type="button" class="btn btn-primary w-100"
+                                        (click)="addDynamicData()">Add</button>
+                                </div>
+                            </div>
+                            <div class="table-responsive mt-4">
+                                <table class="table align-middle table-row-dashed">
+                                    <thead>
+                                        <tr>
+                                            <th class="fw-bold">Dynamic Form</th>
+                                            <th class="fw-bold">Permission</th>
+                                            <th class="fw-bold">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let entry of dynamicEntries.controls; let i = index">
+                                            <td>{{ entry.get('dynamicForm')?.value }}</td>
+                                            <td>{{ entry.get('permission')?.value }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-warning me-2"
+                                                    (click)="editEntry(i)">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+
+                                                <!-- Delete Button with Icon -->
+                                                <button type="button" class="btn btn-sm btn-danger"
+                                                    (click)="removeDynamicData(i)" >
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div *ngIf="activeTab === 'Toolbar'">
+
+                            <div class="row">
+                                <div class="col-md-5 mb-4">
+                                    <label class="required fw-semibold fs-6 mb-2">Form Group</label>
+                                    <!-- <input type="text" class="form-control form-control-solid" name="dynamicForm"
+                                        placeholder="Enter dynamic form" formControlName="dynamicForm" /> -->
+                                    <div class="custom-multiselect">
+                                        <ng-multiselect-dropdown style="
+                                                      display: inline-block; 
+                                                      width: 100%;
+                                                      padding: 0px ;
+                                                      margin-bottom: 0;
+                                                      font-weight: 0px;
+                                                      line-height: 1.52857143;
+                                                      text-align: left;
+                                                      vertical-align: middle;
+                                                      cursor: pointer;
+                                                      background-image: none;
+                                                      border-radius: 4px;
+                                                      " class="form-select form-select-solid form-select"
+                                            [placeholder]="'Select form group'" [settings]="dropdownSettings"
+                                            [data]="formgroupIDs " name="formgroup"
+                                            [formControl]="$any(permissionForm.controls['formgroup'])"
+                                            (onSelect)="onFormGroupSelect($event)"
+                                            (onDeSelect)="onFormGroupDeSelect($event)"
+                                            (onSelectAll)="onSelectAll($event)"
+                                            (onDeSelectAll)="onDeSelectAll($event)">
+                                        </ng-multiselect-dropdown>
+                                    </div>
+                                    <!-- <span style="color: #fc1900;">{{dynamicFormError}}</span> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="modal-footer flex-center">
+            <button type="reset" id="kt_modal_update_customer_cancel" class="btn btn-light me-3"
+                (click)="modal.dismiss('cancel')">
+                Discard
+            </button>
+            <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary" 
+            [disabled]="permissionForm.invalid || permissionForm.pristine" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+                <span *ngIf="!update" class="indicator-label">Submit</span>
+                <span *ngIf="update" class="indicator-label">Update</span>
+                <span class="indicator-progress">
+                    Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                </span>
+            </button>
+        </div>
+
+    </form>
+</ng-template>

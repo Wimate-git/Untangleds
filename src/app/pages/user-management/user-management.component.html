@@ -1,0 +1,760 @@
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true"><p style="color: white" >Loading… please enjoy this virtual cup of coffee! ☕ </p></ngx-spinner>
+  
+<div class="card card-custom">
+    <div class="card-header border-0 pt-6">
+        <h2>User Configuration</h2>
+    </div>
+    <div class="card-header border-0 pt-0">
+
+        <!--begin::Card title-->
+        <div class="card-title">
+
+        <div class="d-flex align-items-center position-relative my-1">
+            <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
+            <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12"
+                placeholder="Search Users">
+        </div> 
+        
+    </div>
+        <!--begin::Card title-->
+
+        <!--begin::Card toolbar-->
+        <div class="card-toolbar">
+            <!--begin::Toolbar-->
+            <div class="d-flex justify-content-end">
+                <!--begin::Add user-->
+                <button type="button" class="btn btn-primary" data-action="create">
+                    Add
+                </button>
+                <!--end::Add user-->
+                </div>
+                <!--end::Toolbar-->
+            <!-- </div> -->
+            <!--end::Card toolbar-->
+        </div>
+    </div>
+    <!-- <div class="card-body pt-0"> -->
+    <div class="card-body pt-0">
+        <app-crud-user [componentSource]="'app-user-management'" [datatableConfig]="datatableConfig" route="/manage-user" (deleteEvent)="delete($event)" (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent" [modal]="openModal1"></app-crud-user>
+    </div>
+</div>
+
+
+<!-- swal is not yet implemented -->
+<swal #noticeSwal [swalOptions]="swalOptions">
+</swal>
+
+<!-- (ngSubmit)="onSubmit($event) -->
+
+<ng-template #openModal1 let-modal>
+    <form [formGroup]="createUserField" (ngSubmit)="onSubmit($event)">
+        <div class="modal-header">
+            <h4 *ngIf="!editOperation" class="modal-title" id="modal-basic-title">Add New User</h4>
+            <h4 *ngIf="editOperation" class="modal-title" id="modal-basic-title">Update User</h4>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+
+        <div class="modal-body">
+            <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-1000px" id="kt_modal_update_customer_scroll"
+                data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}"
+                data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_update_customer_header"
+                data-kt-scroll-wrappers="#kt_modal_update_customer_scroll" data-kt-scroll-offset="300px">
+                <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+                   
+
+                    
+                     
+                            <div class="container">
+        
+                                <div class="row">
+        
+                                    <div class="col-md-4 ">
+                                       
+                                        <div class="col-lg-12 form-group image-input image-input-outline mb-5">
+                                            <!-- <label class="col-lg-12 col-form-label fw-bold fs-6" for="imageInput">Profile
+                                                picture</label> -->
+
+                                                <label class="fw-semibold fs-6 mb-2" for="imageInput">Profile
+                                                picture</label>
+                                            <input type="file" id="imageInput" title="Click to add/update image"
+                                                class="form-control visually-hidden" (change)="onFileChange($event)">
+                                            <label for="imageInput" class="form-control form-control-lg form-control-solid"
+                                                >Upload Image</label>
+                                            <br>
+                                            <img class="btn btn-icon btn-box image-input-wrapper w-125px h-125px btn-active-color-primary w-25px h-25px bg-body shadow"
+                                                src="{{base64textString_temp}}" *ngIf="base64textString_temp">
+                                        </div>
+                                    </div>
+        
+                                    <div class="col-md-4">
+                                        <label class="required fw-semibold fs-6 mb-2"> User ID</label>
+                                        <input type="text" class="
+                                        form-control form-control-lg form-control-solid
+                                        mb-3 mb-lg-0
+                                      " placeholder="Enter User ID" name="userID" formControlName="userID" required
+                                            (keyup)="checkUniqueUserID($event)">
+        
+                                        <span style="color: #fc1900;">{{errorForUniqueUserID}}</span>
+                                        <div *ngIf="
+                                        createUserField.get('userID')?.hasError('required') &&
+                                        createUserField.get('userID')?.touched
+                                      " class="fv-plugins-message-container invalid-feedback">
+                                            User ID is required
+                                        </div>
+        
+        
+                                    </div>
+        
+        
+                                    <div class="col-md-4">
+                                        <label class="required fw-semibold fs-6 mb-2"> Password
+                                        </label>
+        
+                                        <input type="text" class="
+                                        form-control form-control-lg form-control-solid
+                                        mb-3 mb-lg-0
+                                      " placeholder="Enter Password" name="name" formControlName="name" required
+                                            (keyup)="checkName_asPassword($event)">
+        
+                                        <span style="color: #fc1900;">{{errorForInvalidName}}</span>
+        
+                                        <div *ngIf="
+                                        createUserField.get('name')?.hasError('required') &&
+                                        createUserField.get('name')?.touched
+                                      " class="fv-plugins-message-container invalid-feedback">
+                                            Password is required
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+        
+                            <div class="container" style="margin-left: 10px;">
+                                <div class="row mb-7">
+        
+                                    <div class="col-md-4 form-check form-switch">
+                                        <div class="col-lg-12">
+                                            <input class="col-lg-6 form-check-input" formControlName="allowOtherClient"
+                                                type="checkbox" (change)="switchInputs($event)">
+                                            <label class="fw-semibold fs-6 mb-2" style="padding-top: 0px;">
+                                                <b>Allow User to add other Clients</b>
+                                            </label>
+                              
+                                        </div>
+                                    </div>
+        
+                                    <div class="col-md-4 form-check form-switch" style="display: none;">
+                                        <div class="col-lg-12">
+                                            <input class="col-lg-6 form-check-input" formControlName="allowNewClient"
+                                                type="checkbox">
+                                            <label class="fw-semibold fs-6 mb-2" style="padding-top: 0px;">
+                                                <b>Allow User to add New Clients</b>
+                                            </label>
+                                        
+                                        </div>
+                                    </div>
+        
+                                    <div class="col-md-4 form-check form-switch" style="display: none;">
+                                        <div class="col-lg-12">
+                                            <input class="col-lg-6 form-check-input" formControlName="allowOtherCompanyID"
+                                                type="checkbox">
+                                            <label class="fw-semibold fs-6 mb-2" style="padding-top: 0px;">
+                                                <b>Allow User to add other Company</b>
+                                            </label>
+                                   
+                                        </div>
+                                    </div>
+        
+                                    <div class="col-md-4 form-check form-switch" >
+                                        <div class="col-lg-12">
+                                            <input class="col-lg-6 form-check-input" formControlName="allowNewCompanyID"
+                                                type="checkbox" (change)="switchCompanyID($event)">
+                                            <label class="fw-semibold fs-6 mb-2" style="padding-top: 0px;">
+                                                <b>Allow User to add new Company</b>
+                                            </label>
+                                        </div>
+        
+                                </div>
+                            </div>
+        
+                            <div class="container" >
+                                <div class="row mb-7">
+                                   
+                                    
+        
+                                    <div class="col-md-4">
+                                        <label class="required fw-semibold fs-6 mb-2"> Client ID</label>
+                                       
+        
+                                        <select *ngIf="switchBetweenDropdown_textField"
+                                            class="form-select form-select-solid form-select-lg fw-bold"
+                                            placeholder="select client ID" name="client_ID" formControlName="clientID" >
+        
+                                            <option *ngFor="let item of listofClientIDs" [value]="item">
+                                                {{ item }}
+                                            </option>
+                                        </select>
+                       
+        
+                                        <input type="text" *ngIf="disabled_CLientID_textField" class="
+                                        form-control form-control-lg form-control-solid
+                                        mb-3 mb-lg-0
+                                      " name="name" formControlName="disabled_CLientID">
+        
+                                 
+        
+                                    </div>
+        
+                                    <div class="col-md-4" >
+                                        <label class="required fw-semibold fs-6 mb-2"> Company ID</label>
+        
+        
+                                        <select *ngIf="switchBetweenDropdown_company_id" class="form-select form-select-solid form-select-lg fw-bold"
+                                            placeholder="select company ID" name="company_ID" formControlName="companyID"
+                                             >
+        
+                                            <option *ngFor="let item of listofCompanyIDs" [value]="item">
+                                                {{ item }}
+                                            </option>
+                                        </select>
+                                    
+        
+        
+                                        <input type="text" *ngIf="disabled_companyID_textField" class="
+                                        form-control form-control-lg form-control-solid
+                                        mb-3 mb-lg-0 
+                                      " name="name" formControlName="disabled_companyid">
+        
+                                        <div *ngIf="
+                                     createUserField.get('companyID')?.hasError('required') &&
+                                     createUserField.get('companyID')?.touched
+                                  " class="fv-plugins-message-container invalid-feedback">
+                                            Company ID is required
+                                        </div>
+        
+                                    </div>
+        
+        
+                                    <div class="col-md-4">
+                                        <label class="required fw-semibold fs-6 mb-2"> Email
+                                        </label>
+        
+                                        <input type="email" class="
+                                      form-control form-control-lg form-control-solid
+                                      mb-3 mb-lg-0
+                                    " placeholder="Enter email" name="email" formControlName="email" required
+                                            (keyup)="checkUniqueEmail($event);checkMail($event)">
+        
+                                        <span style="color: #fc1900;">{{errorForUniqueEmail}}</span>
+                                        <span style="color: #fc1900;">{{errorForInvalidEmail}}</span>
+                                        <div *ngIf="
+                                      createUserField.get('email')?.hasError('required') &&
+                                      createUserField.get('email')?.touched && createUserField.get('email')?.errors?.pattern
+                                    " class="fv-plugins-message-container invalid-feedback">
+                                            Email is required
+                                           
+                                        </div>
+        
+                                    </div>
+        
+        
+        
+        
+        
+                                </div>
+                            </div>
+        
+                            <div class="container">
+                                <div class="row mb-7">
+                                    <div class="col-md-4">
+                                        <label class="required fw-semibold fs-6 mb-2"> User Name
+                                        </label>
+        
+                                        <input type="text" class="
+                                        form-control form-control-lg form-control-solid
+                                        mb-3 mb-lg-0
+                                      " placeholder="Enter User Name" name="username" formControlName="username" required
+                                            (keyup)="checkUniqueIdentifier($event)">
+        
+                                        <span style="color: #fc1900;">{{errorForUniqueID}}</span>
+                                        <div *ngIf="
+                                        createUserField.get('username')?.hasError('required') &&
+                                        createUserField.get('username')?.touched
+                                      " class="fv-plugins-message-container invalid-feedback">
+                                            Username is required
+                                        </div>
+        
+        
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="required fw-semibold fs-6 mb-2"> Description</label>
+        
+                                        <input type="text" class="
+                                        form-control form-control-lg form-control-solid
+                                        mb-3 mb-lg-0
+                                      " placeholder="Enter Description" name="description" formControlName="description"
+                                            required>
+        
+                                        <div *ngIf="
+                                      createUserField.get('description')?.hasError('required') &&
+                                      createUserField.get('description')?.touched
+                                    " class="fv-plugins-message-container invalid-feedback">
+                                            Description is required
+                                        </div>
+        
+                                    </div>
+        
+                                    <div class="col-md-4">
+                                        <label class="required fw-semibold fs-6 mb-2"> Mobile</label>
+        
+                                        <input type="text" class="
+                                            form-control form-control-lg form-control-solid
+                                            mb-3 mb-lg-0
+                                          " placeholder="Enter mobile number" name="mobile" formControlName="mobile"
+                                            (keypress)="keyPress($event);" (keyup)="uniqueMobile($event)" minlength=10 maxlength=10 required >
+        
+                                            <span style="color: #fc1900;">{{errorForUniquemobileID}}</span>
+                                        <div *ngIf="
+                                               createUserField.get('mobile')?.hasError('required') &&
+                                               createUserField.get('mobile')?.touched 
+                                          " class="fv-plugins-message-container invalid-feedback">
+                                            Mobile Number is required
+                                        </div>
+                                    </div>
+        
+        
+                                </div>
+                            </div>
+        
+                            <div class="container">
+                                <div class="row mb-7">
+                                    <div class="col-md-4">
+                                        <label class="required fw-semibold fs-6 mb-2"> Mobile Privacy</label>
+        
+                                        <select class="form-select form-select-solid form-select-lg fw-bold"
+                                            placeholder="Enter mobile_privacy" name="mobile_privacy"
+                                            formControlName="mobile_privacy" required>
+                                            <option value="Visible">Visible</option>
+                                            <option value="Invisible">Invisible</option>
+                                        </select>
+        
+                                        <div *ngIf="
+                                         createUserField.get('mobile_privacy')?.hasError('required') &&
+                                         createUserField.get('mobile_privacy')?.touched
+                                      " class="fv-plugins-message-container invalid-feedback">
+                                            Mobile Privacy is required
+                                        </div>
+        
+        
+                                    </div>
+        
+                                    <div class="col-md-4">
+                                        <label class="fw-semibold fs-6 mb-2">Reporting To</label>
+        
+                                        <select class="form-select form-select-solid form-select-lg fw-bold"
+                                            placeholder="select report to" name="report_to" formControlName="report_to">
+                                            <option *ngFor="let item of listofReportingUsers" [value]="item">
+                                                {{ item }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="fw-semibold fs-6 mb-2"> Telegram Channel ID
+                                        </label>
+        
+                                        <input type="number" class="
+                                          form-control form-control-lg form-control-solid
+                                          mb-3 mb-lg-0
+                                        " placeholder="Enter Telegram ID" name="telegramID" formControlName="telegramID">
+        
+                                     
+                                    </div>
+        
+        
+                                </div>
+                            </div>
+        
+                            <div class="container">
+        
+        
+                            <div class="row mb-7">
+                                <div class="col-md-4" *ngIf="locationPermissionArray.length>0">
+                                    <label class="required fw-semibold fs-6 mb-2"> Location
+                                        Permission</label>
+                                    <div class="custom-multiselect">
+            
+                                        <p-multiSelect
+                                        [options]="locationPermissionArray" 
+                                        value ="value"
+                                        placeholder="select Location"
+                                        (onChange)="onModuleSelect($event)"
+                                        formControlName="location_permission"
+                                        required>
+                                        </p-multiSelect>
+                                    </div>
+                                </div>
+                               
+        
+        
+                                <!-- (onChange)="onModuleSelect(i, $event)"
+                                (onSelectAllChange)="onSelectAll(i, $event)" -->
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+                               
+                                    <!-- <div class="col-md-4" *ngIf="locationPermissionArray.length>0">
+                                        <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Location
+                                            Permission</label>
+        
+                                            <div class="custom-multiselect">
+        
+                                            <ng-multiselect-dropdown style="
+                                            display: inline-block; 
+                                            width: 100%;
+                                            padding: 0px ;
+                                            margin-bottom: 0;
+                                            font-weight: 0px;
+                                            line-height: 1.52857143;
+                                            text-align: left;
+                                            vertical-align: middle;
+                                            cursor: pointer;
+                                            background-image: none;
+                                            border-radius: 4px;
+                                          
+                                        " class="form-select form-select-solid form-select-lg fw-bold "
+                                            [placeholder]="'select devicetype permission'" [settings]="dropdownSettings"
+                                            [data]="locationPermissionArray" (onSelect)="onLocationSelect($event)"
+                                            [formControl]="$any(createUserField.controls['location_permission'])">
+                                        </ng-multiselect-dropdown>
+                
+                                    </div> -->
+        
+                                        <!-- <div *ngIf="
+                                            createUserField.get('location_permission')?.hasError('required') &&
+                                            createUserField.get('location_permission')?.touched
+                                      " class="fv-plugins-message-container invalid-feedback">
+                                            Location Permission is required
+                                        </div>
+                                    </div> -->
+        
+        
+                                    <div class="col-md-4" *ngIf="formList.length>0">
+                                        <label class="required fw-semibold fs-6 mb-2">FormID Permission</label>
+                                        <div class="custom-multiselect">
+                
+                                            <p-multiSelect
+                                            [options]="formList" 
+                                            placeholder="select formID permission"
+                                            value ="value"
+                                            formControlName="form_permission"
+                                            required>
+                                            </p-multiSelect>
+                                        </div>
+                                    </div>
+          
+        
+                                
+        
+                                    <!-- <div class="col-md-4" *ngIf="formList.length>0">
+                                        <label class="col-lg-12 col-form-label fw-bold fs-6 required">FormID Permission</label>
+        
+                                    <div class="custom-multiselect">
+                                        <ng-multiselect-dropdown style="
+                                        display: inline-block; 
+                                        width: 100%;
+                                        padding: 0px ;
+                                        margin-bottom: 0;
+                                        font-weight: 0px;
+                                        line-height: 1.52857143;
+                                        text-align: left;
+                                        vertical-align: middle;
+                                        cursor: pointer;
+                                        background-image: none;
+                                        border-radius: 4px;
+                                      
+                                    " class="form-select form-select-solid form-select-lg fw-bold"
+                                            [placeholder]="'select formID permission'" [settings]="dropdownSettings"
+                                            [data]="formList" (onSelect)="onDeviceSelect($event)"
+                                            (onSelectAll)="onSelectAllDevices($event)"
+                                            [formControl]="$any(createUserField.controls['device_permission'])">
+                                        </ng-multiselect-dropdown>
+        
+                                    </div>
+        
+                                        <div *ngIf="
+                                            createUserField.get('device_permission')?.hasError('required') &&
+                                            createUserField.get('device_permission')?.touched
+                                      " class="fv-plugins-message-container invalid-feedback">
+                                            Device Permission is required
+                                        </div>
+                                    </div> -->
+        
+        
+                                </div>
+                            </div>
+        
+                            <div class="container">
+                                <div class="row mb-10">
+        
+                                    <div class="col-md-4">
+        
+                                        <label class="fw-semibold fs-6 mb-2"> Tree</label>
+                                        <input type="search" id="search" value="" class="col-md-12 input"
+                                            style="border:px solid silver; margin: 2px;" placeholder="Search For Devices">
+                                        <div class="container " id="SimpleJSTree"></div>
+                                    </div>
+        
+        
+                                    <div class="col-md-4">
+                                        <label class="fw-semibold fs-6 mb-2">
+                                            Redirection</label>
+                               
+                                        <input type="text" name="location_object" formControlName="location_object" class="
+                                       form-control form-control-lg form-control-solid
+                                       mb-3 mb-lg-0
+                                     ">
+                                      
+                                    </div>
+        
+                                    <div class="col-md-4">
+                                        <label class="fw-semibold fs-6 mb-2"> Default Module</label>
+                                    
+                                        <select class="form-select form-select-solid form-select-lg fw-bold"
+                                            placeholder="select default module" name="default_module"
+                                            formControlName="default_module">
+        
+                                            <option [value]="item" *ngFor="let item of ['MagicBoard','PowerBoard','DreamBoard']">
+                                                {{ item }}
+                                            </option>
+                                        </select>
+                                    </div>
+        
+
+                                  
+                                  
+        
+        
+                                </div>
+                            </div>
+
+                            <div class="container">
+                                <div class="row mb-7">
+                                    <div class="col-md-4">
+                                        <label class="required fw-semibold fs-6 mb-2"> Default
+                                            Type</label>
+        
+                                        <select class="form-select form-select-solid form-select-lg fw-bold"
+                                            placeholder="select default device" name="default_type"
+                                            formControlName="default_type" required>
+        
+                                            <option value="Device">Device</option>
+                                            <option value="Location">Location</option>
+                                        </select>
+        
+                                        <div *ngIf="
+                                        createUserField.get('default_type')?.hasError('required') &&
+                                        createUserField.get('default_type')?.touched
+                                  " class="fv-plugins-message-container invalid-feedback">
+                                            Default Type is required
+                                        </div>
+                                    </div>
+        
+                                    <div class="col-md-4">
+                                        <label class="required fw-semibold fs-6 mb-2">Start Node</label>
+        
+                                        <select class="form-select form-select-solid form-select-lg fw-bold"
+                                            placeholder="select start node" name="start_node" formControlName="start_node"
+                                            required>
+                                            <option>Default</option>
+                                            <option [value]="item" *ngFor="let item of startNode">
+                                            {{item}}</option>
+                                        </select>
+        
+                                        <div *ngIf="
+                                        createUserField.get('start_node')?.hasError('required') &&
+                                        createUserField.get('start_node')?.touched
+                                  " class="fv-plugins-message-container invalid-feedback">
+                                            Start Node is required
+                                        </div>
+        
+                                    </div>
+        
+                                    <div class="col-md-4">
+                                        <label class="required fw-semibold fs-6 mb-2">Permission ID</label>
+        
+                                        <select class="form-select form-select-solid form-select-lg fw-bold"
+                                            placeholder="select permission ID" name="permission_ID"
+                                            formControlName="permission_ID" required>
+                                         
+        
+                                            <option *ngFor="let item of listofPermissionIDs" [value]="item">
+                                                {{ item }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+        
+                            <div class="container">
+                                <div class="row mb-7">
+        
+                                    
+        
+                                    <div class="col-md-4">
+                                        <label class="fw-semibold fs-6 mb-2">Alert Levels</label>
+        
+                                        <select class="form-select form-select-solid form-select-lg fw-bold"
+                                            placeholder="select alert levels" name="alert_levels"
+                                            formControlName="alert_levels">
+                                            <option value="NONE">NONE</option>
+                                            <option value="THC DCH2">THC DCH2</option>
+                                        </select>
+                                    </div>
+        
+        
+        
+                                   
+        
+        
+                                    <div class="col-md-4 mt-15">
+                                       
+                                        
+                                        <label class="fw-semibold fs-6 mb-2" style="margin-right: 10px;"><input
+                                                class="form-check-input" name="sms" type="checkbox"
+                                                formControlName="alert_sms" /><span class="fw-bold ps-2 fs-6">SMS
+                                            </span></label>
+        
+                                        <label class="fw-semibold fs-6 mb-2"><input
+                                                class="form-check-input" name="telegram" type="checkbox"
+                                                formControlName="alert_telegram" /><span class="fw-bold ps-2 fs-6">Telegram
+                                            </span></label>
+        
+        
+                                    </div>
+
+
+                                    <div class="col-md-4 mt-7">
+                                        <label class="fw-semibold fs-6 mb-2">Escalation Enable:</label>
+                                        
+                                        <div class="mb-2">
+                                            <label class="fw-semibold fs-6">
+                                                <input class="form-check-input" name="email" type="checkbox" formControlName="escalation_email" />
+                                                <span class="fw-bold ps-2 fs-6">Email</span>
+                                            </label>
+                                        </div>
+                                    
+                                        <div class="mb-2">
+                                            <label class="fw-semibold fs-6">
+                                                <input class="form-check-input" name="sms" type="checkbox" formControlName="escalation_sms" />
+                                                <span class="fw-bold ps-2 fs-6">SMS</span>
+                                            </label>
+                                        </div>
+                                    
+                                        <div class="mb-2">
+                                            <label class="fw-semibold fs-6">
+                                                <input class="form-check-input" name="telegram" type="checkbox" formControlName="escalation_telegram" />
+                                                <span class="fw-bold ps-2 fs-6">Telegram</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+        
+                                   
+                                </div>
+                            </div>
+        
+                            <div class="container" style="margin-left: 10px;">
+                                <div class="row mb-7">
+        
+                                    <div class="col-md-4 form-check form-switch">
+        
+                                        <div class="col-lg-12">
+                                            <input class="col-lg-6 form-check-input" formControlName="enable_user"
+                                                type="checkbox">
+                                            <label class=" fw-semibold fs-6 mb-2" style="padding-top: 0px;">
+                                                <b>Account</b>
+                                            </label>
+                                            
+                                        </div>
+        
+                                        
+                                            <div class="col-lg-12">
+                                                <input class="col-lg-6 form-check-input" formControlName="cognito_update"
+                                                    type="checkbox">
+                                                <label class=" fw-semibold fs-6 mb-2" style="padding-top: 0px;">
+                                                    <b>Cognito Update</b>
+                                                </label>
+                                            
+                                            </div>
+                                    </div>
+        
+        
+                                </div>
+                            </div>
+        
+                            <div class="modal-footer flex-center">
+                                <!--begin::Button-->
+                                <button type="reset" id="kt_modal_update_customer_cancel" class="btn btn-light me-3"
+                                    (click)="modal.dismiss('cancel')">
+                                    Discard
+                                </button>
+                                <!--end::Button-->
+                    
+                                <!--begin::Button-->
+                                <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary"
+                                [disabled]="createUserField.invalid" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+                                    <span *ngIf="!editOperation" class="indicator-label">
+                                        Submit
+                                    </span>
+                                    <span *ngIf="editOperation"  class="indicator-label">
+                                        Update
+                                    </span>
+                                    <span class="indicator-progress">
+                                        Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                                    </span>
+                                </button>
+                                <!--end::Button-->
+                            </div>
+        
+                            <!-- <div class="modal-footer">
+        
+                                <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal"
+                                    #closeUser>Cancel</button>
+                                 
+                                <button [hidden]="hideUpdateButton" type="submit" class="btn btn-sm btn-primary"
+                                    [disabled]="!createUserField.dirty || createUserField.invalid
+                                || errorForUniqueID !='' || errorForUniqueEmail == 'Email already exists' || errorForInvalidEmail == 'Invalid Email Address' 
+                                ||errorForInvalidName == 'Field must contains at least 1 numeric character,at least 1 lowercase letter,at least 1 uppercase letter,at least 1 special character,minimum 6 of length'"
+                                    (click)="updateUser(createUserField.value,'editUser')" *ngIf="showModal"
+                                   >
+                                    Update
+                                </button>
+        
+        
+                            
+                                <button type="button" class="btn btn-sm btn-primary not-allowed" *ngIf="!showModal"
+                                [disabled]="createUserField.invalid || errorForUniqueUserID == 'User ID already exists' || errorForUniqueID !='' || errorForUniqueEmail == 'Email already exists'
+                                || errorForInvalidEmail == 'Invalid Email Address'
+                                || errorForInvalidName == 'Field must contains at least 1 numeric character,at least 1 lowercase letter,at least 1 uppercase letter,at least 1 special character,minimum 6 of length'"
+                                    (click)="createNewUser('','html')">Save</button>
+                            </div> -->
+                        </div>
+                   
+                
+                    
+                </div>
+                <!--end::User form-->
+            </div>
+        </div>
+    </form>
+
+</ng-template> 

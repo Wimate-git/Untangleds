@@ -1,0 +1,23 @@
+<div *ngIf="loading" class="loading-spinner">
+  Loading data, please wait...
+</div>
+
+<div class="row g-6 g-xl-9" *ngIf="cards_2.length > 0">
+  <div class="col-md-6 col-xl-4" *ngFor="let card of cards_2">
+    <app-card2 [componentSource]="'dashboard'"
+      [icon]=card.icon
+      badgeColor="primary"
+      status="view"
+      [title]="card.name ||'N/A'"
+      [description]="card.job || 'N/A'"
+      [date]="card.avgEarnings || 'N/A'"
+      [budget]="card.totalEarnings || 'N/A'"
+    ></app-card2>
+</div>
+
+<!-- https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/public/Climaveneta/Live+Contract/liveContract.png" -->
+
+
+
+
+

@@ -1,0 +1,131 @@
+<!-- <div class="d-flex flex-column flex-center flex-column-fluid">
+  <div class="d-flex flex-column flex-center text-center p-10">
+    <div class="card card-flush  w-lg-650px py-5">
+      <div class="card-body py-15 py-lg-20">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<div class="d-flex flex-column flex-lg-row flex-column-fluid">
+
+  <!--begin::Body-->
+  <div class="d-flex flex-column flex-lg-row-fluid w-lg-50 p-10 order-2 order-lg-1">
+    <!--begin::Form-->
+    <div class="d-flex flex-center flex-column flex-lg-row-fluid">
+      <!--begin::Wrapper-->
+      <div class="<?php echo $params['wrapperClass']?> p-10">
+        <router-outlet></router-outlet>
+      </div>
+
+      <!-- <div class="text-muted fs-7 mt-2 bounce" style="font-weight: bold; color: #333; background: #f8f9fa; padding: 5px 10px; border-radius: 5px;">
+        <span>Powered by</span> <mark style="background: none; color: #007bff;">Wimate</mark>
+      </div> -->
+
+      <div class="text-muted fs-7 mt-2 bounce" style="font-weight: bold; color: #333; background: #f8f9fa; padding: 5px 10px; border-radius: 5px;">
+        <span>Powered by</span> 
+        <a href="https://www.wimate.in/" target="_blank" style="text-decoration: none;">
+            <mark style="background: none; color: #007bff;">Wimate</mark>
+        </a>
+    </div>
+     
+
+
+      <!--end::Wrapper-->
+    </div>
+
+   
+
+    <!--end::Form-->
+
+    <!--begin::Footer-->
+    <!-- <div class="d-flex flex-center flex-wrap px-5">
+   
+      <div class="d-flex fw-semibold text-primary fs-base">
+        <a href="#" class="px-5" target="_blank">Terms</a>
+
+        <a href="#" class="px-5" target="_blank">Plans</a>
+
+        <a href="#" class="px-5" target="_blank">Contact Us</a>
+      </div>
+   
+    </div> -->
+    <!--end::Footer--> 
+  </div>
+  <!--end::Body-->
+
+  <!--begin::Aside-->
+  <div class="d-flex flex-lg-row-fluid w-lg-50 bgi-size-cover bgi-position-center order-1 order-lg-2"
+    [ngStyle]="{'background-image': 'url(' + backgroundUrl + ')'}">
+    <!--begin::Content-->
+    <div class="d-flex flex-column flex-center py-15 px-5 px-md-15 w-100">
+      <!--begin::Logo-->
+      <a routerLink="/" class="mb-12" *ngIf="showLogo">
+        <img alt="Logo" [src]="clientLogo == '' ? logoUrl : clientLogo" class="h-75px" [ngClass]="{'custom-style': clientLogo === ''}" />
+      </a>
+      <!--end::Logo-->
+
+      <!-- <a routerLink="/home" class="mb-12" *ngIf="showLogo">
+        <img
+          alt="Logo"
+          [src]="clientLogo == '' ? './assets/media/Wimate_latest.png' : clientLogo"
+          style="width: 300px;"
+        />
+      </a> -->
+  
+  
+      <a routerLink="/" class="mb-12" *ngIf="!showLogo">
+        <img
+          alt="Logo"
+          src='./assets/Your paragraph text.gif'
+          style="width: 300px;"
+          class="h-75px"
+        />
+      </a>
+
+
+      <!--begin::Image-->
+      <img class="hoverly mx-auto w-300px w-md-50 w-xl-700px mb-10 mb-lg-20" [src]="untangledImage"
+        alt="" />
+      <!--end::Image-->
+
+
+
+     
+
+      <!--begin::Title-->
+      <!-- <h1 class="text-white fs-2qx fw-bolder text-center mb-7">
+        Simplify operations, boost efficiency, and achieve service excellence
+      </h1> -->
+      <!--end::Title-->
+
+      <!--begin::Text-->
+      <!-- <div class="text-white fs-base text-center">
+        In this kind of post, <a href="#" class="opacity-75-hover text-warning fw-bold me-1">the blogger</a>
+
+        introduces a person they’ve interviewed <br /> and provides some background information about
+
+        <a href="#" class="opacity-75-hover text-warning fw-bold me-1">the interviewee</a>
+        and their <br /> work following this is a transcript of the interview.
+      </div> -->
+
+
+      <div [innerHTML]="htmlContent"></div>
+
+      <!-- <div class="text-white fs-base text-center">
+        <span class="opacity-75-hover text-warning fw-bold me-1">Untangled Pro</span> is a cloud-based software suite offering a comprehensive range of modular applications to manage every aspect of your business, from production to service. With its  <span class="opacity-75-hover text-warning fw-bold me-1">no-code platform,</span> businesses can easily customize and integrate tools to streamline operations, optimize workflows, and enhance customer relationships. Tailor your processes with Untangled Pro for unmatched flexibility and control
+      </div> -->
+
+
+
+
+
+
+
+      <!--end::Text-->
+    </div>
+    <!--end::Content-->
+  </div>
+  <!--end::Aside-->
+</div>

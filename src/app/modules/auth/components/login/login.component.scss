@@ -1,0 +1,76 @@
+:host {
+  width: 100%;
+  @media (min-width: 992px) {
+    .login-form {
+      width: 100%;
+      max-width: 450px;
+
+      .mat-form-field {
+        width: 100%;
+      }
+    }
+  }
+}
+
+
+
+.btn-primary:hover{
+  transform: translateY(-2px);
+  transition: 0.8s;
+}
+
+
+.large-input {
+  width: 100%; /* Adjust the width as needed */
+  height: 45px; /* Adjust the height as needed */
+  padding: 10px; /* Optional: Add some padding */
+}
+
+
+//New code for login Continue is here
+.button {
+  padding: 15px 25px;
+  font-size: 14px;
+  font-weight: bolder;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: #1DA1F2;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;
+}
+
+.button:hover {transform: translateY(-2px);}
+
+.button:active {
+  background-color: #1DA1F2;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
+
+
+.mediaFordesk {
+  min-width: 200px; /* Default for mobile devices */
+ 
+  @media (min-width: 300px) {
+    min-width: 325px; /* Set a different min-width for screens between 400px and 800px */
+  }
+
+  @media (min-width: 992px) {
+    min-width: 400px; /* 400px for screens wider than 992px */
+  }
+}
+
+
+.hoverLink {
+  text-decoration: none; /* Remove underline */
+  color: #000; /* Default color */
+  transition: color 0.3s ease; /* Smooth transition */
+}
+
+.hoverLink:hover {
+  color: #007bff; /* Change to your desired highlight color */
+}

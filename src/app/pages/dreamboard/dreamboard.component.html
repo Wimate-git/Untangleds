@@ -1,0 +1,153 @@
+<div class="card">
+    <div class="card-header border-0 pt-6">
+        <h2>Dream Board Configuration</h2>
+    </div>
+    <div class="card-header border-0 pt-0">
+
+        <!--begin::Card title-->
+        <div class="card-title">
+
+        <div class="d-flex align-items-center position-relative my-1">
+            <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
+            <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12"
+                placeholder="Search dreamboard">
+        </div>
+        
+    </div>
+        <!--begin::Card title-->
+
+        <!--begin::Card toolbar-->
+        <div class="card-toolbar">
+            <!--begin::Toolbar-->
+            <div class="d-flex justify-content-end">
+                <!--begin::Add user-->
+                <button type="button" class="btn btn-primary" data-action="create">
+                    Add
+                </button>
+                <!--end::Add user-->
+                </div>
+                <!--end::Toolbar-->
+            <!-- </div> -->
+            <!--end::Card toolbar-->
+        </div>
+    </div>
+    <!-- <div class="card-body pt-0"> -->
+    <div class="card-body pt-0">
+        <app-crud [componentSource]="'dreamboard'" [datatableConfig]="datatableConfig" route="/dreamboard" (deleteEvent)="delete($event)"
+            (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent" [modal]="formModal"></app-crud>
+    </div>
+</div>
+
+<swal #noticeSwal [swalOptions]="swalOptions">
+</swal>
+
+<ng-template #formModal let-modal>
+    <form [formGroup]="dreamboardForm" (ngSubmit)="onSubmit($event)">
+        <div class="modal-header">
+            <h4 *ngIf="!update" class="modal-title" id="modal-basic-title">Add Dream Board</h4>
+            <h4 *ngIf="update" class="modal-title" id="modal-basic-title">Update Dream Board</h4>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div class="modal-body">
+            <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px" id="kt_modal_update_customer_scroll"
+                data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}"
+                data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_update_customer_header"
+                data-kt-scroll-wrappers="#kt_modal_update_customer_scroll" data-kt-scroll-offset="300px">
+                <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+                    <!--begin::Input group-->
+                    <div class="fv-row mb-7">
+                        <!--begin::Label-->
+                        <label class="required fw-semibold fs-6 mb-2">Dream Board ID</label>
+                        <!--end::Label-->
+                        <!--begin::Input-->
+                        <input *ngIf="!update" type="text" class="form-control form-control-solid" name="dreamboardId" placeholder="Enter dreamboard Id"
+                            formControlName="dreamboardId" (keyup)="checkUniqueUid($event)" data-bs-toggle="tooltip" data-bs-placement="top" title="Dreamboard Id and choose file name should be same" required />
+                        <input *ngIf="update" type="text" class="form-control form-control-solid" name="dreamboardId" placeholder="Enter dreamboard Id"
+                            formControlName="dreamboardId"  data-bs-toggle="tooltip" data-bs-placement="top" title="Dreamboard Id and choose file name should be same" readonly required />
+                        <span style="color: #fc1900;">{{error}}</span>
+                        <div *ngIf="dreamboardForm.controls['dreamboardId'].invalid && dreamboardForm.controls['dreamboardId'].touched"
+                            class="invalid-feedback">
+                            Dream Board ID is required.
+                        </div>
+                        <!--end::Input-->
+                    </div>
+                    <!--end::Input group-->
+                    <!--begin::Input group-->
+                    <div class="fv-row mb-7">
+                        <!--begin::Label-->
+                        <label class="required fw-semibold fs-6 mb-2">
+                            <span>Dream Board Name</span>
+                        </label>
+                        <!--end::Label-->
+                        <!--begin::Input-->
+                        <input type="text" class="form-control form-control-solid" name="name" formControlName="name" placeholder="Enter name"/>
+                        <div *ngIf="dreamboardForm.controls['name'].invalid && dreamboardForm.controls['name'].touched"
+                            class="invalid-feedback">
+                            Dream Board Name is required.
+                        </div>
+                        <!--end::Input-->
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <!--begin::Label-->
+                        <label class="required fw-semibold fs-6 mb-2">
+                            <span>Description</span>
+                        </label>
+                        <!--end::Label-->
+                        <!--begin::Input-->
+                        <input type="text" class="form-control form-control-solid" name="description" placeholder="Enter description"
+                            formControlName="description" />
+                       
+                        <!--end::Input-->
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2" style="padding-right: 10px;">Manually Type HTML
+                            Code</label>
+                        <input  type="radio" name="devices" value="code" formControlName="devices">
+                        
+                        <label class="required fw-semibold fs-6 mb-2" style="padding-left: 20px; padding-right: 10px;">Upload
+                            your Application Folder</label>
+                        <input type="radio" name="devices" value="file_up" formControlName="devices">
+                       
+                    </div>
+
+                    <div class="row" *ngIf="dreamboardForm.controls['devices'].value === 'code'">
+                        <label class="required fw-semibold fs-6 mb-2">HTML</label>
+                        <textarea class="form-control form-control-solid" formControlName="HTML" rows="10" placeholder="Enter html code"></textarea>
+                    </div>
+
+                    <div class="row" *ngIf="dreamboardForm.controls['devices'].value === 'file_up'">
+                        <input class="form-control form-control-solid file-upload" type="file" #fileInput (change)="onFilesSelected($event)" webkitdirectory directory
+                            multiple required>
+                    </div>
+                    <!--end::Input group-->
+                </div>
+                <!--end::User form-->
+            </div>
+        </div>
+        <div class="modal-footer flex-center">
+            <!--begin::Button-->
+            <button type="reset" id="kt_modal_update_customer_cancel" class="btn btn-light me-3"
+                (click)="modal.dismiss('cancel')">
+                Discard
+            </button>
+            <!--end::Button-->
+
+            <!--begin::Button-->
+            <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary"
+                [disabled]="dreamboardForm.invalid || dreamboardForm.pristine" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+                <span *ngIf="!update" class="indicator-label">
+                    Submit
+                </span>
+                <span *ngIf="update" class="indicator-label">
+                    Update
+                </span>
+                <span class="indicator-progress">
+                    Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                </span>
+            </button>
+            <!--end::Button-->
+        </div>
+    </form>
+</ng-template>

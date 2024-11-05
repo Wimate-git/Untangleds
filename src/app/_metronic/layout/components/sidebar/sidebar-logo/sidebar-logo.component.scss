@@ -1,0 +1,13 @@
+.logo-container {
+    display: flex;
+    flex-direction: column; /* Stack logos vertically */
+    align-items: center;    /* Center horizontally */
+    justify-content: center; /* Center vertically if needed */
+    text-align: center;      /* Center text, if any */
+  }
+
+
+  .custom-style {
+    background-color: white;
+    border-radius: 30px;
+  }

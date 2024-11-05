@@ -1,0 +1,356 @@
+  
+<div class="card card-custom">
+    <div class="card-header border-0 pt-6">
+        <h2>Client Configuration</h2>
+    </div>
+    <div class="card-header border-0 pt-0">
+
+        <!--begin::Card title-->
+        <div class="card-title">
+
+        <div class="d-flex align-items-center position-relative my-1">
+            <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
+            <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12"
+                placeholder="Search Client">
+        </div> 
+        
+    </div>
+        <!--begin::Card title-->
+
+        <!--begin::Card toolbar-->
+        <div class="card-toolbar">
+            <!--begin::Toolbar-->
+            <div class="d-flex justify-content-end">
+                <!--begin::Add user-->
+                <button type="button" class="btn btn-primary" data-action="create">
+                    Add
+                </button>
+                <!--end::Add user-->
+                </div>
+                <!--end::Toolbar-->
+            <!-- </div> -->
+            <!--end::Card toolbar-->
+        </div>
+    </div>
+    <!-- <div class="card-body pt-0"> -->
+    <div class="card-body pt-0">
+        <app-crud-user [componentSource]="'app-client'" [datatableConfig]="datatableConfig" route="/client" (deleteEvent)="delete($event)" (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent" [modal]="clientModal"></app-crud-user>
+    </div>
+</div>
+
+<!-- swal is not yet implemented -->
+<swal #noticeSwal [swalOptions]="swalOptions">
+</swal>
+
+
+<!-- (click)="openModal('','') -->
+
+
+<ng-template #clientModal let-modal>
+    <form [formGroup]="createClientField" (ngSubmit)="onSubmit($event)">
+      
+        <div class="modal-header">
+            <h4 *ngIf="showHeading" class="modal-title" id="modal-basic-title">Add Client Configuration</h4>
+            <h4 *ngIf="!showHeading" class="modal-title" id="modal-basic-title">Edit Client Configuration</h4>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+
+
+        <div class="modal-body">
+            <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-1000px" id="kt_modal_update_customer_scroll"
+            data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}"
+            data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_update_customer_header"
+            data-kt-scroll-wrappers="#kt_modal_update_customer_scroll" data-kt-scroll-offset="300px">
+            <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+
+           
+                
+                   
+                        <div class="container">
+                            <div class="row">
+    
+                                <div class="col-lg-4 ">
+    
+                                    <div class="col-lg-12 form-group image-input image-input-outline">
+                                        <label class=" fw-semibold fs-6 mb-2" for="imageInput">Client Logo
+                                            1</label>
+                                        <input type="file" id="imageInput" title="Click to add/update image"
+                                            class="form-control visually-hidden" (change)="onFileChange($event)">
+                                        <label for="imageInput" class="form-control form-control-lg form-control-solid"
+                                            >Upload Image</label>
+                                        <br>
+                                        <img class="btn btn-icon btn-box image-input-wrapper w-125px h-125px btn-active-color-primary w-25px h-25px bg-body shadow"
+                                            src="{{base64textString_temp}}" *ngIf="base64textString_temp">
+                                    </div>
+    
+                                </div>
+    
+                                <div class="col-lg-4 ">
+                                    <div class="col-lg-12 form-group image-input image-input-outline">
+                                        <label class=" fw-semibold fs-6 mb-2" for="imageInput1">Client Logo
+                                            2</label>
+                                        <input type="file" id="imageInput1" title="Click to add/update image"
+                                            class="form-control visually-hidden" (change)="onFileChange1($event)">
+                                        <label for="imageInput1" class="form-control form-control-lg form-control-solid"
+                                            >Upload Image</label>
+                                        <br>
+                                        <img class="btn btn-icon btn-box image-input-wrapper w-125px h-125px btn-active-color-primary w-25px h-25px bg-body shadow"
+                                            src="{{base64textString_temp_logo1}}" *ngIf="base64textString_temp_logo1">
+                                    </div>
+    
+                                </div>
+    
+                                <div class="col-md-4">
+                                    <label class="required fw-semibold fs-6 mb-2"> Client ID</label>
+    
+                                    <input type="text" class="
+                                    form-control form-control-lg form-control-solid
+                                    mb-3 mb-lg-0
+                                  " placeholder="Enter client ID" name="clientID" formControlName="clientID" required
+                                        (keyup)="checkUniqueIdentifier($event)">
+    
+                                    <span style="color: #fc1900;">{{errorForUniqueID}}</span>
+    
+                                    <div *ngIf="
+                                    createClientField.get('clientID')?.hasError('required') &&
+                                    createClientField.get('clientID')?.touched
+                                  " class="fv-plugins-message-container invalid-feedback">
+                                        Client ID is required
+                                    </div>
+    
+                                </div>
+    
+                            </div>
+                        </div>
+    
+                        <div class="container mb-7">
+                            <div class="row">
+    
+                                <div class="col-md-4">
+                                    <label class="required fw-semibold fs-6 mb-2"> Client Name</label>
+    
+                                    <input type="text" class="
+                                    form-control form-control-lg form-control-solid
+                                    mb-3 mb-lg-0
+                                  " placeholder="Enter client name" name="clientName" formControlName="clientName"
+                                        required>
+    
+                                    <div *ngIf="
+                                 createClientField.get('clientName')?.hasError('required') &&
+                                 createClientField.get('clientName')?.touched
+                              " class="fv-plugins-message-container invalid-feedback">
+                                        Client Name is required
+                                    </div>
+    
+                                </div>
+    
+                                <div class="col-md-4">
+                                    <label class="required fw-semibold fs-6 mb-2">Client
+                                        Description</label>
+    
+                                    <input type="text" class="
+                                      form-control form-control-lg form-control-solid
+                                      mb-3 mb-lg-0
+                                    " placeholder="Enter client Description" name="clientdesc" formControlName="clientdesc"
+                                        required>
+                                    <div *ngIf="
+                                         createClientField.get('clientdesc')?.hasError('required') &&
+                                         createClientField.get('clientdesc')?.touched
+                                    " class="fv-plugins-message-container invalid-feedback">
+                                        Client Desc is required
+                                    </div>
+    
+                                </div>
+    
+                                <div class="col-md-4">
+                                    <label class="required fw-semibold fs-6 mb-2"> Mobile</label>
+    
+                                    <input type="text" class="
+                                        form-control form-control-lg form-control-solid
+                                        mb-3 mb-lg-0
+                                      " placeholder="Enter mobile number" name="mobile" formControlName="mobile"
+                                        (keypress)="keyPress($event)" minlength=10 maxlength=10 required>
+    
+                                    <div *ngIf="
+                                           createClientField.get('mobile')?.hasError('required') &&
+                                           createClientField.get('mobile')?.touched
+                                      " class="fv-plugins-message-container invalid-feedback">
+                                        Mobile number is required
+                                    </div>
+                                </div>
+    
+    
+                            </div>
+                        </div>
+    
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label class="required fw-semibold fs-6 mb-2"> Email
+                                    </label>
+    
+                                    <input type="email" class="
+                                  form-control form-control-lg form-control-solid
+                                  mb-3 mb-lg-0
+                                " placeholder="Enter email" name="email" formControlName="email"
+                                        (keyup)="checkMail($event)" required>
+    
+                                  
+                                    <span *ngIf="errorForInvalidEmail" style="color: #fc1900;">
+                                        {{ errorForInvalidEmail }}
+                                    </span>
+                                    <span *ngIf="errorForUniqueEmail" style="color: #fc1900;">
+                                        {{ errorForUniqueEmail }}
+                                    </span>
+    
+                                    <div *ngIf="
+                                  createClientField.get('email')?.hasError('required') &&
+                                  createClientField.get('email')?.touched
+                                " class="fv-plugins-message-container invalid-feedback">
+                                        Email is required
+                                    </div>
+    
+                                </div>
+    
+                                <div class="col-md-4">
+                                    <label class=" fw-semibold fs-6 mb-2"> Telegram Channel ID
+                                    </label>
+    
+                                    <input type="number" appPreventScroll class="
+                                      form-control form-control-lg form-control-solid
+                                      mb-3 mb-lg-0
+                                    " placeholder="Enter Telegram ID" name="telegramID" formControlName="telegramID">
+    
+    
+                                </div>
+
+
+                                <div class="col-md-4">
+                                    <label class="fw-semibold fs-6 mb-2">
+                                        Custom Url
+                                    </label>
+                                    <input type="text" class="
+                                    form-control form-control-lg form-control-solid
+                                    mb-3 mb-lg-0
+                                  " placeholder="Enter custom url" name="customUrl" formControlName="customUrl"
+                                      >
+                                    <!-- (click)="showvaluemapping(createOSField.value.enableos)" -->
+                                </div>
+                            </div>
+                        </div>
+    
+    
+                        <div class="container mt-3">
+
+                            <div class="row" style="align-items: end;">    
+                            <div class="col-md-4 mt-3">
+                                <label class="fw-semibold fs-6 mb-2">Client Permission</label>
+                                
+                                <div style="display: flex;gap:5px">
+
+                                    <div class="mb-2">
+                                        <label class="fw-semibold fs-6 mb-2"><input
+                                            class="form-check-input" name="email_permi" type="checkbox"
+                                            formControlName="email_permission" /><span class="fw-bold ps-2 fs-6">Email
+                                        </span></label>
+                                    </div>
+                                
+                                    <div class="mb-2">
+                                        <label class="fw-semibold fs-6 mb-2"><input
+                                            class="form-check-input" name="sms" type="checkbox"
+                                            formControlName="sms_permission" /><span class="fw-bold ps-2 fs-6">SMS
+                                        </span></label>
+                                    </div>
+                                
+                                    <div class="mb-2">
+                                        <label class="fw-semibold fs-6 mb-2"><input
+                                            class="form-check-input" name="telegram_permission" type="checkbox"
+                                            formControlName="telegram_permission" /><span class="fw-bold ps-2 fs-6">Telegram
+                                        </span></label>
+                                    </div>
+
+
+                                </div>
+                               
+                            </div>
+
+
+
+
+                            
+                                <div class="col form-check form-switch">
+                                    <div class="col">
+                                        <input class="col-lg-6 form-check-input" formControlName="enableClient"
+                                            type="checkbox">
+                                        <label class="fw-semibold fs-6 mb-2" style="padding-top: 0px;">
+                                            <b>Enable Client</b>
+                                        </label>
+                                    </div>
+                                </div>
+                            
+
+                                </div>
+
+
+                        </div>
+                         
+
+                        <div class="modal-footer flex-center">
+                            <!--begin::Button-->
+                            <button type="reset" id="kt_modal_update_customer_cancel" class="btn btn-light me-3"
+                                (click)="modal.dismiss('cancel')">
+                                Discard
+                            </button>
+                            <!--end::Button-->
+                
+                            <!--begin::Button-->
+                            <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary"
+                            [disabled]="createClientField.invalid || errorForUniqueID !='' || validEmail == false" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+                                <span *ngIf="!editOperation" class="indicator-label">
+                                    Submit
+                                </span>
+                                <span *ngIf="editOperation"  class="indicator-label">
+                                    Update
+                                </span>
+                                <span class="indicator-progress">
+                                    Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                                </span>
+                            </button>
+                            <!--end::Button-->
+                        </div>
+    
+                        <!-- <div class="modal-footer">
+    
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal"
+                                #closeClient>Cancel</button>
+    
+                            <button [hidden]="hideUpdateButton" type="submit" class="btn btn-sm btn-primary"
+                                 *ngIf="showModal" (click)="updateClient(createClientField.value,'editClient')"
+                                [disabled]="createClientField.invalid ||  validEmail == false">
+                                Update
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary not-allowed" *ngIf="!showModal"
+                                [disabled]="createClientField.invalid || errorForUniqueID !='' || validEmail == false" (click)="createNewClient('')"
+                                >Save</button>
+                        </div> -->
+                    
+
+
+
+                    </div>
+                </div>
+            </div>
+                      
+              
+    
+            
+    
+        
+    </form>
+    
+
+</ng-template>
+<!-- 
+(click)="updateClient(createClientField.value,'editClient')"
+
+(click)="createNewClient('')" -->

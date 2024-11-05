@@ -1,0 +1,730 @@
+<!-- <div class="container mt-3"> -->
+<!-- <h3>Modal Example</h3>
+  <p>Click on the button to open the modal.</p> -->
+
+<!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">
+    Open modal
+  </button> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
+
+  <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#myModal" style="margin-left: 30px;">
+    <span class="svg-icon svg-icon-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect opacity="0.5" x="11.364" y="20.364" width="16" height="2" rx="1" transform="rotate(-90 11.364 20.364)"
+                fill="black" />
+            <rect x="4.36396" y="11.364" width="16" height="2" rx="1" fill="black" />
+        </svg>
+    </span>
+    Location
+</button>
+<!-- </div> -->
+
+<!-- The Modal 1-->
+<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 450px; width: 100%; transform: translate(30%, 0);">
+      <div class="modal-content" style="width: 100%;">
+        <div class="modal-header" style="padding-bottom: 15px;">
+          <h2 class="modal-title">Location</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <br>
+        <div class="container">
+          <input type="search" id="search" class="form-control" style="margin: 0 auto 1em auto; padding: 4px; border-radius: 4px; border: 1px solid silver;" placeholder="Search Locations/Forms..." />
+        </div>
+        <div class="container scroll-y h-300px" id="SimpleJSTree"></div>
+        <div class="modal-footer" *ngIf="!All_button_permissions">
+          <div class="container">
+            <div class="row">
+              <!-- Add Location Button -->
+              <div class="col-6 mb-3">
+                <button type="button" class="btn btn-primary btn-sm w-100" style="background-color: #007bff; color: white; border: none;" data-bs-toggle="modal" data-bs-target="#myModal2" (click)="addLocation()">
+                  <span class="svg-icon svg-icon-primary svg-icon-2x">
+                    <!-- SVG Icon Here -->
+                  </span>
+                  Add Location
+                </button>
+              </div>
+  
+              <!-- Edit Location Button -->
+              <div class="col-6 mb-3">
+                <button type="button" class="btn btn-success btn-sm w-100" style="background-color: #28a745; color: white; border: none;" data-bs-toggle="modal" data-bs-target="#myModal2" (click)="editLocation()">
+                  <span class="svg-icon svg-icon-primary svg-icon-2x">
+                    <!-- SVG Icon Here -->
+                  </span>
+                  Edit Location
+                </button>
+              </div>
+  
+              <!-- Add Form Button -->
+              <div class="col-6 mb-3">
+                <button type="button" class="btn btn-primary btn-sm w-100" style="background-color: #007bff; color: white; border: none;" data-bs-toggle="modal" data-bs-target="#myModal3" (click)="addDevice()">
+                  <span class="svg-icon svg-icon-primary svg-icon-2x">
+                    <!-- SVG Icon Here -->
+                  </span>
+                  Add Form
+                </button>
+              </div>
+  
+              <!-- Edit Form Button -->
+              <div class="col-6 mb-3">
+                <button type="button" class="btn btn-success btn-sm w-100" style="background-color: #28a745; color: white; border: none;" data-bs-toggle="modal" data-bs-target="#myModal3" (click)="editDevice()">
+                  <span class="svg-icon svg-icon-primary svg-icon-2x">
+                    <!-- SVG Icon Here -->
+                  </span>
+                  Edit Form
+                </button>
+              </div>
+  
+              <!-- Delete Node Button -->
+              <div class="col-12">
+                <button 
+                  type="button" 
+                  class="btn btn-danger btn-sm w-100" 
+                  style="background-color: #dc3545; color: white; border: none;" 
+                  (click)="deleteDevice()">
+                  
+                  <span class="svg-icon svg-icon-primary svg-icon-2x">
+                    <!-- SVG Icon Here -->
+                  </span>
+                  Delete Node
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Inline media queries for responsiveness -->
+  <style>
+    @media (max-width: 768px) {
+      #myModal .modal-dialog {
+        max-width: 90%;
+        transform: none; /* Remove the translate on smaller screens */
+      }
+    }
+  </style>
+
+  
+  
+  
+
+<!-- The Modal 2-->
+<div class="modal" id="myModal2">
+    <div class="modal-dialog">
+        <!-- <div class="modal-content">
+
+      Modal Header
+      <div class="modal-header">
+        <h4 class="modal-title">Modal Heading 2</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      Modal body
+      <div class="modal-body">
+        Modal body 2..
+      </div>
+
+
+      Modal footer
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal">Close 2</button>
+       
+         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal"> save</button>
+      </div>
+     
+     
+
+    </div> -->
+
+        <div class="modal-content" style="width:800px;transform: translate(-5%, 0px);">
+            <div class="modal-header" style=" padding-bottom: 15px; ">
+                <h2 class="modal-title" *ngIf="showNewLoc">Add Location </h2>
+                <h2 class="modal-title" *ngIf="!showNewLoc">Edit Location </h2>
+                <button type="button" class="btn-close" data-bs-toggle="modal" aria-label="Close"
+                    data-bs-target="#myModal"></button>
+            </div>
+
+            <div class="fv-row" [formGroup]="createLocationField">
+                <div class="card-body border-top p-9">
+                    <div class="container">
+                        <div class="row">
+                            <b>Parent ID:{{parentID_selected_node}}</b>
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Name</label>
+
+                                <input type="text" class="
+                              form-control form-control-lg form-control-solid
+                              mb-3 mb-lg-0
+                            " placeholder="Enter name" name="name" formControlName="name" required>
+                                <div *ngIf="
+                            createLocationField.get('name')?.hasError('required') &&
+                            createLocationField.get('name')?.touched
+                            " class="fv-plugins-message-container invalid-feedback">
+                                    Name is required
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Description</label>
+
+                                <input type="text" class="
+                              form-control form-control-lg form-control-solid
+                              mb-3 mb-lg-0
+                            " placeholder="Enter description" name="description" formControlName="description"
+                                    required>
+                                <div *ngIf="
+                            createLocationField.get('description')?.hasError('required') &&
+                            createLocationField.get('description')?.touched
+                            " class="fv-plugins-message-container invalid-feedback">
+                                    Description is required
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4">
+                                <!-- <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Area</label> -->
+
+                                <!-- <input type="number" class="
+                              form-control form-control-lg form-control-solid
+                              mb-3 mb-lg-0
+                            " placeholder="Enter area" name="area" formControlName="area" required> -->
+
+                                <div *ngIf="
+                            createLocationField.get('area')?.hasError('required') &&
+                            createLocationField.get('area')?.touched
+                            " class="fv-plugins-message-container invalid-feedback">
+                                    area is required
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="container">
+                        <div class="row">
+
+                            <!-- <div class="col-md-4">
+
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 "> Summary Enable</label>
+                                <label class="form-check form-check-inline form-check-solid me-5"><input
+                                        class="form-check-input" name="summary_enable" type="checkbox"
+                                        formControlName="summary_enable" /><span class="fw-bold ps-2 fs-6">
+                                    </span></label>
+
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 ">Summary Types</label>
+
+                                <select class="form-select form-select-solid form-select-lg fw-bold"
+                                    placeholder="select report to" name="summary_types" formControlName="summary_types">
+                                    <option value="Min">Min</option>
+                                    <option value="Max">Max</option>
+                                    <option value="Avg">Avg</option>
+                                </select>
+                            </div> -->
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 ">Magicboard View</label>
+                                <!-- (selectionChanges)="onDashboardViewSelect($event)" -->
+                                <ngx-select formControlName="magicboard_view"   [allowClear]="true" [items]="multiSelectMagicboard"
+                                optionValueField="value" optionTextField="text" placeholder="Select MagicboardID">
+                                </ngx-select> 
+                                <!-- <p> listofMagicboardIds---{{listofMagicboardIds}}</p> -->
+                                <!-- <ng-multiselect-dropdown *ngIf="multiSelectMagicboard.length > 0" style="
+                                    display: inline-block; 
+                                    width: 100%;
+                                    padding: 0px ;
+                                    margin-bottom: 0;
+                                    font-weight: 0px;
+                                    line-height: 1.52857143;
+                                    text-align: left;
+                                    vertical-align: middle;
+                                    cursor: pointer;
+                                    background-image: none;
+                                    border-radius: 4px;"
+                                  
+                                 class="form-select form-select-solid form-select-lg fw-bold"
+                                    [placeholder]="'Select MagicboardID'" [settings]="singleSelection_magic"
+                                    [data]="multiSelectMagicboard" (onSelect)="onDashboardViewSelect($event)"
+                                    [formControl]="$any(createLocationField.controls['magicboard_view'])" >
+                                </ng-multiselect-dropdown> -->
+
+                                  
+                                <div *ngIf="
+                            createLocationField.get('magicboard_view')?.hasError('required') &&
+                            createLocationField.get('magicboard_view')?.touched
+                            " class="fv-plugins-message-container invalid-feedback">
+                                    Magicboard View is required
+                                </div>
+
+                            </div>
+
+
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 ">DreamBoard View</label>
+                                <!-- <p> listofDreamboardIds---{{listofDreamboardIds}}</p> -->
+                                <ngx-select formControlName="dreamboard_view"  [allowClear]="true" [items]="listofDreamboardIds"
+                                optionValueField="value" optionTextField="text" placeholder="Select DreamboardID">
+                                </ngx-select> 
+                                <!-- <ng-multiselect-dropdown *ngIf="listofDreamboardIds.length > 0" style="
+                            display: inline-block; 
+                            width: 100%;
+                            padding: 0px ;
+                            margin-bottom: 0;
+                            font-weight: 0px;
+                            line-height: 1.52857143;
+                            text-align: left;
+                            vertical-align: middle;
+                            cursor: pointer;
+                            background-image: none;
+                            border-radius: 4px;
+                          
+                        " class="form-select form-select-solid form-select-lg fw-bold"
+                                    [placeholder]="'Select DreamBoard ID'" [settings]="singleSelection_dream"
+                                    [data]="listofDreamboardIds" (onSelect)="onDreamboardViewSelect($event)"
+                                    [formControl]="$any(createLocationField.controls['dreamboard_view'])" >
+                                </ng-multiselect-dropdown> -->
+
+                                  
+                                <div *ngIf="
+                            createLocationField.get('dreamboard_view')?.hasError('required') &&
+                            createLocationField.get('dreamboard_view')?.touched
+                            " class="fv-plugins-message-container invalid-feedback">
+                                    Dreamboard View is required
+                                </div>
+
+                            </div>
+<!-- 
+                            <div class="col-md-4"> -->
+                                <!-- <label class="col-lg-12 col-form-label fw-bold fs-6 ">Leadership View</label> -->
+                                <!-- (selectionChanges)="onLeadershipViewSelect($event)"  -->
+
+                                <!-- <ngx-select formControlName="leadership_view"  [allowClear]="true" [items]="temp_TemplateID_Label"
+                                optionValueField="value" optionTextField="text" placeholder="Select MagicboardID">
+                                </ngx-select>  -->
+                                <!-- <ng-multiselect-dropdown style="
+                            display: inline-block; 
+                            width: 100%;
+                            padding: 0px ;
+                            margin-bottom: 0;
+                            font-weight: 0px;
+                            line-height: 1.52857143;
+                            text-align: left;
+                            vertical-align: middle;
+                            cursor: pointer;
+                            background-image: none;
+                            border-radius: 4px;
+                          
+                        " class="form-select form-select-solid form-select-lg fw-bold"
+                                    [placeholder]="'Select templateID'" [settings]="singleSelection"
+                                    [data]="temp_TemplateID_Label" (onSelect)="onLeadershipViewSelect($event)"
+                                    [formControl]="$any(createLocationField.controls['leadership_view'])" >
+                                </ng-multiselect-dropdown> -->
+
+                                <!-- <div *ngIf="
+                                createLocationField.get('leadership_view')?.hasError('required') &&
+                                createLocationField.get('leadership_view')?.touched
+                                " class="fv-plugins-message-container invalid-feedback">
+                                        Leadership View is required
+                                    </div> -->
+
+                            <!-- </div> -->
+
+                            <!-- <div class="col-md-4"> -->
+                                <!-- <label class="col-lg-12 col-form-label fw-bold fs-6">Mobile View</label> -->
+
+                                <!-- (selectionChanges)="onMobileViewSelect($event)" -->
+   <!-- <ngx-select formControlName="mobile_view"   [allowClear]="true" [items]="temp_TemplateID_Label"
+                                optionValueField="value" optionTextField="text" placeholder="Select templateID">
+                                </ngx-select>  -->
+
+                                <!-- <ng-multiselect-dropdown style="
+                            display: inline-block; 
+                            width: 100%;
+                            padding: 0px ;
+                            margin-bottom: 0;
+                            font-weight: 0px;
+                            line-height: 1.52857143;
+                            text-align: left;
+                            vertical-align: middle;
+                            cursor: pointer;
+                            background-image: none;
+                            border-radius: 4px;
+                          
+                        " class="form-select form-select-solid form-select-lg fw-bold"
+                                    [placeholder]="'Select templateID'" [settings]="singleSelection"
+                                    [data]="temp_TemplateID_Label" (onSelect)="onMobileViewSelect($event)"
+                                    [formControl]="$any(createLocationField.controls['mobile_view'])" >
+                                </ng-multiselect-dropdown> -->
+
+                                <!-- <div *ngIf="
+                                createLocationField.get('mobile_view')?.hasError('required') &&
+                                createLocationField.get('mobile_view')?.touched
+                                " class="fv-plugins-message-container invalid-feedback">
+                                        Mobile View is required
+                                    </div> -->
+                            <!-- </div> -->
+
+                            <div class="col-md-4">
+                               
+                                <label class="col-lg-12 col-form-label fw-bold fs-6">Powerboard View</label>
+                                <ngx-select formControlName="powerboard_view"  [allowClear]="true" [items]="listofPowerboardIds"
+                                optionValueField="value" optionTextField="text" placeholder="Select PowerboardID">
+                                </ngx-select> 
+                                <!-- <select class="form-select form-select-solid form-select-lg fw-bold"
+                                    placeholder="select powerboard view" name="powerboard_view"
+                                    formControlName="powerboard_view">
+<option [value] ="null" [selected]="true" >Select PowerBoardID</option>
+                                    <option *ngFor="let item of listofPowerboardIds" [value]="item">
+                                        {{ item }}
+                                    </option>
+                                </select> -->
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                            data-bs-target="#myModal">Cancel</button>
+
+                        <button type="button" class="btn btn-sm btn-primary not-allowed"
+                            (click)="updateLocation('','location')" data-bs-toggle="modal" data-bs-target="#myModal"
+                            [disabled]="createLocationField.invalid ||  this.All_button_permissions" *ngIf="showNewLoc">Save</button>
+                        <button type="button" class="btn btn-sm btn-primary not-allowed"
+                            (click)="updateLocation('','updatelocation')" data-bs-toggle="modal"
+                            data-bs-target="#myModal"  *ngIf="!showNewLoc && hideDeleteButton"
+                            [disabled]="createLocationField.invalid ||  this.All_button_permissions">Update</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- modal 3 -->
+<div class="modal" id="myModal3">
+    <div class="modal-dialog">
+        <!-- <div class="modal-content">
+  
+        Modal Header
+        <div class="modal-header">
+          <h4 class="modal-title">Modal Heading 2</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+  
+        Modal body
+        <div class="modal-body">
+          Modal body 2..
+        </div>
+  
+  
+        Modal footer
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal">Close 2</button>
+         
+           <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal"> save</button>
+        </div>
+       
+       
+  
+      </div> -->
+
+        <div class="modal-content" style="width:800px;transform: translate(-5%, 0px);">
+            <div class="modal-header" style=" padding-bottom: 15px; ">
+                <h2 class="modal-title" *ngIf="showNewDevice"> Add Form </h2>
+                <h2 class="modal-title" *ngIf="!showNewDevice"> Edit Form  </h2>
+                <button type="button" class="btn-close" data-bs-toggle="modal" aria-label="Close"
+                    data-bs-target="#myModal"></button>
+            </div>
+
+            <div class="fv-row" [formGroup]="createDeviceField">
+                <div class="card-body border-top p-9">
+                    <div class="container">
+                        <div class="row">
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Form Name </label>
+<div class="custom-multiselect">
+    <ng-multiselect-dropdown   style="
+        display: inline-block; 
+        width: 100%;
+        padding: 0px ;
+        margin-bottom: 0;
+        font-weight: 0px;
+        line-height: 1.52857143;
+        text-align: left;
+        vertical-align: middle;
+        cursor: pointer;
+        background-image: none;
+        border-radius: 4px;
+      
+    " class="form-select form-select-solid form-select-lg fw-bold" [placeholder]="'Select Form'"
+                [settings]="dropdownSettings" [data]="listofDeviceIds"  (onDeSelect)="onDeviceDeSelect($event)"
+                (onSelect)="onDeviceSelect($event)" (onSelectAll)="onSelectAllDevices($event)"
+                [formControl]="$any(createDeviceField.controls['name'])" required>
+            </ng-multiselect-dropdown>
+</div>
+                               
+                            
+
+                                <div *ngIf="
+                            createDeviceField.get('name')?.hasError('required') &&
+                            createDeviceField.get('name')?.touched
+                            " class="fv-plugins-message-container invalid-feedback">
+                                Name is required
+                            </div>
+
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Description</label>
+
+                                <input type="text" class="
+                              form-control form-control-lg form-control-solid
+                              mb-3 mb-lg-0
+                            " placeholder="Enter description" name="description" formControlName="description"
+                                    required>
+                                <div *ngIf="
+                            createDeviceField.get('description')?.hasError('required') &&
+                            createDeviceField.get('description')?.touched
+                            " class="fv-plugins-message-container invalid-feedback">
+                                    Description is required
+                                </div>
+
+                            </div>
+                     
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 ">Magicboard View</label> 
+                                <!-- (selectionChanges)="onDashboardViewSelect_device($event)"  -->
+
+                                <ngx-select formControlName="magicboard_view"  [allowClear]="true" [items]="multiSelectMagicboard"
+                                optionValueField="value" optionTextField="text" placeholder="Select MagicboardID">
+                                </ngx-select>
+
+                                <!-- <ng-multiselect-dropdown *ngIf="multiSelectMagicboard.length > 0" style="
+                            display: inline-block; 
+                            width: 100%;
+                            padding: 0px ;
+                            margin-bottom: 0;
+                            font-weight: 0px;
+                            line-height: 1.52857143;
+                            text-align: left;
+                            vertical-align: middle;
+                            cursor: pointer;
+                            background-image: none;
+                            border-radius: 4px;
+                          
+                        " class="form-select form-select-solid form-select-lg fw-bold"
+                                    [placeholder]="'Select MagicboardID'" [settings]="singleSelection"
+                                    [data]="multiSelectMagicboard" (onSelect)="onDashboardViewSelect_device($event)"
+                                    [formControl]="$any(createDeviceField.controls['magicboard_view'])" >
+                                </ng-multiselect-dropdown> -->
+
+                                <div *ngIf="
+                                createDeviceField.get('magicboard_view')?.hasError('required') &&
+                                createDeviceField.get('magicboard_view')?.touched
+                                " class="fv-plugins-message-container invalid-feedback">
+                                    Magicboard View is required
+                                </div>
+
+
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 ">DreamBoard View</label>
+                                <!-- <p> listofDreamboardIds---{{listofDreamboardIds}}</p> -->
+                                <ngx-select formControlName="dreamboard_view_device"  [allowClear]="true" [items]="listofDreamboardIds"
+                                placeholder="Select DreamBoardID">
+                                 </ngx-select>
+                            
+                                <!-- <ng-multiselect-dropdown *ngIf="listofDreamboardIds.length > 0" style="
+                            display: inline-block; 
+                            width: 100%;
+                            padding: 0px ;
+                            margin-bottom: 0;
+                            font-weight: 0px;
+                            line-height: 1.52857143;
+                            text-align: left;
+                            vertical-align: middle;
+                            cursor: pointer;
+                            background-image: none;
+                            border-radius: 4px;
+                          
+                        " class="form-select form-select-solid form-select-lg fw-bold"
+                                    [placeholder]="'Select DreamBoard ID'" [settings]="singleSelection_dream"
+                                    [data]="listofDreamboardIds" (onSelect)="onDreamboardViewSelect_device($event)"
+                                    [formControl]="$any(createDeviceField.controls['dreamboard_view'])" >
+                                </ng-multiselect-dropdown> -->
+
+                                  
+                                <div *ngIf="
+                            createDeviceField.get('dreamboard_view')?.hasError('required') &&
+                            createDeviceField.get('dreamboard_view')?.touched
+                            " class="fv-plugins-message-container invalid-feedback">
+                                    Dreamboard View is required
+                                </div>
+
+                            </div>
+
+                            <!-- <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 ">Leadership View</label> -->
+                                <!-- <ngx-select formControlName="leadership_view"  (selectionChanges)="onLeadershipViewSelect_device($event)" [allowClear]="true" [items]="temp_TemplateID_Label"
+                                optionValueField="value" optionTextField="text" placeholder="Select templateID">
+                                </ngx-select> -->
+                                <!-- <select class="form-select form-select-solid form-select-lg fw-bold"
+                                    placeholder="select report to" name="leadership_view"
+                                    formControlName="leadership_view">
+                                    <option value="auto">Auto</option>
+                                    <option value="type_1">Type 1 LV</option>
+                                    <option value="type_2">TYpe 2 LV</option>
+                                </select> -->
+
+                                <!-- <select class="form-select form-select-solid form-select-lg fw-bold"
+                                placeholder="select leadership view" name="leadership_view"
+                                formControlName="leadership_view" required>
+
+                                <option *ngFor="let item of temp_TemplateID_Label" [value]="item">
+                                    {{ item }}
+                                </option>
+                            </select> -->
+
+                                <!-- <ng-multiselect-dropdown style="
+                            display: inline-block; 
+                            width: 100%;
+                            padding: 0px ;
+                            margin-bottom: 0;
+                            font-weight: 0px;
+                            line-height: 1.52857143;
+                            text-align: left;
+                            vertical-align: middle;
+                            cursor: pointer;
+                            background-image: none;
+                            border-radius: 4px;
+                          
+                        " class="form-select form-select-solid form-select-lg fw-bold"
+                                    [placeholder]="'Select templateID'" [settings]="singleSelection"
+                                    [data]="temp_TemplateID_Label" (onSelect)="onLeadershipViewSelect_device($event)"
+                                    [formControl]="$any(createDeviceField.controls['leadership_view'])">
+                                </ng-multiselect-dropdown> -->
+
+                                <!-- <div *ngIf="
+                                createDeviceField.get('leadership_view')?.hasError('required') &&
+                                createDeviceField.get('leadership_view')?.touched
+                                " class="fv-plugins-message-container invalid-feedback">
+                                    Leadership View is required
+                                </div> -->
+
+
+                            <!-- </div> -->
+
+                            <!-- <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 ">Mobile View</label> -->
+                                <!-- <ngx-select formControlName="mobile_view"  (selectionChanges)="onMobileViewSelect_device($event)" [allowClear]="true" [items]="temp_TemplateID_Label"
+                                optionValueField="value" optionTextField="text" placeholder="Select templateID">
+                                </ngx-select> -->
+
+                                <!-- <select class="form-select form-select-solid form-select-lg fw-bold"
+                                    placeholder="select report to" name="mobile_view" formControlName="mobile_view">
+                                    <option value="auto">Auto</option>
+                                    <option value="type_1">Type 1 LV</option>
+                                    <option value="type_2">TYpe 2 LV</option>
+                                </select> -->
+                                <!-- <select class="form-select form-select-solid form-select-lg fw-bold"
+                                placeholder="select mobile view" name="mobile_view"
+                                formControlName="mobile_view" required>
+
+                                <option *ngFor="let item of temp_TemplateID_Label" [value]="item">
+                                    {{ item }}
+                                </option>
+                            </select> -->
+
+                                <!-- <ng-multiselect-dropdown style="
+                            display: inline-block; 
+                            width: 100%;
+                            padding: 0px ;
+                            margin-bottom: 0;
+                            font-weight: 0px;
+                            line-height: 1.52857143;
+                            text-align: left;
+                            vertical-align: middle;
+                            cursor: pointer;
+                            background-image: none;
+                            border-radius: 4px;
+                          
+                        " class="form-select form-select-solid form-select-lg fw-bold"
+                                    [placeholder]="'Select templateID'" [settings]="singleSelection"
+                                    [data]="temp_TemplateID_Label" (onSelect)="onMobileViewSelect_device($event)"
+                                    [formControl]="$any(createDeviceField.controls['mobile_view'])" >
+                                </ng-multiselect-dropdown> -->
+
+                                <!-- <div *ngIf="
+                                createDeviceField.get('mobile_view')?.hasError('required') &&
+                                createDeviceField.get('mobile_view')?.touched
+                                " class="fv-plugins-message-container invalid-feedback">
+                                    Mobile View is required
+                                </div>
+
+                            </div> -->
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 ">Icon</label>
+                                <ngx-select 
+                                name="icon" formControlName="icon"  
+                                [allowClear]="true" 
+                                [items]="listofIconsIds"
+                                optionValueField="value" 
+                                optionTextField="text" 
+                                placeholder="Select DreamboardID">
+                            </ngx-select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6">Powerboard View</label>
+                                <ngx-select formControlName="powerboard_view_device"  [allowClear]="true" [items]="listofPowerboardIds"
+                               placeholder="Select PowerBoardID">
+                                </ngx-select>
+                                <!-- <select class="form-select form-select-solid form-select-lg fw-bold"
+                                    placeholder="select powerboard view" name="powerboard_view_device"
+                                    formControlName="powerboard_view_device">
+                                    <option [value] ="null" [selected]="true" >Select PowerBoardID</option>  
+                                    <option *ngFor="let item of listofPowerboardIds" [value]="item">
+                                        {{ item }}
+                                    </option>
+                                </select> -->
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                            data-bs-target="#myModal">Cancel</button>
+                        <button type="button" class="btn btn-sm btn-primary not-allowed" data-bs-toggle="modal"
+                            data-bs-target="#myModal" (click)="updateLocation('','device')"
+                            [disabled]="createDeviceField.invalid" *ngIf="showNewDevice">Save</button>
+                        <button type="button" class="btn btn-sm btn-primary not-allowed" data-bs-toggle="modal"
+                            data-bs-target="#myModal" (click)="updateLocation('','updatedevice')"
+                            *ngIf="!showNewDevice && hideDeleteButton"
+
+
+                           
+                            [disabled]="createDeviceField.invalid">Update</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- </body>
+</html> -->

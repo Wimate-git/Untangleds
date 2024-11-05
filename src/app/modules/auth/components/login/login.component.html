@@ -1,0 +1,102 @@
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true"><p style="color: white" > Hang tight, we’re getting you logged in!... </p></ngx-spinner>
+
+<!--begin::Form-->
+<form class="form w-100" [formGroup]="loginForm" novalidate="novalidate" id="kt_login_signin_form"
+  (ngSubmit)="submit()">
+  <!--begin::Heading-->
+  <div class="text-center mb-11">
+    <h1 class="text-gray-900 fw-bolder mb-3">
+      Sign In
+    </h1>
+  </div>
+  <!--end::Heading-->
+
+
+  <!-- begin::Alert error-->
+  <!-- <ng-container *ngIf="hasError">
+    <div class="mb-lg-15 alert alert-danger">
+      <div class="alert-text font-weight-bold">
+        The login details are incorrect
+      </div>
+    </div>
+  </ng-container> -->
+  <!-- end::Alert error-->
+
+  <!--begin::Form group-->
+  <div class="fv-row mb-3 mediaFordesk" >
+    <label class="form-label fs-6 fw-bolder text-gray-900 mb-0">Username</label>
+    <!-- <input class="form-control bg-transparent" type="email" name="email" formControlName="email" autocomplete="off"
+     /> -->
+
+     
+      <p-inputGroup>
+        <input class="large-input" pInputText placeholder="Username" type="email" name="email" formControlName="email" autocomplete="off" />
+    </p-inputGroup>
+     
+        
+  </div>
+  <!--end::Form group-->
+
+  <!--begin::Form group-->
+  <div class="fv-row mb-3">
+    <label class="form-label fw-bolder text-gray-900 fs-6 mb-0">Password</label>
+
+    <div style="position: relative;">
+      
+            <input class="large-input" pInputText [type]="showPassword ? 'text' : 'password'" 
+                   name="password" 
+                   autocomplete="off"
+                   placeholder="Password" 
+                   formControlName="password" 
+                   style="padding-right: 40px;" /> <!-- Added right padding -->
+      
+
+        <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;" (click)="onClick()">
+            <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+        </span>
+    </div>
+</div>
+
+
+  <!--end::Form group-->
+
+  <!--begin::Wrapper-->
+  <div class="d-flex flex-stack flex-wrap gap-3 fs-base fw-semibold mb-5">
+    <div></div>
+
+    <!--begin::Link-->
+    <a routerLink="/auth/forgot-password" class="hoverLink">
+      Forgot Password ?
+    </a>
+    <!--end::Link-->
+  </div>
+  <!--end::Wrapper-->
+
+  <!--begin::Action-->
+  <div class="d-grid">
+    <button type="submit" class="btn button spinner spinner-dark spinner-right" >
+      <ng-container *ngIf="isLoading$ | async">
+        <span class="indicator-progress" [style.display]="'block'">
+          Please wait...
+          <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+        </span>
+      </ng-container>
+      <ng-container *ngIf="(isLoading$ | async) === false">
+        <span class="indicator-label">Continue</span>
+      </ng-container>
+    </button>
+  </div>
+
+  <!--end::Action-->
+</form>
+<!--end::Form-->
+
+<ng-template #formError let-control="control" let-message="message" let-validation="validation">
+  <ng-container *ngIf="control.hasError(validation) && (control.dirty || control.touched)">
+    <div class="fv-plugins-message-container">
+      <span role="alert">
+        {{ message }}
+      </span>
+    </div>
+  </ng-container>
+</ng-template>

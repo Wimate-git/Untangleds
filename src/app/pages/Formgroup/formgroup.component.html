@@ -1,0 +1,180 @@
+<div class="card">
+    <div class="card-header border-0 pt-6">
+        <h2>Form Group</h2>
+    </div>
+    <div class="card-header border-0 pt-0">
+
+        <!--begin::Card title-->
+        <div class="card-title">
+
+        <div class="d-flex align-items-center position-relative my-1">
+            <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
+            <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12"
+                placeholder="Search FormGroup">
+        </div>
+        
+    </div>
+        <!--begin::Card title-->
+
+        <!--begin::Card toolbar-->
+        <div class="card-toolbar">
+            <!--begin::Toolbar-->
+            <div class="d-flex justify-content-end">
+                <!--begin::Add user-->
+                <button type="button" class="btn btn-primary" data-action="create">
+                    Add
+                </button>
+                <!--end::Add user-->
+                </div>
+                <!--end::Toolbar-->
+            <!-- </div> -->
+            <!--end::Card toolbar-->
+        </div>
+    </div>
+    <!-- <div class="card-body pt-0"> -->
+    <div class="card-body pt-0">
+        <app-crud [componentSource]="'dreamboard'" [datatableConfig]="datatableConfig" route="/dreamboard" (deleteEvent)="delete($event)"
+            (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent" [modal]="formModal"></app-crud>
+    </div>
+</div>
+
+<swal #noticeSwal [swalOptions]="swalOptions">
+</swal>
+
+<ng-template #formModal let-modal>
+    <form [formGroup]="formgroupForm" (ngSubmit)="onSubmit($event)">
+        <div class="modal-header">
+            <h4 *ngIf="!update" class="modal-title" id="modal-basic-title">Add FormGroup</h4>
+            <h4 *ngIf="update" class="modal-title" id="modal-basic-title">Update FormGroup</h4>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div class="modal-body">
+            <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-650px" id="kt_modal_update_customer_scroll"
+                data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}"
+                data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_update_customer_header"
+                data-kt-scroll-wrappers="#kt_modal_update_customer_scroll" data-kt-scroll-offset="300px">
+                <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+                    <!--begin::Input group-->
+                    <div class="fv-row mb-7">
+                        <!--begin::Label-->
+                        <label class="required fw-semibold fs-6 mb-2">Formgroup Id</label>
+                        <!--end::Label-->
+                        <!--begin::Input-->
+                        <input *ngIf="!update" type="text" class="form-control form-control-solid" name="formgroupId" placeholder="Enter formgroup Id"
+                            formControlName="formgroupId" (keyup)="checkUniqueUid($event)" data-bs-toggle="tooltip" data-bs-placement="top" required />
+                        <input *ngIf="update" type="text" class="form-control form-control-solid" name="formgroupId" placeholder="Enter dreamboard Id"
+                            formControlName="formgroupId"  data-bs-toggle="tooltip" data-bs-placement="top" readonly required />
+                        <span style="color: #fc1900;">{{error}}</span>
+                        <div *ngIf="formgroupForm.controls['formgroupId'].invalid && formgroupForm.controls['formgroupId'].touched"
+                            class="invalid-feedback">
+                            Formgroup Id is required.
+                        </div>
+                        <!--end::Input-->
+                    </div>
+                    <!--end::Input group-->
+                    <!--begin::Input group-->
+                    <div class="fv-row mb-7">
+                        <!--begin::Label-->
+                        <label class="required fw-semibold fs-6 mb-2">
+                            <span>Label</span>
+                        </label>
+                        <!--end::Label-->
+                        <!--begin::Input-->
+                        <input type="text" class="form-control form-control-solid" name="label" formControlName="label" placeholder="Enter label"/>
+                        <div *ngIf="formgroupForm.controls['label'].invalid && formgroupForm.controls['label'].touched"
+                            class="invalid-feedback">
+                            Label is required.
+                        </div>
+                        <!--end::Input-->
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <!--begin::Label-->
+                        <label class="required fw-semibold fs-6 mb-2">
+                            <span>Description</span>
+                        </label>
+                        <!--end::Label-->
+                        <!--begin::Input-->
+                        <input type="text" class="form-control form-control-solid" name="description" placeholder="Enter description"
+                            formControlName="description" />
+                        <div *ngIf="formgroupForm.controls['description'].invalid && formgroupForm.controls['description'].touched"
+                            class="invalid-feedback">
+                            Description is required.
+                        </div>
+                        <!--end::Input-->
+                    </div>
+                    <div class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2">Form ID</label>
+                        <div class="custom-multiselect">
+                            <ng-multiselect-dropdown style="
+                                      display: inline-block; 
+                                      width: 100%;
+                                      padding: 0px ;
+                                      margin-bottom: 0;
+                                      font-weight: 0px;
+                                      line-height: 1.52857143;
+                                      text-align: left;
+                                      vertical-align: middle;
+                                      cursor: pointer;
+                                      background-image: none;
+                                      border-radius: 4px;
+                                      
+                                      " class="form-select form-select-solid form-select"
+                                [placeholder]="'Select form Id'" [settings]="dropdownSettings" [data]="formList"
+                                name="formList" [formControl]="$any(formgroupForm.controls['formList'])">
+                            </ng-multiselect-dropdown>
+                        </div>
+                    </div>
+                    <div class="image-upload-container" style="align-items: center;">
+                        <!-- Left side text -->
+                        <div class="upload-text" style="flex: 1;">
+                          <label class="fw-semibold fs-6 mb-2" for="profile_avatar">Upload Icon</label>
+                        </div>
+                      
+                        <!-- Right side image preview and input -->
+                        <div class="image-input image-input-outline" [ngClass]="{'image-input-changed': selectedImage}" id="kt_image_1">
+                            <div 
+                              class="image-input-wrapper" 
+                              [ngStyle]="{ 'background-image': selectedImage ? 'url(' + selectedImage + ')' : 'url(assets/media/avatars/blank.png)'}">
+                            </div>
+                          
+                            <label class="btn btn-xs btn-icon btn-circle btn-red btn-hover-text-primary btn-shadow" title="Change avatar">
+                              <i class="fa fa-pen icon-sm text-muted"></i>
+                              <input type="file" (change)="onFileChange($event)" accept=".png, .jpg, .jpeg" style="display:none;"/>
+                            </label>
+                          
+                            <span class="btn btn-xs btn-icon btn-circle btn-white btn-hover-text-primary btn-shadow" (click)="cancelImage()" title="Cancel avatar">
+                              <i class="ki ki-bold-close icon-xs text-muted"></i>
+                            </span>
+                          </div>
+                      </div>
+                    <!--end::Input group-->
+                </div>
+                <!--end::User form-->
+            </div>
+        </div>
+        <div class="modal-footer flex-center">
+            <!--begin::Button-->
+            <button type="reset" id="kt_modal_update_customer_cancel" class="btn btn-light me-3"
+                (click)="modal.dismiss('cancel')">
+                Discard
+            </button>
+            <!--end::Button-->
+
+            <!--begin::Button-->
+            <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary"
+                [disabled]="formgroupForm.invalid" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+                <span *ngIf="!update" class="indicator-label">
+                    Submit
+                </span>
+                <span *ngIf="update" class="indicator-label">
+                    Update
+                </span>
+                <span class="indicator-progress">
+                    Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                </span>
+            </button>
+            <!--end::Button-->
+        </div>
+    </form>
+</ng-template>
