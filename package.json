@@ -37,6 +37,7 @@
     "@types/crypto-js": "^4.2.2",
     "amazon-cognito-identity-js": "^6.3.12",
     "angular-datatables": "^18.0.0",
+    "angular-gridster2": "^18.0.1",
     "angular-in-memory-web-api": "^0.18.0",
     "animate.css": "4.1.1",
     "apexcharts": "^3.37.1",

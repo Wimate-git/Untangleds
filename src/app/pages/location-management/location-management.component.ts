@@ -26,13 +26,15 @@ export class LocationManagementComponent implements OnInit {
   companyId: any;
   tempClient: string;
   trees: any;
-  jsondata: { id: string; text: string; node_type: string; parent: string; dashboard_view: { id: null; }; leadership_view: { id: null; }; mobile_view: { id: null; }; area: null; summary_enable: null; summary_types: null; }[];
+  jsondata: { id: string; text: string; node_type: string; parent: string; dashboard_view: { id: null; }; leadership_view: { id: null; }; mobile_view: { id: null; }; summaryView: null; summary_enable: null; summary_types: null; }[];
   formList: any;
   listofIconsIds: { value: string; text: string; }[];
   userdetails: any;
   userClient: string;
   metadataObject: any;
   originalData: any;
+  maxlength: number = 500;
+  listofsummaryIds: { value: any; text: any; }[];
 
 
 
@@ -122,12 +124,14 @@ export class LocationManagementComponent implements OnInit {
       lookup_data_tempL1: any[]=[];
       listofDeviceIds: any=[];
       user_name: any;
+      lookup_data_summaryCopy:any[] =[]
+      lookup_data_summary1: any[]=[];
     
     
       constructor(private fb: UntypedFormBuilder, private companyConfiguration: SharedService,
         private powerboardConfiguration: SharedService,
         private devicesList: SharedService, private api: APIService, private toast: MatSnackBar, private crn: ChangeDetectorRef,
-        private router: Router,private locationPermissionService:LocationPermissionService
+        private router: Router,private locationPermissionService:LocationPermissionService,private cdr:ChangeDetectorRef
       ) 
       
       {  
@@ -157,6 +161,7 @@ export class LocationManagementComponent implements OnInit {
         console.log('tempClient check',this.tempClient)
         // this.addFromService()
         this.populateDreamboardOptions();
+        this.loadData()
      
 
         // this.SK_clientID = this.userClientIDCognito.attributes["custom:clientID"];
@@ -402,6 +407,95 @@ export class LocationManagementComponent implements OnInit {
               // this.createJSTree(this.trees);
     
       }
+      loadData() {
+        this.fetchCompanyLookupdataOnit(1).then((data: any) => {
+          this.lookup_data_summaryCopy = data; // Assign data to the component property
+          console.log('Data loaded:from location', this.lookup_data_summaryCopy); // Log to verify
+      
+          const summaryIds = this.lookup_data_summaryCopy.map(item => {
+            if (item.P8) {
+              try {
+                // Parse the P8 property
+                const parsedIcon = JSON.parse(item.P8);
+                item.parsedIcon = parsedIcon; // Store the parsed icon back into the object
+              } catch (error) {
+                console.error('Error parsing P8:', error);
+              }
+            }
+            return { value: item.P1, text: item.P1 }; // Prepare the object for the dropdown
+          });
+      
+          this.listofsummaryIds = summaryIds; // Assign to the dropdown data source
+          console.log('Dropdown Data:', this.listofsummaryIds);
+          this.cdr.detectChanges(); // Ensure UI updates
+      
+        }).catch((error: any) => {
+          console.error('Failed to load company lookup data:', error);
+          this.cdr.detectChanges(); // Ensure UI updates
+        });
+      }
+      
+
+
+      fetchCompanyLookupdataOnit(sk: any): any {
+        console.log("I am called snn");
+        console.log('this.SK_clientID check lookup', this.SK_clientID);
+      
+        return new Promise((resolve, reject) => {
+          this.api.GetMaster(this.SK_clientID + "#summary" + "#lookup", sk)
+            .then(response => {
+              if (response && response.options) {
+                if (typeof response.options === 'string') {
+                  let data = JSON.parse(response.options);
+                  console.log("d1 =", data);
+      
+                  if (Array.isArray(data)) {
+                    const promises = [];
+      
+                    for (let index = 0; index < data.length; index++) {
+                      const element = data[index];
+                      console.log('element check', element);
+      
+                      if (element !== null && element !== undefined) {
+                        const key = Object.keys(element)[0]; 
+                        const { P1, P2, P3, P4, P5, P6, P7,P8 } = element[key];
+                        this.lookup_data_summary1.push({ P1, P2, P3, P4, P5, P6, P7,P8});
+                        console.log("d2 =", this.lookup_data_summary1);
+                      } else {
+                        break; // This may need refinement based on your data structure
+                      }
+                    }
+      
+                    // Recursive call to fetch more data
+                    if (data.length > 0) { // Ensure there is data to fetch recursively
+                      promises.push(this.fetchCompanyLookupdataOnit(sk + 1));
+                    }
+      
+                    // Wait for all promises to resolve
+                    Promise.all(promises)
+                      .then(() => resolve(this.lookup_data_summary1))
+                      .catch(reject);
+                  } else {
+                    console.error('Invalid data format - not an array.');
+                    reject(new Error('Invalid data format - not an array.'));
+                  }
+                } else {
+                  console.error('response.options is not a string.');
+                  reject(new Error('response.options is not a string.'));
+                }
+              } else {
+                console.log("this.lookup_data_summary1 checking", this.lookup_data_summary1);
+                resolve(this.lookup_data_summary1); // Resolve if no valid response
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              reject(error);
+            });
+        });
+      }
+
+    
 
       populateDreamboardOptions() {
         this.listofIconsIds = [
@@ -524,7 +618,7 @@ export class LocationManagementComponent implements OnInit {
         this.createLocationField = this.fb.group({
           'name': ['', Validators.required],
           'description': ['', Validators.required],
-          'area': ['', Validators.required],
+          'summaryView': ['', Validators.required],
           'summary_enable': [''],
           'summary_types': ['', Validators.required],
           'magicboard_view': [['']],
@@ -1090,7 +1184,7 @@ export class LocationManagementComponent implements OnInit {
             text: this.createLocationField.value.name,
             description: this.createLocationField.value.description,
             node_type: "location",
-            area: this.createLocationField.value.area,
+            summaryView: this.createLocationField.value.summaryView,
             summary_enable: this.createLocationField.value.summary_enable,
             summary_types: this.createLocationField.value.summary_types,
             magicboard_view: { "id": this.createLocationField.value.magicboard_view },
@@ -1098,8 +1192,10 @@ export class LocationManagementComponent implements OnInit {
             leadership_view: { "id": this.createLocationField.value.leadership_view },
             powerboard_view: { "id": this.createLocationField.value.powerboard_view },
             mobile_view: { "id": this.multiselectMobileView }
+
+      
           })
-    
+          console.log('summary view check', this.temp.summaryView);
           console.log('temp location', this.temp);
         }
     
@@ -1111,7 +1207,7 @@ export class LocationManagementComponent implements OnInit {
               this.temp[index].text = this.createLocationField.value.name;
               this.temp[index].description = this.createLocationField.value.description;
               //this.temp[index].node_type =  "location",
-              this.temp[index].area = this.createLocationField.value.area;
+              this.temp[index].summaryView = this.createLocationField.value.summaryView;
               this.temp[index].summary_enable = this.createLocationField.value.summary_enable;
               this.temp[index].summary_types = this.createLocationField.value.summary_types;
               this.temp[index].magicboard_view = { "id": this.createLocationField.value.magicboard_view }
@@ -1313,7 +1409,7 @@ export class LocationManagementComponent implements OnInit {
         this.createLocationField.patchValue({
           'name': this.final_list.original.text,
           'description': this.final_list.original.description,
-          'area': this.final_list.original.area,
+          'summaryView': this.final_list.original.summaryView,
           'summary_enable': typeof (this.final_list.original.summary_enable) == 'string' ? JSON.parse(this.final_list.original.summary_enable) : this.final_list.original.summary_enable,
           'summary_types': this.final_list.original.summary_types,
           'magicboard_view': this.final_list.original.magicboard_view && this.final_list.original.magicboard_view.id !== null ? this.final_list.original.magicboard_view.id : "",
@@ -1360,7 +1456,7 @@ export class LocationManagementComponent implements OnInit {
         this.createLocationField = this.fb.group({
           'name': '',
           'description': '',
-          'area': '',
+          'summaryView': '',
           'summary_enable': false,
           'summary_types': '',
           'magicboard_view': '',

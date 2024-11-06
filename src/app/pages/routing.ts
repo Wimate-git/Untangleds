@@ -103,6 +103,10 @@ const Routing: Routes = [
     path: 'formgroup',
     loadChildren: () => import('./Formgroup/formgroup.module').then((m) => m.FormgroupModule),
   },
+  {
+    path: 'summary-engine/:id',
+    loadChildren: () => import('./summary-engine/summary-engine.module').then((m) => m.SummaryEngineModule),
+  },
 
   {
     path: '',

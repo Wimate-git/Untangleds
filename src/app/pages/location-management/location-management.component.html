@@ -184,13 +184,13 @@
 
                             </div>
 
-                            <div class="col-md-4">
-                                <!-- <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Area</label> -->
+                            <!-- <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Summary View</label>
 
-                                <!-- <input type="number" class="
+                                <input type="number" class="
                               form-control form-control-lg form-control-solid
                               mb-3 mb-lg-0
-                            " placeholder="Enter area" name="area" formControlName="area" required> -->
+                            " placeholder="Enter area" name="area" formControlName="summaryView" required>
 
                                 <div *ngIf="
                             createLocationField.get('area')?.hasError('required') &&
@@ -199,7 +199,30 @@
                                     area is required
                                 </div>
 
+                            </div> -->
+
+
+
+
+                            <div class="col-md-4">
+                                <label class="col-lg-12 col-form-label fw-bold fs-6 ">Summary View</label>
+                                <ngx-select 
+                                name="icon" formControlName="summaryView"  
+                                [allowClear]="true" 
+                                [items]="listofsummaryIds"
+                                optionValueField="value" 
+                                optionTextField="text" 
+                                placeholder="Select SummaryId">
+                            </ngx-select>
+
+                            <div *ngIf="
+                            createLocationField.get('summaryView')?.hasError('required') &&
+                            createLocationField.get('summaryView')?.touched
+                            " class="fv-plugins-message-container invalid-feedback">
+                                    Summary View is required
+                                </div>
                             </div>
+
 
                         </div>
                     </div>
