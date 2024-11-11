@@ -12,8 +12,21 @@ interface TreeNode {
   id: string;         // Assuming 'id' is a string
   text: string;       // Assuming 'text' is a string
   parent?: string;    // 'parent' can be a string or undefined
-  node_type?: string; // Optional property for node type
+  node_type?: string;
+magicboard_view:any,
+powerboard_view:any,
+description:any,
+summaryView:any,
+dreamboard_view:any,
+powerboard_view_device:any,
+icon:any
+
+
+// Optional property for node type
 }
+
+
+
 // import { LocationPermissionService } from 'src/app/location-permission.service';
 declare let $: any;
 @Component({
@@ -35,7 +48,13 @@ export class LocationManagementComponent implements OnInit {
   originalData: any;
   maxlength: number = 500;
   listofsummaryIds: { value: any; text: any; }[];
-
+  dreamBoardIDs: any[] = [];
+  formattedDreamBoardIDs: { value: any; text: any; }[];
+  formattedpowerBoardIDs: { value: any; text: any; }[];
+  powerBoardIDs: any[] = [];
+  magicBoardIDs: any[] = [];
+  formattedmagicBoardIDs: { value: any; text: any; }[];
+  
 
 
   onDeviceDeSelect($event: ListItem) {
@@ -44,7 +63,7 @@ export class LocationManagementComponent implements OnInit {
     console.log("deselect is triggering")
     }
     
-      createLocationField: UntypedFormGroup;
+      createLocationField: FormGroup;
       createDeviceField: FormGroup;
       createCompanyField: UntypedFormGroup;
       //createMultiDeviceField: FormGroup;
@@ -162,6 +181,9 @@ export class LocationManagementComponent implements OnInit {
         // this.addFromService()
         this.populateDreamboardOptions();
         this.loadData()
+        this.fetchdreamboardlookup(1)
+        this.fetchpowerboardlookup(1)
+        this.fetchmagicboardlookup(1)
      
 
         // this.SK_clientID = this.userClientIDCognito.attributes["custom:clientID"];
@@ -605,10 +627,10 @@ export class LocationManagementComponent implements OnInit {
           'name': [[''], Validators.required],
           'description': ['', Validators.required],
           'magicboard_view': [['']],
-          'leadership_view': [['']],
-          'mobile_view': [['']],
+     
+        
           'icon': [''],
-          "powerboard_view_device": [null],
+          "powerboard_view_device": [''],
           "dreamboard_view_device": [''],
         })
       }
@@ -619,12 +641,12 @@ export class LocationManagementComponent implements OnInit {
           'name': ['', Validators.required],
           'description': ['', Validators.required],
           'summaryView': ['', Validators.required],
-          'summary_enable': [''],
-          'summary_types': ['', Validators.required],
+          // 'summary_enable': [''],
+          // 'summary_types': ['', Validators.required],
           'magicboard_view': [['']],
-          'leadership_view': [['']],
-          'mobile_view': [['']],
-          'powerboard_view': [null],
+          // 'leadership_view': [['']],
+          // 'mobile_view': [['']],
+          'powerboard_view': ['',],
           'dreamboard_view': ['',],
         })
       }
@@ -975,6 +997,7 @@ export class LocationManagementComponent implements OnInit {
                     createJSTree(jsondata: any) {
                       // Store the original data to reinitialize the tree when needed
                       this.originalData = jsondata;
+                      console.log('jsondata check',jsondata)
                     
                       const initializeTree = (data: any) => {
                         $('#SimpleJSTree').jstree({
@@ -1041,8 +1064,12 @@ export class LocationManagementComponent implements OnInit {
                         })
                         .on("changed.jstree", (e: any, data: any) => {
                           if (data && data.node && data.node.text) {
+                            console.log('data chyeck for node',data)
+                            console.log('data.node check',data.node)
                             this.parentID_selected_node = data.node.parent;
+                            console.log('this.parentID_selected_node check',this.parentID_selected_node)
                             this.final_list = data.instance.get_node(data.selected[0]);
+                            console.log('this.final_list check jstree',this.final_list)
                     
                             if (this.final_list.original.node_type === 'location') {
                               this.enableLocationButton = true;
@@ -1178,20 +1205,20 @@ export class LocationManagementComponent implements OnInit {
         if (getType == 'location') {
     
           this.temp.push({
-            id: this.createLocationField.value.name + "#" + (new Date).getTime(),//add unique number 
+            id: this.createLocationField.value.name,//add unique number 
             //id: this.createLocationField.value.name,
             parent: this.final_list.id,
             text: this.createLocationField.value.name,
             description: this.createLocationField.value.description,
             node_type: "location",
             summaryView: this.createLocationField.value.summaryView,
-            summary_enable: this.createLocationField.value.summary_enable,
-            summary_types: this.createLocationField.value.summary_types,
+            // summary_enable: this.createLocationField.value.summary_enable,
+            // summary_types: this.createLocationField.value.summary_types,
             magicboard_view: { "id": this.createLocationField.value.magicboard_view },
             dreamboard_view: { "id": this.createLocationField.value.dreamboard_view },
-            leadership_view: { "id": this.createLocationField.value.leadership_view },
+            // leadership_view: { "id": this.createLocationField.value.leadership_view },
             powerboard_view: { "id": this.createLocationField.value.powerboard_view },
-            mobile_view: { "id": this.multiselectMobileView }
+            // mobile_view: { "id": this.multiselectMobileView }
 
       
           })
@@ -1206,16 +1233,16 @@ export class LocationManagementComponent implements OnInit {
     
               this.temp[index].text = this.createLocationField.value.name;
               this.temp[index].description = this.createLocationField.value.description;
-              //this.temp[index].node_type =  "location",
+              this.temp[index].node_type =  "location",
               this.temp[index].summaryView = this.createLocationField.value.summaryView;
-              this.temp[index].summary_enable = this.createLocationField.value.summary_enable;
-              this.temp[index].summary_types = this.createLocationField.value.summary_types;
+              // this.temp[index].summary_enable = this.createLocationField.value.summary_enable;
+              // this.temp[index].summary_types = this.createLocationField.value.summary_types;
               this.temp[index].magicboard_view = { "id": this.createLocationField.value.magicboard_view }
               this.temp[index].dreamboard_view = { "id": this.createLocationField.value.dreamboard_view  },
-                this.temp[index].leadership_view = { "id": this.multiselectLeadership };
-              this.temp[index].powerboard_view = { "id": this.createLocationField.value.powerboard_view },
+                // this.temp[index].leadership_view = { "id": this.multiselectLeadership };
+              this.temp[index].powerboard_view = { "id": this.createLocationField.value.powerboard_view };
     
-                this.temp[index].mobile_view = { "id": this.multiselectMobileView };
+                // this.temp[index].mobile_view = { "id": this.multiselectMobileView };
     
             }
           }
@@ -1233,15 +1260,15 @@ export class LocationManagementComponent implements OnInit {
                 //id:this.multiselectDevice[noOfChild],
                 mn: this.createDeviceField.get('name')?.value[0].value,
                 text: [this.createDeviceField.get('name')?.value[0].text],
-    RDT:this.RDT_ID,
+
                 parent: this.final_list.id,
                 description: this.createDeviceField.value.description,
                 node_type: "device",
                 icon: this.createDeviceField.value.icon,
                 magicboard_view:  { "id": this.createDeviceField.value.magicboard_view },
                 dreamboard_view:{ "id": this.createDeviceField.value.dreamboard_view_device },
-                leadership_view: { "id": this.createDeviceField.value.leadership_view },
-                mobile_view: { "id": this.createDeviceField.value.mobile_view },
+                // leadership_view: { "id": this.createDeviceField.value.leadership_view },
+                // mobile_view: { "id": this.createDeviceField.value.mobile_view },
                 powerboard_view_device: { "id": this.createDeviceField.value.powerboard_view_device }
     
     
@@ -1286,23 +1313,17 @@ export class LocationManagementComponent implements OnInit {
          
           for (let index = 0; index < this.temp.length; index++) {
             if (this.temp[index].id == this.final_list.id) {
-    if(this.createDeviceField.get('name')?.value[0].text!==null){
-    
-      this.temp[index].text = [this.createDeviceField.get('name')?.value[0].text]
-    }
-    if(this.createDeviceField.get('name')?.value[0].value!==null){
-      this.temp[index].mn = this.createDeviceField.get('name')?.value[0].value
-    } 
-    if(this.createDeviceField.get('name')?.value[0].value!==null&&this.RDT_ID!==""){
-      this.temp[index].RDT = this.RDT_ID
-    } 
-    
+
+              if(this.createDeviceField.get('name')?.value[0].text!==null){
+
+                this.temp[index].text = [this.createDeviceField.get('name')?.value[0].text]
+              }
               this.temp[index].description = this.createDeviceField.value.description;
               this.temp[index].icon = this.createDeviceField.value.icon;
               this.temp[index].magicboard_view =  { "id": this.createDeviceField.value.magicboard_view }
                 this.temp[index].dreamboard_view = { "id": this.createDeviceField.value.dreamboard_view_device }
-                this.temp[index].leadership_view = { "id": this.createDeviceField.value.leadership_view }
-                this.temp[index].mobile_view = { "id": this.createDeviceField.value.mobile_view }
+                // this.temp[index].leadership_view = { "id": this.createDeviceField.value.leadership_view }
+                // this.temp[index].mobile_view = { "id": this.createDeviceField.value.mobile_view }
                 this.temp[index].powerboard_view_device = { "id": this.createDeviceField.value.powerboard_view_device }
     
             }
@@ -1352,13 +1373,13 @@ export class LocationManagementComponent implements OnInit {
             $('#SimpleJSTree').jstree(true).refresh(true);
     
     
-            this.toast.open("Location Configuration updated successfully", " ", {
-              //panelClass: 'error-alert-snackbar',
-    
-              duration: 2000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top',
-            })
+            Swal.fire({
+              position: 'top-end',
+              icon: 'success',
+              title: 'Location Configuration updated successfully',
+              showConfirmButton: false,
+              timer: 2000
+            });
     
             this.multiselectDevice = [];
             this.multiselectDevice_text = [];
@@ -1410,15 +1431,15 @@ export class LocationManagementComponent implements OnInit {
           'name': this.final_list.original.text,
           'description': this.final_list.original.description,
           'summaryView': this.final_list.original.summaryView,
-          'summary_enable': typeof (this.final_list.original.summary_enable) == 'string' ? JSON.parse(this.final_list.original.summary_enable) : this.final_list.original.summary_enable,
-          'summary_types': this.final_list.original.summary_types,
+          // 'summary_enable': typeof (this.final_list.original.summary_enable) == 'string' ? JSON.parse(this.final_list.original.summary_enable) : this.final_list.original.summary_enable,
+          // 'summary_types': this.final_list.original.summary_types,
           'magicboard_view': this.final_list.original.magicboard_view && this.final_list.original.magicboard_view.id !== null ? this.final_list.original.magicboard_view.id : "",
           'dreamboard_view': (this.final_list.original.dreamboard_view && this.final_list.original.dreamboard_view.id !== null) ? this.final_list.original.dreamboard_view.id : "",
-          'leadership_view': this.final_list.original.leadership_view && this.final_list.original.leadership_view.id !== null ? this.final_list.original.leadership_view.id : "",
-          'mobile_view': this.final_list.original.mobile_view && this.final_list.original.mobile_view.id !== null ? this.final_list.original.mobile_view.id : "",
+          // 'leadership_view': this.final_list.original.leadership_view && this.final_list.original.leadership_view.id !== null ? this.final_list.original.leadership_view.id : "",
+          // 'mobile_view': this.final_list.original.mobile_view && this.final_list.original.mobile_view.id !== null ? this.final_list.original.mobile_view.id : "",
           'powerboard_view': this.final_list.original.powerboard_view && this.final_list.original.powerboard_view.id !== null ? this.final_list.original.powerboard_view.id : ""
         })
-    
+    console.log('this.createLocationField check location',this.createLocationField)
       //   {
       //     "area": 1,
       //     "parent": "ITC#1716284934389",
@@ -1494,8 +1515,8 @@ export class LocationManagementComponent implements OnInit {
           'description': this.final_list.original.description,
           'magicboard_view': this.final_list.original.magicboard_view && this.final_list.original.magicboard_view.id !== null ? this.final_list.original.magicboard_view.id : "",
           'dreamboard_view_device': this.final_list.original.dreamboard_view && this.final_list.original.dreamboard_view !== null ? this.final_list.original.dreamboard_view.id : "",
-          'leadership_view': this.final_list.original.leadership_view && this.final_list.original.leadership_view.id !== null ? this.final_list.original.leadership_view.id : "",
-          'mobile_view': this.final_list.original.mobile_view && this.final_list.original.mobile_view.id !== null ? this.final_list.original.mobile_view.id : "",
+
+          // 'mobile_view': this.final_list.original.mobile_view && this.final_list.original.mobile_view.id !== null ? this.final_list.original.mobile_view.id : "",
           // 'magicboard_view':this.final_list.original.magicboard_view && this.final_list.original.magicboard_view.id ? this.final_list.original.magicboard_view.id[0].text : [this.final_list.original.magicboard_view.id],
           // 'leadership_view':this.final_list.original.leadership_view && this.final_list.original.leadership_view.id ? this.final_list.original.leadership_view.id[0].text : [this.final_list.original.leadership_view.id],
           // 'mobile_view': this.final_list.original.mobile_view && this.final_list.original.mobile_view.id ? this.final_list.original.mobile_view.id[0].text : [this.final_list.original.mobile_view.id],
@@ -1649,11 +1670,14 @@ this.temp =JSON.parse(this.temp)
     
             if (value && value.metadata) {
                 // Display success message
-                this.toast.open("Location Configuration deleted successfully", " ", {
-                    duration: 2000,
-                    horizontalPosition: 'right',
-                    verticalPosition: 'top',
+                Swal.fire({
+                  position: 'top-end',
+                  icon: 'success',
+                  title: 'Location Configuration deleted successfully',
+                  showConfirmButton: false,
+                  timer: 2000
                 });
+                
                 this.multiselectDevice = [];
             } else {
                 console.error('Invalid response structure:', value);
@@ -1676,6 +1700,174 @@ this.temp =JSON.parse(this.temp)
         });
     }
     
+
+    async fetchdreamboardlookup(sk: any) {
+      try {
+        const response = await this.api.GetMaster(this.SK_clientID + "#dreamboard#lookup", sk);
+  
+        if (response && response.options) {
+          // Check if response.listOfItems is a string
+          if (typeof response.options === 'string') {
+            let data = JSON.parse(response.options);
+            console.log("d1 =", data)
+            if (Array.isArray(data)) {
+              for (let index = 0; index < data.length; index++) {
+                const element = data[index];
+  
+                if (element !== null && element !== undefined) {
+                  // Extract values from each element and push them to lookup_data_temp1
+                  const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
+                  const { P1, P2, P3, P4 } = element[key]; // Extract values from the nested object
+                  this.dreamBoardIDs.push({ P1, P2, P3, P4 }); // Push an array containing P1, P2, and P3 values
+                  console.log("d2 =", this.dreamBoardIDs)
+                } else {
+                  break;
+                }
+              }
+              //this.lookup_data_temp1.sort((a, b) => b.P5 - a.P5);
+              this.dreamBoardIDs.sort((a: any, b: any) => {
+                return b.P4 - a.P4; // Compare P5 values in descending order
+              });
+              console.log("Lookup sorting", this.dreamBoardIDs);
+              // Continue fetching recursively
+              await this.fetchdreamboardlookup(sk + 1);
+            } else {
+              console.error('Invalid data format - not an array.');
+            }
+          } else {
+            console.error('response.listOfItems is not a string.');
+          }
+        } else {
+  
+  
+          this.dreamBoardIDs = this.dreamBoardIDs.map((item: any) => item.P1)
+  
+          this.dreamBoardIDs.unshift("All");
+  
+          console.log("All the dreamboard id are here ", this.dreamBoardIDs);
+           this.formattedDreamBoardIDs = this.dreamBoardIDs.map((dreamId:any) => ({ text: dreamId, value: dreamId }));
+          this.cdr.detectChanges(); 
+          console.log("Formatted IDs for dropdown:", this.formattedDreamBoardIDs);
+  
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        // Handle the error as needed
+      }
+    }
+
+
+    async fetchpowerboardlookup(sk: any) {
+      try {
+        const response = await this.api.GetMaster(this.SK_clientID + "#powerboard#lookup", sk);
+  
+        if (response && response.options) {
+          // Check if response.listOfItems is a string
+          if (typeof response.options === 'string') {
+            let data = JSON.parse(response.options);
+            console.log("d1 =", data)
+            if (Array.isArray(data)) {
+              for (let index = 0; index < data.length; index++) {
+                const element = data[index];
+  
+                if (element !== null && element !== undefined) {
+                  // Extract values from each element and push them to lookup_data_temp1
+                  const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
+                  const { P1, P2, P3, P4 } = element[key]; // Extract values from the nested object
+                  this.powerBoardIDs.push({ P1, P2, P3, P4 }); // Push an array containing P1, P2, and P3 values
+                  console.log("d2 =", this.powerBoardIDs)
+                } else {
+                  break;
+                }
+              }
+              //this.lookup_data_temp1.sort((a, b) => b.P5 - a.P5);
+              this.powerBoardIDs.sort((a: any, b: any) => {
+                return b.P4 - a.P4; // Compare P5 values in descending order
+              });
+              console.log("Lookup sorting", this.powerBoardIDs);
+              // Continue fetching recursively
+              await this.fetchpowerboardlookup(sk + 1);
+            } else {
+              console.error('Invalid data format - not an array.');
+            }
+          } else {
+            console.error('response.listOfItems is not a string.');
+          }
+        } else {
+  
+  
+          this.powerBoardIDs = this.powerBoardIDs.map((item: any) => item.P1)
+  
+          this.powerBoardIDs.unshift("All");
+  
+          console.log("All the dreamboard id are here ", this.powerBoardIDs);
+           this.formattedpowerBoardIDs = this.powerBoardIDs.map((powerId:any) => ({ text: powerId, value: powerId }));
+          this.cdr.detectChanges(); 
+          console.log("formattedpowerBoardIDs IDs for dropdown:", this.formattedpowerBoardIDs);
+  
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        // Handle the error as needed
+      }
+    }
+    async fetchmagicboardlookup(sk: any) {
+      try {
+        const response = await this.api.GetMaster(this.SK_clientID + "#magicboard#lookup", sk);
+  
+        if (response && response.options) {
+          // Check if response.listOfItems is a string
+          if (typeof response.options === 'string') {
+            let data = JSON.parse(response.options);
+            console.log("d1 =", data)
+            if (Array.isArray(data)) {
+              for (let index = 0; index < data.length; index++) {
+                const element = data[index];
+  
+                if (element !== null && element !== undefined) {
+                  // Extract values from each element and push them to lookup_data_temp1
+                  const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
+                  const { P1, P2, P3, P4 } = element[key]; // Extract values from the nested object
+                  this.magicBoardIDs.push({ P1, P2, P3, P4 }); // Push an array containing P1, P2, and P3 values
+                  console.log("d2 =", this.magicBoardIDs)
+                } else {
+                  break;
+                }
+              }
+              //this.lookup_data_temp1.sort((a, b) => b.P5 - a.P5);
+              this.magicBoardIDs.sort((a: any, b: any) => {
+                return b.P4 - a.P4; // Compare P5 values in descending order
+              });
+              console.log("Lookup sorting", this.magicBoardIDs);
+              // Continue fetching recursively
+              await this.fetchmagicboardlookup(sk + 1);
+            } else {
+              console.error('Invalid data format - not an array.');
+            }
+          } else {
+            console.error('response.listOfItems is not a string.');
+          }
+        } else {
+  
+  
+          this.magicBoardIDs = this.magicBoardIDs.map((item: any) => item.P1)
+  
+          this.magicBoardIDs.unshift("All");
+  
+          console.log("All the dreamboard id are here ", this.magicBoardIDs);
+           this.formattedmagicBoardIDs = this.magicBoardIDs.map((magicId:any) => ({ text: magicId, value: magicId }));
+          this.cdr.detectChanges(); 
+          console.log("formattedpowerBoardIDs IDs for dropdown:", this.formattedmagicBoardIDs);
+  
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        // Handle the error as needed
+      }
+    }
+    
+
+
     
 
 
@@ -1728,8 +1920,10 @@ this.temp =JSON.parse(this.temp)
               console.log('Metadata is not a valid string:', this.metadataObject);
           }
             // console.log("userPermissions iside",this.modifyList(data.location_permission,data.device_type_permission,data.device_permission))
+            if(data){
            return  this.modifyList(this.metadataObject.location_permission,this.metadataObject.form_permission)==="All-All"?false:true
-          
+                
+      }
           }
           
           })
@@ -1743,12 +1937,25 @@ this.temp =JSON.parse(this.temp)
     
           console.log("Data from location: check", jsonModified);
           this.temp = jsonModified
+          console.log('jsonModified check for node',jsonModified)
           const jstreeData = jsonModified.map((treeNode: TreeNode) => ({
             id: treeNode.id, // Use 'id' for jstree node ID
             text: treeNode.text, // Use 'text' for jstree node display
             parent: treeNode.parent || "#", // Set parent, or use "#" for root
-            node_type: treeNode.node_type // You can add additional properties as needed
+            node_type: treeNode.node_type,
+            magicboard_view:treeNode.magicboard_view,
+            powerboard_view:treeNode.powerboard_view,
+            description:treeNode.description,
+            summaryView:treeNode.summaryView,
+            dreamboard_view:treeNode.dreamboard_view,
+            powerboard_view_device:treeNode.powerboard_view_device,
+            icon:treeNode.icon
+
+         
+
+             // You can add additional properties as needed
           }));
+          console.log('jstreeData check for node',jstreeData)
           setTimeout(() => {
             this.createJSTree(jstreeData);
           }, 1000);
