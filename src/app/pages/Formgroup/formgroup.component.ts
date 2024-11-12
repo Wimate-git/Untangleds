@@ -85,6 +85,7 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedImage: string | ArrayBuffer | null = null;
   url: any;
   uploadnew: boolean=false;
+  previewObjDisplay:any=null;
 
   constructor(
     // private apiService: UserService, 
@@ -198,6 +199,77 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedImage = null;  // Clear the image preview
   }
 
+  iconsList:any = [
+    { value: 'toggle-on', label: 'Toggle On', class1: "fs-2x text-danger", class2: "symbol-label bg-light-danger" },
+      { value: 'toggle-on-circle', label: 'Toggle On Circle', class1: "fs-2x text-success", class2: "symbol-label bg-light-success" },
+      { value: 'toggle-off', label: 'Toggle Off', class1: "fs-2x text-warning", class2: "symbol-label bg-light-warning" },
+      { value: 'category', label: 'Category', class1: "fs-2x text-primary", class2: "symbol-label bg-light-primary" },
+      { value: 'setting', label: 'Setting', class1: "fs-2x text-info", class2: "symbol-label bg-light-info" },
+      { value: 'toggle-off-circle', label: 'Toggle Off Circle', class1: "fs-2x text-danger", class2: "symbol-label bg-light-danger" },
+      { value: 'more-2', label: 'More 2', class1: "fs-2x text-dark", class2: "symbol-label bg-light-dark" },
+      { value: 'setting-4', label: 'Setting 4', class1: "fs-2x text-success", class2: "symbol-label bg-light-success" },
+      { value: 'setting-2', label: 'Setting 2', class1: "fs-2x text-warning", class2: "symbol-label bg-light-warning" },
+      { value: 'setting-3', label: 'Setting 3', class1: "fs-2x text-primary", class2: "symbol-label bg-light-primary" },
+      { value: 'eraser', label: 'Eraser', class1: "fs-2x text-info", class2: "symbol-label bg-light-info" },
+      { value: 'paintbucket', label: 'Paintbucket', class1: "fs-2x text-danger", class2: "symbol-label bg-light-danger" },
+      { value: 'add-item', label: 'Add Item', class1: "fs-2x text-success", class2: "symbol-label bg-light-success" },
+      { value: 'design-2', label: 'Design 2', class1: "fs-2x text-dark", class2: "symbol-label bg-light-dark" },
+      { value: 'brush', label: 'Brush', class1: "fs-2x text-info", class2: "symbol-label bg-light-info" },
+      { value: 'size', label: 'Size', class1: "fs-2x text-warning", class2: "symbol-label bg-light-warning" },
+      { value: 'design', label: 'Design', class1: "fs-2x text-primary", class2: "symbol-label bg-light-primary" },
+      { value: 'copy', label: 'Copy', class1: "fs-2x text-danger", class2: "symbol-label bg-light-danger" },
+      { value: 'text', label: 'Text', class1: "fs-2x text-success", class2: "symbol-label bg-light-success" },
+      { value: 'design-frame', label: 'Design Frame', class1: "fs-2x text-dark", class2: "symbol-label bg-light-dark" },
+      { value: 'bucket', label: 'Bucket', class1: "fs-2x text-info", class2: "symbol-label bg-light-info" },
+      { value: 'glass', label: 'Glass', class1: "fs-2x text-warning", class2: "symbol-label bg-light-warning" },
+      { value: 'feather', label: 'Feather', class1: "fs-2x text-danger", class2: "symbol-label bg-light-danger" },
+      { value: 'pencil', label: 'Pencil', class1: "fs-2x text-success", class2: "symbol-label bg-light-success" },
+      { value: 'colors-square', label: 'Colors Square', class1: "fs-2x text-primary", class2: "symbol-label bg-light-primary" },
+      { value: 'design-mask', label: 'Design Mask', class1: "fs-2x text-info", class2: "symbol-label bg-light-info" },
+      { value: 'bucket-square', label: 'Bucket Square', class1: "fs-2x text-dark", class2: "symbol-label bg-light-dark" },
+      { value: 'copy-success', label: 'Copy Success', class1: "fs-2x text-success", class2: "symbol-label bg-light-success" },
+      { value: 'color-swatch', label: 'Color Swatch', class1: "fs-2x text-danger", class2: "symbol-label bg-light-danger" },
+      { value: 'instagram', label: 'Instagram', class1: "fs-2x text-info", class2: "symbol-label bg-light-info" },
+      { value: 'snapchat', label: 'Snapchat', class1: "fs-2x text-warning", class2: "symbol-label bg-light-warning" },
+      { value: 'classmates', label: 'Classmates', class1: "fs-2x text-primary", class2: "symbol-label bg-light-primary" },
+      { value: 'facebook', label: 'Facebook', class1: "fs-2x text-success", class2: "symbol-label bg-light-success" },
+      { value: 'whatsapp', label: 'WhatsApp', class1: "fs-2x text-danger", class2: "symbol-label bg-light-danger" },
+      { value: 'social-media', label: 'Social Media', class1: "fs-2x text-info", class2: "symbol-label bg-light-info" },
+      { value: 'youtube', label: 'YouTube', class1: "fs-2x text-dark", class2: "symbol-label bg-light-dark" },
+      { value: 'dribbble', label: 'Dribbble', class1: "fs-2x text-primary", class2: "symbol-label bg-light-primary" },
+      { value: 'twitter', label: 'Twitter', class1: "fs-2x text-success", class2: "symbol-label bg-light-success" },
+      { value: 'tiktok', label: 'TikTok', class1: "fs-2x text-danger", class2: "symbol-label bg-light-danger" }
+    // { value: 'abstract-33', label: 'Abstract 33', class1: "fs-2x text-danger", class2:"symbol-label bg-light-danger"},
+    // { value: 'abstract-27', label: 'Abstract 27', class1: "fs-2x text-success" ,class2:"symbol-label bg-light-success" },
+    // { value: 'abstract-25', label: 'Abstract 25', class1: "fs-2x text-warning", class2: "symbol-label bg-light-warning" },
+    //   { value: 'abstract-19', label: 'Abstract 19', class1: "fs-2x text-success", class2: "symbol-label bg-light-success" },
+    //   { value: 'abstract-21', label: 'Abstract 21', class1: "fs-2x text-primary", class2: "symbol-label bg-light-primary" },
+    //   { value: 'abstract-35', label: 'Abstract 35', class1: "fs-2x text-secondary", class2: "symbol-label bg-light-secondary" },
+    //   { value: 'abstract-34', label: 'Abstract 34', class1: "fs-2x text-dark", class2: "symbol-label bg-light-dark" },
+    //   { value: 'abstract-20', label: 'Abstract 20', class1: "fs-2x text-muted", class2: "symbol-label bg-light-muted" },
+    //   { value: 'abstract-36', label: 'Abstract 36', class1: "fs-2x text-success", class2: "symbol-label bg-light-success" },
+    //   { value: 'abstract-22', label: 'Abstract 22', class1: "fs-2x text-danger", class2: "symbol-label bg-light-danger" },
+    //   { value: 'abstract-23', label: 'Abstract 23', class1: "fs-2x text-info", class2: "symbol-label bg-light-info" },
+    //   { value: 'abstract-37', label: 'Abstract 37', class1: "fs-2x text-warning", class2: "symbol-label bg-light-warning" },
+    //   { value: 'abstract-44', label: 'Abstract 44', class1: "fs-2x text-primary", class2: "symbol-label bg-light-primary" },
+    //   { value: 'abstract', label: 'Abstract', class1: "fs-2x text-secondary", class2: "symbol-label bg-light-secondary" },
+    //   { value: 'abstract-45', label: 'Abstract 45', class1: "fs-2x text-dark", class2: "symbol-label bg-light-dark" },
+    //   { value: 'abstract-47', label: 'Abstract 47', class1: "fs-2x text-muted", class2: "symbol-label bg-light-muted" },
+    //   { value: 'abstract-46', label: 'Abstract 46', class1: "fs-2x text-danger", class2: "symbol-label bg-light-danger" },
+    //   { value: 'abstract-42', label: 'Abstract 42', class1: "fs-2x text-info", class2: "symbol-label bg-light-info" },
+    //   { value: 'abstract-43', label: 'Abstract 43', class1: "fs-2x text-warning", class2: "symbol-label bg-light-warning" },
+    //   { value: 'abstract-41', label: 'Abstract 41', class1: "fs-2x text-success", class2: "symbol-label bg-light-success" },
+    //   { value: 'abstract-40', label: 'Abstract 40', class1: "fs-2x text-primary", class2: "symbol-label bg-light-primary" },
+    //   { value: 'abstract-27', label: 'Abstract 27', class1: "fs-2x text-secondary", class2: "symbol-label bg-light-secondary" },
+    // { value: 'abstract-26', label: 'Abstract 26', class: `ki-duotone ki-abstract-26 ${this.getRandomColor()}` },
+    // { value: 'abstract-32', label: 'Abstract 32', class: `ki-duotone ki-abstract-32 ${this.getRandomColor()}` },
+    // { value: 'abstract-18', label: 'Abstract 18', class: `ki-duotone ki-abstract-18 ${this.getRandomColor()}` },
+    // { value: 'abstract-24', label: 'Abstract 24', class: `ki-duotone ki-abstract-24 ${this.getRandomColor()}` },
+    // { value: 'abstract-30', label: 'Abstract 30', class: `ki-duotone ki-abstract-30 ${this.getRandomColor()}` },
+    // { value: 'abstract-8', label: 'Abstract 8', class: `ki-duotone ki-abstract-8 ${this.getRandomColor()}` },
+    // Add more icons as needed...
+  ];
+
 
   initForm() {
     this.formgroupForm = this.fb.group({
@@ -208,9 +280,27 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
       createdUser: [' '],
       updatedUser: [' '],
       selectedImage: [''],
+      iconSelect:[''],
+      iconObject:[''],
       createdTime: [Math.ceil(((new Date()).getTime()) / 1000)],
       updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
     });
+  }
+
+  previewIcon(event: any) {
+    // Find the icon based on the selected value
+    const selectedIcon = this.iconsList.find((packet: any) => {
+        return packet.value === this.formgroupForm.get('iconSelect')?.value;
+    });
+  
+    // Perform a deep copy if selectedIcon is found
+    if (selectedIcon) {
+        this.previewObjDisplay = JSON.parse(JSON.stringify(selectedIcon)); // Deep copy
+        console.log(" this.previewObjDisplay ", this.previewObjDisplay);
+    } else {
+        console.warn("No matching icon found.");
+    }
+    this.cdr.detectChanges()
   }
 
   async ngOnInit(): Promise<void> {
@@ -349,28 +439,28 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
       console.log("AFTER JSON PARSE:", this.deleteResponse)
 
 
-      var formData_ = {
-        "bucket_name": "dreamboard-dynamic",
-        "bucket_region": "ap-south-1",
-        "operation_type": "delete",
-        "key": this.deleteResponse.selectedImage,
-      }
-      fetch('https://3luwbeeuk0.execute-api.ap-south-1.amazonaws.com/s1/s3Bucket', { // Replace with your server endpoint
-        method: 'POST',
-        body: JSON.stringify(formData_)
-      })
-        .then(response => response.json())
-        .then(data => {
+      // var formData_ = {
+      //   "bucket_name": "dreamboard-dynamic",
+      //   "bucket_region": "ap-south-1",
+      //   "operation_type": "delete",
+      //   "key": this.deleteResponse.selectedImage,
+      // }
+      // fetch('https://3luwbeeuk0.execute-api.ap-south-1.amazonaws.com/s1/s3Bucket', { // Replace with your server endpoint
+      //   method: 'POST',
+      //   body: JSON.stringify(formData_)
+      // })
+      //   .then(response => response.json())
+      //   .then(data => {
 
-          console.log(data)
+      //     console.log(data)
 
-        })
-        .catch(error => {
+      //   })
+      //   .catch(error => {
 
-          console.error('Error:', error)
+      //     console.error('Error:', error)
 
 
-        });
+      //   });
 
       this.formgroupItem = {
         P1: this.deleteResponse.formgroupId,
@@ -396,6 +486,7 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
 
   edit(P1: any) {
     this.update = true
+    this.previewObjDisplay = '';
     console.log("EDIT ID:", P1)
     this.data_temp = []
 
@@ -408,41 +499,43 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
 
         if (this.data_temp) {
 
-          if (this.data_temp[0].selectedImage) {
+          // if (this.data_temp[0].selectedImage) {
 
-            var request_data = {
-              bucket_name: "dreamboard-dynamic",
-              operation_type: "generate",
-              //key: 'public/' + clientid_ + '/fileuploads/Quote_Template/' + input_ID.value + '/' + visitType + '/',
-              "key": 'public/' + this.client + '/fileuploads/formgroup/' + P1 + '/',
-            }
-            //showLoadingSpinnerm();
-            // Call your API endpoint that triggers the Lambda function
-            fetch('https://3luwbeeuk0.execute-api.ap-south-1.amazonaws.com/s1/s3Bucket', {
-              method: 'POST',
-              body: JSON.stringify(request_data)
-            })
-              .then(response => response.json())
-              .then(data => {
+          //   var request_data = {
+          //     bucket_name: "dreamboard-dynamic",
+          //     operation_type: "generate",
+          //     //key: 'public/' + clientid_ + '/fileuploads/Quote_Template/' + input_ID.value + '/' + visitType + '/',
+          //     "key": 'public/' + this.client + '/fileuploads/formgroup/' + P1 + '/',
+          //   }
+          //   //showLoadingSpinnerm();
+          //   // Call your API endpoint that triggers the Lambda function
+          //   fetch('https://3luwbeeuk0.execute-api.ap-south-1.amazonaws.com/s1/s3Bucket', {
+          //     method: 'POST',
+          //     body: JSON.stringify(request_data)
+          //   })
+          //     .then(response => response.json())
+          //     .then(data => {
 
-                console.log(data);
+          //       console.log(data);
 
-                var data_ = JSON.parse(data.body)
+          //       var data_ = JSON.parse(data.body)
 
-                var data_1 = JSON.parse(data_.data)
-                console.log('data_1 :', data_1);
+          //       var data_1 = JSON.parse(data_.data)
+          //       console.log('data_1 :', data_1);
 
-                this.url = data_1[0].url
-                this.selectedImage = this.url
-                console.log("URL:", this.url)
-              }).catch((error) => {
+          //       this.url = data_1[0].url
+          //       this.selectedImage = this.url
+          //       console.log("URL:", this.url)
+          //     }).catch((error) => {
 
-                console.log("FETCH DATA FROM and BUCKET:", error)
-              })
-          }
-          else {
-            this.selectedImage = this.data_temp[0].selectedImage
-          }
+          //       console.log("FETCH DATA FROM and BUCKET:", error)
+          //     })
+          // }
+          // else {
+          //   this.selectedImage = this.data_temp[0].selectedImage
+          // }
+
+          this.previewObjDisplay = this.data_temp[0].iconObject
 
           this.formgroupForm = this.fb.group({
             formgroupId: [this.data_temp[0].formgroupId],
@@ -450,6 +543,8 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
             description: [this.data_temp[0].description],
             formList: [this.data_temp[0].formList],
             selectedImage: [this.selectedImage],
+            iconSelect:[this.data_temp[0].iconSelect],
+            iconObject:[this.data_temp[0].iconObject],
             createdUser: [this.data_temp[0].createdUser],
             updatedUser: [this.data_temp[0].updatedUser],
             createdTime: [this.data_temp[0].createdTime],
@@ -572,6 +667,10 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
 
       const formValue = this.formgroupForm.value;
 
+      this.formgroupForm.value.iconObject = this.previewObjDisplay
+
+      console.log("CREATE FORMGROUP:",formValue)
+
       this.formgroupForm.value.createdUser = this.users
 
       // if(this.selectedImage){
@@ -597,7 +696,7 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
           P1: this.formgroupForm.value.formgroupId,
           P2: this.formgroupForm.value.label,
           P3: this.formgroupForm.value.description,
-          P4: this.formgroupForm.value.selectedImage,
+          P4: JSON.stringify(this.formgroupForm.value.iconObject),
           P5: this.formgroupForm.value.createdUser,
           P6: this.formgroupForm.value.updatedUser,
           P7: this.formgroupForm.value.updatedTime,
@@ -622,6 +721,8 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
     const updateFn = () => {
 
       const formValue = this.formgroupForm.value
+
+      this.formgroupForm.value.iconObject = this.previewObjDisplay
 
       console.log("FORM USER:",formValue)
 
@@ -651,7 +752,8 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
           P1: this.updateResponse.formgroupId,
           P2: this.updateResponse.label,
           P3: this.updateResponse.description,
-          P4: this.formgroupForm.value.selectedImage,
+          // P4: this.formgroupForm.value.selectedImage,
+          P4: JSON.stringify(this.updateResponse.iconObject),
           P5: this.updateResponse.createdUser,
           P6: this.updateResponse.updatedUser,
           // P7: this.updateResponse.updatedTime,

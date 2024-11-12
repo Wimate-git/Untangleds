@@ -6,10 +6,10 @@
 
     <div class="menu-item">
       <a class="menu-link without-sub" routerLink="/dashboard" routerLinkActive="active">
-        <span class="menu-icon">
-          <app-keenicon name="element-11" class="fs-2"></app-keenicon>
+        <span class="menu-bullet">
+          <app-keenicon name="element-11"></app-keenicon>
         </span>
-        <span class="menu-title" translate="MENU.DASHBOARD"></span>
+        <span class="menu-title" style="font-size: 13.975px;" translate="MENU.DASHBOARD"></span>
       </a>
     </div>
     
@@ -18,16 +18,16 @@
 
     <div class="menu-item">
       <a class="menu-link without-sub" routerLink="/dreamboard" routerLinkActive="active">
-        <span class="menu-icon">
-          <app-keenicon name="bi bi-hypnotize" class="fs-2"></app-keenicon>
+        <span class="menu-bullet">
+          <app-keenicon name="bi bi-hypnotize"></app-keenicon>
         </span>
-        <span class="menu-title">Dream Board</span>
+        <span class="menu-title" style="font-size: 13.975px;">Dream Board</span>
       </a>
 
       <div class="menu-item menu-accordion" *ngFor="let item of menuItems" [attr.data-kt-menu-trigger]="item.subMenu?.length ? 'click' : null" routerLinkActive="here show">
         <span class="menu-link">
-          <span class="menu-icon">
-            <app-keenicon [name]="item.icon ?? 'default-icon'" class="fs-2"></app-keenicon>
+          <span class="menu-bullet">
+            <app-keenicon [name]="item.icon ?? 'default-icon'"></app-keenicon>
           </span>
           <span class="menu-title">{{ item.title }}</span>
           <span *ngIf="item.subMenu?.length" class="menu-arrow"></span>

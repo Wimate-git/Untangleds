@@ -153,8 +153,11 @@ async generatedreamboard() {
 
     // Ensure permission_data.dreamBoardIDs has data
     if (Array.isArray(this.permission_data.dreamBoardIDs) && this.permission_data.dreamBoardIDs.length > 0) {
+
+      const includeAll = this.permission_data.dreamBoardIDs.includes('All');
       for (const pathValue of pathArray) {
-        if (this.permission_data.dreamBoardIDs.includes(pathValue)) {
+        // if (this.permission_data.dreamBoardIDs.includes(pathValue)) {
+      if (includeAll || this.permission_data.dreamBoardIDs.includes(pathValue)) {
           submenu.push({
             title: `${pathValue}`,
             link: `view-dreamboard/${pathValue}/All`,

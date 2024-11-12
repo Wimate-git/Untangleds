@@ -6,7 +6,7 @@
 <div class="row g-6 g-xl-9" *ngIf="cards_2.length > 0">
   <div class="col-md-6 col-xl-4" *ngFor="let card of cards_2">
     <app-card2 [componentSource]="'dashboard'"
-      [icon]=card.icon
+      [icon_]=card.icon
       badgeColor="primary"
       status="view"
       [title]="card.name ||'N/A'"

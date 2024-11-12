@@ -19,6 +19,8 @@ export class Card2Component implements OnInit{
   @Input() progress: number = 50;
   @Input() formgroup: string = '';
   @Input() users: Array<IconUserModel> = [];
+  @Input() icon_: { value: string; label: string; class1: string; class2: string };
+
   id: string;
 
   constructor(private router: Router) {}

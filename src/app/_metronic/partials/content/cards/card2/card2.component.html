@@ -1,10 +1,14 @@
-<a routerLink="/crafted/pages/profile/overview" class="card border border-2 border-gray-400 border-hover" [ngStyle]="{
+<a routerLink="/crafted/pages/profile/overview" class="card border border-2 border-gray-400 border-hover" >
+  <!-- [ngStyle]="{
     'background-image': 'linear-gradient(to top, #f3e7e9 0%, #e3eeff 99%, #e3eeff 100%)',
-  }">
+  }" -->
   <div class="card-header border-0 pt-9">
     <div class="card-title m-0">
       <div class="symbol symbol-70px w-50px ">
-        <img [src]="icon" alt="card2" class="p-3" />
+        <img *ngIf="!icon_"[src]="icon" alt="card2" class="p-3" />
+        <span *ngIf="icon_" [class]="icon_.class2">
+          <app-keenicon [name]="icon_.value" [class]="icon_.class1" style="display: contents;"></app-keenicon>
+        </span>
       </div>
     </div>
 

@@ -125,14 +125,14 @@
                             </ng-multiselect-dropdown>
                         </div>
                     </div>
-                    <div class="image-upload-container" style="align-items: center;">
+                    <!-- <div class="image-upload-container" style="align-items: center;"> -->
                         <!-- Left side text -->
-                        <div class="upload-text" style="flex: 1;">
+                        <!-- <div class="upload-text" style="flex: 1;">
                           <label class="fw-semibold fs-6 mb-2" for="profile_avatar">Upload Icon</label>
-                        </div>
+                        </div> -->
                       
                         <!-- Right side image preview and input -->
-                        <div class="image-input image-input-outline" [ngClass]="{'image-input-changed': selectedImage}" id="kt_image_1">
+                        <!-- <div class="image-input image-input-outline" [ngClass]="{'image-input-changed': selectedImage}" id="kt_image_1">
                             <div 
                               class="image-input-wrapper" 
                               [ngStyle]="{ 'background-image': selectedImage ? 'url(' + selectedImage + ')' : 'url(assets/media/avatars/blank.png)'}">
@@ -146,8 +146,35 @@
                             <span class="btn btn-xs btn-icon btn-circle btn-white btn-hover-text-primary btn-shadow" (click)="cancelImage()" title="Cancel avatar">
                               <i class="ki ki-bold-close icon-xs text-muted"></i>
                             </span>
+                          </div> -->
+
+                          <div class="row mb-3">
+                            <div class="col-md-4">
+                              <label class="fw-semibold fs-6 mb-2 required" for="icon-select">Select an Icon:</label>
+                              <select id="icon-select" formControlName="iconSelect" class="form-select form-select-solid form-select-lg fw-bold" (change)="previewIcon($event)">
+                                <option value="null">Select an option</option>
+                                <ng-container *ngFor="let icon of iconsList">
+                                  <option [value]="icon.value">{{ icon.label }}</option>
+                                </ng-container>
+                              </select>
+                            </div>
+              
+                            <div class="col-md-4 d-flex align-items-center">
+                              <p class="fw-bold fs-6 mb-0 me-2">Selected Icon:</p>
+                              <span class="menu-icon" *ngIf="previewObjDisplay; else noIcon">
+                                  <app-keenicon 
+                                      [name]="previewObjDisplay.value"
+                                      [class]="previewObjDisplay.class1"
+                                      class="fs-4x">
+                                  </app-keenicon>
+                              </span>
+                              <ng-template #noIcon>
+                                  <span class="text-muted">No icon selected</span>
+                              </ng-template>
                           </div>
-                      </div>
+                          
+                          </div>
+                      <!-- </div> -->
                     <!--end::Input group-->
                 </div>
                 <!--end::User form-->
