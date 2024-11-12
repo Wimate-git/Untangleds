@@ -44,8 +44,8 @@
 <ng-template #formModal let-modal>
     <form [formGroup]="dreamboardForm" (ngSubmit)="onSubmit($event)">
         <div class="modal-header">
-            <h4 *ngIf="!update" class="modal-title" id="modal-basic-title">Add Dream Board</h4>
-            <h4 *ngIf="update" class="modal-title" id="modal-basic-title">Update Dream Board</h4>
+            <h4 *ngIf="!update" class="modal-title" id="modal-basic-title">Add Dream Board Configuration</h4>
+            <h4 *ngIf="update" class="modal-title" id="modal-basic-title">Edit Dream Board Configuration</h4>
             <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
         </div>
         <div class="modal-body">
@@ -102,18 +102,18 @@
                     </div>
 
                     <div class="fv-row mb-7">
-                        <label class="required fw-semibold fs-6 mb-2" style="padding-right: 10px;">Manually Type HTML
+                        <label class="required fw-semibold fs-6 mb-2">Select Option: </label>
+                        <label class="fs-6 mb-2" style="padding-right: 10px;"> HTML
                             Code</label>
                         <input  type="radio" name="devices" value="code" formControlName="devices">
                         
-                        <label class="required fw-semibold fs-6 mb-2" style="padding-left: 20px; padding-right: 10px;">Upload
-                            your Application Folder</label>
+                        <label class="fs-6 mb-2" style="padding-left: 20px; padding-right: 10px;">Upload Folder</label>
                         <input type="radio" name="devices" value="file_up" formControlName="devices">
                        
                     </div>
 
                     <div class="row" *ngIf="dreamboardForm.controls['devices'].value === 'code'">
-                        <label class="required fw-semibold fs-6 mb-2">HTML</label>
+                        <label class="fw-semibold fs-6 mb-2">HTML</label>
                         <textarea class="form-control form-control-solid" formControlName="HTML" rows="10" placeholder="Enter html code"></textarea>
                     </div>
 

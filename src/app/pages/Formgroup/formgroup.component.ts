@@ -84,6 +84,7 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
   deleteResponse: any;
   selectedImage: string | ArrayBuffer | null = null;
   url: any;
+  uploadnew: boolean=false;
 
   constructor(
     // private apiService: UserService, 
@@ -125,6 +126,8 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
         console.log("IMAGESELECTEDVALUE:", this.selectedImage);
 
         if (this.update == true) {
+
+          this.uploadnew = true
 
           var formData_ = {
             "bucket_name": "dreamboard-dynamic",
@@ -231,12 +234,26 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
             const responseData = resp || []; // Default to an empty array if resp is null
 
             // Prepare the response structure expected by DataTables
-            callback({
-              draw: dataTablesParameters.draw, // Echo the draw parameter
-              recordsTotal: responseData.length, // Total number of records
-              recordsFiltered: responseData.length, // Filtered records (you may want to adjust this)
-              data: responseData // The actual data array
-            });
+
+            const searchValue = dataTablesParameters.search.value.toLowerCase();
+             const filteredData = Array.from(new Set(
+              responseData
+                .filter((item: { P1: string }) => item.P1.toLowerCase().includes(searchValue.toLowerCase()))
+                .map((item: any) => JSON.stringify(item)) // Stringify the object to make it unique
+            )).map((item: any) => JSON.parse(item)); // Parse back to object
+
+             callback({
+                 draw: dataTablesParameters.draw,
+                 recordsTotal: responseData.length,
+                 recordsFiltered: filteredData.length,
+                 data: filteredData // Return filtered data
+             });
+            // callback({
+            //   draw: dataTablesParameters.draw, // Echo the draw parameter
+            //   recordsTotal: responseData.length, // Total number of records
+            //   recordsFiltered: responseData.length, // Filtered records (you may want to adjust this)
+            //   data: responseData // The actual data array
+            // });
 
             console.log("Response is in this form ", responseData);
           })
@@ -290,9 +307,16 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
         },
         {
           title: 'Updated Time', data: 'P7', render: function (data) {
-            const date = new Date(data * 1000);
-            return `${date.toDateString()} ${date.toLocaleTimeString()}`;
-            //   return moment(data).format('DD MMM YYYY, hh:mm a');;
+            // const date = new Date(data * 1000);
+            // // return `${date.toDateString()} ${date.toLocaleTimeString()}`;
+            // return `${date.toDateString()} ${date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}`;
+            // //   return moment(data).format('DD MMM YYYY, hh:mm a');;
+
+            const date = new Date(data * 1000).toLocaleDateString() + " " + new Date(data * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+
+            // const date = new Date(data * 1000);
+            // return `${date.toDateString()} ${date.toLocaleTimeString()}`; // Format the date and time
+            return date
           }
         }
       ],
@@ -384,45 +408,42 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
 
         if (this.data_temp) {
 
-        if(this.data_temp[0].selectedImage)  {
+          if (this.data_temp[0].selectedImage) {
 
-          var request_data = {
-            bucket_name: "dreamboard-dynamic",
-            operation_type: "generate",
-            //key: 'public/' + clientid_ + '/fileuploads/Quote_Template/' + input_ID.value + '/' + visitType + '/',
-            "key": 'public/' + this.client + '/fileuploads/formgroup/' + P1 + '/',
-          }
-          //showLoadingSpinnerm();
-          // Call your API endpoint that triggers the Lambda function
-          fetch('https://3luwbeeuk0.execute-api.ap-south-1.amazonaws.com/s1/s3Bucket', {
-            method: 'POST',
-            // headers: {
-            //   'Content-Type': 'application/json',
-            // },
-            body: JSON.stringify(request_data)
-          })
-            .then(response => response.json())
-            .then(data => {
-      
-              console.log(data);
-      
-              var data_ = JSON.parse(data.body)
-      
-              var data_1 = JSON.parse(data_.data)
-              console.log('data_1 :', data_1);
-      
-              this.url = data_1[0].url
-              this.selectedImage = this.url
-              console.log("URL:", this.url)
-            }).catch((error) => {
-      
-              console.log("FETCH DATA FROM and BUCKET:", error)
+            var request_data = {
+              bucket_name: "dreamboard-dynamic",
+              operation_type: "generate",
+              //key: 'public/' + clientid_ + '/fileuploads/Quote_Template/' + input_ID.value + '/' + visitType + '/',
+              "key": 'public/' + this.client + '/fileuploads/formgroup/' + P1 + '/',
+            }
+            //showLoadingSpinnerm();
+            // Call your API endpoint that triggers the Lambda function
+            fetch('https://3luwbeeuk0.execute-api.ap-south-1.amazonaws.com/s1/s3Bucket', {
+              method: 'POST',
+              body: JSON.stringify(request_data)
             })
+              .then(response => response.json())
+              .then(data => {
+
+                console.log(data);
+
+                var data_ = JSON.parse(data.body)
+
+                var data_1 = JSON.parse(data_.data)
+                console.log('data_1 :', data_1);
+
+                this.url = data_1[0].url
+                this.selectedImage = this.url
+                console.log("URL:", this.url)
+              }).catch((error) => {
+
+                console.log("FETCH DATA FROM and BUCKET:", error)
+              })
           }
-          else{
+          else {
             this.selectedImage = this.data_temp[0].selectedImage
           }
-      
+
           this.formgroupForm = this.fb.group({
             formgroupId: [this.data_temp[0].formgroupId],
             label: [this.data_temp[0].label],
@@ -446,60 +467,60 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
 
   }
 
-//   async edit(P1: any) {
-//     this.update = true;
-//     console.log("EDIT ID:", P1);
-//     this.data_temp = [];
+  //   async edit(P1: any) {
+  //     this.update = true;
+  //     console.log("EDIT ID:", P1);
+  //     this.data_temp = [];
 
-//     const request_data = {
-//         bucket_name: "dreamboard-dynamic",
-//         operation_type: "generate",
-//         "key": 'public/' + this.client + '/fileuploads/formgroup/' + P1 + '/',
-//     };
+  //     const request_data = {
+  //         bucket_name: "dreamboard-dynamic",
+  //         operation_type: "generate",
+  //         "key": 'public/' + this.client + '/fileuploads/formgroup/' + P1 + '/',
+  //     };
 
-//     try {
-//         // Call your API endpoint that triggers the Lambda function
-//         const response = await fetch('https://3luwbeeuk0.execute-api.ap-south-1.amazonaws.com/s1/s3Bucket', {
-//             method: 'POST',
-//             body: JSON.stringify(request_data)
-//         });
+  //     try {
+  //         // Call your API endpoint that triggers the Lambda function
+  //         const response = await fetch('https://3luwbeeuk0.execute-api.ap-south-1.amazonaws.com/s1/s3Bucket', {
+  //             method: 'POST',
+  //             body: JSON.stringify(request_data)
+  //         });
 
-//         const data = await response.json();
-//         console.log(data);
+  //         const data = await response.json();
+  //         console.log(data);
 
-//         const data_ = JSON.parse(data.body);
-//         const data_1 = JSON.parse(data_.data);
-//         console.log('data_1 :', data_1);
+  //         const data_ = JSON.parse(data.body);
+  //         const data_1 = JSON.parse(data_.data);
+  //         console.log('data_1 :', data_1);
 
-//         this.url = data_1[0].url;
-//         console.log("URL:", this.url);
+  //         this.url = data_1[0].url;
+  //         console.log("URL:", this.url);
 
-//         // Fetching master data
-//         const res: any = await this.api.GetMaster(this.client + '#formgroup#' + P1 + '#main', 1);
-//         if (res && res !== undefined) {
-//             this.data_temp.push(JSON.parse(res.metadata));
-//             console.log("Permission data on edit", this.data_temp);
+  //         // Fetching master data
+  //         const res: any = await this.api.GetMaster(this.client + '#formgroup#' + P1 + '#main', 1);
+  //         if (res && res !== undefined) {
+  //             this.data_temp.push(JSON.parse(res.metadata));
+  //             console.log("Permission data on edit", this.data_temp);
 
-//             if (this.data_temp) {
-//                 this.selectedImage = this.url;
+  //             if (this.data_temp) {
+  //                 this.selectedImage = this.url;
 
-//                 this.formgroupForm = this.fb.group({
-//                     formgroupId: [this.data_temp[0].formgroupId],
-//                     label: [this.data_temp[0].label],
-//                     description: [this.data_temp[0].description],
-//                     formList: [this.data_temp[0].formList],
-//                     selectedImage: [this.url],
-//                     createdUser: [this.data_temp[0].createdUser],
-//                     updatedUser: [this.data_temp[0].updatedUser],
-//                     createdTime: [this.data_temp[0].createdTime],
-//                     updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
-//                 });
-//             }
-//         }
-//     } catch (error) {
-//         console.log("Error during API calls:", error);
-//     }
-// }
+  //                 this.formgroupForm = this.fb.group({
+  //                     formgroupId: [this.data_temp[0].formgroupId],
+  //                     label: [this.data_temp[0].label],
+  //                     description: [this.data_temp[0].description],
+  //                     formList: [this.data_temp[0].formList],
+  //                     selectedImage: [this.url],
+  //                     createdUser: [this.data_temp[0].createdUser],
+  //                     updatedUser: [this.data_temp[0].updatedUser],
+  //                     createdTime: [this.data_temp[0].createdTime],
+  //                     updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
+  //                 });
+  //             }
+  //         }
+  //     } catch (error) {
+  //         console.log("Error during API calls:", error);
+  //     }
+  // }
 
 
   create() {         // click on create new 
@@ -553,9 +574,9 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
 
       this.formgroupForm.value.createdUser = this.users
 
-      if(this.selectedImage){
-        this.formgroupForm.value.selectedImage = this.selectedImage
-      }
+      // if(this.selectedImage){
+      //   this.formgroupForm.value.selectedImage = this.selectedImage
+      // }
 
       const body = {
         PK: this.client + '#' + 'formgroup#' + this.formgroupForm.value.formgroupId + '#main',
@@ -602,6 +623,14 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
 
       const formValue = this.formgroupForm.value
 
+      console.log("FORM USER:",formValue)
+
+      if(this.uploadnew == false){
+
+      this.formgroupForm.value.selectedImage = this.data_temp[0].selectedImage
+      
+      }
+
       this.formgroupForm.value.updatedUser = this.users
 
       const body = {
@@ -625,8 +654,9 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
           P4: this.formgroupForm.value.selectedImage,
           P5: this.updateResponse.createdUser,
           P6: this.updateResponse.updatedUser,
-          P7: this.updateResponse.updatedTime,
-         
+          // P7: this.updateResponse.updatedTime,
+          P7: Math.ceil(((new Date()).getTime()) / 1000)
+
         };
 
         await this.updatedreamboardlookup(1, matchingRecord.P1, 'update', this.formgroupItem)

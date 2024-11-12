@@ -3,6 +3,7 @@ import { ModalConfig, ModalComponent } from '../../_metronic/partials';
 import { APIService } from 'src/app/API.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Route } from "@angular/router";
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
     selector: 'app-dashboardForm',
@@ -37,10 +38,13 @@ export class DashboardFormComponent implements OnInit {
         private api: APIService,
         private cdr: ChangeDetectorRef,
         private route: ActivatedRoute,
+        private spinner:NgxSpinnerService
     ) { }
 
 
     async ngOnInit(): Promise<void> {
+
+        this.spinner.show()
 
         this.route.paramMap.subscribe(params => {
             console.log(this.route)
@@ -134,6 +138,7 @@ export class DashboardFormComponent implements OnInit {
 
         console.log("CARDS ON FORMLIST:", this.cards.length)
         this.loading = false;
+        this.spinner.hide()
         this.cdr.detectChanges();
     }
 

@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { DashboardComponent } from './dashboard.component';
 import { ModalsModule, WidgetsModule } from '../../_metronic/partials';
 import { CardsModule } from '../../_metronic/partials';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
   declarations: [DashboardComponent],
@@ -18,6 +19,7 @@ import { CardsModule } from '../../_metronic/partials';
     ]),
     WidgetsModule,
     ModalsModule,
+    NgxSpinnerModule,
   ],
 })
 export class DashboardModule {}

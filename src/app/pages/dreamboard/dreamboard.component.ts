@@ -136,14 +136,28 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
             this.dreamboardLookupData(1)
             .then((resp:any) => {
                 const responseData = resp || []; // Default to an empty array if resp is null
+
+                const searchValue = dataTablesParameters.search.value.toLowerCase();
+                const filteredData = Array.from(new Set(
+                 responseData
+                   .filter((item: { P1: string }) => item.P1.toLowerCase().includes(searchValue.toLowerCase()))
+                   .map((item: any) => JSON.stringify(item)) // Stringify the object to make it unique
+               )).map((item: any) => JSON.parse(item)); // Parse back to object
+   
+                callback({
+                    draw: dataTablesParameters.draw,
+                    recordsTotal: responseData.length,
+                    recordsFiltered: filteredData.length,
+                    data: filteredData // Return filtered data
+                });
       
                 // Prepare the response structure expected by DataTables
-                callback({
-                  draw: dataTablesParameters.draw, // Echo the draw parameter
-                  recordsTotal: responseData.length, // Total number of records
-                  recordsFiltered: responseData.length, // Filtered records (you may want to adjust this)
-                  data: responseData // The actual data array
-                });
+                // callback({
+                //   draw: dataTablesParameters.draw, // Echo the draw parameter
+                //   recordsTotal: responseData.length, // Total number of records
+                //   recordsFiltered: responseData.length, // Filtered records (you may want to adjust this)
+                //   data: responseData // The actual data array
+                // });
       
                 console.log("Response is in this form ", responseData);
               })
@@ -197,9 +211,17 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
           },
           {
             title: 'Updated Time', data: 'P4', render: function (data) {
-                const date = new Date(data * 1000);
-                return `${date.toDateString()} ${date.toLocaleTimeString()}`;
+                // const date = new Date(data * 1000);
+                // return `${date.toDateString()} ${date.toLocaleTimeString()}`;
+                // const date = new Date(data * 1000);
+                // return `${date.toDateString()} ${date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}`;
+
             //   return moment(data).format('DD MMM YYYY, hh:mm a');;
+            const date = new Date(data * 1000).toLocaleDateString() + " " + new Date(data * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+
+            // const date = new Date(data * 1000);
+            // return `${date.toDateString()} ${date.toLocaleTimeString()}`; // Format the date and time
+            return date
             }
           }
         ],
@@ -607,7 +629,7 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
                     P1: this.updateResponse.dreamboardId,
                     P2: this.updateResponse.name,
                     P3: this.updateResponse.description,
-                    P4: this.updateResponse.updatedTime,
+                    P4: Math.ceil(((new Date()).getTime()) / 1000),
                 }
 
                 await this.updatedreamboardlookup(1, matchingRecord.P1, 'update', this.dreamboardItem)

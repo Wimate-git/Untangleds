@@ -2,6 +2,7 @@ import { Component, HostBinding, Input, OnInit, ViewChild } from '@angular/core'
 import { ModalConfig, ModalComponent } from '../../_metronic/partials';
 import { APIService } from 'src/app/API.service';
 import { ChangeDetectorRef } from '@angular/core';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 
 
@@ -40,6 +41,7 @@ export class DashboardComponent implements OnInit{
   constructor(
     private api: APIService,
     private cdr: ChangeDetectorRef,
+    private spinner:NgxSpinnerService
    
    
   ) {
@@ -48,7 +50,7 @@ export class DashboardComponent implements OnInit{
 
 
   async ngOnInit(): Promise<void> {
-
+    this.spinner.show()
   
     setTimeout(async () => {
     this.login_detail = localStorage.getItem('userAttributes')
@@ -58,7 +60,6 @@ export class DashboardComponent implements OnInit{
 
     this.client=this.loginDetail_string.clientID
     this.user=this.loginDetail_string.username
-
 
     const test = await this.api.GetMaster(this.user+'#user#main',1);
     this.permission_data = JSON.parse(JSON.parse(JSON.stringify(test.metadata)))
@@ -93,6 +94,8 @@ export class DashboardComponent implements OnInit{
         this.formgroup.map(async data => {
           const key = Object.keys(data)[0];
           const item = data[key]; // Extract the actual data using the key
+
+          if(item.P4){
     
           const request_data = {
             bucket_name: "dreamboard-dynamic",
@@ -123,6 +126,7 @@ export class DashboardComponent implements OnInit{
     
             console.log("FORMGROUP S3 bucket icon:",error)
           }
+        }
           return {
             icon: this.url || ' ',
             name: item.P1 || ' ',  // Fallback in case P1 is empty
@@ -137,6 +141,7 @@ export class DashboardComponent implements OnInit{
           };
         })
       );
+      
 
     }
     else{
@@ -206,6 +211,7 @@ export class DashboardComponent implements OnInit{
   
     console.log("CARDS ON FORMGROUP:",this.cards_2)
     this.loading = false;
+    this.spinner.hide();
     this.cdr.detectChanges();
 
     }   , 1000);

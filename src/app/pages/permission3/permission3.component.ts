@@ -95,7 +95,6 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
 
   permissionsList = [
-
     { name: 'Notification Matrix', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Client', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Company', view: false, update: false, xlsxView: false, xlsxUpdate: false },
@@ -158,12 +157,26 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
             const responseData = resp || []; // Default to an empty array if resp is null
 
             // Prepare the response structure expected by DataTables
+
+            const searchValue = dataTablesParameters.search.value.toLowerCase();
+            const filteredData = Array.from(new Set(
+             responseData
+               .filter((item: { P1: string }) => item.P1.toLowerCase().includes(searchValue.toLowerCase()))
+               .map((item: any) => JSON.stringify(item)) // Stringify the object to make it unique
+           )).map((item: any) => JSON.parse(item)); // Parse back to object
+
             callback({
-              draw: dataTablesParameters.draw, // Echo the draw parameter
-              recordsTotal: responseData.length, // Total number of records
-              recordsFiltered: responseData.length, // Filtered records (you may want to adjust this)
-              data: responseData // The actual data array
+                draw: dataTablesParameters.draw,
+                recordsTotal: responseData.length,
+                recordsFiltered: filteredData.length,
+                data: filteredData // Return filtered data
             });
+            // callback({
+            //   draw: dataTablesParameters.draw, // Echo the draw parameter
+            //   recordsTotal: responseData.length, // Total number of records
+            //   recordsFiltered: responseData.length, // Filtered records (you may want to adjust this)
+            //   data: responseData // The actual data array
+            // });
 
             console.log("Response is in this form ", responseData);
           })
@@ -214,8 +227,14 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
         },
         {
           title: 'Updated', data: 'P3', render: function (data) {
-            const date = new Date(data * 1000);
-            return `${date.toDateString()} ${date.toLocaleTimeString()}`; // Format the date and time
+            // const date = new Date(data * 1000);
+            // // return `${date.toDateString()} ${date.toLocaleTimeString()}`; // Format the date and time
+            // return `${date.toDateString()} ${date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}`;
+            const date = new Date(data * 1000).toLocaleDateString() + " " + new Date(data * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+
+            // const date = new Date(data * 1000);
+            // return `${date.toDateString()} ${date.toLocaleTimeString()}`; // Format the date and time
+            return date
           }
         }
       ],
@@ -237,6 +256,34 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
     // await this.addFromService()
   }
+
+  // onSelectAllChanged(index: number, event: Event): void {
+  //   const target = event.target as HTMLInputElement;
+  //   const isChecked = target.checked;
+  
+  //   // Check if the "Select All" row is changed
+  //   if (this.permissionsArray.at(index).get('name')?.value === 'Select All') {
+  //     this.permissionsArray.controls.forEach((control, idx) => {
+  //       // Skip "Select All" itself
+  //       if (idx !== index) {
+  //         control.get('view')?.setValue(isChecked);
+  //         control.get('update')?.setValue(isChecked);
+  //       }
+  //     });
+  //   }
+  // }
+
+  onSelectAllChanged(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const isChecked = target.checked;
+  
+    this.permissionsArray.controls.forEach(control => {
+      // Set both 'view' and 'update' checkboxes to match the "Select All" checkbox
+      control.get('view')?.setValue(isChecked);
+      control.get('update')?.setValue(isChecked);
+    });
+  }
+  
 
 
   onFormGroupSelect(selectedItem: any): void {
@@ -293,8 +340,6 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       console.log("VALUE LENGTH:",value.length)
     }
 }
-
-
 
   onDeSelectAll(deselectedItems: any): void {
     console.log("All deselected Form Groups:", deselectedItems);
@@ -704,7 +749,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
         this.permissionItem = {
           P1: this.updateResponse.permissionID,
           P2: this.updateResponse.label,
-          P3: [Math.ceil(((new Date()).getTime()) / 1000)],
+          P3: Math.ceil(((new Date()).getTime()) / 1000),
         }
 
         await this.updatepermissionlookup(1, matchingRecord.P1, 'update', this.permissionItem)

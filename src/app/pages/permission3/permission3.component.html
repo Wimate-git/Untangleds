@@ -45,8 +45,8 @@
 <ng-template #formModal let-modal>
     <form [formGroup]="permissionForm" (ngSubmit)="onSubmit($event)">
         <div class="modal-header">
-            <h4 *ngIf="!update" class="modal-title" id="modal-basic-title">Add Permission</h4>
-            <h4 *ngIf="update" class="modal-title" id="modal-basic-title">Update Permission</h4>
+            <h4 *ngIf="!update" class="modal-title" id="modal-basic-title">Add Permission Configuration</h4>
+            <h4 *ngIf="update" class="modal-title" id="modal-basic-title">Edit Permission Configuration</h4>
             <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
         </div>
         <div class="modal-body">
@@ -327,6 +327,19 @@
                                         </tr>
                                     </thead>
                                     <tbody formArrayName="permissionsList">
+                                        <tr *ngIf="permissionsArray.controls.length">
+                                            <td>Select All</td>
+                                            <td colspan="2">
+                                              <label class="form-check form-check-custom form-check-solid align-items-start">
+                                                <input
+                                                  class="form-check-input me-3"
+                                                  type="checkbox"
+                                                  (change)="onSelectAllChanged($event)"
+                                                />
+                                                Select All
+                                              </label>
+                                            </td>
+                                          </tr>
                                         <tr *ngFor="let permission of permissionsArray.controls; let i = index"
                                             [formGroupName]="i">
                                             <td>{{ permission.get('name')?.value }}</td>
