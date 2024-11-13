@@ -92,77 +92,128 @@ export class DreamIdComponent implements OnInit{
 
     console.log("USER DREAMBOARD PERMISSION",userPermissions)
 
-    this.route.paramMap.subscribe(params => {
-      console.log(this.route)
-      this.id = params.get('id');
-      this.form_id = params.get('formId');
+    // this.route.paramMap.subscribe(params => {
 
-      if((this.form_id == null)|| (this.form_id == undefined)){
-        this.form_id= 'All'
-      }
+    //   console.log(this.route)
+    //   this.id = params.get('id');
+    //   this.form_id = params.get('formId');
 
-      console.log(this.form_id)
-      console.log(this.id)
+    //   if((this.form_id == null)|| (this.form_id == undefined)){
+    //     this.form_id= 'All'
+    //   }
+
+    //   console.log(this.form_id)
+    //   console.log(this.id)
     
-      // this.loginDetail = JSON.parse(localStorage.getItem("currentUser"))
+    //   // this.loginDetail = JSON.parse(localStorage.getItem("currentUser"))
      
-      // this.client=this.loginDetail.client
-      // this.user=this.loginDetail.id
-      var x= this.apiService.GetMaster(this.client+"#dreamboard#"+this.id+"#main",1).then((res:any)=>{
-        //this.Description=res.description;
-        //this.name=res.name;
-        this.response = JSON.parse(res.metadata)
-        this.url_result=this.response.HTML
-        console.log("URL RES")
-        console.log(this.url_result,)
-        const timestamp = new Date().getTime();
-        if(this.form_id == 'All'){
-          this.url=`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/`+this.url_result+`?t=${timestamp}`+`&loginDetail=${this.login_string}`+`&userPermissions=${userPermissions}`+`&theme=${this.theme}`
+    //   // this.client=this.loginDetail.client
+    //   // this.user=this.loginDetail.id
+    //   var x= this.apiService.GetMaster(this.client+"#dreamboard#"+this.id+"#main",1).then((res:any)=>{
+    //     //this.Description=res.description;
+    //     //this.name=res.name;
+    //     this.response = JSON.parse(res.metadata)
+    //     this.url_result=this.response.HTML
+    //     console.log("URL RES")
+    //     console.log(this.url_result,)
+    //     const timestamp = new Date().getTime();
+    //     if(this.form_id == 'All'){
+    //       this.url=`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/`+this.url_result+`?t=${timestamp}`+`&loginDetail=${this.login_string}`+`&userPermissions=${userPermissions}`+`&theme=${this.theme}`
+    //     }
+    //     else{
+    //     this.url=`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/`+this.url_result+`?t=${timestamp}`+`&loginDetail=${this.login_string}`+`&userPermissions=${userPermissions}`+`&theme=${this.theme}`+`&formId=${this.form_id}`
+    //     }
+    //     this.send_data=this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
+    //     console.log(this.send_data)
+    //     this.changeDetection.detectChanges()
+    //   })
+    // });
+
+    // this.route.queryParamMap.subscribe(queryParams => {//prem
+
+    //   //prem 04/11/2024
+    //   //qr operation
+    //   this.formId = queryParams.get('formId');
+    //   this.recordId = queryParams.get('recordId');
+    //   var params_url = ''
+    //   if (this.formId && this.formId.length > 0)
+    //     params_url = '&formId=' + this.formId;
+    //   if (params_url && params_url.length > 0 && this.recordId && this.recordId.length > 0)
+    //     params_url = params_url + '&recordId=' + this.recordId;
+    //   //qr operation
+    //   //prem 04/11/2024
+
+    //   // this.loginDetail = JSON.parse(localStorage.getItem("currentUser"))
+
+    //   // this.client=this.loginDetail.client
+    //   // this.user=this.loginDetail.id
+    //   var x = this.apiService.GetMaster(this.client + "#dreamboard#" + this.id + "#main", 1).then((res: any) => {
+    //     //this.Description=res.description;
+    //     //this.name=res.name;
+    //     this.response = JSON.parse(res.metadata)
+    //     this.url_result = this.response.HTML
+    //     console.log("URL RES")
+    //     console.log(this.url_result,)
+    //     const timestamp = new Date().getTime();
+    //     //prem 04/11/2024
+    //     //this.url=`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/`+this.url_result+`?t=${timestamp}`+`&loginDetail=${this.login_string}`+`&userPermissions=${userPermissions}`
+    //     this.url = `https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/` + this.url_result + `?t=${timestamp}` + `&loginDetail=${this.login_string}` + `&userPermissions=${userPermissions}` + params_url
+    //     this.send_data = this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
+    //     console.log(this.send_data)
+    //     this.changeDetection.detectChanges()
+    //   })
+
+    // });//prem
+    this.route.paramMap.subscribe(params => {
+      console.log(this.route);
+      this.id = params.get('id');
+      this.form_id = params.get('formId') || 'All'; // Default to 'All' if no formId is found
+      console.log(this.formId);
+      console.log(this.id);
+  
+      this.route.queryParamMap.subscribe(queryParams => {
+        // Handle query parameters such as formId and recordId
+        this.formId = queryParams.get('formId');
+        this.recordId = queryParams.get('recordId');
+        let params_url = '';
+  
+        if (this.formId && this.formId.length > 0) {
+          params_url = `&formId=${this.formId}`;
         }
-        else{
-        this.url=`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/`+this.url_result+`?t=${timestamp}`+`&loginDetail=${this.login_string}`+`&userPermissions=${userPermissions}`+`&theme=${this.theme}`+`&formId=${this.form_id}`
+        if (this.form_id && this.form_id.length > 0) {
+          params_url = `&formId=${this.form_id}`;
         }
-        this.send_data=this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
-        console.log(this.send_data)
-        this.changeDetection.detectChanges()
-      })
+
+        console.log("PARAMS URL:",params_url)
+  
+        if (this.recordId && this.recordId.length > 0) {
+          params_url = `${params_url}&recordId=${this.recordId}`;
+        }
+
+        console.log("AFTER RECORD ID:",params_url)
+  
+        // API call to fetch Dreamboard data
+        var x = this.apiService.GetMaster(this.client + "#dreamboard#" + this.id + "#main", 1).then((res: any) => {
+          this.response = JSON.parse(res.metadata);
+          this.url_result = this.response.HTML;
+          console.log("URL RES", this.url_result);
+          const timestamp = new Date().getTime();
+  
+          // Build the URL based on whether formId is provided or not
+          this.url = `https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/` + this.url_result +
+            `?t=${timestamp}` +
+            `&loginDetail=${this.login_string}` +
+            `&userPermissions=${userPermissions}` +
+            `&theme=${this.theme}` +
+            params_url;
+  
+          this.send_data = this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
+          console.log(this.send_data);
+          this.changeDetection.detectChanges();
+        });
+      });
     });
-
-    this.route.queryParamMap.subscribe(queryParams => {//prem
-
-      //prem 04/11/2024
-      //qr operation
-      this.formId = queryParams.get('formId');
-      this.recordId = queryParams.get('recordId');
-      var params_url = ''
-      if (this.formId && this.formId.length > 0)
-        params_url = '&formId=' + this.formId;
-      if (params_url && params_url.length > 0 && this.recordId && this.recordId.length > 0)
-        params_url = params_url + '&recordId=' + this.recordId;
-      //qr operation
-      //prem 04/11/2024
-
-      // this.loginDetail = JSON.parse(localStorage.getItem("currentUser"))
-
-      // this.client=this.loginDetail.client
-      // this.user=this.loginDetail.id
-      var x = this.apiService.GetMaster(this.client + "#dreamboard#" + this.id + "#main", 1).then((res: any) => {
-        //this.Description=res.description;
-        //this.name=res.name;
-        this.response = JSON.parse(res.metadata)
-        this.url_result = this.response.HTML
-        console.log("URL RES")
-        console.log(this.url_result,)
-        const timestamp = new Date().getTime();
-        //prem 04/11/2024
-        //this.url=`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/`+this.url_result+`?t=${timestamp}`+`&loginDetail=${this.login_string}`+`&userPermissions=${userPermissions}`
-        this.url = `https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/` + this.url_result + `?t=${timestamp}` + `&loginDetail=${this.login_string}` + `&userPermissions=${userPermissions}` + params_url
-        this.send_data = this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
-        console.log(this.send_data)
-        this.changeDetection.detectChanges()
-      })
-
-    });//prem
+    
   }
 }
 
