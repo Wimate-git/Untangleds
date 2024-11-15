@@ -73,6 +73,9 @@ export class DreamIdComponent implements OnInit{
       this.client=this.loginDetail_string.clientID
       this.user=this.loginDetail_string.username
 
+
+      // this.client='WIMATE_ADMIN'
+
     console.log("CLIENT ID",this.client)
     console.log("USER ID",this.user)
     
@@ -92,78 +95,6 @@ export class DreamIdComponent implements OnInit{
 
     console.log("USER DREAMBOARD PERMISSION",userPermissions)
 
-    // this.route.paramMap.subscribe(params => {
-
-    //   console.log(this.route)
-    //   this.id = params.get('id');
-    //   this.form_id = params.get('formId');
-
-    //   if((this.form_id == null)|| (this.form_id == undefined)){
-    //     this.form_id= 'All'
-    //   }
-
-    //   console.log(this.form_id)
-    //   console.log(this.id)
-    
-    //   // this.loginDetail = JSON.parse(localStorage.getItem("currentUser"))
-     
-    //   // this.client=this.loginDetail.client
-    //   // this.user=this.loginDetail.id
-    //   var x= this.apiService.GetMaster(this.client+"#dreamboard#"+this.id+"#main",1).then((res:any)=>{
-    //     //this.Description=res.description;
-    //     //this.name=res.name;
-    //     this.response = JSON.parse(res.metadata)
-    //     this.url_result=this.response.HTML
-    //     console.log("URL RES")
-    //     console.log(this.url_result,)
-    //     const timestamp = new Date().getTime();
-    //     if(this.form_id == 'All'){
-    //       this.url=`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/`+this.url_result+`?t=${timestamp}`+`&loginDetail=${this.login_string}`+`&userPermissions=${userPermissions}`+`&theme=${this.theme}`
-    //     }
-    //     else{
-    //     this.url=`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/`+this.url_result+`?t=${timestamp}`+`&loginDetail=${this.login_string}`+`&userPermissions=${userPermissions}`+`&theme=${this.theme}`+`&formId=${this.form_id}`
-    //     }
-    //     this.send_data=this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
-    //     console.log(this.send_data)
-    //     this.changeDetection.detectChanges()
-    //   })
-    // });
-
-    // this.route.queryParamMap.subscribe(queryParams => {//prem
-
-    //   //prem 04/11/2024
-    //   //qr operation
-    //   this.formId = queryParams.get('formId');
-    //   this.recordId = queryParams.get('recordId');
-    //   var params_url = ''
-    //   if (this.formId && this.formId.length > 0)
-    //     params_url = '&formId=' + this.formId;
-    //   if (params_url && params_url.length > 0 && this.recordId && this.recordId.length > 0)
-    //     params_url = params_url + '&recordId=' + this.recordId;
-    //   //qr operation
-    //   //prem 04/11/2024
-
-    //   // this.loginDetail = JSON.parse(localStorage.getItem("currentUser"))
-
-    //   // this.client=this.loginDetail.client
-    //   // this.user=this.loginDetail.id
-    //   var x = this.apiService.GetMaster(this.client + "#dreamboard#" + this.id + "#main", 1).then((res: any) => {
-    //     //this.Description=res.description;
-    //     //this.name=res.name;
-    //     this.response = JSON.parse(res.metadata)
-    //     this.url_result = this.response.HTML
-    //     console.log("URL RES")
-    //     console.log(this.url_result,)
-    //     const timestamp = new Date().getTime();
-    //     //prem 04/11/2024
-    //     //this.url=`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/`+this.url_result+`?t=${timestamp}`+`&loginDetail=${this.login_string}`+`&userPermissions=${userPermissions}`
-    //     this.url = `https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/` + this.url_result + `?t=${timestamp}` + `&loginDetail=${this.login_string}` + `&userPermissions=${userPermissions}` + params_url
-    //     this.send_data = this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
-    //     console.log(this.send_data)
-    //     this.changeDetection.detectChanges()
-    //   })
-
-    // });//prem
     this.route.paramMap.subscribe(params => {
       console.log(this.route);
       this.id = params.get('id');
@@ -193,7 +124,8 @@ export class DreamIdComponent implements OnInit{
         console.log("AFTER RECORD ID:",params_url)
   
         // API call to fetch Dreamboard data
-        var x = this.apiService.GetMaster(this.client + "#dreamboard#" + this.id + "#main", 1).then((res: any) => {
+        var x = this.apiService.GetMaster('WIMATE_ADMIN' + "#dreamboard#" + this.id + "#main", 1).then((res: any) => {
+        // var x = this.apiService.GetMaster(this.client + "#dreamboard#" + this.id + "#main", 1).then((res: any) => {
           this.response = JSON.parse(res.metadata);
           this.url_result = this.response.HTML;
           console.log("URL RES", this.url_result);

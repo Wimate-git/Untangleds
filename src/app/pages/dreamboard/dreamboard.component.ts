@@ -77,6 +77,7 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
     client: any;
     update: boolean = false;
     error: string;
+    show: boolean=false;
   
     constructor(
         // private apiService: UserService, 
@@ -102,18 +103,41 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       
     initForm() {
-        this.dreamboardForm = this.fb.group({
-            dreamboardId: ['', Validators.required],
-            name: ['', Validators.required],
-            description: ['',],
-            devices: ['',Validators.required],
-            HTML: ['',Validators.required],
-            type: [' '],
-            settings: [' '],
-            rdt: [' '],
-            createdTime: [Math.ceil(((new Date()).getTime()) / 1000)],
-            updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
-        });
+
+        if(this.client == 'WIMATE_ADMIN'){
+
+            this.show = true
+
+            this.dreamboardForm = this.fb.group({
+                dreamboardId: ['', Validators.required],
+                name: ['', Validators.required],
+                description: [''],
+                // dreamboard_module:['',Validators.required],
+                devices: ['',Validators.required],
+                HTML: ['', Validators.required],
+                type: [' '],
+                settings: [' '],
+                rdt: [' '],
+                createdTime: [Math.ceil(((new Date()).getTime()) / 1000)],
+                updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
+            });
+        }
+        else{
+            this.dreamboardForm = this.fb.group({
+                dreamboardId: ['', Validators.required],
+                name: ['', Validators.required],
+                description: ['',],
+                // dreamboard_module:['',Validators.required],
+                devices: [''],
+                HTML: [''],
+                type: [' '],
+                settings: [' '],
+                rdt: [' '],
+                createdTime: [Math.ceil(((new Date()).getTime()) / 1000)],
+                updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
+            });
+        }
+       
       }
   
     ngOnInit(): void {
@@ -127,6 +151,11 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.client=this.loginDetail_string.clientID
     this.users=this.loginDetail_string.username
+
+    if(this.client == 'WIMATE_ADMIN'){
+
+        this.show = true
+    }
 
      this.datatableConfig = {}
      this.lookup_data_user = []
@@ -312,6 +341,7 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
                     name: [this.data_temp[0].name],
                     description: [this.data_temp[0].description],
                     devices: [this.data_temp[0].devices],
+                    dreamboard_module:[this.data_temp[0].dreamboard_module],
                     HTML: [this.HTML_code],
                     type: [this.data_temp[0].type],
                     settings: [this.data_temp[0].setting],
@@ -460,7 +490,7 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
                     // this.isLoading = false;
                     completeFn();
                 }
-            } else {
+            } else if(this.dreamboardForm.get('devices')?.value === 'file_up'){
                 let folder_name = this.files[0]['webkitRelativePath'];
                 folder_name = folder_name.split('/')[0];
                 this.HTML = `public/${this.client}/${this.dreamboardForm.getRawValue().dreamboardId}/src/index.html`;
@@ -533,6 +563,85 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
                             console.error("File upload failed:", err);
                         });
                     }
+
+                    await this.createLookupdreamboard(this.dreamboardItem, 1, this.client+'#dreamboard#lookup');
+                    this.showAlert(successAlert);
+                    this.reloadEvent.emit(true);
+
+                } catch (error) {
+                    console.error("Dreamboard add request error:", error);
+                    errorAlert.text = this.extractText(error);
+                    this.showAlert(errorAlert);
+                } finally {
+                    // this.isLoading = false;
+                    completeFn()
+                }
+            }
+            else{
+                if (!this.dreamboardForm.valid) {
+                    console.log('Form is not valid:', this.dreamboardForm.errors);
+                    return;
+                }
+
+                this.isLoading = true;
+                const formValue = this.dreamboardForm.value;
+                const body = {
+                    PK: this.client+'#' + 'dreamboard#' + this.dreamboardForm.value.dreamboardId + '#main',
+                    SK: 1,
+                    metadata: JSON.stringify(formValue)
+                };
+                console.log('Form Submitted:', formValue);
+                console.log("Body:", body);
+
+                try {
+                    const res = await this.api.CreateMaster(body);
+                    console.log("ADD RESPONSE:", res);
+
+                    // Build dreamboard item for further operations
+                    this.dreamboardItem = {
+                        P1:this.dreamboardForm.value.dreamboardId,
+                        P2:this.dreamboardForm.value.name,
+                        P3:this.dreamboardForm.value.description,
+                        P4:this.dreamboardForm.value.updatedTime,
+                    };
+
+                    // if (this.dreamboardForm.value.devices === 'code') {
+                    //     const requestData = {
+                    //         bucket_name: "dreamboard-dynamic",
+                    //         bucket_region: "ap-south-1",
+                    //         operation_type: "store",
+                    //         key: this.dreamboardForm.value.HTML,
+                    //         data: this.HTML_content,
+                    //         contentType: "text/html"
+                    //     };
+                    //     console.log("REQ DATA:", requestData);
+
+                    //     // POST request for file storage
+                    //     this.apiCallService.postData(requestData).subscribe(
+                    //         (response) => {
+                    //             console.log('POST request successful:', response);
+                    //         },
+                    //         (error) => {
+                    //             console.error('Error in POST request:', error);
+                    //         }
+                    //     );
+                    // } else {
+                    //     // Handle file upload
+                    //     console.log(this.files);
+                    //     const key = `public/${this.client}/${this.dreamboardForm.value.dreamboardId}/`;
+                    //     const readFilePromises = [];
+                    //     for (const file of this.files) {
+                    //         const ch = file.webkitRelativePath;
+                    //         const file_path = key + `${ch}`;
+                    //         console.log("FILEPATH:", file_path);
+                    //         console.log("FILE:", file);
+
+                    //         readFilePromises.push(this.readFile(file, file_path));
+                    //     }
+                    //     await Promise.all(readFilePromises).catch((err) => {
+                    //         console.error("File upload failed:", err);
+                    //     });
+                    // }
 
                     await this.createLookupdreamboard(this.dreamboardItem, 1, this.client+'#dreamboard#lookup');
                     this.showAlert(successAlert);

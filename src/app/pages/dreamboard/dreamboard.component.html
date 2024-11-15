@@ -54,6 +54,14 @@
                 data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_update_customer_header"
                 data-kt-scroll-wrappers="#kt_modal_update_customer_scroll" data-kt-scroll-offset="300px">
                 <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+
+                    <!-- <div class="fv-row mb-7">
+                        <label class="fw-semibold fs-6 mb-2 required">Select Module</label>
+                        <select formControlName="dreamboard_module" class="form-select form-select-solid form-select-lg fw-bold" placeholder="Select Option">
+                            <option value="text">Inbuilt Module</option>
+                            <option value="text">New Module</option>
+                        </select>
+                      </div> -->
                     <!--begin::Input group-->
                     <div class="fv-row mb-7">
                         <!--begin::Label-->
@@ -90,7 +98,7 @@
 
                     <div class="fv-row mb-7">
                         <!--begin::Label-->
-                        <label class="required fw-semibold fs-6 mb-2">
+                        <label class="fw-semibold fs-6 mb-2">
                             <span>Description</span>
                         </label>
                         <!--end::Label-->
@@ -101,7 +109,7 @@
                         <!--end::Input-->
                     </div>
 
-                    <div class="fv-row mb-7">
+                    <div class="fv-row mb-7" *ngIf="show">
                         <label class="required fw-semibold fs-6 mb-2">Select Option: </label>
                         <label class="fs-6 mb-2" style="padding-right: 10px;"> HTML
                             Code</label>

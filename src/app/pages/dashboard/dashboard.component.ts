@@ -197,6 +197,8 @@ export class DashboardComponent implements OnInit {
               }
               catch (error) {
 
+                this.spinner.hide();
+
                 console.log("FORMGROUP S3 bucket icon:", error)
               }
             }
