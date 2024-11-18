@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Injector, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { SharedService } from '../shared.service';
 import { APIService } from 'src/app/API.service';
 import { AbstractControl, FormControl, FormGroup, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
@@ -14,7 +14,25 @@ import 'jstree';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import Swal from 'sweetalert2';
 import { MatMenuTrigger } from '@angular/material/menu';
+
+import HighchartsBullet from 'highcharts/modules/bullet';
+import HighchartsMore from 'highcharts/highcharts-more'; 
+
+import HighchartsSolidGauge from 'highcharts/modules/solid-gauge';
+import bullet from 'highcharts/modules/bullet';
+
+import * as moment from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
+import { NgxDaterangepickerLocaleService } from 'ngx-daterangepicker-bootstrap';
+import bulletChart from 'highcharts/modules/bullet.src';
+import * as Highcharts from 'highcharts';
+
+
+
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
+
+
+
 interface ListItem {
   [key: string]: {
     P1: any;
@@ -37,8 +55,17 @@ interface TreeNode {
   id: string;         // Assuming 'id' is a string
   text: string;       // Assuming 'text' is a string
   parent?: string;    // 'parent' can be a string or undefined
-  node_type?: string; // Optional property for node type
-  summaryView?: string;
+  node_type?: string;
+magicboard_view:any,
+powerboard_view:any,
+description:any,
+summaryView:any,
+dreamboard_view:any,
+powerboard_view_device:any,
+icon:any
+
+
+// Optional property for node type
 }
 interface DashboardItem extends GridsterItem {
   title: string;
@@ -50,6 +77,10 @@ interface NgxSelectEvent {
     value: string;
   };
 }
+
+
+HighchartsMore(Highcharts);
+HighchartsSolidGauge(Highcharts);
 @Component({
   selector: 'app-summary-engine',
   templateUrl: './summary-engine.component.html',
@@ -57,7 +88,17 @@ interface NgxSelectEvent {
 })
 export class SummaryEngineComponent implements OnInit,AfterViewInit,OnDestroy {
   iconOptions: { value: string; label: string; class1: string ,class2: string}[] = [];
-  @ViewChild('calendarModal', { static: true }) calendarModal: any;
+  @ViewChild('calendarModal') calendarModal: any;
+  @ViewChild('calendarModal1') calendarModal1: any;
+  @ViewChild('calendarModal2') calendarModal2: any;
+  @ViewChild('calendarModal3') calendarModal3: any;
+  @ViewChild('calendarModal4') calendarModal4: any;
+  @ViewChild('calendarModal5') calendarModal5: any;
+  @ViewChild('calendarModal6') calendarModal6: any;
+  @ViewChild('dialChartContainer') dialChartContainer!: ElementRef;
+
+  tooltip: string | null = null;
+  chartType: string = 'solidgauge'; 
 
   options: any;
   dashboard: any[] = []; // Initialize an empty array for the dashboard items
@@ -133,6 +174,8 @@ iconsList:any = [
   // { value: 'abstract-8', label: 'Abstract 8', class: `ki-duotone ki-abstract-8 ${this.getRandomColor()}` },
   // Add more icons as needed...
 ];
+
+
   // options: GridsterConfig;
   // dashboard: Array<GridsterItem>;
   @Output() redirection = new EventEmitter<any>()
@@ -144,7 +187,10 @@ iconsList:any = [
   SK_clientID: any;
   showModal: boolean;
   createSummaryField: FormGroup;
+  createKPIWidget2:FormGroup;
   createKPIWidget:FormGroup;
+  createKPIWidget5:FormGroup;
+  createKPIWidget6:FormGroup
   errorForUniqueID: any;
   errorForMobile: any;
   errorForInvalidEmail: string;
@@ -197,7 +243,7 @@ editButtonCheck :any = false
   selectedGroupByValue: any;
   displayLabel: string = '';
 
-  tooltip: string | null = null;
+
   showAddWidgetsTab = false;
   selectedTile: any;
   showGrid = false;
@@ -213,25 +259,167 @@ editButtonCheck :any = false
   isEditMode: boolean = false; // Initially set to false for add mode
 currentItem: any;
 private editTileIndex: number | null = null;
+private widgetIdCounter = 0;
 
   isMenuOpen: boolean = false; // Tracks dropdown menu state
   @ViewChild(MatMenuTrigger) triggerBtn: MatMenuTrigger;
   allUpdateTile: { summaryID: any; summaryName: any; summaryDesc: any; summaryIcon: any; updated: Date; createdUser: any; };
+  groupByFormat: any;
+  editTileIndex1: number | null;
+  editTileIndex2: number | null;
+  createKPIWidget3:FormGroup;
+  editTileIndex3: number | null;
+  editTileIndex4: number | null;
+  createKPIWidget4:FormGroup
+  editTileIndex5: number | null;
+  editTileIndex6: number | null;
+  showIdField = false; 
+  selectedTabset: string = 'dataTab';
+  @ViewChild('bulletChart') bulletChart: ElementRef;
+
+  // Default to 'Data' tab
+  dropsDown = 'down';
+  dropsUp = 'up';
+  opensRight = 'right';
+  opensCenter = 'center';
+  opensLeft = 'left';
+  selectedRangeCalendarTimeRight: any;
+  selectedRangeCalendarCenter: any;
+  selectedRangeCalendarAutoLeft: any;
+  selectedSingleCalendarTimeRight: any;
+  selectedSingleCalendarCenter: any;
+  selectedSingleCalendarAutoLeft: any;
+  selectedSimpleCalendarTimeUpRight: any;
+  selectedSimpleCalendarUpCenter: any;
+  selectedSimpleCalendarAutoUpLeft: any;
+  selectedRangeCalendarTimeInline: any;
+  maxDate?: Dayjs;
+  minDate?: Dayjs;
+  invalidDates: Dayjs[] = [];
+  selectedRangeLabel: string;
+  selectedRangeLabelWithDates: string = '';
+  isEditModeView: boolean = false;  // Default to Edit Mode
+
+  // This method can be used to toggle between Edit and View modes
+  toggleMode(): void {
+    // Toggle the mode and save it to localStorage
+    this.isEditModeView = !this.isEditModeView;
+    localStorage.setItem('editModeState', this.isEditModeView.toString());
+    this.cdr.detectChanges();  // Manually triggers change detection
+  }
+
  
 
+
+  // Function to set the selected tab
+  selectedSettingsTab(tab: string) {
+    this.selectedTabset = tab;
+  }
+
+  themes = [
+    { color: "#338F74", selected: false },
+    { color: "#D66E75", selected: false },
+    { color: "#3C8AB0", selected: false },
+    { color: "#C6A539", selected: false },
+    { color: "#7E6FBF", selected: false }
+  ];
+  
+ 
+  
+
+  selectedColor: string = '#66C7B7'; // Default to the first color
+ 
+
+  // Toggle checkbox visibility and state inside color box
+  toggleCheckbox(theme: any): void {
+    // Clear the 'selected' state for all themes
+    this.themes.forEach(t => t.selected = false);  // Reset selection for all themes
+    
+    // Set the clicked theme as selected
+    theme.selected = true;
+  
+    // Update the selected color based on the theme selection
+    this.selectedColor = theme.color;
+    
+    // Optionally, update the form control with the selected color
+    this.createKPIWidget.get('themeColor')?.setValue(this.selectedColor);
+  
+    // Manually trigger change detection to ensure the UI reflects the changes
+    this.cdr.detectChanges();
+  }
+  
+  toggleCheckbox2(theme: any): void {
+    // Clear the 'selected' state for all themes
+    this.themes.forEach(t => t.selected = false);  // Reset selection for all themes
+  
+    // Set the clicked theme as selected
+    theme.selected = true;
+  
+    // Update the selected color based on the theme selection
+    this.selectedColor = theme.color;
+    
+    // Optionally, update the form control with the selected color
+    this.createKPIWidget2.get('themeColor')?.setValue(this.selectedColor);
+  }
+  toggleCheckbox3(theme: any): void {
+    // Clear the 'selected' state for all themes
+    this.themes.forEach(t => t.selected = false);  // Reset selection for all themes
+  
+    // Set the clicked theme as selected
+    theme.selected = true;
+  
+    // Update the selected color based on the theme selection
+    this.selectedColor = theme.color;
+    
+    // Optionally, update the form control with the selected color
+    this.createKPIWidget3.get('themeColor')?.setValue(this.selectedColor);
+  }
+
+  toggleCheckbox4(theme: any): void {
+    // Clear the 'selected' state for all themes
+    this.themes.forEach(t => t.selected = false);  // Reset selection for all themes
+  
+    // Set the clicked theme as selected
+    theme.selected = true;
+  
+    // Update the selected color based on the theme selection
+    this.selectedColor = theme.color;
+    
+    // Optionally, update the form control with the selected color
+    this.createKPIWidget4.get('themeColor')?.setValue(this.selectedColor);
+  }
+  
+
+  toggleCheckbox5(theme: any): void {
+    // Clear the 'selected' state for all themes
+    this.themes.forEach(t => t.selected = false);  // Reset selection for all themes
+  
+    // Set the clicked theme as selected
+    theme.selected = true;
+  
+    // Update the selected color based on the theme selection
+    this.selectedColor = theme.color;
+    
+    // Optionally, update the form control with the selected color
+    this.createKPIWidget5.get('themeColor')?.setValue(this.selectedColor);
+  }
+  
+
+
+
+
+
+
+
+  
+  
   // Method to toggle the menu open/close
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
   }
 
 
-  showTooltip(item: string): void {
-    this.tooltip = item;
-  }
-
-  hideTooltip(): void {
-    this.tooltip = null;
-  }
+ 
   deleteItem(item: any) {
     // Logic for deleting the item
     console.log('Delete:', item);
@@ -241,13 +429,168 @@ private editTileIndex: number | null = null;
   nineBlocks = Array.from({ length: 9 }, (_, i) => ({ label: `KPI ${i + 1}` }));
 
   constructor(private summaryConfiguration: SharedService,private api: APIService,private fb: UntypedFormBuilder,private cd:ChangeDetectorRef,
-    private toast: MatSnackBar,private router:Router,private modalService: NgbModal,  private route: ActivatedRoute,private cdr:ChangeDetectorRef,private locationPermissionService:LocationPermissionService,private devicesList: SharedService
+    private toast: MatSnackBar,private router:Router,private modalService: NgbModal,  private route: ActivatedRoute,private cdr:ChangeDetectorRef,private locationPermissionService:LocationPermissionService,private devicesList: SharedService,private injector: Injector
     ) {
-      this.createKPIWidget = this.fb.group({
-        groupBy: [''] // Default value can be empty or a specific option
-      });
+    
+      this.selectedRangeCalendarTimeRight = {
+        startDate: dayjs().startOf('day'),
+        endDate: dayjs().endOf('day'),
+      };
+      this.selectedRangeCalendarCenter = {
+        startDate: dayjs().startOf('day'),
+        endDate: dayjs().endOf('day'),
+      };
+      this.selectedRangeCalendarAutoLeft = {
+        startDate: dayjs().startOf('day'),
+        endDate: dayjs().endOf('day'),
+      };
+      this.selectedSingleCalendarTimeRight = dayjs().startOf('day');
+      this.selectedSingleCalendarCenter = dayjs().startOf('day');
+      this.selectedSingleCalendarAutoLeft = dayjs().startOf('day');
+      this.selectedSimpleCalendarTimeUpRight = {
+        startDate: dayjs().startOf('day'),
+        endDate: dayjs().endOf('day'),
+      };
+      this.selectedSimpleCalendarUpCenter = {
+        startDate: dayjs().startOf('day'),
+        endDate: dayjs().endOf('day'),
+      };
+      this.selectedSimpleCalendarAutoUpLeft = {
+        startDate: dayjs().startOf('day'),
+        endDate: dayjs().endOf('day'),
+      };
+      this.selectedRangeCalendarTimeInline = {
+        startDate: dayjs().startOf('day'),
+        endDate: dayjs().endOf('day'),
+      };
+      // this.createKPIWidget = this.fb.group({
+      //   groupBy: [''] // Default value can be empty or a specific option
+      // });
       // this.iconOptions = this.getIconOptions();
      }
+
+     someMethod() {
+      const localeService = this.injector.get(NgxDaterangepickerLocaleService);
+    }
+    ranges: { [key: string]: [dayjs.Dayjs, dayjs.Dayjs] } = {
+      Today: [dayjs().startOf('day'), dayjs().endOf('day')],
+      Yesterday: [
+        dayjs().subtract(1, 'day').startOf('day'),
+        dayjs().subtract(1, 'day').endOf('day'),
+      ],
+      'Last 7 days': [
+        dayjs().subtract(6, 'days').startOf('day'),
+        dayjs().endOf('day'),
+      ],
+      'Last 30 days': [
+        dayjs().subtract(29, 'days').startOf('day'),
+        dayjs().endOf('day'),
+      ],
+      'This month': [dayjs().startOf('month'), dayjs().endOf('month')],
+      'Last month': [
+        dayjs().subtract(1, 'month').startOf('month'),
+        dayjs().subtract(1, 'month').endOf('month'),
+      ],
+      'Last 24 Hours': [
+        dayjs().subtract(24, 'hours').startOf('hour'),
+        dayjs().endOf('hour'),
+      ],
+      'Last 48 Hours': [
+        dayjs().subtract(48, 'hours').startOf('hour'),
+        dayjs().endOf('hour'),
+      ],
+      'This Quarter': [
+        dayjs().month(Math.floor(dayjs().month() / 3) * 3).startOf('month'),
+        dayjs().month(Math.floor(dayjs().month() / 3) * 3 + 2).endOf('month'),
+      ],
+      'Last Quarter': [
+        // Calculate start and end of last quarter
+        dayjs().month(Math.floor((dayjs().month() - 3) / 3) * 3).startOf('month'),
+        dayjs().month(Math.floor((dayjs().month() - 3) / 3) * 3 + 2).endOf('month'),
+      ],
+      'This Year': [dayjs().startOf('year'), dayjs().endOf('year')],
+      'Last Year': [
+        dayjs().subtract(1, 'year').startOf('year'),
+        dayjs().subtract(1, 'year').endOf('year'),
+      ],
+      'This Week': [
+        dayjs().startOf('week'),
+        dayjs().endOf('week'),
+      ],
+      'Last Week': [
+        dayjs().subtract(1, 'week').startOf('week'),
+        dayjs().subtract(1, 'week').endOf('week'),
+      ],
+    };
+    
+    
+    
+    
+    localeTime = {
+      firstDay: 1,
+      startDate: dayjs().startOf('day'),
+      endDate: dayjs().endOf('day'),
+      format: 'DD.MM.YYYY HH:mm:ss',
+      applyLabel: 'Apply',
+      cancelLabel: 'Cancel',
+      fromLabel: 'From',
+      toLabel: 'To',
+    };
+    locale = {
+      firstDay: 1,
+      startDate: dayjs().startOf('day'),
+      endDate: dayjs().endOf('day'),
+      format: 'DD.MM.YYYY',
+      applyLabel: 'Apply',
+      cancelLabel: 'Cancel',
+      fromLabel: 'From',
+      toLabel: 'To',
+    };
+    tooltips = [
+      { date: dayjs(), text: 'Today is just unselectable' },
+      { date: dayjs().add(2, 'days'), text: 'Yeeeees!!!' },
+    ];
+  
+  
+  
+    isInvalidDate = (m: Dayjs) => {
+      return this.invalidDates.some((d) => d.isSame(m, 'day'));
+    };
+  
+    isCustomDate = (date: Dayjs) => {
+      return date.month() === 0 || date.month() === 6 ? 'mycustomdate' : false;
+    };
+  
+    isTooltipDate = (m: Dayjs) => {
+      const tooltip = this.tooltips.find((tt) => tt.date.isSame(m, 'day'));
+      return tooltip ? tooltip.text : false;
+    };
+  
+  
+    datesUpdatedRange($event: any) {
+      const selectedRange = Object.entries(this.ranges).find(([label, dates]) => {
+        const [startDate, endDate] = dates as [dayjs.Dayjs, dayjs.Dayjs];
+        return startDate.isSame($event.startDate, 'day') && endDate.isSame($event.endDate, 'day');
+      });
+      console.log('selectedRange check',selectedRange)
+    
+      if (selectedRange) {
+        const control = this.createKPIWidget.get('selectedRangeType');
+        if (control) {
+          control.setValue(selectedRange[0]);  // Update form control value with selected range label
+        }
+      }
+    }
+    
+     
+    datesUpdatedSingle($event: any) {
+      console.log('single', $event);
+    }
+  
+    datesUpdatedInline($event: Object) {
+      console.log('inline', $event);
+    }
+  
   ngOnDestroy(): void {
     console.log('SummaryEngineComponent destroyed.');
   }
@@ -263,8 +606,124 @@ private editTileIndex: number | null = null;
     this.addFromService()
  
     console.log("this.lookup_data_summary1",this.lookup_data_summary1)
+    this.createChartGauge();
+  
+    this.createKPIWidget.statusChanges.subscribe(status => {
+      // Log form validity status to track changes
+      console.log('Form status changed:', status);
+      console.log('Form validity:', this.createKPIWidget.valid);
+    });
+    // this.createBulletChart();
 
   }
+
+
+  createBulletChart() {
+    const chartoptions:any = {
+      chart: {
+          inverted: true,
+          marginLeft: 135,
+          type: 'bullet'
+      },
+      title: {
+          text: null
+      },
+      legend: {
+          enabled: false
+      },
+      yAxis: {
+          gridLineWidth: 0
+      },
+      plotOptions: {
+          series: {
+              pointPadding: 0.25,
+              borderWidth: 0,
+              color: '#000',
+              targetOptions: {
+                  width: '200%'
+              }
+          }
+      },
+      credits: {
+          enabled: false
+      },
+      exporting: {
+          enabled: false
+      }
+  }
+    Highcharts.chart('bulletChart',chartoptions);
+  }
+
+  private getRandomNumber(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1) + min)
+  }
+
+  private createChartGauge(): void {
+    const chart = Highcharts.chart('chart-gauge', {
+      chart: {
+        type: 'solidgauge',
+        backgroundColor: 'transparent',
+      },
+      title: {
+        text: '',
+      },
+      credits: {
+        enabled: false,
+      },
+      pane: {
+        startAngle: -90,
+        endAngle: 90,
+        center: ['50%', '85%'],
+        size: '160%',
+        background: {
+            innerRadius: '60%',
+            outerRadius: '100%',
+            shape: 'arc',
+        },
+      },
+      yAxis: {
+        min: 0,
+        max: 100,
+        stops: [
+          [0.1, '#55BF3B'], // green
+          [0.5, '#DDDF0D'], // yellow
+          [0.9, '#DF5353'], // red
+        ],
+        minorTickInterval: null,
+        tickAmount: 2,
+        labels: {
+          y: 16,
+        },
+      },
+      plotOptions: {
+        solidgauge: {
+          dataLabels: {
+            y: -25,
+            borderWidth: 0,
+            useHTML: true,
+          },
+        },
+      },
+      tooltip: {
+        enabled: false,
+      },
+      series: [{
+        name: null,
+        data: [this.getRandomNumber(0, 100)],
+        dataLabels: {
+          format: '<div style="text-align: center"><span style="font-size: 1.25rem">{y}</span></div>',
+        },
+      }],
+    } as any);
+
+    setInterval(() => {
+      chart.series[0].points[0].update(this.getRandomNumber(0, 100));
+    }, 1000);
+  }
+
+
+
+
   ngOnInit() {
 
     // this.dropdownSettings = this.devicesList.getMultiSelectSettings();
@@ -289,9 +748,18 @@ private editTileIndex: number | null = null;
   
     this.initializeCompanyFields();
     this.initializeTileFields();
+    this.initializeTileFields1()
+    this.initializeTileFields2()
+    this.initializeTileFields3()
+    this.initializeTileFields4()
+    this.initializeTileFields5()
+    this.initializeTileFields6()
     // this.addJsonValidation();
     this.showTable()
     this.addFromService()
+    const savedState = localStorage.getItem('editModeState');
+    this.isEditModeView = savedState === 'true';
+   
    
 
   
@@ -323,6 +791,8 @@ private editTileIndex: number | null = null;
       pushItems: true,
       displayGrid: 'always', // Optional, for debugging the grid layout
     };
+
+
 
     // this.createKPIWidget.get('formlist')?.valueChanges.subscribe((selectedValue) => {
     //   console.log('Selected Value:', selectedValue);
@@ -360,6 +830,11 @@ private editTileIndex: number | null = null;
     { value: 'none', text: 'None' },
     { value: 'created', text: 'Created Time' },
     { value: 'updated', text: 'Updated Time' },
+    { value: 'name', text: 'Name' },
+    { value: 'phoneNumber', text: 'Phone Number'},
+    { value: 'emailId', text: 'Email Id' },
+
+
     // Add more hardcoded options as needed
   ];
 
@@ -376,6 +851,7 @@ private editTileIndex: number | null = null;
     {value:'%ofDifferenceFrom-Latest',text:'%ofDifferenceFrom-Latest'},
     {value:'Constant',text:'Constant'},
     {value:'Live',text:'Live'},
+
   ]
 
   // ngAfterViewInit() {
@@ -406,55 +882,159 @@ private editTileIndex: number | null = null;
     this.reloadEvent.next(true);
   }
 
-
-
   openKPIModal(content: any, tile?: any, index?: number) {
     console.log('Index checking:', index); // Log the index
+  
+    if (tile) {
+      this.selectedTile = tile;
+      this.editTileIndex = index !== undefined ? index : null; // Store the index, default to null if undefined
+      console.log('Tile Object:', tile); // Log the tile object
+  
+      // Parse multi_value if it is a string
+      let parsedMultiValue = [];
+      if (typeof tile.multi_value === 'string') {
+        try {
+          parsedMultiValue = JSON.parse(tile.multi_value);
+          console.log('Parsed multi_value:', parsedMultiValue); // Log parsed multi_value to verify structure
+        } catch (error) {
+          console.error('Error parsing multi_value:', error);
+        }
+      } else {
+        parsedMultiValue = tile.multi_value;
+      }
+  
+      // Extract value and constantValue from parsed multi_value, assuming the new structure
+      const value = parsedMultiValue[0]?.value || '';
+      const constantValue = parsedMultiValue[0]?.constantValue !== undefined ? parsedMultiValue[0].constantValue : 0;
+      const parsedValue = parsedMultiValue[1]?.processed_value !== undefined ? parsedMultiValue[1].processed_value : 0;
+  
+      // Initialize form fields and pre-select values
+      this.initializeTileFields();
+      this.createKPIWidget.patchValue({
+        formlist: tile.formlist,
+        parameterName: tile.parameterName,
+        groupBy: tile.groupBy,
+        primaryValue: value, // Set the 'value' extracted from multi_value as primaryValue
+        groupByFormat: tile.groupByFormat,
+        constantValue: constantValue, // Use the extracted constantValue
+        processed_value: parsedValue,
+        selectedRangeCalendarTimeRight: tile.selectedRangeCalendarTimeRight, // Patch the selected range object
+        selectedRangeType: tile.selectedRangeType, // Patch the selectedRangeType
+        startDate: tile.predefinedSelectRange?.startDate || '',  // Patch the startDate if it exists
+        endDate: tile.predefinedSelectRange?.endDate || '', 
+        themeColor: tile.themeColor     // Patch the endDate if it exists
+      });
+  
+      this.isEditMode = true; // Set to edit mode
+    } else {
+      this.selectedTile = null; // No tile selected for adding
+      this.isEditMode = false; // Set to add mode
+      this.createKPIWidget.reset(); // Reset the form for new entry
+    }
+  
+    // Clear the 'selected' state for all themes
+    this.themes.forEach(theme => {
+      theme.selected = false; // Deselect all themes
+    });
+  
+    // Iterate through the dashboard to find the theme matching the tile's themeColor
+    const matchingTheme = this.themes.find(theme => theme.color === tile?.themeColor);
+  
+    // If a matching theme is found, set it as selected
+    if (matchingTheme) {
+      matchingTheme.selected = true;
+      console.log('Matching theme found and selected:', matchingTheme);
+    }
+  
+    // Open the modal
+    this.modalService.open(content, { size: 'lg', ariaLabelledBy: 'modal-basic-title' });
+  
+    // Any additional setup if needed
+    this.showTable();
+    this.reloadEvent.next(true);
+  }
+  
+  
+  
 
+
+
+  
+
+  
+  
+  
+
+
+  
+  openKPIModal1(content: any, tile?: any, index?: number) {
     if (tile) {
         this.selectedTile = tile;
-        this.editTileIndex = index !== undefined ? index : null; // Store the index, default to null if undefined
+        this.editTileIndex1 = index !== undefined ? index : null; // Store the index, default to null if undefined
         console.log('Tile Object:', tile); // Log the tile object
-
+  
+        // Parse multi_value if it's a string
+        let parsedMultiValue = [];
+        if (typeof tile.multi_value === 'string') {
+            try {
+                parsedMultiValue = JSON.parse(tile.multi_value);
+                console.log('Parsed multi_value:', parsedMultiValue); // Log parsed multi_value to verify structure
+            } catch (error) {
+                console.error('Error parsing multi_value:', error);
+            }
+        } else {
+            parsedMultiValue = tile.multi_value || [];
+        }
+  
+        // Extract primaryValue and secondaryValue from parsed multi_value
+        const primaryValue = parsedMultiValue[0]?.value || ''; // Assuming value corresponds to primaryValue
+        const secondaryValue = parsedMultiValue[1]?.value || ''; // Assuming value corresponds to secondaryValue
+        const parsedValue = parsedMultiValue[2]?.processed_value !== undefined ? parsedMultiValue[2].processed_value : 0;
+  
         // Initialize form fields and pre-select values
-        this.initializeTileFields();
-        this.createKPIWidget.patchValue({
+        this.initializeTileFields1();
+        this.createKPIWidget1.patchValue({
             formlist: tile.formlist,
             parameterName: tile.parameterName,
             groupBy: tile.groupBy,
-            primaryValue: tile.primaryValue
+            primaryValue: primaryValue, // Set the primaryValue
+            groupByFormat: tile.groupByFormat,
+            constantValue: parsedMultiValue[0]?.constantValue || 0, // Assuming constantValue is in the first item
+            secondaryValue: secondaryValue, // Set the secondaryValue
+            processed_value: parsedValue,
+            themeColor: tile.themeColor
         });
-
+  
         this.isEditMode = true; // Set to edit mode
     } else {
         this.selectedTile = null; // No tile selected for adding
         this.isEditMode = false; // Set to add mode
-        this.createKPIWidget.reset(); // Reset the form for new entry
+        this.createKPIWidget1.reset(); // Reset the form for new entry
     }
-
+  
+    // Clear the 'selected' state for all themes
+    this.themes.forEach(theme => {
+      theme.selected = false; // Deselect all themes
+    });
+  
+    // Find the theme that matches the tile's themeColor
+    const matchingTheme = this.themes.find(theme => theme.color === tile?.themeColor);
+  
+    // If a matching theme is found, set it as selected
+    if (matchingTheme) {
+      matchingTheme.selected = true;
+      console.log('Matching theme found and selected:', matchingTheme);
+    }
+  
     // Open the modal
     this.modalService.open(content, { size: 'lg', ariaLabelledBy: 'modal-basic-title' });
-
+  
     // Any additional setup if needed
     this.showTable();
     this.reloadEvent.next(true);
-}
-
-
-  
-
-  
-  
-  
-
-
-  
-  openKPIModal1(content: any) {
-    this.modalService.open(content, { size: 'lg', ariaLabelledBy: 'modal-basic-title' });
-    this.showTable() 
-    // 
-    this.reloadEvent.next(true);
   }
+  
+
   dropdownOptions = [
     { value: 'option1', label: 'Option 1' },
     { value: 'option2', label: 'Option 2' },
@@ -479,6 +1059,9 @@ private editTileIndex: number | null = null;
       console.log('Specific property value:', this.selectedTile);
       this.showGrid = this.selectedTile === 'widget';
     }
+    setTimeout(() => {
+      this.createChartGauge();
+    }, 100);
   
     // Example: Update a variable or trigger further logic based on the event
     // this.someVariable = event.someProperty;
@@ -558,48 +1141,35 @@ private editTileIndex: number | null = null;
     console.log('Selected icon:', this.selectedIcon); // Debugging line
   }
 
-  onGroupByChange(event: any): void {
-    if (event && event.length > 0) {
-      // Capture both the value and text
-      this.selectedGroupByValue = event[0].value;
-      this.selectedDropdown = event[0].text;
+  // onGroupByChange(event: any): void {
+  //   if (event && event.length > 0) {
+  //     // Capture both the value and text
+  //     this.selectedGroupByValue = event[0].value;
+  //     this.selectedDropdown = event[0].text;
     
-      // Update the display label with the format "Created Time (selected value)"
-      this.updateDisplayLabel(this.selectedDropdown);
-      console.log('Selected GroupBy label:', this.displayLabel);
-      console.log('Selected Value Text:', this.selectedDropdown);
+  //     // Update the display label with the format "Created Time (selected value)"
+  //     this.updateDisplayLabel(this.selectedDropdown);
+  //     console.log('Selected GroupBy label:', this.displayLabel);
+  //     console.log('Selected Value Text:', this.selectedDropdown);
     
-      // Open modal if the selected value is "created"
-      if (this.selectedGroupByValue === 'created') {
-        this.modalService.open(this.calendarModal, { 
-          windowClass: 'right-side-modal',
-          backdrop: false
-        });
-      }
-    } else {
-      console.log('No event value received');
-    }
-  }
+  //     // Open modal if the selected value is "created"
+  //     if (this.selectedGroupByValue === 'created') {
+  //       this.modalService.open(this.calendarModal, { 
+  //         windowClass: 'right-side-modal',
+  //         backdrop: false
+  //       });
+  //     }
+  //   } else {
+  //     console.log('No event value received');
+  //   }
+  // }
   updateDisplayLabel(selectedDropdown: string): void {
     // Format the display label with the selected dropdown text
     this.displayLabel = `${selectedDropdown} (selected value)`;
     console.log('Updated Display Label:', this.displayLabel);
   }
 
-  selectValue(value: string): void {
-    this.selectedModalValue = value;
-    console.log('Selected Value:', this.selectedModalValue);
-  
-    // Combine the dropdown label and modal value for display only
-    const combinedValue = `${this.selectedDropdown} (${this.selectedModalValue})`;
-    console.log('Combined Value:', combinedValue);
-  
-    // Update only the display label (or selectedDropdown) without changing groupByOptions
-    this.selectedDropdown = combinedValue;
-  
-    // Update form control value to reflect combined value for display purposes
-    this.createKPIWidget.get('groupBy')?.setValue(this.selectedGroupByValue);
-  }
+
 
   someOtherFunction(combinedValue: string): void {
     // Use the combined value as needed
@@ -635,18 +1205,66 @@ private editTileIndex: number | null = null;
       .then((result: any) => {
         if (result && result.metadata) {
           const parsedMetadata = JSON.parse(result.metadata);
-          console.log('parsedMetadata check',parsedMetadata)
+          console.log('parsedMetadata check', parsedMetadata);
           this.all_Packet_store = parsedMetadata;
-          this.createdTime = this.all_Packet_store.created
-            this.createdUserName = this.all_Packet_store.createdUser
-    this.dashboard = this.all_Packet_store.grid_details
-    console.log('this.all_Packet_store.grid_details check',this.all_Packet_store.grid_details)
+          this.createdTime = this.all_Packet_store.created;
+          this.createdUserName = this.all_Packet_store.createdUser;
+   
+          console.log('Before Parsing:', this.all_Packet_store.grid_details);
 
-  console.log(" this.dashboard :>>",  this.dashboard )
-this.cdr.detectChanges()
+          // Check if `grid_details` is not empty and `multi_value` is present
+          if (this.all_Packet_store.grid_details && this.all_Packet_store.grid_details.length > 0) {
+            this.all_Packet_store.grid_details.forEach((gridItem: { multi_value: any; }, index: any) => {
+              if (gridItem?.multi_value) {
+                try {
+                  const multiValueString = gridItem.multi_value;
+                  const parsedMultiValue = Array.isArray(multiValueString) 
+                                            ? multiValueString 
+                                            : JSON.parse(multiValueString);
+                  gridItem.multi_value = parsedMultiValue;
+                  console.log(`After Parsing and Reassigning for item ${index}:`, gridItem);
+                } catch (error) {
+                  console.error(`Error parsing multi_value for item ${index}:`, error);
+                }
+              } else {
+                console.log(`multi_value is undefined or not available for item ${index}.`);
+              }
+            });
 
-          console.log('this.all_Packet_store check from open modal', this.all_Packet_store);
+            // Reassign the updated grid_details to dashboard
+            this.dashboard = this.all_Packet_store.grid_details;
+            console.log('this.dashboard after parsing', this.dashboard);
+          } else {
+            console.log('grid_details is undefined or empty.');
+          }
+
+          // Match themeColor and set selected to true
+
+
+          // Iterate through the dashboard and themes to find a matching themeColor
+          this.dashboard.forEach((gridItem: any) => {
+            // Find the theme that matches the current grid item
+            const matchingTheme = this.themes.find(theme => theme.color === gridItem.themeColor);
           
+            // If a matching theme is found, clear the 'selected' state for the matching theme only
+            if (matchingTheme) {
+              // Clear the 'selected' state for all themes in the dashboard except the matched one
+              this.themes.forEach(theme => {
+                if (theme.color !== matchingTheme.color) {
+                  theme.selected = false; // Only unselect the themes that don't match
+                }
+              });
+          
+              // Set the matching theme as selected
+              matchingTheme.selected = true;
+              console.log('Matching theme found and selected:', matchingTheme);
+            }
+          });
+          
+          
+
+          // Continue with other actions
+          this.cdr.detectChanges();
           this.bindDataToGridster(this.all_Packet_store); // Pass the object to bindDataToGridster
           this.openModal('Edit_ts', this.all_Packet_store); // Open modal with the data
         }
@@ -654,47 +1272,159 @@ this.cdr.detectChanges()
       .catch((err) => {
         console.log("Can't fetch", err);
       });
-  }
-  updateTile() {
-    if (this.editTileIndex !== null) {
-        console.log('this.editTileIndex check', this.editTileIndex);
-        console.log('Tile checking for update:', this.dashboard[this.editTileIndex]); // Log the tile being checked
-
-        // Log the current details of the tile before update
-        console.log('Current Tile Details Before Update:', this.dashboard[this.editTileIndex]);
-
-        // Update the properties of the tile with the new values from the form
-        this.dashboard[this.editTileIndex] = {
-            ...this.dashboard[this.editTileIndex], // Keep existing properties
-            formlist: this.createKPIWidget.value.formlist,
-            parameterName: this.createKPIWidget.value.parameterName,
-            groupBy: this.createKPIWidget.value.groupBy,
-            primaryValue: this.createKPIWidget.value.primaryValue,
-            // Include any additional properties if needed
-        };
-
-        // Log the updated details of the tile
-        console.log('Updated Tile Details:', this.dashboard[this.editTileIndex]);
-
-        // Also update the grid_details array to reflect changes
-        this.all_Packet_store.grid_details[this.editTileIndex] = {
-            ...this.all_Packet_store.grid_details[this.editTileIndex], // Keep existing properties
-            ...this.dashboard[this.editTileIndex], // Update with new values
-        };
-        this.openModal('Edit_ts',this.all_Packet_store)
-       
-        this.updateSummary('', 'update_tile');
-        console.log('his.dashboard check from updateTile',this.dashboard)
-
-        console.log("Updated all_Packet_store.grid_details:", this.all_Packet_store.grid_details);
-     
-
-        // Reset the editTileIndex after the update
-        this.editTileIndex = null;
-    } else {
-        console.error("Edit index is null. Unable to update the tile.");
-    }
 }
+
+updateTile() {
+  if (this.editTileIndex !== null) {
+      console.log('this.editTileIndex check', this.editTileIndex);
+      console.log('Tile checking for update:', this.dashboard[this.editTileIndex]);
+
+      const multiValue = this.dashboard[this.editTileIndex].multi_value || [];
+      const primaryValue = multiValue[0]?.value || '';
+      const constantValue = multiValue[0]?.constantValue || 0;
+      const processedValue = this.createKPIWidget.value.processed_value || ''; // Get updated processed_value from the form
+      const updatedConstantValue = this.createKPIWidget.value.constantValue || constantValue; // Get updated constantValue from the form
+
+      console.log('Extracted primaryValue:', primaryValue);
+      console.log('Extracted constantValue:', constantValue);
+      console.log('Form Value for processed_value:', processedValue);
+      console.log('Form Value for constantValue:', updatedConstantValue);
+
+      // Update the multi_value array with the new processed_value and constantValue
+      if (multiValue.length > 1) {
+          // Update processed_value and constantValue at index 1
+          multiValue[1].processed_value = processedValue;
+          multiValue[0].constantValue = updatedConstantValue; // Update constantValue at index 0
+      } else {
+          // If the multi_value array doesn't have enough elements, ensure it's structured correctly
+          multiValue.push({ processed_value: processedValue });
+          multiValue.push({ constantValue: updatedConstantValue });
+      }
+
+      // Now update the tile with the updated multi_value
+      const updatedTile = {
+          ...this.dashboard[this.editTileIndex], // Keep existing properties
+          formlist: this.createKPIWidget.value.formlist,
+          parameterName: this.createKPIWidget.value.parameterName,
+          groupBy: this.createKPIWidget.value.groupBy,
+          primaryValue: primaryValue,
+          groupByFormat: this.createKPIWidget.value.groupByFormat,
+          constantValue: updatedConstantValue, // Use the updated constantValue
+          processed_value: processedValue, // Use the updated processed_value
+          multi_value: multiValue, // Update the multi_value array with the modified data
+          selectedRangeType: this.createKPIWidget.value.selectedRangeType,
+          startDate: this.createKPIWidget.value.startDate,
+          endDate: this.createKPIWidget.value.endDate,
+          themeColor: this.createKPIWidget.value.themeColor
+      };
+
+      // Update the dashboard array using a non-mutative approach
+      this.dashboard = [
+          ...this.dashboard.slice(0, this.editTileIndex),
+          updatedTile,
+          ...this.dashboard.slice(this.editTileIndex + 1)
+      ];
+
+      console.log('Updated Tile Details:', this.dashboard[this.editTileIndex]);
+
+      // Update the grid_details as well
+      this.all_Packet_store.grid_details[this.editTileIndex] = {
+          ...this.all_Packet_store.grid_details[this.editTileIndex],
+          ...updatedTile
+      };
+
+      this.openModal('Edit_ts', this.all_Packet_store);
+      this.updateSummary('', 'update_tile');
+      console.log('this.dashboard check from updateTile', this.dashboard);
+      console.log("Updated all_Packet_store.grid_details:", this.all_Packet_store.grid_details);
+
+      // Reset the editTileIndex after the update
+      this.editTileIndex = null;
+  } else {
+      console.error("Edit index is null. Unable to update the tile.");
+  }
+}
+
+
+
+
+
+
+updateTile1() {
+  if (this.editTileIndex1 !== null) {
+      console.log('this.editTileIndex check', this.editTileIndex1);
+      console.log('Tile checking for update:', this.dashboard[this.editTileIndex1]);
+
+      // Log the current details of the tile before update
+      console.log('Current Tile Details Before Update:', this.dashboard[this.editTileIndex1]);
+      console.log('this.dashboard check from tile1', this.dashboard);
+
+      // Extract the multi_value array
+      let multiValue = this.dashboard[this.editTileIndex1].multi_value || [];
+
+      // Update values in multi_value array
+      const processedValue = this.createKPIWidget1.value.processed_value || ''; // Get updated processed_value from the form
+      const constantValue = this.createKPIWidget1.value.constantValue || 0; // Get updated constantValue from the form
+      const secondaryValue = this.createKPIWidget1.value.secondaryValue || ''; // Get updated secondaryValue from the form
+
+      console.log('Form Value for processed_value:', processedValue);
+      console.log('Form Value for constantValue:', constantValue);
+      console.log('Form Value for secondaryValue:', secondaryValue);
+
+      // Ensure the multiValue array is long enough, and update the values
+      if (multiValue.length > 1) {
+          multiValue[2].processed_value = processedValue; // Update processed_value at index 1
+          multiValue[0].constantValue = constantValue; // Update constantValue at index 0
+          multiValue[1].value = secondaryValue; // Update secondaryValue at index 1
+      } else {
+          // If multi_value array doesn't have enough elements, ensure it's structured correctly
+          // Ensure at least two objects are created with the correct structure
+          if (multiValue.length === 0) {
+              multiValue.push({ processed_value: processedValue });
+              multiValue.push({ constantValue: constantValue});
+              multiValue.push({ secondaryValue: secondaryValue });
+          } else if (multiValue.length === 1) {
+              multiValue.push({ processed_value: processedValue, secondaryValue: secondaryValue });
+          }
+      }
+
+      // Now update the tile with the updated multi_value
+      this.dashboard[this.editTileIndex1] = {
+          ...this.dashboard[this.editTileIndex1], // Keep existing properties
+          formlist: this.createKPIWidget1.value.formlist,
+          parameterName: this.createKPIWidget1.value.parameterName,
+          groupBy: this.createKPIWidget1.value.groupBy,
+          primaryValue: this.createKPIWidget1.value.primaryValue,
+          groupByFormat: this.createKPIWidget1.value.groupByFormat,
+          themeColor: this.createKPIWidget1.value.themeColor,
+          multi_value: multiValue, // Update multi_value with the modified array
+          constantValue: constantValue, // Use the updated constantValue
+          processed_value: processedValue,
+          secondaryValue: secondaryValue
+      };
+
+      // Log the updated details of the tile
+      console.log('Updated Tile Details:', this.dashboard[this.editTileIndex1]);
+
+      // Also update the grid_details array to reflect changes
+      this.all_Packet_store.grid_details[this.editTileIndex1] = {
+          ...this.all_Packet_store.grid_details[this.editTileIndex1], // Keep existing properties
+          ...this.dashboard[this.editTileIndex1], // Update with new values
+      };
+
+      // Open the modal and perform additional actions
+      this.openModal('Edit_ts', this.all_Packet_store);
+      this.updateSummary('', 'update_tile');
+      console.log('this.dashboard check from updateTile', this.dashboard);
+      console.log("Updated all_Packet_store.grid_details:", this.all_Packet_store.grid_details);
+
+      // Reset the editTileIndex after the update
+      this.editTileIndex1 = null;
+  } else {
+      console.error("Edit index is null. Unable to update the tile.");
+  }
+}
+
 
 
 
@@ -1024,14 +1754,49 @@ deleteCompany(value: any) {
      
     })
   }
-  initializeTileFields(){
+  initializeTileFields(): void {
+    // Initialize the form group
     this.createKPIWidget = this.fb.group({
-      'formlist':['',Validators.required],
-      'parameterName':['',Validators.required],
-      'groupBy':['',Validators.required],
-      'primaryValue':['',Validators.required]
-    })
+      'formlist': ['', Validators.required],
+      'parameterName': ['', Validators.required],
+      'groupBy': ['', Validators.required],
+      'primaryValue': ['', Validators.required],
+      'groupByFormat': ['', Validators.required],
+      'constantValue': ['',],
+      widgetid: [this.generateUniqueId()],
+      'processed_value': ['', Validators.required],
+      selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
+      selectedRangeLabelWithDates: [''],
+      'predefinedSelectRange': [''],
+      'selectedRangeType': [''],
+      'themeColor':['',Validators.required]
+      
+    });
   }
+
+  toggleCheckbox1(themeOrEvent: any): void {
+    // If it's a color picker input (e.g., from a custom input field)
+    if (themeOrEvent.target) {
+      this.selectedColor = themeOrEvent.target.value;  // Get the color from the input field
+    } else {
+      // Predefined theme selection (from color boxes)
+      const theme = themeOrEvent;
+  
+      // Clear the selected state for all themes (ensure only one is selected)
+      this.themes.forEach(t => t.selected = false);  // Reset selection for all themes
+  
+      // Toggle the selection state of the clicked theme
+      theme.selected = true;  // Select the clicked theme
+  
+      this.selectedColor = theme.color;  // Set selected color based on the clicked theme
+    }
+  
+    // Update the form control with the selected color
+    this.createKPIWidget1.get('themeColor')?.setValue(this.selectedColor);
+  }
+  
+  
+  
   saveKPIWidget() {
     if (this.createKPIWidget.valid) {
       // Logic to save the KPI Widget data
@@ -1041,33 +1806,589 @@ deleteCompany(value: any) {
       console.log('Form is invalid');
     }
   }
+  generateUniqueId(): number {
+    this.widgetIdCounter++;
+    return Date.now() + this.widgetIdCounter; // Use timestamp and counter for uniqueness
+  }
 
   addTile(key: any) {
     if (key === 'tile') {
+      const uniqueId = this.generateUniqueId();
+  
       const newTile = {
-        x: 0,
-        y: 0,
-        cols: 20,
-        rows: 10,
-        grid_type: "tile",
-        formlist: this.createKPIWidget.value.formlist,
-        parameterName: this.createKPIWidget.value.parameterName,
-        groupBy: this.createKPIWidget.value.groupBy,
-        primaryValue: this.createKPIWidget.value.primaryValue,
+          id: uniqueId,
+          x: 0,
+          y: 0,
+          rows: 20,  // The number of rows in the grid
+          cols: 20,  // The number of columns in the grid
+          rowHeight: 100, // The height of each row in pixels
+          colWidth: 100,  // The width of each column in pixels
+          fixedColWidth: true,  // Enable fixed column widths
+          fixedRowHeight: true, 
+          grid_type: "tile",
+          formlist: this.createKPIWidget.value.formlist,
+          parameterName: this.createKPIWidget.value.parameterName,
+          groupBy: this.createKPIWidget.value.groupBy,
+          groupByFormat: this.createKPIWidget.value.groupByFormat,
+          // selectedColor: this.createKPIWidget.value.selectedColor ,
+          predefinedSelectRange:this.createKPIWidget.value.predefinedSelectRange,
+          selectedRangeType:this.createKPIWidget.value.selectedRangeType,
+          themeColor: this.createKPIWidget.value.themeColor,
+
+        
+          multi_value: [
+              {
+                  value: this.createKPIWidget.value.primaryValue, // Renamed key to 'value'
+                  constantValue: this.createKPIWidget.value.constantValue !== undefined && this.createKPIWidget.value.constantValue !== null 
+                      ? this.createKPIWidget.value.constantValue 
+                      : 0
+              },
+              {
+                  processed_value: this.createKPIWidget.value.processed_value || '', // Default to empty string if not provided
+              }
+          ]
       };
   
       // Initialize this.dashboard if it hasn't been set yet
       if (!this.dashboard) {
-        this.dashboard = [];
+          this.dashboard = [];
       }
   
       // Push the new tile to dashboard
       this.dashboard.push(newTile);
-      
-      console.log('this.dashboard after adding new tile', this.dashboard);
   
+      console.log('this.dashboard after adding new tile', this.dashboard);
       this.updateSummary('', 'add_tile');
+  
+      // Optionally reset the form if needed after adding the tile
+      this.createKPIWidget.patchValue({
+          widgetid: uniqueId
+      });
+  }
+  
+  
+  
+  
+  else if (key === 'tile2') {
+    const uniqueId = this.generateUniqueId();
+    const newTile2 = {
+      id: uniqueId,
+      x: 0,
+      y: 0,
+      cols: 20,
+      rows: 20,
+      rowHeight: 100,
+      colWidth: 100,
+      fixedColWidth: true,
+      fixedRowHeight: true,
+      grid_type: "tile2",
+      formlist: this.createKPIWidget1.value.formlist,
+      parameterName: this.createKPIWidget1.value.parameterName,
+      groupBy: this.createKPIWidget1.value.groupBy,
+      themeColor: this.createKPIWidget1.value.themeColor,  // Ensure this is correctly assigned
+      multi_value: [
+        {
+          value: this.createKPIWidget1.value.primaryValue,
+          constantValue: this.createKPIWidget1.value.constantValue !== undefined && this.createKPIWidget1.value.constantValue !== null
+            ? this.createKPIWidget1.value.constantValue
+            : 0,
+        },
+        {
+          value: this.createKPIWidget1.value.secondaryValue
+        },
+        {
+          processed_value: this.createKPIWidget1.value.processed_value || '',
+        }
+      ],
+      groupByFormat: this.createKPIWidget1.value.groupByFormat,
+    };
+    
+
+    // Initialize this.dashboard if it hasn't been set yet
+    if (!this.dashboard) {
+        this.dashboard = [];
     }
+
+    // Push the new tile to dashboard
+    this.dashboard.push(newTile2);
+
+    console.log('this.dashboard after adding new tile', this.dashboard);
+
+    this.updateSummary('', 'add_tile');
+    this.createKPIWidget1.patchValue({
+        widgetid: uniqueId // Set the ID in the form control
+    });
+}
+
+else if(key === 'tile3'){
+  const uniqueId = this.generateUniqueId();
+
+  const newTile3 = {
+    id: uniqueId,
+    x: 0,
+    y: 0,
+    cols: 20,
+        rows: 20,
+        rowHeight: 100, // The height of each row in pixels
+        colWidth: 100,  // The width of each column in pixels
+        fixedColWidth: true,  // Enable fixed column widths
+        fixedRowHeight: true,
+    grid_type: "tile3",
+    formlist: this.createKPIWidget2.value.formlist,
+    parameterName: this.createKPIWidget2.value.parameterName,
+    groupBy: this.createKPIWidget2.value.groupBy,
+
+    groupByFormat: this.createKPIWidget2.value.groupByFormat,
+    // selectedColor: this.createKPIWidget2.value.selectedColor ,
+    themeColor: this.createKPIWidget2.value.themeColor,
+ // Default value, change this to whatever you prefer
+ // You can also handle default value for this if needed
+
+
+
+
+
+    multi_value: [
+      {
+        value: this.createKPIWidget2.value.primaryValue, // Change primaryValue to value
+        constantValue: this.createKPIWidget2.value.constantValue !== undefined && this.createKPIWidget2.value.constantValue !== null
+        ? this.createKPIWidget2.value.constantValue
+        : 0,
+      },
+      {
+        value: this.createKPIWidget2.value.secondaryValue, // Change secondaryValue to value
+      },
+      {
+        value :this.createKPIWidget2.value.secondaryValueNested
+
+
+      },{
+
+        processed_value: this.createKPIWidget2.value.processed_value || '',
+      }
+  ],
+};
+
+// Initialize this.dashboard if it hasn't been set yet
+if (!this.dashboard) {
+    this.dashboard = [];
+}
+
+// Push the new tile to dashboard
+this.dashboard.push(newTile3);
+
+console.log('this.dashboard after adding new tile', this.dashboard);
+
+this.updateSummary('', 'add_tile');
+this.createKPIWidget2.patchValue({
+  widgetid: uniqueId // Set the ID in the form control
+});
+
+}
+else if(key === 'tile4'){
+  const uniqueId = this.generateUniqueId();
+  const newTile4 = {
+    id: uniqueId,
+    x: 0,
+    y: 0,
+    cols: 20,
+    rows: 20,
+    rowHeight: 200, // The height of each row in pixels
+    colWidth: 200,  // The width of each column in pixels
+    fixedColWidth: true,  // Enable fixed column widths
+    fixedRowHeight: true,
+    grid_type: "tile4",
+    formlist: this.createKPIWidget3.value.formlist,
+    parameterName: this.createKPIWidget3.value.parameterName,
+    groupBy: this.createKPIWidget3.value.groupBy,
+
+    groupByFormat: this.createKPIWidget3.value.groupByFormat,
+    // selectedColor: this.createKPIWidget3.value.selectedColor ,
+    themeColor: this.createKPIWidget3.value.themeColor,
+ // Default value, change this to whatever you prefer
+     // You can also handle default value for this if needed
+  
+        // secondaryValue: this.createKPIWidget4.value.secondaryValue, 
+
+
+
+
+        multi_value: [
+          {
+            value: this.createKPIWidget3.value.primaryValue,// Change primaryValue to value
+            constantValue: this.createKPIWidget3.value.constantValue !== undefined && this.createKPIWidget3.value.constantValue !== null
+            ? this.createKPIWidget3.value.constantValue
+            : 0,
+          },
+          {
+            value: this.createKPIWidget3.value.CompareTile, // Change secondaryValue to value
+          
+          },
+          {
+            value :this.createKPIWidget3.value.WithCompareTile,
+    
+    
+          },{
+    
+            processed_value: this.createKPIWidget3.value.processed_value || '',
+          }
+      ],
+};
+
+// Initialize this.dashboard if it hasn't been set yet
+if (!this.dashboard) {
+    this.dashboard = [];
+}
+
+// Push the new tile to dashboard
+this.dashboard.push(newTile4);
+
+console.log('this.dashboard after adding new tile', this.dashboard);
+
+this.updateSummary('', 'add_tile');
+this.createKPIWidget3.patchValue({
+  widgetid: uniqueId // Set the ID in the form control
+});
+
+}
+
+else if(key === 'tile5'){
+  const uniqueId = this.generateUniqueId();
+  const newTile5 = {
+    id: uniqueId,
+    x: 0,
+    y: 0,
+    cols: 20,
+    rows: 20,
+    rowHeight: 200, // The height of each row in pixels
+    colWidth: 200,  // The width of each column in pixels
+    fixedColWidth: true,  // Enable fixed column widths
+    fixedRowHeight: true,
+    grid_type: "tile5",
+    formlist: this.createKPIWidget4.value.formlist,
+    parameterName: this.createKPIWidget4.value.parameterName,
+    groupBy: this.createKPIWidget4.value.groupBy,
+ 
+    groupByFormat: this.createKPIWidget4.value.groupByFormat,
+    // selectedColor: this.createKPIWidget4.value.selectedColor ,
+    themeColor: this.createKPIWidget4.value.themeColor,
+// Default value, change this to whatever you prefer
+   
+
+   
+
+
+
+
+
+        multi_value: [
+          {
+            value: this.createKPIWidget4.value.primaryValue,
+            constantValue: this.createKPIWidget4.value.constantValue !== undefined && this.createKPIWidget4.value.constantValue !== null
+            ? this.createKPIWidget4.value.constantValue
+            : 0, 
+          },
+          {
+            value: this.createKPIWidget4.value.CompareTile, // Change secondaryValue to value
+          
+          },
+          {
+            value :this.createKPIWidget4.value.WithCompareTile,
+    
+    
+          },{
+    
+            processed_value: this.createKPIWidget4.value.processed_value || '',
+          },
+          {
+            value:this.createKPIWidget4.value.secondaryValue
+          }
+      ],
+
+};
+
+// Initialize this.dashboard if it hasn't been set yet
+if (!this.dashboard) {
+    this.dashboard = [];
+}
+
+// Push the new tile to dashboard
+this.dashboard.push(newTile5);
+
+console.log('this.dashboard after adding new tile', this.dashboard);
+
+this.updateSummary('', 'add_tile');
+this.createKPIWidget4.patchValue({
+  widgetid: uniqueId // Set the ID in the form control
+});
+
+}
+else if(key === 'tile6'){
+  const uniqueId = this.generateUniqueId();
+  const newTile6 = {
+    id: uniqueId,
+    x: 0,
+    y: 0,
+    cols: 20,
+    rows: 20,
+    rowHeight: 200, // The height of each row in pixels
+    colWidth: 200,  // The width of each column in pixels
+    fixedColWidth: true,  // Enable fixed column widths
+    fixedRowHeight: true,
+    grid_type: "tile6",
+    formlist: this.createKPIWidget5.value.formlist,
+    parameterName: this.createKPIWidget5.value.parameterName,
+    groupBy: this.createKPIWidget5.value.groupBy,
+
+    groupByFormat: this.createKPIWidget5.value.groupByFormat,
+    selectedColor: this.createKPIWidget5.value.selectedColor ,
+    themeColor: this.createKPIWidget5.value.themeColor,
+ // Default value, change this to whatever you prefer
+   // You can also handle default value for this if needed
+
+
+    multi_value: [
+      {
+        primaryValue: this.createKPIWidget5.value.primaryValue,
+        constantValue: this.createKPIWidget5.value.constantValue !== undefined && this.createKPIWidget5.value.constantValue !== null
+        ? this.createKPIWidget5.value.constantValue
+        : 0,
+      },
+      {
+        value: this.createKPIWidget5.value.secondaryValue, // Change secondaryValue to value
+      
+      },
+      {
+        value :this.createKPIWidget5.value.secondaryValueNested
+
+
+      },{
+
+        processed_value: this.createKPIWidget5.value.processed_value || '',
+      }
+    
+  ],
+};
+
+// Initialize this.dashboard if it hasn't been set yet
+if (!this.dashboard) {
+    this.dashboard = [];
+}
+
+// Push the new tile to dashboard
+this.dashboard.push(newTile6);
+
+console.log('this.dashboard after adding new tile', this.dashboard);
+
+this.updateSummary('', 'add_tile');
+this.createKPIWidget5.patchValue({
+  widgetid: uniqueId // Set the ID in the form control
+});
+
+}
+else if(key === 'tile7'){
+  const uniqueId = this.generateUniqueId();
+  const newTile6 = {
+    id: uniqueId,
+    x: 0,
+    y: 0,
+    cols: 20,
+    rows: 10,
+    grid_type: "tile7",
+    formlist: this.createKPIWidget6.value.formlist,
+    parameterName: this.createKPIWidget6.value.parameterName,
+    value: this.createKPIWidget6.value.value,
+  
+    groupByFormat: this.createKPIWidget6.value.groupByFormat,
+
+    // Default value for constant fields
+    constantValuevalue: this.createKPIWidget6.value.constantValuevalue !== undefined && this.createKPIWidget6.value.constantValuevalue !== null
+        ? this.createKPIWidget6.value.constantValuevalue
+        : 10, // Default value for constant1 (change as needed)
+
+    constantValueTarget: this.createKPIWidget6.value.constantValueTarget !== undefined && this.createKPIWidget6.value.constantValueTarget !== null
+        ? this.createKPIWidget6.value.constantValueTarget
+        : 20, // Default value for constant2 (change as needed)
+
+    constantValueMaxRange1: this.createKPIWidget6.value.constantValueMaxRange !== undefined && this.createKPIWidget6.value.constantValueMaxRange !== null
+        ? this.createKPIWidget6.value.constantValueMaxRange
+        : 30, // Default value for constant3 (change as needed)
+
+    // Default values for percentage fields
+    percentageValue: this.createKPIWidget6.value.percentageValue !== undefined && this.createKPIWidget6.value.percentageValue !== null
+        ? this.createKPIWidget6.value.percentageValue
+        : 50, // Default value for percentage1 (change as needed)
+
+    percentageValueTarget: this.createKPIWidget6.value.percentageValueTarget !== undefined && this.createKPIWidget6.value.percentageValueTarget !== null
+        ? this.createKPIWidget6.value.percentageValueTarget
+        : 75, // Default value for percentage2 (change as needed)
+
+    percentageValueMaxRange: this.createKPIWidget6.value.percentageValueMaxRange !== undefined && this.createKPIWidget6.value.percentageValueMaxRange !== null
+        ? this.createKPIWidget6.value.percentageValueMaxRange
+        : 90, // Default value for percentage3 (change as needed)
+
+        Target: this.createKPIWidget6.value.Target, // Handle default value for this if needed
+        MaxRange: this.createKPIWidget6.value.MaxRange
+};
+
+
+// Initialize this.dashboard if it hasn't been set yet
+if (!this.dashboard) {
+    this.dashboard = [];
+}
+
+// Push the new tile to dashboard
+this.dashboard.push(newTile6);
+
+console.log('this.dashboard after adding new tile', this.dashboard);
+
+this.updateSummary('', 'add_tile');
+this.createKPIWidget6.patchValue({
+  widgetid: uniqueId // Set the ID in the form control
+});
+
+}
+
+  }
+
+
+  initializeTileFields1(){
+    this.createKPIWidget1 = this.fb.group({
+      'formlist':['',Validators.required],
+      'parameterName':['',Validators.required],
+      'groupBy':['',Validators.required],
+      'primaryValue':['',Validators.required],
+      'groupByFormat':['',Validators.required],
+      'constantValue':[''],
+'secondaryValue':['',Validators.required],
+widgetid: [this.generateUniqueId()],
+'processed_value':['',Validators.required],
+// selectedColor: [this.selectedColor],
+'themeColor': ['', Validators.required]
+    })
+  }
+
+  onColorChange(event: Event) {
+    const colorInput = event.target as HTMLInputElement;
+    this.createKPIWidget1.get('themeColor')?.setValue(colorInput.value)
+  
+    console.log('Color changed:',   this.createKPIWidget1.get('themeColor')?.value);
+  }
+  onColorChange1(event: Event) {
+    const colorInput = event.target as HTMLInputElement;
+    this.createKPIWidget.get('themeColor')?.setValue(colorInput.value)
+  
+    console.log('Color changed:',   this.createKPIWidget.get('themeColor')?.value);
+  }
+  onColorChange2(event: Event) {
+    const colorInput = event.target as HTMLInputElement;
+    this.createKPIWidget2.get('themeColor')?.setValue(colorInput.value)
+  
+    console.log('Color changed:',   this.createKPIWidget2.get('themeColor')?.value);
+  }
+  onColorChange3(event: Event) {
+    const colorInput = event.target as HTMLInputElement;
+    this.createKPIWidget3.get('themeColor')?.setValue(colorInput.value)
+  
+    console.log('Color changed:',   this.createKPIWidget3.get('themeColor')?.value);
+  }
+  onColorChange4(event: Event) {
+    const colorInput = event.target as HTMLInputElement;
+    this.createKPIWidget4.get('themeColor')?.setValue(colorInput.value)
+  
+    console.log('Color changed:',   this.createKPIWidget4.get('themeColor')?.value);
+  }
+  onColorChange5(event: Event) {
+    const colorInput = event.target as HTMLInputElement;
+    this.createKPIWidget5.get('themeColor')?.setValue(colorInput.value)
+  
+    console.log('Color changed:',   this.createKPIWidget5.get('themeColor')?.value);
+  }
+  initializeTileFields2(){
+    this.createKPIWidget2 = this.fb.group({
+      'formlist':['',Validators.required],
+      'parameterName':['',Validators.required],
+      'groupBy':['',Validators.required],
+      'primaryValue':['',Validators.required],
+      'groupByFormat':['',Validators.required],
+      'constantValue':[''],
+'secondaryValue':['',Validators.required],
+'secondaryValueNested':[''],
+widgetid: [this.generateUniqueId()],
+'processed_value':['',Validators.required],
+// selectedColor: [this.selectedColor]'
+'themeColor':['',Validators.required]
+    })
+  }
+
+  initializeTileFields5(){
+    this.createKPIWidget5 = this.fb.group({
+      'formlist':['',Validators.required],
+      'parameterName':['',Validators.required],
+      'groupBy':['',Validators.required],
+      'primaryValue':['',Validators.required],
+      'groupByFormat':['',Validators.required],
+      'constantValue':[''],
+'secondaryValue':['',Validators.required],
+'secondaryValueNested':['',Validators.required],
+widgetid: [this.generateUniqueId()],
+'processed_value':['',Validators.required],
+// selectedColor: [this.selectedColor]
+'themeColor':['',Validators.required]
+    })
+  }
+
+  initializeTileFields6(){
+    this.createKPIWidget6 = this.fb.group({
+      'formlist':['',Validators.required],
+      'parameterName':['',Validators.required],
+      'value':['',Validators.required],
+      'Target':['',Validators.required],
+      'MaxRange':['',Validators.required],
+      'groupByFormat':['',Validators.required],
+      'constantValuevalue':['',Validators.required],
+      'percentageValue':['',Validators.required],
+      'constantValueTarget':['',Validators.required],
+      'constantValueMaxRange':['',Validators.required],
+      'percentageValueTarget':['',Validators.required],
+      'percentageValueMaxRange':['',Validators.required]
+
+
+    })
+  }
+
+  initializeTileFields3(){
+    this.createKPIWidget3 = this.fb.group({
+      'formlist':['',Validators.required],
+      'parameterName':['',Validators.required],
+      'groupBy':['',Validators.required],
+      'primaryValue':['',Validators.required],
+      'groupByFormat':['',Validators.required],
+      'constantValue':[''],
+'CompareTile':['',Validators.required],
+'WithCompareTile':['',Validators.required],
+widgetid: [this.generateUniqueId()],
+'processed_value':['',Validators.required],
+// selectedColor: [this.selectedColor]
+'themeColor':['',Validators.required]
+    })
+  }
+  initializeTileFields4(){
+    this.createKPIWidget4 = this.fb.group({
+      'formlist':['',Validators.required],
+      'parameterName':['',Validators.required],
+      'groupBy':['',Validators.required],
+      'primaryValue':['',Validators.required],
+      'groupByFormat':['',Validators.required],
+      'constantValue':[''],
+'CompareTile':['',Validators.required],
+'WithCompareTile':['',Validators.required],
+'secondaryValue':['',Validators.required],
+widgetid: [this.generateUniqueId()],
+'processed_value':['',Validators.required],
+// selectedColor: [this.selectedColor]
+'themeColor':['',Validators.required]
+    })
   }
   
   
@@ -1193,6 +2514,7 @@ onSelectChange(event: Event): void {
 
         console.log('value check from create master', value);
         if (value) {
+          this.loadData() 
             Swal.fire({
                 position: 'top-end',
                 icon: 'success',
@@ -1299,6 +2621,12 @@ onSelectChange(event: Event): void {
     }
   }
 
+  getHeightBasedOnContent(item: any): string {
+    if (item.multi_value && item.multi_value.length) {
+      return `${100 + item.multi_value.length * 30}px`;  // Adjust height based on the number of values
+    }
+    return '200px';  // Default height
+  }
 
   fetchCompanyLookupdata(sk:any):any {
     console.log("I am called Bro");
@@ -1365,6 +2693,8 @@ onSelectChange(event: Event): void {
     });
   }
   loadData() {
+    this.lookup_data_summary1=[]
+    this.lookup_data_summaryCopy=[]
     this.fetchCompanyLookupdataOnit(1).then((data: any) => {
       this.lookup_data_summaryCopy = data; // Assign data to the component property
       console.log('Data loaded:', this.lookup_data_summaryCopy); // Log to verify
@@ -1701,25 +3031,52 @@ onSelectChange(event: Event): void {
         createdUser: this.createdUserName,
     };
 
-    // Construct the tempObj based on the action type
-    let tempObj:any = {
+    // Construct grid_details in normal JSON format, with conditional parsing/stringifying for multi_value
+    const formattedDashboard = this.dashboard.map(tile => {
+      let multiValueFormatted;
+  
+      // Check if multi_value is a string
+      if (typeof tile.multi_value === 'string') {
+          try {
+              // Parse it first if it's a string
+              multiValueFormatted = JSON.parse(tile.multi_value);
+  
+              // Stringify again to ensure it's in the correct format
+              multiValueFormatted = JSON.stringify(multiValueFormatted);
+          } catch (error) {
+              console.error('Error parsing multi_value:', error);
+              multiValueFormatted = '[]'; // Default to an empty array if parsing fails
+          }
+      } else {
+          // If it's not a string (i.e., an array or object), stringify it
+          multiValueFormatted = JSON.stringify(tile.multi_value || []);
+      }
+  
+      return {
+          ...tile,
+          multi_value: multiValueFormatted // Updated multi_value
+      };
+  });
+  
+
+    let tempObj: any = {
         PK: `${this.SK_clientID}#${this.allCompanyDetails.summaryID}#summary#main`,
-        SK: 1,
-        metadata: JSON.stringify({
+        SK: 1, // Use a simple number as requested
+        metadata: {
             summaryID: this.createSummaryField.value.summaryID,
             summaryName: this.createSummaryField.value.summaryName,
             summaryDesc: this.createSummaryField.value.summarydesc,
-            updated: new Date(),
+            updated: new Date().toISOString(), // Ensure the updated field is formatted
             createdUser: this.createdUserName,
             summaryIcon: this.createSummaryField.value.iconSelect,
-            iconObject: this.previewObjDisplay,
-            // Directly include the grid_details as they are
-            grid_details: this.dashboard // Keep your existing gridster structure
-        })
+            iconObject: this.previewObjDisplay, // Directly use the icon object
+            grid_details: formattedDashboard // Use the array with conditionally formatted multi_value
+        }
     };
 
-    // Logging the constructed tempObj
-    console.log('tempObj constructed for update:', tempObj);
+    // Logging the constructed metadata object
+    console.log('Constructed metadata with conditionally formatted multi_value:', JSON.stringify(tempObj.metadata, null, 2));
+    tempObj.metadata = JSON.stringify(tempObj.metadata);
 
     // Validate PK and SK before proceeding
     if (!tempObj.PK || typeof tempObj.PK !== 'string') {
@@ -1733,6 +3090,7 @@ onSelectChange(event: Event): void {
         });
     }
 
+    // Validate SK
     if (tempObj.SK == null || typeof tempObj.SK !== 'number') {
         console.error("Invalid SK:", tempObj.SK);
         return Swal.fire({
@@ -1745,42 +3103,60 @@ onSelectChange(event: Event): void {
     }
 
     // API call to update the master
+    console.log('tempObj before API call:', JSON.stringify(tempObj, null, 2)); // Log the tempObj
+
     this.api.UpdateMaster(tempObj).then(async response => {
+        console.log('API Response:', response); // Log the API response
+
         if (response && response.metadata) {
-            // Fetch updated data
-            await this.fetchTimeMachineById(1, this.createSummaryField.value.summaryID, 'update', {
-                P1: this.createSummaryField.value.summaryID,
-                P2: this.createSummaryField.value.summaryName,
-                P3: this.createSummaryField.value.summarydesc,
-                P4: Math.ceil(new Date().getTime() / 1000), // Updated date
-                P5: Math.floor(new Date(this.createdTime).getTime() / 1000),
-                P6: this.createdUserName,
-                P7: this.getLoggedUser.username,
-                P8: JSON.stringify(this.previewObjDisplay),
-                P9: this.createSummaryField.value.iconSelect
-            });
+            try {
+                const parsedMetadata = JSON.parse(response.metadata); // Parse the metadata
+                console.log('Parsed Metadata:', parsedMetadata); // Log parsed metadata
 
-            const parsedMetadata = JSON.parse(response.metadata);
-            this.all_Packet_store = parsedMetadata;
-            this.datatableConfig = {};
-            this.lookup_data_summary = [];
-            this.cd.detectChanges();
+                // Fetch updated data
+                await this.fetchTimeMachineById(1, this.createSummaryField.value.summaryID, 'update', {
+                    P1: this.createSummaryField.value.summaryID,
+                    P2: this.createSummaryField.value.summaryName,
+                    P3: this.createSummaryField.value.summarydesc,
+                    P4: Math.ceil(new Date().getTime() / 1000), // Updated date
+                    P5: Math.floor(new Date(this.createdTime).getTime() / 1000),
+                    P6: this.createdUserName,
+                    P7: this.getLoggedUser.username,
+                    P8: JSON.stringify(this.previewObjDisplay),
+                    P9: this.createSummaryField.value.iconSelect
+                });
 
-            Swal.fire({
-                position: 'top-end',
-                icon: 'success',
-                title: 'Summary updated successfully',
-                showConfirmButton: false,
-                timer: 1500
-            });
+                console.log('Data fetched successfully.'); // Log after successful fetch
 
-            this.addFromService();
+                this.all_Packet_store = parsedMetadata; // Update the local state
+                this.datatableConfig = {};
+                this.lookup_data_summary = [];
+                this.cd.detectChanges();
 
-            if (this.modalRef) {
-                this.modalRef.close();
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Summary updated successfully',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+
+                this.addFromService();
+
+                if (this.modalRef) {
+                    this.modalRef.close();
+                }
+            } catch (error: any) {
+                console.error('Error in processing:', error); // Log processing errors
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'error',
+                    title: 'Error in processing data: ' + error.message,
+                    showConfirmButton: true,
+                });
             }
         } else {
-            console.error('Response structure is invalid:', response);
+            console.error('Response structure is invalid:', response); // Log invalid response structure
             Swal.fire({
                 position: 'top-end',
                 icon: 'error',
@@ -1788,12 +3164,13 @@ onSelectChange(event: Event): void {
                 showConfirmButton: true,
             });
         }
-    }).catch((err: any) => {
-        console.error('Error for updating:', err);
+    }).catch(err => {
+        console.error('Error calling UpdateMaster:', err); // Log the error details
         Swal.fire({
             position: 'top-end',
             icon: 'error',
             title: 'Failed to update summary. Please try again.',
+            text: err.message, // Provide additional context for the error
             showConfirmButton: false,
             timer: 1500
         });
@@ -1801,6 +3178,12 @@ onSelectChange(event: Event): void {
 
     this.loadData(); // Call this at the end to refresh data if needed
 }
+
+
+
+
+
+
 
 
 
@@ -2125,9 +3508,18 @@ this.userdetails = this.getLoggedUser.username;
         id: treeNode.id, // Use 'id' for jstree node ID
         text: treeNode.text, // Use 'text' for jstree node display
         parent: treeNode.parent || "#", // Set parent, or use "#" for root
-        node_type: treeNode.node_type, // You can add additional properties as needed
-        summaryView: treeNode.summaryView
+        node_type: treeNode.node_type,
+        magicboard_view:treeNode.magicboard_view,
+        powerboard_view:treeNode.powerboard_view,
+        description:treeNode.description,
+        summaryView:treeNode.summaryView,
+        dreamboard_view:treeNode.dreamboard_view,
+        powerboard_view_device:treeNode.powerboard_view_device,
+        icon:treeNode.icon
 
+     
+
+         // You can add additional properties as needed
       }));
       setTimeout(() => {
         this.createJSTree(jstreeData);
@@ -2411,12 +3803,28 @@ fetchDynamicFormData(value: any) {
         const parsedMetadata = JSON.parse(result.metadata);
         const formFields = parsedMetadata.formFields;
 
+        // Initialize the list with formFields labels
         this.listofDynamicParam = formFields.map((field: any) => {
           return {
             value: field.label,
             text: field.label
           };
         });
+
+        // Include created_time and updated_time
+        if (parsedMetadata.created_time) {
+          this.listofDynamicParam.push({
+            value: parsedMetadata.created_time.toString(),
+            text: 'Created Time' // You can customize the label here if needed
+          });
+        }
+
+        if (parsedMetadata.updated_time) {
+          this.listofDynamicParam.push({
+            value: parsedMetadata.updated_time.toString(),
+            text: 'Updated Time' // You can customize the label here if needed
+          });
+        }
 
         console.log('Transformed dynamic parameters:', this.listofDynamicParam);
 
@@ -2431,12 +3839,993 @@ fetchDynamicFormData(value: any) {
 
 
 
+
 editItem(item: any) {
   console.log('Editing item:', item);
   
   // Open edit modal or perform the edit action here
   // Example: this.openEditModal(item);
 }
+
+// onSelect(value: any) {
+//   if (value) {
+//     // Open the modal when a value is selected
+//     this.modalService.open(this.calendarModal);
+//   }
+// }
+openModalCalender() {
+  const modalRef = this.modalService.open(this.calendarModal);
+  modalRef.result.then(
+    (result) => {
+      console.log('Closed with:', result);
+      this.handleModalClose(result); // Handle logic when modal closes
+    },
+    (reason) => {
+      console.log('Dismissed with:', reason);
+    }
+  );
+}
+openModalCalender1() {
+  const modalRef = this.modalService.open(this.calendarModal1);
+  modalRef.result.then(
+    (result) => {
+      console.log('Closed with:', result);
+      this.handleModalClose(result); // Handle logic when modal closes
+    },
+    (reason) => {
+      console.log('Dismissed with:', reason);
+    }
+  );
+}
+// closeAllModals() {
+//   this.modalService.dismissAll(); // Dismiss all open modals
+// }
+selectValue(value: string, modal: any) {
+  console.log('Selected value:', value);
+  
+  // Set the value to the form control
+  this.groupByFormatControl.setValue(value);
+  
+  // Close the modal after selection
+  this.closeModal(modal);
+}
+
+get groupByFormatControl(): FormControl {
+  return this.createKPIWidget.get('groupByFormat') as FormControl; // Cast to FormControl
+}
+get groupByFormatControl1(): FormControl {
+  return this.createKPIWidget1.get('groupByFormat') as FormControl; // Cast to FormControl
+}
+handleModalClose(selectedValue: string) {
+  // Logic to handle what happens after the modal closes
+  console.log('Handling post modal close logic with value:', selectedValue);
+  // You can update your UI or state here based on the selectedValue
+}
+
+
+showTooltip(item: string) {
+  this.tooltip = item;
+}
+
+hideTooltip() {
+  this.tooltip = null;
+}
+
+
+onCancel(modal: any) {
+  modal.dismiss(); // Dismiss the modal
+}
+calenderClose(event:any){
+
+  
+}
+closeModal(modal: any) {
+  if (modal) {
+    modal.close(); // Close the modal
+  } else {
+    console.error('Modal reference is undefined');
+  }
+}
+
+onValueChange(selectedValue: any): void {
+  // Handle any logic here if needed when the value changes
+  console.log(selectedValue); // Optional: log the selected value
+}
+onRangeSelect(selectedValue: any): void {
+  // Handle any logic here if needed when the value changes
+  console.log('selectedValue checking',selectedValue); // Optional: log the selected value
+}
+
+
+get primaryValue() {
+  return this.createKPIWidget.get('primaryValue');
+}
+get primaryValue1() {
+  return this.createKPIWidget1.get('primaryValue');
+}
+
+get primaryValue2() {
+  return this.createKPIWidget2.get('primaryValue');
+}
+
+get primaryValue3() {
+  return this.createKPIWidget3.get('primaryValue');
+  
+}
+
+get primaryValue4() {
+  return this.createKPIWidget4.get('primaryValue');
+}
+get primaryValue5() {
+  return this.createKPIWidget5.get('primaryValue');
+}
+get Target1() {
+  return this.createKPIWidget6.get('Target');
+}
+get MaxRange1() {
+  return this.createKPIWidget6.get('MaxRange');
+}
+get value1() {
+  return this.createKPIWidget6.get('value');
+}
+onValueChangeMaxRange1(selectedValue: any): void {
+  // Handle any logic here if needed when the value changes
+  console.log(selectedValue); // Optional: log the selected value
+}
+onValueChangevalue1(selectedValue: any): void {
+  // Handle any logic here if needed when the value changes
+  console.log(selectedValue); // Optional: log the selected value
+}
+onValueChange1(selectedValue: any): void {
+  // Handle any logic here if needed when the value changes
+  console.log(selectedValue); // Optional: log the selected value
+}
+onValueChange3(selectedValue: any): void {
+  // Handle any logic here if needed when the value changes
+  console.log(selectedValue); // Optional: log the selected value
+}
+onValueChange6(selectedValue: any): void {
+  // Handle any logic here if needed when the value changes
+  console.log(selectedValue); // Optional: log the selected value
+}
+onValueChange4(selectedValue: any): void {
+  // Handle any logic here if needed when the value changes
+  console.log(selectedValue); // Optional: log the selected value
+}
+onValueChange5(selectedValue: any): void {
+  // Handle any logic here if needed when the value changes
+  console.log(selectedValue); // Optional: log the selected value
+}
+
+// }
+selectValue1(value: string, modal: any) {
+  console.log('Selected value:', value);
+  
+  // Set the value to the form control
+  this.groupByFormatControl1.setValue(value);
+  
+  // Close the modal after selection
+  this.closeModal(modal);
+}
+onValue(value: any) {
+  // Logic to handle value change, if needed
+  console.log("Selected Value:", value);
+}
+onTarget(value: any) {
+  // Logic to handle value change, if needed
+  console.log("Selected Value:", value);
+}
+
+onMaxRange1(value: any) {
+  // Logic to handle value change, if needed
+  console.log("Selected Value:", value);
+}
+
+
+
+
+openKPIModal2(content: any, tile?: any, index?: number) {
+  if (tile) {
+    this.selectedTile = tile;
+    this.editTileIndex2 = index !== undefined ? index : null; // Store the index, default to null if undefined
+    console.log('Tile Object:', tile); // Log the tile object
+
+    // Parse multi_value if it's a string
+    let parsedMultiValue = [];
+    if (typeof tile.multi_value === 'string') {
+      try {
+        parsedMultiValue = JSON.parse(tile.multi_value);
+        console.log('Parsed multi_value:', parsedMultiValue); // Log parsed multi_value to verify structure
+      } catch (error) {
+        console.error('Error parsing multi_value:', error);
+      }
+    } else {
+      parsedMultiValue = tile.multi_value || [];
+    }
+
+    // Extract values for primaryValue, secondaryValue, and secondaryValueNested from parsed multi_value
+    const primaryValue = parsedMultiValue[0]?.value || ''; // Assuming value corresponds to primaryValue
+    const constantValue = parsedMultiValue[0]?.constantValue || 0; // Assuming constantValue is in the first item
+    const secondaryValue = parsedMultiValue[1]?.value || ''; // Assuming value corresponds to secondaryValue
+    const secondaryValueNested = parsedMultiValue[2]?.value || ''; // Assuming value corresponds to secondaryValueNested
+    const parsedValue = parsedMultiValue[3]?.processed_value !== undefined ? parsedMultiValue[3].processed_value : 0;
+
+    // Initialize form fields and pre-select values
+    this.initializeTileFields2();
+    this.createKPIWidget2.patchValue({
+      formlist: tile.formlist,
+      parameterName: tile.parameterName,
+      groupBy: tile.groupBy,
+      primaryValue: primaryValue, // Set the primaryValue
+      groupByFormat: tile.groupByFormat,
+      constantValue: constantValue, // Set the constantValue
+      secondaryValue: secondaryValue, // Set the secondaryValue
+      secondaryValueNested: secondaryValueNested ,// Set the secondaryValueNested
+      processed_value: parsedValue,
+      themeColor:tile.themeColor
+    });
+
+    this.isEditMode = true; // Set to edit mode
+  } else {
+    this.selectedTile = null; // No tile selected for adding
+    this.isEditMode = false; // Set to add mode
+    this.createKPIWidget2.reset(); // Reset the form for new entry
+  }
+  this.themes.forEach(theme => {
+    theme.selected = false; // Deselect all themes
+  });
+
+  // Find the theme that matches the tile's themeColor
+  const matchingTheme = this.themes.find(theme => theme.color === tile?.themeColor);
+
+  // If a matching theme is found, set it as selected
+  if (matchingTheme) {
+    matchingTheme.selected = true;
+    console.log('Matching theme found and selected:', matchingTheme);
+  }
+
+  // Open the modal
+  this.modalService.open(content, { size: 'lg', ariaLabelledBy: 'modal-basic-title' });
+
+  // Any additional setup if needed
+  this.showTable();
+  this.reloadEvent.next(true);
+}
+
+openKPIModal5(content: any, tile?: any, index?: number) {
+  if (tile) {
+    this.selectedTile = tile;
+    this.editTileIndex5 = index !== undefined ? index : null; // Store the index, default to null if undefined
+    console.log('Tile Object5:', tile); // Log the tile object
+
+    let parsedMultiValue = [];
+    if (typeof tile.multi_value === 'string') {
+      try {
+        parsedMultiValue = JSON.parse(tile.multi_value);
+        console.log('Parsed multi_value:', parsedMultiValue); // Log parsed multi_value to verify structure
+      } catch (error) {
+        console.error('Error parsing multi_value:', error);
+      }
+    } else {
+      parsedMultiValue = tile.multi_value || [];
+    }
+
+    // Extract values for primaryValue, secondaryValue, and secondaryValueNested from parsed multi_value
+    const primaryValue5 = parsedMultiValue[0]?.primaryValue || ''; // Use primaryValue for the first item
+    const constantValue5 = parsedMultiValue[0]?.constantValue || ''; // Assuming constantValue is in the first item
+    const secondaryValue5 = parsedMultiValue[1]?.value || ''; // Assuming value corresponds to secondaryValue
+    const secondaryValueNested5 = parsedMultiValue[2]?.value || ''; // Assuming value corresponds to secondaryValueNested
+    const processed_value5 = parsedMultiValue[3]?.processed_value || ''; // Assuming processed_value is in the fourth item
+
+    // Initialize form fields and pre-select values
+    this.initializeTileFields5();
+    this.createKPIWidget5.patchValue({
+        formlist: tile.formlist,
+        parameterName: tile.parameterName,
+        groupBy: tile.groupBy,
+        primaryValue: primaryValue5, // Corrected to use primaryValue from the first item
+        groupByFormat: tile.groupByFormat,
+        constantValue: constantValue5, // Corrected to use the constantValue from the first item
+        secondaryValue: secondaryValue5, // Corrected to use value from the second item
+        secondaryValueNested: secondaryValueNested5, // Corrected to use value from the third item
+        processed_value: processed_value5 ,// Corrected to use processed_value from the fourth item
+        themeColor: tile.themeColor
+    });
+
+    this.isEditMode = true; // Set to edit mode
+  } else {
+    this.selectedTile = null; // No tile selected for adding
+    this.isEditMode = false; // Set to add mode
+    this.createKPIWidget5.reset(); // Reset the form for new entry
+  }
+
+  this.themes.forEach(theme => {
+    theme.selected = false; // Deselect all themes
+  });
+
+  // Find the theme that matches the tile's themeColor
+  const matchingTheme = this.themes.find(theme => theme.color === tile?.themeColor);
+
+  // If a matching theme is found, set it as selected
+  if (matchingTheme) {
+    matchingTheme.selected = true;
+    console.log('Matching theme found and selected:', matchingTheme);
+  }
+
+  this.modalService.open(content, { size: 'lg', ariaLabelledBy: 'modal-basic-title' });
+  this.showTable();
+  this.reloadEvent.next(true);
+}
+
+
+
+
+openKPIModal6(content: any, tile?: any, index?: number) {
+  if (tile) {
+    this.selectedTile = tile;
+    this.editTileIndex6 = index !== undefined ? index : null; // Store the index, default to null if undefined
+    console.log('Tile Object:', tile); // Log the tile object
+
+    // Initialize form fields and pre-select values
+    this.initializeTileFields6();
+    this.createKPIWidget6.patchValue({
+      formlist: tile.formlist,
+      parameterName: tile.parameterName,
+      value: tile.value,
+      Target: tile.Target,
+      MaxRange:tile.MaxRange,
+      groupByFormat:tile.groupByFormat,
+      constantValuevalue:tile.constantValuevalue,
+      percentageValue:tile.percentageValue,
+      constantValueTarget:tile.constantValueTarget,
+      constantValueMaxRange:tile.constantValueMaxRange,
+      percentageValueTarget:tile.percentageValueTarget,
+      percentageValueMaxRange:tile.percentageValueMaxRange
+
+
+
+
+    });
+    
+    this.isEditMode = true; // Set to edit mode
+} else {
+    this.selectedTile = null; // No tile selected for adding
+    this.isEditMode = false; // Set to add mode
+    this.createKPIWidget6.reset(); // Reset the form for new entry
+}
+this.themes.forEach(theme => {
+  theme.selected = false; // Deselect all themes
+});
+
+// Find the theme that matches the tile's themeColor
+const matchingTheme = this.themes.find(theme => theme.color === tile?.themeColor);
+
+// If a matching theme is found, set it as selected
+if (matchingTheme) {
+  matchingTheme.selected = true;
+  console.log('Matching theme found and selected:', matchingTheme);
+}
+
+
+  this.modalService.open(content, { size: 'lg', ariaLabelledBy: 'modal-basic-title' });
+  this.showTable() 
+  // 
+  this.reloadEvent.next(true);
+}
+onValueChange2(selectedValue: any): void {
+  // Handle any logic here if needed when the value changes
+  console.log(selectedValue); // Optional: log the selected value
+}
+
+selectValue2(value: string, modal: any) {
+  console.log('Selected value:', value);
+  
+  // Set the value to the form control
+  this.groupByFormatControl2.setValue(value);
+  
+  // Close the modal after selection
+  this.closeModal(modal);
+}
+
+selectValue4(value: string, modal: any) {
+  console.log('Selected value:', value);
+  
+  // Set the value to the form control
+  this.groupByFormatControl4.setValue(value);
+  
+  // Close the modal after selection
+  this.closeModal(modal);
+}
+selectValue5(value: string, modal: any) {
+  console.log('Selected value:', value);
+  
+  // Set the value to the form control
+  this.groupByFormatControl5.setValue(value);
+  
+  // Close the modal after selection
+  this.closeModal(modal);
+}
+selectValue6(value: string, modal: any) {
+  console.log('Selected value:', value);
+  
+  // Set the value to the form control
+  this.groupByFormatControl6.setValue(value);
+  
+  // Close the modal after selection
+  this.closeModal(modal);
+}
+
+get groupByFormatControl6(): FormControl {
+  return this.createKPIWidget6.get('groupByFormat') as FormControl; // Cast to FormControl
+}
+get groupByFormatControl5(): FormControl {
+  return this.createKPIWidget5.get('groupByFormat') as FormControl; // Cast to FormControl
+}
+get groupByFormatControl4(): FormControl {
+  return this.createKPIWidget4.get('groupByFormat') as FormControl; // Cast to FormControl
+}
+
+get groupByFormatControl2(): FormControl {
+  return this.createKPIWidget2.get('groupByFormat') as FormControl; // Cast to FormControl
+}
+
+openModalCalender2() {
+  const modalRef = this.modalService.open(this.calendarModal2);
+  modalRef.result.then(
+    (result) => {
+      console.log('Closed with:', result);
+      this.handleModalClose(result); // Handle logic when modal closes
+    },
+    (reason) => {
+      console.log('Dismissed with:', reason);
+    }
+  );
+}
+
+openModalCalender3() {
+  const modalRef = this.modalService.open(this.calendarModal3);
+  modalRef.result.then(
+    (result) => {
+      console.log('Closed with:', result);
+      this.handleModalClose(result); // Handle logic when modal closes
+    },
+    (reason) => {
+      console.log('Dismissed with:', reason);
+    }
+  );
+}
+
+openModalCalender4() {
+  const modalRef = this.modalService.open(this.calendarModal4);
+  modalRef.result.then(
+    (result) => {
+      console.log('Closed with:', result);
+      this.handleModalClose(result); // Handle logic when modal closes
+    },
+    (reason) => {
+      console.log('Dismissed with:', reason);
+    }
+  );
+}
+
+openModalCalender5() {
+  const modalRef = this.modalService.open(this.calendarModal5);
+  modalRef.result.then(
+    (result) => {
+      console.log('Closed with:', result);
+      this.handleModalClose(result); // Handle logic when modal closes
+    },
+    (reason) => {
+      console.log('Dismissed with:', reason);
+    }
+  );
+}
+openModalCalender6() {
+  const modalRef = this.modalService.open(this.calendarModal6);
+  modalRef.result.then(
+    (result) => {
+      console.log('Closed with:', result);
+      this.handleModalClose(result); // Handle logic when modal closes
+    },
+    (reason) => {
+      console.log('Dismissed with:', reason);
+    }
+  );
+}
+
+
+updateTile2() {
+  if (this.editTileIndex2 !== null) {
+      console.log('this.editTileIndex check', this.editTileIndex2);
+      console.log('Tile checking for update:', this.dashboard[this.editTileIndex2]); // Log the tile being checked
+
+      // Log the current details of the tile before update
+      console.log('Current Tile Details Before Update:', this.dashboard[this.editTileIndex2]);
+      let multiValueArray = this.dashboard[this.editTileIndex2].multi_value ||[];
+      const processedValue = this.createKPIWidget2.value.processed_value || ''; // Get updated processed_value from the form
+      const constantValue = this.createKPIWidget2.value.constantValue || 0; // Get updated constantValue from the form
+      const secondaryValue = this.createKPIWidget2.value.secondaryValue || '';
+      const secondaryValueNested =this.createKPIWidget2.value.secondaryValueNested ||'';
+      const   primaryValue= this.createKPIWidget2.value.primaryValue ||'';
+      if (multiValueArray.length > 1) {
+        multiValueArray[3].processed_value = processedValue; // Update processed_value at index 1
+        multiValueArray[0].constantValue = constantValue; // Update constantValue at index 0
+        multiValueArray[1].value = secondaryValue;
+        multiValueArray[2].value = secondaryValueNested
+
+         // Update secondaryValue at index 1
+    } else {
+        // If multi_value array doesn't have enough elements, ensure it's structured correctly
+        // Ensure at least two objects are created with the correct structure
+     
+          multiValueArray.push({ processed_value: processedValue });
+          multiValueArray.push({ constantValue: constantValue});
+          multiValueArray.push({ secondaryValue: secondaryValue });
+          multiValueArray.push({secondaryValueNested:secondaryValueNested})
+
+     
+    }
+
+      // Update the properties of the tile with the new values from the form
+      this.dashboard[this.editTileIndex2] = {
+          ...this.dashboard[this.editTileIndex2], // Keep existing properties
+          formlist: this.createKPIWidget2.value.formlist,
+          parameterName: this.createKPIWidget2.value.parameterName,
+          groupBy: this.createKPIWidget2.value.groupBy,
+          primaryValue: this.createKPIWidget2.value.primaryValue,
+          groupByFormat:this.createKPIWidget2.value.groupByFormat,
+          constantValue:this.createKPIWidget2.value.constantValue,
+          secondaryValue:this.createKPIWidget2.value.secondaryValue,
+          secondaryValueNested:this.createKPIWidget2.value.secondaryValueNested,
+          themeColor:this.createKPIWidget2.value.themeColor,
+          processedValue:this.createKPIWidget2.value.processedValue
+
+          // Include any additional properties if needed
+      };
+
+      // Log the updated details of the tile
+      console.log('Updated Tile Details:', this.dashboard[this.editTileIndex2]);
+
+      // Also update the grid_details array to reflect changes
+      this.all_Packet_store.grid_details[this.editTileIndex2] = {
+          ...this.all_Packet_store.grid_details[this.editTileIndex2], // Keep existing properties
+          ...this.dashboard[this.editTileIndex2], // Update with new values
+      };
+      this.openModal('Edit_ts',this.all_Packet_store)
+     
+      this.updateSummary('', 'update_tile');
+      console.log('his.dashboard check from updateTile',this.dashboard)
+
+      console.log("Updated all_Packet_store.grid_details:", this.all_Packet_store.grid_details);
+   
+
+      // Reset the editTileIndex after the update
+      this.editTileIndex2 = null;
+  } else {
+      console.error("Edit index is null. Unable to update the tile.");
+  }
+}
+updateTile3() {
+  if (this.editTileIndex3 !== null) {
+      console.log('this.editTileIndex check', this.editTileIndex3);
+      console.log('Tile checking for update:', this.dashboard[this.editTileIndex3]); // Log the tile being checked
+
+      // Log the current details of the tile before update
+      console.log('Current Tile Details Before Update:', this.dashboard[this.editTileIndex3]);
+      let multiValueArray = this.dashboard[this.editTileIndex3].multi_value ||[];
+      const processedValue = this.createKPIWidget3.value.processed_value || ''; // Get updated processed_value from the form
+      const constantValue = this.createKPIWidget3.value.constantValue || 0; // Get updated constantValue from the form
+      const CompareTile = this.createKPIWidget3.value.CompareTile || '';
+      const WithCompareTile =this.createKPIWidget3.value.WithCompareTile ||'';
+      const   primaryValue= this.createKPIWidget3.value.primaryValue ||'';
+
+
+      if (multiValueArray.length > 1) {
+        multiValueArray[3].processed_value = processedValue; // Update processed_value at index 1
+        multiValueArray[0].constantValue = constantValue; // Update constantValue at index 0
+        multiValueArray[1].value = CompareTile;
+        multiValueArray[2].value = WithCompareTile
+
+         // Update secondaryValue at index 1
+    } else {
+        // If multi_value array doesn't have enough elements, ensure it's structured correctly
+        // Ensure at least two objects are created with the correct structure
+     
+          multiValueArray.push({ processed_value: processedValue });
+          multiValueArray.push({ constantValue: constantValue});
+          multiValueArray.push({ CompareTile: CompareTile });
+          multiValueArray.push({WithCompareTile:WithCompareTile})
+
+     
+    }
+      // Update the properties of the tile with the new values from the form
+      this.dashboard[this.editTileIndex3] = {
+          ...this.dashboard[this.editTileIndex3], // Keep existing properties
+          formlist: this.createKPIWidget3.value.formlist,
+          parameterName: this.createKPIWidget3.value.parameterName,
+          groupBy: this.createKPIWidget3.value.groupBy,
+          primaryValue: this.createKPIWidget3.value.primaryValue,
+          groupByFormat:this.createKPIWidget3.value.groupByFormat,
+          constantValue:this.createKPIWidget3.value.constantValue,
+          CompareTile:this.createKPIWidget3.value.CompareTile,
+          WithCompareTile:this.createKPIWidget3.value.WithCompareTile,
+          themeColor:this.createKPIWidget3.value.themeColor
+          // Include any additional properties if needed
+      };
+
+      // Log the updated details of the tile
+      console.log('Updated Tile Details:', this.dashboard[this.editTileIndex3]);
+
+      // Also update the grid_details array to reflect changes
+      this.all_Packet_store.grid_details[this.editTileIndex3] = {
+          ...this.all_Packet_store.grid_details[this.editTileIndex3], // Keep existing properties
+          ...this.dashboard[this.editTileIndex3], // Update with new values
+      };
+      this.openModal('Edit_ts',this.all_Packet_store)
+     
+      this.updateSummary('', 'update_tile');
+      console.log('his.dashboard check from updateTile',this.dashboard)
+
+      console.log("Updated all_Packet_store.grid_details:", this.all_Packet_store.grid_details);
+   
+
+      // Reset the editTileIndex after the update
+      this.editTileIndex3 = null;
+  } else {
+      console.error("Edit index is null. Unable to update the tile.");
+  }
+}
+updateTile4() {
+  if (this.editTileIndex4 !== null) {
+      console.log('this.editTileIndex check', this.editTileIndex4);
+      console.log('Tile checking for update:', this.dashboard[this.editTileIndex4]); // Log the tile being checked
+
+      // Log the current details of the tile before update
+      console.log('Current Tile Details Before Update:', this.dashboard[this.editTileIndex4]);
+      let multiValueArray = this.dashboard[this.editTileIndex4].multi_value ||[];
+      const processedValue = this.createKPIWidget4.value.processed_value || ''; // Get updated processed_value from the form
+      const constantValue = this.createKPIWidget4.value.constantValue || 0; // Get updated constantValue from the form
+      const CompareTile = this.createKPIWidget4.value.CompareTile || '';
+      const WithCompareTile =this.createKPIWidget4.value.WithCompareTile ||'';
+      const   primaryValue= this.createKPIWidget4.value.primaryValue ||'';
+      const secondaryValue = this.createKPIWidget4.value.secondaryValue || '';
+      if (multiValueArray.length > 1) {
+        multiValueArray[3].processed_value = processedValue; // Update processed_value at index 1
+        multiValueArray[0].constantValue = constantValue; // Update constantValue at index 0
+        multiValueArray[1].value = CompareTile;
+        multiValueArray[2].value = WithCompareTile;
+        multiValueArray[4].value =secondaryValue
+
+         // Update secondaryValue at index 1
+    } else {
+        // If multi_value array doesn't have enough elements, ensure it's structured correctly
+        // Ensure at least two objects are created with the correct structure
+     
+          multiValueArray.push({ processed_value: processedValue });
+          multiValueArray.push({ constantValue: constantValue});
+          multiValueArray.push({ CompareTile: CompareTile });
+          multiValueArray.push({WithCompareTile:WithCompareTile});
+          multiValueArray.push({secondaryValue:secondaryValue})
+
+
+     
+    }
+
+      // Update the properties of the tile with the new values from the form
+      this.dashboard[this.editTileIndex4] = {
+          ...this.dashboard[this.editTileIndex4], // Keep existing properties
+          formlist: this.createKPIWidget4.value.formlist,
+          parameterName: this.createKPIWidget4.value.parameterName,
+          groupBy: this.createKPIWidget4.value.groupBy,
+          primaryValue: this.createKPIWidget4.value.primaryValue,
+          groupByFormat:this.createKPIWidget4.value.groupByFormat,
+          constantValue:this.createKPIWidget4.value.constantValue,
+          CompareTile:this.createKPIWidget4.value.CompareTile,
+          WithCompareTile:this.createKPIWidget4.value.WithCompareTile,
+          themeColor:this.createKPIWidget4.value.themeColor,
+          secondaryValue:this.createKPIWidget4.value.secondaryValue,
+          processedValue:this.createKPIWidget4.value.processedValue
+
+
+          // Include any additional properties if needed
+      };
+
+      // Log the updated details of the tile
+      console.log('Updated Tile Details:', this.dashboard[this.editTileIndex4]);
+
+      // Also update the grid_details array to reflect changes
+      this.all_Packet_store.grid_details[this.editTileIndex4] = {
+          ...this.all_Packet_store.grid_details[this.editTileIndex4], // Keep existing properties
+          ...this.dashboard[this.editTileIndex4], // Update with new values
+      };
+      this.openModal('Edit_ts',this.all_Packet_store)
+     
+      this.updateSummary('', 'update_tile');
+      console.log('his.dashboard check from updateTile',this.dashboard)
+
+      console.log("Updated all_Packet_store.grid_details:", this.all_Packet_store.grid_details);
+   
+
+      // Reset the editTileIndex after the update
+      this.editTileIndex4 = null;
+  } else {
+      console.error("Edit index is null. Unable to update the tile.");
+  }
+}
+
+
+updateTile5() {
+  if (this.editTileIndex5 !== null) {
+      console.log('this.editTileIndex check', this.editTileIndex5);
+      console.log('Tile checking for update:', this.dashboard[this.editTileIndex5]); // Log the tile being checked
+
+      // Log the current details of the tile before update
+      console.log('Current Tile Details Before Update:', this.dashboard[this.editTileIndex5]);
+      let multiValueArray = this.dashboard[this.editTileIndex5].multi_value ||[];
+      const processedValue = this.createKPIWidget5.value.processed_value || ''; // Get updated processed_value from the form
+      const constantValue = this.createKPIWidget5.value.constantValue || 0; // Get updated constantValue from the form
+      const secondaryValue = this.createKPIWidget5.value.secondaryValue || '';
+      const secondaryValueNested =this.createKPIWidget5.value.secondaryValueNested ||'';
+      const   primaryValue= this.createKPIWidget5.value.primaryValue ||'';
+      if (multiValueArray.length > 1) {
+        multiValueArray[3].processed_value = processedValue; // Update processed_value at index 1
+        multiValueArray[0].constantValue = constantValue; // Update constantValue at index 0
+        multiValueArray[1].value = secondaryValue;
+        multiValueArray[2].value = secondaryValueNested
+
+         // Update secondaryValue at index 1
+    } else {
+        // If multi_value array doesn't have enough elements, ensure it's structured correctly
+        // Ensure at least two objects are created with the correct structure
+     
+          multiValueArray.push({ processed_value: processedValue });
+          multiValueArray.push({ constantValue: constantValue});
+          multiValueArray.push({ secondaryValue: secondaryValue });
+          multiValueArray.push({secondaryValueNested:secondaryValueNested})
+
+     
+    }
+
+      // Update the properties of the tile with the new values from the form
+      this.dashboard[this.editTileIndex5] = {
+          ...this.dashboard[this.editTileIndex5], // Keep existing properties
+          formlist: this.createKPIWidget5.value.formlist,
+          parameterName: this.createKPIWidget5.value.parameterName,
+          groupBy: this.createKPIWidget5.value.groupBy,
+          primaryValue: this.createKPIWidget5.value.primaryValue,
+          groupByFormat:this.createKPIWidget5.value.groupByFormat,
+          constantValue:this.createKPIWidget5.value.constantValue,
+          secondaryValue:this.createKPIWidget5.value.secondaryValue,
+          secondaryValueNested:this.createKPIWidget5.value.secondaryValueNested,
+          themeColor:this.createKPIWidget5.value.themeColor
+          // Include any additional properties if needed
+      };
+
+      // Log the updated details of the tile
+      console.log('Updated Tile Details:', this.dashboard[this.editTileIndex5]);
+
+      // Also update the grid_details array to reflect changes
+      this.all_Packet_store.grid_details[this.editTileIndex5] = {
+          ...this.all_Packet_store.grid_details[this.editTileIndex5], // Keep existing properties
+          ...this.dashboard[this.editTileIndex5], // Update with new values
+      };
+      this.openModal('Edit_ts',this.all_Packet_store)
+     
+      this.updateSummary('', 'update_tile');
+      console.log('his.dashboard check from updateTile',this.dashboard)
+
+      console.log("Updated all_Packet_store.grid_details:", this.all_Packet_store.grid_details);
+   
+
+      // Reset the editTileIndex after the update
+      this.editTileIndex2 = null;
+  } else {
+      console.error("Edit index is null. Unable to update the tile.");
+  }
+}
+
+updateTile6() {
+  if (this.editTileIndex6 !== null) {
+      console.log('this.editTileIndex check', this.editTileIndex6);
+      console.log('Tile checking for update:', this.dashboard[this.editTileIndex6]); // Log the tile being checked
+
+      // Log the current details of the tile before update
+      console.log('Current Tile Details Before Update:', this.dashboard[this.editTileIndex6]);
+
+      // Update the properties of the tile with the new values from the form
+      this.dashboard[this.editTileIndex6] = {
+          ...this.dashboard[this.editTileIndex6], // Keep existing properties
+          formlist: this.createKPIWidget6.value.formlist,
+          parameterName: this.createKPIWidget6.value.parameterName,
+          value: this.createKPIWidget6.value.value,
+          Target: this.createKPIWidget6.value.Target,
+          MaxRange:this.createKPIWidget6.value.MaxRange,
+          groupByFormat:this.createKPIWidget6.value.groupByFormat,
+          constantValuevalue:this.createKPIWidget6.value.constantValuevalue,
+          percentageValue:this.createKPIWidget6.value.percentageValue,
+          constantValueTarget:this.createKPIWidget6.value.constantValueTarget,
+          constantValueMaxRange:this.createKPIWidget6.value.constantValueMaxRange,
+          percentageValueTarget:this.createKPIWidget6.value.percentageValueTarget,
+          percentageValueMaxRange:this.createKPIWidget6.value.percentageValueMaxRange,
+          // Include any additional properties if needed
+      };
+    
+      // Log the updated details of the tile
+      console.log('Updated Tile Details:', this.dashboard[this.editTileIndex6]);
+
+      // Also update the grid_details array to reflect changes
+      this.all_Packet_store.grid_details[this.editTileIndex6] = {
+          ...this.all_Packet_store.grid_details[this.editTileIndex6], // Keep existing properties
+          ...this.dashboard[this.editTileIndex6], // Update with new values
+      };
+      this.openModal('Edit_ts',this.all_Packet_store)
+     
+      this.updateSummary('', 'update_tile');
+      console.log('his.dashboard check from updateTile',this.dashboard)
+
+      console.log("Updated all_Packet_store.grid_details:", this.all_Packet_store.grid_details);
+   
+
+      // Reset the editTileIndex after the update
+      this.editTileIndex6 = null;
+  } else {
+      console.error("Edit index is null. Unable to update the tile.");
+  }
+}
+
+
+
+
+selectValue3(value: string, modal: any) {
+  console.log('Selected value:', value);
+  
+  // Set the value to the form control
+  this.groupByFormatControl3.setValue(value);
+  
+  // Close the modal after selection
+  this.closeModal(modal);
+}
+
+get groupByFormatControl3(): FormControl {
+  return this.createKPIWidget3.get('groupByFormat') as FormControl; // Cast to FormControl
+}
+
+
+openKPIModal3(content: any, tile?: any, index?: number) {
+  if (tile) {
+    this.selectedTile = tile;
+    this.editTileIndex3 = index !== undefined ? index : null; // Store the index, default to null if undefined
+    console.log('Tile Object:', tile); // Log the tile object
+
+    let parsedMultiValue = [];
+    if (typeof tile.multi_value === 'string') {
+      try {
+        parsedMultiValue = JSON.parse(tile.multi_value);
+        console.log('Parsed multi_value:', parsedMultiValue); // Log parsed multi_value to verify structure
+      } catch (error) {
+        console.error('Error parsing multi_value:', error);
+      }
+    } else {
+      parsedMultiValue = tile.multi_value || [];
+    }
+
+    // Extract values for primaryValue, secondaryValue, and secondaryValueNested from parsed multi_value
+    const primaryValue = parsedMultiValue[0]?.value || ''; // Assuming value corresponds to primaryValue
+    const constantValue = parsedMultiValue[0]?.constantValue || 0; // Assuming constantValue is in the first item
+    const CompareTile = parsedMultiValue[1]?.value || ''; // Assuming value corresponds to secondaryValue
+    const WithCompareTile = parsedMultiValue[2]?.value || ''; // Assuming value corresponds to secondaryValueNested
+    const parsedValue = parsedMultiValue[3]?.processed_value !== undefined ? parsedMultiValue[3].processed_value : 0;
+
+    // Initialize form fields and pre-select values
+    this.initializeTileFields3();
+    this.createKPIWidget3.patchValue({
+        formlist: tile.formlist,
+        parameterName: tile.parameterName,
+        groupBy: tile.groupBy,
+        primaryValue: primaryValue,  // Use extracted primaryValue
+        groupByFormat: tile.groupByFormat,
+        constantValue: constantValue,  // Use extracted constantValue
+        CompareTile: CompareTile,  // Use extracted CompareTile value
+        WithCompareTile: WithCompareTile,  // Use extracted WithCompareTile value
+        processed_value: parsedValue,  // Use extracted parsedValue
+        themeColor: tile.themeColor,
+    });
+
+    this.isEditMode = true; // Set to edit mode
+  } else {
+    this.selectedTile = null; // No tile selected for adding
+    this.isEditMode = false; // Set to add mode
+    this.createKPIWidget3.reset(); // Reset the form for new entry
+  }
+
+  this.themes.forEach(theme => {
+    theme.selected = false; // Deselect all themes
+  });
+
+  // Find the theme that matches the tile's themeColor
+  const matchingTheme = this.themes.find(theme => theme.color === tile?.themeColor);
+
+  // If a matching theme is found, set it as selected
+  if (matchingTheme) {
+    matchingTheme.selected = true;
+    console.log('Matching theme found and selected:', matchingTheme);
+  }
+
+  // Open modal and trigger necessary actions
+  this.modalService.open(content, { size: 'lg', ariaLabelledBy: 'modal-basic-title' });
+  this.showTable();
+  this.reloadEvent.next(true);
+}
+
+
+
+openKPIModal4(content: any, tile?: any, index?: number) {
+  if (tile) {
+    this.selectedTile = tile;
+    this.editTileIndex4 = index !== undefined ? index : null; // Store the index, default to null if undefined
+    console.log('Tile Object:', tile); // Log the tile object
+
+    let parsedMultiValue = [];
+    if (typeof tile.multi_value === 'string') {
+      try {
+        parsedMultiValue = JSON.parse(tile.multi_value);
+        console.log('Parsed multi_value:', parsedMultiValue); // Log parsed multi_value to verify structure
+      } catch (error) {
+        console.error('Error parsing multi_value:', error);
+      }
+    } else {
+      parsedMultiValue = tile.multi_value || [];
+    }
+
+    // Extract values for primaryValue, constantValue, CompareTile, WithCompareTile, secondaryValue, and processed_value
+    const primaryValue4 = parsedMultiValue[0]?.value || ''; // Primary value from multi_value
+    const constantValue4 = parsedMultiValue[0]?.constantValue || 0; // Constant value from multi_value
+    const CompareTile4 = parsedMultiValue[1]?.value || ''; // Secondary value from multi_value
+    const WithCompareTile4 = parsedMultiValue[2]?.value || ''; // Nested secondary value from multi_value
+    const parsedValue4 = parsedMultiValue[3]?.processed_value !== undefined ? parsedMultiValue[3].processed_value : 0; // Processed value from multi_value
+    const secondaryValue4 = parsedMultiValue[4]?.value || ''; // Secondary value from multi_value
+
+    // Initialize form fields and pre-select values
+    this.initializeTileFields4();
+    this.createKPIWidget4.patchValue({
+        formlist: tile.formlist,
+        parameterName: tile.parameterName,
+        groupBy: tile.groupBy,
+        primaryValue: primaryValue4, // Using extracted primary value
+        groupByFormat: tile.groupByFormat,
+        constantValue: constantValue4, // Using extracted constant value
+        CompareTile: CompareTile4, // Using extracted CompareTile value
+        WithCompareTile: WithCompareTile4, // Using extracted WithCompareTile value
+        secondaryValue: secondaryValue4, // Using extracted secondary value
+        processed_value: parsedValue4,
+        themeColor:tile.themeColor // Using extracted processed value
+    });
+
+    this.isEditMode = true; // Set to edit mode
+  } else {
+    this.selectedTile = null; // No tile selected for adding
+    this.isEditMode = false; // Set to add mode
+    this.createKPIWidget4.reset(); // Reset the form for new entry
+  }
+
+  this.themes.forEach(theme => {
+    theme.selected = false; // Deselect all themes
+  });
+
+  // Find the theme that matches the tile's themeColor
+  const matchingTheme = this.themes.find(theme => theme.color === tile?.themeColor);
+
+  // If a matching theme is found, set it as selected
+  if (matchingTheme) {
+    matchingTheme.selected = true;
+    console.log('Matching theme found and selected:', matchingTheme);
+  }
+
+  this.modalService.open(content, { size: 'lg', ariaLabelledBy: 'modal-basic-title' });
+  this.showTable();
+  this.reloadEvent.next(true);
+}
+
 
 
 }

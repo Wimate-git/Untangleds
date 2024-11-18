@@ -309,3 +309,112 @@ html, body {
 .list-item:hover .tooltip-content {
   visibility: visible;
 }
+
+
+/////////////////////////////////////////
+
+.color-boxes {
+  display: flex;
+  gap: 10px;
+}
+
+.color-box {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid transparent;
+  transition: all 0.3s;
+}
+
+.color-box.checked {
+  border: 2px solid #fff;
+}
+
+.color-box .checkmark {
+  position: absolute;
+  font-size: 20px;
+  color: white;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.color-box.checked .checkmark {
+  opacity: 1;
+}
+
+.color-box:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.color-box.checked {
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.4); /* Optional: highlight color when checked */
+}
+
+.grid-item:hover {
+  opacity: 0.8;  /* Reduce opacity on hover for a subtle effect */
+}
+
+
+.milky {
+  
+  text-transform: uppercase;
+
+  font-size: 30px;
+
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-align: center;
+  z-index: 1; 
+  margin-top: 12px;
+  position: fixed;
+  // padding: 200px 400px;
+  transform: translate(-50%, -50%);
+  border-radius: 20px;
+
+  white-space: nowrap; /* Prevent text wrapping */
+}
+#bulletChart {
+  height: 300px;  /* Make sure the chart has a height */
+  width: 100%;  /* Ensure the chart takes up full width available */
+}
+
+
+
+
+.responsive-image {
+  width: 100%;          /* Ensure the image takes up the full width of the container */
+  height: 100%;         /* Maintain aspect ratio */
+  object-fit: contain;  /* Make sure the entire image is visible */
+}
+
+.responsive-dial{
+  width: 100%;          /* Ensure the image takes up the full width of the container */
+  height: 60%;         /* Maintain aspect ratio */
+  object-fit: cover;
+}
+.responsive-fulldial{
+  width: 100%;          /* Ensure the image takes up the full width of the container */
+  height: 60%;         /* Maintain aspect ratio */
+  object-fit: cover;
+}
+
+
+#chart-gauge {
+  display: block;
+  min-width: 150px;
+  max-width: 400px;
+  height: 200px;
+  margin: 0 auto;
+}
+
+
+.grid-item {
+  border-radius: 16px; /* Ensures rounded corners */
+  overflow: hidden; /* Ensures that the content inside the grid item respects the border-radius */
+}
+

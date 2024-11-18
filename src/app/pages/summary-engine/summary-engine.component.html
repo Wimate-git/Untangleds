@@ -1,399 +1,451 @@
-<!-- <div class="card mb-5 mb-xl-8 card-custom">
-    <div class="card-header border-0 pt-5 ">
-        <h3 class="card-title align-items-start flex-column">
-            <span class="card-label fw-bolder fs-3 mb-1">
-                Summary </span>
-        </h3>
-        <div class="card-toolbar">
 
-            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#summaryModal" (click)="openModal('')">
-                New
-            </button>
-        </div>
-    </div>
-
-
-
-
-
-</div> -->
-
-
-
-<!-- 
-<div class="modal fade" id="summaryModal" tabindex="-1" aria-labelledby="summaryModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content" >
-            <div class="modal-header">
-                <h2 class="modal-title" *ngIf="showHeading">Add Summary </h2>
-                <h2 class="modal-title" *ngIf="!showHeading">Edit Summary </h2>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-          
-                <div class="fv-row"  [formGroup]="createSummaryField">
-                <div class="card-body border-top p-9">
-                    <div class="container mb-10">
-                        <div class="row">
-
-
-
-
-
-                            <div class="col-md-4">
-                                <label class="col-lg-12 col-form-label fw-bold fs-6 required">  ID</label>
-
-                                <input type="text" class="
-                                form-control form-control-lg form-control-solid
-                                mb-3 mb-lg-0
-                              " placeholder="Enter Summary ID" name="summaryID" formControlName="summaryID" required 
-                              (keyup)="checkUniqueIdentifier($event)">
-
-                              <span style="color: #fc1900;">{{errorForUniqueID}}</span>
-                                <div *ngIf="
-                                createSummaryField.get('summaryID')?.hasError('required') &&
-                                createSummaryField.get('summaryID')?.touched
-                              " class="fv-plugins-message-container invalid-feedback">
-                                    Company ID is required
-                                </div>
-
-                            </div>
-                            <div class="col-md-4">
-                                <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Name</label>
-
-                                <input type="text" class="
-                                form-control form-control-lg form-control-solid
-                                mb-3 mb-lg-0
-                              " placeholder="Enter Summary Name" name="summaryName" formControlName="summaryName"
-                                    required>
-
-                                <div *ngIf="
-                             createSummaryField.get('summaryName')?.hasError('required') &&
-                             createSummaryField.get('summaryName')?.touched
-                          " class="fv-plugins-message-container invalid-feedback">
-                                    Summary Name is required
-                                </div>
-
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="col-lg-12 col-form-label fw-bold fs-6 required">
-                                    Description</label>
-
-                                <input type="text" class="
-                                  form-control form-control-lg form-control-solid
-                                  mb-3 mb-lg-0
-                                " placeholder="Enter summary Description" name="summarydesc"
-                                    formControlName="summarydesc" required>
-                                <div *ngIf="
-                                     createSummaryField.get('summarydesc')?.hasError('required') &&
-                                     createSummaryField.get('summarydesc')?.touched
-                                " class="fv-plugins-message-container invalid-feedback">
-                                    Company Desc is required
-                                </div>
-
-                            </div>
-
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                              
-                                <label for="jsonInputControl" class="col-lg-12 col-form-label fw-bold fs-6 required">Grids</label>
-                                <textarea id="jsonInputControl" 
-                                          class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" 
-                                          placeholder="Enter JSON data" 
-                                          formControlName="jsonInputControl"
-                                          style="resize: vertical; width: 100%; max-width: 100%; min-height: 100px; max-height: 300px; overflow: auto;">
-                                </textarea>
-                                
-                             
-                                <div *ngIf="createSummaryField.get('jsonInputControl')?.hasError('invalidJson') && createSummaryField.get('jsonInputControl')?.touched"
-                                     class="text-danger">
-                                    Please enter valid JSON data.
-                                </div>
-                            </div>
-                            
-                    </div>
-                    </div>
-
-
-
-
-
-
-                    <div class="modal-footer">
-                        <div class="row w-100">
-                       
-                            <div class="col-md-12 d-flex justify-content-end align-items-center">
-                                <button type="button" class="btn btn-sm btn-danger me-2" data-bs-dismiss="modal" #closeSummary>Cancel</button>
-                        
-                                <button [hidden]="hideUpdateButton" type="submit" class="btn btn-sm btn-primary me-2"
-                                        (click)="updateSummary(createSummaryField.value, 'editSummary')"
-                                        *ngIf="showModal" 
-                                        [disabled]="createSummaryField.invalid || errorForUniqueID == 'Summary ID already exists' || createSummaryField.get('jsonInputControl')?.invalid || !createSummaryField.dirty">
-                                    Update
-                                </button>
-                        
-                                <button type="button" class="btn btn-sm btn-primary not-allowed"
-                                        *ngIf="!showModal"
-                                        [disabled]="createSummaryField.invalid || createSummaryField.get('jsonInputControl')?.invalid"
-                                        (click)="createNewSummary()">
-                                    Save
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    
-                    
-                    
-                    
-                      
-                </div>
-            </div>
-        </div>
-</div>
-</div>  -->
-
-<!-- <div style="margin-bottom: 20px; text-align: center;" *ngIf="editButtonCheck">
-
-    <button (click)="addItem()" style="padding: 10px 20px; background-color: blue; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-right: 10px; transition: background-color 0.3s;">
-      Add Grid Item
-    </button>
-  
-    <button *ngIf="dashboard.length > 0" (click)="removeItem(dashboard.length - 1)" 
-            style="padding: 10px 20px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-left: 10px; transition: background-color 0.3s;">
-      Remove Last Grid Item
-    </button>
-  </div> -->
-
-
-
-
-
-
-
-
-
-<!-- <h1>{{dashboard[0].grid_type}}</h1> -->
 
 
 <div class="" id="kt_wrapper" *ngIf="editButtonCheck">
-    <div class="" id="kt_content">
-      <div>
-        <div #gridsterContainer>
-          <div class="card" style="width: 100%; height: 100vh; background-color: var(--bs-app-bg-color) !important;">
-            <div class="card-body p-0 pb-0"
-              style="background-color: var(--bs-app-bg-color) !important; padding: 0 !important;">
-              <gridster style="background: var(--bs-app-bg-color)!important;border-radius: 5px;padding: 0px; "
-                [options]="options">
+  <div class="" id="kt_content">
+    <div>
+      <div class="d-flex justify-content-start mb-8">
+        <button class="btn btn-success btn-lg  me-md-2" type="button" (click)="toggleMode()">
+          {{ isEditModeView ? ' View Mode' : ' Edit Mode' }}
+        </button>
+      </div>
+      
+      
+      
+    
+      <div #gridsterContainer>
+        <div class="card" style="width: 100%; height: 100vh; background-color: var(--bs-app-bg-color) !important;">
+          <div class="card-body p-0 pb-0"
+            style="background-color: var(--bs-app-bg-color) !important; padding: 0 !important;">
+            <gridster style="background: var(--bs-app-bg-color)!important;border-radius: 5px;padding: 0px; "
+              [options]="options">
 
-                <gridster-item *ngFor="let item of dashboard; let i = index;" [item]="item" style="border-radius: 5px; padding: 5px; background-color: gray;">
-                  <div>
-                    <div *ngIf="item.grid_type === 'tile'" style="background-color: gray">
-                      <div class="grid-item"
-                           tabindex="0"
-                           style="background-color: gray; position: relative;"
-                           (mouseenter)="isHovered = true"
-                           (mouseleave)="isHovered = false">
-                        <div [style.color]="'white'">{{ item.formlist }}</div>
-                        <div class="value" tabindex="0"></div>
-                        
-                        <!-- Edit icon button -->
-                        <button 
-                          *ngIf="isHovered" 
-                          (click)="openKPIModal(KPIModal, item, i)" 
-                          class="mat-icon-button btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
-                          aria-haspopup="menu" 
-                          aria-expanded="false" 
-                          style="position: absolute; top: 3px; right: -2px; background: none; border: none; cursor: pointer;">
-                          <i class="bi bi-pencil" style="color: var(--bs-body-color);"></i> <!-- Edit icon -->
-                        </button>
-                      </div>
+              <gridster-item *ngFor="let item of dashboard; let i = index;" [item]="item"    class="rounded"     [style.background-color]="item.themeColor"   >
+               
+       
+                <div *ngIf="item.grid_type === 'tile'" >
+                  <div class="grid-item "
+                  tabindex="0"
+                  [style.background-color]="item.themeColor"
+                  style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out;"
+                  (mouseenter)="isHovered = true"
+                  (mouseleave)="isHovered = false"
+                 >
+               
+               <!-- Display the parameterName -->
+               <div [style.color]="'#333333'" style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">
+                 {{ item.parameterName }}
+               </div>
+               
+               <!-- Display processed_value from multi_value -->
+               <div class="value" tabindex="0" style="font-size: 28px; font-weight: bold; color: #333333;">
+                 {{ item.multi_value[1]?.processed_value }}
+               </div>
+               
+               <!-- Edit icon button -->
+               <button *ngIf="isEditModeView&&isHovered" 
+                       (click)="openKPIModal(KPIModal, item, i)" 
+                       class="mat-icon-button btn btn-icon btn-custom  btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
+                       aria-haspopup="menu" 
+                       aria-expanded="false" 
+                       style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer;">
+                 <i class="bi bi-pencil" style="color:black"></i> <!-- Edit icon -->
+               </button>
+               <!-- (contextmenu)="openContextMenu($event, item, i)" -->
+               <!-- Context Menu -->
+               <!-- <mat-menu #contextMenu="matMenu">
+                 <button mat-menu-item (click)="deleteTile(item, i)">Delete Tile</button>
+                 <button mat-menu-item (click)="duplicateTile(item, i)">Duplicate Tile</button>
+                 <button mat-menu-item (click)="refreshTile(item, i)">Refresh Tile</button>
+               </mat-menu> -->
+             
+             </div>
+             
+             
+                </div>
+                
+                  
+                  
+                  <div *ngIf="item.grid_type === 'tile2'" >
+                    <div class="grid-item"
+                         tabindex="0"
+                         [style.background-color]="item.themeColor" 
+                         style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out;"
+                         (mouseenter)="isHovered = true"
+                         (mouseleave)="isHovered = false">
+                         <div [style.color]="'#333333'" style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">
+                          {{ item.parameterName }}
+                        </div>
+                        <div class="value" tabindex="0" style="font-size: 20px; font-weight: bold; color: #333333;">
+                          {{ item.multi_value[2]?.processed_value }} <!-- Access the second element in multi_value array -->
+                        </div>
+                        <div class="value" tabindex="0" style="font-size: 16px; font-weight: bold; color: #333333;">
+                          {{ item.multi_value[1]?.value }} <!-- Access the second element in multi_value array -->
+                        </div>
+                      <!-- Edit icon button -->
+                      <button *ngIf="isEditModeView&&isHovered" 
+                      (click)="openKPIModal1(KPIModal1, item, i)" 
+                      class="mat-icon-button btn btn-icon btn-custom  btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
+                      aria-haspopup="menu" 
+                      aria-expanded="false" 
+                      style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer;">
+                <i class="bi bi-pencil" style="color:black"></i> <!-- Edit icon -->
+              </button>
                     </div>
                   </div>
-                </gridster-item>
-                
 
-              </gridster>
-              <div class="theEnd"></div>
-            </div>
+                  <div *ngIf="item.grid_type === 'tile3'" >
+                    <div class="grid-item"
+                    tabindex="0"
+                    [style.background-color]="item.themeColor"  
+                    style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out;"
+                    (mouseenter)="isHovered = true"
+                    (mouseleave)="isHovered = false">
+               
+                 <!-- Display the parameterName -->
+                 <div [style.color]="'#333333'" style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">
+                   {{ item.parameterName }}
+                 </div>
+
+                 <div class="value" tabindex="0" style="font-size: 16px; font-weight: bold; color: #333333;">
+                  {{ item.multi_value[1]?.value }} <!-- Access the second element in multi_value array -->
+                </div>
+               
+                 <!-- Display processed_value from multi_value -->
+                 <div class="value" tabindex="0" style="font-size: 20px; font-weight: bold; color: #333333;">
+                   {{ item.multi_value[3]?.processed_value }} <!-- Access the second element in multi_value array -->
+                 </div>
+                 <div class="value" tabindex="0" style="font-size: 16px; font-weight: bold; color: #333333;">
+                  {{ item.multi_value[2]?.value }} <!-- Access the second element in multi_value array -->
+                </div>
+               
+                 <!-- Edit icon button -->
+                 <button *ngIf="isEditModeView&&isHovered" 
+                         (click)="openKPIModal2(KPIModal2, item, i)" 
+                         class="mat-icon-button btn btn-icon btn-custom  btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
+                         aria-haspopup="menu" 
+                         aria-expanded="false" 
+                         style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer;">
+                   <i class="bi bi-pencil" style="color:black"></i> <!-- Edit icon -->
+                 </button>
+               
+               </div>
+               
+                  </div>
+
+
+                  <div *ngIf="item.grid_type === 'tile4'" >
+                    <div class="grid-item"
+                    tabindex="0"
+                    [style.background-color]="item.themeColor"  
+                    style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out;"
+                    (mouseenter)="isHovered = true"
+                    (mouseleave)="isHovered = false">
+               
+                 <!-- Display the parameterName -->
+                 <div [style.color]="'#333333'" style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">
+                   {{ item.parameterName }}
+                 </div>
+               
+                 <!-- Display processed_value from multi_value -->
+                 <div class="value" tabindex="0" style="font-size: 28px; font-weight: bold; color: #333333;">
+                   {{ item.multi_value[3]?.processed_value }} <!-- Access the second element in multi_value array -->
+                 </div>
+               
+                 <!-- Edit icon button -->
+                 <button *ngIf="isEditModeView&&isHovered" 
+                         (click)="openKPIModal3(KPIModal3, item, i)" 
+                         class="mat-icon-button btn btn-icon btn-custom  btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
+                         aria-haspopup="menu" 
+                         aria-expanded="false" 
+                         style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer;">
+                   <i class="bi bi-pencil" style="color:black"></i> <!-- Edit icon -->
+                 </button>
+               
+               </div>
+               
+                  </div>
+
+
+                  <div *ngIf="item.grid_type === 'tile5'" >
+                    <div class="grid-item"
+                         tabindex="0"
+                         [style.background-color]="item.themeColor" 
+                         style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out;"
+                         (mouseenter)="isHovered = true"
+                         (mouseleave)="isHovered = false">
+                         <div [style.color]="'#333333'" style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">
+                          {{ item.parameterName }}
+                        </div>
+                        <div class="value" tabindex="0" style="font-size: 20px; font-weight: bold; color: #333333;">
+                          {{ item.multi_value[3]?.processed_value }} <!-- Access the second element in multi_value array -->
+                        </div>
+                        <div class="value" tabindex="0" style="font-size: 16px; font-weight: bold; color: #333333;">
+                          {{ item.multi_value[4]?.value }} <!-- Access the second element in multi_value array -->
+                        </div>
+                      <!-- Edit icon button -->
+                      <button *ngIf="isEditModeView&&isHovered" 
+                      (click)="openKPIModal4(KPIModal4, item, i)" 
+                      class="mat-icon-button btn btn-icon btn-custom  btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
+                      aria-haspopup="menu" 
+                      aria-expanded="false" 
+                      style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer;">
+                <i class="bi bi-pencil" style="color:black"></i> <!-- Edit icon -->
+              </button>
+                    </div>
+                  </div>
+
+                  <!-- <div class="grid-item" tabindex="0"  (click)="openKPIModal6(KPIModal6,'')" >
+                    <div>Bullet Chart</div>
+                    <div class="chart">
+                      <div class="bullet-bar" tabindex="0"></div>
+                    </div>
+                  </div> -->
+
+                  <div *ngIf="item.grid_type === 'tile6'" >
+                    <div class="grid-item"
+                    tabindex="0"
+                    [style.background-color]="item.themeColor"  
+                    style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out;"
+                    (mouseenter)="isHovered = true"
+                    (mouseleave)="isHovered = false">
+               
+                 <!-- Display the parameterName -->
+                 <div [style.color]="'#333333'" style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">
+                   {{ item.parameterName }}
+                 </div>
+
+                 <div class="value" tabindex="0" style="font-size: 16px; font-weight: bold; color: #333333;">
+                  {{ item.multi_value[1]?.value }} <!-- Access the second element in multi_value array -->
+                </div>
+               
+                 <!-- Display processed_value from multi_value -->
+                 <div class="value" tabindex="0" style="font-size: 20px; font-weight: bold; color: #333333;">
+                   {{ item.multi_value[3]?.processed_value }} <!-- Access the second element in multi_value array -->
+                 </div>
+                 <div class="value" tabindex="0" style="font-size: 16px; font-weight: bold; color: #333333;">
+                  {{ item.multi_value[2]?.value }} <!-- Access the second element in multi_value array -->
+                </div>
+               
+                 <!-- Edit icon button -->
+                 <button *ngIf="isEditModeView&&isHovered" 
+                         (click)="openKPIModal5(KPIModal5, item, i)" 
+                         class="mat-icon-button btn btn-icon btn-custom  btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
+                         aria-haspopup="menu" 
+                         aria-expanded="false" 
+                         style="position: absolute; top: 10px; right: 10px; ; border: none; cursor: pointer;">
+                   <i class="bi bi-pencil" style="color:black"></i> <!-- Edit icon -->
+                 </button>
+               
+               </div>
+               
+                  </div>
+                  <div *ngIf="item.grid_type === 'tile7'" style="background-color: gray">
+                
+                    <div class="grid-item "
+                         tabindex="0"
+                         style="background-color: gray; position: relative;"
+                         (mouseenter)="isHovered = true"
+                         (mouseleave)="isHovered = false">
+                      <div [style.color]="'white'">{{ item.formlist }}</div>
+                      <div class="bullet-bar" tabindex="0"></div>
+                      
+                      <!-- Edit icon button -->
+                      <button 
+                        *ngIf="isEditModeView&&isHovered" 
+                        (click)="openKPIModal6(KPIModal6, item, i)" 
+                        class="mat-icon-button btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
+                        aria-haspopup="menu" 
+                        aria-expanded="false" 
+                        style="position: absolute; top: 3px; right: -2px; background: none; border: none; cursor: pointer;">
+                        <i class="bi bi-pencil" style="color: var(--bs-body-color);"></i> <!-- Edit icon -->
+                      </button>
+           
+                    </div>
+                  </div>
+       
+              </gridster-item>
+              
+
+            </gridster>
+            <div class="theEnd"></div>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 
 
 
 
 <!-- <h1 *ngIf="!editButtonCheck">iam landing page</h1> -->
 <div class="row">
-  <div class="col-xl-7" *ngIf="!editButtonCheck">
-    <!-- Begin Engage widget 9 -->
-    <div class="card h-lg-100" style="background: linear-gradient(112.14deg, #FF8A00 0%, #E96922 100%)">
-      <!-- Begin Body -->
-      <div class="card-body">
-        <!-- Begin Row -->
-        <div class="row align-items-center">
-          <!-- Begin Left Column -->
-          <div class="col-sm-7 pe-0 mb-5 mb-sm-0">
-            <!-- Begin Wrapper -->
-            <div class="d-flex justify-content-between h-100 flex-column pt-5 pb-2 ps-4 pe-4">
-              <!-- Begin Container -->
-              <div class="text-center mb-4" style="margin-left: -45px;">
-                <!-- Begin Title -->
-                <h3 class="fs-2x fw-semibold text-white">Summary Dashboard</h3>
-                <span class="fw-semibold text-white opacity-75" style="margin-left: -20px;">Elevate your dashboard
-                  experience!</span>
-                <!-- End Title -->
-              </div>
-              <!-- End Container -->
-
-              <!-- Begin Button Container -->
-              <div class="d-flex align-items-center justify-content-center gap-4" style="margin-left: -40px;">
-                <!-- Begin Create Button -->
-                <button data-bs-toggle="tooltip" title="Add Dashboard"
-                  class="btn btn-color-white bg-white bg-opacity-15 bg-hover-opacity-25 fw-semibold d-flex align-items-center"
-                  (click)="openModal('new', null, summaryModal)">
-                  <i class="bi bi-plus-square-fill fs-3 text-white me-2"></i>Create
-                </button>
-                <!-- End Create Button -->
-
-                <!-- Begin Location Button -->
-                <button type="button" data-bs-toggle="modal" data-bs-target="#myModalLocation"
-                  class="btn btn-color-white bg-white bg-opacity-15 bg-hover-opacity-25 fw-semibold d-flex align-items-center">
-                  <i class="bi bi-geo-alt fs-3 text-white me-2"></i> Location
-                </button>
-                <!-- End Location Button -->
-              </div>
-              <!-- End Button Container -->
+<div class="col-xl-7" *ngIf="!editButtonCheck">
+  <!-- Begin Engage widget 9 -->
+  <div class="card h-lg-100" style="background: linear-gradient(112.14deg, #FF8A00 0%, #E96922 100%)">
+    <!-- Begin Body -->
+    <div class="card-body">
+      <!-- Begin Row -->
+      <div class="row align-items-center">
+        <!-- Begin Left Column -->
+        <div class="col-sm-7 pe-0 mb-5 mb-sm-0">
+          <!-- Begin Wrapper -->
+          <div class="d-flex justify-content-between h-100 flex-column pt-5 pb-2 ps-4 pe-4">
+            <!-- Begin Container -->
+            <div class="text-center mb-4" style="margin-left: -45px;">
+              <!-- Begin Title -->
+              <h3 class="fs-2x fw-semibold text-white">Summary Dashboard</h3>
+              <span class="fw-semibold text-white opacity-75" style="margin-left: -20px;">Elevate your dashboard
+                experience!</span>
+              <!-- End Title -->
             </div>
-            <!-- End Wrapper -->
+            <!-- End Container -->
+
+            <!-- Begin Button Container -->
+            <div class="d-flex align-items-center justify-content-center gap-4" style="margin-left: -40px;">
+              <!-- Begin Create Button -->
+              <button data-bs-toggle="tooltip" title="Add Dashboard"
+                class="btn btn-color-white bg-white bg-opacity-15 bg-hover-opacity-25 fw-semibold d-flex align-items-center"
+                (click)="openModal('new', null, summaryModal)">
+                <i class="bi bi-plus-square-fill fs-3 text-white me-2"></i>Create
+              </button>
+              <!-- End Create Button -->
+
+              <!-- Begin Location Button -->
+              <button type="button" data-bs-toggle="modal" data-bs-target="#myModalLocation"
+                class="btn btn-color-white bg-white bg-opacity-15 bg-hover-opacity-25 fw-semibold d-flex align-items-center">
+                <i class="bi bi-geo-alt fs-3 text-white me-2"></i> Location
+              </button>
+              <!-- End Location Button -->
+            </div>
+            <!-- End Button Container -->
           </div>
-          <!-- End Left Column -->
-
-          <!-- Begin Right Column -->
-          <div class="col-sm-5 text-center">
-            <!-- Begin Illustration -->
-            <img src="./assets/media/svg/illustrations/easy/1.svg" class="h-200px h-lg-250px my-n6" alt="">
-            <!-- End Illustration -->
-          </div>
-          <!-- End Right Column -->
+          <!-- End Wrapper -->
         </div>
-        <!-- End Row -->
-      </div>
-      <!-- End Body -->
-    </div>
-    <!-- End Engage widget 9 -->
-  </div>
+        <!-- End Left Column -->
 
-
-  <div class="col-xl-5" *ngIf="!editButtonCheck">
-    <div id="kt_player_widget_2" class="card card-flush h-xl-100">
-      <div class="card-body card-rounded bg-black pt-0" style="padding: 0px !important;">
-        <iframe
-          src="https://www.youtube.com/embed/_T_M_oiFS68?enablejsapi=1&amp;controls=1&amp;modestbranding=1&amp;rel=0"
-          frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""
-          class="embed-responsive-item rounded youtube-iframe" style="overflow: hidden; height: 100%; width: 100%;"
-          id="widget2" title="Master Your IoT Apps with Powerboard!!!">
-        </iframe>
-        <div class="video-controls">
+        <!-- Begin Right Column -->
+        <div class="col-sm-5 text-center">
+          <!-- Begin Illustration -->
+          <img src="./assets/media/svg/illustrations/easy/1.svg" class="h-200px h-lg-250px my-n6" alt="">
+          <!-- End Illustration -->
         </div>
+        <!-- End Right Column -->
+      </div>
+      <!-- End Row -->
+    </div>
+    <!-- End Body -->
+  </div>
+  <!-- End Engage widget 9 -->
+</div>
+
+
+<div class="col-xl-5" *ngIf="!editButtonCheck">
+  <div id="kt_player_widget_2" class="card card-flush h-xl-100">
+    <div class="card-body card-rounded bg-black pt-0" style="padding: 0px !important;">
+      <iframe
+        src="https://www.youtube.com/embed/_T_M_oiFS68?enablejsapi=1&amp;controls=1&amp;modestbranding=1&amp;rel=0"
+        frameborder="0" allow="autoplay; encrypted-media" allowfullscreen=""
+        class="embed-responsive-item rounded youtube-iframe" style="overflow: hidden; height: 100%; width: 100%;"
+        id="widget2" title="Master Your IoT Apps with Powerboard!!!">
+      </iframe>
+      <div class="video-controls">
       </div>
     </div>
   </div>
+</div>
 </div>
 
 
 
 
 <div class="col-xl-12" style="margin-top: 20px;" *ngIf="!editButtonCheck">
-  <!--begin::Table widget 15-->
-  <div class="card card-flush h-lg-100">
-    <!--begin::Header-->
-    <div class="card-header pt-7">
-      <h3 class="card-title align-items-start flex-column">
-        <span class="card-label fw-bold text-gray-800">Latest 20 Updated</span>
-      </h3>
-      <div class="card-toolbar">
-        <a href="javascript:void(0);" (click)="openSummaryTable(content)" class="btn btn-sm btn-light-primary">
-          View All
-        </a>
-      </div>
+<!--begin::Table widget 15-->
+<div class="card card-flush h-lg-100">
+  <!--begin::Header-->
+  <div class="card-header pt-7">
+    <h3 class="card-title align-items-start flex-column">
+      <span class="card-label fw-bold text-gray-800">Latest 20 Updated</span>
+    </h3>
+    <div class="card-toolbar">
+      <a href="javascript:void(0);" (click)="openSummaryTable(content)" class="btn btn-sm btn-light-primary">
+        View All
+      </a>
     </div>
-    <!--end::Header-->
-
-    <!--begin::Body-->
-    <div class="card-body pt-6">
-      <div class="table-responsive">
-        <table class="table table-row-dashed align-middle gs-0 gy-3 my-0"
-          *ngIf="lookup_data_summaryCopy && lookup_data_summaryCopy.length > 0">
-          <!--begin::Table head-->
-          <thead>
-            <tr class="fs-7 fw-bold text-gray-500 border-bottom-0">
-              <th class="fw-bold text-dark fs-4">Id</th>
-              <th class="  text-start fw-bold text-dark fs-4">Name</th>
-              <th class=" text-start fw-bold text-dark fs-4">Description</th>
-              <th class=" text-start fw-bold text-dark fs-4">Updated</th>
-              <th class="  text-start fw-bold text-dark fs-4">Created</th>
-              <th class="  text-start fw-bold text-dark fs-4">View</th>
-            </tr>
-
-          </thead>
-          <!--end::Table head-->
-
-          <!--begin::Table body-->
-          <tbody>
-            <tr *ngFor="let item of lookup_data_summaryCopy">
-              <td>
-                <div class="d-flex align-items-center">
-                  <span class="text-gray-500 fw-semibold d-block fs-7 me-2">
-                    <div class="symbol symbol-50px me-5">
-                      <span [class]="item.parsedIcon.class2">
-                        <app-keenicon [name]="item.parsedIcon.value" [class]="item.parsedIcon.class1"
-                          style="display: contents;"></app-keenicon>
-                      </span>
-                    </div>
-                  </span>
-                  <div class="d-flex justify-content-start flex-column">
-                    <a class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6"
-                      (click)="viewItem(item.P1); $event.preventDefault()">{{ item.P1 }}</a>
-                  </div>
-                </div>
-              </td>
-              <td class="text-start">
-                <span class="text-gray-600 fw-bold fs-6" (click)="viewItem(item.P1); $event.preventDefault()">{{ item.P2
-                  }}</span>
-              </td>
-              <td class="text-start ">
-                <span class="text-gray-600 fw-bold fs-6" (click)="viewItem(item.P1); $event.preventDefault()">{{ item.P3
-                  }}</span>
-              </td>
-              <td class="text-start">
-                <span class="text-gray-600 fw-bold fs-6" style="padding-left: 5px;"
-                  (click)="viewItem(item.P1); $event.preventDefault()">{{ convertToIST(item.P4) }}</span>
-              </td>
-              <td class="text-start ">
-                <span class="text-gray-600 fw-bold fs-6" (click)="viewItem(item.P1); $event.preventDefault()">{{
-                  convertToIST(item.P5) }}</span>
-              </td>
-              <td class="text-start">
-                <a href="javascript:void(0);" (click)="viewItem(item.P1); $event.preventDefault()"
-                  class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary w-30px h-30px">
-                  <i class="ki-duotone ki-black-right fs-2 text-gray-500"></i>
-                </a>
-              </td>
-            </tr>
-          </tbody>
-          <!--end::Table body-->
-        </table>
-      </div>
-      <!--end::Table-->
-    </div>
-    <!--end: Card Body-->
   </div>
-  <!--end::Table widget 15-->
+  <!--end::Header-->
+
+  <!--begin::Body-->
+  <div class="card-body pt-6">
+    <div class="table-responsive">
+      <table class="table table-row-dashed align-middle gs-0 gy-3 my-0"
+        *ngIf="lookup_data_summaryCopy && lookup_data_summaryCopy.length > 0">
+        <!--begin::Table head-->
+        <thead>
+          <tr class="fs-7 fw-bold text-gray-500 border-bottom-0">
+            <th class="fw-bold text-dark fs-4">Id</th>
+            <th class="  text-start fw-bold text-dark fs-4">Name</th>
+            <th class=" text-start fw-bold text-dark fs-4">Description</th>
+            <th class=" text-start fw-bold text-dark fs-4">Updated</th>
+            <th class="  text-start fw-bold text-dark fs-4">Created</th>
+            <th class="  text-start fw-bold text-dark fs-4">View</th>
+          </tr>
+
+        </thead>
+        <!--end::Table head-->
+
+        <!--begin::Table body-->
+        <tbody>
+          <tr *ngFor="let item of lookup_data_summaryCopy">
+            <td>
+              <div class="d-flex align-items-center">
+                <span class="text-gray-500 fw-semibold d-block fs-7 me-2">
+                  <div class="symbol symbol-50px me-5">
+                    <span [class]="item.parsedIcon.class2">
+                      <app-keenicon [name]="item.parsedIcon.value" [class]="item.parsedIcon.class1"
+                        style="display: contents;"></app-keenicon>
+                    </span>
+                  </div>
+                </span>
+                <div class="d-flex justify-content-start flex-column">
+                  <a class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6"
+                    (click)="viewItem(item.P1); $event.preventDefault()">{{ item.P1 }}</a>
+                </div>
+              </div>
+            </td>
+            <td class="text-start">
+              <span class="text-gray-600 fw-bold fs-6" (click)="viewItem(item.P1); $event.preventDefault()">{{ item.P2
+                }}</span>
+            </td>
+            <td class="text-start ">
+              <span class="text-gray-600 fw-bold fs-6" (click)="viewItem(item.P1); $event.preventDefault()">{{ item.P3
+                }}</span>
+            </td>
+            <td class="text-start">
+              <span class="text-gray-600 fw-bold fs-6" style="padding-left: 5px;"
+                (click)="viewItem(item.P1); $event.preventDefault()">{{ convertToIST(item.P4) }}</span>
+            </td>
+            <td class="text-start ">
+              <span class="text-gray-600 fw-bold fs-6" (click)="viewItem(item.P1); $event.preventDefault()">{{
+                convertToIST(item.P5) }}</span>
+            </td>
+            <td class="text-start">
+              <a href="javascript:void(0);" (click)="viewItem(item.P1); $event.preventDefault()"
+                class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary w-30px h-30px">
+                <i class="ki-duotone ki-black-right fs-2 text-gray-500"></i>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+        <!--end::Table body-->
+      </table>
+    </div>
+    <!--end::Table-->
+  </div>
+  <!--end: Card Body-->
+</div>
+<!--end::Table widget 15-->
 </div>
 
 
@@ -407,217 +459,94 @@
 
 
 <div style="top: 1%;
-  z-index: 100;
-  right:44px;
-  flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20 gap-2">
+z-index: 100;
+right:44px;
+flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20 gap-2">
 
-  <nav class="myMenu" #tooltipContainer>
-    <input type="checkbox" href="#" class="myMenu-open" name="myMenu-open" id="myMenu-open" />
-    <label class="myMenu-open-button" for="myMenu-open">
-      <span class="hamburger hamburger-1"></span>
-      <span class="hamburger hamburger-2"></span>
-      <span class="hamburger hamburger-3"></span>
-    </label>
-    <!--  -->
-    <a title="Add Dashboard" class="myMenu-item" (click)="openModal('new',null, summaryModal)"> <i style="color: white;"
-        class="fa fa-plus"></i> </a>
-    <a class="myMenu-item" #myLink *ngIf="editButtonCheck" title="Edit Dashboard"
-      (click)="openModal('edit',all_Packet_store, summaryModal)"> <i style="color: white;" class="fa fa-edit"></i> </a>
-    <a class="myMenu-item" data-bs-toggle="modal" data-bs-placement="left" title="Location" data-bs-target="#myModal"
-      routerLink="/summary-engine">
-      <i style="color: white;" class="fa fa-home"></i> </a>
-    <!-- <a class="myMenu-item" (click)="openSummaryTable(content)" title="Search dashboard"> <i style="color: white;"
-        class="fa fa-search"></i> </a> -->
-
-
-
-    <a *ngIf="!isSummaryEngine()" class="myMenu-item" (click)="openSummaryTable(content)" title="Search dashboard">
-      <i style="color: white;" class="fa fa-search"></i>
-    </a>
+<nav class="myMenu" #tooltipContainer>
+  <input type="checkbox" href="#" class="myMenu-open" name="myMenu-open" id="myMenu-open" />
+  <label class="myMenu-open-button" for="myMenu-open">
+    <span class="hamburger hamburger-1"></span>
+    <span class="hamburger hamburger-2"></span>
+    <span class="hamburger hamburger-3"></span>
+  </label>
+  <!--  -->
+  <a title="Add Dashboard" class="myMenu-item" (click)="openModal('new',null, summaryModal)"> <i style="color: white;"
+      class="fa fa-plus"></i> </a>
+  <a class="myMenu-item" #myLink *ngIf="editButtonCheck" title="Edit Dashboard"
+    (click)="openModal('edit',all_Packet_store, summaryModal)"> <i style="color: white;" class="fa fa-edit"></i> </a>
+  <a class="myMenu-item" data-bs-toggle="modal" data-bs-placement="left" title="Location" data-bs-target="#myModal"
+    routerLink="/summary-engine">
+    <i style="color: white;" class="fa fa-home"></i> </a>
+  <!-- <a class="myMenu-item" (click)="openSummaryTable(content)" title="Search dashboard"> <i style="color: white;"
+      class="fa fa-search"></i> </a> -->
 
 
 
-    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="width:50px;height:50px">
-      <defs>
-        <filter id="shadowed-goo">
+  <a *ngIf="!isSummaryEngine()" class="myMenu-item" (click)="openSummaryTable(content)" title="Search dashboard">
+    <i style="color: white;" class="fa fa-search"></i>
+  </a>
 
-          <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10" />
-          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
-          <feGaussianBlur in="goo" stdDeviation="3" result="shadow" />
-          <feColorMatrix in="shadow" mode="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 -0.2"
-            result="shadow" />
-          <feOffset in="shadow" dx="1" dy="1" result="shadow" />
-          <feComposite in2="shadow" in="goo" result="goo" />
-          <feComposite in2="goo" in="SourceGraphic" result="mix" />
-        </filter>
-        <filter id="goo">
-          <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10" />
-          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
-          <feComposite in2="goo" in="SourceGraphic" result="mix" />
-        </filter>
-      </defs>
-    </svg>
 
-  </nav>
+
+  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="width:50px;height:50px">
+    <defs>
+      <filter id="shadowed-goo">
+
+        <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10" />
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+        <feGaussianBlur in="goo" stdDeviation="3" result="shadow" />
+        <feColorMatrix in="shadow" mode="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 -0.2"
+          result="shadow" />
+        <feOffset in="shadow" dx="1" dy="1" result="shadow" />
+        <feComposite in2="shadow" in="goo" result="goo" />
+        <feComposite in2="goo" in="SourceGraphic" result="mix" />
+      </filter>
+      <filter id="goo">
+        <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10" />
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+        <feComposite in2="goo" in="SourceGraphic" result="mix" />
+      </filter>
+    </defs>
+  </svg>
+
+</nav>
 </div>
 
 
 
 
 <ng-template #content let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title">Summary Configuration</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
-  </div>
-  <div class="modal-body">
-    <div class="card-body pt-0">
+<div class="modal-header">
+  <h4 class="modal-title">Summary Configuration</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+</div>
+<div class="modal-body">
+  <div class="card-body pt-0">
 
-      <app-crud-company [datatableConfig]="datatableConfig" route="/summary-engine"
-        (deleteEvent)="delete($event);modal.dismiss()" (editEvent)="edit($event);modal.dismiss()"
-        (createEvent)="create()" [reload]="reloadEvent"></app-crud-company>
-    </div>
+    <app-crud-company [datatableConfig]="datatableConfig" route="/summary-engine"
+      (deleteEvent)="delete($event);modal.dismiss()" (editEvent)="edit($event);modal.dismiss()"
+      (createEvent)="create()" [reload]="reloadEvent"></app-crud-company>
+  </div>
 
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
-  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
+</div>
 </ng-template>
 
-<!-- <swal #noticeSwal [swalOptions]="swalOptions">
-  </swal> -->
 
-<!-- <ng-template #summaryModal let-modal>
-    <div class="modal-header">
-      <h2 class="modal-title" *ngIf="showHeading">Add Summary</h2>
-      <h2 class="modal-title" *ngIf="!showHeading">Edit Summary</h2>
-      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
-    </div>
-  
-    <div class="modal-body">
-      <form [formGroup]="createSummaryField">
-        <div class="container">
-          <div class="row">
-      
-            <div class="col-md-4">
-              <label class="col-form-label fw-bold fs-6 required">ID</label>
-              <input type="text" class="form-control form-control-solid" placeholder="Enter Summary ID"
-                formControlName="summaryID" required (keyup)="checkUniqueIdentifier($event)">
-              <span style="color: #fc1900;">{{ errorForUniqueID }}</span>
-              <div
-                *ngIf="createSummaryField.get('summaryID')?.hasError('required') && createSummaryField.get('summaryID')?.touched"
-                class="invalid-feedback">
-                Summary ID is required
-              </div>
-            </div>
-  
-        
-            <div class="col-md-4">
-              <label class="col-form-label fw-bold fs-6 required">Name</label>
-              <input type="text" class="form-control form-control-solid" placeholder="Enter Summary Name"
-                formControlName="summaryName" required>
-              <div
-                *ngIf="createSummaryField.get('summaryName')?.hasError('required') && createSummaryField.get('summaryName')?.touched"
-                class="invalid-feedback">
-                Summary Name is required
-              </div>
-            </div>
-  
-      
-            <div class="col-md-4">
-              <label class="col-form-label fw-bold fs-6 required">Description</label>
-              <input type="text" class="form-control form-control-solid" placeholder="Enter Summary Description"
-                formControlName="summarydesc" required>
-              <div
-                *ngIf="createSummaryField.get('summarydesc')?.hasError('required') && createSummaryField.get('summarydesc')?.touched"
-                class="invalid-feedback">
-                Summary Description is required
-              </div>
-            </div>
-          </div>
-
-
-
-
-
-          <div class="row mb-3">
-            <div class="col-md-4">
-                <label class="col-form-label fw-bold fs-6 required" for="icon-select">Select an Icon:</label>
-                <select id="icon-select" formControlName="iconSelect" class="form-control">
-                    <option value="" >Select an option</option>
-                    <ng-container *ngFor="let icon of iconsList">
-                        <option [ngValue]="icon">
-                            {{ icon.label }}
-                        </option>
-                    </ng-container>
-                </select>
-            </div>
-        
-            <div class="col-md-4 d-flex align-items-center">
-                <p class="fw-bold fs-6 ">Selected Icon:</p>
-                <span class="menu-icon" *ngIf="createSummaryField.value.iconSelect">
-                    <app-keenicon [name]="createSummaryField.value.iconSelect.value" [class]="createSummaryField.value.iconSelect.class1" class="fs-4x"></app-keenicon>
-                </span>
-            </div>
-        </div>
-        
-      
-          
-   
-
-
- 
-
-
-  
-         
-          <div class="row">
-            <div class="col-md-12">
-              <label class="col-form-label fw-bold fs-6 required">Grids</label>
-              <textarea class="form-control form-control-solid" placeholder="Enter JSON data"
-                formControlName="jsonInputControl"
-                style="resize: vertical; min-height: 100px; max-height: 300px;"></textarea>
-              <div
-                *ngIf="createSummaryField.get('jsonInputControl')?.hasError('invalidJson') && createSummaryField.get('jsonInputControl')?.touched"
-                class="text-danger">
-                Please enter valid JSON data.
-              </div>
-            </div>
-          </div>
-  
-      
-
-  
-        </div>
-
-
-
-        
-
-      </form>
-    </div>
-
-
-    
-  
-   
-    <div class="modal-footer">
-      <button type="button" class="btn btn-danger" (click)="modal.dismiss()">Cancel</button>
-      <button type="button" *ngIf="!showModal" class="btn btn-primary" [disabled]="createSummaryField.invalid"
-        (click)="createNewSummary();modal.dismiss()">Save</button>
-      <button type="button" *ngIf="showModal" class="btn btn-primary" [disabled]="createSummaryField.invalid"
-        (click)="updateSummary(createSummaryField.value, 'editSummary');modal.dismiss()">Update</button>
-    </div>
-  </ng-template> -->
 <style>
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(3, 150px); /* 3 columns with fixed width */
-    grid-template-rows: 150px; /* Set fixed row height */
-    grid-auto-rows: 150px; /* Set height for additional rows */
+    grid-template-columns: repeat(3, 1fr); /* Use 1fr for equal column width */
+    grid-template-rows: 120px; /* Decrease fixed row height */
+    grid-auto-rows: 120px; /* Decrease height for additional rows */
     grid-gap: 10px;
-    max-width: 480px;
+    max-width: 750px; /* Increase max width of the container */
     margin: 20px auto;
     margin-top: 20px;
+    justify-items: stretch; /* Ensures grid items stretch to fill available space */
 }
 
 .grid-item {
@@ -634,11 +563,12 @@
     cursor: pointer; /* Show pointer cursor */
     pointer-events: auto; /* Ensures interactivity */
     overflow: visible; /* Allows any overflowing content to be visible */
+    height: 100%; /* Ensures each item stretches to fill its grid cell */
 }
 
-.grid-item:focus {
-    outline: 2px solid blue; /* Visible outline for focused items */
-}
+/* .grid-item:focus {
+    outline: 2px solid blue; 
+} */
 
 .value {
     font-size: 24px;
@@ -665,335 +595,282 @@
     background-color: blue;
     margin: 0 5px;
 }
-
-
-
 </style>
 
 
+
 <ng-template #summaryModal let-modal>
-  <div class="modal-header">
-    <h2 class="modal-title">{{ showHeading ? 'Add Summary' : 'Edit Summary' }}</h2>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
-  </div>
+<div class="modal-header">
+  <h2 class="modal-title">{{ showHeading ? 'Add Summary' : 'Edit Summary' }}</h2>
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+</div>
 
 
-  <div class="modal-body">
-    <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap" id="myTab" role="tablist">
-      <div class="row w-100">
-        <div class="col-4" role="Add Dashboard">
-          <li class="nav-item">
-            <a class="nav-link text-active-primary me-6" id="add-dashboard-tab" data-bs-toggle="tab"
-              (click)="selectedTab = 'add-dashboard'" role="tab" aria-controls="add-dashboard" aria-selected="true">
-              {{ showModal ? 'Edit Dashboard' : 'Add Dashboard' }}
-            </a>
-          </li>
-        </div>
-        
-
-        <!-- Conditionally Display Add Widgets Tab -->
-        <div class="col-4" role="Add Widgets">
-          <li class="nav-item">
-            <a class="nav-link text-active-primary me-6" id="add-widget-tab" data-bs-toggle="tab"
-              (click)="showAddWidgetsTab ? selectedTab = 'add-widget' : onAddWidgetTabClick()"
-              role="tab" aria-controls="add-widget" aria-selected="false">Add Widgets</a>
-          </li>
-        </div>
-        
-
-        <div class="col-4" role="Autoflow Config">
-          <li class="nav-item">
-            <a class="nav-link text-active-primary me-6" id="autoflow-config-tab" data-bs-toggle="tab"
-              (click)="onAutoflowConfigTabClick()"
-              role="tab" aria-controls="autoflow-config" aria-selected="false">Autoflow Config</a>
-          </li>
-        </div>
-      </div>
-    </ul>
-
-
-
-    <div class="tab-content" id="myTabContent">
-      <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTab === 'add-dashboard'}" id="add-dashboard" role="tabpanel" aria-labelledby="add-dashboard-tab">
-        <form [formGroup]="createSummaryField">
-          <div class="container">
-            <div class="row mb-3">
-              <div class="col-12">
-                <!-- <label class="col-form-label fw-bold fs-6 required">Add Dashboard</label> -->
-              </div>
-            </div>
-            <div class="row">
-              <!-- Summary ID Input -->
-              <div class="col-md-4">
-                <label class="col-form-label fw-bold fs-6 required">ID</label>
-                <input type="text" class="form-control form-control-solid" placeholder="Enter Summary ID"
-                  formControlName="summaryID" required (keyup)="checkUniqueIdentifier($event)">
-                <span style="color: #fc1900;">{{ errorForUniqueID }}</span>
-                <div
-                  *ngIf="createSummaryField.get('summaryID')?.hasError('required') && createSummaryField.get('summaryID')?.touched"
-                  class="invalid-feedback">
-                  Summary ID is required
-                </div>
-              </div>
-
-              <!-- Summary Name Input -->
-              <div class="col-md-4">
-                <label class="col-form-label fw-bold fs-6 required">Name</label>
-                <input type="text" class="form-control form-control-solid" placeholder="Enter Summary Name"
-                  formControlName="summaryName" required>
-                <div
-                  *ngIf="createSummaryField.get('summaryName')?.hasError('required') && createSummaryField.get('summaryName')?.touched"
-                  class="invalid-feedback">
-                  Summary Name is required
-                </div>
-              </div>
-
-              <!-- Summary Description Input -->
-              <div class="col-md-4">
-                <label class="col-form-label fw-bold fs-6 required">Description</label>
-                <input type="text" class="form-control form-control-solid" placeholder="Enter Summary Description"
-                  formControlName="summarydesc" required>
-                <div
-                  *ngIf="createSummaryField.get('summarydesc')?.hasError('required') && createSummaryField.get('summarydesc')?.touched"
-                  class="invalid-feedback">
-                  Summary Description is required
-                </div>
-              </div>
-            </div>
-
-            <div class="row mb-3">
-              <div class="col-md-4">
-                <label class="col-form-label fw-bold fs-6 required" for="icon-select">Select an Icon:</label>
-                <select id="icon-select" formControlName="iconSelect" class="form-control" (change)="previewIcon($event)">
-                  <option value="null">Select an option</option>
-                  <ng-container *ngFor="let icon of iconsList">
-                    <option [value]="icon.value">{{ icon.label }}</option>
-                  </ng-container>
-                </select>
-              </div>
-
-              <div class="col-md-4 d-flex align-items-center">
-                <p class="fw-bold fs-6 mb-0 me-2">Selected Icon:</p>
-                <span class="menu-icon" *ngIf="previewObjDisplay; else noIcon">
-                    <app-keenicon 
-                        [name]="previewObjDisplay.value"
-                        [class]="previewObjDisplay.class1"
-                        class="fs-4x">
-                    </app-keenicon>
-                </span>
-                <ng-template #noIcon>
-                    <span class="text-muted">No icon selected</span>
-                </ng-template>
-            </div>
-            
-            </div>
-
-            <!-- JSON Data Input -->
-            <!-- <div class="row">
-              <div class="col-md-12">
-                <label class="col-form-label fw-bold fs-6 required">Grids</label>
-                <textarea class="form-control form-control-solid" placeholder="Enter JSON data"
-                  formControlName="jsonInputControl"
-                  style="resize: vertical; min-height: 100px; max-height: 300px;"></textarea>
-                <div
-                  *ngIf="createSummaryField.get('jsonInputControl')?.hasError('invalidJson') && createSummaryField.get('jsonInputControl')?.touched"
-                  class="text-danger">
-                  Please enter valid JSON data.
-                </div>
-              </div>
-            </div> -->
-          </div>
-        </form>
-      </div>
-
-      <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTab === 'add-widget'}" id="add-widget" role="tabpanel" aria-labelledby="add-widget-tab">
-
-   
-        <div class="container">
-          <div class="row">
-              <div class="col-md-6 centered-dropdown-container">
-                  <label class="col-form-label fw-bold fs-6">Widget Type</label>
-                  <ngx-select
-                    [allowClear]="true"
-                    name="icon"
-                    formControlName="tilesList"
-                    [items]="listofTiles"
-                    optionValueField="value"
-                    optionTextField="text"
-                    placeholder="Select Form"
-                    (selectionChanges)="tileChange($event)"
-                  >
-                  </ngx-select>
-              </div>
-          </div>
+<div class="modal-body">
+  <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap" id="myTab" role="tablist">
+    <div class="row w-100">
+      <div class="col-4" role="Add Dashboard">
+        <li class="nav-item">
+          <a class="nav-link text-active-primary me-6" id="add-dashboard-tab" data-bs-toggle="tab"
+            (click)="selectedTab = 'add-dashboard'" role="tab" aria-controls="add-dashboard" aria-selected="true">
+            {{ showModal ? 'Edit Dashboard' : 'Add Dashboard' }}
+          </a>
+        </li>
       </div>
       
 
-      <div *ngIf="showGrid" class="grid-container">
-        <div class="grid-item highlight" tabindex="0" (click)="openKPIModal(KPIModal,'')">
-          <div>Tile 1</div>
-          <div class="value" tabindex="0"></div>
-        </div>
-        <div class="grid-item" tabindex="0" (click)="openKPIModal1(KPIModal1)">
-          <div>Tile2</div>
-          <div class="value" tabindex="0"></div>
-          <div></div>
-        </div>
-        <div class="grid-item" tabindex="0">
-          <div>Label</div>
-          <div tabindex="0">Label: Value 2</div>
-          <div class="value" tabindex="0">Value</div>
-          <div>Label: Value 3</div>
-        </div>
-        <div class="grid-item" tabindex="0">
-          <div>Label</div>
-          <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
-        </div>
-        <div class="grid-item" tabindex="0">
-          <div>Label</div>
-          <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
-          <div>Label: Value 2</div>
-        </div>
-        <div class="grid-item" tabindex="0">
-          <div>Label</div>
-          <div tabindex="0">Label: Value 2</div>
-          <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
-          <div>Label: Value 3</div>
-        </div>
-        <div class="grid-item" tabindex="0">
-          <div>Bullet Chart</div>
-          <div class="chart">
-            <div class="bullet-bar" tabindex="0"></div>
-          </div>
-        </div>
-        <div class="grid-item" tabindex="0">
-          <div>Dial Chart</div>
-          <div class="chart" tabindex="0">⌛</div>
-        </div>
-        <div class="grid-item" tabindex="0">
-          <div>Full Dial Chart</div>
-          <div class="chart" tabindex="0">⌛</div>
-        </div>
+      <!-- Conditionally Display Add Widgets Tab -->
+      <div class="col-4" role="Add Widgets">
+        <li class="nav-item">
+          <a class="nav-link text-active-primary me-6" id="add-widget-tab" data-bs-toggle="tab"
+            (click)="showAddWidgetsTab ? selectedTab = 'add-widget' : onAddWidgetTabClick()"
+            role="tab" aria-controls="add-widget" aria-selected="false">Add Widgets</a>
+        </li>
+      </div>
+      
+
+      <div class="col-4" role="Autoflow Config">
+        <li class="nav-item">
+          <a class="nav-link text-active-primary me-6" id="autoflow-config-tab" data-bs-toggle="tab"
+            (click)="onAutoflowConfigTabClick()"
+            role="tab" aria-controls="autoflow-config" aria-selected="false">Autoflow Config</a>
+        </li>
       </div>
     </div>
-    
-    <ng-template #KPIModal1 let-modal>
-      <div class="modal-header">
-        <h4 class="modal-title">KPI Widget-2</h4>
-        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
-      </div>
-      <div class="fv-row" [formGroup]="createKPIWidget1">
-        <div class="modal-body">
-          <div class="card-body pt-0">
-            <div class="row g-3"> <!-- g-3 adds consistent gap between columns -->
-              <div class="col-md-6"> <!-- Column for the first dropdown -->
-                <label class="col-form-label fw-bold fs-6">Forms</label>
+  </ul>
+
+
+
+  <div class="tab-content" id="myTabContent">
+    <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTab === 'add-dashboard'}" id="add-dashboard" role="tabpanel" aria-labelledby="add-dashboard-tab">
+      <form [formGroup]="createSummaryField">
+        <div class="container">
+          <div class="row mb-3">
+            <div class="col-12">
+              <!-- <label class="col-form-label fw-bold fs-6 required">Add Dashboard</label> -->
+            </div>
+          </div>
+          <div class="row">
+            <!-- Summary ID Input -->
+            <div class="col-md-4">
+              <label class="col-form-label fw-bold fs-6 required">ID</label>
+              <input type="text" class="form-control form-control-solid" placeholder="Enter Summary ID"
+                formControlName="summaryID" required (keyup)="checkUniqueIdentifier($event)">
+              <span style="color: #fc1900;">{{ errorForUniqueID }}</span>
+              <div
+                *ngIf="createSummaryField.get('summaryID')?.hasError('required') && createSummaryField.get('summaryID')?.touched"
+                class="invalid-feedback">
+                Summary ID is required
+              </div>
+            </div>
+
+            <!-- Summary Name Input -->
+            <div class="col-md-4">
+              <label class="col-form-label fw-bold fs-6 required">Name</label>
+              <input type="text" class="form-control form-control-solid" placeholder="Enter Summary Name"
+                formControlName="summaryName" required>
+              <div
+                *ngIf="createSummaryField.get('summaryName')?.hasError('required') && createSummaryField.get('summaryName')?.touched"
+                class="invalid-feedback">
+                Summary Name is required
+              </div>
+            </div>
+
+            <!-- Summary Description Input -->
+            <div class="col-md-4">
+              <label class="col-form-label fw-bold fs-6 required">Description</label>
+              <input type="text" class="form-control form-control-solid" placeholder="Enter Summary Description"
+                formControlName="summarydesc" required>
+              <div
+                *ngIf="createSummaryField.get('summarydesc')?.hasError('required') && createSummaryField.get('summarydesc')?.touched"
+                class="invalid-feedback">
+                Summary Description is required
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label class="col-form-label fw-bold fs-6 required" for="icon-select">Select an Icon:</label>
+              <select id="icon-select" formControlName="iconSelect" class="form-control" (change)="previewIcon($event)">
+                <option value="null">Select an option</option>
+                <ng-container *ngFor="let icon of iconsList">
+                  <option [value]="icon.value">{{ icon.label }}</option>
+                </ng-container>
+              </select>
+            </div>
+
+            <div class="col-md-4 d-flex align-items-center">
+              <p class="fw-bold fs-6 mb-0 me-2">Selected Icon:</p>
+              <span class="menu-icon" *ngIf="previewObjDisplay; else noIcon">
+                  <app-keenicon 
+                      [name]="previewObjDisplay.value"
+                      [class]="previewObjDisplay.class1"
+                      class="fs-4x">
+                  </app-keenicon>
+              </span>
+              <ng-template #noIcon>
+                  <span class="text-muted">No icon selected</span>
+              </ng-template>
+          </div>
+          
+          </div>
+
+          <!-- JSON Data Input -->
+          <!-- <div class="row">
+            <div class="col-md-12">
+              <label class="col-form-label fw-bold fs-6 required">Grids</label>
+              <textarea class="form-control form-control-solid" placeholder="Enter JSON data"
+                formControlName="jsonInputControl"
+                style="resize: vertical; min-height: 100px; max-height: 300px;"></textarea>
+              <div
+                *ngIf="createSummaryField.get('jsonInputControl')?.hasError('invalidJson') && createSummaryField.get('jsonInputControl')?.touched"
+                class="text-danger">
+                Please enter valid JSON data.
+              </div>
+            </div>
+          </div> -->
+        </div>
+      </form>
+    </div>
+
+    <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTab === 'add-widget'}" id="add-widget" role="tabpanel" aria-labelledby="add-widget-tab">
+
+ 
+      <div class="container">
+        <div class="row">
+            <div class="col-md-6 centered-dropdown-container">
+                <label class="col-form-label fw-bold fs-6">Widget Type</label>
                 <ngx-select
                   [allowClear]="true"
                   name="icon"
-                  formControlName="formlist"
-                  [items]="listofDeviceIds"
+                  formControlName="tilesList"
+                  [items]="listofTiles"
                   optionValueField="value"
                   optionTextField="text"
                   placeholder="Select Form"
-              > <!-- Ensures dropdown takes full width of column -->
+                  (selectionChanges)="tileChange($event)"
+                >
                 </ngx-select>
-              </div>
-        
-              <div class="col-md-6"> <!-- Column for the second dropdown -->
-                <label class="col-form-label fw-bold fs-6 required">Group By</label>
-                <ngx-select
-                  [allowClear]="true"
-                  name="icon"
-                  formControlName="groupBy"
-                  [items]="groupByOptions"
-                  optionValueField="value"
-                  optionTextField="text"
-                  placeholder="Select Group"
-                  (selectionChanges)="onGroupByChange($event)"
-                  class="w-100"> <!-- Ensures dropdown takes full width of column -->
-                </ngx-select>
-              </div>
-              <div class="fv-row">
-                <div class="row">
-                    <div class="col-md-6"> <!-- Column for the first dropdown -->
-                        <label class="col-form-label fw-bold fs-6 required">Show Values</label>
-                        <ngx-select
-                            [allowClear]="true"
-                            name="primary-icon"
-                            formControlName="primaryValue"
-                            [items]="showValues"
-                            optionValueField="value"
-                            optionTextField="text"
-                            placeholder="Select Group"
-                            class="w-100"> <!-- Ensures dropdown takes full width of column -->
-                        </ngx-select>
-                    </div>
-                    <div class="col-md-6"> <!-- Column for the second dropdown -->
-                        <label class="col-form-label fw-bold fs-6 required">Secondary Value</label>
-                        <ngx-select
-                            [allowClear]="true"
-                            name="secondary-icon"
-                            formControlName="secondaryValue"
-                            [items]="showValues"
-                            optionValueField="value"
-                            optionTextField="text"
-                            placeholder="Select Group"
-                            class="w-100"> <!-- Ensures dropdown takes full width of column -->
-                        </ngx-select>
-                    </div>
-                </div>
             </div>
-            
-            </div>
-          </div>
         </div>
-        
+    </div>
+    <!-- <button (click)="createChartGauge()">click me</button> -->
+
+    <div *ngIf="showGrid" class="grid-container">
+      <div class="grid-item highlight" tabindex="0" (click)="openKPIModal(KPIModal,'')" style="background: linear-gradient(to right, #ff7e5f, #feb47b); padding: 20px; border-radius: 8px; color: white;">
+        <div>Label</div>
+        <div class="value" tabindex="0">Value</div>
+      </div>
+      <div class="grid-item" tabindex="0" (click)="openKPIModal1(KPIModal1,'')" style="background: #3498db; padding: 20px; border-radius: 8px; color: white;">
+        <div>Label</div>
+        <div class="value" tabindex="0">Value</div>
+        <div tabindex="0">Label: Value 2</div>
+      </div>
+      <div class="grid-item" tabindex="0" (click)="openKPIModal2(KPIModal2,'')" style="background: #e74c3c; padding: 20px; border-radius: 8px; color: white;">
+        <div>Label</div>
+        <div tabindex="0">Label: Value 2</div>
+        <div class="value" tabindex="0">Value</div>
+        <div>Label: Value 3</div>
+      </div>
       
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
+      <div class="grid-item" tabindex="0" (click)="openKPIModal3(KPIModal3,'')" style="background: #8e44ad; padding: 20px; border-radius: 8px; color: white;">
+        <div>Label</div>
+        <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
       </div>
+      
+      <div class="grid-item" tabindex="0" (click)="openKPIModal4(KPIModal4,'')" style="background: #2ecc71; padding: 20px; border-radius: 8px; color: white;">
+        <div>Label</div>
+        <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
+        <div>Label: Value 2</div>
       </div>
-    </ng-template>
+      
+      
+      <div class="grid-item" tabindex="0" (click)="openKPIModal5(KPIModal5,'')" style="background: #2a3439; padding: 20px; border-radius: 8px; color: white;">
+        <div>Label</div>
+        <div tabindex="0">Label: Value 2</div>
+        <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
+        <div>Label: Value 3</div>
+      </div>
+      
+      
+      
+      <div class="grid-item" tabindex="0" style="background-color: rgb(135, 222, 222);">
+
+
+        <!-- <div id="bulletChart"style="height:100px"></div> -->
+        <!-- (click)="openKPIModal6(KPIModal6, '')" -->
+         <h1>Coming Soon</h1>
+
+      </div>
+      
+      <div class="grid-item" tabindex="0" style="background-color: burlywood;">
+        <h1>Coming Soon</h1>
+
+          <!-- <div id="chart-gauge" style="height:117px;width: 240px;"></div> -->
+   
+     
+      </div>
+      <div class="grid-item" tabindex="0" style="background-color: rgb(222, 135, 176);">
+        <h1>Coming Soon</h1>
+ 
+        <!-- <h4>Full Dial Chart</h4> -->
     
-      
-      
-
-      <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTab === 'autoflow-config'}" id="autoflow-config" role="tabpanel" aria-labelledby="autoflow-config-tab">
-        <form>
-          <div class="container">
-            <div class="row mb-3">
-              <div class="col-12">
-                <label class="col-form-label fw-bold fs-6">Autoflow Config</label>
-              </div>
-            </div>
-            <div class="row">
-
-            </div>
-          </div>
-        </form>
+       
       </div>
+
+
+      
+
+  
+
+
+
+      
+      
     </div>
   </div>
-
-  <!-- Modal Footer -->
-  <div class="modal-footer">
-    <button type="button" class="btn btn-danger" (click)="modal.dismiss()">Cancel</button>
-    
-    <!-- Conditionally display the Save button for Add Summary -->
-    <button *ngIf="selectedTab === 'add-dashboard' && !showModal" type="button" class="btn btn-primary" 
   
-      (click)="createNewSummary(); modal.dismiss()">Save</button>
-      
-    <!-- Conditionally display the Update button for Edit Summary only when in edit mode -->
-    <button *ngIf="selectedTab === 'add-dashboard' && showModal" type="button" class="btn btn-primary" 
-      [disabled]="createSummaryField.invalid" 
-      (click)="updateSummary(createSummaryField.value, 'editSummary'); modal.dismiss()">Update</button>
 
-    <!-- Conditionally display the Update Widget button only in Edit Widget mode (when 'add-widget' is selected and showModal is true) -->
-    <!-- <button *ngIf="selectedTab === 'add-widget' && showModal" type="button" class="btn btn-primary" 
-      [disabled]="createSummaryField.invalid" 
-      (click)="updateWidget(createSummaryField.value, 'editWidget'); modal.dismiss()">Update Widget</button> -->
+  
+    
+    
+
+    <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTab === 'autoflow-config'}" id="autoflow-config" role="tabpanel" aria-labelledby="autoflow-config-tab">
+      <form>
+        <div class="container">
+          <div class="row mb-3">
+            <div class="col-12">
+              <label class="col-form-label fw-bold fs-6">Autoflow Config</label>
+            </div>
+          </div>
+          <div class="row">
+
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Footer -->
+<div class="modal-footer">
+  <button type="button" class="btn btn-danger" (click)="modal.dismiss()">Cancel</button>
+  
+  <!-- Conditionally display the Save button for Add Summary -->
+  <button *ngIf="selectedTab === 'add-dashboard' && !showModal" type="button" class="btn btn-primary" 
+
+    (click)="createNewSummary(); modal.dismiss()">Save</button>
+    
+  <!-- Conditionally display the Update button for Edit Summary only when in edit mode -->
+  <button *ngIf="selectedTab === 'add-dashboard' && showModal" type="button" class="btn btn-primary" 
+    [disabled]="createSummaryField.invalid" 
+    (click)="updateSummary(createSummaryField.value, 'editSummary'); modal.dismiss()">Update</button>
+
+  <!-- Conditionally display the Update Widget button only in Edit Widget mode (when 'add-widget' is selected and showModal is true) -->
+  <!-- <button *ngIf="selectedTab === 'add-widget' && showModal" type="button" class="btn btn-primary" 
+    [disabled]="createSummaryField.invalid" 
+    (click)="updateWidget(createSummaryField.value, 'editWidget'); modal.dismiss()">Update Widget</button> -->
 </div>
 
 </ng-template>
@@ -1005,252 +882,2200 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
 
 <!-- <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#myModal" style="margin-left: 30px;">
-    <span class="svg-icon svg-icon-2">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <rect opacity="0.5" x="11.364" y="20.364" width="16" height="2" rx="1" transform="rotate(-90 11.364 20.364)"
-                fill="black" />
-            <rect x="4.36396" y="11.364" width="16" height="2" rx="1" fill="black" />
-        </svg>
-    </span>
-    Location
+  <span class="svg-icon svg-icon-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect opacity="0.5" x="11.364" y="20.364" width="16" height="2" rx="1" transform="rotate(-90 11.364 20.364)"
+              fill="black" />
+          <rect x="4.36396" y="11.364" width="16" height="2" rx="1" fill="black" />
+      </svg>
+  </span>
+  Location
 </button> -->
 <!-- </div> -->
 
 <!-- The Modal 1-->
 <div class="modal fade" id="myModalLocation" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true"
-  data-bs-backdrop="static" data-bs-keyboard="false">
-  <div class="modal-dialog modal-dialog-centered" style="max-width: 450px; width: 100%; transform: translate(30%, 0);">
-    <div class="modal-content" style="width: 100%;">
-      <div class="modal-header" style="padding-bottom: 15px;">
-        <h2 class="modal-title">Location</h2>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <br>
+data-bs-backdrop="static" data-bs-keyboard="false">
+<div class="modal-dialog modal-dialog-centered" style="max-width: 450px; width: 100%; transform: translate(30%, 0);">
+  <div class="modal-content" style="width: 100%;">
+    <div class="modal-header" style="padding-bottom: 15px;">
+      <h2 class="modal-title">Location</h2>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <br>
+    <div class="container">
+      <input type="search" id="search" class="form-control"
+        style="margin: 0 auto 1em auto; padding: 4px; border-radius: 4px; border: 1px solid silver;"
+        placeholder="Search Locations/Forms..." />
+    </div>
+    <div class="container scroll-y h-300px" id="SimpleJSTree"></div>
+    <div class="modal-footer">
       <div class="container">
-        <input type="search" id="search" class="form-control"
-          style="margin: 0 auto 1em auto; padding: 4px; border-radius: 4px; border: 1px solid silver;"
-          placeholder="Search Locations/Forms..." />
-      </div>
-      <div class="container scroll-y h-300px" id="SimpleJSTree"></div>
-      <div class="modal-footer">
-        <div class="container">
-          <div class="row">
-            <div class="col-md-6">
-              <button type="button" class="btn btn-sm btn-primary" [disabled]="!enableLocationButton"
-                data-bs-dismiss="modal" (click)="LocationSummary()">
+        <div class="row">
+          <div class="col-md-6">
+            <button type="button" class="btn btn-sm btn-primary" [disabled]="!enableLocationButton"
+              data-bs-dismiss="modal" (click)="LocationSummary()">
 
-                Ok
-              </button>
-              &nbsp;
-              <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal">
+              Ok
+            </button>
+            &nbsp;
+            <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal">
 
-                Cancel
-              </button>
-            </div>
-            <!-- Add Location Button -->
-
+              Cancel
+            </button>
           </div>
+          <!-- Add Location Button -->
+
         </div>
       </div>
     </div>
   </div>
 </div>
+</div>
+
+
+
+
+
+
 <ng-template #KPIModal let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title">KPI Widget-1</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
-  </div>
-  <div class="fv-row" [formGroup]="createKPIWidget">
-    <div class="modal-body">
-      <div class="card-body pt-0">
-        <div class="row g-3"> <!-- g-3 adds consistent gap between columns -->
-          <div class="col-md-4">
-            <label for="formlist" class="col-form-label fw-bold fs-6">Forms</label>
-            <ngx-select
-              id="formlist"
-              [allowClear]="true"
-              name="icon"
-              formControlName="formlist"
-              [items]="listofDeviceIds"
-              optionValueField="value"
-              optionTextField="text"
-              (selectionChanges)="selectFormParams($event)"
-              placeholder="Select Form">
-            </ngx-select>
-          </div>
-          <div class="col-md-4">
-            <label for="parameterName" class="col-form-label fw-bold fs-6">Parameter</label>
-            <ngx-select
-              id="parameterName"
-              [allowClear]="true"
-              formControlName="parameterName"
-              [items]="listofDynamicParam"
-              optionValueField="value"
-              optionTextField="text"
-              placeholder="Select Parameter"
-              style="width: 100%;">
-            </ngx-select>
-          </div>
-          <div class="col-md-4">
-            <label for="groupBy" class="col-form-label fw-bold fs-6 required">Group By</label>
-            <ngx-select
-              id="groupBy"
-              [allowClear]="true"
-              name="icon"
-              formControlName="groupBy"
-              [items]="groupByOptions"
-              optionValueField="value"
-              optionTextField="text"
-              placeholder="Select Group"
-              (selectionChanges)="onGroupByChange($event)"
-              class="w-100">
-            </ngx-select>
-          </div>
-          <div class="col-md-4">
-            <label for="primaryValue" class="col-form-label fw-bold fs-6 required">Show values</label>
-            <ngx-select
-              id="primaryValue"
-              [allowClear]="true"
-              name="icon"
-              formControlName="primaryValue"
-              [items]="showValues"
-              optionValueField="value"
-              optionTextField="text"
-              placeholder="Select Group"
-              class="w-100">
-            </ngx-select>
+<div class="modal-header">
+  <h4 class="modal-title">KPI Widget-1</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+</div>
+
+<!-- Modal body with Tabs -->
+<div class="fv-row" [formGroup]="createKPIWidget">
+  <div class="modal-body">
+    <div class="card-body pt-0">
+
+      <!-- Tab Navigation -->
+      <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap" id="myTab_settings" role="tablist">
+        <div class="col-6" role="Data">
+          <li class="nav-item">
+            <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab" aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Data</a>
+          </li>
+        </div>
+        <div class="col-6" role="Settings">
+          <li class="nav-item">
+            <a class="nav-link text-active-primary me-6" id="settings-tabpane" data-bs-toggle="tab" role="tab" aria-controls="settings-tab" aria-selected="false" (click)="selectedSettingsTab('settings-tab')">Settings</a>
+          </li>
+        </div>
+      </ul>
+
+      <!-- Tab Content -->
+      <div class="tab-content mt-3" id="modalTabsContent">
+        <!-- General Tab Content -->
+        <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'dataTab'}" id="dataTab" role="tabpanel" aria-labelledby="home-tab">
+          <div class="row g-3"> <!-- g-3 adds consistent gap between columns -->
+            <!-- Existing fields from your modal go here (form controls, inputs, etc.) -->
+            <div class="col-md-4">
+              <label for="formlist" class="col-form-label fw-bold fs-6 required">Forms</label>
+              <ngx-select
+                id="formlist"
+                [allowClear]="true"
+                name="icon"
+                formControlName="formlist"
+                [items]="listofDeviceIds"
+                optionValueField="value"
+                optionTextField="text"
+                (selectionChanges)="selectFormParams($event)"
+                placeholder="Select Form">
+              </ngx-select>
+            </div>
+            <div class="col-md-4">
+              <label for="parameterName" class="col-form-label fw-bold fs-6 required">Parameter</label>
+              <ngx-select
+                id="parameterName"
+                [allowClear]="true"
+                formControlName="parameterName"
+                [items]="listofDynamicParam"
+                optionValueField="value"
+                optionTextField="text"
+                placeholder="Select Parameter"
+                style="width: 100%;">
+              </ngx-select>
+            </div>
+
+            <div class="col-md-4">
+              <label for="groupBy" class="col-form-label fw-bold fs-6 required">Group By</label>
+              <ngx-select
+                id="groupBy"
+                [allowClear]="true"
+                name="icon"
+                formControlName="groupBy"
+                [items]="groupByOptions"
+                optionValueField="value"
+                optionTextField="text"
+                placeholder="Select Group"
+                class="w-100">
+              </ngx-select>
+            </div>
+            <div class="col-md-4">
+              <label for="primaryValue" class="col-form-label fw-bold fs-6 required">Primary value</label>
+              <ngx-select
+                id="primaryValue"
+                [allowClear]="true"
+                name="icon"
+                formControlName="primaryValue"
+                [items]="showValues"
+                optionValueField="value"
+                optionTextField="text"
+                placeholder="Select Group"
+                (change)="onValueChange($event)" 
+                class="w-100">
+              </ngx-select>
+            </div>
+            <div class="col-md-4" *ngIf="primaryValue?.value === 'Constant'">
+              <label for="constant" class="col-form-label fw-bold fs-6 required">Constant</label>
+              <input
+                id="constant"
+                type="number"
+                class="form-control form-control-solid"
+                placeholder="Select constant"
+                formControlName="constantValue"
+              />
+            </div>
+  
+            <div class="col-md-4">
+              <label for="groupByFormat" class="col-form-label fw-bold fs-6 required">GroupByFormat</label>
+              <input
+                id="groupByFormat"
+                type="text"
+                class="form-control form-control-solid"
+                placeholder="Select GroupByFormat"
+                [formControl]="groupByFormatControl" 
+                (click)="openModalCalender()"
+                readonly /> <!-- Make it readonly to prevent manual input -->
+            </div>
+  
+            <!-- Input field for ID -->
+            <div class="col-md-4" *ngIf="showIdField">
+              <label for="id" class="col-form-label fw-bold fs-6 required">ID</label>
+              <input
+                id="id"
+                type="number"
+                class="form-control form-control-solid"
+                placeholder="Enter ID"
+                formControlName="widgetid" 
+              />
+            </div>
+
+            <div class="col-md-4" >
+              <label for="constant" class="col-form-label fw-bold fs-6 required">Processed Value</label>
+              <input
+                type="text"
+                class="form-control form-control-solid"
+                placeholder="Select Processed Value"
+                formControlName="processed_value"
+              />
+            </div>
+
+<div class="col-6">
+<label for="rangeCalendarTimeRight" class="col-form-label fw-bold fs-6">Pre Defined Date Range</label>
+<input
+type="text"
+id="rangeCalendarCenter"
+class="form-control"
+style="box-shadow: none; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+readonly
+ngxDaterangepickerBootstrap
+formControlName="predefinedSelectRange" 
+[drops]="dropsDown"
+[opens]="opensCenter"
+[locale]="locale"
+[ranges]="ranges"
+[showCustomRangeLabel]="true"
+[showCancel]="true"
+[linkedCalendars]="true"
+[alwaysShowCalendars]="false"
+[showRangeLabelOnInput]="false"
+[keepCalendarOpeningWithRange]="false"
+[isTooltipDate]="isTooltipDate"
+[isCustomDate]="isCustomDate"
+[isInvalidDate]="isInvalidDate"
+(datesUpdated)="datesUpdatedRange($event)" 
+aria-describedby="rangeCalendarCenterDesc"
+/>
+
+
+
+
+
+
+<div id="rangeCalendarTimeRightDesc" class="form-text">
+</div>
+</div>
+<div class="col-md-4">
+<label for="groupByFormat" class="col-form-label fw-bold fs-6 required">DateRange Label</label>
+<input
+ 
+  type="text"
+  class="form-control form-control-solid"
+  placeholder="Select GroupByFormat"
+  formControlName="selectedRangeType"
+
+  readonly /> <!-- Make it readonly to prevent manual input -->
+</div>
+
+
+            
+
+            <!-- More form fields... -->
           </div>
         </div>
+
+        <!-- Settings Tab Content -->
+        <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab" role="tabpanel" aria-labelledby="settings-tabpane">
+<!-- Themes Section -->
+<div class="row g-3">
+<div class="col-md-6">
+<label class="col-form-label fw-bold fs-6 required" >Themes:</label>
+<div class="color-boxes">
+  <div
+  *ngFor="let theme of themes"
+  class="color-box"
+  [ngStyle]="{ 'background-color': theme.color }"
+  (click)="toggleCheckbox(theme)"  
+  [class.checked]="theme.selected"
+>
+  <div *ngIf="theme.selected" class="checkmark">✔</div>
+</div>
+
+</div>
+</div>
+
+<!-- Custom Color Picker Section -->
+<div class="col-md-6">
+<label class="col-form-label fw-bold fs-6">Custom:</label>
+<div class="d-flex align-items-center">
+  <input
+  type="color"
+  id="customColor"
+  class="form-control form-control-solid"
+  style="width: 40px; height: 40px;"
+  [value]="selectedColor"
+  formControlName="themeColor"
+  (input)="onColorChange1($event)"
+/>
+  <!-- <span class="fs-6 ms-2">A</span> -->
+</div>
+</div>
+</div>
+
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+        </div>
       </div>
+
     </div>
-    
-    <div class="modal-footer">
+
+    <div class="modal-footer" style="margin-top: 20px;">
       <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
-      <button type="button" class="btn btn-primary" (click)="addTile('tile'); modal.dismiss()" *ngIf="!isEditMode">Save</button> <!-- Save button shown only in add mode -->
-      <button type="button" class="btn btn-warning" (click)="updateTile(); modal.dismiss()" *ngIf="isEditMode">Update</button> <!-- Update button shown only in edit mode -->
+<button type="button" class="btn btn-primary" 
+(click)="addTile('tile'); modal.dismiss()" 
+*ngIf="!isEditMode" 
+
+[disabled]="createKPIWidget.invalid">Save</button>
+      <button type="button" class="btn btn-warning" (click)="updateTile(); modal.dismiss()" *ngIf="isEditMode">Update</button>
     </div>
   </div>
+</div>
 </ng-template>
+
+
 
 
 
 
 
 <style>
-  .container1 {
-      max-width: 600px;
-      margin: 20px auto;
-      padding: 20px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-family: Arial, sans-serif;
-      background-color: #f8f9fa;
-  }
+.container1 {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+}
 
-  .list-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-  }
+.list-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
 
-  .list-column {
-      width: 48%;
-  }
+.list-column {
+    width: 48%;
+}
 
-  .list-item {
-      padding: 8px;
-      border-radius: 4px;
-      margin-bottom: 10px;
-      cursor: pointer;
-  }
+.list-item {
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
 
-  .list-item:hover, .list-item.active {
-      background-color: #e7f1ff;
-      color: #004085;
-  }
+.list-item:hover, .list-item.active {
+    background-color: #e7f1ff;
+    color: #004085;
+}
 
-  .title {
-      font-weight: bold;
-  }
+.title {
+    font-weight: bold;
+}
 
-  .example {
-   
-      font-size: 14px;
-  }
+.example {
+ 
+    font-size: 14px;
+}
 </style>
+
+
 <ng-template #calendarModal let-modal>
-  <div class="modal-header">
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
-  </div>
-  <div class="modal-body right-side-modal">
-    <div class="card-body pt-0">
-      <div class="container1">
-        <div class="list-row">
-          <!-- Left Column -->
-          <div class="list-column">
-            <div class="list-item active" (click)="selectValue('Year')" (mouseenter)="showTooltip('Year')" (mouseleave)="hideTooltip()">
-              <div class="title">Year</div>
-              <div class="example">E.g., 2003, 2004</div>
-              <div *ngIf="tooltip === 'Year'" class="tooltip-content">
-                All distinct year values present in the column.<br>E.g., <span style="color: #f86c6b;">2003, 2004</span>
-              </div>
-            </div>
-            <div class="list-item" (click)="selectValue('QuarterYear')" (mouseenter)="showTooltip('QuarterYear')" (mouseleave)="hideTooltip()">
-              <div class="title">Quarter & Year</div>
-              <div class="example">E.g., Q1 2004</div>
-              <div *ngIf="tooltip === 'QuarterYear'" class="tooltip-content">
-                Distinct quarters and years available.<br>E.g., Q1 2004
-              </div>
-            </div>
-            <div class="list-item" (click)="selectValue('MonthYear')">
-              <div class="title">Month & Year</div>
-              <div class="example">E.g., March 2004</div>
-            </div>
-            <div class="list-item" (click)="selectValue('WeekYear')">
-              <div class="title">Week & Year</div>
-              <div class="example">E.g., W1 2004</div>
-            </div>
-            <div class="list-item" (click)="selectValue('FullDate')">
-              <div class="title">Full Date</div>
-              <div class="example">E.g., 1/1/2000</div>
-            </div>
-            <div class="list-item" (click)="selectValue('DateTime')">
-              <div class="title">Date & Time</div>
-              <div class="example">E.g., 01 Jan, 2000 00:00:07 hrs</div>
-            </div>
+<div class="modal-header">
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+</div>
+<div class="modal-body right-side-modal">
+  <div class="card-body pt-0">
+    <div class="container1">
+      <div class="list-row">
+        <div class="list-column">
+          <div class="list-item active" (click)="selectValue('Year', modal)" (mouseenter)="showTooltip('Year')" (mouseleave)="hideTooltip()">
+            <div class="title">Year</div>
+            <div class="example">E.g., 2003, 2004</div>
           </div>
-          <!-- Right Column -->
-          <div class="list-column">
-            <div class="list-item" (click)="selectValue('Quarter')">
-              <div class="title">Quarter</div>
-              <div class="example">E.g., Q1, Q2</div>
-            </div>
-            <div class="list-item" (click)="selectValue('Month')">
-              <div class="title">Month</div>
-              <div class="example">E.g., January, February</div>
-            </div>
-            <div class="list-item" (click)="selectValue('Week')">
-              <div class="title">Week</div>
-              <div class="example">E.g., Week 1, Week 2</div>
-            </div>
-            <div class="list-item" (click)="selectValue('WeekDay')">
-              <div class="title">Week Day</div>
-              <div class="example">E.g., Sunday, Monday</div>
-            </div>
-            <div class="list-item" (click)="selectValue('DayOfMonth')">
-              <div class="title">Day of Month</div>
-              <div class="example">E.g., 1 to 31</div>
-            </div>
-            <div class="list-item" (click)="selectValue('HourOfDay')">
-              <div class="title">Hour of Day</div>
-              <div class="example">E.g., 0 to 23 hrs</div>
-            </div>
+          <div class="list-item" (click)="selectValue('QuarterYear', modal)" (mouseenter)="showTooltip('QuarterYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Quarter & Year</div>
+            <div class="example">E.g., Q1 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue('MonthYear', modal)" (mouseenter)="showTooltip('MonthYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Month & Year</div>
+            <div class="example">E.g., March 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue('WeekYear', modal)" (mouseenter)="showTooltip('WeekYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Week & Year</div>
+            <div class="example">E.g., W1 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue('FullDate', modal)" (mouseenter)="showTooltip('FullDate')" (mouseleave)="hideTooltip()">
+            <div class="title">Full Date</div>
+            <div class="example">E.g., 1/1/2000</div>
+          </div>
+          <div class="list-item" (click)="selectValue('DateTime', modal)" (mouseenter)="showTooltip('DateTime')" (mouseleave)="hideTooltip()">
+            <div class="title">Date & Time</div>
+            <div class="example">E.g., 01 Jan, 2000 00:00:07 hrs</div>
+          </div>
+        </div>
+        <div class="list-column">
+          <div class="list-item" (click)="selectValue('Quarter', modal)">
+            <div class="title">Quarter</div>
+            <div class="example">E.g., Q1, Q2</div>
+          </div>
+          <div class="list-item" (click)="selectValue('Month', modal)">
+            <div class="title">Month</div>
+            <div class="example">E.g., January, February</div>
+          </div>
+          <div class="list-item" (click)="selectValue('Week', modal)">
+            <div class="title">Week</div>
+            <div class="example">E.g., Week 1, Week 2</div>
+          </div>
+          <div class="list-item" (click)="selectValue('WeekDay', modal)">
+            <div class="title">Week Day</div>
+            <div class="example">E.g., Sunday, Monday</div>
+          </div>
+          <div class="list-item" (click)="selectValue('DayOfMonth', modal)">
+            <div class="title">Day of Month</div>
+            <div class="example">E.g., 1 to 31</div>
+          </div>
+          <div class="list-item" (click)="selectValue('HourOfDay', modal)">
+            <div class="title">Hour of Day</div>
+            <div class="example">E.g., 0 to 23 hrs</div>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 </ng-template>
+
+<ng-template #calendarModal1 let-modal>
+<div class="modal-header">
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+</div>
+<div class="modal-body right-side-modal">
+  <div class="card-body pt-0">
+    <div class="container1">
+      <div class="list-row">
+        <div class="list-column">
+          <div class="list-item active" (click)="selectValue1('Year', modal)" (mouseenter)="showTooltip('Year')" (mouseleave)="hideTooltip()">
+            <div class="title">Year</div>
+            <div class="example">E.g., 2003, 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue1('QuarterYear', modal)" (mouseenter)="showTooltip('QuarterYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Quarter & Year</div>
+            <div class="example">E.g., Q1 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue1('MonthYear', modal)" (mouseenter)="showTooltip('MonthYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Month & Year</div>
+            <div class="example">E.g., March 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue1('WeekYear', modal)" (mouseenter)="showTooltip('WeekYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Week & Year</div>
+            <div class="example">E.g., W1 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue1('FullDate', modal)" (mouseenter)="showTooltip('FullDate')" (mouseleave)="hideTooltip()">
+            <div class="title">Full Date</div>
+            <div class="example">E.g., 1/1/2000</div>
+          </div>
+          <div class="list-item" (click)="selectValue1('DateTime', modal)" (mouseenter)="showTooltip('DateTime')" (mouseleave)="hideTooltip()">
+            <div class="title">Date & Time</div>
+            <div class="example">E.g., 01 Jan, 2000 00:00:07 hrs</div>
+          </div>
+        </div>
+        <div class="list-column">
+          <div class="list-item" (click)="selectValue1('Quarter', modal)">
+            <div class="title">Quarter</div>
+            <div class="example">E.g., Q1, Q2</div>
+          </div>
+          <div class="list-item" (click)="selectValue1('Month', modal)">
+            <div class="title">Month</div>
+            <div class="example">E.g., January, February</div>
+          </div>
+          <div class="list-item" (click)="selectValue1('Week', modal)">
+            <div class="title">Week</div>
+            <div class="example">E.g., Week 1, Week 2</div>
+          </div>
+          <div class="list-item" (click)="selectValue1('WeekDay', modal)">
+            <div class="title">Week Day</div>
+            <div class="example">E.g., Sunday, Monday</div>
+          </div>
+          <div class="list-item" (click)="selectValue1('DayOfMonth', modal)">
+            <div class="title">Day of Month</div>
+            <div class="example">E.g., 1 to 31</div>
+          </div>
+          <div class="list-item" (click)="selectValue1('HourOfDay', modal)">
+            <div class="title">Hour of Day</div>
+            <div class="example">E.g., 0 to 23 hrs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</ng-template>
+<ng-template #calendarModal2 let-modal>
+<div class="modal-header">
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+</div>
+<div class="modal-body right-side-modal">
+  <div class="card-body pt-0">
+    <div class="container1">
+      <div class="list-row">
+        <div class="list-column">
+          <div class="list-item active" (click)="selectValue2('Year', modal)" (mouseenter)="showTooltip('Year')" (mouseleave)="hideTooltip()">
+            <div class="title">Year</div>
+            <div class="example">E.g., 2003, 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue2('QuarterYear', modal)" (mouseenter)="showTooltip('QuarterYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Quarter & Year</div>
+            <div class="example">E.g., Q1 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue2('MonthYear', modal)" (mouseenter)="showTooltip('MonthYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Month & Year</div>
+            <div class="example">E.g., March 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue2('WeekYear', modal)" (mouseenter)="showTooltip('WeekYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Week & Year</div>
+            <div class="example">E.g., W1 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue2('FullDate', modal)" (mouseenter)="showTooltip('FullDate')" (mouseleave)="hideTooltip()">
+            <div class="title">Full Date</div>
+            <div class="example">E.g., 1/1/2000</div>
+          </div>
+          <div class="list-item" (click)="selectValue2('DateTime', modal)" (mouseenter)="showTooltip('DateTime')" (mouseleave)="hideTooltip()">
+            <div class="title">Date & Time</div>
+            <div class="example">E.g., 01 Jan, 2000 00:00:07 hrs</div>
+          </div>
+        </div>
+        <div class="list-column">
+          <div class="list-item" (click)="selectValue2('Quarter', modal)">
+            <div class="title">Quarter</div>
+            <div class="example">E.g., Q1, Q2</div>
+          </div>
+          <div class="list-item" (click)="selectValue2('Month', modal)">
+            <div class="title">Month</div>
+            <div class="example">E.g., January, February</div>
+          </div>
+          <div class="list-item" (click)="selectValue2('Week', modal)">
+            <div class="title">Week</div>
+            <div class="example">E.g., Week 1, Week 2</div>
+          </div>
+          <div class="list-item" (click)="selectValue2('WeekDay', modal)">
+            <div class="title">Week Day</div>
+            <div class="example">E.g., Sunday, Monday</div>
+          </div>
+          <div class="list-item" (click)="selectValue2('DayOfMonth', modal)">
+            <div class="title">Day of Month</div>
+            <div class="example">E.g., 1 to 31</div>
+          </div>
+          <div class="list-item" (click)="selectValue2('HourOfDay', modal)">
+            <div class="title">Hour of Day</div>
+            <div class="example">E.g., 0 to 23 hrs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</ng-template>
+<ng-template #calendarModal3 let-modal>
+<div class="modal-header">
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+</div>
+<div class="modal-body right-side-modal">
+  <div class="card-body pt-0">
+    <div class="container1">
+      <div class="list-row">
+        <div class="list-column">
+          <div class="list-item active" (click)="selectValue3('Year', modal)" (mouseenter)="showTooltip('Year')" (mouseleave)="hideTooltip()">
+            <div class="title">Year</div>
+            <div class="example">E.g., 2003, 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue3('QuarterYear', modal)" (mouseenter)="showTooltip('QuarterYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Quarter & Year</div>
+            <div class="example">E.g., Q1 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue3('MonthYear', modal)" (mouseenter)="showTooltip('MonthYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Month & Year</div>
+            <div class="example">E.g., March 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue3('WeekYear', modal)" (mouseenter)="showTooltip('WeekYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Week & Year</div>
+            <div class="example">E.g., W1 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue3('FullDate', modal)" (mouseenter)="showTooltip('FullDate')" (mouseleave)="hideTooltip()">
+            <div class="title">Full Date</div>
+            <div class="example">E.g., 1/1/2000</div>
+          </div>
+          <div class="list-item" (click)="selectValue3('DateTime', modal)" (mouseenter)="showTooltip('DateTime')" (mouseleave)="hideTooltip()">
+            <div class="title">Date & Time</div>
+            <div class="example">E.g., 01 Jan, 2000 00:00:07 hrs</div>
+          </div>
+        </div>
+        <div class="list-column">
+          <div class="list-item" (click)="selectValue3('Quarter', modal)">
+            <div class="title">Quarter</div>
+            <div class="example">E.g., Q1, Q2</div>
+          </div>
+          <div class="list-item" (click)="selectValue3('Month', modal)">
+            <div class="title">Month</div>
+            <div class="example">E.g., January, February</div>
+          </div>
+          <div class="list-item" (click)="selectValue3('Week', modal)">
+            <div class="title">Week</div>
+            <div class="example">E.g., Week 1, Week 2</div>
+          </div>
+          <div class="list-item" (click)="selectValue3('WeekDay', modal)">
+            <div class="title">Week Day</div>
+            <div class="example">E.g., Sunday, Monday</div>
+          </div>
+          <div class="list-item" (click)="selectValue3('DayOfMonth', modal)">
+            <div class="title">Day of Month</div>
+            <div class="example">E.g., 1 to 31</div>
+          </div>
+          <div class="list-item" (click)="selectValue3('HourOfDay', modal)">
+            <div class="title">Hour of Day</div>
+            <div class="example">E.g., 0 to 23 hrs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</ng-template>
+
+<ng-template #calendarModal4 let-modal>
+<div class="modal-header">
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+</div>
+<div class="modal-body right-side-modal">
+  <div class="card-body pt-0">
+    <div class="container1">
+      <div class="list-row">
+        <div class="list-column">
+          <div class="list-item active" (click)="selectValue4('Year', modal)" (mouseenter)="showTooltip('Year')" (mouseleave)="hideTooltip()">
+            <div class="title">Year</div>
+            <div class="example">E.g., 2003, 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue4('QuarterYear', modal)" (mouseenter)="showTooltip('QuarterYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Quarter & Year</div>
+            <div class="example">E.g., Q1 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue4('MonthYear', modal)" (mouseenter)="showTooltip('MonthYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Month & Year</div>
+            <div class="example">E.g., March 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue4('WeekYear', modal)" (mouseenter)="showTooltip('WeekYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Week & Year</div>
+            <div class="example">E.g., W1 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue4('FullDate', modal)" (mouseenter)="showTooltip('FullDate')" (mouseleave)="hideTooltip()">
+            <div class="title">Full Date</div>
+            <div class="example">E.g., 1/1/2000</div>
+          </div>
+          <div class="list-item" (click)="selectValue4('DateTime', modal)" (mouseenter)="showTooltip('DateTime')" (mouseleave)="hideTooltip()">
+            <div class="title">Date & Time</div>
+            <div class="example">E.g., 01 Jan, 2000 00:00:07 hrs</div>
+          </div>
+        </div>
+        <div class="list-column">
+          <div class="list-item" (click)="selectValue4('Quarter', modal)">
+            <div class="title">Quarter</div>
+            <div class="example">E.g., Q1, Q2</div>
+          </div>
+          <div class="list-item" (click)="selectValue4('Month', modal)">
+            <div class="title">Month</div>
+            <div class="example">E.g., January, February</div>
+          </div>
+          <div class="list-item" (click)="selectValue4('Week', modal)">
+            <div class="title">Week</div>
+            <div class="example">E.g., Week 1, Week 2</div>
+          </div>
+          <div class="list-item" (click)="selectValue4('WeekDay', modal)">
+            <div class="title">Week Day</div>
+            <div class="example">E.g., Sunday, Monday</div>
+          </div>
+          <div class="list-item" (click)="selectValue4('DayOfMonth', modal)">
+            <div class="title">Day of Month</div>
+            <div class="example">E.g., 1 to 31</div>
+          </div>
+          <div class="list-item" (click)="selectValue4('HourOfDay', modal)">
+            <div class="title">Hour of Day</div>
+            <div class="example">E.g., 0 to 23 hrs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</ng-template>
+<ng-template #calendarModal5 let-modal>
+<div class="modal-header">
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+</div>
+<div class="modal-body right-side-modal">
+  <div class="card-body pt-0">
+    <div class="container1">
+      <div class="list-row">
+        <div class="list-column">
+          <div class="list-item active" (click)="selectValue5('Year', modal)" (mouseenter)="showTooltip('Year')" (mouseleave)="hideTooltip()">
+            <div class="title">Year</div>
+            <div class="example">E.g., 2003, 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue5('QuarterYear', modal)" (mouseenter)="showTooltip('QuarterYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Quarter & Year</div>
+            <div class="example">E.g., Q1 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue5('MonthYear', modal)" (mouseenter)="showTooltip('MonthYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Month & Year</div>
+            <div class="example">E.g., March 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue5('WeekYear', modal)" (mouseenter)="showTooltip('WeekYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Week & Year</div>
+            <div class="example">E.g., W1 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue5('FullDate', modal)" (mouseenter)="showTooltip('FullDate')" (mouseleave)="hideTooltip()">
+            <div class="title">Full Date</div>
+            <div class="example">E.g., 1/1/2000</div>
+          </div>
+          <div class="list-item" (click)="selectValue5('DateTime', modal)" (mouseenter)="showTooltip('DateTime')" (mouseleave)="hideTooltip()">
+            <div class="title">Date & Time</div>
+            <div class="example">E.g., 01 Jan, 2000 00:00:07 hrs</div>
+          </div>
+        </div>
+        <div class="list-column">
+          <div class="list-item" (click)="selectValue5('Quarter', modal)">
+            <div class="title">Quarter</div>
+            <div class="example">E.g., Q1, Q2</div>
+          </div>
+          <div class="list-item" (click)="selectValue5('Month', modal)">
+            <div class="title">Month</div>
+            <div class="example">E.g., January, February</div>
+          </div>
+          <div class="list-item" (click)="selectValue5('Week', modal)">
+            <div class="title">Week</div>
+            <div class="example">E.g., Week 1, Week 2</div>
+          </div>
+          <div class="list-item" (click)="selectValue5('WeekDay', modal)">
+            <div class="title">Week Day</div>
+            <div class="example">E.g., Sunday, Monday</div>
+          </div>
+          <div class="list-item" (click)="selectValue5('DayOfMonth', modal)">
+            <div class="title">Day of Month</div>
+            <div class="example">E.g., 1 to 31</div>
+          </div>
+          <div class="list-item" (click)="selectValue5('HourOfDay', modal)">
+            <div class="title">Hour of Day</div>
+            <div class="example">E.g., 0 to 23 hrs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</ng-template>
+<ng-template #calendarModal6 let-modal>
+<div class="modal-header">
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+</div>
+<div class="modal-body right-side-modal">
+  <div class="card-body pt-0">
+    <div class="container1">
+      <div class="list-row">
+        <div class="list-column">
+          <div class="list-item active" (click)="selectValue6('Year', modal)" (mouseenter)="showTooltip('Year')" (mouseleave)="hideTooltip()">
+            <div class="title">Year</div>
+            <div class="example">E.g., 2003, 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue6('QuarterYear', modal)" (mouseenter)="showTooltip('QuarterYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Quarter & Year</div>
+            <div class="example">E.g., Q1 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue6('MonthYear', modal)" (mouseenter)="showTooltip('MonthYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Month & Year</div>
+            <div class="example">E.g., March 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue6('WeekYear', modal)" (mouseenter)="showTooltip('WeekYear')" (mouseleave)="hideTooltip()">
+            <div class="title">Week & Year</div>
+            <div class="example">E.g., W1 2004</div>
+          </div>
+          <div class="list-item" (click)="selectValue6('FullDate', modal)" (mouseenter)="showTooltip('FullDate')" (mouseleave)="hideTooltip()">
+            <div class="title">Full Date</div>
+            <div class="example">E.g., 1/1/2000</div>
+          </div>
+          <div class="list-item" (click)="selectValue6('DateTime', modal)" (mouseenter)="showTooltip('DateTime')" (mouseleave)="hideTooltip()">
+            <div class="title">Date & Time</div>
+            <div class="example">E.g., 01 Jan, 2000 00:00:07 hrs</div>
+          </div>
+        </div>
+        <div class="list-column">
+          <div class="list-item" (click)="selectValue6('Quarter', modal)">
+            <div class="title">Quarter</div>
+            <div class="example">E.g., Q1, Q2</div>
+          </div>
+          <div class="list-item" (click)="selectValue6('Month', modal)">
+            <div class="title">Month</div>
+            <div class="example">E.g., January, February</div>
+          </div>
+          <div class="list-item" (click)="selectValue6('Week', modal)">
+            <div class="title">Week</div>
+            <div class="example">E.g., Week 1, Week 2</div>
+          </div>
+          <div class="list-item" (click)="selectValue6('WeekDay', modal)">
+            <div class="title">Week Day</div>
+            <div class="example">E.g., Sunday, Monday</div>
+          </div>
+          <div class="list-item" (click)="selectValue6('DayOfMonth', modal)">
+            <div class="title">Day of Month</div>
+            <div class="example">E.g., 1 to 31</div>
+          </div>
+          <div class="list-item" (click)="selectValue6('HourOfDay', modal)">
+            <div class="title">Hour of Day</div>
+            <div class="example">E.g., 0 to 23 hrs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</ng-template>
+
+
+<ng-template #KPIModal1 let-modal>
+<div class="modal-header">
+  <h4 class="modal-title">KPI Widget-2</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+</div>
+<div class="fv-row" [formGroup]="createKPIWidget1">
+  <div class="modal-body">
+    <div class="card-body pt-0">
+      <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap" id="myTab_settings1" role="tablist">
+        <div class="col-6" role="Data">
+          <li class="nav-item">
+            <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab" aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Data</a>
+          </li>
+        </div>
+        <div class="col-6" role="Settings">
+          <li class="nav-item">
+            <a class="nav-link text-active-primary me-6" id="settings-tabpane" data-bs-toggle="tab" role="tab" aria-controls="settings-tab" aria-selected="false" (click)="selectedSettingsTab('settings-tab')">Settings</a>
+          </li>
+        </div>
+      </ul>
+      <div class="tab-content mt-3" id="modalTabsContent">
+        <!-- General Tab Content -->
+        <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'dataTab'}" id="dataTab" role="tabpanel" aria-labelledby="home-tab">
+      <div class="row g-3"> <!-- g-3 adds consistent gap between columns -->
+        <div class="col-md-4"> <!-- Column for the first dropdown -->
+          <label class="col-form-label fw-bold fs-6">Forms</label>
+          <ngx-select
+            [allowClear]="true"
+            name="icon"
+            formControlName="formlist"
+            [items]="listofDeviceIds"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Form"
+            (selectionChanges)="selectFormParams($event)"
+        > <!-- Ensures dropdown takes full width of column -->
+          </ngx-select>
+        </div>
+        <div class="col-md-4">
+          <label for="parameterName" class="col-form-label fw-bold fs-6">Parameter</label>
+          <ngx-select
+            id="parameterName"
+            [allowClear]="true"
+            formControlName="parameterName"
+            [items]="listofDynamicParam"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Parameter"
+            style="width: 100%;">
+          </ngx-select>
+        </div>
+  
+        <div class="col-md-4"> <!-- Column for the second dropdown -->
+          <label class="col-form-label fw-bold fs-6 required">Group By</label>
+          <ngx-select
+            [allowClear]="true"
+            name="icon"
+            formControlName="groupBy"
+            [items]="groupByOptions"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Group"
+     
+            class="w-100"> <!-- Ensures dropdown takes full width of column -->
+          </ngx-select>
+        </div>
+        <div class="fv-row">
+          <div class="row">
+              <div class="col-md-4"> <!-- Column for the first dropdown -->
+                  <label class="col-form-label fw-bold fs-6 required">Primary Value</label>
+                  <ngx-select
+                      [allowClear]="true"
+                      name="primary-icon"
+                      formControlName="primaryValue"
+                      [items]="showValues"
+                      optionValueField="value"
+                      optionTextField="text"
+                      placeholder="Select Group"
+                      class="w-100"> <!-- Ensures dropdown takes full width of column -->
+                  </ngx-select>
+              </div>
+
+              <div class="col-md-4" *ngIf="primaryValue1?.value === 'Constant'">
+                <label for="constant1" class="col-form-label fw-bold fs-6 required">Constant</label>
+                <input
+                  id="constant1"
+                  type="number"
+                  class="form-control form-control-solid"
+                  placeholder="Select constant"
+                  formControlName="constantValue"
+                  (change)="onValueChange1($event)" 
+                />
+              </div>
+              <div class="col-md-4"> <!-- Column for the second dropdown -->
+                  <label class="col-form-label fw-bold fs-6 required">Secondary Value</label>
+                  <ngx-select
+                      [allowClear]="true"
+                      name="secondary-icon"
+                      formControlName="secondaryValue"
+                      [items]="showValues"
+                      optionValueField="value"
+                      optionTextField="text"
+                      placeholder="Select Group"
+                      class="w-100"> <!-- Ensures dropdown takes full width of column -->
+                  </ngx-select>
+              </div>
+
+
+    
+    
+              <div class="col-md-4">
+                <label for="groupByFormat" class="col-form-label fw-bold fs-6 required">GroupByFormat</label>
+                <input
+                  id="groupByFormat"
+                  type="text"
+                  class="form-control form-control-solid"
+                  placeholder="Select GroupByFormat"
+                  [formControl]="groupByFormatControl1" 
+                  (click)="openModalCalender1()"
+                  readonly /> <!-- Make it readonly to prevent manual input -->
+              
+    
+              </div>
+
+
+              <div class="col-md-4" *ngIf="showIdField">
+                <label for="id" class="col-form-label fw-bold fs-6 required">ID</label>
+                <input
+                  id="id"
+                  type="number"
+                  class="form-control form-control-solid"
+                  placeholder="Enter ID"
+                  formControlName="widgetid" 
+                />
+              </div>
+
+
+
+              <div class="col-md-4" >
+                <label for="constant" class="col-form-label fw-bold fs-6 required">Processed Value</label>
+                <input
+                  type="text"
+                  class="form-control form-control-solid"
+                  placeholder="Select Processed Value"
+                  formControlName="processed_value"
+                />
+              </div>
+          </div>
+      </div>
+      
+      </div>
+        </div>
+
+        <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab" role="tabpanel" aria-labelledby="settings-tabpane">
+          <!-- Themes Section -->
+<div class="row g-3">
+<div class="col-md-6">
+  <label class="col-form-label fw-bold fs-6">Themes:</label>
+  <div class="color-boxes">
+    <div
+      *ngFor="let theme of themes"
+      class="color-box"
+      [ngStyle]="{ 'background-color': theme.color }"
+      (click)="toggleCheckbox1(theme)"
+      [class.checked]="theme.selected"
+    >
+      <div *ngIf="theme.selected" class="checkmark">✔</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Custom Color Picker Section -->
+<div class="col-md-6">
+  <label class="col-form-label fw-bold fs-6">Custom:</label>
+  <div class="d-flex align-items-center">
+    <input
+      type="color"
+      id="customColor"
+      class="form-control form-control-solid"
+      style="width: 40px; height: 40px;"
+  formControlName="themeColor"
+  (input)="onColorChange($event)" 
+  
+    />
+  </div>
+</div>
+</div>
+
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+      </div>
+
+    </div>
+  </div>
+  
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
+  <button type="button" class="btn btn-primary" (click)="addTile('tile2'); modal.dismiss()" [disabled]="createKPIWidget1.invalid" *ngIf="!isEditMode">Save</button> <!-- Save button shown only in add mode -->
+  <button type="button" class="btn btn-warning" (click)="updateTile1(); modal.dismiss()" *ngIf="isEditMode">Update</button> <!-- Update button shown only in edit mode -->
+</div>
+</div>
+</ng-template>
+
+
+
+<ng-template #KPIModal2 let-modal>
+<div class="modal-header">
+  <h4 class="modal-title">KPI Widget-3</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+</div>
+<div class="fv-row" [formGroup]="createKPIWidget2">
+  <div class="modal-body">
+    <div class="card-body pt-0">
+
+      <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap" id="myTab_settings1" role="tablist">
+        <div class="col-6" role="Data">
+          <li class="nav-item">
+            <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab" aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Data</a>
+          </li>
+        </div>
+        <div class="col-6" role="Settings">
+          <li class="nav-item">
+            <a class="nav-link text-active-primary me-6" id="settings-tabpane" data-bs-toggle="tab" role="tab" aria-controls="settings-tab" aria-selected="false" (click)="selectedSettingsTab('settings-tab')">Settings</a>
+          </li>
+        </div>
+      </ul>
+      <div class="tab-content mt-3" id="modalTabsContent">
+        <!-- General Tab Content -->
+        <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'dataTab'}" id="dataTab" role="tabpanel" aria-labelledby="home-tab">
+      <div class="row g-3"> <!-- g-3 adds consistent gap between columns -->
+        <div class="col-md-4"> <!-- Column for the first dropdown -->
+          <label class="col-form-label fw-bold fs-6">Forms</label>
+          <ngx-select
+            [allowClear]="true"
+            name="icon"
+            formControlName="formlist"
+            [items]="listofDeviceIds"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Form"
+            (selectionChanges)="selectFormParams($event)"
+        > <!-- Ensures dropdown takes full width of column -->
+          </ngx-select>
+        </div>
+        <div class="col-md-4">
+          <label for="parameterName" class="col-form-label fw-bold fs-6">Parameter</label>
+          <ngx-select
+            id="parameterName"
+            [allowClear]="true"
+            formControlName="parameterName"
+            [items]="listofDynamicParam"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Parameter"
+            style="width: 100%;">
+          </ngx-select>
+        </div>
+  
+        <div class="col-md-4"> <!-- Column for the second dropdown -->
+          <label class="col-form-label fw-bold fs-6 required">Group By</label>
+          <ngx-select
+            [allowClear]="true"
+            name="icon"
+            formControlName="groupBy"
+            [items]="groupByOptions"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Group"
+     
+            class="w-100"> <!-- Ensures dropdown takes full width of column -->
+          </ngx-select>
+        </div>
+        <div class="fv-row">
+          <div class="row">
+              <div class="col-md-4"> <!-- Column for the first dropdown -->
+                  <label class="col-form-label fw-bold fs-6 required">Primary Value</label>
+                  <ngx-select
+                      [allowClear]="true"
+                      name="primary-icon"
+                      formControlName="primaryValue"
+                      [items]="showValues"
+                      optionValueField="value"
+                      optionTextField="text"
+                      placeholder="Select Group"
+                      class="w-100"> <!-- Ensures dropdown takes full width of column -->
+                  </ngx-select>
+              </div>
+
+              <div class="col-md-4" *ngIf="primaryValue2?.value === 'Constant'">
+                <label for="constant12" class="col-form-label fw-bold fs-6 required">Constant</label>
+                <input
+                  id="constant2"
+                  type="number"
+                  class="form-control form-control-solid"
+                  placeholder="Select constant"
+                  formControlName="constantValue"
+                  (change)="onValueChange2($event)" 
+                />
+              </div>
+              <div class="col-md-4"> <!-- Column for the second dropdown -->
+                  <label class="col-form-label fw-bold fs-6 required">Secondary Value</label>
+                  <ngx-select
+                      [allowClear]="true"
+                      name="secondary-icon"
+                      formControlName="secondaryValue"
+                      [items]="showValues"
+                      optionValueField="value"
+                      optionTextField="text"
+                      placeholder="Select Secondary Value"
+                      class="w-100"> <!-- Ensures dropdown takes full width of column -->
+                  </ngx-select>
+              </div>
+
+              <div class="col-md-4"> <!-- Column for the second dropdown -->
+                <label class="col-form-label fw-bold fs-6 required">Tertiary Value</label>
+                <ngx-select
+                    [allowClear]="true"
+                    name="secondary-icon"
+                    formControlName="secondaryValueNested"
+                    [items]="showValues"
+                    optionValueField="value"
+                    optionTextField="text"
+                    placeholder="Select Tertiary Value"
+                    class="w-100"> <!-- Ensures dropdown takes full width of column -->
+                </ngx-select>
+            </div>
+
+
+
+    
+    
+              <div class="col-md-4">
+                <label for="groupByFormat" class="col-form-label fw-bold fs-6 required">GroupByFormat</label>
+                <input
+                  id="groupByFormat"
+                  type="text"
+                  class="form-control form-control-solid"
+                  placeholder="Select GroupByFormat"
+                  [formControl]="groupByFormatControl2" 
+                  (click)="openModalCalender2()"
+                  readonly /> <!-- Make it readonly to prevent manual input -->
+              
+    
+              </div>
+
+
+              <div class="col-md-4" *ngIf="showIdField">
+                <label for="id" class="col-form-label fw-bold fs-6 required">ID</label>
+                <input
+                  id="id"
+                  type="number"
+                  class="form-control form-control-solid"
+                  placeholder="Enter ID"
+                  formControlName="widgetid" 
+                />
+              </div>
+
+              <div class="col-md-4" >
+                <label for="constant" class="col-form-label fw-bold fs-6 required">Processed Value</label>
+                <input
+                  type="text"
+                  class="form-control form-control-solid"
+                  placeholder="Select Processed Value"
+                  formControlName="processed_value"
+                />
+              </div>
+          </div>
+      </div>
+      
+      </div>
+        </div>
+
+        <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab" role="tabpanel" aria-labelledby="settings-tabpane">
+          <!-- Themes Section -->
+          <div class="row g-3">
+          <div class="col-md-6">
+            <label class="col-form-label fw-bold fs-6">Themes:</label>
+            <div class="color-boxes">
+              <div
+              *ngFor="let theme of themes"
+              class="color-box"
+              [ngStyle]="{ 'background-color': theme.color }"
+              (click)="toggleCheckbox2(theme)"  
+              [class.checked]="theme.selected"
+            >
+              <div *ngIf="theme.selected" class="checkmark">✔</div>
+            </div>
+            
+            </div>
+          </div>
+          
+          <!-- Custom Color Picker Section -->
+          <div class="col-md-6">
+            <label class="col-form-label fw-bold fs-6">Custom:</label>
+            <div class="d-flex align-items-center">
+              <input
+              type="color"
+              id="customColor"
+              class="form-control form-control-solid"
+              style="width: 40px; height: 40px;"
+              [value]="selectedColor"
+              formControlName="themeColor"
+              (input)="onColorChange2($event)"
+            />
+              <!-- <span class="fs-6 ms-2">A</span> -->
+            </div>
+          </div>
+          </div>
+          
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+      </div>
+    </div>
+  </div>
+  
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
+  <button type="button" class="btn btn-primary" (click)="addTile('tile3'); modal.dismiss()" [disabled]="createKPIWidget2.invalid" *ngIf="!isEditMode">Save</button> <!-- Save button shown only in add mode -->
+  <button type="button" class="btn btn-warning" (click)="updateTile2(); modal.dismiss()" *ngIf="isEditMode">Update</button> <!-- Update button shown only in edit mode -->
+</div>
+</div>
+</ng-template>
+
+<ng-template #KPIModal3 let-modal>
+<div class="modal-header">
+  <h4 class="modal-title">KPI Widget-4</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+</div>
+<div class="fv-row" [formGroup]="createKPIWidget3">
+  <div class="modal-body">
+    <div class="card-body pt-0">
+      <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap" id="myTab_settings1" role="tablist">
+        <div class="col-6" role="Data">
+          <li class="nav-item">
+            <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab" aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Data</a>
+          </li>
+        </div>
+        <div class="col-6" role="Settings">
+          <li class="nav-item">
+            <a class="nav-link text-active-primary me-6" id="settings-tabpane" data-bs-toggle="tab" role="tab" aria-controls="settings-tab" aria-selected="false" (click)="selectedSettingsTab('settings-tab')">Settings</a>
+          </li>
+        </div>
+      </ul>
+      <div class="tab-content mt-3" id="modalTabsContent">
+        <!-- General Tab Content -->
+        <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'dataTab'}" id="dataTab" role="tabpanel" aria-labelledby="home-tab">
+      <div class="row g-3"> <!-- g-3 adds consistent gap between columns -->
+        <div class="col-md-4"> <!-- Column for the first dropdown -->
+          <label class="col-form-label fw-bold fs-6">Forms</label>
+          <ngx-select
+            [allowClear]="true"
+            name="icon"
+            formControlName="formlist"
+            [items]="listofDeviceIds"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Form"
+            (selectionChanges)="selectFormParams($event)"
+        > <!-- Ensures dropdown takes full width of column -->
+          </ngx-select>
+        </div>
+        <div class="col-md-4">
+          <label for="parameterName" class="col-form-label fw-bold fs-6">Parameter</label>
+          <ngx-select
+            id="parameterName"
+            [allowClear]="true"
+            formControlName="parameterName"
+            [items]="listofDynamicParam"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Parameter"
+            style="width: 100%;">
+          </ngx-select>
+        </div>
+  
+        <div class="col-md-4"> <!-- Column for the second dropdown -->
+          <label class="col-form-label fw-bold fs-6 required">Group By</label>
+          <ngx-select
+            [allowClear]="true"
+            name="icon"
+            formControlName="groupBy"
+            [items]="groupByOptions"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Group"
+     
+            class="w-100"> <!-- Ensures dropdown takes full width of column -->
+          </ngx-select>
+        </div>
+        <div class="fv-row">
+          <div class="row">
+              <div class="col-md-4"> <!-- Column for the first dropdown -->
+                  <label class="col-form-label fw-bold fs-6 required">Primary Value</label>
+                  <ngx-select
+                      [allowClear]="true"
+                      name="primary-icon"
+                      formControlName="primaryValue"
+                      [items]="showValues"
+                      optionValueField="value"
+                      optionTextField="text"
+                      placeholder="Select Group"
+                      class="w-100"> <!-- Ensures dropdown takes full width of column -->
+                  </ngx-select>
+              </div>
+
+
+
+              <div class="col-md-4" *ngIf="primaryValue3?.value === 'Constant'">
+                <label for="constant12" class="col-form-label fw-bold fs-6 required">Constant</label>
+                <input
+                  id="constant3"
+                  type="number"
+                  class="form-control form-control-solid"
+                  placeholder="Select constant"
+                  formControlName="constantValue"
+                  (change)="onValueChange3($event)" 
+                />
+              </div>
+              <div class="col-md-4"> <!-- Column for the second dropdown -->
+                  <label class="col-form-label fw-bold fs-6 required">Compare From</label>
+                  <ngx-select
+                      [allowClear]="true"
+                      name="secondary-icon"
+                      formControlName="CompareTile"
+                      [items]="showValues"
+                      optionValueField="value"
+                      optionTextField="text"
+                      placeholder="Select ComparisionValue"
+                      class="w-100"> <!-- Ensures dropdown takes full width of column -->
+                  </ngx-select>
+              </div>
+
+              <div class="col-md-4"> <!-- Column for the second dropdown -->
+                <label class="col-form-label fw-bold fs-6 required">Compare To</label>
+                <ngx-select
+                    [allowClear]="true"
+                    name="secondary-icon"
+                    formControlName="WithCompareTile"
+                    [items]="showValues"
+                    optionValueField="value"
+                    optionTextField="text"
+                    placeholder="Select ComparisionValue"
+                    class="w-100"> <!-- Ensures dropdown takes full width of column -->
+                </ngx-select>
+            </div>
+
+
+
+    
+    
+              <div class="col-md-4">
+                <label for="groupByFormat" class="col-form-label fw-bold fs-6 required">GroupByFormat</label>
+                <input
+                  id="groupByFormat"
+                  type="text"
+                  class="form-control form-control-solid"
+                  placeholder="Select GroupByFormat"
+                  [formControl]="groupByFormatControl3" 
+                  (click)="openModalCalender3()"
+                  readonly /> <!-- Make it readonly to prevent manual input -->
+              
+    
+              </div>
+
+              <div class="col-md-4" *ngIf="showIdField">
+                <label for="id" class="col-form-label fw-bold fs-6 required">ID</label>
+                <input
+                  id="id"
+                  type="number"
+                  class="form-control form-control-solid"
+                  placeholder="Enter ID"
+                  formControlName="widgetid" 
+                />
+              </div>
+
+              <div class="col-md-4" >
+                <label for="constant" class="col-form-label fw-bold fs-6 required">Processed Value</label>
+                <input
+                  type="text"
+                  class="form-control form-control-solid"
+                  placeholder="Select Processed Value"
+                  formControlName="processed_value"
+                />
+              </div>
+          </div>
+      </div>
+      
+      </div>
+      </div>
+
+      <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab" role="tabpanel" aria-labelledby="settings-tabpane">
+        <!-- Themes Section -->
+        <div class="row g-3">
+        <div class="col-md-6">
+          <label class="col-form-label fw-bold fs-6">Themes:</label>
+          <div class="color-boxes">
+            <div
+            *ngFor="let theme of themes"
+            class="color-box"
+            [ngStyle]="{ 'background-color': theme.color }"
+            (click)="toggleCheckbox3(theme)"  
+            [class.checked]="theme.selected"
+          >
+            <div *ngIf="theme.selected" class="checkmark">✔</div>
+          </div>
+          
+          </div>
+        </div>
+        
+        <!-- Custom Color Picker Section -->
+        <div class="col-md-6">
+          <label class="col-form-label fw-bold fs-6">Custom:</label>
+          <div class="d-flex align-items-center">
+            <input
+            type="color"
+            id="customColor"
+            class="form-control form-control-solid"
+            style="width: 40px; height: 40px;"
+            [value]="selectedColor"
+            formControlName="themeColor"
+            (input)="onColorChange3($event)"
+          />
+            <!-- <span class="fs-6 ms-2">A</span> -->
+          </div>
+        </div>
+        </div>
+        
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                  </div>
+      </div>
+    </div>
+  </div>
+  
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
+  <button type="button" class="btn btn-primary" (click)="addTile('tile4'); modal.dismiss()" [disabled]="createKPIWidget3.invalid" *ngIf="!isEditMode">Save</button> <!-- Save button shown only in add mode -->
+  <button type="button" class="btn btn-warning" (click)="updateTile3(); modal.dismiss()"  *ngIf="isEditMode">Update</button> <!-- Update button shown only in edit mode -->
+</div>
+</div>
+</ng-template>
+<ng-template #KPIModal4 let-modal>
+<div class="modal-header">
+  <h4 class="modal-title">KPI Widget-5</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+</div>
+<div class="fv-row" [formGroup]="createKPIWidget4">
+  <div class="modal-body">
+    <div class="card-body pt-0">
+
+      <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap" id="myTab_settings1" role="tablist">
+        <div class="col-6" role="Data">
+          <li class="nav-item">
+            <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab" aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Data</a>
+          </li>
+        </div>
+        <div class="col-6" role="Settings">
+          <li class="nav-item">
+            <a class="nav-link text-active-primary me-6" id="settings-tabpane" data-bs-toggle="tab" role="tab" aria-controls="settings-tab" aria-selected="false" (click)="selectedSettingsTab('settings-tab')">Settings</a>
+          </li>
+        </div>
+      </ul>
+
+      <div class="tab-content mt-3" id="modalTabsContent">
+        <!-- General Tab Content -->
+        <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'dataTab'}" id="dataTab" role="tabpanel" aria-labelledby="home-tab">
+      <div class="row g-3"> <!-- g-3 adds consistent gap between columns -->
+        <div class="col-md-4"> <!-- Column for the first dropdown -->
+          <label class="col-form-label fw-bold fs-6">Forms</label>
+          <ngx-select
+            [allowClear]="true"
+            name="icon"
+            formControlName="formlist"
+            [items]="listofDeviceIds"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Form"
+            (selectionChanges)="selectFormParams($event)"
+        > <!-- Ensures dropdown takes full width of column -->
+          </ngx-select>
+        </div>
+        <div class="col-md-4">
+          <label for="parameterName" class="col-form-label fw-bold fs-6">Parameter</label>
+          <ngx-select
+            id="parameterName"
+            [allowClear]="true"
+            formControlName="parameterName"
+            [items]="listofDynamicParam"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Parameter"
+            style="width: 100%;">
+          </ngx-select>
+        </div>
+  
+        <div class="col-md-4"> <!-- Column for the second dropdown -->
+          <label class="col-form-label fw-bold fs-6 required">Group By</label>
+          <ngx-select
+            [allowClear]="true"
+            name="icon"
+            formControlName="groupBy"
+            [items]="groupByOptions"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Group"
+     
+            class="w-100"> <!-- Ensures dropdown takes full width of column -->
+          </ngx-select>
+        </div>
+        <div class="fv-row">
+          <div class="row">
+              <div class="col-md-4"> <!-- Column for the first dropdown -->
+                  <label class="col-form-label fw-bold fs-6 required">Primary Value</label>
+                  <ngx-select
+                      [allowClear]="true"
+                      name="primary-icon"
+                      formControlName="primaryValue"
+                      [items]="showValues"
+                      optionValueField="value"
+                      optionTextField="text"
+                      placeholder="Select Group"
+                      class="w-100"> <!-- Ensures dropdown takes full width of column -->
+                  </ngx-select>
+              </div>
+
+
+
+              <div class="col-md-4" *ngIf="primaryValue4?.value === 'Constant'">
+                <label for="constant12" class="col-form-label fw-bold fs-6 required">Constant</label>
+                <input
+                  id="constant4"
+                  type="number"
+                  class="form-control form-control-solid"
+                  placeholder="Select constant"
+                  formControlName="constantValue"
+                  (change)="onValueChange3($event)" 
+                />
+              </div>
+              <div class="col-md-4"> <!-- Column for the second dropdown -->
+                  <label class="col-form-label fw-bold fs-6 required">Compare From</label>
+                  <ngx-select
+                      [allowClear]="true"
+                      name="secondary-icon"
+                      formControlName="CompareTile"
+                      [items]="showValues"
+                      optionValueField="value"
+                      optionTextField="text"
+                      placeholder="Select ComparisionValue"
+                      class="w-100"> <!-- Ensures dropdown takes full width of column -->
+                  </ngx-select>
+              </div>
+
+              <div class="col-md-4"> <!-- Column for the second dropdown -->
+                <label class="col-form-label fw-bold fs-6 required">Compare To</label>
+                <ngx-select
+                    [allowClear]="true"
+                    name="secondary-icon"
+                    formControlName="WithCompareTile"
+                    [items]="showValues"
+                    optionValueField="value"
+                    optionTextField="text"
+                    placeholder="Select ComparisionValue"
+                    class="w-100"> <!-- Ensures dropdown takes full width of column -->
+                </ngx-select>
+            </div>
+
+
+
+    
+    
+              <div class="col-md-4">
+                <label for="groupByFormat" class="col-form-label fw-bold fs-6 required">GroupByFormat</label>
+                <input
+                  id="groupByFormat"
+                  type="text"
+                  class="form-control form-control-solid"
+                  placeholder="Select GroupByFormat"
+                  [formControl]="groupByFormatControl4" 
+                  (click)="openModalCalender4()"
+                  readonly /> <!-- Make it readonly to prevent manual input -->
+              
+    
+              </div>
+              <div class="col-md-4"> <!-- Column for the second dropdown -->
+                <label class="col-form-label fw-bold fs-6 required">Secondary Value</label>
+                <ngx-select
+                    [allowClear]="true"
+                    name="secondary-icon"
+                    formControlName="secondaryValue"
+                    [items]="showValues"
+                    optionValueField="value"
+                    optionTextField="text"
+                    placeholder="Select Secondary Value"
+                    class="w-100"> <!-- Ensures dropdown takes full width of column -->
+                </ngx-select>
+            </div>
+
+            <div class="col-md-4" *ngIf="showIdField">
+              <label for="id" class="col-form-label fw-bold fs-6 required">ID</label>
+              <input
+                id="id"
+                type="number"
+                class="form-control form-control-solid"
+                placeholder="Enter ID"
+                formControlName="widgetid" 
+              />
+            </div>
+
+            <div class="col-md-4" >
+              <label for="constant" class="col-form-label fw-bold fs-6 required">Processed Value</label>
+              <input
+                type="text"
+                class="form-control form-control-solid"
+                placeholder="Select Processed Value"
+                formControlName="processed_value"
+              />
+            </div>
+          </div>
+      </div>
+      
+      </div>
+        </div>
+
+        <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab" role="tabpanel" aria-labelledby="settings-tabpane">
+          <!-- Themes Section -->
+          <div class="row g-3">
+          <div class="col-md-6">
+            <label class="col-form-label fw-bold fs-6">Themes:</label>
+            <div class="color-boxes">
+              <div
+              *ngFor="let theme of themes"
+              class="color-box"
+              [ngStyle]="{ 'background-color': theme.color }"
+              (click)="toggleCheckbox4(theme)"  
+              [class.checked]="theme.selected"
+            >
+              <div *ngIf="theme.selected" class="checkmark">✔</div>
+            </div>
+            
+            </div>
+          </div>
+          
+          <!-- Custom Color Picker Section -->
+          <div class="col-md-6">
+            <label class="col-form-label fw-bold fs-6">Custom:</label>
+            <div class="d-flex align-items-center">
+              <input
+              type="color"
+              id="customColor"
+              class="form-control form-control-solid"
+              style="width: 40px; height: 40px;"
+              [value]="selectedColor"
+              formControlName="themeColor"
+              (input)="onColorChange4($event)"
+            />
+              <!-- <span class="fs-6 ms-2">A</span> -->
+            </div>
+          </div>
+          </div>
+          
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+      </div>
+
+
+    </div>
+  </div>
+  
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
+  <button type="button" class="btn btn-primary" (click)="addTile('tile5'); modal.dismiss()" [disabled]="createKPIWidget4.invalid" *ngIf="!isEditMode">Save</button> <!-- Save button shown only in add mode -->
+  <button type="button" class="btn btn-warning" (click)="updateTile4(); modal.dismiss()"  *ngIf="isEditMode">Update</button> <!-- Update button shown only in edit mode -->
+</div>
+</div>
+</ng-template>
+
+
+<ng-template #KPIModal5 let-modal>
+<div class="modal-header">
+  <h4 class="modal-title">KPI Widget-6</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+</div>
+<div class="fv-row" [formGroup]="createKPIWidget5">
+  <div class="modal-body">
+    <div class="card-body pt-0">
+
+
+      <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap" id="myTab_settings1" role="tablist">
+        <div class="col-6" role="Data">
+          <li class="nav-item">
+            <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab" aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Data</a>
+          </li>
+        </div>
+        <div class="col-6" role="Settings">
+          <li class="nav-item">
+            <a class="nav-link text-active-primary me-6" id="settings-tabpane" data-bs-toggle="tab" role="tab" aria-controls="settings-tab" aria-selected="false" (click)="selectedSettingsTab('settings-tab')">Settings</a>
+          </li>
+        </div>
+      </ul>
+
+      <div class="tab-content mt-3" id="modalTabsContent">
+        <!-- General Tab Content -->
+        <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'dataTab'}" id="dataTab" role="tabpanel" aria-labelledby="home-tab">
+      <div class="row g-3"> <!-- g-3 adds consistent gap between columns -->
+        <div class="col-md-4"> <!-- Column for the first dropdown -->
+          <label class="col-form-label fw-bold fs-6">Forms</label>
+          <ngx-select
+            [allowClear]="true"
+            name="icon"
+            formControlName="formlist"
+            [items]="listofDeviceIds"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Form"
+            (selectionChanges)="selectFormParams($event)"
+        > <!-- Ensures dropdown takes full width of column -->
+          </ngx-select>
+        </div>
+        <div class="col-md-4">
+          <label for="parameterName" class="col-form-label fw-bold fs-6">Parameter</label>
+          <ngx-select
+            id="parameterName"
+            [allowClear]="true"
+            formControlName="parameterName"
+            [items]="listofDynamicParam"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Parameter"
+            style="width: 100%;">
+          </ngx-select>
+        </div>
+  
+        <div class="col-md-4"> <!-- Column for the second dropdown -->
+          <label class="col-form-label fw-bold fs-6 required">Group By</label>
+          <ngx-select
+            [allowClear]="true"
+            name="icon"
+            formControlName="groupBy"
+            [items]="groupByOptions"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Group"
+     
+            class="w-100"> <!-- Ensures dropdown takes full width of column -->
+          </ngx-select>
+        </div>
+        <div class="fv-row">
+          <div class="row">
+              <div class="col-md-4"> <!-- Column for the first dropdown -->
+                  <label class="col-form-label fw-bold fs-6 required">Primary Value</label>
+                  <ngx-select
+                      [allowClear]="true"
+                      name="primary-icon"
+                      formControlName="primaryValue"
+                      [items]="showValues"
+                      optionValueField="value"
+                      optionTextField="text"
+                      placeholder="Select Group"
+                      class="w-100"> <!-- Ensures dropdown takes full width of column -->
+                  </ngx-select>
+              </div>
+
+              <div class="col-md-4" *ngIf="primaryValue5?.value === 'Constant'">
+                <label for="constant12" class="col-form-label fw-bold fs-6 required">Constant</label>
+                <input
+                  id="constant5"
+                  type="number"
+                  class="form-control form-control-solid"
+                  placeholder="Select constant"
+                  formControlName="constantValue"
+                  (change)="onValueChange5($event)" 
+                />
+              </div>
+              <div class="col-md-4"> <!-- Column for the second dropdown -->
+                  <label class="col-form-label fw-bold fs-6 required">Secondary Value</label>
+                  <ngx-select
+                      [allowClear]="true"
+                      name="secondary-icon"
+                      formControlName="secondaryValue"
+                      [items]="showValues"
+                      optionValueField="value"
+                      optionTextField="text"
+                      placeholder="Select Secondary Value"
+                      class="w-100"> <!-- Ensures dropdown takes full width of column -->
+                  </ngx-select>
+              </div>
+
+              <div class="col-md-4"> <!-- Column for the second dropdown -->
+                <label class="col-form-label fw-bold fs-6 required">Tertiary Value</label>
+                <ngx-select
+                    [allowClear]="true"
+                    name="secondary-icon"
+                    formControlName="secondaryValueNested"
+                    [items]="showValues"
+                    optionValueField="value"
+                    optionTextField="text"
+                    placeholder="Select Secondary Value"
+                    class="w-100"> <!-- Ensures dropdown takes full width of column -->
+                </ngx-select>
+            </div>
+
+
+
+    
+    
+              <div class="col-md-4">
+                <label for="groupByFormat" class="col-form-label fw-bold fs-6 required">GroupByFormat</label>
+                <input
+                  id="groupByFormat"
+                  type="text"
+                  class="form-control form-control-solid"
+                  placeholder="Select GroupByFormat"
+                  [formControl]="groupByFormatControl5" 
+                  (click)="openModalCalender5()"
+                  readonly /> <!-- Make it readonly to prevent manual input -->
+              
+    
+              </div>
+
+
+              <div class="col-md-4" *ngIf="showIdField">
+                <label for="id" class="col-form-label fw-bold fs-6 required">ID</label>
+                <input
+                  id="id"
+                  type="number"
+                  class="form-control form-control-solid"
+                  placeholder="Enter ID"
+                  formControlName="widgetid" 
+                />
+              </div>
+
+              <div class="col-md-4" >
+                <label for="constant" class="col-form-label fw-bold fs-6 required">Processed Value</label>
+                <input
+                  type="text"
+                  class="form-control form-control-solid"
+                  placeholder="Select Processed Value"
+                  formControlName="processed_value"
+                />
+              </div>
+          </div>
+      </div>
+      
+      </div>
+        </div>
+
+        <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab" role="tabpanel" aria-labelledby="settings-tabpane">
+          <!-- Themes Section -->
+          <div class="row g-3">
+          <div class="col-md-6">
+            <label class="col-form-label fw-bold fs-6">Themes:</label>
+            <div class="color-boxes">
+              <div
+              *ngFor="let theme of themes"
+              class="color-box"
+              [ngStyle]="{ 'background-color': theme.color }"
+              (click)="toggleCheckbox5(theme)"  
+              [class.checked]="theme.selected"
+            >
+              <div *ngIf="theme.selected" class="checkmark">✔</div>
+            </div>
+            
+            </div>
+          </div>
+          
+          <!-- Custom Color Picker Section -->
+          <div class="col-md-6">
+            <label class="col-form-label fw-bold fs-6">Custom:</label>
+            <div class="d-flex align-items-center">
+              <input
+              type="color"
+              id="customColor"
+              class="form-control form-control-solid"
+              style="width: 40px; height: 40px;"
+              [value]="selectedColor"
+              formControlName="themeColor"
+              (input)="onColorChange5($event)"
+            />
+              <!-- <span class="fs-6 ms-2">A</span> -->
+            </div>
+          </div>
+          </div>
+          
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+      </div>
+    </div>
+  </div>
+  
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
+  <button type="button" class="btn btn-primary" (click)="addTile('tile6'); modal.dismiss()" [disabled]="createKPIWidget5.invalid" *ngIf="!isEditMode">Save</button> <!-- Save button shown only in add mode -->
+  <button type="button" class="btn btn-warning" (click)="updateTile5(); modal.dismiss()" *ngIf="isEditMode">Update</button> <!-- Update button shown only in edit mode -->
+</div>
+</div>
+</ng-template>
+
+<ng-template #KPIModal6 let-modal>
+<div class="modal-header">
+  <h4 class="modal-title">KPI Widget-7</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+</div>
+<div class="fv-row" [formGroup]="createKPIWidget6">
+  <div class="modal-body">
+    <div class="card-body pt-0">
+      <div class="row g-3"> <!-- g-3 adds consistent gap between columns -->
+        <div class="col-md-4"> <!-- Column for the first dropdown -->
+          <label class="col-form-label fw-bold fs-6">Forms</label>
+          <ngx-select
+            [allowClear]="true"
+            name="icon"
+            formControlName="formlist"
+            [items]="listofDeviceIds"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Form"
+            (selectionChanges)="selectFormParams($event)"
+        > <!-- Ensures dropdown takes full width of column -->
+          </ngx-select>
+        </div>
+        <div class="col-md-4">
+          <label for="parameterName" class="col-form-label fw-bold fs-6">Parameter</label>
+          <ngx-select
+            id="parameterName"
+            [allowClear]="true"
+            formControlName="parameterName"
+            [items]="listofDynamicParam"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Parameter"
+            style="width: 100%;">
+          </ngx-select>
+        </div>
+        <div class="col-md-4"> <!-- Column for the first dropdown -->
+          <label class="col-form-label fw-bold fs-6 required">Value</label>
+          <ngx-select
+              [allowClear]="true"
+              name="primary-icon"
+              formControlName="value"
+              [items]="showValues"
+              optionValueField="value"
+              optionTextField="text"
+              placeholder="Select Group"
+              (change)="onValue($event)"
+              class="w-100"> <!-- Ensures dropdown takes full width of column -->
+      
+          </ngx-select>
+      </div>
+
+      <div class="col-md-4" *ngIf="value1?.value === 'Constant'">
+        <label for="constant12" class="col-form-label fw-bold fs-6 required">Constant</label>
+        <input
+          id="constant6"
+          type="number"
+          class="form-control form-control-solid"
+          placeholder="Select constant"
+          formControlName="constantValuevalue"
+          (change)="onValueChangevalue1($event)" 
+        />
+      </div>
+      <div class="col-md-4" *ngIf="value1?.value && value1?.value !== 'Constant'">
+        <label for="percentageValue" class="col-form-label fw-bold fs-6 required">Percentage</label>
+        <div style="display: flex; align-items: center;">
+            <input
+                id="percentageValue"
+                type="number"
+                class="form-control form-control-solid"
+                placeholder="Enter percentage"
+                formControlName="percentageValue" 
+                style="flex: 1; margin-right: 5px;" 
+            />
+            <span>%</span> <!-- Displays percentage sign next to the input -->
+        </div>
+    </div>
+    
+  
+        <!-- <div class="col-md-4"> 
+          <label class="col-form-label fw-bold fs-6 required">Group By</label>
+          <ngx-select
+            [allowClear]="true"
+            name="icon"
+            formControlName="groupBy"
+            [items]="groupByOptions"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Group"
+     
+            class="w-100"> 
+          </ngx-select>
+        </div> -->
+        <div class="fv-row">
+          <div class="row">
+
+
+            <div class="col-md-4"> <!-- Column for the first dropdown -->
+              <label class="col-form-label fw-bold fs-6 required">Target</label>
+              <ngx-select
+                  [allowClear]="true"
+                  name="primary-icon"
+                  formControlName="Target"
+                  [items]="showValues"
+                  optionValueField="value"
+                  optionTextField="text"
+                  placeholder="Select Group"
+                  (change)="onTarget($event)"
+                  class="w-100"> <!-- Ensures dropdown takes full width of column -->
+              </ngx-select>
+          </div>
+
+
+
+          <div class="col-md-4" *ngIf="Target1?.value === 'Constant'">
+            <label for="constant12" class="col-form-label fw-bold fs-6 required">Constant</label>
+            <input
+              id="constant6"
+              type="number"
+              class="form-control form-control-solid"
+              placeholder="Select constant"
+              formControlName="constantValueTarget"
+              (change)="onValueChange6($event)" 
+            />
+          </div>
+          <div class="col-md-4" *ngIf="Target1?.value && Target1?.value !== 'Constant'">
+            <label for="percentageValue" class="col-form-label fw-bold fs-6 required">Percentage</label>
+            <div style="display: flex; align-items: center;">
+                <input
+                    id="percentageValueTarget"
+                    type="number"
+                    class="form-control form-control-solid"
+                    placeholder="Enter percentage"
+                    formControlName="percentageValueTarget" 
+                    style="flex: 1; margin-right: 5px;" 
+                />
+                <span>%</span> <!-- Displays percentage sign next to the input -->
+            </div>
+        </div>
+
+          <div class="col-md-4"> <!-- Column for the first dropdown -->
+            <label class="col-form-label fw-bold fs-6 required">Max Range</label>
+            <ngx-select
+                [allowClear]="true"
+                name="primary-icon"
+                formControlName="MaxRange"
+                [items]="showValues"
+                optionValueField="value"
+                optionTextField="text"
+                placeholder="Select Group"
+                (change)="onMaxRange1($event)"
+                class="w-100"> <!-- Ensures dropdown takes full width of column -->
+            </ngx-select>
+        </div>
+        <div class="col-md-4" *ngIf="MaxRange1?.value === 'Constant'">
+          <label for="constant12" class="col-form-label fw-bold fs-6 required">Constant</label>
+          <input
+            id="constant6"
+            type="number"
+            class="form-control form-control-solid"
+            placeholder="Select constant"
+            formControlName="constantValueMaxRange"
+            (change)="onValueChangeMaxRange1($event)" 
+          />
+        </div>
+        <div class="col-md-4" *ngIf="MaxRange1?.value && MaxRange1?.value !== 'Constant'">
+          <label for="percentageValue" class="col-form-label fw-bold fs-6 required">Percentage</label>
+          <div style="display: flex; align-items: center;">
+              <input
+                  id="percentageValueMaxRange"
+                  type="number"
+                  class="form-control form-control-solid"
+                  placeholder="Enter percentage"
+                  formControlName="percentageValueMaxRange" 
+                  style="flex: 1; margin-right: 5px;" 
+              />
+              <span>%</span> <!-- Displays percentage sign next to the input -->
+          </div>
+      </div>
+    
+    
+              <div class="col-md-4">
+                <label for="groupByFormat" class="col-form-label fw-bold fs-6 required">GroupByFormat</label>
+                <input
+                  id="groupByFormat"
+                  type="text"
+                  class="form-control form-control-solid"
+                  placeholder="Select GroupByFormat"
+                  [formControl]="groupByFormatControl6" 
+                  (click)="openModalCalender6()"
+                  readonly /> <!-- Make it readonly to prevent manual input -->
+              
+    
+              </div>
+
+              <div class="col-md-4" *ngIf="showIdField">
+                <label for="id" class="col-form-label fw-bold fs-6 required">ID</label>
+                <input
+                  id="id"
+                  type="number"
+                  class="form-control form-control-solid"
+                  placeholder="Enter ID"
+                  formControlName="widgetid" 
+                />
+              </div>
+          </div>
+      </div>
+      
+      </div>
+    </div>
+  </div>
+  
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
+  <button type="button" class="btn btn-primary" (click)="addTile('tile7'); modal.dismiss()"  *ngIf="!isEditMode">Save</button> <!-- Save button shown only in add mode -->
+  <button type="button" class="btn btn-warning" (click)="updateTile5(); modal.dismiss()" *ngIf="isEditMode">Update</button> <!-- Update button shown only in edit mode -->
+</div>
+</div>
+</ng-template>
+
+
+
 
 
 
