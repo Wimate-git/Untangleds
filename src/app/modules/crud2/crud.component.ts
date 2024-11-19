@@ -114,7 +114,7 @@ export class Crud2Component implements OnInit, AfterViewInit, OnDestroy{
           </button>`;
 
         const deleteButton = `
-          <button class="btn btn-icon btn-active-light-primary w-30px h-30px" data-action="delete" data-id="${full.P1}">
+          <button class="btn btn-icon btn-active-light-danger w-30px h-30px" data-action="delete" data-id="${full.P1}">
             <i class="ki-duotone ki-trash fs-3">
               <span class="path1"></span><span class="path2"></span>
               <span class="path3"></span><span class="path4"></span><span class="path5"></span>

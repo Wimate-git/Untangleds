@@ -104,6 +104,14 @@ export class ClientComponent implements OnInit {
 
   isLoading:boolean = false
 
+
+
+    //Upload Logos
+    selectedFiles: { [key: string]: File } = {};
+    imageUrls: string[] = [];
+    hover: boolean[] = [false, false, false, false];
+    temporderedUrls: any[] = [undefined, undefined, undefined, undefined];
+
  
   
 
@@ -1708,6 +1716,53 @@ showAlert(swalOptions: SweetAlertOptions) {
     }
     this.validEmail = true;
   }
+
+
+
+
+
+  //File upload logic is here
+  onFileUploaded(event: any, logoKey: string): void {
+    const files = event.target.files;
+    if (files.length > 0) {
+      // Add the file(s) to the selectedFiles object with key-value pair (logo1, logo2, etc.)
+      this.selectedFiles[logoKey] = files[0];
+      
+      // Preview the selected images by generating URLs for them
+      this.previewFiles();
+    }
+
+    console.log("ALl the selected files are here ",this.selectedFiles);
+  }
+
+  // Generate previews for selected files (URLs for displaying the image)
+  private previewFiles(): void {
+    // this.imageUrls = []; // Clear previous URLs
+    for (let key in this.selectedFiles) {
+      console.log("Key is here ",key);
+      const file = this.selectedFiles[key];
+      const objectURL = URL.createObjectURL(file);
+      // this.imageUrls.push(objectURL);
+
+
+
+      //Push to particular index
+       // Determine the index based on file name (e.g., imageInput2, imageInput4)
+       if (key?.includes('imageInput1')) {
+        this.temporderedUrls[0] = objectURL;  // Place imageInput1 at index 0
+      } else if (key?.includes('imageInput2')) {
+        this.temporderedUrls[1] = objectURL;  // Place imageInput2 at index 1
+      } else if (key?.includes('imageInput3')) {
+        this.temporderedUrls[2] = objectURL;  // Place imageInput3 at index 2
+      } else if (key?.includes('imageInput4')) {
+        this.temporderedUrls[3] = objectURL;  // Place imageInput4 at index 3
+      }
+
+
+      this.imageUrls = this.temporderedUrls
+    }
+  }
+
 
 
 }
