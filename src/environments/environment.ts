@@ -1,15 +1,8 @@
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
-const accessKeyId = 'AKIAQ4NXP4MBOXGQ7X4S';
-const secretAccessKey = 'PIPvbgyRh46F1W+QAcRjNYnYWP5mCO4oiSOrpxCS';
 export const environment = {
   production: false,
-
-  credentials :{
-    accessKeyId,
-    secretAccessKey
-  },
 
   cognito: {
     cognitoUserPoolId:"ap-south-1_aaPSwPS14",
