@@ -71,10 +71,10 @@
 
 
 
-<!--                            
-                                <div class="col-lg-4">
+        
+                                <div class="col-lg-4 mb-5">
                               
-                                    <label  class="col-lg-12 col-form-label fw-bold fs-6" for="imageInput1">Client Logo</label>
+                                    <label  class="fw-semibold fs-6 mb-2" for="imageInput1">Client Logo</label>
                                     <input type="file" id="imageInput1" class="form-control" (change)="onFileUploaded($event, 'imageInput1')" >
                                     
 
@@ -85,8 +85,8 @@
                                   <span><a *ngIf="imageUrls[0]" class="btn btn-sm btn-success fw-bolder ms-2 fs-8 py-1 px-3 " >Uploaded</a></span>
                             </div>
 
-                            <div class="col-lg-4">
-                                <label class="col-lg-12 col-form-label fw-bold fs-6" for="imageInput2">
+                            <div class="col-lg-4 mb-5">
+                                <label class="fw-semibold fs-6 mb-2" for="imageInput2">
                                     Favicon Logo</label>
                                 <input type="file" id="imageInput2" class="form-control" (change)="onFileUploaded($event, 'imageInput2')" >
                                 
@@ -99,9 +99,9 @@
                             </div>
 
 
-                            <div class="col-lg-4">
+                            <div class="col-lg-4 mb-5">
 
-                                <label class="col-lg-12 col-form-label fw-bold fs-6" for="imageInput3">Client Logo (Dark Theme)</label>
+                                <label class="fw-semibold fs-6 mb-2" for="imageInput3">Client Logo (Dark Theme)</label>
                                 <input type="file" id="imageInput3" class="form-control" (change)="onFileUploaded($event, 'imageInput3')" >
                                 
                             
@@ -113,8 +113,8 @@
                             </div>
 
 
-                            <div class="col-lg-4">
-                                <label class="col-lg-12 col-form-label fw-bold fs-6" for="imageInput4">
+                            <div class="col-lg-4 mb-5">
+                                <label class="fw-semibold fs-6 mb-2" for="imageInput4">
                                     Favicon Logo (Dark theme)</label>
                                 <input type="file" id="imageInput4" class="form-control" (change)="onFileUploaded($event, 'imageInput4')">
                               
@@ -124,11 +124,11 @@
                                 <span><a *ngIf="imageUrls[3]" class="btn btn-sm btn-success fw-bolder ms-2 fs-8 py-1 px-3 " >Uploaded</a></span>
                             </div>
 
- -->
+ 
 
 
     
-                                <div class="col-lg-4 ">
+                                <!-- <div class="col-lg-4 ">
     
                                     <div class="col-lg-12 form-group image-input image-input-outline">
                                         <label class=" fw-semibold fs-6 mb-2" for="imageInput">Client Logo
@@ -142,9 +142,9 @@
                                             src="{{base64textString_temp}}" *ngIf="base64textString_temp">
                                     </div>
     
-                                </div>
+                                </div> -->
     
-                                <div class="col-lg-4 ">
+                                <!-- <div class="col-lg-4 ">
                                     <div class="col-lg-12 form-group image-input image-input-outline">
                                         <label class=" fw-semibold fs-6 mb-2" for="imageInput1">Favicon Logo
                                             </label>
@@ -157,7 +157,7 @@
                                             src="{{base64textString_temp_logo1}}" *ngIf="base64textString_temp_logo1">
                                     </div>
     
-                                </div>
+                                </div> -->
     
                                 <div class="col-md-4">
                                     <label class="required fw-semibold fs-6 mb-2"> Client ID</label>
@@ -178,13 +178,8 @@
                                     </div>
     
                                 </div>
-    
-                            </div>
-                        </div>
-    
-                        <div class="container mb-7">
-                            <div class="row">
-    
+
+
                                 <div class="col-md-4">
                                     <label class="required fw-semibold fs-6 mb-2"> Client Name</label>
     
@@ -202,6 +197,14 @@
                                     </div>
     
                                 </div>
+    
+                            </div>
+                        </div>
+    
+                        <div class="container mb-7">
+                            <div class="row">
+    
+                           
     
                                 <div class="col-md-4">
                                     <label class="required fw-semibold fs-6 mb-2">Client
@@ -237,13 +240,9 @@
                                         Mobile number is required
                                     </div>
                                 </div>
-    
-    
-                            </div>
-                        </div>
-    
-                        <div class="container">
-                            <div class="row">
+
+
+
                                 <div class="col-md-4">
                                     <label class="required fw-semibold fs-6 mb-2"> Email
                                     </label>
@@ -271,6 +270,14 @@
     
                                 </div>
     
+    
+                            </div>
+                        </div>
+    
+                        <div class="container">
+                            <div class="row">
+                              
+    
                                 <div class="col-md-4">
                                     <label class=" fw-semibold fs-6 mb-2"> Telegram Channel ID
                                     </label>
@@ -295,6 +302,39 @@
                                       >
                                     <!-- (click)="showvaluemapping(createOSField.value.enableos)" -->
                                 </div>
+
+
+
+                                <div class="col-md-4 mt-3">
+                                    <label class="fw-semibold fs-6 mb-2">Client Permission</label>
+                                    
+                                    <div style="display: flex;gap:5px">
+    
+                                        <div class="mb-2">
+                                            <label class="fw-semibold fs-6 mb-2"><input
+                                                class="form-check-input" name="email_permi" type="checkbox"
+                                                formControlName="email_permission" /><span class="fw-bold ps-2 fs-6">Email
+                                            </span></label>
+                                        </div>
+                                    
+                                        <div class="mb-2">
+                                            <label class="fw-semibold fs-6 mb-2"><input
+                                                class="form-check-input" name="sms" type="checkbox"
+                                                formControlName="sms_permission" /><span class="fw-bold ps-2 fs-6">SMS
+                                            </span></label>
+                                        </div>
+                                    
+                                        <div class="mb-2">
+                                            <label class="fw-semibold fs-6 mb-2"><input
+                                                class="form-check-input" name="telegram_permission" type="checkbox"
+                                                formControlName="telegram_permission" /><span class="fw-bold ps-2 fs-6">Telegram
+                                            </span></label>
+                                        </div>
+    
+    
+                                    </div>
+                                   
+                                </div>
                             </div>
                         </div>
     
@@ -302,36 +342,7 @@
                         <div class="container mt-3">
 
                             <div class="row" style="align-items: end;">    
-                            <div class="col-md-4 mt-3">
-                                <label class="fw-semibold fs-6 mb-2">Client Permission</label>
-                                
-                                <div style="display: flex;gap:5px">
-
-                                    <div class="mb-2">
-                                        <label class="fw-semibold fs-6 mb-2"><input
-                                            class="form-check-input" name="email_permi" type="checkbox"
-                                            formControlName="email_permission" /><span class="fw-bold ps-2 fs-6">Email
-                                        </span></label>
-                                    </div>
-                                
-                                    <div class="mb-2">
-                                        <label class="fw-semibold fs-6 mb-2"><input
-                                            class="form-check-input" name="sms" type="checkbox"
-                                            formControlName="sms_permission" /><span class="fw-bold ps-2 fs-6">SMS
-                                        </span></label>
-                                    </div>
-                                
-                                    <div class="mb-2">
-                                        <label class="fw-semibold fs-6 mb-2"><input
-                                            class="form-check-input" name="telegram_permission" type="checkbox"
-                                            formControlName="telegram_permission" /><span class="fw-bold ps-2 fs-6">Telegram
-                                        </span></label>
-                                    </div>
-
-
-                                </div>
-                               
-                            </div>
+                         
 
 
 

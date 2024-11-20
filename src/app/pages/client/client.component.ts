@@ -8,8 +8,9 @@ import { APIService } from "src/app/API.service";
 import Swal, { SweetAlertOptions } from "sweetalert2";
 import { SharedService } from "../shared.service";
 import { Config } from "datatables.net";
-import { SwalComponent } from "@sweetalert2/ngx-sweetalert2";
 
+import { SwalComponent } from "@sweetalert2/ngx-sweetalert2";
+import { S3bucketService } from "src/app/modules/auth/services/s3bucket.service";
 
 
 interface ListItem {
@@ -131,7 +132,11 @@ export class ClientComponent implements OnInit {
     }
 
 
-    onSubmit(event:any){
+    async onSubmit(event:any){
+
+
+      this.uploadFiles()
+
      
       console.log("Submitted is clicked ",event);
       if(event.type == 'submit' && this.editOperation == false){
@@ -143,7 +148,7 @@ export class ClientComponent implements OnInit {
     }
 
     
-    constructor(private fb: UntypedFormBuilder,private cd:ChangeDetectorRef,private api: APIService,private toast: MatSnackBar,private companyconfig:SharedService){
+    constructor(private fb: UntypedFormBuilder,private cd:ChangeDetectorRef,private api: APIService,private toast: MatSnackBar,private companyconfig:SharedService,private S3service:S3bucketService){
 
     }
   
@@ -943,7 +948,11 @@ export class ClientComponent implements OnInit {
       if (value) {
         //alert('New configuration created successfully');
 
+
+       
+
         await this.createLookUpRdt(items,1,"client"+"#lookup")
+      
 
         if(customUrl != '' && customUrl != null){
           const tempItems = {
@@ -956,7 +965,7 @@ export class ClientComponent implements OnInit {
         }
 
 
-
+       
 
         this.showAlert(successAlert)
 
@@ -1191,7 +1200,8 @@ showAlert(swalOptions: SweetAlertOptions) {
   
           }
           else{
-            if(customUrl != ''){
+            console.log("Updating the url is here ",customUrl);
+            if(customUrl != '' && customUrl != null){
               const tempItems = {
                 PK: customUrl,
                 SK: 1,
@@ -1201,6 +1211,7 @@ showAlert(swalOptions: SweetAlertOptions) {
               await this.api.UpdateMaster(tempItems)
             }
           }
+
   
 
         this.showAlert(successAlert)
@@ -1359,6 +1370,11 @@ showAlert(swalOptions: SweetAlertOptions) {
 
     console.log('deleteuser is called', value);
 
+
+    this.S3service.removeFolder(`clientLogos/${value}`)
+
+    // this.files = [];
+
     if (this.clientSK) {
 
       this.allClientDetails = {
@@ -1401,10 +1417,31 @@ showAlert(swalOptions: SweetAlertOptions) {
 
 
 
-
+  // Utility to reset file input by ID
+  resetFileInput(inputId: string): void {
+    const inputElement = document.getElementById(inputId) as HTMLInputElement;
+    if (inputElement) {
+      inputElement.value = ''; // Reset the file input
+    }
+  }
 
 
   openModal(getValues: any, getKey: any) {
+
+
+
+       // Reset file input values by accessing them by their ID
+       this.resetFileInput('imageInput1');
+       this.resetFileInput('imageInput2');
+       this.resetFileInput('imageInput3');
+       this.resetFileInput('imageInput4');
+  
+  
+      this.selectedFiles = {}
+  
+      this.imageUrls = []
+  
+      this.temporderedUrls = [undefined, undefined, undefined, undefined];
 
     this.devicesArray = []
         this.tempUrl = ''
@@ -1509,10 +1546,60 @@ showAlert(swalOptions: SweetAlertOptions) {
           'enableClient': getValues.enableClient,
           // 'metadata': this.updateItem(parsed)
         })
+
+
+        this.getFileUrls(getValues.clientID)
+
+        // const filesUrls = this.S3service.getFilesFromFolder(getValues.clientID)
+
+
       }
+
     }
     this.cd.detectChanges()
   }
+
+
+
+  async getFileUrls(getValues:any){
+    // Initialize an array with `undefined` values to hold the images in specific order
+    
+    let orderedUrls: any[] = [undefined, undefined, undefined, undefined];
+
+    const filesUrls = this.S3service.getFilesFromFolder(getValues)
+
+
+    for(let fileName of await filesUrls){
+       // Determine the index based on file name (e.g., imageInput2, imageInput4)
+       if (fileName?.includes('imageInput1')) {
+        orderedUrls[0] = fileName;  // Place imageInput1 at index 0
+      } else if (fileName?.includes('imageInput2')) {
+        orderedUrls[1] = fileName;  // Place imageInput2 at index 1
+      } else if (fileName?.includes('imageInput3')) {
+        orderedUrls[2] = fileName;  // Place imageInput3 at index 2
+      } else if (fileName?.includes('imageInput4')) {
+        orderedUrls[3] = fileName;  // Place imageInput4 at index 3
+      }
+    }
+
+
+      // After processing all files, assign the ordered URLs to the imageUrls array
+      this.imageUrls = orderedUrls;
+      this.temporderedUrls = orderedUrls
+
+
+       // Log the ordered image URLs for debugging
+      console.log('Ordered File URLs:', this.imageUrls);
+
+
+      this.cd.detectChanges()
+   
+  }
+
+
+
+
+
 
   // updateItem(getValues: any): UntypedFormArray {
   //   //console.log('get', getValues);
@@ -1759,9 +1846,105 @@ showAlert(swalOptions: SweetAlertOptions) {
       }
 
 
-      this.imageUrls = this.temporderedUrls
+      // this.imageUrls = this.temporderedUrls
+
+        // After all images are processed, update the imageUrls array
+      this.imageUrls = [...this.temporderedUrls];  // Make sure to spread the array to trigger change detection
     }
   }
+
+
+  async uploadFiles() {
+    if (Object.keys(this.selectedFiles).length === 0) {
+      return; // No files selected
+    }
+
+    const folderPath = `clientLogos/${this.createClientField.get('clientID')?.value}/`; // Define the S3 folder path
+    let uploadedUrls: string[] = [];
+
+    // Loop through all files in the selectedFiles object and upload them one by one
+    for (let key in this.selectedFiles) {
+      const file = this.selectedFiles[key];
+
+      // Generate custom file names (e.g., logo1.jpg, logo2.png, etc.)
+      const fileExtension = file.name.split('.').pop();
+      const customFileName = `${key}.${fileExtension}`;
+      const path = `${folderPath}${customFileName}`;
+
+      console.log('Path is here: ', path);
+      console.log('FileName is here: ', customFileName);
+
+      try {
+        const baseName = key;  // Use the base name without the extension
+        
+        // Delete existing files with similar base name
+        await this.S3service.deleteExistingFiles(folderPath, baseName);
+
+        
+
+        // Upload the new file to S3
+        const uploadedFileUrl = await this.S3service.uploadFile(path, file);
+
+        // Push the uploaded file URL to the uploadedUrls array
+        uploadedUrls.push(uploadedFileUrl);
+
+        // Once all files are uploaded, update the imageUrls array (or log them)
+        if (uploadedUrls.length === Object.keys(this.selectedFiles).length) {
+          this.imageUrls = uploadedUrls; // Store the S3 keys for previews or further use
+          console.log('All files uploaded successfully:', uploadedUrls);
+        }
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      }
+    }
+  }
+
+
+
+  // async getFilesFromFolder(clientName: string) {
+  //   try {
+  //     const folderPath = `clientLogos/${clientName}`; // Define the folder path
+  //     const result = await Storage.list(folderPath, { level: 'public' }); // List all files in the folder
+  
+  //     // Initialize an array with `undefined` values to hold the images in specific order
+  //     let orderedUrls: any[] = [undefined, undefined, undefined, undefined];
+  
+  //     // Map through the result to get URLs for each file
+  //     await Promise.all(result.map(async (file) => {
+  //       const filePath: any = file.key;  // The path of each file in the folder
+  //       const fileUrl = await Storage.get(filePath);  // Get the URL for each file
+  
+  //       // Extract the file name to determine where to place it in the orderedUrls array
+  //       const fileName = file.key?.split('/').pop(); // Get just the filename from the key (remove the path part)
+  
+  //       console.log("Filename is here ",fileName);
+  
+  //       // Determine the index based on file name (e.g., imageInput2, imageInput4)
+  //       if (fileName?.includes('imageInput1')) {
+  //         orderedUrls[0] = fileUrl;  // Place imageInput1 at index 0
+  //       } else if (fileName?.includes('imageInput2')) {
+  //         orderedUrls[1] = fileUrl;  // Place imageInput2 at index 1
+  //       } else if (fileName?.includes('imageInput3')) {
+  //         orderedUrls[2] = fileUrl;  // Place imageInput3 at index 2
+  //       } else if (fileName?.includes('imageInput4')) {
+  //         orderedUrls[3] = fileUrl;  // Place imageInput4 at index 3
+  //       }
+  //     }));
+  
+  //     // After processing all files, assign the ordered URLs to the imageUrls array
+  //     this.imageUrls = orderedUrls;
+  //     this.temporderedUrls = orderedUrls
+  
+  //     // Log the ordered image URLs for debugging
+  //     console.log('Ordered File URLs:', this.imageUrls);
+  
+  //     // Trigger change detection to ensure the UI is updated
+  //     this.cd.detectChanges();
+  
+  //   } catch (error) {
+  //     console.error('Error fetching files:', error);
+  //   }
+  // }
 
 
 

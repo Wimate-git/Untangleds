@@ -10,3 +10,30 @@
     transition: 0.5s;
 } 
 
+.image-preview {
+  display: none;
+  transition: opacity 0.3s ease;
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%); /* Center the image */
+  z-index: 10;
+}
+
+/* Show the preview when hovering over the file input */
+.show-preview {
+  display: block;
+}
+
+/* Positioning adjustments for each file input */
+#imageInput1:hover + .image-preview,
+#imageInput2:hover + .image-preview,
+#imageInput3:hover + .image-preview,
+#imageInput4:hover + .image-preview {
+  display: block;
+}
+
+.image-preview img {
+  max-width: 120px;
+  max-height: 120px;
+}
