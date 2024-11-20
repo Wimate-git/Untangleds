@@ -16,12 +16,6 @@ export class S3bucketService {
     // // Initialize the S3 client with your region
     // this.s3 = new S3Client({ region: this.region });
 
-    // Hard-coded credentials (for testing only)
-    // const hardCodedCredentials: any = {
-    //   accessKeyId: 'AKIAQ4NXP4MBOXGQ7X4S',
-    //   secretAccessKey: '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'
-    // };
-
     this.s3 = new S3Client({
       region: this.region,
       credentials: environment.credentials,  // Use the hard-coded credentials here
