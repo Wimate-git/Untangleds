@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { S3Client, PutObjectCommand, DeleteObjectCommand, ListObjectsV2Command, S3ClientConfig, DeleteObjectsCommand } from '@aws-sdk/client-s3';
+import { env } from 'process';
 import { from } from 'rxjs'; // Using RxJS for async handling (optional)
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -15,14 +17,14 @@ export class S3bucketService {
     // this.s3 = new S3Client({ region: this.region });
 
     // Hard-coded credentials (for testing only)
-    const hardCodedCredentials: any = {
-      accessKeyId: 'AKIAQ4NXP4MBG5CQI3NN',
-      secretAccessKey: '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'
-    };
+    // const hardCodedCredentials: any = {
+    //   accessKeyId: 'AKIAQ4NXP4MBOXGQ7X4S',
+    //   secretAccessKey: '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'
+    // };
 
     this.s3 = new S3Client({
       region: this.region,
-      credentials: hardCodedCredentials,  // Use the hard-coded credentials here
+      credentials: environment.credentials,  // Use the hard-coded credentials here
     });
   }
 
