@@ -15,14 +15,23 @@ export class SidebarLogoComponent implements OnInit, OnDestroy {
   @Input() toggleEnabled: boolean ;
   @Input() toggleType: string = '';
   @Input() toggleState: string = '';
-  currentLayoutType: LayoutType | null;
+  currentLayoutType: any;
+
+  private linkElement: HTMLLinkElement
+  private splashScreenLogoElement: HTMLImageElement;
 
   toggleAttr: string;
   clientLogo: any = '';
+  isDarkMode: any = '';
 
-  constructor(private layout: LayoutService,private cd: ChangeDetectorRef,private getImage:ClientLogoService) {}
+  constructor(private layout: LayoutService,private cd: ChangeDetectorRef,private getImage:ClientLogoService) {
+    this.splashScreenLogoElement = document.getElementById('splash-screen-logo') as HTMLImageElement;
+    this.linkElement = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
+  }
 
   async ngOnInit() {
+
+    this.isDarkMode = localStorage.getItem('kt_theme_mode_menu')
 
       console.log("Sidebar executed");
 
@@ -31,13 +40,30 @@ export class SidebarLogoComponent implements OnInit, OnDestroy {
       .asObservable()
       .subscribe((layout) => {
         this.currentLayoutType = layout;
+        if (this.linkElement && this.clientLogo) {
+          if(this.isDarkMode == 'light' || this.isDarkMode == null){
+            this.linkElement.href = this.clientLogo[1]
+          }
+          else{
+            this.linkElement.href = this.clientLogo[3];
+          }
+        }
       });
     this.unsubscribe.push(layoutSubscr);
 
     // this.clientLogo = await this.getImage.getClientLogo()
 
-    this.clientLogo = JSON.parse(localStorage.getItem('clientLogo') || '');
-    console.log("Client Logo from local Storage is:", this.clientLogo);
+    this.clientLogo = await this.getImage.getClientLogo()
+
+
+    if (this.linkElement && this.clientLogo) {
+      if(this.isDarkMode == 'light' || this.isDarkMode == null){
+        this.linkElement.href = this.clientLogo[1]
+      }
+      else{
+        this.linkElement.href = this.clientLogo[3];
+      }
+    }
 
     // this.clientLogo = ''
 

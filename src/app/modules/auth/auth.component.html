@@ -13,7 +13,7 @@
   <!--begin::Body-->
   <div class="d-flex flex-column flex-lg-row-fluid w-lg-50 p-10 order-2 order-lg-1">
     <!--begin::Form-->
-    <div class="d-flex flex-center flex-column flex-lg-row-fluid">
+    <div class="d-flex flex-center flex-column flex-lg-row-fluid mode">
       <!--begin::Wrapper-->
       <div class="<?php echo $params['wrapperClass']?> p-10">
         <router-outlet></router-outlet>
@@ -62,7 +62,7 @@
     <div class="d-flex flex-column flex-center py-15 px-5 px-md-15 w-100">
       <!--begin::Logo-->
       <a routerLink="/" class="mb-12" *ngIf="showLogo">
-        <img alt="Logo" [src]="clientLogo == '' ? logoUrl : clientLogo" class="h-75px" [ngClass]="{'custom-style': clientLogo === ''}" />
+        <img alt="Logo" [src]="clientLogo == [] || clientLogo == null || clientLogo == undefined || clientLogo == '' ? './assets/media/misc/Wimate_Logo.png' : currentLayoutType !== 'rgb(15, 16, 20)'?clientLogo && clientLogo[0] && clientLogo[0]:clientLogo && clientLogo && clientLogo[2] && clientLogo[2]" class="h-75px" [ngClass]="{'custom-style': clientLogo === ''}" />
       </a>
       <!--end::Logo-->
 
