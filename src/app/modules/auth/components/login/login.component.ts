@@ -95,8 +95,20 @@ export class LoginComponent implements OnInit, OnDestroy {
   async submit() {
 
 
-    const clientID = JSON.parse(localStorage.getItem('clientFetched') || '')
-    // console.log("Client iD in login is here ",clientID)
+    let clientID = '';
+
+    try {
+        // Try to parse the value from localStorage
+        const clientFetched = localStorage.getItem('clientFetched');
+        if (clientFetched) {
+            clientID = JSON.parse(clientFetched);  // Parsing only if the value is not null
+        }
+    } catch (error) {
+        console.error('Error parsing clientFetched from localStorage:', error);
+    }
+
+    // Proceed with your logic
+    console.log("Client ID in login is here", clientID);
 
     await signOut()
     .then(() => {
