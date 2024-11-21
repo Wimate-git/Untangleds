@@ -11,6 +11,7 @@ import { Config } from "datatables.net";
 
 import { SwalComponent } from "@sweetalert2/ngx-sweetalert2";
 import { S3bucketService } from "src/app/modules/auth/services/s3bucket.service";
+import { stringify } from "querystring";
 
 
 interface ListItem {
@@ -1364,14 +1365,17 @@ showAlert(swalOptions: SweetAlertOptions) {
 
 
 
-  deleteClient(value: any) {
+  async deleteClient(value: any) {
 
     this.clientSK = value;
 
     console.log('deleteuser is called', value);
 
+    this.deleteS3Urls(value)
+    
+   
 
-    this.S3service.removeFolder(`clientLogos/${value}`)
+  
 
     // this.files = [];
 
@@ -1413,6 +1417,27 @@ showAlert(swalOptions: SweetAlertOptions) {
        
     }
 
+  }
+
+
+
+  async deleteS3Urls(getValues:any){
+    
+    let filesUrls = await this.S3service.getFilesFromFolder(getValues)
+
+    console.log("Api is called BTW",filesUrls);
+
+
+    const data = filesUrls && filesUrls.body && JSON.parse(filesUrls.body).data
+
+    console.log("Data is here ",data);
+
+    filesUrls = data && data.map((item:any)=>item.Key)
+
+    for(let fileName of await filesUrls){
+      await this.S3service.removeFolder(fileName)
+    }
+    
   }
 
 
@@ -1563,22 +1588,32 @@ showAlert(swalOptions: SweetAlertOptions) {
 
   async getFileUrls(getValues:any){
     // Initialize an array with `undefined` values to hold the images in specific order
+
+    console.log("Client to be fetched is ",getValues);
     
     let orderedUrls: any[] = [undefined, undefined, undefined, undefined];
 
-    const filesUrls = this.S3service.getFilesFromFolder(getValues)
+    let filesUrls = await this.S3service.getFilesFromFolder(getValues)
+
+    console.log("Api is called BTW",filesUrls);
+
+    const data =filesUrls && filesUrls.body && JSON.parse(filesUrls.body).data
+
+    console.log("Data is here ",data);
+
+    filesUrls =data && data.map((item:any)=>item.Key)
 
 
     for(let fileName of await filesUrls){
        // Determine the index based on file name (e.g., imageInput2, imageInput4)
        if (fileName?.includes('imageInput1')) {
-        orderedUrls[0] = fileName;  // Place imageInput1 at index 0
+        orderedUrls[0] = `https://assets-untangleds.s3.ap-south-1.amazonaws.com/${fileName}`;  // Place imageInput1 at index 0
       } else if (fileName?.includes('imageInput2')) {
-        orderedUrls[1] = fileName;  // Place imageInput2 at index 1
+        orderedUrls[1] = `https://assets-untangleds.s3.ap-south-1.amazonaws.com/${fileName}` // Place imageInput2 at index 1
       } else if (fileName?.includes('imageInput3')) {
-        orderedUrls[2] = fileName;  // Place imageInput3 at index 2
+        orderedUrls[2] = `https://assets-untangleds.s3.ap-south-1.amazonaws.com/${fileName}` // Place imageInput3 at index 2
       } else if (fileName?.includes('imageInput4')) {
-        orderedUrls[3] = fileName;  // Place imageInput4 at index 3
+        orderedUrls[3] = `https://assets-untangleds.s3.ap-south-1.amazonaws.com/${fileName}`  // Place imageInput4 at index 3
       }
     }
 
@@ -1860,7 +1895,7 @@ showAlert(swalOptions: SweetAlertOptions) {
     }
 
     const folderPath = `clientLogos/${this.createClientField.get('clientID')?.value}/`; // Define the S3 folder path
-    let uploadedUrls: string[] = [];
+    let uploadedUrls: any[] = [];
 
     // Loop through all files in the selectedFiles object and upload them one by one
     for (let key in this.selectedFiles) {
@@ -1883,7 +1918,9 @@ showAlert(swalOptions: SweetAlertOptions) {
         
 
         // Upload the new file to S3
-        const uploadedFileUrl = await this.S3service.uploadFile(path, file);
+        const uploadedFileUrl = this.S3service.uploadFile(path, file);
+        
+        console.log("Uploaded result is here ",uploadedFileUrl);
 
         // Push the uploaded file URL to the uploadedUrls array
         uploadedUrls.push(uploadedFileUrl);
