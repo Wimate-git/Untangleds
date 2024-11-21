@@ -158,7 +158,7 @@ rdtListWorkAround :any =[{
   final_list: any;
   enableLocationButton: boolean;
   enableDeviceButton: boolean;
-
+  adminLogin:boolean = false
 
   constructor(private apiService: UserService,private configService:SharedService,private fb:FormBuilder
     ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal,private DynamicApi:DynamicApiService,
@@ -171,6 +171,7 @@ rdtListWorkAround :any =[{
     this.getLoggedUser = this.configService.getLoggedUserDetails()
 
     this.SK_clientID = this.getLoggedUser.clientID;
+    this.adminLogin = this.SK_clientID == 'WIMATE_ADMIN'?true:false 
     this.user_companyID = this.getLoggedUser.companyID
  
     this.dropdownSettings = this.configService.getSettings();
@@ -2030,10 +2031,10 @@ rdtListWorkAround :any =[{
           'clientID': getValues.clientID,
           'disabled_CLientID': this.showDisabledClientID,
           'disabled_companyid':this.showDisabledCompanyID,
-          'allowOtherClient': false,
+          'allowOtherClient':  [{value:false,disabled:!this.adminLogin}],
           'allowNewClient': [{value:getValues.allowNewClient}],
           'allowOtherCompanyID': getValues.allowOtherCompanyID,
-          'allowNewCompanyID': getValues.allowNewCompanyID,
+          'allowNewCompanyID':  [{value:false,disabled:!this.adminLogin}],
           'companyID': getValues.companyID,
           'username': getValues.username,
           'description': getValues.description,
@@ -2116,10 +2117,10 @@ rdtListWorkAround :any =[{
           'disabled_companyid':[{value:getValues.companyID,disabled:true}],
           'key': getValues.key,
           //'disabled_CLientID':this.switchInputs( getValues.allowOtherClient),
-          'allowOtherClient': false,
+          'allowOtherClient': [{value:false,disabled:!this.adminLogin}],
           'allowNewClient': [{value:getValues.allowNewClient}],
           'allowOtherCompanyID': getValues.allowOtherCompanyID,
-          'allowNewCompanyID': false,
+          'allowNewCompanyID': [{value:false,disabled:!this.adminLogin}],
           'companyID': getValues.companyID,
           'username': getValues.username,
           'description': getValues.description,

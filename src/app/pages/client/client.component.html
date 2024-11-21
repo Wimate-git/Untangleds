@@ -22,7 +22,7 @@
             <!--begin::Toolbar-->
             <div class="d-flex justify-content-end">
                 <!--begin::Add user-->
-                <button type="button" class="btn btn-primary" data-action="create">
+                <button type="button" class="btn btn-primary" data-action="create" [disabled]="!adminLogin">
                     Add
                 </button>
                 <!--end::Add user-->

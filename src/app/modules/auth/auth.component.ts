@@ -4,6 +4,7 @@ import { ClientLogoService } from './services/client-logo.service';
 import { LayoutService } from 'src/app/_metronic/layout/core/layout.service';
 import { Subscription } from 'rxjs';
 import { LayoutType } from 'src/app/_metronic/layout/core/configs/config';
+import { Router } from '@angular/router';
 
 // const BODY_CLASSES = ['bgi-size-cover', 'bgi-position-center', 'bgi-no-repeat'];
 
@@ -28,7 +29,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   clientLogo: any= '';
   showLogo:boolean = false;
 
-  constructor(private layout: LayoutService,private s3Service: S3ServiceService,private cd:ChangeDetectorRef,private getImage:ClientLogoService) {
+  constructor(private layout: LayoutService,private s3Service: S3ServiceService,private cd:ChangeDetectorRef,private getImage:ClientLogoService,private router: Router) {
     this.splashScreenLogoElement = document.getElementById('splash-screen-logo') as HTMLImageElement;
     this.linkElement = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
   }

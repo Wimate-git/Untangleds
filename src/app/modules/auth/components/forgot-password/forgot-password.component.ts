@@ -8,6 +8,8 @@ import Swal from 'sweetalert2';
 import { SharedService } from 'src/app/pages/shared.service';
 import { APIService } from 'src/app/API.service';
 import { Router } from '@angular/router';
+import { DynamicApiService } from 'src/app/pages/dynamic-api.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 enum ErrorStates {
   NotSubmitted,
@@ -35,7 +37,7 @@ export class ForgotPasswordComponent implements OnInit {
   filterUser: any = []
   selectedUser: any;
   constructor(private fb: FormBuilder, private authService: AuthService,
-    private cd:ChangeDetectorRef,private api:APIService, private router:Router) {
+    private cd:ChangeDetectorRef,private api:APIService, private router:Router,private DynamicApi:DynamicApiService,private toast:MatSnackBar) {
     this.isLoading$ = this.authService.isLoading$;
   }
 
@@ -254,6 +256,26 @@ async confirmNewPassword() {
       await this.api.UpdateMaster(tempObj)
       // Notify user of success
       this.showVerificationFields = false; // Hide the verification fields
+
+      const body = { type: "forgot_password", username:this.selectedUser,email:tempResult.email,password:confirmPassword};
+
+
+      this.DynamicApi.sendData(body).subscribe((response: any) => {
+        console.log('Response from Lambda:', response);
+  
+  
+        this.toast.open("Mail Sent Successfully", " ", {
+  
+          duration: 2000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top',
+          //   //panelClass: ['blue-snackbar']
+        })
+  
+  
+      }, (error: any) => {
+        console.error('Error calling dynamic lambda:', error);
+      });
 
     
       return Swal.fire({

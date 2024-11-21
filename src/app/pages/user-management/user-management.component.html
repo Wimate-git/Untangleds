@@ -50,7 +50,7 @@
     <form [formGroup]="createUserField" (ngSubmit)="onSubmit($event)">
         <div class="modal-header">
             <h4 *ngIf="!editOperation" class="modal-title" id="modal-basic-title">Add New User</h4>
-            <h4 *ngIf="editOperation" class="modal-title" id="modal-basic-title">Update User</h4>
+            <h4 *ngIf="editOperation" class="modal-title" id="modal-basic-title">Edit User Configuration</h4>
             <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
         </div>
 

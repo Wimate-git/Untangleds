@@ -21,7 +21,7 @@ export class ClientLogoService {
 
     const baseUrl = new URL(fullUrl).origin
     // const baseUrl = new URL(fullUrl).origin == 'http://localhost:4200'?'https://main.d171psdgt7n0kh.amplifyapp.com':'http://localhost:4200'
-    // console.log("Base url is here ",baseUrl);
+    // console.log("Base url is here ",baseUrl); https://untangled.cloudtesla.com/
 
     const metadata = await this.getLogo(baseUrl)
 
@@ -72,6 +72,9 @@ export class ClientLogoService {
 
     let imageUrls = []
     try{
+
+
+      localStorage.setItem('clientFetched',JSON.stringify(getValues))
  
     console.log("Client to be fetched is ",getValues);
     

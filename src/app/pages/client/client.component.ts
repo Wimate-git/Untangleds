@@ -130,6 +130,9 @@ export class ClientComponent implements OnInit {
       // this.loading()
 
       this.showTable()
+
+
+     
     }
 
 
@@ -416,11 +419,15 @@ export class ClientComponent implements OnInit {
             this.listofSK = this.lookup_data_user.map((item:any)=>item.P1)
 
             this.uniqueEmail = this.lookup_data_user.map((item:any)=>item.P4)
+          
             if(this.SK_clientID != 'WIMATE_ADMIN'){
               this.lookup_data_user = this.lookup_data_user.filter((item:any)=>item.P1 == this.SK_clientID)
+            }
+            else{
+              this.adminLogin = true
             }   
 
-
+            this.cd.detectChanges()
             resolve(this.lookup_data_user); // Resolve with the current lookup data
           }
         })

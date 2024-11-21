@@ -33,13 +33,14 @@ export class LoginComponent implements OnInit, OnDestroy {
   // private fields
   private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
   userDetails: any;
+  baseUrl:any;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router,
-    private api:APIService,private spinner:NgxSpinnerService
+    private api:APIService,private spinner:NgxSpinnerService,
   ) {
     this.isLoading$ = this.authService.isLoading$;
     // redirect to home if already logged in
@@ -53,6 +54,12 @@ export class LoginComponent implements OnInit, OnDestroy {
     // get return url from route parameters or default to '/'
     this.returnUrl =
       this.route.snapshot.queryParams['returnUrl'.toString()] || '/';
+
+
+    const fullUrl = window.location.href
+    this.baseUrl = new URL(fullUrl).origin
+
+    // this.baseUrl = 'https://main.d171psdgt7n0kh.amplifyapp.com/'
   }
 
 
@@ -86,6 +93,10 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   async submit() {
+
+
+    const clientID = JSON.parse(localStorage.getItem('clientFetched') || '')
+    // console.log("Client iD in login is here ",clientID)
 
     await signOut()
     .then(() => {
@@ -133,6 +144,39 @@ export class LoginComponent implements OnInit, OnDestroy {
         });
       }
 
+      localStorage.setItem('userAttributes','{}')
+
+      try {
+        const result:any = await this.api.GetMaster(`${(this.f.email.value).toLowerCase()}#user#main`, 1);
+        if (result) {
+
+          const metaData = JSON.parse(result.metadata)
+
+          console.log(`result is here ${clientID} != ${metaData.clientID}`);
+
+          if(this.baseUrl != 'https://untangled.cloudtesla.com' && this.baseUrl != 'http://localhost:4200' ){
+            if(clientID != metaData.clientID && metaData.clientID != 'WIMATE_ADMIN'){
+              this.spinner.hide();
+              return Swal.fire({
+                title: '⚠️ Client Mismatch',
+                text: 'The username is not associated with this client ID and does not match the URL. Please ensure that you are logging in using the correct URL and credentials specific to your client.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+              });
+            }
+          }
+
+
+          localStorage.setItem('userAttributes', JSON.stringify(metaData));
+
+          if (result && result.metadata && result.metadata.profile_picture) {
+            localStorage.setItem('profileImage', result.metadata.profile_picture)
+          }
+        }
+      } catch (err) {
+        console.error("Error in fetching the user ", user);
+      }
+
     
       const loginCredentials = {
         username: this.f.email.value,
@@ -153,24 +197,12 @@ export class LoginComponent implements OnInit, OnDestroy {
         });
       this.unsubscribe.push(loginSubscr);
 
-      localStorage.setItem('userAttributes','{}')
+      
 
 
 
 
-      try {
-        const result:any = await this.api.GetMaster(`${(this.f.email.value).toLowerCase()}#user#main`, 1);
-        if (result) {
-          console.log("Result is here ", result);
-          localStorage.setItem('userAttributes', JSON.stringify(JSON.parse(result.metadata)));
-
-          if (result && result.metadata && result.metadata.profile_picture) {
-            localStorage.setItem('profileImage', result.metadata.profile_picture)
-          }
-        }
-      } catch (err) {
-        console.error("Error in fetching the user ", user);
-      }
+     
     
       localStorage.setItem('loginDetails', JSON.stringify(loginCredentials));
     
