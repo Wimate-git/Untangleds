@@ -7,14 +7,14 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 
 import { RouteReuseStrategy, RouterModule } from '@angular/router';
 import { SummaryEngineComponent } from './summary-engine.component';
-import { CrudcompanyModule } from '../company/crud-company/crud.module';
+
 
 import { CustomReuseStrategy } from './custom-reuse-strategy';
 
 
 import { NgxSelectModule } from 'ngx-select-ex';
-import { GridsterModule } from 'angular-gridster2';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
+import { NgbModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -26,6 +26,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { NgxDaterangepickerBootstrapComponent, NgxDaterangepickerBootstrapDirective, NgxDaterangepickerBootstrapModule, provideDaterangepickerLocale } from 'ngx-daterangepicker-bootstrap';
+import { GridsterModule } from 'angular-gridster2';
+import { NgxSpinnerModule } from 'ngx-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { CrudSummaryComponent } from './crud-summary/crud-summary.component';
 
  // Import Keen UI Module
 
@@ -40,16 +44,17 @@ import { NgxDaterangepickerBootstrapComponent, NgxDaterangepickerBootstrapDirect
   declarations: [SummaryEngineComponent],
   imports: [
     CommonModule,
+    GridsterModule,
     NgxDaterangepickerBootstrapDirective,
     NgxDaterangepickerBootstrapComponent,
     FormsModule,
     ReactiveFormsModule,
     NgxDaterangepickerBootstrapModule,
-    CrudcompanyModule,
+    CrudSummaryComponent,
  
     NgMultiSelectDropDownModule,
     NgxSelectModule,
-    GridsterModule,
+
     MatSnackBarModule,
     NgbModule,
     MatFormFieldModule,
@@ -60,6 +65,10 @@ import { NgxDaterangepickerBootstrapComponent, NgxDaterangepickerBootstrapDirect
     // BrowserAnimationsModule, // Required for Angular Material animations
     MatButtonModule,
     MatMenuModule,
+    NgxSpinnerModule,
+    MatTooltipModule,
+    NgbTooltipModule,
+    
 
    
 

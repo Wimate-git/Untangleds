@@ -10,7 +10,8 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 @NgModule({
   declarations: [CrudSummaryComponent],
   imports: [
-    CommonModule, DataTablesModule,
+    CommonModule, 
+    DataTablesModule,
     SweetAlert2Module.forChild(),
     NgbModalModule,
   ],

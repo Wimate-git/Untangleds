@@ -4,11 +4,11 @@
 <div class="" id="kt_wrapper" *ngIf="editButtonCheck">
   <div class="" id="kt_content">
     <div>
-      <div class="d-flex justify-content-start mb-8">
+      <!-- <div class="d-flex justify-content-start mb-8">
         <button class="btn btn-success btn-lg  me-md-2" type="button" (click)="toggleMode()">
           {{ isEditModeView ? ' View Mode' : ' Edit Mode' }}
         </button>
-      </div>
+      </div> -->
       
       
       
@@ -18,39 +18,85 @@
           <div class="card-body p-0 pb-0"
             style="background-color: var(--bs-app-bg-color) !important; padding: 0 !important;">
             <gridster style="background: var(--bs-app-bg-color)!important;border-radius: 5px;padding: 0px; "
-              [options]="options">
+              [options]="options" >
 
-              <gridster-item *ngFor="let item of dashboard; let i = index;" [item]="item"    class="rounded"     [style.background-color]="item.themeColor"   >
+              <gridster-item *ngFor="let item of dashboard; let i = index;" [item]="item"    [style.background-color]="item.themeColor"  class="rounded">
                
        
                 <div *ngIf="item.grid_type === 'tile'" >
-                  <div class="grid-item "
+                  <div class=" grid-item"
                   tabindex="0"
                   [style.background-color]="item.themeColor"
                   style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out;"
                   (mouseenter)="isHovered = true"
                   (mouseleave)="isHovered = false"
                  >
-               
-               <!-- Display the parameterName -->
-               <div [style.color]="'#333333'" style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">
-                 {{ item.parameterName }}
-               </div>
-               
-               <!-- Display processed_value from multi_value -->
-               <div class="value" tabindex="0" style="font-size: 28px; font-weight: bold; color: #333333;">
-                 {{ item.multi_value[1]?.processed_value }}
-               </div>
+                 <div class="row text_3d" >
+                  <!-- Display the parameterName -->
+                  <div [style.color]="'#333333'" style="font-size: 16px;font-weight: bold; margin-bottom: 10px;">
+                    {{ item.parameterName }}
+                  </div>
+                
+                  <!-- Display processed_value from multi_value -->
+                  <div  tabindex="0" style="font-size: 28px;font-weight: bold">
+                    {{ item.multi_value[1]?.processed_value }}
+                  </div>
+                </div>
+                
                
                <!-- Edit icon button -->
-               <button *ngIf="isEditModeView&&isHovered" 
-                       (click)="openKPIModal(KPIModal, item, i)" 
-                       class="mat-icon-button btn btn-icon btn-custom  btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
-                       aria-haspopup="menu" 
-                       aria-expanded="false" 
-                       style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer;">
-                 <i class="bi bi-pencil" style="color:black"></i> <!-- Edit icon -->
+               <div 
+               class="action-menu-container d-flex align-items-center" 
+               style="position: absolute; top: 10px; right: 10px; gap: 10px;">
+             
+               <!-- Edit Button -->
+               <button 
+                 *ngIf="isEditModeView && isHovered" 
+                 (click)="openKPIModal(KPIModal, item, i)" 
+                 class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
+                 aria-haspopup="menu" 
+                 aria-expanded="false" 
+                 style="background: none; border: none; cursor: pointer;">
+                 <i class="bi bi-pencil" style="color:black;"></i> <!-- Edit Icon -->
                </button>
+             
+               <!-- Dropdown Menu -->
+               <div *ngIf="isEditModeView " class="dropdown">
+                <button
+              
+                [matMenuTriggerFor]="menu"
+                class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" >
+                <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>
+              </button>
+            
+              <mat-menu #menu="matMenu" class="mat-elevation-z4">
+                <button mat-menu-item (click)="duplicateTile(item, i)">
+                  <i class="bi bi-files fs-4"></i>
+                  <span>Duplicate</span>
+                </button>
+                <button mat-menu-item (click)="deleteTile(item, i)">
+                  <i class="bi bi-trash fs-4"></i>
+                  <span>Delete</span>
+                </button>
+                
+              </mat-menu>
+              </div>
+              
+              
+              
+             </div>
+             
+         
+             
+             
+
+
+
+
+
+
+
+
                <!-- (contextmenu)="openContextMenu($event, item, i)" -->
                <!-- Context Menu -->
                <!-- <mat-menu #contextMenu="matMenu">
@@ -73,6 +119,8 @@
                          style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out;"
                          (mouseenter)="isHovered = true"
                          (mouseleave)="isHovered = false">
+
+                         <div class="row text_3d" >
                          <div [style.color]="'#333333'" style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">
                           {{ item.parameterName }}
                         </div>
@@ -82,15 +130,47 @@
                         <div class="value" tabindex="0" style="font-size: 16px; font-weight: bold; color: #333333;">
                           {{ item.multi_value[1]?.value }} <!-- Access the second element in multi_value array -->
                         </div>
-                      <!-- Edit icon button -->
-                      <button *ngIf="isEditModeView&&isHovered" 
-                      (click)="openKPIModal1(KPIModal1, item, i)" 
-                      class="mat-icon-button btn btn-icon btn-custom  btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
-                      aria-haspopup="menu" 
-                      aria-expanded="false" 
-                      style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer;">
-                <i class="bi bi-pencil" style="color:black"></i> <!-- Edit icon -->
-              </button>
+                         </div>
+                        <div 
+                        class="action-menu-container d-flex align-items-center" 
+                        style="position: absolute; top: 10px; right: 10px; gap: 10px; z-index: 1000;">
+                        
+                        <!-- Edit Icon Button -->
+                        <button 
+                          *ngIf="isEditModeView && isHovered" 
+                          (click)="openKPIModal1(KPIModal1, item, i)" 
+                          class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
+                          aria-haspopup="menu" 
+                          aria-expanded="false" 
+                          style="background: none; border: none; cursor: pointer;">
+                          <i class="bi bi-pencil" style="color: black;"></i> <!-- Edit icon -->
+                        </button>
+                      
+                        <!-- Dropdown Menu -->
+                        <div 
+                          *ngIf="isEditModeView " 
+                          class="dropdown" 
+                          style="position: relative;">
+                          <button
+              
+                          [matMenuTriggerFor]="menu"
+                          class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" >
+                          <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>
+                        </button>
+                      
+                        <mat-menu #menu="matMenu" class="mat-elevation-z4">
+                          <button mat-menu-item (click)="duplicateTile1(item, i)">
+                            <i class="bi bi-files fs-4"></i>
+                            <span>Duplicate</span>
+                          </button>
+                          <button mat-menu-item (click)="deleteTile(item, i)">
+                            <i class="bi bi-trash fs-4"></i>
+                            <span>Delete</span>
+                          </button>
+                        </mat-menu>
+                        </div>
+                      </div>
+                      
                     </div>
                   </div>
 
@@ -101,6 +181,7 @@
                     style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out;"
                     (mouseenter)="isHovered = true"
                     (mouseleave)="isHovered = false">
+                    <div class="row text_3d" >
                
                  <!-- Display the parameterName -->
                  <div [style.color]="'#333333'" style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">
@@ -118,53 +199,129 @@
                  <div class="value" tabindex="0" style="font-size: 16px; font-weight: bold; color: #333333;">
                   {{ item.multi_value[2]?.value }} <!-- Access the second element in multi_value array -->
                 </div>
+                    </div>
                
                  <!-- Edit icon button -->
-                 <button *ngIf="isEditModeView&&isHovered" 
-                         (click)="openKPIModal2(KPIModal2, item, i)" 
-                         class="mat-icon-button btn btn-icon btn-custom  btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
-                         aria-haspopup="menu" 
-                         aria-expanded="false" 
-                         style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer;">
-                   <i class="bi bi-pencil" style="color:black"></i> <!-- Edit icon -->
+
+                 <div 
+                 class="action-menu-container d-flex align-items-center justify-content-end" 
+                 style="position: absolute; top: 10px; right: 10px; gap: 10px; z-index: 1000;">
+                 
+                 <!-- Edit Icon Button -->
+                 <button 
+                   *ngIf="isEditModeView && isHovered" 
+                   (click)="openKPIModal2(KPIModal2, item, i)" 
+                   class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
+                   aria-haspopup="menu" 
+                   aria-expanded="false" 
+                   style="background: none; border: none; cursor: pointer;">
+                   <i class="bi bi-pencil" style="color: black;"></i>
                  </button>
+               
+                 <!-- Dropdown Menu -->
+                 <div 
+                   *ngIf="isEditModeView " 
+                   class="dropdown" 
+                   style="position: relative;">
+                   <button
+              
+                   [matMenuTriggerFor]="menu"
+                   class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" >
+                   <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>
+                 </button>
+               
+                 <mat-menu #menu="matMenu" class="mat-elevation-z4">
+                   <button mat-menu-item (click)="duplicateTile2(item, i)">
+                    <i class="bi bi-files fs-4"></i>
+                     <span>Duplicate</span>
+                   </button>
+                   <button mat-menu-item (click)="deleteTile(item, i)">
+                    <i class="bi bi-trash fs-4"></i>
+                     <span>Delete</span>
+                   </button>
+                 </mat-menu>
+                 </div>
+               </div>
+               
                
                </div>
                
                   </div>
 
-
-                  <div *ngIf="item.grid_type === 'tile4'" >
-                    <div class="grid-item"
-                    tabindex="0"
-                    [style.background-color]="item.themeColor"  
-                    style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out;"
-                    (mouseenter)="isHovered = true"
-                    (mouseleave)="isHovered = false">
+                  <div *ngIf="item.grid_type === 'tile4'">
+                    <div 
+                      class="grid-item"
+                      tabindex="0"
+                      [style.background-color]="item.themeColor"
+                      style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out;"
+                      (mouseenter)="isHovered = true"
+                      (mouseleave)="isHovered = false">
+                      
+                      <!-- Up Arrow Icon -->
                
-                 <!-- Display the parameterName -->
-                 <div [style.color]="'#333333'" style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">
-                   {{ item.parameterName }}
-                 </div>
-               
-                 <!-- Display processed_value from multi_value -->
-                 <div class="value" tabindex="0" style="font-size: 28px; font-weight: bold; color: #333333;">
-                   {{ item.multi_value[3]?.processed_value }} <!-- Access the second element in multi_value array -->
-                 </div>
-               
-                 <!-- Edit icon button -->
-                 <button *ngIf="isEditModeView&&isHovered" 
-                         (click)="openKPIModal3(KPIModal3, item, i)" 
-                         class="mat-icon-button btn btn-icon btn-custom  btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
-                         aria-haspopup="menu" 
-                         aria-expanded="false" 
-                         style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer;">
-                   <i class="bi bi-pencil" style="color:black"></i> <!-- Edit icon -->
-                 </button>
-               
-               </div>
-               
+                      <div class="row text_3d" >
+                      <!-- Display the parameterName -->
+                      <div 
+                        [style.color]="'#333333'" 
+                        style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">
+                        {{ item.parameterName }}
+                      </div>
+                  
+                      <!-- Display processed_value from multi_value -->
+                      <div 
+                        class="value" 
+                        tabindex="0" 
+                        style="font-size: 28px; font-weight: bold; color: #333333;">
+                        {{ item.multi_value[3]?.processed_value }}
+                        <i 
+                        class="bi bi-arrow-up fs-2x" 
+                        style="font-size: 20px; color:green;" 
+                        aria-label="Increase">
+                      </i>
+                      </div>
+                    </div>
+                
+                  
+                      <!-- Edit icon button -->
+                      <div 
+                        class="action-menu-container d-flex align-items-center justify-content-end" 
+                        style="position: absolute; top: 10px; right: 10px; gap: 10px; z-index: 1000;">
+                        <button 
+                          *ngIf="isEditModeView " 
+                          (click)="openKPIModal3(KPIModal3, item, i)" 
+                          class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
+                          aria-haspopup="menu" 
+                          aria-expanded="false" 
+                          style="background: none; border: none; cursor: pointer;">
+                          <i class="bi bi-pencil" style="color:black"></i>
+                        </button>
+                  
+                        <div 
+                          *ngIf="isEditModeView" 
+                          class="dropdown" 
+                          style="position: relative;">
+                          <button
+              
+                          [matMenuTriggerFor]="menu"
+                          class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" >
+                          <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>
+                        </button>
+                      
+                        <mat-menu #menu="matMenu" class="mat-elevation-z4">
+                          <button mat-menu-item (click)="duplicateTile3(item, i)">
+                            <i class="bi bi-files fs-4"></i>
+                            <span>Duplicate</span>
+                          </button>
+                          <button mat-menu-item (click)="deleteTile(item, i)">
+                            <i class="bi bi-trash fs-4"></i>
+                            <span>Delete</span>
+                          </button>
+                        </mat-menu>
+                        </div>
+                      </div>
+                    </div>
                   </div>
+                  
 
 
                   <div *ngIf="item.grid_type === 'tile5'" >
@@ -174,24 +331,59 @@
                          style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out;"
                          (mouseenter)="isHovered = true"
                          (mouseleave)="isHovered = false">
+
+                         <div class="row text_3d" >
                          <div [style.color]="'#333333'" style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">
                           {{ item.parameterName }}
                         </div>
                         <div class="value" tabindex="0" style="font-size: 20px; font-weight: bold; color: #333333;">
                           {{ item.multi_value[3]?.processed_value }} <!-- Access the second element in multi_value array -->
+                          <i 
+                          class="bi bi-arrow-up fs-2x" 
+                          style="font-size: 20px; color:green" 
+                          aria-label="Increase">
+                        </i>
                         </div>
                         <div class="value" tabindex="0" style="font-size: 16px; font-weight: bold; color: #333333;">
                           {{ item.multi_value[4]?.value }} <!-- Access the second element in multi_value array -->
                         </div>
+                         </div>
+                        <div 
+                        class="action-menu-container d-flex align-items-center justify-content-end" 
+                        style="position: absolute; top: 10px; right: 10px; gap: 10px; z-index: 1000;">
                       <!-- Edit icon button -->
                       <button *ngIf="isEditModeView&&isHovered" 
                       (click)="openKPIModal4(KPIModal4, item, i)" 
                       class="mat-icon-button btn btn-icon btn-custom  btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
                       aria-haspopup="menu" 
                       aria-expanded="false" 
-                      style="position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer;">
+                      style="background: none; border: none; cursor: pointer;">
                 <i class="bi bi-pencil" style="color:black"></i> <!-- Edit icon -->
               </button>
+
+              <div 
+              *ngIf="isEditModeView " 
+              class="dropdown" 
+              style="position: relative;">
+              <button
+              
+              [matMenuTriggerFor]="menu"
+              class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" >
+              <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>
+            </button>
+          
+            <mat-menu #menu="matMenu" class="mat-elevation-z4">
+              <button mat-menu-item (click)="duplicateTile4(item, i)">
+                <i class="bi bi-files fs-4"></i>
+                <span>Duplicate</span>
+              </button>
+              <button mat-menu-item (click)="deleteTile(item, i)">
+                <i class="bi bi-trash fs-4"></i>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
+            </div>
+                        </div>
                     </div>
                   </div>
 
@@ -211,6 +403,7 @@
                     (mouseleave)="isHovered = false">
                
                  <!-- Display the parameterName -->
+                 <div class="row text_3d" >
                  <div [style.color]="'#333333'" style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">
                    {{ item.parameterName }}
                  </div>
@@ -222,20 +415,52 @@
                  <!-- Display processed_value from multi_value -->
                  <div class="value" tabindex="0" style="font-size: 20px; font-weight: bold; color: #333333;">
                    {{ item.multi_value[3]?.processed_value }} <!-- Access the second element in multi_value array -->
+                   <i 
+                   class="bi bi-arrow-up fs-2x" 
+                   style="font-size: 20px; color:green" 
+                   aria-label="Increase">
+                 </i>
                  </div>
                  <div class="value" tabindex="0" style="font-size: 16px; font-weight: bold; color: #333333;">
                   {{ item.multi_value[2]?.value }} <!-- Access the second element in multi_value array -->
                 </div>
+                 </div>
                
                  <!-- Edit icon button -->
+                 <div 
+                 class="action-menu-container d-flex align-items-center justify-content-end" 
+                 style="position: absolute; top: 10px; right: 10px; gap: 10px; z-index: 1000;">
                  <button *ngIf="isEditModeView&&isHovered" 
                          (click)="openKPIModal5(KPIModal5, item, i)" 
                          class="mat-icon-button btn btn-icon btn-custom  btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
                          aria-haspopup="menu" 
                          aria-expanded="false" 
-                         style="position: absolute; top: 10px; right: 10px; ; border: none; cursor: pointer;">
+                         style="background: none; border: none; cursor: pointer;">
                    <i class="bi bi-pencil" style="color:black"></i> <!-- Edit icon -->
                  </button>
+                 <div 
+                 *ngIf="isEditModeView " 
+                 class="dropdown" 
+                 style="position: relative;">
+                 <button
+              
+                 [matMenuTriggerFor]="menu"
+                 class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" data-bs-auto-close="outside" >
+                 <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>
+               </button>
+             
+               <mat-menu #menu="matMenu" class="mat-elevation-z4">
+                 <button mat-menu-item (click)="duplicateTile5(item, i)">
+                  <i class="bi bi-files fs-4"></i>
+                   <span>Duplicate</span>
+                 </button>
+                 <button mat-menu-item (click)="deleteTile(item, i)">
+                  <i class="bi bi-trash fs-4"></i>
+                   <span>Delete</span>
+                 </button>
+               </mat-menu>
+               </div>
+                 </div>
                
                </div>
                
@@ -263,6 +488,83 @@
            
                     </div>
                   </div>
+
+
+
+                  <div *ngIf="item.grid_type === 'title'" >
+                    <div 
+                    class="gridster-item title-widget"
+                    tabindex="0"
+                    [style.background-color]="item.themeColor"
+              
+                    (mouseenter)="isHovered = true"
+                    (mouseleave)="isHovered = false"
+                  >
+                    <div class="row ">
+                      <!-- Display the parameterName -->
+                      <div class="text_3d"
+                    
+                      [style.font-size]="item.fontSize" 
+                      [style.font-weight]="item.fontWeight" 
+                      [style.text-align]="item.textAlign" 
+                      [style.color]="item.textColor"
+
+                      >
+                      {{ item.customLabel }}
+                    </div>
+                      <!-- Display processed_value from multi_value -->
+                    </div>
+                  
+                    <!-- Action Menu -->
+                    <div 
+                      class="action-menu-container d-flex align-items-center" 
+                      style="position: absolute; top: 10px; right: 10px; gap: 10px;">
+                      <!-- Edit Button -->
+                      <button 
+                        *ngIf="isEditModeView " 
+                        (click)="openTitleModal(TitleModal, item, i)" 
+                        class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
+                        aria-haspopup="menu" 
+                        aria-expanded="false" 
+                        style="background: none; border: none; cursor: pointer;">
+                        <i class="bi bi-pencil" style="color:black;"></i> <!-- Edit Icon -->
+                      </button>
+                  
+                      <!-- Dropdown Menu -->
+                      <div 
+                      *ngIf="isEditModeView" 
+                      class="dropdown" 
+                      (mouseenter)="onMouseEnter()"
+                      (mouseleave)="onMouseLeave()"
+                    >
+                    <button
+              
+                    [matMenuTriggerFor]="menu"
+                    class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" data-bs-auto-close="outside" >
+                    <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>
+                  </button>
+                
+                  <mat-menu #menu="matMenu" class="mat-elevation-z4">
+                    <button mat-menu-item (click)="duplicateTile5(item, i)">
+                      <i class="bi bi-files fs-4"></i>
+                      <span>Duplicate</span>
+                    </button>
+                    <button mat-menu-item (click)="deleteTile(item, i)">
+                      <i class="bi bi-trash fs-4"></i>
+                      <span>Delete</span>
+                    </button>
+                  </mat-menu>
+                    </div>
+                    
+                    </div>
+                  </div>
+                  
+               
+               
+                  </div>
+
+
+
        
               </gridster-item>
               
@@ -293,32 +595,33 @@
           <!-- Begin Wrapper -->
           <div class="d-flex justify-content-between h-100 flex-column pt-5 pb-2 ps-4 pe-4">
             <!-- Begin Container -->
-            <div class="text-center mb-4" style="margin-left: -45px;">
+            <div class="mb-4 ms-3">
               <!-- Begin Title -->
-              <h3 class="fs-2x fw-semibold text-white">Summary Dashboard</h3>
-              <span class="fw-semibold text-white opacity-75" style="margin-left: -20px;">Elevate your dashboard
-                experience!</span>
+              <h1 class="fs-2x fw-bold text-white">Summary Dashboard</h1>
+              <h4 class="fs-4 fw-semibold text-white ms-1">Unleash the Power of Data with Intuitive Dashboards!</h4>
+
               <!-- End Title -->
             </div>
+            
             <!-- End Container -->
-
-            <!-- Begin Button Container -->
-            <div class="d-flex align-items-center justify-content-center gap-4" style="margin-left: -40px;">
+            <div class="d-flex align-items-center gap-4 ms-3" style="text-align: left;">
               <!-- Begin Create Button -->
-              <button data-bs-toggle="tooltip" title="Add Dashboard"
-                class="btn btn-color-white bg-white bg-opacity-15 bg-hover-opacity-25 fw-semibold d-flex align-items-center"
-                (click)="openModal('new', null, summaryModal)">
-                <i class="bi bi-plus-square-fill fs-3 text-white me-2"></i>Create
+              <button data-bs-toggle="tooltip" title="Create Dashboard"
+                  class="btn btn-color-white bg-white bg-opacity-15 bg-hover-opacity-25 fw-semibold d-flex align-items-center"  (click)="openModal('new', null, summaryModal)">
+                  <i class="bi bi-plus-square-fill fs-3 text-white me-2"></i>Create
               </button>
               <!-- End Create Button -->
-
+              
               <!-- Begin Location Button -->
               <button type="button" data-bs-toggle="modal" data-bs-target="#myModalLocation"
-                class="btn btn-color-white bg-white bg-opacity-15 bg-hover-opacity-25 fw-semibold d-flex align-items-center">
-                <i class="bi bi-geo-alt fs-3 text-white me-2"></i> Location
+                  class="btn btn-color-white bg-white bg-opacity-15 bg-hover-opacity-25 fw-semibold d-flex align-items-center">
+                  <i class="bi bi-geo-alt fs-3 text-white me-2"></i> Location
               </button>
               <!-- End Location Button -->
-            </div>
+          </div>
+          
+            <!-- Begin Button Container -->
+
             <!-- End Button Container -->
           </div>
           <!-- End Wrapper -->
@@ -361,91 +664,101 @@
 
 
 <div class="col-xl-12" style="margin-top: 20px;" *ngIf="!editButtonCheck">
-<!--begin::Table widget 15-->
-<div class="card card-flush h-lg-100">
-  <!--begin::Header-->
-  <div class="card-header pt-7">
-    <h3 class="card-title align-items-start flex-column">
-      <span class="card-label fw-bold text-gray-800">Latest 20 Updated</span>
-    </h3>
-    <div class="card-toolbar">
-      <a href="javascript:void(0);" (click)="openSummaryTable(content)" class="btn btn-sm btn-light-primary">
-        View All
-      </a>
+  <!--begin::Table widget 15-->
+  <div class="card card-flush h-lg-100">
+    <!--begin::Header-->
+    <div class="card-header pt-7">
+      <h3 class="card-title align-items-start flex-column">
+        <span class="card-label fw-bold text-gray-800">Latest 20 Updated</span>
+      </h3>
+      <div class="card-toolbar">
+        <a href="javascript:void(0);" (click)="openSummaryTable(content)" class="btn btn-sm btn-light-primary">
+          View All
+        </a>
+      </div>
     </div>
-  </div>
-  <!--end::Header-->
+    <!--end::Header-->
 
-  <!--begin::Body-->
-  <div class="card-body pt-6">
-    <div class="table-responsive">
-      <table class="table table-row-dashed align-middle gs-0 gy-3 my-0"
-        *ngIf="lookup_data_summaryCopy && lookup_data_summaryCopy.length > 0">
-        <!--begin::Table head-->
-        <thead>
-          <tr class="fs-7 fw-bold text-gray-500 border-bottom-0">
-            <th class="fw-bold text-dark fs-4">Id</th>
-            <th class="  text-start fw-bold text-dark fs-4">Name</th>
-            <th class=" text-start fw-bold text-dark fs-4">Description</th>
-            <th class=" text-start fw-bold text-dark fs-4">Updated</th>
-            <th class="  text-start fw-bold text-dark fs-4">Created</th>
-            <th class="  text-start fw-bold text-dark fs-4">View</th>
-          </tr>
+    <!--begin::Body-->
+    <div class="card-body pt-6">
+      <div class="table-responsive">
+        <table class="table table-row-dashed align-middle gs-0 gy-3 my-0">
+          <!--begin::Table head-->
+          <thead>
+            <tr class="fs-7 fw-bold text-gray-500 border-bottom-0">
+              <th class="fw-bold text-dark fs-4">Id</th>
+              <th class="text-start fw-bold text-dark fs-4">Name</th>
+              <th class="text-start fw-bold text-dark fs-4">Description</th>
+              <th class="text-start fw-bold text-dark fs-4">Updated</th>
+              <th class="text-start fw-bold text-dark fs-4">Created</th>
+              <th class="text-start fw-bold text-dark fs-4">View</th>
+            </tr>
+          </thead>
+          <!--end::Table head-->
 
-        </thead>
-        <!--end::Table head-->
-
-        <!--begin::Table body-->
-        <tbody>
-          <tr *ngFor="let item of lookup_data_summaryCopy">
-            <td>
-              <div class="d-flex align-items-center">
-                <span class="text-gray-500 fw-semibold d-block fs-7 me-2">
-                  <div class="symbol symbol-50px me-5">
-                    <span [class]="item.parsedIcon.class2">
-                      <app-keenicon [name]="item.parsedIcon.value" [class]="item.parsedIcon.class1"
-                        style="display: contents;"></app-keenicon>
-                    </span>
+          <!--begin::Table body-->
+          <tbody *ngIf="lookup_data_summaryCopy && lookup_data_summaryCopy.length > 0; else noDataTemplate">
+            <tr *ngFor="let item of lookup_data_summaryCopy | slice:0:20">
+              <td>
+                <div class="d-flex align-items-center">
+                  <span class="text-gray-500 fw-semibold d-block fs-7 me-2">
+                    <div class="symbol symbol-50px me-5">
+                      <span [class]="item.parsedIcon?.class2">
+                        <app-keenicon [name]="item.parsedIcon?.value" [class]="item.parsedIcon?.class1"
+                          style="display: contents;"></app-keenicon>
+                      </span>
+                    </div>
+                  </span>
+                  <div class="d-flex justify-content-start flex-column">
+                    <a class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6"
+                      (click)="viewItem(item.P1); $event.preventDefault()">{{ item.P1 }}</a>
                   </div>
-                </span>
-                <div class="d-flex justify-content-start flex-column">
-                  <a class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6"
-                    (click)="viewItem(item.P1); $event.preventDefault()">{{ item.P1 }}</a>
                 </div>
-              </div>
-            </td>
-            <td class="text-start">
-              <span class="text-gray-600 fw-bold fs-6" (click)="viewItem(item.P1); $event.preventDefault()">{{ item.P2
-                }}</span>
-            </td>
-            <td class="text-start ">
-              <span class="text-gray-600 fw-bold fs-6" (click)="viewItem(item.P1); $event.preventDefault()">{{ item.P3
-                }}</span>
-            </td>
-            <td class="text-start">
-              <span class="text-gray-600 fw-bold fs-6" style="padding-left: 5px;"
-                (click)="viewItem(item.P1); $event.preventDefault()">{{ convertToIST(item.P4) }}</span>
-            </td>
-            <td class="text-start ">
-              <span class="text-gray-600 fw-bold fs-6" (click)="viewItem(item.P1); $event.preventDefault()">{{
-                convertToIST(item.P5) }}</span>
-            </td>
-            <td class="text-start">
-              <a href="javascript:void(0);" (click)="viewItem(item.P1); $event.preventDefault()"
-                class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary w-30px h-30px">
-                <i class="ki-duotone ki-black-right fs-2 text-gray-500"></i>
-              </a>
-            </td>
-          </tr>
-        </tbody>
-        <!--end::Table body-->
-      </table>
+              </td>
+              <td class="text-start">
+                <span class="text-gray-600 fw-bold fs-6" (click)="viewItem(item.P1); $event.preventDefault()">{{ item.P2 }}</span>
+              </td>
+              <td class="text-start">
+                <span class="text-gray-600 fw-bold fs-6" (click)="viewItem(item.P1); $event.preventDefault()">{{ item.P3 }}</span>
+              </td>
+              <td class="text-start">
+                <span class="text-gray-600 fw-bold fs-6" style="padding-left: 5px;" (click)="viewItem(item.P1); $event.preventDefault()">
+                  {{ convertToIST(item.P4) }}
+                </span>
+              </td>
+              <td class="text-start">
+                <span class="text-gray-600 fw-bold fs-6" (click)="viewItem(item.P1); $event.preventDefault()">
+                  {{ convertToIST(item.P5) }}
+                </span>
+              </td>
+              <td class="text-start">
+                <a href="javascript:void(0);" (click)="viewItem(item.P1); $event.preventDefault()"
+                  class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary w-30px h-30px">
+                  <i class="ki-duotone ki-black-right fs-2 text-gray-500"></i>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+          <!--end::Table body-->
+
+          <!--begin::No data template-->
+          <ng-template #noDataTemplate>
+            <tbody>
+              <tr>
+                <td colspan="6" class="text-center text-gray-500">
+                  No data available
+                </td>
+              </tr>
+            </tbody>
+          </ng-template>
+          <!--end::No data template-->
+        </table>
+      </div>
+      <!--end::Table-->
     </div>
-    <!--end::Table-->
+    <!--end: Card Body-->
   </div>
-  <!--end: Card Body-->
-</div>
-<!--end::Table widget 15-->
+  <!--end::Table widget 15-->
 </div>
 
 
@@ -458,6 +771,15 @@
 
 
 
+<ngx-spinner 
+  *ngIf="loading" 
+  bdColor="rgba(0, 0, 0, 0.8)" 
+  size="medium" 
+  color="#fff" 
+  type="square-jelly-box" 
+  [fullScreen]="true">
+  <p style="color: white">Loading Widgets, please wait...</p>
+</ngx-spinner>
 <div style="top: 1%;
 z-index: 100;
 right:44px;
@@ -486,6 +808,39 @@ flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20
   <a *ngIf="!isSummaryEngine()" class="myMenu-item" (click)="openSummaryTable(content)" title="Search dashboard">
     <i style="color: white;" class="fa fa-search"></i>
   </a>
+<!-- 
+        <div class="d-flex justify-content-start mb-8">
+        <button class="btn btn-success btn-lg  me-md-2" type="button" (click)="toggleMode()">
+          {{ isEditModeView ? ' View Mode' : ' Edit Mode' }}
+        </button>
+      </div> -->
+
+  <!-- <a *ngIf="!isSummaryEngine()" class="myMenu-item"  title="Search dashboard" (click)="toggleMode()">
+    {{ isEditModeView ? ' View Mode' : ' Edit Mode' }}
+    <i style="color: white;" class="fa fa-search"></i>
+  </a> -->
+
+<!-- NGX Spinner -->
+
+
+<!-- View/Edit Mode Toggle -->
+<a *ngIf="!isSummaryEngine()" 
+   class="myMenu-item" 
+   (click)="toggleMode()" 
+   style="cursor: pointer;">
+  <i 
+    style="color: white;" 
+    class="fa" 
+    [ngClass]="isEditModeView ? 'fa-eye' : 'fa-pencil-alt'">
+  </i>
+  <span *ngIf="false" style="font-size: 14px;">
+    {{ isEditModeView ? ' View Mode' : ' Edit Mode' }}
+  </span>
+</a>
+
+
+
+
 
 
 
@@ -524,9 +879,10 @@ flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20
 <div class="modal-body">
   <div class="card-body pt-0">
 
-    <app-crud-company [datatableConfig]="datatableConfig" route="/summary-engine"
+    <app-crud-summary [datatableConfig]="datatableConfig" route="/summary-engine"
       (deleteEvent)="delete($event);modal.dismiss()" (editEvent)="edit($event);modal.dismiss()"
-      (createEvent)="create()" [reload]="reloadEvent"></app-crud-company>
+      (createEvent)="create()" [reload]="reloadEvent"></app-crud-summary>
+      <table #dataTable class="table table-striped table-bordered"></table>
   </div>
 
 </div>
@@ -609,9 +965,11 @@ flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20
 <div class="modal-body">
   <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap" id="myTab" role="tablist">
     <div class="row w-100">
-      <div class="col-4" role="Add Dashboard">
+      <div class="col-6" role="Add Dashboard">
         <li class="nav-item">
           <a class="nav-link text-active-primary me-6" id="add-dashboard-tab" data-bs-toggle="tab"
+
+          [class.active]="selectedTab === 'add-dashboard'" 
             (click)="selectedTab = 'add-dashboard'" role="tab" aria-controls="add-dashboard" aria-selected="true">
             {{ showModal ? 'Edit Dashboard' : 'Add Dashboard' }}
           </a>
@@ -620,22 +978,23 @@ flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20
       
 
       <!-- Conditionally Display Add Widgets Tab -->
-      <div class="col-4" role="Add Widgets">
+      <div class="col-6" role="Add Widgets">
         <li class="nav-item">
           <a class="nav-link text-active-primary me-6" id="add-widget-tab" data-bs-toggle="tab"
+          [class.active]="selectedTab === 'add-widget'" 
             (click)="showAddWidgetsTab ? selectedTab = 'add-widget' : onAddWidgetTabClick()"
             role="tab" aria-controls="add-widget" aria-selected="false">Add Widgets</a>
         </li>
       </div>
       
 
-      <div class="col-4" role="Autoflow Config">
+      <!-- <div class="col-4" role="Autoflow Config">
         <li class="nav-item">
           <a class="nav-link text-active-primary me-6" id="autoflow-config-tab" data-bs-toggle="tab"
             (click)="onAutoflowConfigTabClick()"
             role="tab" aria-controls="autoflow-config" aria-selected="false">Autoflow Config</a>
         </li>
-      </div>
+      </div> -->
     </div>
   </ul>
 
@@ -652,42 +1011,81 @@ flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20
           </div>
           <div class="row">
             <!-- Summary ID Input -->
-            <div class="col-md-4">
-              <label class="col-form-label fw-bold fs-6 required">ID</label>
-              <input type="text" class="form-control form-control-solid" placeholder="Enter Summary ID"
-                formControlName="summaryID" required (keyup)="checkUniqueIdentifier($event)">
-              <span style="color: #fc1900;">{{ errorForUniqueID }}</span>
-              <div
-                *ngIf="createSummaryField.get('summaryID')?.hasError('required') && createSummaryField.get('summaryID')?.touched"
-                class="invalid-feedback">
-                Summary ID is required
-              </div>
-            </div>
+<!-- Summary ID Input -->
+<div class="col-md-4">
+  <label class="col-form-label fw-bold fs-6 required d-flex align-items-center">
+    ID 
+    <span class="fs-4 text-primary" 
+          data-bs-toggle="tooltip" 
+          data-bs-placement="top" 
+          [title]="showModal ? '' : 'Enter a unique identifier for the summary.'">
+      <i class="bi bi-info-circle fs-5"></i>
+    </span>
+  </label>
+  <input type="text"
+         class="form-control form-control-solid"
+         placeholder="Enter Summary ID"
+         formControlName="summaryID"
+         [readonly]="showModal" 
+         required
+         (keyup)="checkUniqueIdentifier()">
+  <span *ngIf="errorForUniqueID" style="color: #fc1900;">{{ errorForUniqueID }}</span>
+  <div *ngIf="createSummaryField.get('summaryID')?.hasError('required') && createSummaryField.get('summaryID')?.touched"
+       class="invalid-feedback">
+    Summary ID is required
+  </div>
+</div>
 
-            <!-- Summary Name Input -->
-            <div class="col-md-4">
-              <label class="col-form-label fw-bold fs-6 required">Name</label>
-              <input type="text" class="form-control form-control-solid" placeholder="Enter Summary Name"
-                formControlName="summaryName" required>
-              <div
-                *ngIf="createSummaryField.get('summaryName')?.hasError('required') && createSummaryField.get('summaryName')?.touched"
-                class="invalid-feedback">
-                Summary Name is required
-              </div>
-            </div>
+<!-- Summary Name Input -->
+<div class="col-md-4">
+  <label class="col-form-label fw-bold fs-6 required d-flex align-items-center">
+    Name 
+    <span class="ms-2 text-primary" 
+          data-bs-toggle="tooltip" 
+          data-bs-placement="top" 
+          [title]="showModal ? 'To change name for the summary.' : 'Enter a unique name for the summary.'">
+      <i class="bi bi-info-circle fs-5"></i>
+    </span>
+  </label>
+  <input type="text"
+         class="form-control form-control-solid"
+         placeholder="Enter Summary Name"
+         formControlName="summaryName"
+         required
+         (keyup)="checkUniqueName()">
+  <span *ngIf="errorForUniqueName" style="color: #fc1900;">{{ errorForUniqueName }}</span>
+  <div *ngIf="createSummaryField.get('summaryName')?.hasError('required') && createSummaryField.get('summaryName')?.touched"
+       class="invalid-feedback">
+    Summary Name is required
+  </div>
+</div>
 
-            <!-- Summary Description Input -->
-            <div class="col-md-4">
-              <label class="col-form-label fw-bold fs-6 required">Description</label>
-              <input type="text" class="form-control form-control-solid" placeholder="Enter Summary Description"
-                formControlName="summarydesc" required>
-              <div
-                *ngIf="createSummaryField.get('summarydesc')?.hasError('required') && createSummaryField.get('summarydesc')?.touched"
-                class="invalid-feedback">
-                Summary Description is required
-              </div>
-            </div>
+<!-- Summary Description Input -->
+<div class="col-md-4">
+  <label class="col-form-label fw-bold fs-6 required d-flex align-items-center">
+    Description 
+    <span class="ms-2 text-primary" 
+          data-bs-toggle="tooltip" 
+          data-bs-placement="top" 
+          [title]="showModal ? 'To change the description of the summary.' : 'Provide a brief description of the summary.'">
+      <i class="bi bi-info-circle fs-5"></i>
+    </span>
+  </label>
+  <input type="text" 
+         class="form-control form-control-solid" 
+         placeholder="Enter Summary Description"
+         formControlName="summarydesc" 
+         required>
+  <div *ngIf="createSummaryField.get('summarydesc')?.hasError('required') && createSummaryField.get('summarydesc')?.touched"
+       class="invalid-feedback">
+    Summary Description is required
+  </div>
+</div>
+
           </div>
+          
+          
+          
 
           <div class="row mb-3">
             <div class="col-md-4">
@@ -739,25 +1137,33 @@ flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20
  
       <div class="container">
         <div class="row">
-            <div class="col-md-6 centered-dropdown-container">
-                <label class="col-form-label fw-bold fs-6">Widget Type</label>
-                <ngx-select
-                  [allowClear]="true"
-                  name="icon"
-                  formControlName="tilesList"
-                  [items]="listofTiles"
-                  optionValueField="value"
-                  optionTextField="text"
-                  placeholder="Select Form"
-                  (selectionChanges)="tileChange($event)"
-                >
-                </ngx-select>
-            </div>
+          <div class="col-md-6 centered-dropdown-container">
+            <label class="col-form-label fw-bold fs-6">Widget Type</label>
+            <ngx-select
+              [allowClear]="true"
+              name="icon"
+              formControlName="tilesList"
+              [items]="listofTiles"
+              optionValueField="value"
+              optionTextField="text"
+              placeholder="Select Form"
+              (selectionChanges)="tileChange($event)"
+            >
+            </ngx-select>
+          </div>
+          
+          <!-- Conditionally render grid-item -->
+          <div *ngIf="!showGrid" class="grid-item" tabindex="0" 
+               style="background: linear-gradient(135deg, #43cea2, #185a9d); padding: 20px; border-radius: 8px; color: white; margin-top: 10px;" (click)="openKPIModal(KPIModal,'')">
+               <div>Label</div>
+               <div class="value" tabindex="0">Value</div>
+          </div>
         </div>
+        
     </div>
     <!-- <button (click)="createChartGauge()">click me</button> -->
 
-    <div *ngIf="showGrid" class="grid-container">
+    <div *ngIf="showGrid && selectedTile !== 'Title'" class="grid-container">
       <div class="grid-item highlight" tabindex="0" (click)="openKPIModal(KPIModal,'')" style="background: linear-gradient(to right, #ff7e5f, #feb47b); padding: 20px; border-radius: 8px; color: white;">
         <div>Label</div>
         <div class="value" tabindex="0">Value</div>
@@ -773,62 +1179,55 @@ flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20
         <div class="value" tabindex="0">Value</div>
         <div>Label: Value 3</div>
       </div>
-      
       <div class="grid-item" tabindex="0" (click)="openKPIModal3(KPIModal3,'')" style="background: #8e44ad; padding: 20px; border-radius: 8px; color: white;">
         <div>Label</div>
         <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
       </div>
-      
       <div class="grid-item" tabindex="0" (click)="openKPIModal4(KPIModal4,'')" style="background: #2ecc71; padding: 20px; border-radius: 8px; color: white;">
         <div>Label</div>
         <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
         <div>Label: Value 2</div>
       </div>
-      
-      
       <div class="grid-item" tabindex="0" (click)="openKPIModal5(KPIModal5,'')" style="background: #2a3439; padding: 20px; border-radius: 8px; color: white;">
         <div>Label</div>
         <div tabindex="0">Label: Value 2</div>
         <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
         <div>Label: Value 3</div>
       </div>
-      
-      
-      
-      <div class="grid-item" tabindex="0" style="background-color: rgb(135, 222, 222);">
-
-
-        <!-- <div id="bulletChart"style="height:100px"></div> -->
-        <!-- (click)="openKPIModal6(KPIModal6, '')" -->
-         <h1>Coming Soon</h1>
-
+      <!-- <div class="grid-item" tabindex="0" style="background-color: rgb(135, 222, 222);">
+        <h1>Coming Soon</h1>
       </div>
-      
       <div class="grid-item" tabindex="0" style="background-color: burlywood;">
         <h1>Coming Soon</h1>
-
-          <!-- <div id="chart-gauge" style="height:117px;width: 240px;"></div> -->
-   
-     
       </div>
       <div class="grid-item" tabindex="0" style="background-color: rgb(222, 135, 176);">
         <h1>Coming Soon</h1>
- 
-        <!-- <h4>Full Dial Chart</h4> -->
-    
-       
-      </div>
-
-
-      
-
-  
-
-
-
-      
-      
+      </div> -->
     </div>
+    
+    <div *ngIf="showGrid" class="container" style="margin-top: 10px;">
+      <div class="row">
+        <!-- Grid item spanning full width -->
+        <div class="col-md-12">
+          <div 
+            *ngIf="showTitleGrid" 
+            class="grid-item" 
+            tabindex="0" 
+         
+            style="background: linear-gradient(to right, #6a11cb, #2575fc); padding: 20px; border-radius: 8px; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); cursor: pointer;"  (click)="openTitleModal(TitleModal)">
+            <div tabindex="0" style="margin-top: 10px; font-size: 1.2em; font-weight: bold;">Add Title Here</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    
+    
+    
+
+
   </div>
   
 
@@ -858,19 +1257,27 @@ flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20
   <button type="button" class="btn btn-danger" (click)="modal.dismiss()">Cancel</button>
   
   <!-- Conditionally display the Save button for Add Summary -->
-  <button *ngIf="selectedTab === 'add-dashboard' && !showModal" type="button" class="btn btn-primary" 
+  <button *ngIf="selectedTab === 'add-dashboard' && !showModal" 
+  type="button" 
+  class="btn btn-primary" 
+  [disabled]="createSummaryField.invalid || isDuplicateID || isDuplicateName" 
+  (click)="createNewSummary(); modal.dismiss()">
+Save
+</button>
 
-    (click)="createNewSummary(); modal.dismiss()">Save</button>
+
     
   <!-- Conditionally display the Update button for Edit Summary only when in edit mode -->
-  <button *ngIf="selectedTab === 'add-dashboard' && showModal" type="button" class="btn btn-primary" 
-    [disabled]="createSummaryField.invalid" 
-    (click)="updateSummary(createSummaryField.value, 'editSummary'); modal.dismiss()">Update</button>
+  <button *ngIf="selectedTab === 'add-dashboard' && showModal" 
+  type="button" 
+  class="btn btn-primary" 
+  [disabled]="createSummaryField.invalid" 
+  (click)="updateSummary(createSummaryField.value, 'editSummary'); modal.dismiss()">
+Update
+</button>
 
-  <!-- Conditionally display the Update Widget button only in Edit Widget mode (when 'add-widget' is selected and showModal is true) -->
-  <!-- <button *ngIf="selectedTab === 'add-widget' && showModal" type="button" class="btn btn-primary" 
-    [disabled]="createSummaryField.invalid" 
-    (click)="updateWidget(createSummaryField.value, 'editWidget'); modal.dismiss()">Update Widget</button> -->
+
+
 </div>
 
 </ng-template>
@@ -895,43 +1302,37 @@ flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20
 
 <!-- The Modal 1-->
 <div class="modal fade" id="myModalLocation" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true"
-data-bs-backdrop="static" data-bs-keyboard="false">
-<div class="modal-dialog modal-dialog-centered" style="max-width: 450px; width: 100%; transform: translate(30%, 0);">
-  <div class="modal-content" style="width: 100%;">
-    <div class="modal-header" style="padding-bottom: 15px;">
-      <h2 class="modal-title">Location</h2>
-      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    </div>
-    <br>
-    <div class="container">
-      <input type="search" id="search" class="form-control"
-        style="margin: 0 auto 1em auto; padding: 4px; border-radius: 4px; border: 1px solid silver;"
-        placeholder="Search Locations/Forms..." />
-    </div>
-    <div class="container scroll-y h-300px" id="SimpleJSTree"></div>
-    <div class="modal-footer">
+     data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 450px; width: 100%;">
+    <div class="modal-content" style="width: 100%;">
+      <div class="modal-header" style="padding-bottom: 15px;">
+        <h2 class="modal-title">Location</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <br>
       <div class="container">
-        <div class="row">
-          <div class="col-md-6">
-            <button type="button" class="btn btn-sm btn-primary" [disabled]="!enableLocationButton"
-              data-bs-dismiss="modal" (click)="LocationSummary()">
-
-              Ok
-            </button>
-            &nbsp;
-            <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal">
-
-              Cancel
-            </button>
+        <input type="search" id="search" class="form-control"
+               style="margin: 0 auto 1em auto; padding: 4px; border-radius: 4px; border: 1px solid silver;"
+               placeholder="Search Locations/Forms..." />
+      </div>
+      <div class="container scroll-y h-300px" id="SimpleJSTree"></div>
+      <div class="modal-footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6">
+              <button type="button" class="btn btn-sm btn-primary" [disabled]="!enableLocationButton"
+                      data-bs-dismiss="modal" (click)="LocationSummary()">Ok</button>
+              &nbsp;
+              <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal">Cancel</button>
+            </div>
+            <!-- Add Location Button -->
           </div>
-          <!-- Add Location Button -->
-
         </div>
       </div>
     </div>
   </div>
 </div>
-</div>
+
 
 
 
@@ -970,7 +1371,14 @@ data-bs-backdrop="static" data-bs-keyboard="false">
           <div class="row g-3"> <!-- g-3 adds consistent gap between columns -->
             <!-- Existing fields from your modal go here (form controls, inputs, etc.) -->
             <div class="col-md-4">
-              <label for="formlist" class="col-form-label fw-bold fs-6 required">Forms</label>
+              <label for="formlist" class="col-form-label fw-bold fs-6 required">Forms
+                <span class="ms-2 text-primary" 
+                data-bs-toggle="tooltip" 
+                data-bs-placement="top" 
+                title="Select form from the list">
+            <i class="bi bi-info-circle fs-5"></i>
+          </span>
+              </label>
               <ngx-select
                 id="formlist"
                 [allowClear]="true"
@@ -1012,7 +1420,15 @@ data-bs-backdrop="static" data-bs-keyboard="false">
               </ngx-select>
             </div>
             <div class="col-md-4">
-              <label for="primaryValue" class="col-form-label fw-bold fs-6 required">Primary value</label>
+              <label for="primaryValue" class="col-form-label fw-bold fs-6 required">Primary value
+
+                  <span class="ms-2 text-primary" 
+          data-bs-toggle="tooltip" 
+          data-bs-placement="top" 
+          title="Show Value As">
+      <i class="bi bi-info-circle fs-5"></i>
+    </span>
+              </label>
               <ngx-select
                 id="primaryValue"
                 [allowClear]="true"
@@ -1023,7 +1439,10 @@ data-bs-backdrop="static" data-bs-keyboard="false">
                 optionTextField="text"
                 placeholder="Select Group"
                 (change)="onValueChange($event)" 
-                class="w-100">
+                class="w-100"
+                [title]="isEditMode ? 'Edit mode: Show value as' : 'Add mode: Select value to show'"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top">
               </ngx-select>
             </div>
             <div class="col-md-4" *ngIf="primaryValue?.value === 'Constant'">
@@ -1186,7 +1605,14 @@ aria-describedby="rangeCalendarCenterDesc"
 *ngIf="!isEditMode" 
 
 [disabled]="createKPIWidget.invalid">Save</button>
-      <button type="button" class="btn btn-warning" (click)="updateTile(); modal.dismiss()" *ngIf="isEditMode">Update</button>
+<button 
+    type="button" 
+    class="btn btn-warning" 
+    (click)="updateTile(); modal.dismiss()" 
+    *ngIf="isEditMode" 
+    [disabled]="createKPIWidget.invalid">
+    Update
+  </button>
     </div>
   </div>
 </div>
@@ -1770,7 +2196,14 @@ aria-describedby="rangeCalendarCenterDesc"
         <div class="fv-row">
           <div class="row">
               <div class="col-md-4"> <!-- Column for the first dropdown -->
-                  <label class="col-form-label fw-bold fs-6 required">Primary Value</label>
+                  <label class="col-form-label fw-bold fs-6 required">Primary Value
+                    <span class="ms-2 text-primary" 
+                    data-bs-toggle="tooltip" 
+                    data-bs-placement="top" 
+                    title="Show Value As">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+                  </label>
                   <ngx-select
                       [allowClear]="true"
                       name="primary-icon"
@@ -1795,7 +2228,14 @@ aria-describedby="rangeCalendarCenterDesc"
                 />
               </div>
               <div class="col-md-4"> <!-- Column for the second dropdown -->
-                  <label class="col-form-label fw-bold fs-6 required">Secondary Value</label>
+                  <label class="col-form-label fw-bold fs-6 required">Secondary Value
+                    <span class="ms-2 text-primary" 
+                    data-bs-toggle="tooltip" 
+                    data-bs-placement="top" 
+                    title="Show Value As">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+                  </label>
                   <ngx-select
                       [allowClear]="true"
                       name="secondary-icon"
@@ -1858,7 +2298,7 @@ aria-describedby="rangeCalendarCenterDesc"
           <!-- Themes Section -->
 <div class="row g-3">
 <div class="col-md-6">
-  <label class="col-form-label fw-bold fs-6">Themes:</label>
+  <label class="col-form-label fw-bold fs-6 required">Themes:</label>
   <div class="color-boxes">
     <div
       *ngFor="let theme of themes"
@@ -1988,7 +2428,14 @@ aria-describedby="rangeCalendarCenterDesc"
         <div class="fv-row">
           <div class="row">
               <div class="col-md-4"> <!-- Column for the first dropdown -->
-                  <label class="col-form-label fw-bold fs-6 required">Primary Value</label>
+                  <label class="col-form-label fw-bold fs-6 required">Primary Value
+                    <span class="ms-2 text-primary" 
+                    data-bs-toggle="tooltip" 
+                    data-bs-placement="top" 
+                    title="Show Value As">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+                  </label>
                   <ngx-select
                       [allowClear]="true"
                       name="primary-icon"
@@ -2013,7 +2460,14 @@ aria-describedby="rangeCalendarCenterDesc"
                 />
               </div>
               <div class="col-md-4"> <!-- Column for the second dropdown -->
-                  <label class="col-form-label fw-bold fs-6 required">Secondary Value</label>
+                  <label class="col-form-label fw-bold fs-6 required">Secondary Value
+                    <span class="ms-2 text-primary" 
+                    data-bs-toggle="tooltip" 
+                    data-bs-placement="top" 
+                    title="Show Value As">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+                  </label>
                   <ngx-select
                       [allowClear]="true"
                       name="secondary-icon"
@@ -2027,7 +2481,14 @@ aria-describedby="rangeCalendarCenterDesc"
               </div>
 
               <div class="col-md-4"> <!-- Column for the second dropdown -->
-                <label class="col-form-label fw-bold fs-6 required">Tertiary Value</label>
+                <label class="col-form-label fw-bold fs-6 required">Tertiary Value
+                  <span class="ms-2 text-primary" 
+                  data-bs-toggle="tooltip" 
+                  data-bs-placement="top" 
+                  title="Show Value As">
+              <i class="bi bi-info-circle fs-5"></i>
+            </span>
+                </label>
                 <ngx-select
                     [allowClear]="true"
                     name="secondary-icon"
@@ -2089,7 +2550,7 @@ aria-describedby="rangeCalendarCenterDesc"
           <!-- Themes Section -->
           <div class="row g-3">
           <div class="col-md-6">
-            <label class="col-form-label fw-bold fs-6">Themes:</label>
+            <label class="col-form-label fw-bold fs-6 required">Themes:</label>
             <div class="color-boxes">
               <div
               *ngFor="let theme of themes"
@@ -2216,7 +2677,14 @@ aria-describedby="rangeCalendarCenterDesc"
         <div class="fv-row">
           <div class="row">
               <div class="col-md-4"> <!-- Column for the first dropdown -->
-                  <label class="col-form-label fw-bold fs-6 required">Primary Value</label>
+                  <label class="col-form-label fw-bold fs-6 required">Primary Value
+                    <span class="ms-2 text-primary" 
+                    data-bs-toggle="tooltip" 
+                    data-bs-placement="top" 
+                    title="Show Value As">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+                  </label>
                   <ngx-select
                       [allowClear]="true"
                       name="primary-icon"
@@ -2243,7 +2711,14 @@ aria-describedby="rangeCalendarCenterDesc"
                 />
               </div>
               <div class="col-md-4"> <!-- Column for the second dropdown -->
-                  <label class="col-form-label fw-bold fs-6 required">Compare From</label>
+                  <label class="col-form-label fw-bold fs-6 required">Compare From
+                    <span class="ms-2 text-primary" 
+                    data-bs-toggle="tooltip" 
+                    data-bs-placement="top" 
+                    title="Comparision Indicator">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+                  </label>
                   <ngx-select
                       [allowClear]="true"
                       name="secondary-icon"
@@ -2257,7 +2732,14 @@ aria-describedby="rangeCalendarCenterDesc"
               </div>
 
               <div class="col-md-4"> <!-- Column for the second dropdown -->
-                <label class="col-form-label fw-bold fs-6 required">Compare To</label>
+                <label class="col-form-label fw-bold fs-6 required">Compare To
+                  <span class="ms-2 text-primary" 
+                  data-bs-toggle="tooltip" 
+                  data-bs-placement="top" 
+                  title="Comparision Indicator">
+              <i class="bi bi-info-circle fs-5"></i>
+            </span>
+                </label>
                 <ngx-select
                     [allowClear]="true"
                     name="secondary-icon"
@@ -2318,7 +2800,7 @@ aria-describedby="rangeCalendarCenterDesc"
         <!-- Themes Section -->
         <div class="row g-3">
         <div class="col-md-6">
-          <label class="col-form-label fw-bold fs-6">Themes:</label>
+          <label class="col-form-label fw-bold fs-6 required">Themes:</label>
           <div class="color-boxes">
             <div
             *ngFor="let theme of themes"
@@ -2446,7 +2928,14 @@ aria-describedby="rangeCalendarCenterDesc"
         <div class="fv-row">
           <div class="row">
               <div class="col-md-4"> <!-- Column for the first dropdown -->
-                  <label class="col-form-label fw-bold fs-6 required">Primary Value</label>
+                  <label class="col-form-label fw-bold fs-6 required">Primary Value
+                    <span class="ms-2 text-primary" 
+                    data-bs-toggle="tooltip" 
+                    data-bs-placement="top" 
+                    title="Show Value As">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+                  </label>
                   <ngx-select
                       [allowClear]="true"
                       name="primary-icon"
@@ -2473,7 +2962,14 @@ aria-describedby="rangeCalendarCenterDesc"
                 />
               </div>
               <div class="col-md-4"> <!-- Column for the second dropdown -->
-                  <label class="col-form-label fw-bold fs-6 required">Compare From</label>
+                  <label class="col-form-label fw-bold fs-6 required">Compare From
+                    <span class="ms-2 text-primary" 
+                    data-bs-toggle="tooltip" 
+                    data-bs-placement="top" 
+                    title="Comparision Indicator">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+                  </label>
                   <ngx-select
                       [allowClear]="true"
                       name="secondary-icon"
@@ -2487,7 +2983,14 @@ aria-describedby="rangeCalendarCenterDesc"
               </div>
 
               <div class="col-md-4"> <!-- Column for the second dropdown -->
-                <label class="col-form-label fw-bold fs-6 required">Compare To</label>
+                <label class="col-form-label fw-bold fs-6 required">Compare To
+                  <span class="ms-2 text-primary" 
+                  data-bs-toggle="tooltip" 
+                  data-bs-placement="top" 
+                  title="Comparision Indicator">
+              <i class="bi bi-info-circle fs-5"></i>
+            </span>
+                </label>
                 <ngx-select
                     [allowClear]="true"
                     name="secondary-icon"
@@ -2518,7 +3021,14 @@ aria-describedby="rangeCalendarCenterDesc"
     
               </div>
               <div class="col-md-4"> <!-- Column for the second dropdown -->
-                <label class="col-form-label fw-bold fs-6 required">Secondary Value</label>
+                <label class="col-form-label fw-bold fs-6 required">Secondary Value
+                  <span class="ms-2 text-primary" 
+                  data-bs-toggle="tooltip" 
+                  data-bs-placement="top" 
+                  title="Show Value As">
+              <i class="bi bi-info-circle fs-5"></i>
+            </span>
+                </label>
                 <ngx-select
                     [allowClear]="true"
                     name="secondary-icon"
@@ -2561,7 +3071,7 @@ aria-describedby="rangeCalendarCenterDesc"
           <!-- Themes Section -->
           <div class="row g-3">
           <div class="col-md-6">
-            <label class="col-form-label fw-bold fs-6">Themes:</label>
+            <label class="col-form-label fw-bold fs-6 required">Themes:</label>
             <div class="color-boxes">
               <div
               *ngFor="let theme of themes"
@@ -2694,7 +3204,14 @@ aria-describedby="rangeCalendarCenterDesc"
         <div class="fv-row">
           <div class="row">
               <div class="col-md-4"> <!-- Column for the first dropdown -->
-                  <label class="col-form-label fw-bold fs-6 required">Primary Value</label>
+                  <label class="col-form-label fw-bold fs-6 required">Primary Value
+                    <span class="ms-2 text-primary" 
+                    data-bs-toggle="tooltip" 
+                    data-bs-placement="top" 
+                    title="Show Value As">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+                  </label>
                   <ngx-select
                       [allowClear]="true"
                       name="primary-icon"
@@ -2719,7 +3236,14 @@ aria-describedby="rangeCalendarCenterDesc"
                 />
               </div>
               <div class="col-md-4"> <!-- Column for the second dropdown -->
-                  <label class="col-form-label fw-bold fs-6 required">Secondary Value</label>
+                  <label class="col-form-label fw-bold fs-6 required">Secondary Value
+                    <span class="ms-2 text-primary" 
+                    data-bs-toggle="tooltip" 
+                    data-bs-placement="top" 
+                    title="Show Value As">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+                  </label>
                   <ngx-select
                       [allowClear]="true"
                       name="secondary-icon"
@@ -2733,7 +3257,14 @@ aria-describedby="rangeCalendarCenterDesc"
               </div>
 
               <div class="col-md-4"> <!-- Column for the second dropdown -->
-                <label class="col-form-label fw-bold fs-6 required">Tertiary Value</label>
+                <label class="col-form-label fw-bold fs-6 required">Tertiary Value
+                  <span class="ms-2 text-primary" 
+                  data-bs-toggle="tooltip" 
+                  data-bs-placement="top" 
+                  title="Show Value As">
+              <i class="bi bi-info-circle fs-5"></i>
+            </span>
+                </label>
                 <ngx-select
                     [allowClear]="true"
                     name="secondary-icon"
@@ -2795,7 +3326,7 @@ aria-describedby="rangeCalendarCenterDesc"
           <!-- Themes Section -->
           <div class="row g-3">
           <div class="col-md-6">
-            <label class="col-form-label fw-bold fs-6">Themes:</label>
+            <label class="col-form-label fw-bold fs-6 required">Themes:</label>
             <div class="color-boxes">
               <div
               *ngFor="let theme of themes"
@@ -3073,6 +3604,226 @@ aria-describedby="rangeCalendarCenterDesc"
 </div>
 </div>
 </ng-template>
+
+
+<ng-template #TitleModal let-modal>
+  <div class="modal-content" style="border-radius: 8px; overflow: hidden;">
+    <div class="modal-header">
+      <h4 class="modal-title">Add Title</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+
+    <div class="fv-row" [formGroup]="createTitle">
+      <div class="modal-body">
+        <div class="card-body pt-0">
+
+          <!-- Rich Text Editor Toolbar -->
+          <div class="editor-toolbar d-flex align-items-center gap-2 mb-3">
+            <button
+            type="button"
+            class="btn btn-light"
+            [class.active]="createTitle.value.fontStyle === 'italic'"
+            (click)="toggleItalic()"
+          >
+            <i>I</i>
+          </button>
+            <!-- Bold Button -->
+            <button
+              type="button"
+              class="btn btn-light"
+              [class.active]="createTitle.value.fontWeight === 'bold'"
+              (click)="toggleBold()"
+            >
+              <b>B</b>
+            </button>
+          
+            <!-- Italic Button -->
+         
+          
+            <!-- Underline Button -->
+            <button
+              type="button"
+              class="btn btn-light"
+              [class.active]="createTitle.value.textDecoration === 'underline'"
+              (click)="toggleUnderline()"
+            >
+              <u>U</u>
+            </button>
+          
+            <!-- Alignment Buttons -->
+            <button
+              type="button"
+              class="btn btn-light"
+              [class.active]="createTitle.value.textAlign === 'left'"
+              (click)="setTextAlignment('left')"
+            >
+              <i class="bi bi-text-left"></i>
+            </button>
+            <button
+              type="button"
+              class="btn btn-light"
+              [class.active]="createTitle.value.textAlign === 'center'"
+              (click)="setTextAlignment('center')"
+            >
+              <i class="bi bi-text-center"></i>
+            </button>
+            <button
+              type="button"
+              class="btn btn-light"
+              [class.active]="createTitle.value.textAlign === 'right'"
+              (click)="setTextAlignment('right')"
+            >
+              <i class="bi bi-text-right"></i>
+            </button>
+          
+            <!-- Font Family Selector -->
+            <select
+            class="form-select"
+            (change)="onFontChange($event)"
+            [value]="createTitle.value.fontFamily"
+            style="width: auto;"
+          >
+            <option value="Lato">Lato</option>
+            <option value="Open Sans">Open Sans</option>
+            <option value="Roboto">Roboto</option>
+            <option value="Serif">Serif</option>
+            <option value="Arial">Arial</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Tahoma">Tahoma</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Trebuchet MS">Trebuchet MS</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Comic Sans MS">Comic Sans MS</option>
+            <option value="Calibri">Calibri</option>
+            <option value="Lucida Sans Unicode">Lucida Sans Unicode</option>
+            <option value="Impact">Impact</option>
+            <option value="Garamond">Garamond</option>
+            <option value="Palatino Linotype">Palatino Linotype</option>
+            <option value="Arial Black">Arial Black</option>
+          </select>
+          
+          
+            <!-- Font Size Selector -->
+            <select
+            class="form-select"
+            (change)="onFontSizeChange($event)"
+            [value]="createTitle.value.fontSize"
+            style="width: auto;"
+          >
+            <option value="8px">8</option>
+            <option value="10px">10</option>
+            <option value="12px">12</option>
+            <option value="14px">14</option>
+            <option value="16px">16</option>
+            <option value="18px">18</option>
+            <option value="20px">20</option>
+            <option value="22px">22</option>
+            <option value="24px">24</option>
+            <option value="26px">26</option>
+            <option value="28px">28</option>
+            <option value="30px">30</option>
+            <option value="36px">36</option>
+            <option value="42px">42</option>
+            <option value="48px">48</option>
+            <option value="56px">56</option>
+            <option value="64px">64</option>
+            <option value="72px">72</option>
+            <option value="80px">80</option>
+            <option value="90px">90</option>
+            <option value="100px">100</option>
+          </select>
+          
+          
+            <!-- Background Color Picker -->
+
+            
+          </div>
+          <div class="color-picker-row" style="display: flex; gap: 1rem; align-items: center;">
+            <!-- Background Color Picker -->
+            <div class="color-picker-container">
+              <label for="bgColorPicker" class="form-label">Choose Background Color:</label>
+              <input
+                id="bgColorPicker"
+                type="color"
+                class="form-control-color"
+                [value]="createTitle.value.themeColor || '#ffffff'"
+                (input)="updateNameContainerColor($event)"
+                [style.background]="createTitle.value.themeColor || '#ffffff'"
+                title="Choose Name container background color"
+              />
+            </div>
+            
+            <!-- Text Color Picker -->
+            <div class="color-picker-container">
+              <label for="textColorPicker" class="form-label">Choose Text Color:</label>
+              <input
+                id="textColorPicker"
+                type="color"
+                class="form-control-color"
+                [value]="createTitle.value.textColor || '#000000'"
+                (input)="updateTextColor($event)"
+                [style.background]="createTitle.value.textColor || '#000000'"
+                title="Choose text color"
+              />
+            </div>
+          </div>
+          
+          
+          <!-- Name Container -->
+          <div
+          class="col-md-12"
+          style="padding: 10px; border-radius: 8px;"
+        >
+          <label class="col-form-label fw-bold fs-6 required">Name</label>
+          <div
+          formControlName="customLabel"
+          contenteditable="true"
+          class="form-control form-control-solid rich-text-editor"
+          [style.font-family]="createTitle.value.fontFamily"
+          [style.font-size]="createTitle.value.fontSize"
+          [style.text-align]="createTitle.value.textAlign"
+          [style.font-weight]="createTitle.value.fontWeight"
+          [style.font-style]="createTitle.value.fontStyle"
+          [style.text-decoration]="createTitle.value.textDecoration"
+          [style.background-color]="createTitle.value.themeColor"
+          [style.color]="createTitle.value.textColor"
+          (input)="updateCustomLabel($event)"
+          [textContent]="createTitle.value.customLabel"
+        >
+        </div>
+        
+        
+        
+        
+          <!-- Validation Feedback -->
+          <div
+            class="invalid-feedback"
+            *ngIf="createTitle.get('customLabel')?.invalid && createTitle.get('customLabel')?.touched"
+            style="padding: 5px; border-radius: 5px;"
+          >
+            Title Name is required
+          </div>
+        </div>
+        
+          
+        
+
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
+        <button type="button" class="btn btn-primary" (click)="addTile('title'); modal.dismiss()" *ngIf="!isEditMode">Save</button>
+        <button type="button" class="btn btn-warning" (click)="updateTitle(); modal.dismiss()" *ngIf="isEditMode">Update</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+
+
 
 
 

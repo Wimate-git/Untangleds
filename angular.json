@@ -39,15 +39,21 @@
               "src/assets"
             ],
 "styles": [
+  {
+    "input": "node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+  },
+ 
   "src/styles.scss", 
   "node_modules/datatables.net-bs5/css/dataTables.bootstrap5.min.css", 
-  "node_modules/primeng/resources/themes/lara-light-blue/theme.css", 
-  "node_modules/primeng/resources/primeng.min.css", 
+
   "node_modules/ngx-spinner/animations/square-jelly-box.css", 
-  "node_modules/jstree/dist/themes/default/style.min.css" 
+  "node_modules/jstree/dist/themes/default/style.min.css"
+  
+  
 ],
 
 "scripts": [
+ 
   "node_modules/jquery/dist/jquery.min.js",  
   "node_modules/datatables.net/js/dataTables.js", 
   "node_modules/datatables.net-bs5/js/dataTables.bootstrap5.min.js", 
@@ -56,6 +62,7 @@
   "node_modules/datatables.net-buttons/js/buttons.html5.js", 
   "node_modules/datatables.net-buttons/js/buttons.print.js", 
   "node_modules/jstree/dist/jstree.min.js" 
+
 ]
 
 

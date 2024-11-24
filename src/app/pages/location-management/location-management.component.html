@@ -449,11 +449,11 @@
 
                         <button type="button" class="btn btn-sm btn-primary not-allowed"
                             (click)="updateLocation('','location')" data-bs-toggle="modal" data-bs-target="#myModal"
-                            [disabled]="createLocationField.invalid ||  this.All_button_permissions" *ngIf="showNewLoc">Save</button>
+                            [disabled]="createLocationField.invalid ||  this.All_button_permissions" *ngIf="showNewLoc" [disabled]="createLocationField.invalid">Save</button>
                         <button type="button" class="btn btn-sm btn-primary not-allowed"
                             (click)="updateLocation('','updatelocation')" data-bs-toggle="modal"
                             data-bs-target="#myModal"  *ngIf="!showNewLoc && hideDeleteButton"
-                            [disabled]="createLocationField.invalid ||  this.All_button_permissions">Update</button>
+                            [disabled]="createLocationField.invalid ||  this.All_button_permissions" [disabled]="createLocationField.invalid">Update</button>
                     </div>
 
                 </div>
