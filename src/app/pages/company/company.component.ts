@@ -221,8 +221,11 @@ export class CompanyComponent implements OnInit{
         },
         {
           title: 'Updated', data: 'P4', render: function (data) {
-            const date = new Date(data * 1000);
-            return `${date.toDateString()} ${date.toLocaleTimeString()}`; // Format the date and time
+            const date = new Date(data * 1000).toLocaleDateString() + " " + new Date(data * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+
+            // const date = new Date(data * 1000);
+            // return `${date.toDateString()} ${date.toLocaleTimeString()}`; // Format the date and time
+            return date
           }
         }
       ],

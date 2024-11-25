@@ -1,6 +1,6 @@
 <div class="card card-custom">
     <div class="card-header border-0 pt-6">
-        <h2>Connection Configuration</h2>
+        <h2>Communication Configuration</h2>
     </div>
     <div class="card-header border-0 pt-0">
 
@@ -45,50 +45,525 @@
 <ng-template #companyModal let-modal>
     <form [formGroup]="createConnectionField" (ngSubmit)="onSubmit($event)">
         <div class="modal-header">
-            <h4 *ngIf="editOperation" class="modal-title" id="modal-basic-title">Edit Connection Configuration</h4>
-            <h4 *ngIf="!editOperation" class="modal-title" id="modal-basic-title">Add Connection Configuration</h4>
+            <h4 *ngIf="editOperation" class="modal-title" id="modal-basic-title">Edit Communication Configuration</h4>
+            <h4 *ngIf="!editOperation" class="modal-title" id="modal-basic-title">Add Communication Configuration</h4>
             <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
         </div>
 
+    
+
         <div class="modal-body">
-                <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-1000px" id="kt_modal_update_customer_scroll"
+            <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-1000px" id="kt_modal_update_customer_scroll"
                 data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}"
                 data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_update_customer_header"
                 data-kt-scroll-wrappers="#kt_modal_update_customer_scroll" data-kt-scroll-offset="300px">
-                <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
-                    
+
+                <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1" >
+                    <div class="container" style=" margin-bottom: 20px;padding: 10px;">
+                        <div class="row mb-2">
+                            <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Communication ID</label>
+                                <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter connection ID" name="comtnID" formControlName="comtnID" required
+                                    (keyup)="checkUniqueIdentifier($event)">
+                                <span style="color: #fc1900;">{{errorForUniqueID}}</span>
+                                <div *ngIf="createConnectionField.get('comtnID')?.hasError('required') &&
+                                            createConnectionField.get('comtnID')?.touched"
+                                    class="fv-plugins-message-container invalid-feedback">
+                                    Communication ID is required
+                                </div>
+                            </div>
 
 
+                            <div class="col-md-4">
+                                <label class="fw-semibold fs-6 mb-2">Version</label>
+                                <input type="number" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Version" name="version" formControlName="version" 
+                                    >
+                            </div>
 
-                    <div class="container">
+
+                            <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Username</label>
+                                <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Username" name="username" formControlName="username" 
+                                    required >
+                            </div>
+
+
+                         
+
+                        </div>
+
                         <div class="row">
                             <div class="col-md-4">
-                                <label class="required fw-semibold fs-6 mb-2">Connection ID</label>
-        
-                                <input type="text" class="
-                                form-control form-control-lg form-control-solid
-                                mb-3 mb-lg-0
-                              " placeholder="Enter connection ID" name="contnID" formControlName="contnID" required 
-                              (keyup)="checkUniqueIdentifier($event)">
-        
-                              <span style="color: #fc1900;">{{errorForUniqueID}}</span>
-                                <div *ngIf="
-                                createConnectionField.get('contnID')?.hasError('required') &&
-                                createConnectionField.get('contnID')?.touched
-                              " class="fv-plugins-message-container invalid-feedback">
-                                    Company ID is required
-                                </div>
-        
+                                <label class="required fw-semibold fs-6 mb-2">Password</label>
+                                <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Password" name="password" formControlName="password" 
+                                    required >
                             </div>
                         </div>
                     </div>
+                </div>
+                
+                <!-- Telegram Section -->
+                <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+                    <div class="container custom-container">
+                        <h5 class="section-title"><i class="bi bi-telegram fs-4"></i>Telegram</h5>
+                        <div class="row">
+                            
+
+                            <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Chat ID</label>
+                                <input type="text" maxlength=15 class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter chat ID" name="chatID" formControlName="chatID" required>
+                                <div *ngIf="createConnectionField.get('chatID')?.hasError('required') &&
+                                            createConnectionField.get('chatID')?.touched"
+                                    class="fv-plugins-message-container invalid-feedback">
+                                    Telegram chatID is required
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Bot Token</label>
+                                <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Bot token" name="botToken" formControlName="botToken" required>
+                                <div *ngIf="createConnectionField.get('botToken')?.hasError('required') &&
+                                            createConnectionField.get('botToken')?.touched"
+                                    class="fv-plugins-message-container invalid-feedback">
+                                    Telegram Bot token is required
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Priority</label>
+                                <input type="number" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Priority" name="telegramPriority" formControlName="telegramPriority" required> 
+                                <!-- <div *ngIf="createConnectionField.get('smsNumber')?.hasError('required') &&
+                                            createConnectionField.get('smsNumber')?.touched"
+                                    class="fv-plugins-message-container invalid-feedback">
+                                    Balance is required
+                                </div> -->
+                            </div>
+
+
+                            <div class="col-md-4">
+                                <div class="col-md-4 form-check form-switch" style="padding-top: 40px;">
+                                    <input class="col-lg-6 form-check-input" formControlName="telegramToken"
+                                        type="checkbox" style="margin-right: 5px;">
+                                    <label class="fw-semibold fs-6 mb-2" style="padding-top: 0px;">
+                                        <b>Token</b>
+                                    </label>
+                                </div>
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SMS Section (To be added later) -->
+                <div class="collapse show" #collapse2="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+                    <div class="container custom-container">
+                        <h5 class="section-title"><i class="bi  bi-chat-quote-fill fs-4" style="margin-right: 2px;"></i>SMS</h5>
+                        <div class="row mb-2">
+                            <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Phone Number</label>
+                                <input type="text" minlength=10 maxlength=10 class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter SMS Phone Number" name="smsNumber" formControlName="smsNumber"
+                                    (keypress)="keyPress($event);" (keyup)="uniqueMobile($event)" pattern="^[0-9]{10}$"  required>
+
+
+                                    <span style="color: #fc1900;">{{errorForUniquemobileID}}</span>
+                                    <div *ngIf="
+                                           createConnectionField.get('smsNumber')?.hasError('required') &&
+                                           createConnectionField.get('smsNumber')?.touched 
+                                      " class="fv-plugins-message-container invalid-feedback">
+                                        SMS Phone Number is required
+                                    </div>
+                            </div>
+
+
+                            <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Priority</label>
+                                <input type="number" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Priority" name="smsPriority" formControlName="smsPriority" required>
+                                <!-- <div *ngIf="createConnectionField.get('smsNumber')?.hasError('required') &&
+                                            createConnectionField.get('smsNumber')?.touched"
+                                    class="fv-plugins-message-container invalid-feedback">
+                                    Balance is required
+                                </div> -->
+                            </div>
+                           
+
+
+
+                            <div class="col-md-4">
+                                <label class="fw-semibold fs-6 mb-2">Url</label>
+                                <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter url" name="smsUrl" formControlName="smsUrl">
+                                <!-- <div *ngIf="createConnectionField.get('smsNumber')?.hasError('required') &&
+                                            createConnectionField.get('smsNumber')?.touched"
+                                    class="fv-plugins-message-container invalid-feedback">
+                                    Balance is required
+                                </div> -->
+                            </div>
+
+
+                           
+
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-4">
+                                <label class="fw-semibold fs-6 mb-2">Message Prefix</label>
+                                <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Message Prefix" name="message_prefix" formControlName="message_prefix">
+                                <!-- <div *ngIf="createConnectionField.get('smsNumber')?.hasError('required') &&
+                                            createConnectionField.get('smsNumber')?.touched"
+                                    class="fv-plugins-message-container invalid-feedback">
+                                    Balance is required
+                                </div> -->
+                            </div>
+
+
+                            <div class="col-md-4">
+                                <label class="fw-semibold fs-6 mb-2">Message Sufix</label>
+                                <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Message Sufix" name="message_sufix" formControlName="message_sufix">
+                                <!-- <div *ngIf="createConnectionField.get('smsNumber')?.hasError('required') &&
+                                            createConnectionField.get('smsNumber')?.touched"
+                                    class="fv-plugins-message-container invalid-feedback">
+                                    Balance is required
+                                </div> -->
+                            </div>
+
+
+
+                            <div class="col-md-4">
+                                <label class="fw-semibold fs-6 mb-2">Sender</label>
+                                <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Sender" name="smsSender" formControlName="smsSender">
+                                <!-- <div *ngIf="createConnectionField.get('smsNumber')?.hasError('required') &&
+                                            createConnectionField.get('smsNumber')?.touched"
+                                    class="fv-plugins-message-container invalid-feedback">
+                                    Balance is required
+                                </div> -->
+                            </div>
+
+                        </div>
+
+
+                        <div class="row">
+
+                          
+
+
+                            <div class="col-md-4">
+                                <label class=" fw-semibold fs-6 mb-2">Balance Url</label>
+                                <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Balance url" name="smsBalanceUrl" formControlName="smsBalanceUrl" >
+                                <!-- <div *ngIf="createConnectionField.get('smsNumber')?.hasError('required') &&
+                                            createConnectionField.get('smsNumber')?.touched"
+                                    class="fv-plugins-message-container invalid-feedback">
+                                    Balance is required
+                                </div> -->
+                            </div>
+
+
+                            <div class="col-md-4">
+                                <label class="fw-semibold fs-6 mb-2">Key</label>
+                                <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Key" name="smsKey" formControlName="smsKey">
+                                <!-- <div *ngIf="createConnectionField.get('smsNumber')?.hasError('required') &&
+                                            createConnectionField.get('smsNumber')?.touched"
+                                    class="fv-plugins-message-container invalid-feedback">
+                                    Balance is required
+                                </div> -->
+                            </div>
+
+
+
+
+                            <div class="col-md-4">
+                                <div class="col-md-4 form-check form-switch" style="padding-top: 40px;">
+                                    <input class="col-lg-6 form-check-input" formControlName="smsToken"
+                                        type="checkbox" style="margin-right: 5px;">
+                                    <label class="fw-semibold fs-6 mb-2" style="padding-top: 0px;">
+                                        <b>Token</b>
+                                    </label>
+                            </div>
+                                </div>
+                           
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <!-- WhatsApp Section (To be added later) -->
+                <div class="collapse show" #collapse3="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+                    <div class="container custom-container">
+                        <h5 class="section-title"><i class="bi bi-whatsapp fs-4"></i>WhatsApp</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Phone Number</label>
+                                <input type="text" minlength=10 maxlength=10 class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter WhatsApp Number" pattern="^[0-9]{10}$"  name="whatsappNumber"
+                                    (keypress)="keyPress($event);" (keyup)="uniqueWhatsAppMobile($event)" formControlName="whatsappNumber" required>
+                               
+                                <span style="color: #fc1900;">{{errorForUniqueWhatsappmobileID}}</span>
+                                <div *ngIf="
+                                       createConnectionField.get('whatsappNumber')?.hasError('required') &&
+                                       createConnectionField.get('whatsappNumber')?.touched 
+                                  " class="fv-plugins-message-container invalid-feedback">
+                                    WhatsApp Phone Number is required
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Priority</label>
+                                <input type="number" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Priority" name="whatsAppPriority" formControlName="whatsAppPriority" required>
+                                <!-- <div *ngIf="createConnectionField.get('smsNumber')?.hasError('required') &&
+                                            createConnectionField.get('smsNumber')?.touched"
+                                    class="fv-plugins-message-container invalid-feedback">
+                                    Balance is required
+                                </div> -->
+                            </div>
+
+
+                            <div class="col-md-4">
+                                <div class="col-md-4 form-check form-switch" style="padding-top: 40px;">
+                                    <input class="col-lg-6 form-check-input" formControlName="whatsAppToken"
+                                        type="checkbox" style="margin-right: 5px;">
+                                    <label class="fw-semibold fs-6 mb-2" style="padding-top: 0px;">
+                                        <b>Token</b>
+                                    </label>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+                 <!-- WhatsApp Section (To be added later) -->
+                 <div class="collapse show" #collapse3="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+                    <div class="container custom-container">
+                        <h5 class="section-title"><i class="bi bi-envelope-at-fill fs-4"></i> Email</h5>
+                        <div class="row mb-2">
+                            <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Email ID</label>
+                                <input ngbTooltip="Check your inbox to verify this email address, Ignore if already done" type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Email"  name="email" formControlName="email"
+                                    (keyup)="checkUniqueEmail($event);checkMail($event)" required>
+                            
+
+                                <span style="color: #fc1900;">{{errorForUniqueEmail}}</span>
+                                <span style="color: #fc1900;">{{errorForInvalidEmail}}</span>
+                                <div *ngIf="
+                              createConnectionField.get('email')?.hasError('required') &&
+                              createConnectionField.get('email')?.touched && createConnectionField.get('email')?.errors?.pattern
+                            " class="fv-plugins-message-container invalid-feedback">
+                                    Email ID is required
+                                   
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Priority</label>
+                                <input type="number" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Priority" name="emailPriority" formControlName="emailPriority" required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="fw-semibold fs-6 mb-2">Name</label>
+                                <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Name" name="name" formControlName="name">
+                            </div>
+                            
+    
+                         
+
+                        </div>
+
+
+                        <div class="row mb-2">
+                            <div class="col-md-4">
+                                <label class="fw-semibold fs-6 mb-2">Error Date</label>
+                                <input type="datetime-local" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Error Date" name="errorDate" formControlName="errorDate">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="fw-semibold fs-6 mb-2">Response</label>
+                                <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Response" name="emailResponse" formControlName="emailResponse">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="fw-semibold fs-6 mb-2">Response Code</label>
+                                <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Response Code" name="responseCode" formControlName="responseCode">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="fw-semibold fs-6 mb-2">Mail Subject</label>
+                                <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Mail Subject" name="mailOptions_subject" formControlName="mailOptions_subject">
+                            </div>
+
+
+                            <div class="col-md-4">
+                                <label class="fw-semibold fs-6 mb-2">Mail To Address</label>
+                                <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Mail to Address" name="mailOptions_to" formControlName="mailOptions_to">
+                            </div>
+
+
+                            <div class="col-md-4">
+                                <div class="col-md-4 form-check form-switch" style="padding-top: 40px;">
+                                    <input class="col-lg-6 form-check-input" formControlName="emailToken"
+                                        type="checkbox" style="margin-right: 5px;">
+                                    <label class="fw-semibold fs-6 mb-2" style="padding-top: 0px;">
+                                        <b>Token</b>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- Push Notifications Section (To be added later) -->
+                <div class="collapse show" #collapse3="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+                    <div class="container custom-container">
+                        <h5 class="section-title"><i class="bi bi-app-indicator fs-4"></i> Push Notifications</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Token</label>
+                                <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Token ID"   name="tokenIDPush"
+                                     formControlName="tokenIDPush" required>
+                               
+                                <div *ngIf="
+                                       createConnectionField.get('tokenIDPush')?.hasError('required') &&
+                                       createConnectionField.get('tokenIDPush')?.touched 
+                                  " class="fv-plugins-message-container invalid-feedback">
+                                    Token ID is required
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Priority</label>
+                                <input type="number" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Enter Priority" name="pushPriority" formControlName="pushPriority" required>
+                                <!-- <div *ngIf="createConnectionField.get('smsNumber')?.hasError('required') &&
+                                            createConnectionField.get('smsNumber')?.touched"
+                                    class="fv-plugins-message-container invalid-feedback">
+                                    Balance is required
+                                </div> -->
+                            </div>
+
+
+                            <div class="col-md-4">
+                                <div class="col-md-4 form-check form-switch" style="padding-top: 40px;">
+                                    <input class="col-lg-6 form-check-input" formControlName="pushToken"
+                                        type="checkbox" style="margin-right: 5px;">
+                                    <label class="fw-semibold fs-6 mb-2" style="padding-top: 0px;">
+                                        <b>Token</b>
+                                    </label>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
 
 
 
 
 
+                <div class="container custom-container">
+                     <!-- Button to add a new dynamic field -->
+                     <button type="button" class="btn btn-info btn-sm mb-2 me-2" (click)="addDynamicField()">Add Field</button>
+                     <button type="button" class="btn btn-danger btn-sm mb-2" (click)="removeAllDynamicFields()">Remove All Field</button>
+                    <div class="row">
+                        
+                      <!-- Loop through the dynamic fields FormArray and render label-input pairs -->
+                      <div *ngFor="let field of dynamicFieldsArray.controls; let i = index" class="col-md-4">
+                        <div [formGroup]="field">
+                          <!-- Label input -->
+                          <label class="required fw-semibold fs-6 mb-2">Label</label> 
+                    
+                          <!-- <button type="button" class="btn btn-warning btn-circle"  (click)="removeDynamicField(i)"><i class="fa fa-times"></i>
+                          </button> -->
+
+                          <input type="text" placeholder="Enter Label" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" formControlName="label" >
+              
+                          <!-- Value input -->
+                          <label class="required fw-semibold fs-6 mb-2">Value</label>
+                          <input type="text" placeholder="Enter Value" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" formControlName="value" >
+              
+                          <div *ngIf="field.get('label')?.hasError('required') && field.get('label')?.touched" class="fv-plugins-message-container invalid-feedback">
+                            Label is required
+                          </div>
+                          <div *ngIf="field.get('value')?.hasError('required') && field.get('value')?.touched" class="fv-plugins-message-container invalid-feedback">
+                            Value is required
+                          </div>
+              
+                          <!-- Remove Button -->
+                          <button type="button" class="btn btn-danger btn-sm mt-2 mb-2" (click)="removeDynamicField(i)">Remove</button>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+            </div>
+
+                
+
+                 
+
+
+
+
+                <div class="modal-footer flex-center">
+                    <!--begin::Button-->
+                    <button type="reset" id="kt_modal_update_customer_cancel" class="btn btn-light me-3"
+                        (click)="modal.dismiss('cancel')">
+                        Discard
+                    </button>
+                    <!--end::Button-->
+        
+                    <!--begin::Button-->
+                    <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary"
+                    [disabled]="createConnectionField.invalid" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+                        <span *ngIf="!editOperation" class="indicator-label">
+                            Submit
+                        </span>
+                        <span *ngIf="editOperation"  class="indicator-label">
+                            Update
+                        </span>
+                        <span class="indicator-progress">
+                            Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                        </span>
+                    </button>
+                    <!--end::Button-->
                 </div>
             </div>
-        </div>
+        
     </form>
 </ng-template>

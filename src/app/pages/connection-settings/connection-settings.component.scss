@@ -1,0 +1,64 @@
+/* Style the section titles for better visibility */
+.section-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: #333;
+  
+}
+
+/* Optional: Style for separating the sections visually */
+.custom-container {
+    padding: 10px;
+    border-radius: 8px;
+    // background-color: #f9f9f9;
+    margin-bottom: 20px;
+    border: 1px ridge;
+}
+
+/* Optional: Make the section collapsible headers more distinct */
+.collapse .section-title {
+    cursor: pointer;
+    color: #007bff;
+}
+
+
+
+
+.bi-whatsapp{
+    margin-right: 2px;
+    color: #25d366;
+}
+
+
+.bi-telegram{
+    margin-right: 2px;
+    color: #0088cc
+}
+
+
+
+
+
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    padding: 6px 0px;
+    border-radius: 15px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.42857;
+}
+
+
+
+.btn:hover{
+    transform: translateY(-2px);
+    transition:0.8s
+}
+
+
+.bi-envelope-at-fill{
+    color: #FF0000;
+}

@@ -91,12 +91,14 @@ const Routing: Routes = [
     loadChildren: () => import('./location-management/location-management.module').then((m) => m.LocationManagementModule),
   },
 
+  
+
   {
     path: 'summary-engine',
     loadChildren: () => import('./summary-engine/summary-engine.module').then((m) => m.SummaryEngineModule),
   },
   {
-    path: 'connection',
+    path: 'Communication',
     loadChildren: () => import('./connection-settings/connection-settings.module').then((m) => m.ConnectionModule),
   },
   {
