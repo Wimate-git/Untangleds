@@ -52,6 +52,12 @@ export class DreamIdComponent implements OnInit{
 
      this.loginDetail_string = JSON.parse(this.login_detail) 
     console.log("AFTER JSON STRINGIFY",this.loginDetail_string)
+
+    delete this.loginDetail_string.profile_picture;
+
+
+    console.log("AFTER REMOVE OF pic:",this.loginDetail_string)
+    
     // this.loginDetail = JSON.parse(localStorage.getItem("currentUser")) 
       this.client=this.loginDetail_string.clientID
       this.user=this.loginDetail_string.username
@@ -130,7 +136,7 @@ export class DreamIdComponent implements OnInit{
           // Build the URL based on whether formId is provided or not
           this.url = `https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/` + this.url_result +
             `?t=${timestamp}` +
-            `&loginDetail=${this.login_string}` +
+            `&loginDetail=${JSON.stringify(JSON.stringify(this.loginDetail_string))}` +
             `&userPermissions=${userPermissions}` +
             `&theme=${this.theme}` +
             params_url;
