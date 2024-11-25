@@ -192,11 +192,13 @@ async forgotCognitoPass() {
       },
       onFailure: (err) => {
         console.error('Error in forgotPassword: ', err);
-        // Handle the error appropriately
-         // Handle the error appropriately
+        // Extract the error message from the error object if available
+        const errorMessage = err.message || 'An error occurred while sending the verification code. Please check your input and try again.';
+
+        // Display the error message in the Swal alert
         Swal.fire({
           title: 'Error',
-          text: 'An error occurred while sending the verification code. Please check your input and try again.',
+          text: errorMessage,  // Display the extracted error message
           icon: 'error',
           confirmButtonText: 'Okay'
         });

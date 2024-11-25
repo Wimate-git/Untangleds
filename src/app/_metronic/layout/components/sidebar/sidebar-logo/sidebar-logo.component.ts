@@ -16,6 +16,7 @@ export class SidebarLogoComponent implements OnInit, OnDestroy {
   @Input() toggleType: string = '';
   @Input() toggleState: string = '';
   currentLayoutType: any;
+  showLogo :boolean = false
 
   private linkElement: HTMLLinkElement
   private splashScreenLogoElement: HTMLImageElement;
@@ -54,6 +55,8 @@ export class SidebarLogoComponent implements OnInit, OnDestroy {
     // this.clientLogo = await this.getImage.getClientLogo()
 
     this.clientLogo = await this.getImage.getClientLogo()
+
+    this.showLogo = true
 
 
     if (this.linkElement && this.clientLogo) {

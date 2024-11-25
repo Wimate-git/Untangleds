@@ -1,5 +1,5 @@
 <!--begin::Logo image-->
-<a routerLink="/dashboard" class="logo-container">
+<a routerLink="/dashboard" class="logo-container" *ngIf="showLogo">
   <ng-container *ngIf="isDarkMode == 'dark'">
     <img
     alt="Logo"
@@ -16,6 +16,16 @@
   <img alt="Logo" [src]="clientLogo == [] || clientLogo == null || clientLogo == undefined ? './assets/media/misc/Wimate_Logo.png' : isDarkMode == 'light'?clientLogo && clientLogo[0] && clientLogo[0]:clientLogo && clientLogo && clientLogo[2] && clientLogo[2]" class="h-20px app-sidebar-logo-minimize" />
 </a>
 <!--end::Logo image-->
+
+
+<a routerLink="/" class="mb-12" *ngIf="!showLogo">
+  <img
+    alt="Logo"
+    src='./assets/Your paragraph text.gif'
+    style="width: 300px;"
+    class="h-75px"
+  />
+</a>
 
 
 <!-- <ng-container *ngIf="toggleEnabled">
