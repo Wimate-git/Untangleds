@@ -45,7 +45,8 @@
  
   "src/styles.scss", 
   "node_modules/datatables.net-bs5/css/dataTables.bootstrap5.min.css", 
-
+  "node_modules/primeng/resources/themes/lara-light-blue/theme.css",
+  "node_modules/primeng/resources/primeng.min.css",
   "node_modules/ngx-spinner/animations/square-jelly-box.css", 
   "node_modules/jstree/dist/themes/default/style.min.css"
   
