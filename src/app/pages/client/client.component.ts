@@ -12,6 +12,7 @@ import { Config } from "datatables.net";
 import { SwalComponent } from "@sweetalert2/ngx-sweetalert2";
 import { S3bucketService } from "src/app/modules/auth/services/s3bucket.service";
 import { stringify } from "querystring";
+import { HttpClient } from "@angular/common/http";
 
 
 interface ListItem {
@@ -81,6 +82,8 @@ export class ClientComponent implements OnInit {
   activeTabIndex: number = 0;
   subscritionFields: UntypedFormGroup;
 
+  dynamicFields: { name: string, label: string }[] = []; 
+
 
     addUnifier:boolean = false
     deviceForm: FormGroup;
@@ -114,7 +117,7 @@ export class ClientComponent implements OnInit {
     hover: boolean[] = [false, false, false, false];
     temporderedUrls: any[] = [undefined, undefined, undefined, undefined];
 
- 
+    iconList: string[] = []; 
   
 
     async ngOnInit(){
@@ -131,7 +134,7 @@ export class ClientComponent implements OnInit {
 
       this.showTable()
 
-
+      this.loadIcons()
      
     }
 
@@ -152,7 +155,7 @@ export class ClientComponent implements OnInit {
     }
 
     
-    constructor(private fb: UntypedFormBuilder,private cd:ChangeDetectorRef,private api: APIService,private toast: MatSnackBar,private companyconfig:SharedService,private S3service:S3bucketService){
+    constructor(private fb: UntypedFormBuilder,private cd:ChangeDetectorRef,private api: APIService,private toast: MatSnackBar,private companyconfig:SharedService,private S3service:S3bucketService,private http: HttpClient){
 
     }
   
@@ -273,11 +276,113 @@ export class ClientComponent implements OnInit {
   }
 
 
+  loadIcons() {
+    // Load the icon classes from the JSON file located in the assets folder
+    this.http.get<string[]>('assets/my-icons.json').subscribe(
+      (data) => {
+        this.iconList = data; // Store the icon classes into the iconList array
+        console.log("Icons are here ",this.iconList);
+      },
+      (error) => {
+        console.error('Error loading icon classes:', error);
+      }
+    );
+  }
+
+
   edit(P1: any) {
     console.log("Edited username is here ", P1);
     // $('#clientModal').modal('show');
     // this.openModalHelpher(P1)
     this.openModalHelpher(P1);
+  }
+
+
+
+  populateDynamicFields() {
+    // Clear existing form fields (optional if you want to start fresh)
+    if(this.dynamicFieldsArray){
+      this.dynamicFieldsArray.clear();
+    }
+ 
+  
+    // Loop over your dynamicFieldsData array and add each field
+    this.dynamicFields.forEach((field:any) => {
+      const group = this.fb.group({
+        label: [field.label, Validators.required],  // pre-fill label
+        value: [field.value, Validators.required]   // pre-fill value
+      });
+      this.dynamicFieldsArray.push(group);
+    });
+  }
+
+  // Get the dynamic fields FormArray (cast to FormArray)
+  get dynamicFieldsArray(): any {
+    return this.createClientField.get('dynamicFields') as FormArray;
+  }
+
+  // Add dynamic fields to the FormArray
+  addDynamicFieldsToFormArray() {
+    // Clear the current FormArray
+    this.dynamicFieldsArray.clear();
+
+    // Add controls for each dynamic field
+    this.dynamicFields.forEach((field) => {
+      const group = this.fb.group({
+        label: [field.label, Validators.required],
+        value: ['', Validators.required] // 'value' field for input value
+      });
+      this.dynamicFieldsArray.push(group);
+    });
+  }
+
+  // Method to add a new dynamic field (if needed in the future)
+  addDynamicField() {
+
+    if(this.dynamicFieldsArray.length > 2){
+
+      console.log(this.createClientField.value);
+
+      return Swal.fire({
+        title: 'Limit Reached!',
+        text: 'You can only add up to three Buttons.',
+        icon: 'warning',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#3085d6',
+        showCloseButton: true,
+        reverseButtons: true,  // Reverses the buttons' positions
+        backdrop: true, // Adds a backdrop overlay
+    });
+    }
+
+    const newField = this.fb.group({
+      label: ['', Validators.required],
+      icon: ['', Validators.required],
+      desc: ['', Validators.required],
+      color: ['#000000', Validators.required],
+      dreamboardID:['',Validators.required],
+      url: ['',Validators.required]
+    });
+    this.dynamicFieldsArray.push(newField);
+  }
+
+
+   // Method to remove a dynamic field from the FormArray
+   removeDynamicField(index: number) {
+    this.dynamicFieldsArray.removeAt(index);
+  }
+
+
+  removeAllDynamicFields() {
+    console.log("Form data is here ",this.createClientField);
+
+    console.log("Form is ",this.createClientField.valid);
+
+
+    console.log('Form is valid:', this.createClientField.valid); // true or false
+  console.log('Form errors:', this.createClientField.errors); // any form-wide errors
+  console.log('Form status:', this.createClientField.status);
+    this.dynamicFieldsArray.clear();
   }
 
 
@@ -702,6 +807,7 @@ export class ClientComponent implements OnInit {
       'email': ['', Validators.required],
       'telegramID': ['', Validators.required],
       'enableClient': ['', Validators.required],
+      dynamicFields: this.fb.array([])
       // metadata: this.fb.array([this.createItem()])
     })    
 
@@ -899,6 +1005,8 @@ export class ClientComponent implements OnInit {
 
   createNewClient(getNewFields: any) {
 
+    console.log("Dynamic fields data is here ",this.createClientField.value.dynamicFields);
+
     const successAlert: SweetAlertOptions = {
       icon: 'success',
       title: 'Success!',
@@ -924,6 +1032,8 @@ export class ClientComponent implements OnInit {
       telegramID: this.createClientField.value.telegramID,
       clientLogo1: this.base64textString_temp,
       clientLogo2: this.base64textString_temp_logo1,
+
+      dynamicFields: JSON.stringify(this.createClientField.value.dynamicFields),
       updated: new Date()
     }
 
@@ -958,10 +1068,6 @@ export class ClientComponent implements OnInit {
 
       if (value) {
         //alert('New configuration created successfully');
-
-
-       
-
         await this.createLookUpRdt(items,1,"client"+"#lookup")
       
 
@@ -969,57 +1075,25 @@ export class ClientComponent implements OnInit {
           const tempItems = {
             PK: customUrl,
             SK: 1,
-            metadata: JSON.stringify({clientID:this.allClientDetails.PK, clientLogo1: this.base64textString_temp,
-              clientLogo2: this.base64textString_temp_logo1,})
+            metadata: JSON.stringify({clientID:this.allClientDetails.PK,dynamicFields:JSON.stringify(this.createClientField.value.dynamicFields) })
           }
           await this.api.CreateMaster(tempItems)
         }
-
-
-       
 
         this.showAlert(successAlert)
 
         this.reloadEvent.next(true);
 
-        // this.toast.open("New Client Configuration created successfully", " ", {
-        //   //panelClass: 'error-alert-snackbar',
-
-        //   duration: 2000,
-        //   horizontalPosition: 'right',
-        //   verticalPosition: 'top',
-        // })
-
-        // this.closeClient.nativeElement.click();
-
-
       }
       else {
         this.showAlert(errorAlert)
-        // Swal.fire({
-        //   customClass: {
-        //     container: 'swal2-container'
-        //   },
-        //   position: 'center',
-        //   icon: 'warning',
-        //   title: 'Error in adding Client Configuration',
-        //   showCancelButton: true,
-        //   allowOutsideClick: false,////prevents outside click
-        // })
-        //alert('Error in adding User Configuration');
+     
       }
 
     }).catch((err: any) => {
       console.log('err for creation', err);
       this.showAlert(errorAlert)
-      // this.toast.open("Error in adding new client Configuration ", "Check again", {
-      //   //panelClass: 'error-alert-snackbar',
-
-      //   duration: 5000,
-      //   horizontalPosition: 'right',
-      //   verticalPosition: 'top',
-      //   //   //panelClass: ['blue-snackbar']
-      // })
+     
     })
   }
 
@@ -1153,6 +1227,7 @@ showAlert(swalOptions: SweetAlertOptions) {
         telegramID: this.createClientField.value.telegramID,
         clientLogo1: this.base64textString_temp,
         clientLogo2: this.base64textString_temp_logo1,
+        dynamicFields: JSON.stringify(this.createClientField.value.dynamicFields),
         updated: new Date()
       }
   
@@ -1202,8 +1277,7 @@ showAlert(swalOptions: SweetAlertOptions) {
               const tempItems = {
                 PK: customUrl,
                 SK: 1,
-                metadata: JSON.stringify({clientID:this.allClientDetails.PK, clientLogo1: this.base64textString_temp,
-                  clientLogo2: this.base64textString_temp_logo1,})
+                metadata: JSON.stringify({clientID:this.allClientDetails.PK, dynamicFields:JSON.stringify(this.createClientField.value.dynamicFields)})
               }
               await this.api.CreateMaster(tempItems)
             }
@@ -1216,41 +1290,18 @@ showAlert(swalOptions: SweetAlertOptions) {
               const tempItems = {
                 PK: customUrl,
                 SK: 1,
-                metadata: JSON.stringify({clientID:this.allClientDetails.PK, clientLogo1: this.base64textString_temp,
-                  clientLogo2: this.base64textString_temp_logo1,})
+                metadata: JSON.stringify({clientID:this.allClientDetails.PK, dynamicFields:JSON.stringify(this.createClientField.value.dynamicFields)})
               }
               await this.api.UpdateMaster(tempItems)
             }
           }
 
-  
-
         this.showAlert(successAlert)
-
-        
-
-
-
-
 
         this.reloadEvent.next(true)
 
-        //alert('Configuration updated successfully');
-        // this.toast.open("Client Configuration updated successfully", "", {
-        //   //panelClass: 'error-alert-snackbar',
-
-        //   duration: 2000,
-        //   horizontalPosition: 'right',
-        //   verticalPosition: 'top',
-        //   //   //panelClass: ['blue-snackbar']
-        // })
-
-        //need to refresh table so updated value will be fetched
         this.addFromService();
-        //modal closing based on viewchild
-        // this.closeClient.nativeElement.click();
-
-
+        
       }
       else {
         this.showAlert(errorAlert)
@@ -1515,6 +1566,7 @@ showAlert(swalOptions: SweetAlertOptions) {
           'enableClient': getValues.enableClient,
           'email': getValues.email,
           'telegramID': getValues.telegramID,
+          dynamicFields: this.fb.array([])
           // 'metadata': this.fb.array([])
         })
 
@@ -1527,22 +1579,8 @@ showAlert(swalOptions: SweetAlertOptions) {
 
         console.log("All the values are here to be polpulated ",getValues);
 
-        // const tempParsemetadata = JSON.parse(getValues.metadata)
-
-      
-
         this.tempValueHolder = getValues
-
-        // for (let checkPermission = 0; checkPermission < this.allPermissions_user.length; checkPermission++) {
-        //   if (this.allPermissions_user[checkPermission] === 'Client - Update') {
-        //     this.hideUpdateButton = false;
-        //     break;
-        //   }
-
-        //   else if (this.allPermissions_user[checkPermission] === 'Client - View') {
-        //     this.hideUpdateButton = true;
-        //   }
-        // }
+       
         this.showHeading = false;
         this.showModal = true;
         this.base64textString_temp = getValues.clientLogo1;
@@ -1579,12 +1617,35 @@ showAlert(swalOptions: SweetAlertOptions) {
           'email': getValues.emailID,
           'telegramID': getValues.telegramID,
           'enableClient': getValues.enableClient,
+          dynamicFields: this.fb.array([])
           // 'metadata': this.updateItem(parsed)
         })
 
 
         this.getFileUrls(getValues.clientID)
 
+
+         // Now let's populate the dynamic fields (if any)
+          if (getValues.dynamicFields) {
+            const dynamicFieldsArray = JSON.parse(getValues.dynamicFields);
+
+            console.log("data",dynamicFieldsArray);
+            const dynamicFieldsFormArray = this.createClientField.get('dynamicFields') as FormArray;
+
+            // Iterate over dynamicFieldsArray and create a FormGroup for each item
+            dynamicFieldsArray.forEach((field:any) => {
+              const group = this.fb.group({
+                label: [field.label, Validators.required],
+                icon: [field.icon, Validators.required],
+                desc: [field.desc, Validators.required],
+                color: [field.color, Validators.required],
+                dreamboardID:[field.dreamboardID,Validators.required],
+                url: [field.url,Validators.required]  // Adjust fields based on your data structure
+              });
+              dynamicFieldsFormArray.push(group);  // Add the FormGroup to the FormArray
+            });
+          }
+          
         // const filesUrls = this.S3service.getFilesFromFolder(getValues.clientID)
 
 

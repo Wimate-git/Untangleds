@@ -9,6 +9,7 @@ import { InlineSVGModule } from "ng-inline-svg-2";
 import { Crud2Module } from "src/app/modules/crud2/crud.module";
 import { SweetAlert2Module } from "@sweetalert2/ngx-sweetalert2";
 import { NgbCollapseModule } from "@ng-bootstrap/ng-bootstrap";
+import { HttpClientModule } from "@angular/common/http";
 
 
 
@@ -29,6 +30,7 @@ import { NgbCollapseModule } from "@ng-bootstrap/ng-bootstrap";
     Crud2Module,
     FormsModule,
     NgbCollapseModule,
+    HttpClientModule,
     NgMultiSelectDropDownModule,
     InlineSVGModule.forRoot(),
     SweetAlert2Module.forChild(),

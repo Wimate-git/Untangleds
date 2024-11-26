@@ -337,6 +337,106 @@
                                 </div>
                             </div>
                         </div>
+
+
+                        
+                            <div class="container custom-container mt-4">
+                                <!-- Button to add a new dynamic field -->
+                                <h5 class="section-title"><i class="fa-regular fa-circle-question fs-4"></i> Assistance buttons</h5>
+                                <!-- <button type="button" class="btn btn-info btn-sm mb-2 me-2" (click)="addDynamicField()"><i class="bi bi-plus-square fs-3"></i></button>
+                                <button type="button" class="btn btn-danger btn-sm mb-2" (click)="removeAllDynamicFields()"><i class="fa-solid fa-square-minus fs-3"></i></button> -->
+
+                                <div style="display: flex;align-items: center;margin-bottom: 10px;">
+                                       <!-- Add New Field Button -->
+                                        <button type="button" class="btn btn-primary btn-circle btn-custom" title="Add button" (click)="addDynamicField()">
+                                            <i class="bi bi-plus-square fs-4 ps-1"></i>
+                                        </button>
+
+                                        <!-- Remove All Fields Button -->
+                                        <button type="button" class="btn btn-danger btn-circle btn-custom" title="Remove all" (click)="removeAllDynamicFields()">
+                                            <i class="fa-solid fa-square-minus fs-4 ps-1"></i>
+                                        </button>
+                                </div>
+                                
+                              
+                                   
+                                 <!-- Loop through the dynamic fields FormArray and render label-input pairs -->
+                                 <div *ngFor="let field of dynamicFieldsArray.controls; let i = index" >
+                                   <div [formGroup]="field">
+                                     <!-- Label input -->
+                                     <div class="row">
+                                     <div class="col-md-4">
+                                        <label class="required fw-semibold fs-6 mb-2">Icon</label> 
+                                        <!-- <input type="text" placeholder="Enter bootstrap Icon" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" formControlName="icon" > -->
+                                        
+
+                                          <div class="input-group">
+                                            <!-- Dropdown for Bootstrap Icons -->
+                                            <select class="form-control form-control-lg form-control-solid" formControlName="icon" placeholder="Enter bootstrap Icon">
+                                                <option value="" disabled [ngClass]="{'d-none': field.get('icon')?.value !== ''}">Enter bootstrap Icon</option>
+                                                <option *ngFor="let icon of iconList" [value]="icon">{{ icon }}</option>
+                                            </select>
+                                            <div *ngIf="field.get('icon')?.hasError('required') && field.get('icon')?.touched" class="fv-plugins-message-container invalid-feedback">
+                                                Icon is required
+                                              </div>
+                                        </div>
+                                     </div>
+                                     
+                                     <div class="col-md-4">
+                                         <!-- Value input -->
+                                            <label class="required fw-semibold fs-6 mb-2">Label</label>
+                                            <input type="text" placeholder="Enter Label" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" formControlName="label" >
+                                            <div *ngIf="field.get('label')?.hasError('required') && field.get('label')?.touched" class="fv-plugins-message-container invalid-feedback">
+                                                Label is required
+                                            </div>
+                                     </div>
+                                    
+                                     <div class="col-md-4 mb-1">
+                                        <!-- Value input -->
+                                           <label class="required fw-semibold fs-6 mb-2">Desc</label>
+                                           <input type="text" placeholder="Enter Description" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" formControlName="desc" >
+                                           <div *ngIf="field.get('desc')?.hasError('required') && field.get('desc')?.touched" class="fv-plugins-message-container invalid-feedback">
+                                               Description is required
+                                           </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <!-- Value input -->
+                                           <label class="required fw-semibold fs-6 mb-2">Button Color</label>
+                                           <input type="color" placeholder="Enter Color" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" formControlName="color" >
+                                           <div *ngIf="field.get('color')?.hasError('required') && field.get('color')?.touched" class="fv-plugins-message-container invalid-feedback">
+                                               Button Color is required
+                                           </div>
+                                    </div>
+                                   
+                                    <div class="col-md-4">
+                                        <!-- Value input -->
+                                           <label class="required fw-semibold fs-6 mb-2">Button Url</label>
+                                           <input type="text" placeholder="Enter Botton url" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" formControlName="url" >
+                                           <div *ngIf="field.get('url')?.hasError('required') && field.get('url')?.touched" class="fv-plugins-message-container invalid-feedback">
+                                               Button Url is required
+                                           </div>
+                                    </div>
+                                   
+                                    <div class="col-md-4">
+                                        <!-- Value input -->
+                                           <label class="required fw-semibold fs-6 mb-2">Dreamboard ID</label>
+                                           <input type="text" placeholder="Enter Dreamboard ID" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" formControlName="dreamboardID" >
+                                           <div *ngIf="field.get('dreamboardID')?.hasError('required') && field.get('dreamboardID')?.touched" class="fv-plugins-message-container invalid-feedback">
+                                               Dreamboard id is required
+                                           </div>
+                                    </div>
+                         
+                                  
+                                    </div>
+                                       <!-- Remove Button -->
+                                       <button type="button" class="btn btn-danger btn-sm mt-2 mb-2" (click)="removeDynamicField(i)">Remove</button>
+                                   </div>
+                                 </div>
+                              
+           
+                             </div>
+                        
     
     
                         <div class="container mt-5">

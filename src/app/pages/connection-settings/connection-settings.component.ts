@@ -78,7 +78,7 @@ export class ConnectionSettingsComponent implements OnInit{
     this.createConnectionField = this.fb.group({
       comtnID:['',Validators.required],
       configurationType: [''],
-      version:[''],
+      version:['',Validators.required],
       chatID:['',Validators.required],
       botToken:['',Validators.required],
       smsNumber:['',Validators.required],
@@ -652,7 +652,7 @@ export class ConnectionSettingsComponent implements OnInit{
     const successAlert: SweetAlertOptions = {
       icon: 'success',
       title: 'Success!',
-      text: this.editOperation ? 'Company updated successfully!' : 'Company created successfully!',
+      text: this.editOperation ? 'Communication updated successfully!' : 'Communication created successfully!',
   };
     const errorAlert: SweetAlertOptions = {
         icon: 'error',
@@ -884,7 +884,7 @@ export class ConnectionSettingsComponent implements OnInit{
     const successAlert: SweetAlertOptions = {
       icon: 'success',
       title: 'Success!',
-      text: this.editOperation ? 'Company updated successfully!' : 'Comapany created successfully!',
+      text: this.editOperation ? 'Communication updated successfully!' : 'Communication created successfully!',
   };
     const errorAlert: SweetAlertOptions = {
         icon: 'error',
