@@ -625,7 +625,7 @@
                                    
         
         
-                                    <div class="col-md-4 mt-15">
+                                    <div class="col-md-4 mt-12">
                                        
                                         
                                         <label class="fw-semibold fs-6 mb-2" style="margin-right: 10px;"><input
@@ -711,7 +711,7 @@
                     
                                 <!--begin::Button-->
                                 <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary"
-                                [disabled]="createUserField.invalid" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+                                [disabled]="createUserField.invalid || errorForUniqueID != '' || errorForUniqueEmail != '' || errorForInvalidEmail != '' || errorForInvalidName != '' || errorForUniqueUserID != '' || errorForUniqueID != '' || errorForUniquemobileID != ''" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
                                     <span *ngIf="!editOperation" class="indicator-label">
                                         Submit
                                     </span>

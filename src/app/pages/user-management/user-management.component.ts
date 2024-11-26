@@ -159,6 +159,7 @@ rdtListWorkAround :any =[{
   enableLocationButton: boolean;
   enableDeviceButton: boolean;
   adminLogin:boolean = false
+  Allpermission: any;
 
   constructor(private apiService: UserService,private configService:SharedService,private fb:FormBuilder
     ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal,private DynamicApi:DynamicApiService,
@@ -171,6 +172,11 @@ rdtListWorkAround :any =[{
     this.getLoggedUser = this.configService.getLoggedUserDetails()
 
     this.SK_clientID = this.getLoggedUser.clientID;
+
+    this.Allpermission = this.getLoggedUser.permission_ID == 'All'?true:false;
+
+    console.log("All the permissions are here ",this.Allpermission);
+ 
     this.adminLogin = this.SK_clientID == 'WIMATE_ADMIN'?true:false 
     this.user_companyID = this.getLoggedUser.companyID
  
@@ -742,6 +748,7 @@ rdtListWorkAround :any =[{
 
       }
       else if ((getUserID.target.value).toLowerCase() == (this.listofUserID[uniqueID]).toLowerCase()) {
+        this.createUserField.setErrors({ invalidForm: true });
         this.errorForUniqueUserID = "User ID already exists";
       }
     }
@@ -757,6 +764,7 @@ rdtListWorkAround :any =[{
 
       }
       else if (getUserID.target.value == this.listofMobileID[uniqueID]) {
+        this.createUserField.setErrors({ invalidForm: true });
         this.errorForUniquemobileID = "Mobile no already exists";
       }
     }
@@ -837,6 +845,7 @@ rdtListWorkAround :any =[{
     const temp_Password = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>?`~_-]).{6,}$/;
     this.errorForInvalidName = ''; // Clear previous error
     if (!temp_Password.test(password)) {
+      this.createUserField.setErrors({ invalidForm: true });
         this.errorForInvalidName =
             "Password must contain at least 1 numeric character, at least 1 lowercase letter, at least 1 uppercase letter, at least 1 special character, and be at least 6 characters long.";
     }
@@ -895,6 +904,7 @@ rdtListWorkAround :any =[{
 
       }
       else if (tempUser.toLowerCase() == this.listofSK[uniqueID].toLowerCase()) {
+        this.createUserField.setErrors({ invalidForm: true });
         this.errorForUniqueID = "User Name already exists";
       }
     }
@@ -924,6 +934,7 @@ rdtListWorkAround :any =[{
     this.errorForUniqueEmail = '';
     for (let uniqueID = 0; uniqueID < this.listofEmails.length; uniqueID++) {
       if (getMail.target.value == this.listofEmails[uniqueID]) {
+        this.createUserField.setErrors({ invalidForm: true });
         this.errorForUniqueEmail = "Email already exists";
       }
     }
@@ -1996,6 +2007,11 @@ rdtListWorkAround :any =[{
 
     console.log("Openmodal value are here ",getValues);
 
+    this.switchBetweenDropdown_textField = false;
+    this.disabled_CLientID_textField = true;
+    this.switchBetweenDropdown_company_id = false;
+    this.disabled_companyID_textField = true;
+
     this.dataUser = getValues;
     this.editOperation = false;
     // console.log('getvalues inside openModal', getValues);
@@ -2031,10 +2047,10 @@ rdtListWorkAround :any =[{
           'clientID': getValues.clientID,
           'disabled_CLientID': this.showDisabledClientID,
           'disabled_companyid':this.showDisabledCompanyID,
-          'allowOtherClient':  [{value:false,disabled:!this.adminLogin}],
+          'allowOtherClient':  [{value:false,disabled: !this.Allpermission}],
           'allowNewClient': [{value:getValues.allowNewClient}],
           'allowOtherCompanyID': getValues.allowOtherCompanyID,
-          'allowNewCompanyID':  [{value:false,disabled:!this.adminLogin}],
+          'allowNewCompanyID':  [{value:false,disabled: !this.Allpermission}],
           'companyID': getValues.companyID,
           'username': getValues.username,
           'description': getValues.description,
@@ -2117,10 +2133,10 @@ rdtListWorkAround :any =[{
           'disabled_companyid':[{value:getValues.companyID,disabled:true}],
           'key': getValues.key,
           //'disabled_CLientID':this.switchInputs( getValues.allowOtherClient),
-          'allowOtherClient': [{value:false,disabled:!this.adminLogin}],
+          'allowOtherClient': [{value:false,disabled:!this.Allpermission}],
           'allowNewClient': [{value:getValues.allowNewClient}],
           'allowOtherCompanyID': getValues.allowOtherCompanyID,
-          'allowNewCompanyID': [{value:false,disabled:!this.adminLogin}],
+          'allowNewCompanyID': [{value:false,disabled:!this.Allpermission}],
           'companyID': getValues.companyID,
           'username': getValues.username,
           'description': getValues.description,
