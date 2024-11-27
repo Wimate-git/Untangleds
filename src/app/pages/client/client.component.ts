@@ -361,7 +361,7 @@ export class ClientComponent implements OnInit {
       desc: ['', Validators.required],
       color: ['#000000', Validators.required],
       dreamboardID:['',Validators.required],
-      url: ['',Validators.required]
+      url: ['']
     });
     this.dynamicFieldsArray.push(newField);
   }
@@ -1639,9 +1639,10 @@ showAlert(swalOptions: SweetAlertOptions) {
                 icon: [field.icon, Validators.required],
                 desc: [field.desc, Validators.required],
                 color: [field.color, Validators.required],
-                dreamboardID:[field.dreamboardID,Validators.required],
-                url: [field.url,Validators.required]  // Adjust fields based on your data structure
-              });
+                dreamboardID:[field.dreamboardID],
+                url: [field.url]  // Adjust fields based on your data structure
+              },  { validators: this.urlOrDreamboardRequiredValidator });
+              
               dynamicFieldsFormArray.push(group);  // Add the FormGroup to the FormArray
             });
           }
@@ -1655,6 +1656,18 @@ showAlert(swalOptions: SweetAlertOptions) {
     this.cd.detectChanges()
   }
 
+
+   // Custom validator for the condition
+   urlOrDreamboardRequiredValidator(group: FormGroup) {
+    const url = group.get('url')?.value;
+    const dreamboardID = group.get('dreamboardID')?.value;
+
+    if (!url && !dreamboardID) {
+      return { urlOrDreamboardRequired: true };  // Return error if both are empty
+    }
+
+    return null;  // No error if one of them is provided
+  }
 
 
   async getFileUrls(getValues:any){

@@ -370,8 +370,8 @@
                                         <!-- <input type="text" placeholder="Enter bootstrap Icon" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" formControlName="icon" > -->
                                         
 
-                                          <div class="input-group">
-                                            <!-- Dropdown for Bootstrap Icons -->
+                                          <!-- <div class="input-group">
+                                           
                                             <select class="form-control form-control-lg form-control-solid" formControlName="icon" placeholder="Enter bootstrap Icon">
                                                 <option value="" disabled [ngClass]="{'d-none': field.get('icon')?.value !== ''}">Enter bootstrap Icon</option>
                                                 <option *ngFor="let icon of iconList" [value]="icon">{{ icon }}</option>
@@ -379,7 +379,42 @@
                                             <div *ngIf="field.get('icon')?.hasError('required') && field.get('icon')?.touched" class="fv-plugins-message-container invalid-feedback">
                                                 Icon is required
                                               </div>
-                                        </div>
+                                        </div> -->
+
+
+                                        <p-dropdown 
+                                                [options]="iconList" 
+                                                optionLabel="name" 
+                                                [filter]="true" 
+                                                filterBy="name"
+                                                [showClear]="true"
+                                                placeholder="Enter Bootstrap Icon"
+                                                formControlName="icon" 
+                                                styleClass="w-100"
+                                                [ngClass]="{'is-invalid': field.get('icon')?.invalid && field.get('icon')?.touched}">
+                                                
+                                                <ng-template pTemplate="selectedItem" let-selectedOption>
+                                                    <div class="flex align-items-center gap-2">
+                                                        <!-- Optionally, add an icon preview if it's relevant -->
+                                                        <i *ngIf="selectedOption" [ngClass]="selectedOption" class="fs-2"></i>
+                                                        <div>{{ selectedOption }}</div>
+                                                    </div>
+                                                </ng-template>
+                                                
+                                                <ng-template pTemplate="item" let-icon>
+                                                    <div style="display: flex;flex-direction:row; gap: 5px;align-items: center;">
+                                                        <!-- Show icon and icon name in the dropdown list -->
+                                                        <i [ngClass]="'bi-'+icon" class="fs-1"></i>
+                                                        <div>{{ icon }}</div>
+                                                    </div>
+                                                </ng-template>
+                                            </p-dropdown>
+
+                                            <div *ngIf="field.get('icon')?.hasError('required') && field.get('icon')?.touched" class="invalid-feedback">
+                                                Icon is required
+                                            </div>
+
+
                                      </div>
                                      
                                      <div class="col-md-4">
@@ -411,8 +446,8 @@
                                    
                                     <div class="col-md-4">
                                         <!-- Value input -->
-                                           <label class="required fw-semibold fs-6 mb-2">Button Url</label>
-                                           <input type="text" placeholder="Enter Botton url" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" formControlName="url" >
+                                           <label class="fw-semibold fs-6 mb-2" [ngClass]="{'required': field.get('url')?.hasError('required') && field.get('url')?.touched || field.hasError('urlOrDreamboardRequired')}">Button Url</label>
+                                           <input ngbTooltip="Add your URL here if you want this button to redirect to your own website." type="text" placeholder="Enter Botton url" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" formControlName="url" >
                                            <div *ngIf="field.get('url')?.hasError('required') && field.get('url')?.touched" class="fv-plugins-message-container invalid-feedback">
                                                Button Url is required
                                            </div>
@@ -420,8 +455,8 @@
                                    
                                     <div class="col-md-4">
                                         <!-- Value input -->
-                                           <label class="required fw-semibold fs-6 mb-2">Dreamboard ID</label>
-                                           <input type="text" placeholder="Enter Dreamboard ID" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" formControlName="dreamboardID" >
+                                           <label class="fw-semibold fs-6 mb-2" [ngClass]="{'required': field.get('dreamboardID')?.hasError('required') && field.get('dreamboardID')?.touched || field.hasError('urlOrDreamboardRequired')}">Dreamboard ID</label>
+                                           <input ngbTooltip="Add Dreamboard ID if you want this button to redirect to custom dreamboard URL." type="text" placeholder="Enter Dreamboard ID" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" formControlName="dreamboardID" >
                                            <div *ngIf="field.get('dreamboardID')?.hasError('required') && field.get('dreamboardID')?.touched" class="fv-plugins-message-container invalid-feedback">
                                                Dreamboard id is required
                                            </div>

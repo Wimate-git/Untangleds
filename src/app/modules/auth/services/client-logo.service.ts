@@ -38,7 +38,7 @@ export class ClientLogoService {
         this.splashScreenLogoElement.src =  logUrls[0];
       }
 
-      return logUrls
+      return [logUrls,metadata]
     }
     return ''
    
@@ -51,7 +51,7 @@ export class ClientLogoService {
       if(result && result.metadata){
         const metadata = JSON.parse(result.metadata);
 
-        console.log("Metadata is here ",metadata);
+        // console.log("Metadata is here ",metadata);
 
         const logo  = metadata.clientLogo1
         console.log("Custom Logo is here ",logo);

@@ -23,19 +23,39 @@
         <span>Powered by</span> <mark style="background: none; color: #007bff;">Wimate</mark>
       </div> -->
 
-      <div class="text-muted fs-7 mt-2 bounce" style="font-weight: bold; color: #333; background: #f8f9fa; padding: 5px 10px; border-radius: 5px;">
+      <div class="text-muted fs-7 bounce mb-10" style="font-weight: bold; color: #333; background: #f8f9fa; padding: 5px 10px; border-radius: 5px;">
         <span>Powered by</span> 
         <a href="https://www.wimate.in/" target="_blank" style="text-decoration: none;">
             <mark style="background: none; color: #007bff;">Wimate</mark>
         </a>
     </div>
+
+
+
+
+    <div class="app-engage">
+      <!-- Button with dynamic style and redirection -->
+    
+      <div *ngFor="let button of dynamicFields">
+        <a target="_blank" class="app-engage-btn hover-dark" (click)="redirectTo(button.url,button.dreamboardID)">		
+          <i [ngClass]="'bi-' + button.icon" [ngStyle]="{'color': button.color}" class="fs-1 mb-2"><span class="path1"></span><span class="path2"></span></i>	  <!-- Button Label -->
+          {{ button.label }}
+  
+          <p class="fs-8 mt-2" style="font-weight: lighter;padding: 10px;text-align: center;">{{ button.desc }}</p>
+        </a>
+      </div>
+      <!-- Optional button description (e.g., a tooltip) -->
+    </div>
+   
      
 
 
       <!--end::Wrapper-->
     </div>
 
-   
+
+    
+    
 
     <!--end::Form-->
 

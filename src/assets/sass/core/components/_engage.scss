@@ -1,32 +1,36 @@
-//
-// Engage panel(used for demo product demo)
-//
 
+//Engage Panel is currently used for Login tickets service please dont minipute it
+
+//Dont manipulate this 
 .app-engage {
-	position: fixed;
-	right: 0;
-	top: 50%;
-	transform: translateY(-50%);
+	// position: fixed;
+	// right: 0;
+	// top: 50%;
+	// transform: translateY(-50%);
 	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
-	z-index: $engage-z-index;
+	flex-wrap: wrap;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	// z-index: $engage-z-index;
 	padding-right: 12px;
+	gap:10px;
 
 	.app-engage-btn {
 		display: flex;
 		align-items: center;
-		justify-content: center;
+		justify-content: flex-start;
 		flex-direction: column;
 		box-shadow: var(--#{$prefix}engage-btn-box-shadow);
 		border-width: 1px;
 		border-style: solid;
+		padding-top: 20px;
 		font-size: 12px;
 		font-weight: $font-weight-bold;
 		margin-bottom: 8px;
 		@include border-radius(6px);
-		width: 66px;
-		height: 70px;
+		width: 200px;
+		height: 150px;
 
 		@include button-custom-variant(
 			$color: var(--#{$prefix}engage-btn-color), 
@@ -43,7 +47,9 @@
 			color: var(--#{$prefix}dark-inverse);
 			border-color: var(--#{$prefix}dark);
 			background-color: var(--#{$prefix}dark);
-
+			cursor: pointer;
+			transform: translateY(-5px);
+			transition: 0.8s;
 			i,
 			.svg-icon {
 				color: var(--#{$prefix}dark-inverse);

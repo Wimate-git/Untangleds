@@ -54,7 +54,8 @@ export class SidebarLogoComponent implements OnInit, OnDestroy {
 
     // this.clientLogo = await this.getImage.getClientLogo()
 
-    this.clientLogo = await this.getImage.getClientLogo()
+    const tempDataHolder = await this.getImage.getClientLogo()
+    this.clientLogo = tempDataHolder[0]
 
     this.showLogo = true
 

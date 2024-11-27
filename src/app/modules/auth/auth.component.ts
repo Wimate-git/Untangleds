@@ -29,6 +29,11 @@ export class AuthComponent implements OnInit, OnDestroy {
   clientLogo: any= '';
   showLogo:boolean = false;
 
+  testCSS:string ='fa-regular fa-user'
+
+  dynamicFields:any;
+  client: any;
+
   constructor(private layout: LayoutService,private s3Service: S3ServiceService,private cd:ChangeDetectorRef,private getImage:ClientLogoService,private router: Router) {
     this.splashScreenLogoElement = document.getElementById('splash-screen-logo') as HTMLImageElement;
     this.linkElement = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
@@ -49,15 +54,20 @@ export class AuthComponent implements OnInit, OnDestroy {
       this.cd.detectChanges()
     });
 
-    this.clientLogo = await this.getImage.getClientLogo()
+   
+    const tempDataHolder = await this.getImage.getClientLogo()
 
-    // if(this.clientLogo == '' || this.clientLogo == null){
-    //   localStorage.setItem('clientLogo',JSON.stringify(this.logoUrl))
-    // }
-    // else{
-    //   localStorage.setItem('clientLogo',JSON.stringify(this.clientLogo))
-    // }
-    // Get the element
+    if(tempDataHolder && tempDataHolder[0]){
+      this.clientLogo = tempDataHolder[0]
+      if(tempDataHolder[1]){
+        this.dynamicFields = JSON.parse(tempDataHolder[1].dynamicFields)
+        this.client = tempDataHolder[1].clientID.split('#')[0]
+      }
+    }
+
+    console.log("Dynamic fields are here ",this.dynamicFields);
+  
+
       const element = document.querySelector('body');
 
       let computedStyle:any
@@ -81,8 +91,23 @@ export class AuthComponent implements OnInit, OnDestroy {
     this.cd.detectChanges()
     
   }
+    // Method to handle redirection (for external URLs)
+    redirectTo(url: string,dreamboardID:any): void {
+      
+      let redirectUrl
+      if(url != ''){
+        redirectUrl = url
+      }
+      else{
+        redirectUrl = `https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/public/${this.client}/${dreamboardID}/src/index.html?loginDetail=${this.client}`;
+      }
 
-  ngOnDestroy() {
-    // BODY_CLASSES.forEach((c) => document.body.classList.remove(c));
-  }
+      console.log("Url is here ",redirectUrl);
+
+      // Open the URL in a new tab
+      window.open(redirectUrl, '_blank');
+    }
+      ngOnDestroy() {
+        // BODY_CLASSES.forEach((c) => document.body.classList.remove(c));
+      }
 }
