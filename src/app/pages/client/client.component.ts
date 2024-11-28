@@ -117,7 +117,7 @@ export class ClientComponent implements OnInit {
     hover: boolean[] = [false, false, false, false];
     temporderedUrls: any[] = [undefined, undefined, undefined, undefined];
 
-    iconList: string[] = []; 
+    iconList: any[] = []; 
   
 
     async ngOnInit(){
@@ -280,7 +280,7 @@ export class ClientComponent implements OnInit {
     // Load the icon classes from the JSON file located in the assets folder
     this.http.get<string[]>('assets/my-icons.json').subscribe(
       (data) => {
-        this.iconList = data; // Store the icon classes into the iconList array
+        this.iconList = data;// Store the icon classes into the iconList array
         console.log("Icons are here ",this.iconList);
       },
       (error) => {
@@ -360,7 +360,7 @@ export class ClientComponent implements OnInit {
       icon: ['', Validators.required],
       desc: ['', Validators.required],
       color: ['#000000', Validators.required],
-      dreamboardID:['',Validators.required],
+      dreamboardID:[''],
       url: ['']
     });
     this.dynamicFieldsArray.push(newField);
@@ -1050,6 +1050,7 @@ export class ClientComponent implements OnInit {
     P3: tempObj.mobile,
     P4: tempObj.emailID,
     P5: date,
+    P6:tempObj.email
     }
 
 
@@ -1251,6 +1252,7 @@ showAlert(swalOptions: SweetAlertOptions) {
       P3: tempObj?.mobile,
       P4: tempObj?.emailID,
       P5: date,
+      P6:tempObj?.email
       }
 
 
@@ -1659,6 +1661,8 @@ showAlert(swalOptions: SweetAlertOptions) {
 
    // Custom validator for the condition
    urlOrDreamboardRequiredValidator(group: FormGroup) {
+    console.log("Iam called in validators");
+
     const url = group.get('url')?.value;
     const dreamboardID = group.get('dreamboardID')?.value;
 
