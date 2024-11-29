@@ -1,0 +1,12 @@
+
+   <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-5 g-6 g-xl-9 mb-6 mb-xl-9">
+    <div class="col" *ngFor="let item of transformedData">
+        
+      <app-card4 [componentSource]="'project-dashboard'"
+        icon="./assets/media/svg/files/folder-document.svg"
+        [title]="item.id"
+        [description]="item.Files + ' files'"
+      ></app-card4>
+    </div>
+  </div>
+  

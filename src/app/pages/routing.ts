@@ -6,6 +6,18 @@ const Routing: Routes = [
     loadChildren: () => import('./dashboard/dashboard.module').then((m) => m.DashboardModule),
   },
   {
+    path: 'project-dashboard',
+    loadChildren: () => import('./project-dashboard/project-dashboard.module').then((m) => m.ProjectDashboardModule),
+  },
+  {
+    path: 'Project Configuration/project',
+    loadChildren: () => import('./project/project.module').then((m) => m.ProjectModule),
+  },
+  {
+    path: 'project-dashboard/project-template-dashboard/:projectgroup',
+    loadChildren: () => import('./project-template-dashboard/project-template-dashboard.module').then((m) => m.ProjectTemplateDashboardModule),
+  },
+  {
     path: 'dashboard/dashboardFrom/:formgroup',
     loadChildren: () => import('./dashbordForm/dashboardForm.module').then((m) =>m.DashboardFormModule),
   },
@@ -104,6 +116,14 @@ const Routing: Routes = [
   {
     path: 'formgroup',
     loadChildren: () => import('./Formgroup/formgroup.module').then((m) => m.FormgroupModule),
+  },
+  {
+    path: 'Project Configuration/project-template',
+    loadChildren: () => import('./project-template/project-template.module').then((m) => m.ProjectTemplateModule),
+  },
+  {
+    path: 'Project Configuration/folder-configuration',
+    loadChildren: () => import('./folder-configuration/folder-configuration.module').then((m) => m.FolderConfigurationModule),
   },
   {
     path: 'summary-engine/:id',

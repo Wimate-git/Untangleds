@@ -12,6 +12,18 @@
         <span class="menu-title" style="font-size: 13.975px;" translate="MENU.DASHBOARD"></span>
       </a>
     </div>
+
+    <div class="menu-item">
+      <a class="menu-link without-sub" routerLink="/project-dashboard" routerLinkActive="active">
+        <!-- <span class="menu-bullet">
+          <app-keenicon name="ki-duotone ki-abstract-26"></app-keenicon>
+        </span> -->
+        <span class="menu-bullet">
+          <i class="fa-solid fa-cube"></i>
+        </span>
+        <span class="menu-title" style="font-size: 13.975px;">Project</span>
+      </a>
+    </div>
     
 
     <!-- Layout builder -->
@@ -189,6 +201,52 @@
         </span>
         <span class="menu-title">Form Group</span>
       </a>
+    </div>
+
+    <div class="menu-item menu-accordion" data-kt-menu-trigger="click" routerLinkActive="here show">
+      <span class="menu-link">
+        <span class="menu-bullet">
+          <!-- <app-keenicon name="profile-circle" class="fs-2"></app-keenicon> -->
+          <i class="fa-solid fa-wand-sparkles"></i>
+
+        </span>
+        <span class="menu-title" data-link="/Project Configuration">Project Configuration
+        </span>
+        <span class="menu-arrow"></span>
+      </span>
+      <div class="menu-sub menu-sub-accordion" routerLinkActive="menu-active-bg">
+        <div class="menu-item">
+          <a class="menu-link without-sub" routerLinkActive="active" routerLink="/Project Configuration/project">
+            <span class="menu-bullet">
+              <span class="bullet bullet-dot"></span>
+            </span>
+            <span class="menu-title">Project
+            </span>
+          </a>
+        </div>
+      </div>
+      <div class="menu-sub menu-sub-accordion" routerLinkActive="menu-active-bg">
+        <div class="menu-item">
+          <a class="menu-link without-sub" routerLinkActive="active" routerLink="/Project Configuration/folder-configuration">
+            <span class="menu-bullet">
+              <span class="bullet bullet-dot"></span>
+            </span>
+            <span class="menu-title">Project Group
+            </span>
+          </a>
+        </div>
+      </div>
+      <div class="menu-sub menu-sub-accordion" routerLinkActive="menu-active-bg">
+        <div class="menu-item">
+          <a class="menu-link without-sub" routerLinkActive="active" routerLink="/Project Configuration/project-template">
+            <span class="menu-bullet">
+              <span class="bullet bullet-dot"></span>
+            </span>
+            <span class="menu-title">Project Template
+            </span>
+          </a>
+        </div>
+      </div>
     </div>
 
     <div class="menu-item">

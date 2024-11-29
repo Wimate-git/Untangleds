@@ -1,0 +1,235 @@
+<div class="card">
+    <div class="card-header border-0 pt-6">
+        <h2>Project Group Configuration</h2>
+    </div>
+    <div class="card-header border-0 pt-0">
+
+        <!--begin::Card title-->
+        <div class="card-title">
+
+            <div class="d-flex align-items-center position-relative my-1">
+                <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
+                <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12"
+                    placeholder="Search Folder">
+            </div>
+
+        </div>
+        <!--begin::Card title-->
+
+        <!--begin::Card toolbar-->
+        <div class="card-toolbar">
+            <!--begin::Toolbar-->
+            <div class="d-flex justify-content-end">
+                <!--begin::Add user-->
+                <button type="button" class="btn btn-primary" data-action="create">
+                    Add
+                </button>
+                <!--end::Add user-->
+            </div>
+            <!--end::Toolbar-->
+            <!-- </div> -->
+            <!--end::Card toolbar-->
+        </div>
+    </div>
+    <!-- <div class="card-body pt-0"> -->
+    <div class="card-body pt-0">
+        <app-crud [componentSource]="'permission3'" [datatableConfig]="datatableConfig" route="/permission1"
+            (deleteEvent)="delete($event)" (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent"
+            [modal]="formModal"></app-crud>
+    </div>
+</div>
+
+<swal #noticeSwal [swalOptions]="swalOptions">
+</swal>
+
+<ng-template #formModal let-modal>
+    <form [formGroup]="folderForm" (ngSubmit)="onSubmit($event)">
+        <div class="modal-header">
+            <h4 *ngIf="!update" class="modal-title" id="modal-basic-title">Add Project group Configuration</h4>
+            <h4 *ngIf="update" class="modal-title" id="modal-basic-title">Edit Project group Configuration</h4>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div class="modal-body">
+            <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-900px" id="kt_modal_update_customer_scroll"
+                data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}"
+                data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_update_customer_header"
+                data-kt-scroll-wrappers="#kt_modal_update_customer_scroll" data-kt-scroll-offset="300px">
+                <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+                    <!--begin::Input group-->
+                    <div class="row">
+                        <!-- Permission Id -->
+                        <div class="col-md-4 mb-4">
+                            <label class="required fw-semibold fs-6 mb-2">Label</label>
+                            <input *ngIf="!update" type="text" class="form-control form-control-solid mb-3 mb-lg-0"
+                                name="labelID" placeholder="Enter label Id" formControlName="labelID"
+                                (keyup)="checkUniqueUid($event)" required />
+                            <input *ngIf="update" type="text" class="form-control form-control-solid mb-3 mb-lg-0"
+                                name="labelID" placeholder="Enter label Id" formControlName="labelID"
+                                readonly required />
+                                <span style="color: #fc1900;">{{error}}</span>
+                            <div *ngIf="folderForm.controls['labelID'].invalid && folderForm.controls['labelID'].touched"
+                                class="invalid-feedback">
+                                Label is required.
+                            </div>
+                        </div>
+
+                        <!-- Label -->
+                        <div class="col-md-4 mb-4">
+                            <label class="required fw-semibold fs-6 mb-2">Description</label>
+                            <input type="text" class="form-control form-control-solid" name="label"
+                                formControlName="description" placeholder="Enter description" />
+                            <div *ngIf="folderForm.controls['description'].invalid && folderForm.controls['description'].touched"
+                                class="invalid-feedback">
+                                Description is required.
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 mb-4">
+                            <label class="required fw-semibold fs-6 mb-2">Project Template</label>
+                            <div class="custom-multiselect">
+                                <ng-multiselect-dropdown style="
+                                          display: inline-block; 
+                                          width: 100%;
+                                          padding: 0px ;
+                                          margin-bottom: 0;
+                                          font-weight: 0px;
+                                          line-height: 1.52857143;
+                                          text-align: left;
+                                          vertical-align: middle;
+                                          cursor: pointer;
+                                          background-image: none;
+                                          border-radius: 4px;
+                                          
+                                          " class="form-select form-select-solid form-select"
+                                    [placeholder]="'Select template Id'" [settings]="dropdownSettings" [data]="formList"
+                                    name="formList" [formControl]="$any(folderForm.controls['formList'])" (onSelect)="onFormGroupSelect($event)">
+                                </ng-multiselect-dropdown>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-md-6 mb-4">
+                            <label class="required fw-semibold fs-6 mb-2">Color</label>
+                            <div class="d-flex align-items-center">
+                                <!-- Enlarged Select -->
+                                <select
+                                    type="text"
+                                    class="form-select form-select-solid form-select-lg me-3"
+                                    name="color"
+                                    placeholder="Select Color"
+                                    formControlName="color"
+                                    (change)="updateSelectedColor($event)"
+                                >
+                                    <option value="" disabled [selected]="true">Select Color</option>
+                                    <option value="#3598dc">Blue</option>
+                                    <option value="#26C281">Green-Jungle</option>
+                                    <option value="#D91E18">Red-Thunderbird</option>
+                                    <option value="#8E44AD">Purple</option>
+                                </select>
+                
+                                <!-- Color Display Card -->
+                                <div
+                                    class="color-preview"
+                                    [style.backgroundColor]="selectedColor"
+                                    style="
+                                        width: 50px;
+                                        height: 50px;
+                                        border-radius: 5px;
+                                        border: 1px solid #ccc;
+                                    "
+                                ></div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label class="required fw-semibold fs-6 mb-2">Icon</label>
+                            <div class="d-flex align-items-center">
+                                <!-- Enlarged Select -->
+                                <select
+                                    type="text"
+                                    class="form-select form-select-solid form-select-lg me-3"
+                                    name="iconSelect"
+                                    placeholder="Select Icon"
+                                    formControlName="iconSelect"
+                                    (change)="previewIcon($event)"
+                                >
+                                    <option value="" disabled [selected]="true">Select Icon</option>
+                                    <ng-container *ngFor="let icon of iconsList">
+                                        <option [value]="icon.value">{{ icon.label }}</option>
+                                      </ng-container>
+                                </select>
+                
+                                <!-- Color Display Card -->
+                                <div
+                                class="col-md-4 d-flex align-items-center"
+                                    style="
+                                        width: 50px;
+                                        height: 50px;
+                                        border-radius: 5px;
+                                    "
+                                >
+                                <p class="fw-bold fs-6 mb-0 me-2">:</p>
+                                <span class="menu-icon" *ngIf="previewObjDisplay">
+                                    <app-keenicon 
+                                        [name]="previewObjDisplay.value"
+                                        [class]="previewObjDisplay.class1"
+                                        class="fs-4x">
+                                    </app-keenicon>
+                                </span>
+                              </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-14 mb-4">
+                            <label class="required fw-semibold fs-6 mb-2">Remarks</label>
+                            <textarea type="text" class="form-control form-control-solid" name="remarks" rows="4"
+                                formControlName="remarks" placeholder="Remarks" ></textarea>
+                            <!-- <div *ngIf="folderForm.controls['projectTemplate'].invalid && folderForm.controls['projectTemplate'].touched"
+                                class="invalid-feedback">
+                                Project Template is required.
+                            </div> -->
+                        </div>
+
+
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer flex-center">
+            <button type="reset" id="kt_modal_update_customer_cancel" class="btn btn-light me-3"
+                (click)="modal.dismiss('cancel')">
+                Discard
+            </button>
+            <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary" 
+            [disabled]="folderForm.invalid || folderForm.pristine" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+                <span *ngIf="!update" class="indicator-label">Submit</span>
+                <span *ngIf="update" class="indicator-label">Update</span>
+                <span class="indicator-progress">
+                    Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                </span>
+            </button>
+        </div>
+
+    </form>
+</ng-template>
+
+<div class="modal fade" id="secondaryModal" tabindex="-1" aria-labelledby="secondaryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="secondaryModalLabel">Secondary Modal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Content of the second modal -->
+                <p>This is the second modal, opened on top of the first modal.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+

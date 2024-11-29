@@ -1,0 +1,129 @@
+
+<!-- <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-5 g-6 g-xl-9 mb-6 mb-xl-9">
+    <div class="col" *ngFor="let item of transformedData">
+        
+      <app-card4 [componentSource]="'project-template'"
+        icon="./assets/media/svg/files/folder-document.svg"
+        [title]="item.id"
+        [description]="item.Files + ' files'"
+      ></app-card4>
+    </div>
+  </div> -->
+  <div class="row g-4">
+  <div class="col-xxl-6 col-lg-6 col-md-12" *ngFor="let item of transformedData">
+    <!--begin::Engage widget 8-->
+    <div class="card border-0 h-md-100" data-bs-theme="light"   [style.backgroundColor]="item.color" (click)="onStatusClick({ id: item.id}, {description: item.description })">
+      <!--begin::Body style="background: linear-gradient(112.14deg, #00D2FF 0%, #3A7BD5 100%)"-->
+      <div class="card-body" >
+        <!--begin::Row-->
+        <div class="row align-items-center h-100">
+
+          <!-- <div class="col-2 pt-10">    icon add
+           
+          </div> -->
+          <!--begin::Col-->
+          <div class="col-12 ps-xl-13">
+            <!--begin::Title-->
+            <div class="text-white mb-2 pt-6">
+              <!-- <span class="fs-4 fw-semibold me-2 d-block lh-1 pb-2 opacity-75">Get best offer</span> -->
+              <span class="fs-3qx fw-bold">{{item.id}}</span>
+
+              <div class="symbol symbol-70px w-50px ">
+                <!-- <img *ngIf="!icon_"[src]="icon" alt="card2" class="p-3" /> -->
+                <!-- <span [class]="item.icon.class2"> -->
+                  <!-- <app-keenicon [name]="item.icon.value" [class]="item.icon.class1" style="display: contents;"></app-keenicon> -->
+                <!-- </span> -->
+              </div>
+
+            </div>
+            <!--end::Title-->
+            <!--begin::Text-->
+            <span class="fw-semibold text-white fs-4 mb-8 d-block opacity-75">{{item.description}}</span>
+            <!--end::Text-->
+            <!--begin::Items-->
+            <div class="d-flex flex-column gap-4 mb-10 mb-xl-20">
+              <!--begin::Item-->
+              <div class="d-flex align-items-center">
+                <!--begin::Symbol-->
+                <div class="symbol symbol-30px symbol-circle me-3">
+                  <span class="symbol-label" style="background: #35C7FF">
+                    <i class="ki-duotone ki-abstract-41 fs-5 text-white">
+                      <span class="path1"></span>
+                      <span class="path2"></span>
+                    </i>
+                  </span>
+                </div>
+                <!--end::Symbol-->
+                <!--begin::Info-->
+                <div class="text-white">
+                  <span class="fw-semibold d-block fs-5 opacity-75">{{item.label_1}}</span>
+                  <!-- <span class="fw-bold fs-7">Up to 500</span> -->
+                </div>
+                <!--end::Info-->
+              </div>
+              <!--end::Item-->
+              
+              <!--begin::Item-->
+              <div class="d-flex align-items-center">
+                <!--begin::Symbol-->
+                <div class="symbol symbol-30px symbol-circle me-3">
+                  <span class="symbol-label" style="background: #35C7FF">
+                    <i class="ki-duotone ki-abstract-41 fs-5 text-white">
+                      <span class="path1"></span>
+                      <span class="path2"></span>
+                    </i>
+                  </span>
+                </div>
+                <!--end::Symbol-->
+                <!--begin::Info-->
+                <div class="text-white">
+                  <span class="fw-semibold d-block fs-5 opacity-75">{{item.label_2}}</span>
+                  <!-- <span class="fw-bold fs-7">Up to 500</span> -->
+                </div>
+                <!--end::Info-->
+              </div>
+              <!--end::Item-->
+            
+              <!--begin::Item-->
+              <div class="d-flex align-items-center">
+                <!--begin::Symbol-->
+                <div class="symbol symbol-30px symbol-circle me-3">
+                  <span class="symbol-label" style="background: #35C7FF">
+                    <i class="ki-duotone ki-abstract-26 fs-5 text-white">
+                      <span class="path1"></span>
+                      <span class="path2"></span>
+                    </i>
+                  </span>
+                </div>
+                <!--end::Symbol-->
+                <!--begin::Info-->
+                <div class="text-white">
+                  <span class="fw-semibold opacity-75 d-block fs-5">{{item.label_3}}</span>
+                  <!-- <span class="fw-bold fs-7">Unlimited</span> -->
+                </div>
+                <!--end::Info-->
+              </div>
+              <!--end::Item-->
+            </div>
+            
+            <!--end::Items-->
+            <!--begin::Action-->
+            <!-- <div class="d-flex flex-column flex-sm-row d-grid gap-2">
+              <a href="#" class="btn btn-success flex-shrink-0 me-lg-2" data-bs-toggle="modal" data-bs-target="#kt_modal_upgrade_plan">Upgrade Plan</a>
+              <a href="#" class="btn btn-primary flex-shrink-0" style="background: rgba(255, 255, 255, 0.2)" data-bs-toggle="modal" data-bs-target="#kt_modal_create_app">Read Guides</a>
+            </div> -->
+            <!--end::Action-->
+          </div>
+          <!--end::Col-->
+          <!--begin::Col-->
+        
+          <!--end::Col-->
+        </div>
+        <!--end::Row-->
+      </div>
+      <!--end::Body-->
+    </div>
+    <!--end::Engage widget 8-->
+  </div>
+  </div>
+  
