@@ -93,13 +93,15 @@ export class DreamIdComponent implements OnInit{
       console.log(this.id);
 
 
-      this.project =  await this.apiService.GetMaster(this.client+'#project#'+this.form_id+'#main',1)
+      this.project =  await this.apiService.GetMaster(this.client+'_project_'+this.form_id+'_main',1)
 
       console.log("PROJECT:",this.project)
 
       // this.project.PK = this.project.PK.replace(/#/g, "_");
 
-      // console.log(this.project.PK); 
+      // console.log(this.project); 
+
+
   
       this.route.queryParamMap.subscribe(queryParams => {
         // Handle query parameters such as formId and recordId
