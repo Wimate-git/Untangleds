@@ -93,13 +93,19 @@ export class DreamIdComponent implements OnInit{
       console.log(this.id);
 
 
+
+
+
       this.project =  await this.apiService.GetMaster(this.client+'#project#'+this.form_id+'#main',1)
+
+      if(this.project && this.project.PK){
 
       console.log("PROJECT:",this.project)
 
       this.project.PK = this.project.PK.replace(/#/g, "_");
 
       console.log(this.project); 
+      }
 
 
   
