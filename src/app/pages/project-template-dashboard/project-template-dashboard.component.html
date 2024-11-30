@@ -1,4 +1,4 @@
-
+<ngx-spinner *ngIf="loading" bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true"><p style="color: white" > Loading data, please wait... </p></ngx-spinner>
 <!-- <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-5 g-6 g-xl-9 mb-6 mb-xl-9">
     <div class="col" *ngFor="let item of transformedData">
         
@@ -28,11 +28,15 @@
               <!-- <span class="fs-4 fw-semibold me-2 d-block lh-1 pb-2 opacity-75">Get best offer</span> -->
               <span class="fs-3qx fw-bold">{{item.id}}</span>
 
+              <!-- <app-keenicon 
+  [class1]="item.icon.class1" 
+  [class2]="item.icon.class2" 
+  [label]="item.icon.label" 
+  [value]="item.icon.value">
+</app-keenicon> -->
+
               <div class="symbol symbol-70px w-50px ">
-                <!-- <img *ngIf="!icon_"[src]="icon" alt="card2" class="p-3" /> -->
-                <!-- <span [class]="item.icon.class2"> -->
-                  <!-- <app-keenicon [name]="item.icon.value" [class]="item.icon.class1" style="display: contents;"></app-keenicon> -->
-                <!-- </span> -->
+               
               </div>
 
             </div>

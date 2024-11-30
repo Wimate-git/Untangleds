@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { APIService } from 'src/app/API.service';
 import { Router } from '@angular/router';
-
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
     selector: 'app-project-template-dashboard',
@@ -22,16 +22,22 @@ export class ProjectTemplateDashboardComponent implements OnInit {
     groupData: any;
     project: any[];
     project_Data: any[]=[];
+    loading = true;
+
+    iconData: { class1: string; class2: string; label: string; value: string; };
    
     constructor(
         private api: APIService,
         private cdr: ChangeDetectorRef,
         private route: ActivatedRoute,
         private router: Router,
+        private spinner: NgxSpinnerService
     ) { }
 
 
     async ngOnInit(): Promise<void> {
+
+        this.spinner.show()
 
         this.route.paramMap.subscribe(params => {
             console.log(this.route)
@@ -89,9 +95,14 @@ export class ProjectTemplateDashboardComponent implements OnInit {
             icon: JSON.parse(item.P4)
           }));
           
+          
 
           console.log("After creating object :",this.transformedData)
         this.cdr.detectChanges();   
+
+        this.loading= false
+
+       this.spinner.hide();
 
     } 
 
@@ -200,7 +211,7 @@ export class ProjectTemplateDashboardComponent implements OnInit {
     onStatusClick(title:any, description:any){
 
 
-        this.router.navigate([`view-dreamboard/Forms/${title.id}`]);
+        this.router.navigate([`view-dreamboard/Project Detail/${title.id}`]);
 
     }
     
