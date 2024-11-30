@@ -2,6 +2,7 @@ import { ChangeDetectorRef,Component, OnInit } from '@angular/core';
 import { APIService } from 'src/app/API.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Route } from "@angular/router";
+import { param } from 'jquery';
 
 @Component({
   selector: 'app-dream-id',
@@ -27,6 +28,7 @@ export class DreamIdComponent implements OnInit{
   form_id: any;
   formId: string | null;
   recordId: string | null;
+  project: any;
   
   constructor(
 
@@ -81,18 +83,29 @@ export class DreamIdComponent implements OnInit{
 
     console.log("USER DREAMBOARD PERMISSION",userPermissions)
 
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.subscribe(async params => {
       console.log(this.route);
       this.id = params.get('id')
       this.form_id = params.get('formId')
+      
       // this.form_id = params.get('formId') || 'All'; // Default to 'All' if no formId is found
       // console.log(this.formId);
       console.log(this.id);
+
+
+      this.project =  await this.apiService.GetMaster(this.client+'#project#'+this.form_id+'#main',1)
+
+      console.log("PROJECT:",this.project)
+
+      this.project.PK = this.project.PK.replace(/#/g, "_");
+
+      console.log(this.project.PK); 
   
       this.route.queryParamMap.subscribe(queryParams => {
         // Handle query parameters such as formId and recordId
         this.formId = queryParams.get('formId');
         this.recordId = queryParams.get('recordId');
+        
         let params_url = '';
   
         if (this.formId && this.formId.length > 0) {
@@ -139,7 +152,7 @@ export class DreamIdComponent implements OnInit{
             `&loginDetail=${JSON.stringify(JSON.stringify(this.loginDetail_string))}` +
             `&userPermissions=${userPermissions}` +
             `&theme=${this.theme}` +
-            params_url;
+            params_url+`&project=${JSON.stringify(this.project)}`
   
           this.send_data = this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
           console.log(this.send_data);
