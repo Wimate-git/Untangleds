@@ -97,9 +97,9 @@ export class DreamIdComponent implements OnInit{
 
       console.log("PROJECT:",this.project)
 
-      this.project.PK = this.project.PK.replace(/#/g, "_");
+      // this.project.PK = this.project.PK.replace(/#/g, "_");
 
-      console.log(this.project.PK); 
+      // console.log(this.project.PK); 
   
       this.route.queryParamMap.subscribe(queryParams => {
         // Handle query parameters such as formId and recordId
