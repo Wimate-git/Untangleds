@@ -36,6 +36,7 @@ export class ForgotPasswordComponent implements OnInit {
   lookup_All_User: any = [];
   filterUser: any = []
   selectedUser: any;
+  errorForInvalidName: any = '';
   constructor(private fb: FormBuilder, private authService: AuthService,
     private cd:ChangeDetectorRef,private api:APIService, private router:Router,private DynamicApi:DynamicApiService,private toast:MatSnackBar) {
     this.isLoading$ = this.authService.isLoading$;
@@ -298,6 +299,20 @@ async confirmNewPassword() {
       // Handle error
     }
   });
+}
+
+
+checkName_asPassword(getPassword: Event) {
+  const password = (getPassword.target as HTMLInputElement).value;
+
+  const temp_Password = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>?`~_-]).{6,}$/;
+  this.errorForInvalidName = ''; // Clear previous error
+  if (!temp_Password.test(password)) {
+    this.confirmPassword.setErrors({ invalidForm: true });
+      this.errorForInvalidName =
+          "Password must be at least 6 characters long and include 1 number, 1 lowercase letter, 1 uppercase letter, and 1 special character.";
+  }
+  console.log(this.errorForInvalidName);
 }
 
 }

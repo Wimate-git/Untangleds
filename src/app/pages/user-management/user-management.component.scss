@@ -11,3 +11,44 @@
     transition: 0.5s;
 } 
 
+
+
+/* Override Bootstrap button styles for this specific button */
+.copy-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* Icon style */
+.copy-icon {
+  display: inline-block;
+}
+
+/* Text that shows up on hover */
+.copy-text {
+  display: none; /* Initially hidden */
+}
+
+/* Show text when hovered */
+.copy-btn:hover .copy-text {
+  display: inline-block;
+}
+
+/* Show the text when hovered and icon still appears */
+.copy-btn:hover .copy-icon {
+  margin-right: 5px;
+  transition: 0.4s;/* Increase space when showing text */
+}
+
+/* Optional: Button hover effect */
+.copy-btn:hover {
+  background-color: #d9534f; /* Darker red (Bootstrap's btn-danger on hover) */
+}
+
+
+
+

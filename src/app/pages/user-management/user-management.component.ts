@@ -160,6 +160,7 @@ rdtListWorkAround :any =[{
   enableDeviceButton: boolean;
   adminLogin:boolean = false
   Allpermission: any;
+  cloneUserOperation: boolean = false;
 
   constructor(private apiService: UserService,private configService:SharedService,private fb:FormBuilder
     ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal,private DynamicApi:DynamicApiService,
@@ -2097,6 +2098,8 @@ rdtListWorkAround :any =[{
       //updated device congifuration(update)
       else if (getValues) {
 
+        this.cloneUserOperation = false
+
         this.disabled_CLientID_textField = true
        
 
@@ -3132,7 +3135,29 @@ rdtListWorkAround :any =[{
   };
 
 
+  async onCloneUser(){
+      this.cloneUserOperation = true
 
+      this.createUserField.get('username')?.reset()
+      this.createUserField.get('name')?.reset()
+      this.createUserField.get('userID')?.reset()
+      this.createUserField.get('email')?.reset()
+      this.createUserField.get('mobile')?.reset()
+
+      this.editOperation = false
+
+
+      Swal.fire({
+        toast: true,
+        position: 'bottom',
+        icon: 'success', // or another icon like 'info', 'error', etc.
+        title: 'User Configuration Cloned Successfully',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true
+      });
+      
+  }
 
 
 
