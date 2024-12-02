@@ -190,7 +190,7 @@
 
             <!--begin::Button-->
             <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary"
-                [disabled]="formgroupForm.invalid" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+                [disabled]="formgroupForm.invalid || formgroupForm.pristine" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
                 <span *ngIf="!update" class="indicator-label">
                     Submit
                 </span>

@@ -3,6 +3,8 @@ import { ModalConfig, ModalComponent } from '../../_metronic/partials';
 import { APIService } from 'src/app/API.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { SweetAlertOptions } from 'sweetalert2';
+import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 
 
 
@@ -12,6 +14,11 @@ import { NgxSpinnerService } from 'ngx-spinner';
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
+
+  swalOptions: SweetAlertOptions = {};
+  @ViewChild('noticeSwal')
+
+  noticeSwal!: SwalComponent;
 
 
   modalConfig: ModalConfig = {
@@ -45,7 +52,6 @@ export class DashboardComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private spinner: NgxSpinnerService
 
-
   ) {
 
   }
@@ -67,6 +73,8 @@ export class DashboardComponent implements OnInit {
       this.permission_data = JSON.parse(JSON.parse(JSON.stringify(test.metadata)))
 
       console.log("PERMISSION DATA:", this.permission_data)
+
+      if(this.permission_data.permission_ID !== 'All'){
 
       const permisson_response = await this.api.GetMaster(this.client + '#permission#' + this.permission_data.permission_ID + '#main', 1);
 
@@ -217,14 +225,48 @@ export class DashboardComponent implements OnInit {
           })
         );
       }
+    }
+    else{
+      this.loading = false;
+      this.spinner.hide();
+    }
 
       console.log("CARDS ON FORMGROUP:", this.cards_2)
       this.loading = false;
       this.spinner.hide();
+
+     if(this.cards_2.length=== 0){
+      
+      const errorAlert_: SweetAlertOptions = {
+        icon: 'error',
+        title: 'No Data!',
+        text: 'Sorry ! No data avaliable',
+      };
+
+      this.showAlert(errorAlert_)
+     }
+
+
       this.cdr.detectChanges();
 
     }, 1000);
 
+  }
+
+  showAlert(swalOptions: SweetAlertOptions) {
+    let style = swalOptions.icon?.toString() || 'success';
+    if (swalOptions.icon === 'error') {
+      style = 'danger';
+    }
+    this.swalOptions = Object.assign({
+      buttonsStyling: false,
+      confirmButtonText: "Ok, got it!",
+      customClass: {
+        confirmButton: "btn btn-" + style
+      }
+    }, swalOptions);
+    this.cdr.detectChanges();
+    this.noticeSwal.fire();
   }
 
   async openModal() {

@@ -5,6 +5,7 @@ import { DashboardComponent } from './dashboard.component';
 import { ModalsModule, WidgetsModule } from '../../_metronic/partials';
 import { CardsModule } from '../../_metronic/partials';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { CrudModule } from 'src/app/modules/crud/crud.module';
 
 @NgModule({
   declarations: [DashboardComponent],
@@ -18,6 +19,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
       },
     ]),
     WidgetsModule,
+    CrudModule,
     ModalsModule,
     NgxSpinnerModule,
   ],

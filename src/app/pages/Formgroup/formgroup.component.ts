@@ -280,7 +280,7 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
       createdUser: [' '],
       updatedUser: [' '],
       selectedImage: [''],
-      iconSelect:[''],
+      iconSelect:['',Validators.required],
       iconObject:[''],
       createdTime: [Math.ceil(((new Date()).getTime()) / 1000)],
       updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],

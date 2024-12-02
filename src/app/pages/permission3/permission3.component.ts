@@ -95,6 +95,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
 
   permissionsList = [
+    { name: 'Communication', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Notification Matrix', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Client', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Company', view: false, update: false, xlsxView: false, xlsxUpdate: false },
@@ -102,6 +103,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     { name: 'Permission', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Form Group', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Location Management', view: false, update: false, xlsxView: false, xlsxUpdate: false },
+    { name: 'Project Configuration', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Summary Engine', view: false, update: false, xlsxView: false, xlsxUpdate: false },
 
     // Add more permissions as needed
@@ -416,8 +418,8 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       advance_report: [[]],
       powerboardId: [[]],
       magicboardId: [[]],
-      permissionsList: this.fb.array([]),
-      dynamicEntries: this.fb.array([]),
+      permissionsList: this.fb.array([],Validators.required),
+      dynamicEntries: this.fb.array([],Validators.required),
       dynamicForm: [[]],
       permission: [[]],
       createdTime: [Math.ceil(((new Date()).getTime()) / 1000)],
