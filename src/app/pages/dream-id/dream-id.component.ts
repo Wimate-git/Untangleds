@@ -100,9 +100,11 @@ export class DreamIdComponent implements OnInit{
 
       if(this.project && this.project.PK){
 
-      console.log("PROJECT:",this.project)
+      console.log("PROJECT:",(this.project))
 
       this.project.PK = this.project.PK.replace(/#/g, "_");
+
+      this.project.metadata = JSON.parse(this.project.metadata)
 
       console.log(this.project); 
       }
@@ -160,7 +162,7 @@ export class DreamIdComponent implements OnInit{
             `&loginDetail=${JSON.stringify(JSON.stringify(this.loginDetail_string))}` +
             `&userPermissions=${userPermissions}` +
             `&theme=${this.theme}` +
-            params_url+`&project=${JSON.stringify(this.project)}`
+            params_url+`&project=${JSON.stringify((this.project))}`
   
           this.send_data = this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
           console.log(this.send_data);
