@@ -1,0 +1,215 @@
+
+    <div class="modal-content" style="border-radius: 8px; overflow: hidden;">
+      <div class="modal-header">
+        <h4 class="modal-title">Add Title</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+      </div>
+  
+      <div class="fv-row" [formGroup]="createTitle">
+        <div class="modal-body">
+          <div class="card-body pt-0">
+  
+            <!-- Rich Text Editor Toolbar -->
+            <div class="editor-toolbar d-flex align-items-center gap-2 mb-3">
+              <button
+              type="button"
+              class="btn btn-light"
+              [class.active]="createTitle.value.fontStyle === 'italic'"
+              (click)="toggleItalic()"
+            >
+              <i>I</i>
+            </button>
+              <!-- Bold Button -->
+              <button
+                type="button"
+                class="btn btn-light"
+                [class.active]="createTitle.value.fontWeight === 'bold'"
+                (click)="toggleBold()"
+              >
+                <b>B</b>
+              </button>
+            
+              <!-- Italic Button -->
+           
+            
+              <!-- Underline Button -->
+              <button
+                type="button"
+                class="btn btn-light"
+                [class.active]="createTitle.value.textDecoration === 'underline'"
+                (click)="toggleUnderline()"
+              >
+                <u>U</u>
+              </button>
+            
+              <!-- Alignment Buttons -->
+              <button
+                type="button"
+                class="btn btn-light"
+                [class.active]="createTitle.value.textAlign === 'left'"
+                (click)="setTextAlignment('left')"
+              >
+                <i class="bi bi-text-left"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-light"
+                [class.active]="createTitle.value.textAlign === 'center'"
+                (click)="setTextAlignment('center')"
+              >
+                <i class="bi bi-text-center"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-light"
+                [class.active]="createTitle.value.textAlign === 'right'"
+                (click)="setTextAlignment('right')"
+              >
+                <i class="bi bi-text-right"></i>
+              </button>
+            
+              <!-- Font Family Selector -->
+              <select
+              class="form-select"
+              (change)="onFontChange($event)"
+              [value]="createTitle.value.fontFamily"
+              style="width: auto;"
+            >
+              <option value="Lato">Lato</option>
+              <option value="Open Sans">Open Sans</option>
+              <option value="Roboto">Roboto</option>
+              <option value="Serif">Serif</option>
+              <option value="Arial">Arial</option>
+              <option value="Courier New">Courier New</option>
+              <option value="Georgia">Georgia</option>
+              <option value="Tahoma">Tahoma</option>
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Trebuchet MS">Trebuchet MS</option>
+              <option value="Verdana">Verdana</option>
+              <option value="Comic Sans MS">Comic Sans MS</option>
+              <option value="Calibri">Calibri</option>
+              <option value="Lucida Sans Unicode">Lucida Sans Unicode</option>
+              <option value="Impact">Impact</option>
+              <option value="Garamond">Garamond</option>
+              <option value="Palatino Linotype">Palatino Linotype</option>
+              <option value="Arial Black">Arial Black</option>
+            </select>
+            
+            
+              <!-- Font Size Selector -->
+              <select
+              class="form-select"
+              (change)="onFontSizeChange($event)"
+              [value]="createTitle.value.fontSize"
+              style="width: auto;"
+            >
+              <option value="8px">8</option>
+              <option value="10px">10</option>
+              <option value="12px">12</option>
+              <option value="14px">14</option>
+              <option value="16px">16</option>
+              <option value="18px">18</option>
+              <option value="20px">20</option>
+              <option value="22px">22</option>
+              <option value="24px">24</option>
+              <option value="26px">26</option>
+              <option value="28px">28</option>
+              <option value="30px">30</option>
+              <option value="36px">36</option>
+              <option value="42px">42</option>
+              <option value="48px">48</option>
+              <option value="56px">56</option>
+              <option value="64px">64</option>
+              <option value="72px">72</option>
+              <option value="80px">80</option>
+              <option value="90px">90</option>
+              <option value="100px">100</option>
+            </select>
+            
+            
+              <!-- Background Color Picker -->
+  
+              
+            </div>
+            <div class="color-picker-row" style="display: flex; gap: 1rem; align-items: center;">
+              <!-- Background Color Picker -->
+              <div class="color-picker-container">
+                <label for="bgColorPicker" class="form-label">Choose Background Color:</label>
+                <input
+                  id="bgColorPicker"
+                  type="color"
+                  class="form-control-color"
+                  [value]="createTitle.value.themeColor || '#ffffff'"
+                  (input)="updateNameContainerColor($event)"
+                  [style.background]="createTitle.value.themeColor || '#ffffff'"
+                  title="Choose Name container background color"
+                />
+              </div>
+              
+              <!-- Text Color Picker -->
+              <div class="color-picker-container">
+                <label for="textColorPicker" class="form-label">Choose Text Color:</label>
+                <input
+                  id="textColorPicker"
+                  type="color"
+                  class="form-control-color"
+                  [value]="createTitle.value.textColor || '#000000'"
+                  (input)="updateTextColor($event)"
+                  [style.background]="createTitle.value.textColor || '#000000'"
+                  title="Choose text color"
+                />
+              </div>
+            </div>
+            
+            
+            <!-- Name Container -->
+            <div
+            class="col-md-12"
+            style="padding: 10px; border-radius: 8px;"
+          >
+            <label class="col-form-label fw-bold fs-6 required">Name</label>
+            <div
+            formControlName="customLabel"
+            contenteditable="true"
+            class="form-control form-control-solid rich-text-editor"
+            [style.font-family]="createTitle.value.fontFamily"
+            [style.font-size]="createTitle.value.fontSize"
+            [style.text-align]="createTitle.value.textAlign"
+            [style.font-weight]="createTitle.value.fontWeight"
+            [style.font-style]="createTitle.value.fontStyle"
+            [style.text-decoration]="createTitle.value.textDecoration"
+            [style.background-color]="createTitle.value.themeColor"
+            [style.color]="createTitle.value.textColor"
+            (input)="updateCustomLabel($event)"
+            [textContent]="createTitle.value.customLabel"
+          >
+          </div>
+          
+          
+          
+          
+            <!-- Validation Feedback -->
+            <div
+              class="invalid-feedback"
+              *ngIf="createTitle.get('customLabel')?.invalid && createTitle.get('customLabel')?.touched"
+              style="padding: 5px; border-radius: 5px;"
+            >
+              Title Name is required
+            </div>
+          </div>
+          
+            
+          
+  
+  
+          </div>
+        </div>
+  
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
+          <button type="button" class="btn btn-primary" (click)="addTile('title'); modal.dismiss()" *ngIf="!isEditMode">Save</button>
+          <button type="button" class="btn btn-warning" (click)="updateTitle(); modal.dismiss()" *ngIf="isEditMode">Update</button>
+        </div>
+      </div>
+    </div>
+ 

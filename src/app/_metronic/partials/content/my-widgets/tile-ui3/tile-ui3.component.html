@@ -1,0 +1,84 @@
+<div *ngIf="item.grid_type === 'tile3'" >
+    <div class="grid-item"
+    tabindex="0"
+    [style.background]="item.themeColor" 
+    style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out;"
+   >
+    <div class="row text_3d" style="display: flex; flex-direction: column; align-items: flex-start;">
+
+ <!-- Display the parameterName -->
+ <div   [style.font-size]="item.fontSize" 
+   
+  
+ [style.color]="item.fontColor"  style=" font-weight: bold;">
+   {{ item.parameterName }}
+ </div>
+
+ <div   [style.font-size]="item.fontSize" 
+   
+  
+ [style.color]="item.fontColor"  class="value" tabindex="0" style=" font-weight: bold; color: #333333;">
+  {{ item.multi_value[1]?.value }} <!-- Access the second element in multi_value array -->
+</div>
+
+ <!-- Display processed_value from multi_value -->
+ <div   [style.font-size]="item.fontSize" 
+   
+  
+ [style.color]="item.fontColor"  class="value" tabindex="0" style=" font-weight: bold; color: #333333;">
+   {{ item.multi_value[3]?.processed_value }} <!-- Access the second element in multi_value array -->
+ </div>
+ <div   [style.font-size]="item.fontSize" 
+   
+  
+ [style.color]="item.fontColor"  class="value" tabindex="0" style=" font-weight: bold; color: #333333;">
+  {{ item.multi_value[2]?.value }} <!-- Access the second element in multi_value array -->
+</div>
+    </div>
+
+ <!-- Edit icon button -->
+
+ <div 
+ class="action-menu-container d-flex align-items-center justify-content-end" 
+ style="position: absolute; top: 10px; right: 10px; gap: 10px; z-index: 1000;">
+ 
+ <!-- Edit Icon Button -->
+ <button 
+ *ngIf="isEditModeView"
+ (click)="edit_each_tileUI(item,index)"
+   class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
+   aria-haspopup="menu" 
+   aria-expanded="false" 
+   style="background: none; border: none; cursor: pointer;">
+   <i class="bi bi-pencil" style="color: black;"></i>
+ </button>
+
+ <!-- Dropdown Menu -->
+ <div 
+ *ngIf="isEditModeView"
+   class="dropdown" 
+   style="position: relative;">
+   <button
+
+   [matMenuTriggerFor]="menu"
+   class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" >
+   <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>
+ </button>
+
+ <mat-menu #menu="matMenu" class="mat-elevation-z4">
+   <button mat-menu-item (click)="edit_each_duplicate(item,index)">
+    <i class="bi bi-files fs-4"></i>
+     <span>Duplicate</span>
+   </button>
+   <button mat-menu-item (click)="deleteTile(item,index)">
+    <i class="bi bi-trash fs-4"></i>
+     <span>Delete</span>
+   </button>
+ </mat-menu>
+ </div>
+</div>
+
+
+</div>
+
+  </div>

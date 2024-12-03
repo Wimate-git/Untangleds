@@ -1,0 +1,62 @@
+<div *ngIf="item.grid_type === 'tile'">
+  <div class="grid-item"
+       tabindex="0"
+       [style.background]="item.themeColor"
+       style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out; width: 100%; height: 100%;">
+
+    <!-- Content -->
+    <div class="row text_3d" style="display: flex; flex-direction: column; align-items: flex-start;">
+      <!-- Parameter Name -->
+      <div 
+      [style.font-size]="item.fontSize" 
+   
+  
+      [style.color]="item.fontColor"
+       style="font-weight: bold; margin-bottom: 10px;">
+        {{ item.parameterName }}
+      </div>
+      
+      <!-- Processed Value -->
+      <div     [style.font-size]="item.fontSize" 
+   
+  
+      [style.color]="item.fontColor" tabindex="0" style=" font-weight: bold;">
+        {{ item.multi_value[0]?.processed_value }}
+      </div>
+    </div>
+
+    <!-- Action Menu -->
+    <div class="action-menu-container d-flex align-items-center"
+         style="position: absolute; top: 10px; right: 10px; gap: 10px;">
+      <!-- Edit Button -->
+      <button *ngIf="isEditModeView"
+              class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px"
+              (click)="edit_each_tileUI(item, index)"
+              aria-haspopup="menu"
+              aria-expanded="false"
+              style="background: none; border: none; cursor: pointer;">
+        <i class="bi bi-pencil" style="color: black;"></i>
+      </button>
+
+      <!-- Dropdown Menu -->
+      <div class="dropdown">
+        <button *ngIf="isEditModeView"
+                [matMenuTriggerFor]="menu"
+                class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px">
+          <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>
+        </button>
+        <mat-menu #menu="matMenu" class="mat-elevation-z4">
+          <button mat-menu-item (click)="edit_each_duplicate(item, index)">
+            <i class="bi bi-files fs-4"></i>
+            <span>Duplicate</span>
+          </button>
+          <button mat-menu-item (click)="deleteTile(item, index)">
+            <i class="bi bi-trash fs-4"></i>
+            <span>Delete</span>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+  </div>
+</div>
+

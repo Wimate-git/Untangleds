@@ -4,6 +4,7 @@ export * from './content/widgets/widgets.module';
 export * from './content/chat-inner/chat-inner.module';
 export * from './content/cards/cards.module';
 export * from './content/cards/icon-user.model';
+export * from './content/my-widgets/my-widgets.module'
 
 // Layout
 export * from './layout/extras/extras.module';

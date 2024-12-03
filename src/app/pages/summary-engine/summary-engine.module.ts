@@ -30,6 +30,7 @@ import { GridsterModule } from 'angular-gridster2';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CrudSummaryComponent } from './crud-summary/crud-summary.component';
+import { MyWidgetsModule } from 'src/app/_metronic/partials';
 
  // Import Keen UI Module
 
@@ -44,6 +45,8 @@ import { CrudSummaryComponent } from './crud-summary/crud-summary.component';
   declarations: [SummaryEngineComponent],
   imports: [
     CommonModule,
+    
+    MyWidgetsModule,
     GridsterModule,
     NgxDaterangepickerBootstrapDirective,
     NgxDaterangepickerBootstrapComponent,
@@ -68,6 +71,7 @@ import { CrudSummaryComponent } from './crud-summary/crud-summary.component';
     NgxSpinnerModule,
     MatTooltipModule,
     NgbTooltipModule,
+   
     
 
    

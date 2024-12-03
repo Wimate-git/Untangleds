@@ -1,0 +1,642 @@
+/* Full page layout for gridster */
+
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  
+  // gridster {
+  //   background-color: #f0f0f0;
+  //   height: 100vh; /* Full viewport height */
+  //   width: 100%;  /* Full viewport width */
+  //   display: block; /* Ensure gridster stretches across the screen */
+  //   box-sizing: border-box;
+  // }
+  
+
+  
+/* Apply dark background for the grid */
+/* Apply dark background for the grid */
+/* Base Gridster Styling */
+/* Main Grid Container */
+// .gridster {
+//   background-color: #1e1e1e; /* Dark mode background */
+//   position: relative;
+//   overflow: hidden;
+// }
+
+// /* Single Grid Lines */
+// .gridster .grid-lines {
+//   background-size: 40px 40px; /* Adjust grid spacing */
+//   background-image: 
+//     linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+//     linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+// }
+
+// /* Remove Border from Grid Items to Prevent Overlap */
+// .gridster-item {
+//   background: transparent; /* Transparent background */
+//   border: none; /* Remove extra border */
+// }
+
+// /* Add Hover or Active States */
+// .gridster-item:hover {
+//   background: rgba(255, 255, 255, 0.1); /* Highlight on hover */
+// }
+
+
+
+  
+  .grid-item-content {
+    background-color: gray;
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: calc(1.2rem + 1vw); /* Responsive font size based on viewport width */
+    height: 100%;
+    border-radius: 5px;
+    text-align: center;
+  }
+  
+  .grid-item-content h3 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  
+  .grid-item-content p {
+    font-size: 1rem;
+  }
+
+
+
+
+
+
+  .myMenu {
+    filter: url("#shadowed-goo");
+  }
+  
+  .myMenu-item, .myMenu-open-button {
+    background: #009EF7;
+    border-radius: 100%;
+    width: 50px;
+    height: 50px;
+    margin-left: -40px;
+    position: absolute;
+    top: 20px;
+    color: white;
+    text-align: center;
+    line-height: 50px;
+    transform: translate3d(0, 0, 0);
+    transition: transform ease-out 200ms;
+  }
+  
+  .myMenu-open {
+    display: none;
+  }
+  
+  .hamburger {
+    width: 25px;
+    height: 3px;
+    background: white;
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -12.5px;
+    margin-top: -1.5px;
+    transition: transform 200ms;
+  }
+  
+  .hamburger-1 {
+    transform: translate3d(0, -8px, 0);
+  }
+  
+  .hamburger-2 {
+    transform: translate3d(0, 0, 0);
+  }
+  
+  .hamburger-3 {
+    transform: translate3d(0, 8px, 0);
+  }
+  
+  .myMenu-open:checked + .myMenu-open-button .hamburger-1 {
+    transform: translate3d(0, 0, 0) rotate(45deg);
+  }
+  .myMenu-open:checked + .myMenu-open-button .hamburger-2 {
+    transform: translate3d(0, 0, 0) scale(0.1, 1);
+  }
+  .myMenu-open:checked + .myMenu-open-button .hamburger-3 {
+    transform: translate3d(0, 0, 0) rotate(-45deg);
+  }
+  
+  .myMenu {
+    position: absolute;
+    left: 50%;
+    margin-left: -40px;
+    padding-top: 20px;
+    padding-left: 40px;
+    width: 45px;
+    height: 50px;
+    box-sizing: border-box;
+    font-size: 20px;
+    text-align: left;
+  }
+  
+  .myMenu-item:hover {
+    background: black;
+    color: #009EF7;
+    
+  }
+  .myMenu-item:nth-child(3) {
+    transition-duration: 180ms;
+  }
+  .myMenu-item:nth-child(4) {
+    transition-duration: 180ms;
+  }
+  .myMenu-item:nth-child(5) {
+    transition-duration: 180ms;
+  }
+  .myMenu-item:nth-child(6) {
+    transition-duration: 180ms;
+  }
+  .myMenu-item:nth-child(7) {
+    transition-duration: 180ms;
+  }
+  .myMenu-item:nth-child(8) {
+    transition-duration: 180ms;
+  }
+  .myMenu-item:nth-child(9) {
+    transition-duration: 180ms;
+  }
+  .myMenu-open-button {
+    z-index: 2;
+    transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition-duration: 400ms;
+    transform: scale(1.1, 1.1) translate3d(0, 0, 0);
+    cursor: pointer;
+  }
+  
+  .myMenu-open-button:hover {
+    transform: scale(1.2, 1.2) translate3d(0, 0, 0);
+  }
+  
+  .myMenu-open:checked + .myMenu-open-button {
+    transition-timing-function: linear;
+    transition-duration: 200ms;
+    transform: scale(0.8, 0.8) translate3d(0, 0, 0);
+  }
+  
+  .myMenu-open:checked ~ .myMenu-item {
+    transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
+  .myMenu-open:checked ~ .myMenu-item:nth-child(3) {
+    transition-duration: 190ms;
+    transform: translate3d(0,90px, 0);
+  }
+  .myMenu-open:checked ~ .myMenu-item:nth-child(4) {
+    transition-duration: 290ms;
+    transform: translate3d(0,180px,0);
+  }
+  .myMenu-open:checked ~ .myMenu-item:nth-child(5) {
+    transition-duration: 390ms;
+    transform: translate3d(0,270px,  0);
+  }
+  .myMenu-open:checked ~ .myMenu-item:nth-child(6) {
+    transition-duration: 490ms;
+    transform: translate3d(0,360px, 0);
+  }
+  .myMenu-open:checked ~ .myMenu-item:nth-child(7) {
+    transition-duration: 590ms;
+    transform: translate3d(0,450px, 0);
+  }
+  .myMenu-open:checked ~ .myMenu-item:nth-child(8) {
+    transition-duration: 690ms;
+    transform: translate3d(0,540px, 0);
+  }
+  .myMenu-open:checked ~ .myMenu-item:nth-child(9) {
+    transition-duration: 790ms;
+    transform: translate3d(0,630px, 0);
+  }
+
+
+  .custom-title-container {
+    margin-left: 20px; /* Adjust this value as needed */
+  }
+
+/* Custom styles for the toast */
+
+
+  
+
+
+.icon-block {
+  display: flex; /* Use flexbox for alignment */
+  align-items: center; /* Center items vertically */
+  padding: 10px; /* Add some padding */
+  border: 1px solid #ccc; /* Optional: border around the block */
+  border-radius: 5px; /* Optional: rounded corners */
+  background-color: #f9f9f9; /* Optional: background color */
+}
+
+.icon-container {
+  margin-right: 8px; /* Space between the icon and text */
+}
+
+.icon-background {
+  background-color: red; /* Set your desired background color */
+  display: inline-flex; /* Ensure it behaves like an inline element */
+  padding: 10px; /* Add padding to create space around the icon */
+  border-radius: 5px; /* Optional: rounded corners */
+  align-items: center; /* Center the icon vertically if necessary */
+}
+
+
+.right-side-modal .modal-dialog {
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100%;
+  max-width: 350px; /* Adjust width as needed */
+  border-radius: 0;
+  margin: 0;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for depth */
+}
+
+.right-side-modal .modal-content {
+  height: 100%;
+  padding: 20px;
+}
+
+.list-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.list-item {
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+
+.list-item.active {
+  background-color: #e6f7ff;
+}
+
+.list-item:hover {
+  background-color: #f0f0f0;
+}
+
+.tooltip-content {
+  position: absolute;
+  top: 50%;
+  left: 110%;
+  width: 200px;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #333;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.2;
+  transform: translateY(-50%);
+  visibility: visible;
+  z-index: 10;
+}
+
+
+.example {
+  font-size: 14px;
+  color: #888;
+}
+
+
+
+.list-item {
+  position: relative;
+}
+
+.list-item .tooltip-content {
+  visibility: hidden;
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  border-radius: 4px;
+  padding: 8px;
+  position: absolute;
+  top: -10px;
+  left: 110%;
+  width: 200px;
+  z-index: 1;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.list-item:hover .tooltip-content {
+  visibility: visible;
+}
+
+
+/////////////////////////////////////////
+
+.color-boxes {
+  display: flex;
+  gap: 10px;
+}
+
+.color-box {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid transparent;
+  transition: all 0.3s;
+}
+
+.color-box.checked {
+  border: 2px solid #fff;
+}
+
+.color-box .checkmark {
+  position: absolute;
+  font-size: 20px;
+  color: white;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.color-box.checked .checkmark {
+  opacity: 1;
+}
+
+.color-box:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.color-box.checked {
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.4); /* Optional: highlight color when checked */
+}
+
+.grid-item:hover {
+  opacity: 0.8;  /* Reduce opacity on hover for a subtle effect */
+}
+
+
+.milky {
+  
+  text-transform: uppercase;
+
+  font-size: 30px;
+
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-align: center;
+  z-index: 1; 
+  margin-top: 12px;
+  position: fixed;
+  // padding: 200px 400px;
+  transform: translate(-50%, -50%);
+  border-radius: 20px;
+
+  white-space: nowrap; /* Prevent text wrapping */
+}
+#bulletChart {
+  height: 300px;  /* Make sure the chart has a height */
+  width: 100%;  /* Ensure the chart takes up full width available */
+}
+
+
+
+
+.responsive-image {
+  width: 100%;          /* Ensure the image takes up the full width of the container */
+  height: 100%;         /* Maintain aspect ratio */
+  object-fit: contain;  /* Make sure the entire image is visible */
+}
+
+.responsive-dial{
+  width: 100%;          /* Ensure the image takes up the full width of the container */
+  height: 60%;         /* Maintain aspect ratio */
+  object-fit: cover;
+}
+.responsive-fulldial{
+  width: 100%;          /* Ensure the image takes up the full width of the container */
+  height: 60%;         /* Maintain aspect ratio */
+  object-fit: cover;
+}
+
+
+#chart-gauge {
+  display: block;
+  min-width: 150px;
+  max-width: 400px;
+  height: 200px;
+  margin: 0 auto;
+}
+
+
+.grid-item {
+  border-radius: 16px; /* Ensures rounded corners */
+  overflow: hidden; /* Ensures that the content inside the grid item respects the border-radius */
+}
+
+
+.draggable {
+  cursor: grab;
+  /* Add styles for the draggable state */
+}
+
+.draggable:active {
+  cursor: grabbing;
+}
+
+
+
+
+
+.value {
+  font-size: clamp(20px, 2.5vw, 28px); /* Dynamically adjust font size */
+  font-weight: bold;
+}
+.movingcenter{
+  top: 50%; 
+  right: 50%;
+
+  transform: translate(50%, -50%);
+}
+.text_3d {
+  position: fixed;
+  top: 50%; 
+  right: 50%;
+
+  transform: translate(50%, -50%);
+}
+
+.text_3d1{
+  position: fixed;
+  top: 600%; 
+  right: 50%;
+
+  transform: translate(50%, -50%);
+}
+
+// .title-widget {
+//   grid-column: span 100; /* Adjust for large span */
+//   grid-row: span 2; /* Ensure enough height */
+//   background: linear-gradient(90deg, #6A1B9A, #1E88E5); /* Gradient background */
+//   color: white; /* Text color */
+//   border-radius: 8px; /* Rounded corners */
+//   font-size: 20px; /* Font size */
+//   font-weight: bold; /* Bold text */
+//   text-align: center; /* Center text */
+//   padding: 20px; /* Inner padding */
+//   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Depth shadow */
+// }
+
+
+.modal-content {
+  border-radius: 8px;
+  overflow: hidden;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.editor-toolbar .btn {
+  margin-right: 5px;
+}
+
+.form-control-color {
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 10px;
+}
+
+.form-control {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+button.active {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+
+
+.color-picker-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+input[type="color"] {
+  width: 50px;
+  height: 36px;
+  border: 1px solid #ced4da;
+  border-radius: 6px; /* Rounded corners */
+  padding: 0;
+  overflow: hidden;
+  background: none; /* Ensures the background color shows */
+  cursor: pointer;
+  transition: border-color 0.3s, background 0.3s;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: none; /* Remove the default border inside the input */
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type="color"]:hover {
+  border-color: #495057;
+}
+
+input[type="color"]:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+
+
+.text-primary i {
+  cursor: pointer; /* Ensure the icon is visually clickable */
+  padding: 5px; /* Optional: Increase padding for better click area */
+}
+
+.info-tooltip {
+  color: #6c757d; /* Adjust to match the design */
+  cursor: pointer;
+  margin-left: 8px;
+  font-size: 14px;
+  position: relative;
+  display: inline-block;
+}
+
+.info-tooltip:hover i {
+  color: #0056b3; /* Tooltip icon hover effect */
+}
+
+
+
+#rangeCalendarCenter + .daterangepicker {
+  width: 400px !important;
+  max-width: none !important;
+}
+.no-underline {
+  text-decoration: none;
+}
+
+
+
+// .dropdown-menu {
+//   display: block !important;
+//   opacity: 1 !important;
+// }
+
+
+.dropdown-menu {
+  z-index: 1050 !important; /* Ensure the dropdown is on top */
+}
+
+.modal-dialog {
+  margin: auto; /* Center horizontally */
+  max-width: 450px;
+  width: 100%;
+}
+.tooltip {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  border-radius: 4px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
