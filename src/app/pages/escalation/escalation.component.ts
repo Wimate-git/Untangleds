@@ -597,6 +597,16 @@ console.log("PARRAY3:",permissionsArray)
   }
   
 
+  keyPress(event: any) {
+    const pattern = /['1-9'\+\\ ]/;
+
+    let inputChar = String.fromCharCode(event.charCode);
+    // console.log('inputchar',inputChar);
+    if (event.keyCode != 8 && !pattern.test(inputChar)) {
+      event.preventDefault();
+    }
+  }
+
 
 
   updateConfiguration(value: any, getKey: any) {
@@ -945,8 +955,8 @@ console.log("PARRAY3:",permissionsArray)
       ],
       createdRow: (row, data, dataIndex) => {
         $('td:eq(0)', row).addClass('d-flex align-items-center');
-      },
-    };
+      }
+  };
   
   }
 

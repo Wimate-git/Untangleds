@@ -297,6 +297,13 @@ async confirmNewPassword() {
     onFailure: (err) => {
       console.error('Error confirming password: ', err);
       // Handle error
+        // Display the error message in the Swal alert
+        return Swal.fire({
+          title: 'Error',
+          text: err.message,  // Display the extracted error message
+          icon: 'error',
+          confirmButtonText: 'Okay'
+        });
     }
   });
 }

@@ -69,7 +69,7 @@ export class Crud2Component implements OnInit, AfterViewInit, OnDestroy{
     if(this.componentSource == 'app-configuration'){
       this.filterSearch = 'matrix_filter'
     }
-    else if(this.componentSource == 'app-configuration'){
+    else if(this.componentSource == 'client-configuration'){
       this.filterSearch = 'client_filter'
     }
 
@@ -80,13 +80,16 @@ export class Crud2Component implements OnInit, AfterViewInit, OnDestroy{
 
     this.dtOptions = {
       dom: "<'row'<'col-sm-12'tr>>" +
-      "<'d-flex justify-content-between'<'col-sm-12 col-md-5'i><'d-flex justify-content-between'p>>",
+      "<'d-flex align-items-baseline justify-content-between'<'col-sm-12 col-md-5'i><'d-flex align-items-baseline justify-content-between'p>>",
       processing: true,
       order:true,
       language: {
         processing: '<span class="spinner-border spinner-border-sm align-middle"></span> Loading...'
       },
       search: true,
+      "lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+      lengthChange:true,
+    pageLength: 10, // Default number of rows to show
       ...this.datatableConfig
     };
     

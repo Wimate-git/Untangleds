@@ -65,8 +65,8 @@ export class CrudcompanyComponent implements OnInit, AfterViewInit, OnDestroy{
 
     this.dtOptions = {
      
-      dom: `<'row'<'col-sm-12'tr>>` +
-      "<'d-flex justify-content-between'<'col-sm-12 col-md-5'i><'d-flex justify-content-between'p>>",
+      dom: "<'row'<'col-sm-12'tr>>" +
+      "<'d-flex align-items-baseline justify-content-between'<'col-sm-12 col-md-5'i><'d-flex align-items-baseline justify-content-between'p>>",
       processing: true,
       language: {
         processing: '<span class="spinner-border spinner-border-sm align-middle"></span> Loading...'
