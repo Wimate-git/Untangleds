@@ -2,8 +2,8 @@
   Loading data, please wait...
 </div> -->
 <ngx-spinner *ngIf="loading" bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true"><p style="color: white" > Loading data, please wait... </p></ngx-spinner>
-<div class="row g-6 g-xl-9" *ngIf="cards.length > 0">
-    <div class="col-md-6 col-xl-4" *ngFor="let card of cards">
+<div class="row g-6 g-xl-4" *ngIf="cards.length > 0">
+    <div class="col-md-6 col-xl-3" *ngFor="let card of cards">
       <app-card2 [componentSource]="'dashboardForm'"
         icon="https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/public/Climaveneta/Live+Contract/liveContract.png"
         badgeColor="primary"
