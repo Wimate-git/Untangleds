@@ -102,12 +102,29 @@
                                     placeholder="Enter Password" name="password" formControlName="password" 
                                     required >
                             </div>
+
+
+                            <!-- (onChange)="onModuleSelect($event)" -->
+                            <div class="col-md-4">
+                                <label class="required fw-semibold fs-6 mb-2">Communication Type</label>
+                                <div class="custom-multiselect">
+                                    <p-multiSelect
+                                    [options]="communicationTypeArray" 
+                                    value ="value"
+                                    (onChange)="commChangeTracker($event)"
+                                    [(ngModel)]="selectedComms" 
+                                    placeholder="select Communication Type"
+                                    formControlName="configurationType"
+                                    required>
+                                    </p-multiSelect>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Telegram Section -->
-                <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+                <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1" *ngIf="selectedComms.includes('Telegram')">
                     <div class="container custom-container">
                         <h5 class="section-title"><i class="bi bi-telegram fs-4"></i>Telegram</h5>
                         <div class="row">
@@ -166,7 +183,7 @@
                 </div>
 
                 <!-- SMS Section (To be added later) -->
-                <div class="collapse show" #collapse2="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+                <div class="collapse show" #collapse2="ngbCollapse" [(ngbCollapse)]="isCollapsed1"  *ngIf="selectedComms.includes('SMS')">
                     <div class="container custom-container">
                         <h5 class="section-title"><i class="bi  bi-chat-quote-fill fs-4" style="margin-right: 2px;"></i>SMS</h5>
                         <div class="row mb-2">
@@ -305,7 +322,7 @@
                 </div>
 
                 <!-- WhatsApp Section (To be added later) -->
-                <div class="collapse show" #collapse3="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+                <div class="collapse show" #collapse3="ngbCollapse" [(ngbCollapse)]="isCollapsed1"  *ngIf="selectedComms.includes('WhatsApp')">
                     <div class="container custom-container">
                         <h5 class="section-title"><i class="bi bi-whatsapp fs-4"></i>WhatsApp</h5>
                         <div class="row">
@@ -354,7 +371,7 @@
 
 
                  <!-- WhatsApp Section (To be added later) -->
-                 <div class="collapse show" #collapse3="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+                 <div class="collapse show" #collapse3="ngbCollapse" [(ngbCollapse)]="isCollapsed1"  *ngIf="selectedComms.includes('Email')">
                     <div class="container custom-container">
                         <h5 class="section-title"><i class="bi bi-envelope-at-fill fs-4"></i> Email</h5>
                         <div class="row mb-2">
@@ -446,7 +463,7 @@
 
 
                 <!-- Push Notifications Section (To be added later) -->
-                <div class="collapse show" #collapse3="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+                <div class="collapse show" #collapse3="ngbCollapse" [(ngbCollapse)]="isCollapsed1"  *ngIf="selectedComms.includes('Push Notification')">
                     <div class="container custom-container">
                         <h5 class="section-title"><i class="bi bi-app-indicator fs-4"></i> Push Notifications</h5>
                         <div class="row">
@@ -496,7 +513,7 @@
 
 
 
-                <div class="container custom-container">
+                <div class="container custom-container" [ngStyle]="{ 'margin-bottom': selectedComms.length === 0 ? '150px' : '0px'}">
                      <!-- Button to add a new dynamic field -->
                      <button type="button" class="btn btn-info btn-sm mb-2 me-2" (click)="addDynamicField()">Add Field</button>
                      <button type="button" class="btn btn-danger btn-sm mb-2" (click)="removeAllDynamicFields()">Remove All Field</button>

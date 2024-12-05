@@ -9,6 +9,7 @@ import { NgxSpinner, NgxSpinnerModule } from "ngx-spinner";
 import { ConnectionSettingsComponent } from "./connection-settings.component";
 import { SweetAlert2Module } from "@sweetalert2/ngx-sweetalert2";
 import { Crud2Module } from "src/app/modules/crud2/crud.module";
+import { MultiSelectModule } from "primeng/multiselect";
 
 
 
@@ -36,6 +37,7 @@ import { Crud2Module } from "src/app/modules/crud2/crud.module";
     NgxSpinnerModule,
     SweetAlert2Module.forChild(),
     Crud2Module,
+    MultiSelectModule,
 ]
 })
 export class ConnectionModule { }

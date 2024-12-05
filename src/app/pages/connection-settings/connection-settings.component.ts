@@ -10,6 +10,7 @@ import { SharedService } from '../shared.service';
 import { DynamicApiService } from '../dynamic-api.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
+//Version Date 5 Dec Asad 2025
 
 interface ListItem {
   [key: string]: {
@@ -39,6 +40,11 @@ export class ConnectionSettingsComponent implements OnInit{
   maxlength: number = 500;
   lookup_data_communication: any = [];
   currentEmail: any = '';
+
+  selectedComms:any = []
+
+
+  communicationTypeArray = ['Telegram','SMS','Push Notification','WhatsApp','Email']
 
   constructor(private fb:FormBuilder,private cd:ChangeDetectorRef,private api:APIService,private notifyConfig:SharedService,
     private DynamicApi:DynamicApiService,private toast:MatSnackBar
@@ -77,12 +83,12 @@ export class ConnectionSettingsComponent implements OnInit{
   initializeForm(){
     this.createConnectionField = this.fb.group({
       comtnID:['',Validators.required],
-      configurationType: [''],
+      configurationType: ['',Validators.required],
       version:['',Validators.required],
-      chatID:['',Validators.required],
-      botToken:['',Validators.required],
-      smsNumber:['',Validators.required],
-      whatsappNumber:['',Validators.required],
+      chatID:[''],
+      botToken:[''],
+      smsNumber:[''],
+      whatsappNumber:[''],
       balanceUrl:[''],
       smsUrl:[''],
       message_prefix:[''],
@@ -91,12 +97,12 @@ export class ConnectionSettingsComponent implements OnInit{
       password:['',Validators.required],
       smsBalanceUrl:[''],
       smsSender:[''],
-      smsPriority:['',Validators.required],
+      smsPriority:[''],
       smsKey:[''],
       smsToken:[''],
-      email:['',Validators.required],
+      email:[''],
       name:[''],
-      emailPriority:['',Validators.required],
+      emailPriority:[''],
       errorDate:[''],
       emailResponse:[''],
       responseCode:[''],
@@ -104,17 +110,118 @@ export class ConnectionSettingsComponent implements OnInit{
       mailOptions_to:[''],
       emailToken:[''],
       pushToken:[''],
-      pushPriority:['',Validators.required],
-      tokenIDPush:['',Validators.required],
-      whatsAppPriority:['',Validators.required],
+      pushPriority:[''],
+      tokenIDPush:[''],
+      whatsAppPriority:[''],
       whatsAppToken:[''],
-      telegramPriority:['',Validators.required],
+      telegramPriority:[''],
       telegramToken:[''],
       dynamicFields: this.fb.array([])
     })
+  }
 
+
+
+  // Method to clear validators for all relevant fields
+clearValidatorsForAllFields(): void {
+  this.createConnectionField.get('chatID')?.clearValidators();
+  this.createConnectionField.get('botToken')?.clearValidators();
+  this.createConnectionField.get('smsNumber')?.clearValidators();
+  this.createConnectionField.get('whatsappNumber')?.clearValidators();
+  this.createConnectionField.get('whatsAppPriority')?.clearValidators();
+  this.createConnectionField.get('email')?.clearValidators();
+  this.createConnectionField.get('emailPriority')?.clearValidators();
+  this.createConnectionField.get('tokenIDPush')?.clearValidators();
+  this.createConnectionField.get('pushPriority')?.clearValidators();
+  this.createConnectionField.get('telegramPriority')?.clearValidators()
+  this.createConnectionField.get('smsPriority')?.clearValidators()
+}
+
+// Method to update the validity of the fields after adding/removing validators
+updateValidatorsForFields(): void {
+  this.createConnectionField.get('chatID')?.updateValueAndValidity();
+  this.createConnectionField.get('botToken')?.updateValueAndValidity();
+  this.createConnectionField.get('smsNumber')?.updateValueAndValidity();
+  this.createConnectionField.get('whatsappNumber')?.updateValueAndValidity();
+  this.createConnectionField.get('whatsAppPriority')?.updateValueAndValidity();
+  this.createConnectionField.get('email')?.updateValueAndValidity();
+  this.createConnectionField.get('emailPriority')?.updateValueAndValidity();
+  this.createConnectionField.get('tokenIDPush')?.updateValueAndValidity();
+  this.createConnectionField.get('pushPriority')?.updateValueAndValidity();
+  this.createConnectionField.get('telegramPriority')?.updateValueAndValidity()
+  this.createConnectionField.get('smsPriority')?.updateValueAndValidity()
+}
+
+
+
+commChangeTracker(event:any){
+  try{
+
+    const value = event.value
+      console.log("Changed value is here", value);
+
+      if(!value){
+        return
+      }
+  
+      // Reset validators for all fields first
+      this.clearValidatorsForAllFields();
+  
+      // Telegram Validation
+      if (value.includes('Telegram')) {
+        this.createConnectionField.get('chatID')?.setValidators([Validators.required]);
+        this.createConnectionField.get('botToken')?.setValidators([Validators.required]);
+        this.createConnectionField.get('telegramPriority')?.setValidators([Validators.required]);
+      }
+  
+      // SMS Validation
+      if (value.includes('SMS')) {
+        this.createConnectionField.get('smsNumber')?.setValidators([Validators.required]);
+        this.createConnectionField.get('smsPriority')?.setValidators([Validators.required]);
+      }
+  
+      // WhatsApp Validation
+      if (value.includes('WhatsApp')) {
+        this.createConnectionField.get('whatsappNumber')?.setValidators([Validators.required, Validators.pattern('^[0-9]{10}$')]);
+        this.createConnectionField.get('whatsAppPriority')?.setValidators([Validators.required]);
+      }
+  
+      // Email Validation
+      if (value.includes('Email')) {
+        this.createConnectionField.get('email')?.setValidators([Validators.required, Validators.email]);
+        this.createConnectionField.get('emailPriority')?.setValidators([Validators.required]);
+      }
+  
+      // Push Notification Validation
+      if (value.includes('Push Notification')) {
+        this.createConnectionField.get('tokenIDPush')?.setValidators([Validators.required]);
+        this.createConnectionField.get('pushPriority')?.setValidators([Validators.required]);
+      }
+  
+      // Update the validity of the fields after adding/removing validators
+      this.updateValidatorsForFields();
+      this.cd.detectChanges()
+
+
+        // Update button state based on the form's validity
+        this.toggleSubmitButton();
+      console.log("Is form valid " ,this.createConnectionField.valid);
 
   }
+  catch(error){
+    console.log("Error in valueChnages ",error)
+  }
+}
+
+
+
+// Method to toggle submit button enable/disable based on form validity
+toggleSubmitButton(): void {
+  const submitButton = document.getElementById('kt_modal_update_customer_submit') as HTMLButtonElement;
+  if (submitButton) {
+    submitButton.disabled = !this.createConnectionField.valid;
+  }
+}
 
   async showTable() {
 
@@ -217,6 +324,9 @@ export class ConnectionSettingsComponent implements OnInit{
     };
   
   }
+
+
+
 
 
   fetchCompanyLookupdata(sk:any):any {
@@ -446,6 +556,7 @@ export class ConnectionSettingsComponent implements OnInit{
     console.log('getvalues inside openModal', getValues);
 
     this.currentEmail = ''
+    this.selectedComms = []
   
     if (getValues == "") {
       this.editOperation = false;
@@ -491,12 +602,16 @@ export class ConnectionSettingsComponent implements OnInit{
       }
 
 
+      this.selectedComms =  getValues.configurationType == undefined ? []: JSON.parse(getValues.configurationType)
+
+
       //Set the form Values (Populate)
       this.createConnectionField = this.fb.group({
         comtnID:{value:getValues.commID,disabled:true},
         version:getValues.version,
         username:getValues.username,
         password:getValues.password,
+        configurationType:[this.selectedComms],
 
         //Telegram
         chatID:telegramParsed.chatID,
@@ -542,6 +657,8 @@ export class ConnectionSettingsComponent implements OnInit{
         //Dynamic fields
         dynamicFields: this.fb.array([])
       })
+
+      console.log("Values to be populated are here  ",this.createConnectionField.value);
 
       this.currentEmail = emailParsed.email
 
@@ -669,6 +786,8 @@ export class ConnectionSettingsComponent implements OnInit{
       version: this.createConnectionField.value.version,
       username: this.createConnectionField.value.username,
       password: this.createConnectionField.value.password,
+      configurationType: JSON.stringify(this.createConnectionField.value.configurationType),
+      
 
 
       //Telegram
@@ -714,7 +833,7 @@ export class ConnectionSettingsComponent implements OnInit{
       }),
 
       //Push Notification
-      push:JSON.stringify({
+       push:JSON.stringify({
         pushToken: this.createConnectionField.value.pushToken,
         pushPriority: this.createConnectionField.value.pushPriority,
         tokenIDPush: this.createConnectionField.value.tokenIDPush,
@@ -723,6 +842,8 @@ export class ConnectionSettingsComponent implements OnInit{
       
       dynamicFields: JSON.stringify(this.createConnectionField.value.dynamicFields),
     }
+
+  
 
     const tempObj = {
       PK: this.SK_clientID+"#communication#"+this.createConnectionField.value.comtnID+"#main",
@@ -750,24 +871,29 @@ export class ConnectionSettingsComponent implements OnInit{
 
       await this.createLookUpRdt(items,1,tempClient)
 
-      const body = { type: "verifyIdentities",email:this.createConnectionField.value.email};
 
-      this.DynamicApi.sendData(body).subscribe(response => {
-        console.log('Response from Lambda:', response);
-  
-  
-        this.toast.open("Mail Sent Successfully", " ", {
-  
-          duration: 2000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top',
-          //   //panelClass: ['blue-snackbar']
-        })
-  
-  
-      }, error => {
-        console.error('Error calling dynamic lambda:', error);
-      });
+      if(this.createConnectionField.value.email != '' && this.selectedComms.includes('Email')){
+        const body = { type: "verifyIdentities",email:this.createConnectionField.value.email};
+
+        this.DynamicApi.sendData(body).subscribe(response => {
+          console.log('Response from Lambda:', response);
+    
+    
+          this.toast.open("Mail Sent Successfully", " ", {
+    
+            duration: 2000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+            //   //panelClass: ['blue-snackbar']
+          })
+    
+    
+        }, error => {
+          console.error('Error calling dynamic lambda:', error);
+        });
+      }
+
+     
 
 
 
@@ -902,6 +1028,7 @@ export class ConnectionSettingsComponent implements OnInit{
         version: this.createConnectionField.value.version,
         username: this.createConnectionField.value.username,
         password: this.createConnectionField.value.password,
+        configurationType:JSON.stringify(this.createConnectionField.value.configurationType),
   
   
         //Telegram
@@ -980,26 +1107,31 @@ export class ConnectionSettingsComponent implements OnInit{
       if (value) {
         await this.fetchTimeMachineById(1,items.P1, 'update', items);
 
-        const body = { type: "verifyIdentities",email:this.createConnectionField.value.email};
 
-        if(this.currentEmail != body.email){
-          this.DynamicApi.sendData(body).subscribe(response => {
-            console.log('Response from Lambda:', response);
-      
-      
-            this.toast.open("Mail Sent Successfully", " ", {
-      
-              duration: 2000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top',
-              //   //panelClass: ['blue-snackbar']
-            })
-      
-      
-          }, error => {
-            console.error('Error calling dynamic lambda:', error);
-          });
+        if(this.selectedComms.includes('Email')){
+          const body = { type: "verifyIdentities",email:this.createConnectionField.value.email};
+
+          if(this.currentEmail != body.email){
+            this.DynamicApi.sendData(body).subscribe(response => {
+              console.log('Response from Lambda:', response);
+        
+        
+              this.toast.open("Mail Sent Successfully", " ", {
+        
+                duration: 2000,
+                horizontalPosition: 'right',
+                verticalPosition: 'top',
+                //   //panelClass: ['blue-snackbar']
+              })
+        
+        
+            }, error => {
+              console.error('Error calling dynamic lambda:', error);
+            });
+          }
+         
         }
+
        
 
         this.datatableConfig = {}
