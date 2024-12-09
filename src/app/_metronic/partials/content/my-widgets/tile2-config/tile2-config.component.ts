@@ -52,6 +52,8 @@ export class Tile2ConfigComponent implements OnInit{
   showIdField = false;
   @Input() modal :any
   shouldShowProcessedValue: boolean = false;
+  dashboardIdsList: any;
+  p1ValuesSummary: any;
 
 ngOnInit(): void {
   this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
@@ -64,7 +66,62 @@ ngOnInit(): void {
   console.log('this.SK_clientID check', this.SK_clientID)
   this.initializeTileFields1()
   this.dynamicData()
+  this.dashboardIds(1)
   
+}
+
+async dashboardIds(sk: any) {
+  console.log("Iam called Bro");
+  try {
+    const response = await this.api.GetMaster(this.SK_clientID + "#summary#lookup", sk);
+
+    if (response && response.options) {
+      if (typeof response.options === 'string') {
+        let data = JSON.parse(response.options);
+        console.log("d1 =", data);
+
+        if (Array.isArray(data)) {
+          for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+
+            if (element !== null && element !== undefined) {
+              const key = Object.keys(element)[0];
+              const { P1, P2, P3, P4, P5, P6, P7, P8, P9 } = element[key];
+
+              // Ensure dashboardIdsList is initialized
+              if (!this.dashboardIdsList) {
+                this.dashboardIdsList = [];
+              }
+
+              // Check if P1 exists before pushing
+              if (P1 !== undefined && P1 !== null) {
+                this.dashboardIdsList.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9 });
+                console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5, P6, P7, P8, P9 });
+                console.log('this.dashboardIdsList check',this.dashboardIdsList)
+                this.p1ValuesSummary = this.dashboardIdsList.map((item: { P1: any; }) => item.P1);
+console.log('P1 values: dashboard', this.p1ValuesSummary);
+              } else {
+                console.warn("Skipping element because P1 is not defined or null");
+              }
+            } else {
+              break;
+            }
+          }
+
+          // Continue fetching recursively
+          await this.dashboardIds(sk + 1);
+        } else {
+          console.error('Invalid data format - not an array.');
+        }
+      } else {
+        console.error('response.options is not a string.');
+      }
+    } else {
+      console.log("Lookup to be displayed", this.dashboardIdsList);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
 }
   SK_clientID(arg0: string, SK_clientID: any) {
     throw new Error('Method not implemented.');
@@ -127,6 +184,8 @@ generateUniqueId(): number {
       'processed_value1':[''],
       fontSize: [14, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['#000000', Validators.required], 
+      dashboardIds:[''],
+      selectType:['']
     })
   }
 
@@ -168,6 +227,8 @@ generateUniqueId(): number {
          themeColor: this.createKPIWidget1.value.themeColor,
          fontSize: `${this.createKPIWidget1.value.fontSize}px`,// Added fontSize
          fontColor: this.createKPIWidget1.value.fontColor,  // Ensure this is correctly assigned
+         dashboardIds:this.createKPIWidget1.value.dashboardIds,
+         selectType:this.createKPIWidget1.value.selectType,
          multi_value: [
            {
              value: this.createKPIWidget1.value.primaryValue,
@@ -299,6 +360,10 @@ generateUniqueId(): number {
         themeColor: tile.themeColor,
         fontSize: fontSizeValue, // Preprocessed fontSize value
         fontColor: tile.fontColor,
+        dashboardIds: tile.dashboardIds,
+        selectType:tile.selectType
+
+
 
       });
 
@@ -443,6 +508,8 @@ generateUniqueId(): number {
         secondaryValue: secondaryValue,
         fontSize: fontSizeValue,
         fontColor: this.createKPIWidget1.value.fontColor,
+        dashboardIds:this.createKPIWidget1.value.dashboardIds,
+        selectType:this.createKPIWidget1.value.selectType
       };
 
       // Log the updated details of the tile
@@ -499,6 +566,10 @@ generateUniqueId(): number {
 
     // Add more hardcoded options as needed
   ];
+  SelectTypeSummary =[
+    { value: 'NewTab', text: 'New Tab' },
+    { value: 'Modal', text: 'Modal' },
+  ]
   fetchDynamicFormData(value: any) {
     console.log("Data from lookup:", value);
 

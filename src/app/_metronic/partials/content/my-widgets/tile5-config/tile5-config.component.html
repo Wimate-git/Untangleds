@@ -203,6 +203,36 @@
                     formControlName="processed_value"
                   />
                 </div>
+
+                <div class="col-md-4 mb-3">
+                  <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Summary Dashboard Id</label>
+                  <ngx-select
+                    id="parameterName"
+                    [allowClear]="true"
+                    formControlName="dashboardIds"
+                    [items]="p1ValuesSummary"
+                    optionValueField="value"
+                    optionTextField="text"
+                    placeholder="Select Parameter"
+                 
+                    style="width: 100%;">
+                  </ngx-select>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Select Type</label>
+                  <ngx-select
+                    id="selectType"
+                    [allowClear]="true"
+                    formControlName="selectType"
+                    [items]="SelectTypeSummary"
+                    optionValueField="value"
+                    optionTextField="text"
+                    placeholder="Select Parameter"
+                   
+                    style="width: 100%;">
+                  </ngx-select>
+                </div>
               </div>
           </div>
           

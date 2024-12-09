@@ -51,6 +51,8 @@ export class Tile5ConfigComponent implements OnInit {
   @Input() modal :any
   listofDynamicParam: any;
   tooltip: string | null = null;
+  dashboardIdsList: any;
+  p1ValuesSummary: any;
   ngOnInit(): void {
     this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
     console.log('this.getLoggedUser check', this.getLoggedUser)
@@ -62,7 +64,66 @@ export class Tile5ConfigComponent implements OnInit {
     console.log('this.SK_clientID check', this.SK_clientID)
     this.initializeTileFields4()
     this.dynamicData()
+    this.dashboardIds(1)
   }
+
+  async dashboardIds(sk: any) {
+    console.log("Iam called Bro");
+    try {
+      const response = await this.api.GetMaster(this.SK_clientID + "#summary#lookup", sk);
+  
+      if (response && response.options) {
+        if (typeof response.options === 'string') {
+          let data = JSON.parse(response.options);
+          console.log("d1 =", data);
+  
+          if (Array.isArray(data)) {
+            for (let index = 0; index < data.length; index++) {
+              const element = data[index];
+  
+              if (element !== null && element !== undefined) {
+                const key = Object.keys(element)[0];
+                const { P1, P2, P3, P4, P5, P6, P7, P8, P9 } = element[key];
+  
+                // Ensure dashboardIdsList is initialized
+                if (!this.dashboardIdsList) {
+                  this.dashboardIdsList = [];
+                }
+  
+                // Check if P1 exists before pushing
+                if (P1 !== undefined && P1 !== null) {
+                  this.dashboardIdsList.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9 });
+                  console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5, P6, P7, P8, P9 });
+                  console.log('this.dashboardIdsList check',this.dashboardIdsList)
+                  this.p1ValuesSummary = this.dashboardIdsList.map((item: { P1: any; }) => item.P1);
+  console.log('P1 values: dashboard', this.p1ValuesSummary);
+                } else {
+                  console.warn("Skipping element because P1 is not defined or null");
+                }
+              } else {
+                break;
+              }
+            }
+  
+            // Continue fetching recursively
+            await this.dashboardIds(sk + 1);
+          } else {
+            console.error('Invalid data format - not an array.');
+          }
+        } else {
+          console.error('response.options is not a string.');
+        }
+      } else {
+        console.log("Lookup to be displayed", this.dashboardIdsList);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+  SelectTypeSummary =[
+    { value: 'NewTab', text: 'New Tab' },
+    { value: 'Modal', text: 'Modal' },
+  ]
   constructor(private summaryConfiguration: SharedService,private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector,
     private spinner: NgxSpinnerService,private zone: NgZone
@@ -169,6 +230,9 @@ export class Tile5ConfigComponent implements OnInit {
       'themeColor': ['', Validators.required],
       fontSize: [14, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['#000000', Validators.required], 
+      dashboardIds:[''],
+      selectType:['']
+
     })
   }
   openModalCalender4() {
@@ -254,7 +318,11 @@ export class Tile5ConfigComponent implements OnInit {
          // selectedColor: this.createKPIWidget4.value.selectedColor ,
          themeColor: this.createKPIWidget4.value.themeColor,
          fontSize: `${this.createKPIWidget4.value.fontSize}px`,// Added fontSize
-         fontColor: this.createKPIWidget4.value.fontColor,  
+         fontColor: this.createKPIWidget4.value.fontColor, 
+         dashboardIds: this.createKPIWidget4.value.dashboardIds,
+         selectType:this.createKPIWidget4.value.selectType,
+
+
          // Default value, change this to whatever you prefer
  
  
@@ -369,6 +437,10 @@ export class Tile5ConfigComponent implements OnInit {
           processedValue: this.createKPIWidget4.value.processedValue,
           fontSize: fontSizeValue,
           fontColor: this.createKPIWidget4.value.fontColor,
+          dashboardIds:this.createKPIWidget4.value.dashboardIds,
+          selectType:this.createKPIWidget4.value.selectType
+
+
   
   
           // Include any additional properties if needed
@@ -449,6 +521,10 @@ export class Tile5ConfigComponent implements OnInit {
         themeColor: tile.themeColor,
         fontSize: fontSizeValue, // Preprocessed fontSize value
         fontColor: tile.fontColor, // Using extracted processed value
+        dashboardIds:tile.dashboardIds,
+        selectType:tile.selectType
+
+
       });
 
       this.isEditMode = true; // Set to edit mode

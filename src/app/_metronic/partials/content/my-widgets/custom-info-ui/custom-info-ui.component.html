@@ -1,0 +1,27 @@
+
+
+<div class="modal-header">
+  <h5 class="modal-title">Dashboard Id Configuration</h5>
+  <button type="button" class="btn-close" (click)="closeModal()"></button>
+</div>
+
+<div class="modal-body">
+  <!-- Device content -->
+  <div class="device-section">
+    <label class="col-form-label fw-bold fs-6">Dashboard Id: {{ tile1Config.dashboardIds }}</label>
+    <!-- <p class="device-content"></p>  Display dashboardIds dynamically -->
+  </div>
+
+  <!-- Optional iframe -->
+  <iframe *ngIf="iframeUrl"
+    [src]="iframeUrl"
+    width="100%"
+    height="900px"
+    (load)="onIframeLoad($event)"
+    sandbox="allow-scripts allow-same-origin"
+    title="Angular Module">
+  </iframe>
+</div>
+
+
+

@@ -41,8 +41,13 @@ import { Tile5ConfigComponent } from 'src/app/_metronic/partials/content/my-widg
 import { TitleConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/title-config/title-config.component';
 import { Tile6ConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/tile6-config/tile6-config.component';
 import { Chart1ConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/chart1-config/chart1-config.component';
-
+import { Chart2ConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/chart2-config/chart2-config.component';
+import { Chart3ConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/chart3-config/chart3-config.component';
+import { Chart4ConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/chart4-config/chart4-config.component';
+import Funnel from 'highcharts/modules/funnel';
+import { Chart5ConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/chart5-config/chart5-config.component';
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
+
 
 
 
@@ -119,13 +124,21 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   @ViewChild(TitleConfigComponent, { static: false }) titleConfigComponent: TitleConfigComponent;
   @ViewChild(Tile6ConfigComponent, { static: false }) tileConfig6Component: Tile6ConfigComponent;
   @ViewChild(Chart1ConfigComponent, { static: false }) ChartConfig1Component: Chart1ConfigComponent;
+  @ViewChild(Chart2ConfigComponent, { static: false }) ChartConfig2Component: Chart2ConfigComponent;
+  @ViewChild(Chart3ConfigComponent, { static: false }) ChartConfig3Component: Chart3ConfigComponent;
+  @ViewChild(Chart4ConfigComponent, { static: false }) ChartConfig4Component: Chart4ConfigComponent;
+  @ViewChild(Chart5ConfigComponent, { static: false }) ChartConfig5Component: Chart5ConfigComponent;
   @ViewChild('summaryModal') summaryModal!: TemplateRef<any>;
+ 
+  
 
 
   @ViewChild('tileModal', { static: true }) tileModal!: ElementRef<HTMLDivElement>;
   chartIdsFromChild1: any;
   chartHeight: any[]=[];
   chartWidth: any[]=[];
+  disableMenuQP: boolean = false;
+  viewModeQP: boolean = false;
 
 
 
@@ -169,32 +182,32 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
             {
               name: 'Sales',
               y: 30,
-              color: '#FF6F61',  // Coral Red
+    
             },
             {
               name: 'Marketing',
               y: 20,
-              color: '#6B8E23',  // Olive Green
+         
             },
             {
               name: 'Development',
               y: 25,
-              color: '#1E90FF',  // Dodger Blue
+           
             },
             {
               name: 'Customer Support',
               y: 15,
-              color: '#FF6347',  // Tomato
+      
             },
             {
               name: 'Research',
               y: 10,
-              color: '#FFD700',  // Gold
+      
             },
             {
               name: 'HR',
               y: 10,
-              color: '#8A2BE2',  // Blue Violet
+
             },
           ],
         },
@@ -204,6 +217,144 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     Highcharts.chart('pieChart', chartOptions);
   }
   
+  createLineChart(){
+
+    const linechartOptions: any = {
+      chart: {
+        type: 'line' // Line chart type
+    },
+    title: {
+        text: ''
+    },
+    subtitle: {
+        text: ''
+    },
+    xAxis: {
+        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    },
+    yAxis: {
+        title: {
+            text: 'Sales (in USD)'
+        }
+    },
+    tooltip: {
+        pointFormat: '{series.name}: <b>{point.y}</b>'
+    },
+    series: [{
+        name: 'Product A',
+        data: [100, 120, 150, 180, 200, 220, 250, 270, 300, 320, 350, 400]
+    }, {
+        name: 'Product B',
+        data: [80, 90, 110, 140, 160, 180, 210, 230, 250, 270, 290, 350]
+    }],
+    credits: {
+      enabled: false,
+    },
+    };
+  Highcharts.chart('lineChart', linechartOptions);
+  }
+
+  createBarChart() {
+    const barchartOptions: any = {
+      chart: {
+        type: 'column'  // Change 'bar' to 'column' for vertical bars
+      },
+      title: {
+        text: ''
+      },
+      xAxis: {
+        categories: ['Category 1', 'Category 2', 'Category 3', 'Category 4']
+      },
+      yAxis: {
+        title: {
+          text: 'Values'
+        }
+      },
+      series: [{
+        name: 'Data Series 1',
+        data: [1, 3, 2, 4]
+      }, {
+        name: 'Data Series 2',
+        data: [2, 4, 3, 5]
+      }, {
+        name: 'Data Series 3',
+        data: [3, 2, 4, 6]
+      }],
+      credits: {
+        enabled: false
+      }
+    };
+    Highcharts.chart('barChart', barchartOptions);
+  }
+
+
+  createAreaChart() {
+    const areachartOptions: any = {
+      chart: {
+        type: 'area'
+      },
+      title: {
+        text: ''
+      },
+      subtitle: {
+        text: ''
+      },
+      xAxis: {
+        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul']
+      },
+      yAxis: {
+        title: {
+          text: 'Values'
+        }
+      },
+      tooltip: {
+        pointFormat: '{series.name}: <b>{point.y}</b>'
+      },
+      series: [{
+        name: 'Data Series',
+        data: [1, 3, 2, 4, 6, 5, 7]
+      }],
+
+      credits: {
+        enabled: false
+      }
+    };
+    Highcharts.chart('areaChart', areachartOptions);
+  }
+  
+  createCalumnChart() {
+    const barchartOptions: any = {
+      chart: {
+        type: 'bar'  // Change 'bar' to 'column' for vertical bars
+      },
+      title: {
+        text: ''
+      },
+      xAxis: {
+        categories: ['Category 1', 'Category 2', 'Category 3', 'Category 4']
+      },
+      yAxis: {
+        title: {
+          text: 'Values'
+        }
+      },
+      series: [{
+        name: 'Data Series 1',
+        data: [1, 3, 2, 4]
+      }, {
+        name: 'Data Series 2',
+        data: [2, 4, 3, 5]
+      }, {
+        name: 'Data Series 3',
+        data: [3, 2, 4, 6]
+      }],
+      credits: {
+        enabled: false
+      }
+    };
+    Highcharts.chart('columnChart', barchartOptions);
+  }
+
   
   
 
@@ -405,6 +556,17 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   showIdField = false;
   selectedTabset: string = 'dataTab';
   @ViewChild('bulletChart') bulletChart: ElementRef;
+  isFullScreen = false; // Track the fullscreen state
+  isFullView = false;   // Track if the icon is in full view mode
+
+  toggleFullView() {
+    this.isFullScreen = !this.isFullScreen;  // Toggle the full-screen state
+    this.isFullView = !this.isFullView;      // Toggle the icon state (expand/compress)
+
+    // Save the state to localStorage
+    localStorage.setItem('isFullScreen', JSON.stringify(this.isFullScreen));
+  }
+
 
 
   // Default to 'Data' tab
@@ -440,7 +602,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   isUpdateMode: boolean = false;
   responseData: any;
   hoverWidget: any = false;
-
+  hideButton:boolean=false;
 
   toggleDropdown(event: Event): void {
     this.zone.run(() => {
@@ -816,6 +978,28 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
 
   ngOnInit() {
 
+
+    this.route.queryParams.subscribe((params) => {
+
+      console.log('params check',params)
+      this.isEditModeView =false;
+
+        if (params['viewMode']) {
+          this.viewModeQP = params['viewMode'] === 'true';
+          this.hideButton = true
+          sessionStorage.setItem('viewMode', this.viewModeQP.toString());
+        }
+      
+        if (params['disableMenu']) {
+          this.disableMenuQP = params['disableMenu'] === 'true';
+          sessionStorage.setItem('disableMenu', this.disableMenuQP.toString());
+        }
+      
+            // Check if parameters are available
+        
+        
+         
+          });
     // this.dropdownSettings = this.devicesList.getMultiSelectSettings();
     this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
     console.log('this.getLoggedUser check', this.getLoggedUser)
@@ -858,8 +1042,14 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     this.cdr.detectChanges();
     this.fetchLiveContractlookup(1)
     this.fetchContractOrderMasterlookup(1)
+    const savedFullScreen = localStorage.getItem('isFullScreen');
+    if (savedFullScreen) {
+      this.isFullScreen = JSON.parse(savedFullScreen);
+    } else {
+      this.isFullScreen = true;  // Default to full screen if not in localStorage
+    }
 
-
+    
 
   }
   selectFormParams(event: any) {
@@ -967,6 +1157,33 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
       setTimeout(() => {
         this.createPieChart()
       }, 500);
+      setTimeout(() => {
+        this.createLineChart()
+        
+      }, 500);
+setTimeout(() => {
+  this.createBarChart()
+}, 500);
+setTimeout(() => {
+
+    this.createBarChart()
+ 
+}, 500);
+
+setTimeout(() => {
+  this.createAreaChart()
+}, 500);
+
+
+
+
+setTimeout(() => {
+  this.createCalumnChart()
+}, 500);
+
+
+ 
+     
     } else {
       // Reset all grid visibility if no option is selected
       this.showGrid = false;
@@ -988,15 +1205,42 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   viewItem(id: string): void {
-    // Navigate to the desired route
+    // Navigate to the desired rout
+    this.isFullScreen = !this.isFullScreen;  // Toggle the full-screen state
+    this.isFullView = !this.isFullView;      // Toggle the icon state (expand/compress)
+
+    // Save the state to localStorage
+    localStorage.setItem('isFullScreen', JSON.stringify(this.isFullScreen));
     this.router.navigate([`/summary-engine/${id}`]);
-  
+
+
+
     // Set the state to Edit Mode
-    this.showModal = true; // Ensure the modal opens in Edit mode
-  
+    this.showModal = true; // Open modal in edit mode
+
     // Open the modal with appropriate flag and content
     this.openModal('edit_ts', this.all_Packet_store, this.summaryModal);
   }
+  
+  toggleFullScreen() {
+    this.isFullScreen = !this.isFullScreen;
+    localStorage.setItem('isFullScreen', JSON.stringify(this.isFullScreen));
+  }
+  
+  setFullScreen(): void {
+    document.body.style.overflow = 'hidden'; // Hide overflow to simulate fullscreen
+    document.body.requestFullscreen?.(); // Optional: Fullscreen API to enter fullscreen mode (browser-specific)
+    // Add any other fullscreen-related styles or classes
+  }
+  
+  // Method to exit fullscreen
+  exitFullScreen(): void {
+    document.body.style.overflow = 'auto'; // Restore overflow
+    document.exitFullscreen?.(); // Optional: Fullscreen API to exit fullscreen mode (browser-specific)
+    // Remove fullscreen-related styles or classes
+  }
+
+  
   redirectDashboard(id: string): void {
     // Dismiss all modals
     this.modalService.dismissAll(); // Remove the modal-open class
@@ -1248,6 +1492,41 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
       }, 500);
 
     }
+
+    else if(event.arg1.grid_type=='Linechart'){
+      this.modalService.open(KPIModal, { size: 'lg' });
+      console.log('event check', event)
+      setTimeout(() => {
+        this.ChartConfig2Component.openChartModal2(event.arg1, event.arg2)
+      }, 500);
+
+    }
+
+    else if(event.arg1.grid_type=='Barchart'){
+      this.modalService.open(KPIModal, { size: 'lg' });
+      console.log('event check', event)
+      setTimeout(() => {
+        this.ChartConfig3Component.openChartModal3(event.arg1, event.arg2)
+      }, 500);
+
+    }
+
+    else if(event.arg1.grid_type=='Areachart'){
+      this.modalService.open(KPIModal, { size: 'lg' });
+      console.log('event check', event)
+      setTimeout(() => {
+        this.ChartConfig4Component.openChartModal4(event.arg1, event.arg2)
+      }, 500);
+
+    }
+    else if(event.arg1.grid_type=='Columnchart'){
+      this.modalService.open(KPIModal, { size: 'lg' });
+      console.log('event check', event)
+      setTimeout(() => {
+        this.ChartConfig5Component.openChartModal5(event.arg1, event.arg2)
+      }, 500);
+
+    }
     
 
     
@@ -1296,6 +1575,30 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
 
     }
     else if(event.arg1.grid_type=='chart'){
+      console.log('event check', event)
+      this.dashboard.push(event.arg1)
+  this.updateSummary('','update_tile')
+
+    }
+    else if(event.arg1.grid_type=='Linechart'){
+      console.log('event check', event)
+      this.dashboard.push(event.arg1)
+  this.updateSummary('','update_tile')
+
+    }
+    else if(event.arg1.grid_type=='Barchart'){
+      console.log('event check', event)
+      this.dashboard.push(event.arg1)
+  this.updateSummary('','update_tile')
+
+    }
+    else if(event.arg1.grid_type=='Areachart'){
+      console.log('event check', event)
+      this.dashboard.push(event.arg1)
+  this.updateSummary('','update_tile')
+
+    }
+    else if(event.arg1.grid_type=='Columnchart'){
       console.log('event check', event)
       this.dashboard.push(event.arg1)
   this.updateSummary('','update_tile')
@@ -3726,5 +4029,25 @@ if(key=='add_tile'){
     this.modalService.open(ChartModal1, { size: 'lg' });
     modal.dismiss();
   }
+  openChartModal2(ChartModal2: TemplateRef<any>,modal:any) {
+    this.modalService.open(ChartModal2, { size: 'lg' });
+    modal.dismiss();
+  }
+
+  openChartModal3(ChartModal3: TemplateRef<any>,modal:any) {
+    this.modalService.open(ChartModal3, { size: 'lg' });
+    modal.dismiss();
+  }
+
+  openChartModal4(ChartModal4: TemplateRef<any>,modal:any) {
+    this.modalService.open(ChartModal4, { size: 'lg' });
+    modal.dismiss();
+  }
+
+  openChartModal5(ChartModal5: TemplateRef<any>,modal:any) {
+    this.modalService.open(ChartModal5, { size: 'lg' });
+    modal.dismiss();
+  }
+
 
 }

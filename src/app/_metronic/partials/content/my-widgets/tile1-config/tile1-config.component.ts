@@ -59,6 +59,10 @@ export class Tile1ConfigComponent implements OnInit {
   maxDate?: Dayjs;
   minDate?: Dayjs;
   shouldShowProcessedValue: boolean = false;
+  dashboardIdList: any;
+  idsDashboard: any;
+  dashboardIdsList: any;
+  p1ValuesSummary: any;
 
 
  
@@ -75,6 +79,7 @@ export class Tile1ConfigComponent implements OnInit {
     this.initializeTileFields()
     this.setupRanges();
     this.dynamicData()
+    this.dashboardIds(1)
   }
 
   convertTo12HourFormat(time: string): string {
@@ -154,7 +159,9 @@ export class Tile1ConfigComponent implements OnInit {
       fontSize: [14, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['#000000', Validators.required], // Default to black
       selectFromTime:[''],
-      selectToTime:['']
+      selectToTime:[''],
+      dashboardIds:[''],
+      selectType:['']
     });
   }
   
@@ -174,6 +181,67 @@ export class Tile1ConfigComponent implements OnInit {
       console.log("Error fetching the dynamic form data", err);
     }
   }
+
+
+  async dashboardIds(sk: any) {
+    console.log("Iam called Bro");
+    try {
+      const response = await this.api.GetMaster(this.SK_clientID + "#summary#lookup", sk);
+
+      if (response && response.options) {
+        if (typeof response.options === 'string') {
+          let data = JSON.parse(response.options);
+          console.log("d1 =", data);
+
+          if (Array.isArray(data)) {
+            for (let index = 0; index < data.length; index++) {
+              const element = data[index];
+
+              if (element !== null && element !== undefined) {
+                const key = Object.keys(element)[0];
+                const { P1, P2, P3, P4, P5, P6, P7, P8, P9 } = element[key];
+
+                // Ensure dashboardIdsList is initialized
+                if (!this.dashboardIdsList) {
+                  this.dashboardIdsList = [];
+                }
+
+                // Check if P1 exists before pushing
+                if (P1 !== undefined && P1 !== null) {
+                  this.dashboardIdsList.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9 });
+                  console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5, P6, P7, P8, P9 });
+                  console.log('this.dashboardIdsList check',this.dashboardIdsList)
+                  this.p1ValuesSummary = this.dashboardIdsList.map((item: { P1: any; }) => item.P1);
+console.log('P1 values: dashboard', this.p1ValuesSummary);
+                } else {
+                  console.warn("Skipping element because P1 is not defined or null");
+                }
+              } else {
+                break;
+              }
+            }
+
+            // Continue fetching recursively
+            await this.dashboardIds(sk + 1);
+          } else {
+            console.error('Invalid data format - not an array.');
+          }
+        } else {
+          console.error('response.options is not a string.');
+        }
+      } else {
+        console.log("Lookup to be displayed", this.dashboardIdsList);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+  p1Values(arg0: string, p1Values: any) {
+    throw new Error('Method not implemented.');
+  }
+  
+  
+  
 
 
   generateUniqueId(): number {
@@ -203,6 +271,8 @@ export class Tile1ConfigComponent implements OnInit {
         parameterName: this.createKPIWidget.value.parameterName,
         groupBy: this.createKPIWidget.value.groupBy,
         groupByFormat: this.createKPIWidget.value.groupByFormat,
+        dashboardIds: this.createKPIWidget.value.dashboardIds,
+        selectType:this.createKPIWidget.value.selectType,
      
         predefinedSelectRange: {
           startDate: this.createKPIWidget.value.predefinedSelectRange[0].format('YYYY-MM-DD'),
@@ -311,7 +381,10 @@ export class Tile1ConfigComponent implements OnInit {
         fontSize: fontSizeValue,
         fontColor: this.createKPIWidget.value.fontColor,
         selectFromTime:this.createKPIWidget.value.selectFromTime,
-        selectToTime:this.createKPIWidget.value.selectToTime
+        selectToTime:this.createKPIWidget.value.selectToTime,
+        dashboardIds:this.createKPIWidget.value.dashboardIds,
+        selectType:this.createKPIWidget.value.selectType
+
 
 
       };
@@ -490,7 +563,11 @@ openKPIModal(tile: any, index: number) {
       fontSize: fontSizeValue, // Preprocessed fontSize value
       fontColor: tile.fontColor,
       selectFromTime:tile.selectFromTime,
-      selectToTime:tile.selectToTime
+      selectToTime:tile.selectToTime,
+      dashboardIds:tile.dashboardIds,
+      selectType:tile.selectType
+
+
 
 
 
@@ -631,6 +708,11 @@ openKPIModal(tile: any, index: number) {
     { value: 'Constant', text: 'Constant' },
     { value: 'Live', text: 'Live' },
 
+  ]
+
+  SelectTypeSummary =[
+    { value: 'NewTab', text: 'New Tab' },
+    { value: 'Modal', text: 'Modal' },
   ]
   onValueChange(selectedValue: any): void {
     // Handle any logic here if needed when the value changes

@@ -12,7 +12,7 @@ import {
   ViewChild
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalOptions, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { SwalComponent, SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { DataTableDirective, DataTablesModule } from 'angular-datatables';
 import { Config } from 'datatables.net';
@@ -57,6 +57,9 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
   private modalRef: NgbModalRef;
   private clickListener: () => void;
   idInAction: number | undefined;
+  modalConfig: NgbModalOptions = {
+    modalDialogClass: 'modal-dialog modal-dialog-centered mw-1000px',
+  };
 
   constructor(
     private renderer: Renderer2,
@@ -124,16 +127,30 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.clickListener = this.renderer.listen(document, 'click', (event) => {
       const closestBtn = event.target.closest('.btn');
+     
       if (closestBtn) {
         const { action, id } = closestBtn.dataset;
+        this.idInAction = id;
+
         switch (action) {
-          case 'edit':
-            this.editEvent.emit(Number(id));
+          case 'view':
+            this.router.navigate([`${this.route}/${id}`]);
             break;
+
+          case 'create':
+            this.createEvent.emit(true);
+            this.modalRef = this.modalService.open(this.modal, this.modalConfig);
+            break;
+
+          case 'edit':
+            this.editEvent.emit(this.idInAction);
+            this.modalRef = this.modalService.open(this.modal, this.modalConfig);
+            break;
+
           case 'delete':
-            this.deleteSwal.fire().then((result) => {
-              if (result.isConfirmed) {
-                this.triggerDelete();
+            this.deleteSwal.fire().then((clicked) => {
+              if (clicked.isConfirmed) {
+                this.successSwal.fire();
               }
             });
             break;
@@ -155,6 +172,7 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   triggerDelete(): void {
+    console.log('this.idInAction checking',this.idInAction)
     this.deleteEvent.emit(this.idInAction);
   }
 

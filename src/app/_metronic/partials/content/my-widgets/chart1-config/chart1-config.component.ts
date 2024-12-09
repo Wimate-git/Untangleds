@@ -72,6 +72,10 @@ export class Chart1ConfigComponent implements OnInit {
   selectedParamName: any;
   selectedItem: any;
   highchartsOptionsJson: string;
+  chartFinalOptions: any;
+  listofDynamicParamFilter: any;
+  dashboardIdsList: any;
+  p1ValuesSummary: any;
 
 
  
@@ -88,6 +92,7 @@ export class Chart1ConfigComponent implements OnInit {
     this.initializeTileFields()
     this.setupRanges();
     this.dynamicData()
+    this.dashboardIds(1)
 
 
 
@@ -169,7 +174,10 @@ export class Chart1ConfigComponent implements OnInit {
       filterForm:[''],
       filterParameter:[''],
       filterDescription:[''],
-      custom_Label:['']
+      custom_Label:['',Validators.required],
+   
+  
+
 
     });
 
@@ -246,7 +254,10 @@ export class Chart1ConfigComponent implements OnInit {
             selectedRangeType: [''],
             selectFromTime: [''],
             selectToTime: [''],
-            parameterValue:['']
+            parameterValue:[''],
+            dashboardIds:[''],
+            selectType:['']
+
           })
         );
         console.log('this.all_fields check', this.all_fields);
@@ -273,65 +284,97 @@ export class Chart1ConfigComponent implements OnInit {
   
 
   addTile(key: any) {
-    console.log('this.noOfParams check',this.noOfParams)
+    console.log('this.noOfParams check', this.noOfParams);
+  
+    // Only proceed if the key is 'chart'
     if (key === 'chart') {
       const uniqueId = this.generateUniqueId();
-      console.log('this.createChart.value.all_fields', this.createChart.value.all_fields);
+      console.log('this.createChart.value:', this.createChart.value);  // Log form values for debugging
   
+      // Check for highchartsOptionsJson
+      let highchartsOptionsJson = this.createChart.value.highchartsOptionsJson || {};
+      
+      // Update highchartsOptionsJson
+
+
+// If it's stringified, parse it to an object first
+if (typeof highchartsOptionsJson === 'string') {
+  highchartsOptionsJson = JSON.parse(highchartsOptionsJson);
+}
+
+// Update the chart options dynamically
+const updatedHighchartsOptionsJson = {
+  ...highchartsOptionsJson,
+  title: {
+    ...highchartsOptionsJson.title,
+    text: this.createChart.value.chart_title || ''  // Update the title dynamically
+  }
+};
+console.log('updatedHighchartsOptionsJson check',updatedHighchartsOptionsJson)
+this.chartFinalOptions =JSON.stringify(updatedHighchartsOptionsJson,null,4)
+console.log('this.chartFinalOptions check',this.chartFinalOptions)
+    
+  
+      // Create the new tile object with all the required properties
       const newTile = {
         id: uniqueId,
         x: 0,
         y: 0,
-        rows: 20, // The number of rows in the grid
-        cols: 20, // The number of columns in the grid
-        rowHeight: 100, // The height of each row in pixels
-        colWidth: 100, // The width of each column in pixels
-        fixedColWidth: true, // Enable fixed column widths
+        rows: 20,
+        cols: 20,
+        rowHeight: 100,
+        colWidth: 100,
+        fixedColWidth: true,
         fixedRowHeight: true,
-        grid_type: "chart",
+        grid_type: 'chart',
   
-        chart_title: this.createChart.value.chart_title,
-        // fontSize: this.createChart.value.fontSize,
-        fontSize: `${this.createChart.value.fontSize}px`,// Added fontSize
-        themeColor: 'var(--bs-body-bg)',
-        // fontColor: this.createChart.value.fontColor,
-        chartConfig: this.createChart.value.all_fields,
-        filterForm: this.createChart.value.filterForm,
-        filterParameter:this.createChart.value.filterParameter,
-        filterDescription:this.createChart.value.filterDescription,
-        custom_Label:this.createChart.value.custom_Label,
-       
+        chart_title: this.createChart.value.chart_title || '',  // Ensure this value exists
+        fontSize: `${this.createChart.value.fontSize || 16}px`,  // Provide a fallback font size
+        themeColor: 'var(--bs-body-bg)',  // Default theme color
+        chartConfig: this.createChart.value.all_fields || [],  // Default to empty array if missing
+        filterForm: this.createChart.value.filterForm || {},
+        filterParameter: this.createChart.value.filterParameter || {},
+        filterDescription: this.createChart.value.filterDescription || '',
+        custom_Label: this.createChart.value.custom_Label || '',
+      
 
-
-
-        highchartsOptionsJson: this.createChart.value.highchartsOptionsJson,
   
-        // Include noOfParams
-        noOfParams: this.noOfParams,
+        highchartsOptionsJson: this.chartFinalOptions,
+        noOfParams: this.noOfParams || 0,  // Ensure noOfParams has a valid value
+
       };
   
-      // Initialize this.dashboard if it hasn't been set yet
+      // Log the new tile object to verify it's being created correctly
+      console.log('New Tile Object:', newTile);
+  
+      // Initialize dashboard array if it doesn't exist
       if (!this.dashboard) {
+        console.log('Initializing dashboard array');
         this.dashboard = [];
       }
   
-      // Push the new tile to dashboard
+      // Push the new tile to the dashboard array
       this.dashboard.push(newTile);
+      console.log('Updated Dashboard:', this.dashboard);  // Log updated dashboard
   
-      console.log('this.dashboard after adding new tile', this.dashboard);
-  
+      // Emit the updated dashboard array
       this.grid_details = this.dashboard;
       this.dashboardChange.emit(this.grid_details);
+  
+      // Optionally update the summary if required
       if (this.grid_details) {
         this.updateSummary('add_tile');
       }
   
-      // Optionally reset the form if needed after adding the tile
+      // Optionally reset the form fields after adding the tile
       this.createChart.patchValue({
         widgetid: uniqueId,
+        chart_title: '',  // Reset chart title field (or leave it if needed)
+        highchartsOptionsJson: {},  // Reset chart options (or leave it if needed)
       });
     }
   }
+  
   
   onFontColorChange(event: Event): void {
     const color = (event.target as HTMLInputElement).value;
@@ -341,12 +384,26 @@ export class Chart1ConfigComponent implements OnInit {
   updateTile(key: any) {
     console.log('key checking from update', key);
     // console.log('highchartsOptionsJson checking',highchartsOptionsJson)
-   const tempParsed = JSON.parse(this.createChart.value.highchartsOptionsJson)
+   let tempParsed = this.createChart.value.highchartsOptionsJson
     if (this.editTileIndex !== null) {
       console.log('this.editTileIndex check', this.editTileIndex);
       console.log('Tile checking for update:', this.dashboard[this.editTileIndex]);
   
-  
+  if (typeof tempParsed === 'string') {
+    tempParsed = JSON.parse(tempParsed);
+}
+
+// Update the chart options dynamically
+const updatedHighchartsOptionsJson = {
+  ...tempParsed,
+  title: {
+    ...tempParsed.title,
+    text: this.createChart.value.chart_title || ''  // Update the title dynamically
+  }
+};
+console.log('updatedHighchartsOptionsJson check',updatedHighchartsOptionsJson)
+this.chartFinalOptions =JSON.stringify(updatedHighchartsOptionsJson,null,4)
+console.log('this.chartFinalOptions check',this.chartFinalOptions)
       // Update the multi_value array with the new processed_value and constantValue
 
   
@@ -358,14 +415,6 @@ export class Chart1ConfigComponent implements OnInit {
       // Now update the tile with the updated multi_value
       const updatedTile = {
         ...this.dashboard[this.editTileIndex], // Keep existing properties
-        // formlist: this.createChart.value.formlist,
-        // parameterName: this.createChart.value.parameterName,
-        // groupBy: this.createChart.value.groupBy,
-        // primaryValue: primaryValue,
-        // groupByFormat: this.createChart.value.groupByFormat,
-        // constantValue: updatedConstantValue, // Use the updated constantValue
-        // processed_value: processedValue, // Use the updated processed_value
-    // Update the multi_value array with the modified data
 
 
    
@@ -374,7 +423,7 @@ export class Chart1ConfigComponent implements OnInit {
     // themeColor: this.createChart.value.themeColor,
     // fontColor: this.createChart.value.fontColor,
     chartConfig: this.createChart.value.all_fields,
-    highchartsOptionsJson: JSON.stringify(tempParsed),
+    highchartsOptionsJson: this.chartFinalOptions,
     // filterForm:this.createChart.value.filterForm,
     // filterParameter:this.createChart.value.filterParameter,
     // filterDescription:this.createChart.value.filterDescription,
@@ -647,7 +696,11 @@ repopulate_fields(getValues: any) {
           selectedRangeType: parsedChartConfig[i].selectedRangeType,
           selectFromTime: parsedChartConfig[i].selectFromTime,
           selectToTime: parsedChartConfig[i].selectToTime,
-          parameterValue:parsedChartConfig[i].parameterValue
+          parameterValue:parsedChartConfig[i].parameterValue,
+          dashboardIds:parsedChartConfig[i].dashboardIds,
+          selectType:parsedChartConfig[i].selectType
+
+
 
         }));
       }
@@ -684,6 +737,59 @@ repopulate_fields(getValues: any) {
   
   onMouseEnter(): void {
     this.isHovered = true;
+  }
+  async dashboardIds(sk: any) {
+    console.log("Iam called Bro");
+    try {
+      const response = await this.api.GetMaster(this.SK_clientID + "#summary#lookup", sk);
+
+      if (response && response.options) {
+        if (typeof response.options === 'string') {
+          let data = JSON.parse(response.options);
+          console.log("d1 =", data);
+
+          if (Array.isArray(data)) {
+            for (let index = 0; index < data.length; index++) {
+              const element = data[index];
+
+              if (element !== null && element !== undefined) {
+                const key = Object.keys(element)[0];
+                const { P1, P2, P3, P4, P5, P6, P7, P8, P9 } = element[key];
+
+                // Ensure dashboardIdsList is initialized
+                if (!this.dashboardIdsList) {
+                  this.dashboardIdsList = [];
+                }
+
+                // Check if P1 exists before pushing
+                if (P1 !== undefined && P1 !== null) {
+                  this.dashboardIdsList.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9 });
+                  console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5, P6, P7, P8, P9 });
+                  console.log('this.dashboardIdsList check',this.dashboardIdsList)
+                  this.p1ValuesSummary = this.dashboardIdsList.map((item: { P1: any; }) => item.P1);
+console.log('P1 values: dashboard', this.p1ValuesSummary);
+                } else {
+                  console.warn("Skipping element because P1 is not defined or null");
+                }
+              } else {
+                break;
+              }
+            }
+
+            // Continue fetching recursively
+            await this.dashboardIds(sk + 1);
+          } else {
+            console.error('Invalid data format - not an array.');
+          }
+        } else {
+          console.error('response.options is not a string.');
+        }
+      } else {
+        console.log("Lookup to be displayed", this.dashboardIdsList);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   }
   
   onMouseLeave(): void {
@@ -736,8 +842,72 @@ repopulate_fields(getValues: any) {
       });
   }
 
+  fetchDynamicFormDataFilter(value: any) {
+    console.log("Data from lookup:", value);
+
+    this.api
+      .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
+      .then((result: any) => {
+        if (result && result.metadata) {
+          const parsedMetadata = JSON.parse(result.metadata);
+          console.log('parsedMetadata check dynamic',parsedMetadata)
+          const formFields = parsedMetadata.formFields;
+          console.log('formFields check',formFields)
+
+          // Initialize the list with formFields labels
+          this.listofDynamicParamFilter = formFields.map((field: any) => {
+            console.log('field check',field)
+            return {
+              value: field.name,
+              text: field.label
+            };
+          });
+
+          // Include created_time and updated_time
+          if (parsedMetadata.created_time) {
+            this.listofDynamicParamFilter.push({
+              value: parsedMetadata.created_time.toString(),
+              text: 'Created Time' // You can customize the label here if needed
+            });
+          }
+
+          if (parsedMetadata.updated_time) {
+            this.listofDynamicParamFilter.push({
+              value: parsedMetadata.updated_time.toString(),
+              text: 'Updated Time' // You can customize the label here if needed
+            });
+          }
+
+          console.log('Transformed dynamic parameters:', this.listofDynamicParamFilter);
+
+          // Trigger change detection to update the view
+          this.cdr.detectChanges();
+        }
+      })
+      .catch((err) => {
+        console.log("Can't fetch", err);
+      });
+  }
+
+  SelectTypeSummary =[
+    { value: 'NewTab', text: 'New Tab' },
+    { value: 'Modal', text: 'Modal' },
+  ]
+
   dynamicparameterValue(event: any): void {
     console.log('event check for dynamic param',event)
+    console.log('event[0].text check',event[0].text)
+    const filterParameter=this.createChart.get('filterParameter')
+    console.log('filterParameter check',filterParameter)
+    if (event && event[0] && event[0].text) {
+    if(filterParameter){
+
+      filterParameter.setValue(event[0].text)
+      this.cdr.detectChanges();   
+    }
+  }else{
+    console.log('failed to set value')
+  }
    
 
     if (event && event[0].value) {
@@ -796,6 +966,19 @@ repopulate_fields(getValues: any) {
 
       if (selectedText) {
         this.fetchDynamicFormData(selectedText);
+      }
+    } else {
+      console.error('Event data is not in the expected format:', event);
+    }
+  }
+
+  selectFormParamsFilter(event: any) {
+    if (event && event[0] && event[0].data) {
+      const selectedFilterText = event[0].data.text;  // Adjust based on the actual structure
+      console.log('Selected Form Text:', selectedFilterText);
+
+      if (selectedFilterText) {
+        this.fetchDynamicFormDataFilter(selectedFilterText);
       }
     } else {
       console.error('Event data is not in the expected format:', event);

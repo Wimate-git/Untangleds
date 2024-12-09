@@ -4,7 +4,7 @@
 </div>
 <div class="container" *ngIf="createChart">
   <div class="row">
-    <div class="col-md-4" [formGroup]="createChart">
+    <div class="col-md-6" [formGroup]="createChart">
       <label class="col-lg-12 col-form-label fw-bold fs-6 ">Parameters
       </label>
       <input type="number" class="
@@ -12,7 +12,7 @@
                         mb-3 mb-lg-0" name="add_fields" formControlName="add_fields"
         (keyup)="addControls($event,'html')" required>
     </div>
-    <div class="col-md-4" [formGroup]="createChart">
+    <div class="col-md-6" [formGroup]="createChart">
       <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Title </label>
 
       <input type="text" class="
@@ -182,6 +182,36 @@
                         formControlName="selectToTime">
                     </div>
 
+                    <div class="col-md-4 mb-3">
+                      <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Summary Dashboard Id</label>
+                      <ngx-select
+                        id="parameterName"
+                        [allowClear]="true"
+                        formControlName="dashboardIds"
+                        [items]="p1ValuesSummary"
+                        optionValueField="value"
+                        optionTextField="text"
+                        placeholder="Select Parameter"
+                      
+                        style="width: 100%;">
+                      </ngx-select>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                      <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Select Type</label>
+                      <ngx-select
+                        id="selectType"
+                        [allowClear]="true"
+                        formControlName="selectType"
+                        [items]="SelectTypeSummary"
+                        optionValueField="value"
+                        optionTextField="text"
+                        placeholder="Select Parameter"
+                       
+                        style="width: 100%;">
+                      </ngx-select>
+                    </div>
+
 
 
                   </div>
@@ -237,7 +267,7 @@
 
 
                     <div class="col-md-6 mb-3">
-                      <label for="custom_Label" class="col-form-label fw-bold fs-6 ">Custom Label</label>
+                      <label for="custom_Label" class="col-form-label fw-bold fs-6  required">Custom Label</label>
                       <input type="text" class="form-control form-control-solid"  name="custom_Label"
                         formControlName="custom_Label">
                     </div>
@@ -283,15 +313,16 @@
           </div>
           <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'filter-tab'}" id="filter-tab"
           role="tabpanel" aria-labelledby="filter-tabpane">
+          <form [formGroup]="createChart">
           
           <div class="row">
-            <div class="col-md-5 mb-3">
+            <!-- <div class="col-md-5 mb-3">
               <label for="formlist" class="col-createChart-label fw-bold fs-6 required">Forms</label>
               <ngx-select id="formlist" [allowClear]="true" name="icon" formControlName="filterForm"
-                [items]="listofDeviceIds" optionValueField="value" optionTextField="text"
-                (selectionChanges)="selectFormParams($event)" placeholder="Select createChart">
+                [items]="listofDynamicParamFilter" optionValueField="value" optionTextField="text"
+                (selectionChanges)="selectFormParamsFilter($event)" placeholder="Select createChart">
               </ngx-select>
-            </div>
+            </div> -->
             
             <div class="col-md-5 mb-3">
               <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Parameter</label>
@@ -324,6 +355,9 @@
             placeholder="Enter description"
           >{{ selectedParameterValue }}</textarea>
           </div>
+
+
+          </form>
           
         </div>
         
@@ -336,7 +370,7 @@
       <div class="modal-footer" style="margin-top: 20px;">
         <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
         <button type="button" class="btn btn-primary" *ngIf="!isEditMode"
-          (click)="addTile('chart');modal.dismiss()">Save</button>
+          (click)="addTile('chart');modal.dismiss()" [disabled]="createChart?.invalid">Save</button>
         <button type="button" class="btn btn-warning" (click)="updateTile('chart');modal.dismiss() " *ngIf="isEditMode"
           [disabled]="createChart?.invalid">
           Update

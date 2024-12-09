@@ -36,6 +36,17 @@ import { TileUi6Component } from './tile-ui6/tile-ui6.component';
 import { Chart1ConfigComponent } from './chart1-config/chart1-config.component';
 import { ChartUi1Component } from './chart-ui1/chart-ui1.component';
 
+import { ChartUi2Component } from './chart-ui2/chart-ui2.component';
+import { Chart2ConfigComponent } from './chart2-config/chart2-config.component';
+import { Chart3ConfigComponent } from './chart3-config/chart3-config.component';
+import { ChartUi3Component } from './chart-ui3/chart-ui3.component';
+import { ChartUi4Component } from './chart-ui4/chart-ui4.component';
+import { Chart4ConfigComponent } from './chart4-config/chart4-config.component';
+import { ChartUi5Component } from './chart-ui5/chart-ui5.component';
+import { Chart5ConfigComponent } from './chart5-config/chart5-config.component';
+import { CustomInfoUiComponent } from './custom-info-ui/custom-info-ui.component';
+
+
 
 
 
@@ -49,7 +60,17 @@ import { ChartUi1Component } from './chart-ui1/chart-ui1.component';
     Tile6ConfigComponent,
     TileUi6Component,
     ChartUi1Component,
-    Chart1ConfigComponent
+    Chart1ConfigComponent,
+    Chart2ConfigComponent,
+    ChartUi2Component,
+    Chart3ConfigComponent,
+    ChartUi3Component,
+    ChartUi4Component,
+    Chart4ConfigComponent,
+    ChartUi5Component,
+    Chart5ConfigComponent,
+    CustomInfoUiComponent
+
 
   ],
   imports: [
@@ -96,7 +117,18 @@ import { ChartUi1Component } from './chart-ui1/chart-ui1.component';
     Tile6ConfigComponent,
     TileUi6Component,
     ChartUi1Component,
-    Chart1ConfigComponent
+    Chart1ConfigComponent,
+    Chart2ConfigComponent,
+    ChartUi2Component,
+    Chart3ConfigComponent,
+    ChartUi3Component,
+    ChartUi4Component,
+    Chart4ConfigComponent,
+    Chart4ConfigComponent,
+    ChartUi5Component,
+    Chart5ConfigComponent,
+    CustomInfoUiComponent
+  
 
     
 

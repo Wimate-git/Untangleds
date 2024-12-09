@@ -1,0 +1,41 @@
+<div class="action-menu-container d-flex align-items-center"
+style="position: absolute; top: 10px; right: 10px; gap: 10px;z-index: 50;">
+<!-- Edit Button -->
+<button *ngIf="isEditModeView" style="z-index: 50;"
+     class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px"
+     (click)="edit_each_tileUI(item, index)"
+     aria-haspopup="menu"
+     aria-expanded="false"
+     style="background: none; border: none; cursor: pointer;">
+<i class="bi bi-pencil" style="color: black;"></i>
+</button>
+
+<!-- Dropdown Menu -->
+<div class="dropdown">
+<button *ngIf="isEditModeView"
+       [matMenuTriggerFor]="menu"
+       class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px">
+ <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>
+</button>
+<mat-menu #menu="matMenu" class="mat-elevation-z4">
+ <button mat-menu-item (click)="edit_each_duplicate(item, index)">
+   <i class="bi bi-files fs-4"></i>
+   <span>Duplicate</span>
+ </button>
+ <button mat-menu-item (click)="deleteTile(item, index)">
+   <i class="bi bi-trash fs-4"></i>
+   <span>Delete</span>
+ </button>
+</mat-menu>
+</div>
+</div>
+
+<div *ngIf="item.grid_type === 'Linechart'" id="pieChart{{index + 1}}"  [style.width.px]="chartWidth" [style.height.px]="chartHeight">
+
+  <div class="custom-label" *ngIf="item.custom_Label">
+    {{ item.custom_Label }}
+  </div>
+
+
+
+</div>

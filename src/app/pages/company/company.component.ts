@@ -1075,7 +1075,7 @@ export class CompanyComponent implements OnInit{
           }
         ]
         const obj = {
-          PK: this.SK_clientID +"#"+ this.createCompanyField.value.companyID + "#location" + "#main",
+          PK: items.P2+"#"+ this.createCompanyField.value.companyID + "#location" + "#main",
           SK: 1,
           metadata: JSON.stringify(temp)
         };
