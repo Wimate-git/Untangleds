@@ -804,7 +804,7 @@ export class ClientComponent implements OnInit {
       'email_permission': ['', Validators.required],
       'sms_permission': ['', Validators.required],
       'telegram_permission': ['', Validators.required],
-      'email': ['', Validators.required],
+      'email': [false, Validators.required],
       'telegramID': ['', Validators.required],
       'enableClient': ['', Validators.required],
       dynamicFields: this.fb.array([])
@@ -1050,7 +1050,7 @@ export class ClientComponent implements OnInit {
     P3: tempObj.mobile,
     P4: tempObj.emailID,
     P5: date,
-    P6:tempObj.email
+    P6:tempObj && tempObj.email == null ? false : true
     }
 
 
@@ -1252,7 +1252,7 @@ showAlert(swalOptions: SweetAlertOptions) {
       P3: tempObj?.mobile,
       P4: tempObj?.emailID,
       P5: date,
-      P6:tempObj?.email
+      P6:tempObj && tempObj.email == null ? false : true
       }
 
 
