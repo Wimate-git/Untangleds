@@ -54,6 +54,8 @@ export class Tile2ConfigComponent implements OnInit{
   shouldShowProcessedValue: boolean = false;
   dashboardIdsList: any;
   p1ValuesSummary: any;
+  selectedParameterValue: any;
+  parameterNameRead: any;
 
 ngOnInit(): void {
   this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
@@ -185,7 +187,11 @@ generateUniqueId(): number {
       fontSize: [14, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['#000000', Validators.required], 
       dashboardIds:[''],
-      selectType:['']
+      selectType:[''],
+      filterParameter:[''],
+      filterDescription:[''],
+      selectedRangeType:['',Validators.required]
+
     })
   }
 
@@ -229,6 +235,13 @@ generateUniqueId(): number {
          fontColor: this.createKPIWidget1.value.fontColor,  // Ensure this is correctly assigned
          dashboardIds:this.createKPIWidget1.value.dashboardIds,
          selectType:this.createKPIWidget1.value.selectType,
+         filterParameter:this.createKPIWidget1.value.filterParameter,
+         filterDescription:this.createKPIWidget1.value.filterDescription,
+         selectedRangeType:this.createKPIWidget1.value.selectedRangeType,
+         parameterNameRead: this.parameterNameRead, 
+
+
+
          multi_value: [
            {
              value: this.createKPIWidget1.value.primaryValue,
@@ -361,7 +374,12 @@ generateUniqueId(): number {
         fontSize: fontSizeValue, // Preprocessed fontSize value
         fontColor: tile.fontColor,
         dashboardIds: tile.dashboardIds,
-        selectType:tile.selectType
+        selectType:tile.selectType,
+        filterParameter:tile.filterParameter,
+        filterDescription:tile.filterDescription,
+        selectedRangeType:tile.selectedRangeType
+
+
 
 
 
@@ -395,6 +413,21 @@ generateUniqueId(): number {
     // this.showTable();
     this.reloadEvent.next(true);
   }
+
+  onAdd(): void {
+    // Set the `selectedParameterValue` to the `name` of the selected parameter
+    this.selectedParameterValue = this.selectedParameterValue;
+    console.log('this.selectedParameterValue check',this.selectedParameterValue)
+  
+    // Update the form control value for filterDescription
+    this.createKPIWidget1.patchValue({
+      filterDescription: `${this.selectedParameterValue}`,
+    });
+  
+    // Manually trigger change detection to ensure the UI reflects the changes
+    this.cdr.detectChanges();
+  }
+
   selectValue1(value: string, modal: any) {
     console.log('Selected value:', value);
 
@@ -404,6 +437,38 @@ generateUniqueId(): number {
     // Close the modal after selection
     this.closeModal(modal);
   }
+
+  dynamicparameterValue(event: any): void {
+    console.log('event check for dynamic param',event)
+    console.log('event[0].text check',event[0].text)
+    const filterParameter=this.createKPIWidget1.get('filterParameter')
+    console.log('filterParameter check',filterParameter)
+    if (event && event[0] && event[0].text) {
+    if(filterParameter){
+
+      filterParameter.setValue(event[0].text)
+      this.cdr.detectChanges();   
+    }
+  }else{
+    console.log('failed to set value')
+  }
+   
+
+    if (event && event[0].value) {
+      // Format the value as ${field-key}
+      const formattedValue = "${"+event[0].value+"}"; 
+      console.log('formattedValue check',formattedValue) // You can customize the formatting as needed
+      this.selectedParameterValue = formattedValue;
+
+  
+      console.log('Formatted Selected Item:', this.selectedParameterValue);
+    } else {
+      console.log('Event structure is different:', event);
+    }
+
+  }
+
+
   get groupByFormatControl1(): FormControl {
     return this.createKPIWidget1.get('groupByFormat') as FormControl; // Cast to FormControl
   }
@@ -470,7 +535,8 @@ generateUniqueId(): number {
       // Update values in multi_value array
       // const processedValue = this.createKPIWidget1.value.processed_value || ''; // Get updated processed_value from the form
       const constantValue = this.createKPIWidget1.value.constantValue || 0; // Get updated constantValue from the form
-      const secondaryValue = this.createKPIWidget1.value.secondaryValue || ''; // Get updated secondaryValue from the form
+      const secondaryValue = this.createKPIWidget1.value.secondaryValue || '';
+      const primaryValue = this.createKPIWidget1.value.primaryValue || multiValue[0]?.value || '';  // Get updated secondaryValue from the form
 
       // console.log('Form Value for processed_value:', processedValue);
       console.log('Form Value for constantValue:', constantValue);
@@ -479,7 +545,8 @@ generateUniqueId(): number {
       // Ensure the multiValue array is long enough, and update the values
       if (multiValue.length > 1) {
         // multiValue[2].processed_value = processedValue; // Update processed_value at index 1
-        multiValue[0].constantValue = constantValue; // Update constantValue at index 0
+        multiValue[0].constantValue = constantValue;
+        multiValue[0].value = primaryValue; // Update constantValue at index 0
         multiValue[1].value = secondaryValue; // Update secondaryValue at index 1
       } else {
         // If multi_value array doesn't have enough elements, ensure it's structured correctly
@@ -494,14 +561,15 @@ generateUniqueId(): number {
       }
       const fontSizeValue = `${this.createKPIWidget1.value.fontSize}px`;
       // Now update the tile with the updated multi_value
-      this.dashboard[this.editTileIndex1] = {
+      const updateTile = {
         ...this.dashboard[this.editTileIndex1], // Keep existing properties
         formlist: this.createKPIWidget1.value.formlist,
         parameterName: this.createKPIWidget1.value.parameterName,
         groupBy: this.createKPIWidget1.value.groupBy,
-        primaryValue: this.createKPIWidget1.value.primaryValue,
+        primaryValue: primaryValue,
         groupByFormat: this.createKPIWidget1.value.groupByFormat,
         themeColor: this.createKPIWidget1.value.themeColor,
+        parameterNameRead: this.parameterNameRead,
         multi_value: multiValue, // Update multi_value with the modified array
         constantValue: constantValue, // Use the updated constantValue
         // processed_value: processedValue,
@@ -509,17 +577,26 @@ generateUniqueId(): number {
         fontSize: fontSizeValue,
         fontColor: this.createKPIWidget1.value.fontColor,
         dashboardIds:this.createKPIWidget1.value.dashboardIds,
-        selectType:this.createKPIWidget1.value.selectType
+        selectType:this.createKPIWidget1.value.selectType,
+        filterParameter:this.createKPIWidget1.value.filterParameter,
+        filterDescription:this.createKPIWidget1.value.filterDescription,
+        selectedRangeType:this.createKPIWidget1.value.selectedRangeType
       };
 
       // Log the updated details of the tile
       console.log('Updated Tile Details:', this.dashboard[this.editTileIndex1]);
 
       // Also update the grid_details array to reflect changes
-      this.all_Packet_store.grid_details[this.editTileIndex1] = {
-        ...this.all_Packet_store.grid_details[this.editTileIndex1], // Keep existing properties
-        ...this.dashboard[this.editTileIndex1], // Update with new values
-      };
+      this.dashboard = [
+        ...this.dashboard.slice(0, this.editTileIndex1),
+        updateTile,
+        ...this.dashboard.slice(this.editTileIndex1 + 1),
+      ];
+  
+      console.log('Updated dashboard:', this.dashboard);
+  
+      // Update grid_details and emit the event
+      this.all_Packet_store.grid_details[this.editTileIndex1] = { ...this.all_Packet_store.grid_details[this.editTileIndex1], ...updateTile };
 
       // Open the modal and perform additional actions
       this.grid_details = this.dashboard;
@@ -546,14 +623,21 @@ generateUniqueId(): number {
     { value: 'average', text: 'Average' },
     { value: 'latest', text: 'Latest' },
     { value: 'previous', text: 'Previous' },
-    { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
-    { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
-    { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
-    { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
+    // { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
+    // { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
+    // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
+    // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
     { value: 'Constant', text: 'Constant' },
     { value: 'Live', text: 'Live' },
+    { value: 'Count', text: 'Count' },
+
 
   ]
+  parameterValue(event:any){
+    console.log('event for parameter check',event)
+    this.parameterNameRead = event[0].text
+
+  }
 
   groupByOptions = [
     { value: 'none', text: 'None' },
@@ -566,6 +650,17 @@ generateUniqueId(): number {
 
     // Add more hardcoded options as needed
   ];
+  dateRangeLabel =[
+    { value: 'Today', text: 'Today' },
+    { value: 'Yesterday', text: 'Yesterday' },
+    { value: 'Last 7 Days', text: 'Last 7 Days' },
+    { value: 'Last 30 Days', text: 'Last 30 Days' },
+    { value: 'This Month', text: 'This Month' },
+    { value: 'Last Month', text: 'Last Month' },
+    { value: 'This Year', text: 'This Year' },
+    { value: 'Last Year', text: 'Last Year' },
+    
+  ]
   SelectTypeSummary =[
     { value: 'NewTab', text: 'New Tab' },
     { value: 'Modal', text: 'Modal' },
@@ -579,11 +674,13 @@ generateUniqueId(): number {
         if (result && result.metadata) {
           const parsedMetadata = JSON.parse(result.metadata);
           const formFields = parsedMetadata.formFields;
+          console.log('formFields check',formFields)
 
           // Initialize the list with formFields labels
           this.listofDynamicParam = formFields.map((field: any) => {
+            console.log('field check',field)
             return {
-              value: field.label,
+              value: field.name,
               text: field.label
             };
           });

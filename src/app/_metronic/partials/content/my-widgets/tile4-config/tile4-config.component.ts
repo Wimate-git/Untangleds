@@ -54,7 +54,10 @@ getLoggedUser: any;
   @Input() modal :any
   dashboardIdsList: any;
   p1ValuesSummary: any;
+  selectedParameterValue: string;
 
+  shouldShowProcessedValue: boolean = false;
+  parameterNameRead: any;
 ngOnInit(){
   this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
   console.log('this.getLoggedUser check', this.getLoggedUser)
@@ -189,13 +192,19 @@ initializeTileFields3() {
     'CompareTile': ['', Validators.required],
     'WithCompareTile': ['', Validators.required],
     widgetid: [this.generateUniqueId()],
-    'processed_value': ['', Validators.required],
+    'processed_value': [''],
+    'processed_value1': [''],
+    'processed_value2': [''],
     // selectedColor: [this.selectedColor]
     'themeColor': ['', Validators.required],
     fontSize: [14, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
     fontColor: ['#000000', Validators.required], 
     dashboardIds:[''],
-    selectType:['']
+    selectType:[''],
+    filterParameter:[''],
+    filterDescription:[''],
+    selectedRangeType:['']
+
   })
 }
 generateUniqueId(): number {
@@ -229,14 +238,20 @@ showValues = [
   { value: 'average', text: 'Average' },
   { value: 'latest', text: 'Latest' },
   { value: 'previous', text: 'Previous' },
-  { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
-  { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
-  { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
-  { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
+  // { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
+  // { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
+  // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
+  // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
   { value: 'Constant', text: 'Constant' },
   { value: 'Live', text: 'Live' },
+  { value: 'Count', text: 'Count' },
 
 ]
+parameterValue(event:any){
+  console.log('event for parameter check',event)
+  this.parameterNameRead = event[0].text
+
+}
 
 groupByOptions = [
   { value: 'none', text: 'None' },
@@ -258,11 +273,13 @@ fetchDynamicFormData(value: any) {
       if (result && result.metadata) {
         const parsedMetadata = JSON.parse(result.metadata);
         const formFields = parsedMetadata.formFields;
+        console.log('formFields check',formFields)
 
         // Initialize the list with formFields labels
         this.listofDynamicParam = formFields.map((field: any) => {
+          console.log('field check',field)
           return {
-            value: field.label,
+            value: field.name,
             text: field.label
           };
         });
@@ -303,6 +320,52 @@ selectFormParams(event: any) {
   } else {
     console.error('Event data is not in the expected format:', event);
   }
+}
+
+
+dynamicparameterValue(event: any): void {
+  console.log('event check for dynamic param',event)
+  console.log('event[0].text check',event[0].text)
+  const filterParameter=this.createKPIWidget3.get('filterParameter')
+  console.log('filterParameter check',filterParameter)
+  if (event && event[0] && event[0].text) {
+  if(filterParameter){
+
+    filterParameter.setValue(event[0].text)
+    this.cdr.detectChanges();   
+  }
+}else{
+  console.log('failed to set value')
+}
+ 
+
+  if (event && event[0].value) {
+    // Format the value as ${field-key}
+    const formattedValue = "${"+event[0].value+"}"; 
+    console.log('formattedValue check',formattedValue) // You can customize the formatting as needed
+    this.selectedParameterValue = formattedValue;
+
+
+    console.log('Formatted Selected Item:', this.selectedParameterValue);
+  } else {
+    console.log('Event structure is different:', event);
+  }
+
+}
+
+
+onAdd(): void {
+  // Set the `selectedParameterValue` to the `name` of the selected parameter
+  this.selectedParameterValue = this.selectedParameterValue;
+  console.log('this.selectedParameterValue check',this.selectedParameterValue)
+
+  // Update the form control value for filterDescription
+  this.createKPIWidget3.patchValue({
+    filterDescription: `${this.selectedParameterValue}`,
+  });
+
+  // Manually trigger change detection to ensure the UI reflects the changes
+  this.cdr.detectChanges();
 }
 onValueChange3(selectedValue: any): void {
   // Handle any logic here if needed when the value changes
@@ -370,6 +433,10 @@ addTile(key: any) {
      dashboardIds:this.createKPIWidget3.value.dashboardIds,
 
      selectType:this.createKPIWidget3.value.selectType,
+     filterParameter:this.createKPIWidget3.value.filterParameter,
+     filterDescription:this.createKPIWidget3.value.filterDescription,
+     selectedRangeType:this.createKPIWidget3.value.selectedRangeType,
+     parameterNameRead: this.parameterNameRead, 
      // Default value, change this to whatever you prefer
      // You can also handle default value for this if needed
 
@@ -384,19 +451,19 @@ addTile(key: any) {
          constantValue: this.createKPIWidget3.value.constantValue !== undefined && this.createKPIWidget3.value.constantValue !== null
            ? this.createKPIWidget3.value.constantValue
            : 0,
+           processed_value: this.createKPIWidget3.value.processed_value || '',
        },
        {
          value: this.createKPIWidget3.value.CompareTile, // Change secondaryValue to value
+         processed_value: this.createKPIWidget3.value.processed_value1 || '',
 
        },
        {
          value: this.createKPIWidget3.value.WithCompareTile,
+         processed_value:this.createKPIWidget3.value.processed_value2 || ''
 
 
-       }, {
-
-         processed_value: this.createKPIWidget3.value.processed_value || '',
-       }
+       }, 
      ],
    };
 
@@ -470,7 +537,10 @@ openKPIModal3( tile?: any, index?: number) {
       fontSize: fontSizeValue, // Preprocessed fontSize value
       fontColor: tile.fontColor,
       dashboardIds:tile.dashboardIds,
-      selectType:tile.selectType
+      selectType:tile.selectType,
+      filterParameter:tile.filterParameter,
+      filterDescription:tile.filterDescription,
+      selectedRangeType:tile.selectedRangeType
 
     });
 
@@ -576,7 +646,11 @@ updateTile3() {
       fontSize: fontSizeValue,
       fontColor: this.createKPIWidget3.value.fontColor,
       selectType:this.createKPIWidget3.value.selectType,
-      dashboardIds:this.createKPIWidget3.value.dashboardIds
+      dashboardIds:this.createKPIWidget3.value.dashboardIds,
+      filterParameter:this.createKPIWidget3.value.filterParameter,
+      filterDescription:this.createKPIWidget3.value.filterDescription,
+      selectedRangeType:this.createKPIWidget3.value.selectedRangeType,
+      parameterNameRead: this.parameterNameRead, 
 
       // Include any additional properties if needed
     };
@@ -647,6 +721,17 @@ get primaryValue3() {
   return this.createKPIWidget3?.get('primaryValue');
 
 }
+dateRangeLabel =[
+  { value: 'Today', text: 'Today' },
+  { value: 'Yesterday', text: 'Yesterday' },
+  { value: 'Last 7 Days', text: 'Last 7 Days' },
+  { value: 'Last 30 Days', text: 'Last 30 Days' },
+  { value: 'This Month', text: 'This Month' },
+  { value: 'Last Month', text: 'Last Month' },
+  { value: 'This Year', text: 'This Year' },
+  { value: 'Last Year', text: 'Last Year' },
+  
+]
 duplicateTile3(tile: any, index: number): void {
   if (!tile || index < 0 || index >= this.dashboard.length) {
     console.error('Invalid tile or index for duplication.');

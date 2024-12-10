@@ -53,6 +53,10 @@ export class Tile5ConfigComponent implements OnInit {
   tooltip: string | null = null;
   dashboardIdsList: any;
   p1ValuesSummary: any;
+  selectedParameterValue: any;
+
+  shouldShowProcessedValue: boolean = false;
+  parameterNameRead: any;
   ngOnInit(): void {
     this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
     console.log('this.getLoggedUser check', this.getLoggedUser)
@@ -172,15 +176,21 @@ export class Tile5ConfigComponent implements OnInit {
     { value: 'average', text: 'Average' },
     { value: 'latest', text: 'Latest' },
     { value: 'previous', text: 'Previous' },
-    { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
-    { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
-    { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
-    { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
+    // { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
+    // { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
+    // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
+    // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
     { value: 'Constant', text: 'Constant' },
     { value: 'Live', text: 'Live' },
+    { value: 'Count', text: 'Count' },
   
   ]
   
+  parameterValue(event:any){
+    console.log('event for parameter check',event)
+    this.parameterNameRead = event[0].text
+  
+  }
   groupByOptions = [
     { value: 'none', text: 'None' },
     { value: 'created', text: 'Created Time' },
@@ -225,13 +235,19 @@ export class Tile5ConfigComponent implements OnInit {
       'WithCompareTile': ['', Validators.required],
       'secondaryValue': ['', Validators.required],
       widgetid: [this.generateUniqueId()],
-      'processed_value': ['', Validators.required],
+      'processed_value': [''],
+      'processed_value1': [''],
+      'processed_value2': [''],
+      'processed_value3':[''],
       // selectedColor: [this.selectedColor]
       'themeColor': ['', Validators.required],
       fontSize: [14, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['#000000', Validators.required], 
       dashboardIds:[''],
-      selectType:['']
+      selectType:[''],
+      filterParameter:[''],
+      filterDescription:[''],
+      selectedRangeType:['']
 
     })
   }
@@ -321,6 +337,13 @@ export class Tile5ConfigComponent implements OnInit {
          fontColor: this.createKPIWidget4.value.fontColor, 
          dashboardIds: this.createKPIWidget4.value.dashboardIds,
          selectType:this.createKPIWidget4.value.selectType,
+         filterParameter:this.createKPIWidget4.value.filterParameter,
+         filterDescription:this.createKPIWidget4.value.filterDescription,
+         selectedRangeType:this.createKPIWidget4.value.selectedRangeType,
+         parameterNameRead:this.parameterNameRead,
+
+
+
 
 
          // Default value, change this to whatever you prefer
@@ -338,21 +361,22 @@ export class Tile5ConfigComponent implements OnInit {
              constantValue: this.createKPIWidget4.value.constantValue !== undefined && this.createKPIWidget4.value.constantValue !== null
                ? this.createKPIWidget4.value.constantValue
                : 0,
+               processed_value: this.createKPIWidget4.value.processed_value || '',
            },
            {
              value: this.createKPIWidget4.value.CompareTile, // Change secondaryValue to value
+             processed_value: this.createKPIWidget4.value.processed_value1 || '',
  
            },
            {
              value: this.createKPIWidget4.value.WithCompareTile,
+             processed_value: this.createKPIWidget4.value.processed_value2 || '',
  
  
-           }, {
- 
-             processed_value: this.createKPIWidget4.value.processed_value || '',
-           },
+           }, 
            {
-             value: this.createKPIWidget4.value.secondaryValue
+             value: this.createKPIWidget4.value.secondaryValue,
+             processed_value: this.createKPIWidget4.value.processed_value3 || '',
            }
          ],
  
@@ -392,25 +416,25 @@ export class Tile5ConfigComponent implements OnInit {
         // Log the current details of the tile before update
         console.log('Current Tile Details Before Update:', this.dashboard[this.editTileIndex4]);
         let multiValueArray = this.dashboard[this.editTileIndex4].multi_value || [];
-        const processedValue = this.createKPIWidget4.value.processed_value || ''; // Get updated processed_value from the form
+        // Get updated processed_value from the form
         const constantValue = this.createKPIWidget4.value.constantValue || 0; // Get updated constantValue from the form
         const CompareTile = this.createKPIWidget4.value.CompareTile || '';
         const WithCompareTile = this.createKPIWidget4.value.WithCompareTile || '';
         const primaryValue = this.createKPIWidget4.value.primaryValue || '';
         const secondaryValue = this.createKPIWidget4.value.secondaryValue || '';
         if (multiValueArray.length > 1) {
-          multiValueArray[3].processed_value = processedValue; // Update processed_value at index 1
+        // Update processed_value at index 1
           multiValueArray[0].constantValue = constantValue; // Update constantValue at index 0
           multiValueArray[1].value = CompareTile;
           multiValueArray[2].value = WithCompareTile;
-          multiValueArray[4].value = secondaryValue
+          multiValueArray[3].value = secondaryValue
   
           // Update secondaryValue at index 1
         } else {
           // If multi_value array doesn't have enough elements, ensure it's structured correctly
           // Ensure at least two objects are created with the correct structure
   
-          multiValueArray.push({ processed_value: processedValue });
+        
           multiValueArray.push({ constantValue: constantValue });
           multiValueArray.push({ CompareTile: CompareTile });
           multiValueArray.push({ WithCompareTile: WithCompareTile });
@@ -438,7 +462,11 @@ export class Tile5ConfigComponent implements OnInit {
           fontSize: fontSizeValue,
           fontColor: this.createKPIWidget4.value.fontColor,
           dashboardIds:this.createKPIWidget4.value.dashboardIds,
-          selectType:this.createKPIWidget4.value.selectType
+          selectType:this.createKPIWidget4.value.selectType,
+          filterParameter:this.createKPIWidget4.value.filterParameter,
+          filterDescription:this.createKPIWidget4.value.filterDescription,
+          selectedRangeType:this.createKPIWidget4.value.selectedRangeType,
+          parameterNameRead:this.parameterNameRead,
 
 
   
@@ -474,7 +502,19 @@ export class Tile5ConfigComponent implements OnInit {
         console.error("Edit index is null. Unable to update the tile.");
       }
     }
-
+    onAdd(): void {
+      // Set the `selectedParameterValue` to the `name` of the selected parameter
+      this.selectedParameterValue = this.selectedParameterValue;
+      console.log('this.selectedParameterValue check',this.selectedParameterValue)
+    
+      // Update the form control value for filterDescription
+      this.createKPIWidget4.patchValue({
+        filterDescription: `${this.selectedParameterValue}`,
+      });
+    
+      // Manually trigger change detection to ensure the UI reflects the changes
+      this.cdr.detectChanges();
+    }
     onFontColorChange(event: Event): void {
       const color = (event.target as HTMLInputElement).value;
       this.createKPIWidget4.patchValue({ fontColor: color });
@@ -502,8 +542,8 @@ export class Tile5ConfigComponent implements OnInit {
       const constantValue4 = parsedMultiValue[0]?.constantValue || 0; // Constant value from multi_value
       const CompareTile4 = parsedMultiValue[1]?.value || ''; // Secondary value from multi_value
       const WithCompareTile4 = parsedMultiValue[2]?.value || ''; // Nested secondary value from multi_value
-      const parsedValue4 = parsedMultiValue[3]?.processed_value !== undefined ? parsedMultiValue[3].processed_value : 0; // Processed value from multi_value
-      const secondaryValue4 = parsedMultiValue[4]?.value || ''; // Secondary value from multi_value
+ // Processed value from multi_value
+      const secondaryValue4 = parsedMultiValue[3]?.value || ''; // Secondary value from multi_value
       const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14; 
       // Initialize form fields and pre-select values
       this.initializeTileFields4();
@@ -517,12 +557,17 @@ export class Tile5ConfigComponent implements OnInit {
         CompareTile: CompareTile4, // Using extracted CompareTile value
         WithCompareTile: WithCompareTile4, // Using extracted WithCompareTile value
         secondaryValue: secondaryValue4, // Using extracted secondary value
-        processed_value: parsedValue4,
+    
         themeColor: tile.themeColor,
         fontSize: fontSizeValue, // Preprocessed fontSize value
         fontColor: tile.fontColor, // Using extracted processed value
         dashboardIds:tile.dashboardIds,
-        selectType:tile.selectType
+        selectType:tile.selectType,
+        filterParameter:tile.filterParameter,
+        filterDescription:tile.filterDescription,
+        selectedRangeType:tile.selectedRangeType
+
+
 
 
       });
@@ -551,6 +596,47 @@ export class Tile5ConfigComponent implements OnInit {
 
     this.reloadEvent.next(true);
   }
+
+dynamicparameterValue(event: any): void {
+  console.log('event check for dynamic param',event)
+  console.log('event[0].text check',event[0].text)
+  const filterParameter=this.createKPIWidget4.get('filterParameter')
+  console.log('filterParameter check',filterParameter)
+  if (event && event[0] && event[0].text) {
+  if(filterParameter){
+
+    filterParameter.setValue(event[0].text)
+    this.cdr.detectChanges();   
+  }
+}else{
+  console.log('failed to set value')
+}
+ 
+
+  if (event && event[0].value) {
+    // Format the value as ${field-key}
+    const formattedValue = "${"+event[0].value+"}"; 
+    console.log('formattedValue check',formattedValue) // You can customize the formatting as needed
+    this.selectedParameterValue = formattedValue;
+
+
+    console.log('Formatted Selected Item:', this.selectedParameterValue);
+  } else {
+    console.log('Event structure is different:', event);
+  }
+
+}
+dateRangeLabel =[
+  { value: 'Today', text: 'Today' },
+  { value: 'Yesterday', text: 'Yesterday' },
+  { value: 'Last 7 Days', text: 'Last 7 Days' },
+  { value: 'Last 30 Days', text: 'Last 30 Days' },
+  { value: 'This Month', text: 'This Month' },
+  { value: 'Last Month', text: 'Last Month' },
+  { value: 'This Year', text: 'This Year' },
+  { value: 'Last Year', text: 'Last Year' },
+  
+]
   closeModal(modal: any) {
     if (modal) {
       modal.close(); // Close the modal
@@ -580,11 +666,13 @@ export class Tile5ConfigComponent implements OnInit {
         if (result && result.metadata) {
           const parsedMetadata = JSON.parse(result.metadata);
           const formFields = parsedMetadata.formFields;
+          console.log('formFields check',formFields)
   
           // Initialize the list with formFields labels
           this.listofDynamicParam = formFields.map((field: any) => {
+            console.log('field check',field)
             return {
-              value: field.label,
+              value: field.name,
               text: field.label
             };
           });

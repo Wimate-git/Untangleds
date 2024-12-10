@@ -223,45 +223,7 @@
           <!-- Settings Tab Content -->
           <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab"
             role="tabpanel" aria-labelledby="settings-tabpane">
-<!-- 
-                  <div class="row g-3" [formGroup]="createChart" *ngIf="createChart">
-                    <div class="col-md-12 mb-3">
-                      <label class="col-form-label fw-bold fs-6 required">Themes:</label>
-                      <div class="color-boxes">
-                        <div *ngFor="let theme of themes" 
-                             class="color-box"
-                             [ngStyle]="{ 'background-image': theme.color }"
-                             (click)="toggleCheckbox(theme)"
-                             [class.checked]="theme.selected">
-                          <div *ngIf="theme.selected" class="checkmark">✔</div>
-                        </div>
-                      </div>
-                      
-                    </div>
 
-                
-                    <div class="col-md-6 mb-3">
-                      <label for="fontSize" class="col-form-label fw-bold fs-6 required">Font Size</label>
-                      <input id="fontSize" type="number" class="form-control form-control-solid"
-                        placeholder="Enter Font Size (e.g., 14)" formControlName="fontSize" min="8" max="72">
-                      <div *ngIf="createChart.get('fontSize')?.errors?.min || createChart.get('fontSize')?.errors?.max"
-                        class="text-danger mt-1">
-                        Font size must be between 8 and 72.
-                      </div>
-                    </div>
-
-         
-                    <div class="col-md-6 mb-3">
-                      <label for="fontColor" class="col-form-label fw-bold fs-6 required">Font Color</label>
-                      <div class="d-flex align-items-center">
-                        <input id="fontColor" type="color" class="form-control form-control-color me-3"
-                          [value]="createChart.get('fontColor')?.value" (input)="onFontColorChange($event)"
-                          style="width: 50px; height: 38px; padding: 0; border-radius: 5px; border: 1px solid #ced4da;">
-                        <input type="text" class="form-control form-control-solid" formControlName="fontColor" readonly
-                          style="flex: 1;" placeholder="Selected Color Code">
-                      </div>
-                    </div>
-                  </div> -->
                   <div class="row">
 
 
@@ -316,13 +278,7 @@
           <form [formGroup]="createChart">
           
           <div class="row">
-            <!-- <div class="col-md-5 mb-3">
-              <label for="formlist" class="col-createChart-label fw-bold fs-6 required">Forms</label>
-              <ngx-select id="formlist" [allowClear]="true" name="icon" formControlName="filterForm"
-                [items]="listofDynamicParamFilter" optionValueField="value" optionTextField="text"
-                (selectionChanges)="selectFormParamsFilter($event)" placeholder="Select createChart">
-              </ngx-select>
-            </div> -->
+   
             
             <div class="col-md-5 mb-3">
               <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Parameter</label>

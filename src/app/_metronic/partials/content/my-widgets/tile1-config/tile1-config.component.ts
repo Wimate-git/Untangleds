@@ -63,6 +63,8 @@ export class Tile1ConfigComponent implements OnInit {
   idsDashboard: any;
   dashboardIdsList: any;
   p1ValuesSummary: any;
+  selectedParameterValue: string;
+  parameterNameRead: any;
 
 
  
@@ -139,6 +141,19 @@ export class Tile1ConfigComponent implements OnInit {
       // ... add other ranges as needed
     };
   }
+
+  dateRangeLabel =[
+    { value: 'Today', text: 'Today' },
+    { value: 'Yesterday', text: 'Yesterday' },
+    { value: 'Last 7 Days', text: 'Last 7 Days' },
+    { value: 'Last 30 Days', text: 'Last 30 Days' },
+    { value: 'This Month', text: 'This Month' },
+    { value: 'Last Month', text: 'Last Month' },
+    { value: 'This Year', text: 'This Year' },
+    { value: 'Last Year', text: 'Last Year' },
+    
+  ]
+  
   initializeTileFields(): void {
     // Initialize the form group
     this.createKPIWidget = this.fb.group({
@@ -152,8 +167,8 @@ export class Tile1ConfigComponent implements OnInit {
       processed_value: [''],
       selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
       selectedRangeLabelWithDates: [''],
-      predefinedSelectRange: [{ startDate: moment().startOf('day'), endDate: moment().endOf('day') }],
-      selectedRangeType: [''],
+      // predefinedSelectRange: [{ startDate: moment().startOf('day'), endDate: moment().endOf('day') }],
+      selectedRangeType: ['',Validators.required],
       themeColor: ['', Validators.required],
       // New fields for font size and font color
       fontSize: [14, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
@@ -161,7 +176,10 @@ export class Tile1ConfigComponent implements OnInit {
       selectFromTime:[''],
       selectToTime:[''],
       dashboardIds:[''],
-      selectType:['']
+      selectType:[''],
+      filterParameter:[''],
+      filterDescription:[''],
+
     });
   }
   
@@ -248,7 +266,10 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     this.widgetIdCounter++;
     return Date.now() + this.widgetIdCounter; // Use timestamp and counter for uniqueness
   }
-  
+  descriptionValue(description:any){
+    console.log('description checking',description)
+
+  }
 
   addTile(key: any) {
     if (key === 'tile') {
@@ -273,11 +294,15 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         groupByFormat: this.createKPIWidget.value.groupByFormat,
         dashboardIds: this.createKPIWidget.value.dashboardIds,
         selectType:this.createKPIWidget.value.selectType,
+        filterParameter:this.createKPIWidget.value.filterParameter,
+        filterDescription:this.createKPIWidget.value.filterDescription,
+        parameterNameRead: this.parameterNameRead, 
+
      
-        predefinedSelectRange: {
-          startDate: this.createKPIWidget.value.predefinedSelectRange[0].format('YYYY-MM-DD'),
-          endDate: this.createKPIWidget.value.predefinedSelectRange[1].format('YYYY-MM-DD'),
-        },
+        // predefinedSelectRange: {
+        //   startDate: this.createKPIWidget.value.predefinedSelectRange[0].format('YYYY-MM-DD'),
+        //   endDate: this.createKPIWidget.value.predefinedSelectRange[1].format('YYYY-MM-DD'),
+        // },
         selectedRangeType: this.createKPIWidget.value.selectedRangeType,
         themeColor: this.createKPIWidget.value.themeColor,
         fontSize: `${this.createKPIWidget.value.fontSize}px`,// Added fontSize
@@ -323,92 +348,69 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   
   updateTile(key: any) {
     console.log('key checking from update', key);
+  
     if (this.editTileIndex !== null) {
       console.log('this.editTileIndex check', this.editTileIndex);
       console.log('Tile checking for update:', this.dashboard[this.editTileIndex]);
   
       const multiValue = this.dashboard[this.editTileIndex].multi_value || [];
-      const primaryValue = multiValue[0]?.value || '';
+      const primaryValue = this.createKPIWidget.value.primaryValue || multiValue[0]?.value || ''; // Get primaryValue from form or multi_value[0]
       const constantValue = multiValue[0]?.constantValue || 0;
-      const processedValue = this.createKPIWidget.value.processed_value || ''; // Get updated processed_value from the form
-      const updatedConstantValue = this.createKPIWidget.value.constantValue || constantValue; // Get updated constantValue from the form
-  
+      const processedValue = this.createKPIWidget.value.processed_value || ''; // Form value
+      const updatedConstantValue = this.createKPIWidget.value.constantValue || constantValue; // Form value
+      
       console.log('Extracted primaryValue:', primaryValue);
-      console.log('Extracted constantValue:', constantValue);
       console.log('Form Value for processed_value:', processedValue);
       console.log('Form Value for constantValue:', updatedConstantValue);
   
-      // Update the multi_value array with the new processed_value and constantValue
+      // Update multi_value array
       if (multiValue.length > 1) {
-        // Update processed_value and constantValue at index 1
         multiValue[1].processed_value = processedValue;
-        multiValue[0].constantValue = updatedConstantValue; // Update constantValue at index 0
+        multiValue[0].constantValue = updatedConstantValue;
+        multiValue[0].value = primaryValue; // Sync primaryValue to multi_value[0]
       } else {
-        // If the multi_value array doesn't have enough elements, ensure it's structured correctly
-        multiValue.push({ processed_value: processedValue });
-        multiValue.push({ constantValue: updatedConstantValue });
+        multiValue.push({ processed_value: processedValue, constantValue: updatedConstantValue, value: primaryValue });
       }
   
-      // Add defensive checks for predefinedSelectRange
-      const predefinedSelectRange = this.createKPIWidget.value.predefinedSelectRange || [];
-      const startDate = predefinedSelectRange[0] ? predefinedSelectRange[0].format('YYYY-MM-DD') : '';
-      const endDate = predefinedSelectRange[1] ? predefinedSelectRange[1].format('YYYY-MM-DD') : '';
-  
-      if (!startDate || !endDate) {
-        console.error('Predefined Select Range is invalid or missing:', predefinedSelectRange);
-      }
-  
-      const fontSizeValue = `${this.createKPIWidget.value.fontSize}px`;
-      // Now update the tile with the updated multi_value
+      // Prepare the updated tile object
       const updatedTile = {
         ...this.dashboard[this.editTileIndex], // Keep existing properties
         formlist: this.createKPIWidget.value.formlist,
         parameterName: this.createKPIWidget.value.parameterName,
+        primaryValue: primaryValue, // Updated primaryValue from form or multi_value
         groupBy: this.createKPIWidget.value.groupBy,
-        primaryValue: primaryValue,
         groupByFormat: this.createKPIWidget.value.groupByFormat,
         constantValue: updatedConstantValue, // Use the updated constantValue
         processed_value: processedValue, // Use the updated processed_value
         multi_value: multiValue, // Update the multi_value array with the modified data
         selectedRangeType: this.createKPIWidget.value.selectedRangeType,
-        predefinedSelectRange: {
-          startDate: startDate,
-          endDate: endDate,
-        },
         startDate: this.createKPIWidget.value.startDate,
         endDate: this.createKPIWidget.value.endDate,
         themeColor: this.createKPIWidget.value.themeColor,
-        fontSize: fontSizeValue,
+        fontSize: `${this.createKPIWidget.value.fontSize}px`,
         fontColor: this.createKPIWidget.value.fontColor,
-        selectFromTime:this.createKPIWidget.value.selectFromTime,
-        selectToTime:this.createKPIWidget.value.selectToTime,
-        dashboardIds:this.createKPIWidget.value.dashboardIds,
-        selectType:this.createKPIWidget.value.selectType
-
-
-
+        selectFromTime: this.createKPIWidget.value.selectFromTime,
+        selectToTime: this.createKPIWidget.value.selectToTime,
+        dashboardIds: this.createKPIWidget.value.dashboardIds,
+        selectType: this.createKPIWidget.value.selectType,
+        filterParameter: this.createKPIWidget.value.filterParameter,
+        filterDescription: this.createKPIWidget.value.filterDescription,
+        parameterNameRead: this.parameterNameRead,
       };
-      console.log('updatedTile checking', updatedTile);
   
-      // Update the dashboard array using a non-mutative approach
+      console.log('Updated tile:', updatedTile);
+  
+      // Update the dashboard array with the updated tile
       this.dashboard = [
         ...this.dashboard.slice(0, this.editTileIndex),
         updatedTile,
         ...this.dashboard.slice(this.editTileIndex + 1),
       ];
   
-      console.log('Updated Tile Details:', this.dashboard[this.editTileIndex]);
+      console.log('Updated dashboard:', this.dashboard);
   
-      // Update the grid_details as well
-      this.all_Packet_store.grid_details[this.editTileIndex] = {
-        ...this.all_Packet_store.grid_details[this.editTileIndex],
-        ...updatedTile,
-      };
-      console.log(
-        '  this.all_Packet_store.grid_details[this.editTileIndex]',
-        this.all_Packet_store.grid_details[this.editTileIndex]
-      );
-      console.log('this.dashboard checking from gitproject', this.dashboard);
+      // Update grid_details and emit the event
+      this.all_Packet_store.grid_details[this.editTileIndex] = { ...this.all_Packet_store.grid_details[this.editTileIndex], ...updatedTile };
       this.grid_details = this.dashboard;
       this.dashboardChange.emit(this.grid_details);
   
@@ -416,16 +418,58 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         this.updateSummary('update_tile');
       }
   
-      console.log('this.dashboard check from updateTile', this.dashboard);
-      console.log('Updated all_Packet_store.grid_details:', this.all_Packet_store.grid_details);
-  
-      // Reset the editTileIndex after the update
+      // Reset editTileIndex after the update
       this.editTileIndex = null;
     } else {
       console.error('Edit index is null. Unable to update the tile.');
     }
   }
   
+
+
+  dynamicparameterValue(event: any): void {
+    console.log('event check for dynamic param',event)
+    console.log('event[0].text check',event[0].text)
+    const filterParameter=this.createKPIWidget.get('filterParameter')
+    console.log('filterParameter check',filterParameter)
+    if (event && event[0] && event[0].text) {
+    if(filterParameter){
+
+      filterParameter.setValue(event[0].text)
+      this.cdr.detectChanges();   
+    }
+  }else{
+    console.log('failed to set value')
+  }
+   
+
+    if (event && event[0].value) {
+      // Format the value as ${field-key}
+      const formattedValue = "${"+event[0].value+"}"; 
+      console.log('formattedValue check',formattedValue) // You can customize the formatting as needed
+      this.selectedParameterValue = formattedValue;
+
+  
+      console.log('Formatted Selected Item:', this.selectedParameterValue);
+    } else {
+      console.log('Event structure is different:', event);
+    }
+
+  }
+
+  onAdd(): void {
+    // Set the `selectedParameterValue` to the `name` of the selected parameter
+    this.selectedParameterValue = this.selectedParameterValue;
+    console.log('this.selectedParameterValue check',this.selectedParameterValue)
+  
+    // Update the form control value for filterDescription
+    this.createKPIWidget.patchValue({
+      filterDescription: `${this.selectedParameterValue}`,
+    });
+  
+    // Manually trigger change detection to ensure the UI reflects the changes
+    this.cdr.detectChanges();
+  }
 
   selectedSettingsTab(tab: string) {
     this.selectedTabset = tab;
@@ -454,7 +498,7 @@ alert('cloned tile')
     clonedTile.formlist = tile.formlist;
     clonedTile.groupBy = tile.groupBy;
     clonedTile.groupByFormat = tile.groupByFormat;
-    clonedTile.predefinedSelectRange = tile.predefinedSelectRange;
+    // clonedTile.predefinedSelectRange = tile.predefinedSelectRange;
     clonedTile.selectedRangeType = tile.selectedRangeType;
     clonedTile.themeColor = tile.themeColor;
 
@@ -530,7 +574,7 @@ openKPIModal(tile: any, index: number) {
     }
 
     // Extract value and constantValue from parsed multi_value, assuming the new structure
-    const value = parsedMultiValue[0]?.value || '';
+    const value = parsedMultiValue.length > 0 ? parsedMultiValue[0]?.value || '' : '';
     const constantValue = parsedMultiValue[0]?.constantValue !== undefined ? parsedMultiValue[0].constantValue : 0;
     const parsedValue = parsedMultiValue[0]?.processed_value !== undefined ? parsedMultiValue[0].processed_value : 0;
 
@@ -540,11 +584,11 @@ openKPIModal(tile: any, index: number) {
     // Initialize form fields and pre-select values
     this.initializeTileFields();
 
-    const predefinedRange = {
-      startDate: new Date(tile.predefinedSelectRange.startDate),
-      endDate: new Date(tile.predefinedSelectRange.endDate),
-    };
-    console.log('predefinedRange check', predefinedRange);
+    // const predefinedRange = {
+    //   startDate: new Date(tile.predefinedSelectRange.startDate),
+    //   endDate: new Date(tile.predefinedSelectRange.endDate),
+    // };
+    // console.log('predefinedRange check', predefinedRange);
 
     this.createKPIWidget.patchValue({
       formlist: tile.formlist,
@@ -554,18 +598,22 @@ openKPIModal(tile: any, index: number) {
       groupByFormat: tile.groupByFormat,
       constantValue: constantValue, // Use the extracted constantValue
       processed_value: parsedValue,
-      predefinedSelectRange: predefinedRange,
+      // predefinedSelectRange: predefinedRange,
       selectedRangeCalendarTimeRight: tile.selectedRangeCalendarTimeRight, // Patch the selected range object
       selectedRangeType: tile.selectedRangeType, // Patch the selectedRangeType
-      startDate: tile.predefinedSelectRange?.startDate || '', // Patch the startDate if it exists
-      endDate: tile.predefinedSelectRange?.endDate || '',
+      // startDate: tile.predefinedSelectRange?.startDate || '', // Patch the startDate if it exists
+      // endDate: tile.predefinedSelectRange?.endDate || '',
       themeColor: tile.themeColor,
       fontSize: fontSizeValue, // Preprocessed fontSize value
       fontColor: tile.fontColor,
       selectFromTime:tile.selectFromTime,
       selectToTime:tile.selectToTime,
       dashboardIds:tile.dashboardIds,
-      selectType:tile.selectType
+      selectType:tile.selectType,
+      filterParameter:tile.filterParameter,
+      filterDescription:tile.filterDescription
+
+
 
 
 
@@ -668,6 +716,7 @@ openKPIModal(tile: any, index: number) {
 
   parameterValue(event:any){
     console.log('event for parameter check',event)
+    this.parameterNameRead = event[0].text
 
   }
   selectFormParams(event: any) {
@@ -701,12 +750,13 @@ openKPIModal(tile: any, index: number) {
     { value: 'average', text: 'Average' },
     { value: 'latest', text: 'Latest' },
     { value: 'previous', text: 'Previous' },
-    { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
-    { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
-    { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
-    { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
+    // { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
+    // { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
+    // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
+    // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
     { value: 'Constant', text: 'Constant' },
     { value: 'Live', text: 'Live' },
+    { value: 'Count', text: 'Count' },
 
   ]
 
@@ -786,33 +836,33 @@ openKPIModal(tile: any, index: number) {
   hideTooltip() {
     this.tooltip = null;
   }
-get datePickerControl(){
-  return this.createKPIWidget?.get('predefinedSelectRange') as FormControl
-}
-  datesUpdatedRange($event: any): void {
-    const selectedRange = Object.entries(this.ranges).find(([label, dates]) => {
-      const [startDate, endDate] = dates as [moment.Moment, moment.Moment];
-      return (
-        startDate.isSame($event.startDate, 'day') &&
-        endDate.isSame($event.endDate, 'day')
-      );
-    });
+// get datePickerControl(){
+//   return this.createKPIWidget?.get('predefinedSelectRange') as FormControl
+// }
+  // datesUpdatedRange($event: any): void {
+  //   const selectedRange = Object.entries(this.ranges).find(([label, dates]) => {
+  //     const [startDate, endDate] = dates as [moment.Moment, moment.Moment];
+  //     return (
+  //       startDate.isSame($event.startDate, 'day') &&
+  //       endDate.isSame($event.endDate, 'day')
+  //     );
+  //   });
   
-    console.log('Selected Range Check:', selectedRange);
+  //   console.log('Selected Range Check:', selectedRange);
   
-    if (selectedRange) {
-      const control = this.createKPIWidget.get('predefinedSelectRange');
-      if (control) {
-        control.setValue(selectedRange[1]); // Update the form control value with the range label
-      }
-    }
-    if (selectedRange) {
-      const control = this.createKPIWidget.get('selectedRangeType');
-      if (control) {
-        control.setValue(selectedRange[0]); // Update the form control value with the range label
-      }
-    }
-  }
+  //   if (selectedRange) {
+  //     const control = this.createKPIWidget.get('predefinedSelectRange');
+  //     if (control) {
+  //       control.setValue(selectedRange[1]); // Update the form control value with the range label
+  //     }
+  //   }
+  //   if (selectedRange) {
+  //     const control = this.createKPIWidget.get('selectedRangeType');
+  //     if (control) {
+  //       control.setValue(selectedRange[0]); // Update the form control value with the range label
+  //     }
+  //   }
+  // }
   
   
 

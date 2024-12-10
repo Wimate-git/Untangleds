@@ -1,5 +1,6 @@
 
 
+
 <div class="page-content" #pageContent [ngClass]="{'full-screen-page': isFullScreen&&editButtonCheck}">
   <div class="" id="kt_wrapper" *ngIf="editButtonCheck">
     <div class="" id="kt_content">
@@ -199,7 +200,7 @@
   <div class="row">
   <div class="col-xl-7" *ngIf="!editButtonCheck">
     <!-- Begin Engage widget 9 -->
-    <div class="card h-lg-100" style="background: linear-gradient(112.14deg, #FF8A00 0%, #E96922 100%)">
+    <div class="card h-lg-100" style="background: linear-gradient(112.14deg, #183462 0%, #183462 100%)">
       <!-- Begin Body -->
       <div class="card-body">
         <!-- Begin Row -->
@@ -397,6 +398,15 @@
     [fullScreen]="true">
     <p style="color: white">Loading Widgets, please wait...</p>
   </ngx-spinner>
+  <ngx-spinner 
+  *ngIf="isLoading" 
+  bdColor="rgba(0, 0, 0, 0.8)" 
+  size="medium" 
+  color="#fff" 
+  type="square-jelly-box" 
+  [fullScreen]="true">
+  <p style="color: white">Loading Data, please wait...</p>
+  </ngx-spinner>
   <div style="top: 1%;
   z-index: 100;
   right:44px;
@@ -415,7 +425,7 @@
     <a class="myMenu-item" #myLink *ngIf="editButtonCheck" title="Edit Dashboard" (click)="openModal('edit',all_Packet_store, summaryModal)"> <i style="color: white;" class="fa fa-edit"></i> </a>
     <!-- <a class="myMenu-item" data-bs-toggle="modal" data-bs-placement="left" title="Home" data-bs-target="#myModal" routerLink="/summary-engine">
       <i style="color: white;" class="fa fa-home"></i> </a> -->
-    <a *ngIf="!isSummaryEngine()" class="myMenu-item" (click)="openSummaryTable(content)" title="Search dashboard">
+    <a  class="myMenu-item" (click)="openSummaryTable(content)" title="Search dashboard">
       <i style="color: white;" class="fa fa-search"></i>
     </a>
   
@@ -427,6 +437,10 @@
     <a class="myMenu-item" *ngIf="!isSummaryEngine()" (click)="toggleFullView()" style="cursor: pointer;" [attr.title]="isFullView ? 'Exit Full View' : 'Full View'">
       <i style="color: white;" class="fa" [ngClass]="isFullView ? 'fa-compress' : 'fa-expand'"></i>
     </a>
+    <a class="myMenu-item" *ngIf="!isSummaryEngine()" (click)="reloadPage()" style="cursor: pointer;" [attr.title]="isFullView ? 'Exit Full View' : 'Full View'">
+      <i style="color: white;" class="fa" [ngClass]="isFullView ? 'fa-refresh' : 'fa-refresh'"></i>
+    </a>
+  
   
     <!-- SVG Filter (Retained) -->
     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="width:50px;height:50px">
@@ -577,8 +591,8 @@
   
     <div class="tab-content" id="myTabContent">
       <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTab === 'add-dashboard'}" id="add-dashboard" role="tabpanel" aria-labelledby="add-dashboard-tab">
-        <form [formGroup]="createSummaryField">
-          <div class="container">
+        <form >
+          <div class="container" [formGroup]="createSummaryField">
             <div class="row mb-3">
               <div class="col-12">
                 <!-- <label class="col-form-label fw-bold fs-6 required">Add Dashboard</label> -->
@@ -710,7 +724,7 @@
       <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTab === 'add-widget'}" id="add-widget" role="tabpanel" aria-labelledby="add-widget-tab">
   
    
-        <div class="container">
+        <div class="container" [formGroup]="createSummaryField">
           <div class="row">
             <div class="col-md-6 centered-dropdown-container">
               <label class="col-form-label fw-bold fs-6">Widget Type</label>
@@ -733,12 +747,57 @@
          
             
             <!-- Conditionally render grid-item -->
-            <div *ngIf="!showGrid" class="grid-item" tabindex="0"
-            style="background: linear-gradient(135deg, #43cea2, #185a9d); padding: 20px; border-radius: 8px; color: white; margin-top: 10px; cursor: pointer;"
-            (click)="openKPIModal(KPIModal,modal)" >
-         <div>Label</div>
-         <div class="value" tabindex="0">Value</div>
-       </div>
+            <div *ngIf="!showGrid" class="grid-container">
+              <div class="grid-item highlight" tabindex="0" (click)="openKPIModal(KPIModal,modal);modal.dismiss"  style="background: linear-gradient(to right, #ff7e5f, #feb47b); padding: 20px; border-radius: 8px; color: white;">
+                <div>Label</div>
+                <div class="value" tabindex="0">Value</div>
+              </div>
+              <div class="grid-item" tabindex="0" (click)="openKPIModal1(KPIModal1,modal);modal.dismiss" style="background: #3498db; padding: 20px; border-radius: 8px; color: white;">
+                <div>Label</div>
+                <div class="value" tabindex="0">Value</div>
+                <div tabindex="0">Label: Value 2</div>
+              </div>
+              <div class="grid-item" tabindex="0" (click)="openKPIModal2(KPIModal2,modal)" style="background: #e74c3c; padding: 20px; border-radius: 8px; color: white;">
+                <div>Label</div>
+                <div tabindex="0">Label: Value 2</div>
+                <div class="value" tabindex="0">Value</div>
+                <div>Label: Value 3</div>
+              </div>
+              <div class="grid-item" tabindex="0" (click)="openKPIModal3(KPIModal3,modal)" style="background: #8e44ad; padding: 20px; border-radius: 8px; color: white;">
+                <div>Label</div>
+                <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
+              </div>
+              <div class="grid-item" tabindex="0" (click)="openKPIModal4(KPIModal4,modal)" style="background: #2ecc71; padding: 20px; border-radius: 8px; color: white;">
+                <div>Label</div>
+                <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
+                <div>Label: Value 2</div>
+              </div>
+              <div class="grid-item" tabindex="0" (click)="openKPIModal5(KPIModal5,modal)" style="background: #2a3439; padding: 20px; border-radius: 8px; color: white;">
+                <div>Label</div>
+                <div tabindex="0">Label: Value 2</div>
+                <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
+                <div>Label: Value 3</div>
+              </div>
+              <!-- <div class="grid-item" tabindex="0" (click)="openChartModal1(ChartModal1,modal)" style="background: #2a3439; padding: 20px; border-radius: 8px; color: white;">
+                <div>Label</div>
+                <div tabindex="0">Label: Value 2</div>
+                <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
+                <div>Label: Value 3</div>
+              </div> -->
+        
+            
+            
+              
+              <!-- <div class="grid-item" tabindex="0" style="background-color: rgb(135, 222, 222);">
+                <h1>Coming Soon</h1>
+              </div>
+              <div class="grid-item" tabindex="0" style="background-color: burlywood;">
+                <h1>Coming Soon</h1>
+              </div>
+              <div class="grid-item" tabindex="0" style="background-color: rgb(222, 135, 176);">
+                <h1>Coming Soon</h1>
+              </div> -->
+            </div>
        
           </div>
           

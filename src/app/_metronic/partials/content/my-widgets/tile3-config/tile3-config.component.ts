@@ -59,6 +59,8 @@ export class Tile3ConfigComponent implements OnInit{
   dashboardIdsList: any;
 
   p1ValuesSummary: any;
+  selectedParameterValue: string;
+  parameterNameRead: any;
 
   ngOnInit(){
     this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
@@ -189,7 +191,11 @@ export class Tile3ConfigComponent implements OnInit{
       fontSize: [14, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['#000000', Validators.required], 
       dashboardIds:[''],
-      selectType:['']
+      selectType:[''],
+      filterParameter:[''],
+      filterDescription:[''],
+      selectedRangeType:['']
+
     })
   }
 
@@ -233,6 +239,10 @@ if (key === 'tile3') {
        dashboardIds:this.createKPIWidget2.value.dashboardIds,
 
        selectType:this.createKPIWidget2.value.selectType,
+       filterParameter:this.createKPIWidget2.value.filterParameter,
+       filterDescription:this.createKPIWidget2.value.filterDescription,
+       selectedRangeType:this.createKPIWidget2.value.selectedRangeType,
+       parameterNameRead: this.parameterNameRead, 
        // Default value, change this to whatever you prefer
        // You can also handle default value for this if needed
 
@@ -296,89 +306,92 @@ if (key === 'tile3') {
   
   
   }
-  updateTile2(key:any) {
+  updateTile2(key: any) {
     if (this.editTileIndex2 !== null) {
       console.log('this.editTileIndex check', this.editTileIndex2);
-      console.log('Tile checking for update:', this.dashboard[this.editTileIndex2]); // Log the tile being checked
-
-      // Log the current details of the tile before update
-      console.log('Current Tile Details Before Update:', this.dashboard[this.editTileIndex2]);
-      let multiValueArray = this.dashboard[this.editTileIndex2].multi_value || [];
-      const processedValue = this.createKPIWidget2.value.processed_value || ''; // Get updated processed_value from the form
-      const constantValue = this.createKPIWidget2.value.constantValue || 0; // Get updated constantValue from the form
+      console.log('Tile checking for update:', this.dashboard[this.editTileIndex2]);
+  
+      const multiValue = this.dashboard[this.editTileIndex2].multi_value || [];
+      const processedValue = this.createKPIWidget2.value.processed_value || ''; // Form value
+      const constantValue = this.createKPIWidget2.value.constantValue || 0;
       const secondaryValue = this.createKPIWidget2.value.secondaryValue || '';
       const secondaryValueNested = this.createKPIWidget2.value.secondaryValueNested || '';
-      const primaryValue = this.createKPIWidget2.value.primaryValue || '';
-      if (multiValueArray.length > 1) {
-    // Update processed_value at index 1
-        multiValueArray[0].constantValue = constantValue; // Update constantValue at index 0
-        multiValueArray[1].value = secondaryValue;
-        multiValueArray[2].value = secondaryValueNested
-
-        // Update secondaryValue at index 1
+      const primaryValue = this.createKPIWidget2.value.primaryValue || multiValue[0]?.value || ''; // Ensure it gets value from form or multi_value[0]
+  
+      console.log('Extracted primaryValue:', primaryValue);
+      console.log('Form Value for processed_value:', processedValue);
+      console.log('Form Value for constantValue:', constantValue);
+  
+      // Update multi_value array
+      if (multiValue.length > 1) {
+        multiValue[0].constantValue = constantValue;
+        multiValue[0].value = primaryValue; // Sync primaryValue to multi_value[0]
+        multiValue[1].value = secondaryValue;
+        multiValue[2].value = secondaryValueNested;
       } else {
-        // If multi_value array doesn't have enough elements, ensure it's structured correctly
-        // Ensure at least two objects are created with the correct structure
-
-      
-        multiValueArray.push({ constantValue: constantValue });
-        multiValueArray.push({ secondaryValue: secondaryValue });
-        multiValueArray.push({ secondaryValueNested: secondaryValueNested })
-
-
+        // If multi_value is not enough, ensure it's structured correctly
+        multiValue.push({ constantValue: constantValue, value: primaryValue });
+        multiValue.push({ value: secondaryValue });
+        multiValue.push({ value: secondaryValueNested });
       }
+  
       const fontSizeValue = `${this.createKPIWidget2.value.fontSize}px`;
-      // Update the properties of the tile with the new values from the form
-      this.dashboard[this.editTileIndex2] = {
+  
+      // Prepare the updated tile object
+      const updatedTile = {
         ...this.dashboard[this.editTileIndex2], // Keep existing properties
         formlist: this.createKPIWidget2.value.formlist,
         parameterName: this.createKPIWidget2.value.parameterName,
+        primaryValue: primaryValue, // Use updated primaryValue
         groupBy: this.createKPIWidget2.value.groupBy,
-        primaryValue: this.createKPIWidget2.value.primaryValue,
         groupByFormat: this.createKPIWidget2.value.groupByFormat,
-        constantValue: this.createKPIWidget2.value.constantValue,
-        secondaryValue: this.createKPIWidget2.value.secondaryValue,
-        secondaryValueNested: this.createKPIWidget2.value.secondaryValueNested,
+        constantValue: constantValue, // Use updated constantValue
+        processed_value: processedValue, // Use updated processed_value
+        multi_value: multiValue, // Update multi_value array
+        selectedRangeType: this.createKPIWidget2.value.selectedRangeType,
+        startDate: this.createKPIWidget2.value.startDate,
+        endDate: this.createKPIWidget2.value.endDate,
         themeColor: this.createKPIWidget2.value.themeColor,
         fontSize: fontSizeValue,
         fontColor: this.createKPIWidget2.value.fontColor,
-        dashboardIds:this.createKPIWidget2.value.dashboardIds,
-
-        selectType:this.createKPIWidget2.value.selectType,
-       
-
-        // Include any additional properties if needed
+        selectFromTime: this.createKPIWidget2.value.selectFromTime,
+        selectToTime: this.createKPIWidget2.value.selectToTime,
+        dashboardIds: this.createKPIWidget2.value.dashboardIds,
+        selectType: this.createKPIWidget2.value.selectType,
+        filterParameter: this.createKPIWidget2.value.filterParameter,
+        filterDescription: this.createKPIWidget2.value.filterDescription,
+        parameterNameRead: this.parameterNameRead,
       };
-
-      // Log the updated details of the tile
-      console.log('Updated Tile Details:', this.dashboard[this.editTileIndex2]);
-
-      // Also update the grid_details array to reflect changes
-      this.all_Packet_store.grid_details[this.editTileIndex2] = {
-        ...this.all_Packet_store.grid_details[this.editTileIndex2], // Keep existing properties
-        ...this.dashboard[this.editTileIndex2], // Update with new values
-      };
-
+  
+      console.log('Updated tile:', updatedTile);
+  
+      // Update the dashboard array with the updated tile
+      this.dashboard = [
+        ...this.dashboard.slice(0, this.editTileIndex2),
+        updatedTile,
+        ...this.dashboard.slice(this.editTileIndex2 + 1),
+      ];
+  
+      console.log('Updated dashboard:', this.dashboard);
+  
+      // Update grid_details and emit the event
+      this.all_Packet_store.grid_details[this.editTileIndex2] = { ...this.all_Packet_store.grid_details[this.editTileIndex2], ...updatedTile };
       this.grid_details = this.dashboard;
-     
       this.dashboardChange.emit(this.grid_details);
   
-      if(this.grid_details)
-        {
-          this.updateSummary('update_tile')
-        }
-   
-      console.log('his.dashboard check from updateTile', this.dashboard)
-
-      console.log("Updated all_Packet_store.grid_details:", this.all_Packet_store.grid_details);
-
-
-      // Reset the editTileIndex after the update
+      if (this.grid_details) {
+        this.updateSummary('update_tile');
+      }
+  
+      // Reset editTileIndex after the update
       this.editTileIndex2 = null;
     } else {
-      console.error("Edit index is null. Unable to update the tile.");
+      console.error('Edit index is null. Unable to update the tile.');
     }
   }
+  
+  
+  
 
 
   showValues = [
@@ -388,12 +401,13 @@ if (key === 'tile3') {
     { value: 'average', text: 'Average' },
     { value: 'latest', text: 'Latest' },
     { value: 'previous', text: 'Previous' },
-    { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
-    { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
-    { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
-    { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
+    // { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
+    // { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
+    // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
+    // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
     { value: 'Constant', text: 'Constant' },
     { value: 'Live', text: 'Live' },
+    { value: 'Count', text: 'Count' },
 
   ]
 
@@ -408,6 +422,22 @@ if (key === 'tile3') {
 
     // Add more hardcoded options as needed
   ];
+  dateRangeLabel =[
+    { value: 'Today', text: 'Today' },
+    { value: 'Yesterday', text: 'Yesterday' },
+    { value: 'Last 7 Days', text: 'Last 7 Days' },
+    { value: 'Last 30 Days', text: 'Last 30 Days' },
+    { value: 'This Month', text: 'This Month' },
+    { value: 'Last Month', text: 'Last Month' },
+    { value: 'This Year', text: 'This Year' },
+    { value: 'Last Year', text: 'Last Year' },
+    
+  ]
+  parameterValue(event:any){
+    console.log('event for parameter check',event)
+    this.parameterNameRead = event[0].text
+
+  }
 
   fetchDynamicFormData(value: any) {
     console.log("Data from lookup:", value);
@@ -418,11 +448,13 @@ if (key === 'tile3') {
         if (result && result.metadata) {
           const parsedMetadata = JSON.parse(result.metadata);
           const formFields = parsedMetadata.formFields;
+          console.log('formFields check',formFields)
 
           // Initialize the list with formFields labels
           this.listofDynamicParam = formFields.map((field: any) => {
+            console.log('field check',field)
             return {
-              value: field.label,
+              value: field.name,
               text: field.label
             };
           });
@@ -463,6 +495,36 @@ if (key === 'tile3') {
     } else {
       console.error('Event data is not in the expected format:', event);
     }
+  }
+
+  dynamicparameterValue(event: any): void {
+    console.log('event check for dynamic param',event)
+    console.log('event[0].text check',event[0].text)
+    const filterParameter=this.createKPIWidget2.get('filterParameter')
+    console.log('filterParameter check',filterParameter)
+    if (event && event[0] && event[0].text) {
+    if(filterParameter){
+
+      filterParameter.setValue(event[0].text)
+      this.cdr.detectChanges();   
+    }
+  }else{
+    console.log('failed to set value')
+  }
+   
+
+    if (event && event[0].value) {
+      // Format the value as ${field-key}
+      const formattedValue = "${"+event[0].value+"}"; 
+      console.log('formattedValue check',formattedValue) // You can customize the formatting as needed
+      this.selectedParameterValue = formattedValue;
+
+  
+      console.log('Formatted Selected Item:', this.selectedParameterValue);
+    } else {
+      console.log('Event structure is different:', event);
+    }
+
   }
 
   onColorChange2(event: Event) {
@@ -528,7 +590,7 @@ edit_Tile3(tile?: any, index?: number) {
       }
 
       // Extract values for primaryValue, secondaryValue, and secondaryValueNested from parsed multi_value
-      const primaryValue = parsedMultiValue[0]?.value || ''; // Assuming value corresponds to primaryValue
+      const value = parsedMultiValue.length > 0 ? parsedMultiValue[0]?.value || '' : ''; // Assuming value corresponds to primaryValue
       const constantValue = parsedMultiValue[0]?.constantValue || 0; // Assuming constantValue is in the first item
       const secondaryValue = parsedMultiValue[1]?.value || ''; // Assuming value corresponds to secondaryValue
       const secondaryValueNested = parsedMultiValue[2]?.value || ''; // Assuming value corresponds to secondaryValueNested
@@ -541,7 +603,7 @@ edit_Tile3(tile?: any, index?: number) {
         formlist: tile.formlist,
         parameterName: tile.parameterName,
         groupBy: tile.groupBy,
-        primaryValue: primaryValue, // Set the primaryValue
+        primaryValue: value, // Set the primaryValue
         groupByFormat: tile.groupByFormat,
         constantValue: constantValue, // Set the constantValue
         secondaryValue: secondaryValue, // Set the secondaryValue
@@ -551,7 +613,10 @@ edit_Tile3(tile?: any, index?: number) {
         fontSize: fontSizeValue, // Preprocessed fontSize value
         fontColor: tile.fontColor,
         dashboardIds:tile.dashboardIds,
-        selectType:tile.selectType
+        selectType:tile.selectType,
+        filterParameter:tile.filterParameter,
+        filterDescription:tile.filterDescription,
+        selectedRangeType:tile.selectedRangeType
 
       });
 
@@ -575,6 +640,21 @@ edit_Tile3(tile?: any, index?: number) {
     }
 
 
+  }
+
+
+  onAdd(): void {
+    // Set the `selectedParameterValue` to the `name` of the selected parameter
+    this.selectedParameterValue = this.selectedParameterValue;
+    console.log('this.selectedParameterValue check',this.selectedParameterValue)
+  
+    // Update the form control value for filterDescription
+    this.createKPIWidget2.patchValue({
+      filterDescription: `${this.selectedParameterValue}`,
+    });
+  
+    // Manually trigger change detection to ensure the UI reflects the changes
+    this.cdr.detectChanges();
   }
   handleModalClose(selectedValue: string) {
     // Logic to handle what happens after the modal closes

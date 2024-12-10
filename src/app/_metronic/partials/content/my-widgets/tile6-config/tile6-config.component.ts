@@ -51,7 +51,9 @@ export class Tile6ConfigComponent implements OnInit{
   showIdField = false;
   dashboardIdsList: any;
   p1ValuesSummary: any;
-
+  shouldShowProcessedValue: boolean = false;
+  selectedParameterValue: string;
+  parameterNameRead: any;
 
 ngOnInit(){
   this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
@@ -221,7 +223,13 @@ constructor(private summaryConfiguration: SharedService,private api: APIService,
         fontSize: fontSizeValue, // Preprocessed fontSize value
         fontColor: tile.fontColor,
         dashboardIds:tile.dashboardIds,
-        selectType:tile.selectType
+        selectType:tile.selectType,
+        filterParameter:tile.filterParameter,
+        filterDescription:tile.filterDescription,
+        selectedRangeType:tile.selectedRangeType
+
+
+
 
 
       });
@@ -283,13 +291,18 @@ constructor(private summaryConfiguration: SharedService,private api: APIService,
       'secondaryValue': ['', Validators.required],
       'secondaryValueNested': ['', Validators.required],
       widgetid: [this.generateUniqueId()],
-      'processed_value': ['', Validators.required],
+      'processed_value': [''],
+      'processed_value1': [''],
+      'processed_value2': [''],
       // selectedColor: [this.selectedColor]
       'themeColor': ['', Validators.required],
       fontSize: [14, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['#000000', Validators.required], 
       dashboardIds:[''],
-      selectType:['']
+      selectType:[''],
+      filterParameter:[''],
+      filterDescription:[''],
+      selectedRangeType:['']
     })
   }
   generateUniqueId(): number {
@@ -303,14 +316,20 @@ constructor(private summaryConfiguration: SharedService,private api: APIService,
     { value: 'average', text: 'Average' },
     { value: 'latest', text: 'Latest' },
     { value: 'previous', text: 'Previous' },
-    { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
-    { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
-    { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
-    { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
+    // { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
+    // { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
+    // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
+    // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
     { value: 'Constant', text: 'Constant' },
     { value: 'Live', text: 'Live' },
+    { value: 'Count', text: 'Count' },
   
   ]
+  parameterValue(event:any){
+    console.log('event for parameter check',event)
+    this.parameterNameRead = event[0].text
+  
+  }
 
   SelectTypeSummary =[
     { value: 'NewTab', text: 'New Tab' },
@@ -338,11 +357,13 @@ constructor(private summaryConfiguration: SharedService,private api: APIService,
         if (result && result.metadata) {
           const parsedMetadata = JSON.parse(result.metadata);
           const formFields = parsedMetadata.formFields;
+          console.log('formFields check',formFields)
   
           // Initialize the list with formFields labels
           this.listofDynamicParam = formFields.map((field: any) => {
+            console.log('field check',field)
             return {
-              value: field.label,
+              value: field.name,
               text: field.label
             };
           });
@@ -416,7 +437,7 @@ constructor(private summaryConfiguration: SharedService,private api: APIService,
       const secondaryValueNested = this.createKPIWidget5.value.secondaryValueNested || '';
       const primaryValue = this.createKPIWidget5.value.primaryValue || '';
       if (multiValueArray.length > 1) {
-        multiValueArray[3].processed_value = processedValue; // Update processed_value at index 1
+      // Update processed_value at index 1
         multiValueArray[0].constantValue = constantValue; // Update constantValue at index 0
         multiValueArray[1].value = secondaryValue;
         multiValueArray[2].value = secondaryValueNested
@@ -426,7 +447,7 @@ constructor(private summaryConfiguration: SharedService,private api: APIService,
         // If multi_value array doesn't have enough elements, ensure it's structured correctly
         // Ensure at least two objects are created with the correct structure
 
-        multiValueArray.push({ processed_value: processedValue });
+      
         multiValueArray.push({ constantValue: constantValue });
         multiValueArray.push({ secondaryValue: secondaryValue });
         multiValueArray.push({ secondaryValueNested: secondaryValueNested })
@@ -449,7 +470,11 @@ constructor(private summaryConfiguration: SharedService,private api: APIService,
         fontSize: fontSizeValue,
         fontColor: this.createKPIWidget5.value.fontColor,
         dashboardIds:this.createKPIWidget5.value.dashboardIds,
-        selectType:this.createKPIWidget5.value.selectType
+        selectType:this.createKPIWidget5.value.selectType,
+        filterParameter:this.createKPIWidget5.value.filterParameter,
+        filterDescription:this.createKPIWidget5.value.filterDescription,
+        selectedRangeType:this.createKPIWidget5.value.selectedRangeType,
+
 
 
         // Include any additional properties if needed
@@ -544,6 +569,48 @@ constructor(private summaryConfiguration: SharedService,private api: APIService,
     // Update summary to handle the addition of the duplicated tile
     this.updateSummary('add_tile');
   }
+
+  dynamicparameterValue(event: any): void {
+    console.log('event check for dynamic param',event)
+    console.log('event[0].text check',event[0].text)
+    const filterParameter=this.createKPIWidget5.get('filterParameter')
+    console.log('filterParameter check',filterParameter)
+    if (event && event[0] && event[0].text) {
+    if(filterParameter){
+  
+      filterParameter.setValue(event[0].text)
+      this.cdr.detectChanges();   
+    }
+  }else{
+    console.log('failed to set value')
+  }
+   
+  
+    if (event && event[0].value) {
+      // Format the value as ${field-key}
+      const formattedValue = "${"+event[0].value+"}"; 
+      console.log('formattedValue check',formattedValue) // You can customize the formatting as needed
+      this.selectedParameterValue = formattedValue;
+  
+  
+      console.log('Formatted Selected Item:', this.selectedParameterValue);
+    } else {
+      console.log('Event structure is different:', event);
+    }
+  
+  }
+
+  dateRangeLabel =[
+    { value: 'Today', text: 'Today' },
+    { value: 'Yesterday', text: 'Yesterday' },
+    { value: 'Last 7 Days', text: 'Last 7 Days' },
+    { value: 'Last 30 Days', text: 'Last 30 Days' },
+    { value: 'This Month', text: 'This Month' },
+    { value: 'Last Month', text: 'Last Month' },
+    { value: 'This Year', text: 'This Year' },
+    { value: 'Last Year', text: 'Last Year' },
+    
+  ]
   addTile(key: any) {
 
 
@@ -579,6 +646,10 @@ constructor(private summaryConfiguration: SharedService,private api: APIService,
        fontColor: this.createKPIWidget5.value.fontColor,
        dashboardIds:this.createKPIWidget5.value.dashboardIds,
        selectType: this.createKPIWidget5.value.selectType,
+       filterParameter:this.createKPIWidget5.value.filterParameter,
+       filterDescription:this.createKPIWidget5.value.filterDescription,
+       selectedRangeType:this.createKPIWidget5.value.selectedRangeType,
+       parameterNameRead:this.parameterNameRead,
 
        // Default value, change this to whatever you prefer
        // You can also handle default value for this if needed
@@ -590,19 +661,19 @@ constructor(private summaryConfiguration: SharedService,private api: APIService,
            constantValue: this.createKPIWidget5.value.constantValue !== undefined && this.createKPIWidget5.value.constantValue !== null
              ? this.createKPIWidget5.value.constantValue
              : 0,
+             processed_value: this.createKPIWidget5.value.processed_value || '',
          },
          {
            value: this.createKPIWidget5.value.secondaryValue, // Change secondaryValue to value
+           processed_value: this.createKPIWidget5.value.processed_value1 || '',
 
          },
          {
-           value: this.createKPIWidget5.value.secondaryValueNested
+           value: this.createKPIWidget5.value.secondaryValueNested,
+           processed_value: this.createKPIWidget5.value.processed_value2 || '',
 
 
-         }, {
-
-           processed_value: this.createKPIWidget5.value.processed_value || '',
-         }
+         }, 
 
        ],
      };
@@ -629,6 +700,19 @@ constructor(private summaryConfiguration: SharedService,private api: APIService,
      });
 
    }
+  }
+  onAdd(): void {
+    // Set the `selectedParameterValue` to the `name` of the selected parameter
+    this.selectedParameterValue = this.selectedParameterValue;
+    console.log('this.selectedParameterValue check',this.selectedParameterValue)
+  
+    // Update the form control value for filterDescription
+    this.createKPIWidget5.patchValue({
+      filterDescription: `${this.selectedParameterValue}`,
+    });
+  
+    // Manually trigger change detection to ensure the UI reflects the changes
+    this.cdr.detectChanges();
   }
   get groupByFormatControl5(): FormControl {
     return this.createKPIWidget5.get('groupByFormat') as FormControl; // Cast to FormControl

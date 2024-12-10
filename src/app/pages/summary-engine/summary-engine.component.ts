@@ -139,6 +139,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   chartWidth: any[]=[];
   disableMenuQP: boolean = false;
   viewModeQP: boolean = false;
+  tilesListDefault: string;
+  defaultValue: string;
 
 
 
@@ -557,7 +559,19 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   selectedTabset: string = 'dataTab';
   @ViewChild('bulletChart') bulletChart: ElementRef;
   isFullScreen = false; // Track the fullscreen state
+
   isFullView = false;   // Track if the icon is in full view mode
+
+  isLoading = false; // Add loading state
+
+  reloadPage() {
+    this.isLoading = true;  // Set loading state to true
+    this.spinner.show();     // Show the spinner
+
+    setTimeout(() => {
+      window.location.reload();  // Reload the page
+    }, 2000);  // Adjust delay to show spinner for a brief moment
+  }
 
   toggleFullView() {
     this.isFullScreen = !this.isFullScreen;  // Toggle the full-screen state
@@ -1131,7 +1145,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     { value: 'option3', label: 'Option 3' },
   ];
   listofTiles = [
-    { value: 'Widget', label: 'Widget' },
+    { value: 'Tiles', label: 'Tiles' },
     { value: 'Title', label: 'Title' },
     { value: 'Chart', label: 'Chart' },
 
@@ -1149,7 +1163,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
 
 
       // Update visibility based on the selected tile
-      this.showGrid = this.selectedTile === 'Widget' || this.selectedTile === 'Title' || this.selectedTile === 'Chart';
+      this.showGrid = this.selectedTile === 'Tiles' || this.selectedTile === 'Title' || this.selectedTile === 'Chart';
 
      
       this.showTitleGrid = this.selectedTile === 'Title'; // Show specific grid for Title
@@ -1193,6 +1207,7 @@ setTimeout(() => {
   }
 
 
+
   isSummaryEngine(): boolean {
     return this.router.url === '/summary-engine'; // Check if the current route is /summary-engine
   }
@@ -1205,6 +1220,24 @@ setTimeout(() => {
   }
 
   viewItem(id: string): void {
+    // Navigate to the desired rout
+    this.isFullScreen = !this.isFullScreen;  // Toggle the full-screen state
+    this.isFullView = !this.isFullView;      // Toggle the icon state (expand/compress)
+
+    // Save the state to localStorage
+    localStorage.setItem('isFullScreen', JSON.stringify(this.isFullScreen));
+    this.router.navigate([`/summary-engine/${id}`]);
+
+
+
+    // Set the state to Edit Mode
+    this.showModal = true; // Open modal in edit mode
+
+    // Open the modal with appropriate flag and content
+    // this.openModal('edit_ts', this.all_Packet_store, this.summaryModal);
+  }
+  
+  dashboardOpen(id: string): void {
     // Navigate to the desired rout
     this.isFullScreen = !this.isFullScreen;  // Toggle the full-screen state
     this.isFullView = !this.isFullView;      // Toggle the icon state (expand/compress)
@@ -1767,7 +1800,9 @@ setTimeout(() => {
       summaryID: '',
       summaryName: '',
       summarydesc: '',
-      iconSelect: ''
+      iconSelect: '',
+      
+      
     });
   
     // Open modal for new entry
@@ -1780,6 +1815,7 @@ setTimeout(() => {
       this.showHeading = false;
       this.showModal = true;
       this.cd.detectChanges();
+         this.tilesListDefault = 'Tiles'
 
       console.log('this.createSummaryField from editModal', this.createSummaryField);
 
@@ -1795,8 +1831,10 @@ setTimeout(() => {
         summaryID: getValues.summaryID,
         summaryName: getValues.summaryName,
         summarydesc: getValues.summaryDesc || '', // Default to empty string if summaryDesc is undefined
-        iconSelect: getValues.summaryIcon || ''  // Default to empty string if summaryIcon is undefined
+        iconSelect: getValues.summaryIcon || '',
+        tilesList:getValues.tilesList  // Default to empty string if summaryIcon is undefined
       });
+      this.cd.detectChanges(); 
     }
   }
 
@@ -1821,6 +1859,7 @@ setTimeout(() => {
     if (getValues) {
       this.showHeading = false;
       this.showModal = true;
+      this.tilesListDefault = 'Tiles'
 
       // Disable summaryID and set form values for editing
       this.createSummaryField.get('summaryID')?.disable();
@@ -1828,7 +1867,9 @@ setTimeout(() => {
         summaryID: getValues.summaryID,
         summaryName: getValues.summaryName,
         summarydesc: getValues.summaryDesc,
-        iconSelect: getValues.summaryIcon  // Assign the entire icon object here
+        iconSelect: getValues.summaryIcon,
+        tilesList:this.tilesListDefault
+          // Assign the entire icon object here
       });
       console.log('this.createSummaryField from editModal', this.createSummaryField);
       if (typeof getValues.iconObject == "string") {
@@ -1904,7 +1945,10 @@ setTimeout(() => {
       'summaryID': ['', Validators.required],
       'summaryName': ['', Validators.required],
       'summarydesc': ['', Validators.required],
-      'iconSelect': [[], Validators.required]
+      'iconSelect': [[], Validators.required],
+      'tilesList':['Tiles']
+
+     
 
     })
   }
@@ -2208,6 +2252,7 @@ setTimeout(() => {
 
 
   createNewSummary() {
+    this.defaultValue = 'Tiles'
     if (this.isDuplicateID || this.isDuplicateName || this.createSummaryField.invalid) {
       return; // Prevent saving if there are errors
     }
@@ -2258,8 +2303,14 @@ setTimeout(() => {
         updated: updatedDateISO,   // Updated date in ISO format
         createdUser: this.allCompanyDetails.createdUser, // Use the persisted createdUser
         iconObject: this.allCompanyDetails.iconObject,
+        tilesList:this.defaultValue 
+
       })
     };
+    // Now, patch the 'tilesList' form control after creating the summary
+this.createSummaryField.patchValue({
+  tilesList: this.defaultValue // Set the value to 'Widget'
+});
 
     console.log("TempObj is here ", tempObj);
     const temobj1: any = JSON.stringify(this.createSummaryField.value.iconSelect)
@@ -2304,7 +2355,7 @@ setTimeout(() => {
           if (result.isConfirmed) {
             // This block is executed when the "OK" button is clicked
             if (items && items.P1) {
-              this.viewItem(items.P1);
+              this.dashboardOpen(items.P1);
           // Pass item.P1 to viewItem
             }
             if (this.modalRef) {

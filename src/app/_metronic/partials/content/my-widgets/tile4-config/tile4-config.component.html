@@ -7,12 +7,18 @@
       <div class="modal-body">
         <div class="card-body pt-0">
           <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap" id="myTab_settings1" role="tablist">
-            <div class="col-6" role="Data">
+            <div class="col-4" role="Data">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab" aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Data</a>
               </li>
             </div>
-            <div class="col-6" role="Settings">
+            <div class="col-4" role="Filter">
+              <li class="nav-item">
+                <a class="nav-link text-active-primary me-6" id="filter-tab" data-bs-toggle="tab" role="tab"
+                  aria-controls="filter-tab" aria-selected="false" (click)="selectedSettingsTab('filter-tab')">Filter</a>
+              </li>
+            </div>
+            <div class="col-4" role="Settings">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="settings-tabpane" data-bs-toggle="tab" role="tab" aria-controls="settings-tab" aria-selected="false" (click)="selectedSettingsTab('settings-tab')">Settings</a>
               </li>
@@ -46,6 +52,7 @@
                 optionValueField="value"
                 optionTextField="text"
                 placeholder="Select Parameter"
+                (selectionChanges)="parameterValue($event)"
                 style="width: 100%;">
               </ngx-select>
             </div>
@@ -171,7 +178,7 @@
                     />
                   </div>
     
-                  <div class="col-md-4" >
+                  <div class="col-md-4" *ngIf="shouldShowProcessedValue">
                     <label for="constant" class="col-form-label fw-bold fs-6 required">Processed Value</label>
                     <input
                       type="text"
@@ -180,7 +187,40 @@
                       formControlName="processed_value"
                     />
                   </div>
+                  <div class="col-md-4"  *ngIf="shouldShowProcessedValue">
+                    <label for="constant" class="col-form-label fw-bold fs-6 required">Processed Value</label>
+                    <input
+                      type="text"
+                      class="form-control form-control-solid"
+                      placeholder="Select Processed Value"
+                      formControlName="processed_value1"
+                    />
+                  </div>
+                  <div class="col-md-4"  *ngIf="shouldShowProcessedValue">
+                    <label for="constant" class="col-form-label fw-bold fs-6 required">Processed Value</label>
+                    <input
+                      type="text"
+                      class="form-control form-control-solid"
+                      placeholder="Select Processed Value"
+                      formControlName="processed_value2"
+                    />
+                  </div>
 
+                  <div class="col-md-4 mb-3">
+                    <label  class="col-form-label fw-bold fs-6 required">Date Range Label</label>
+                    <ngx-select
+                    id="selectedRangeType"
+                    [allowClear]="true"
+                    formControlName="selectedRangeType"
+                    [items]="dateRangeLabel"
+                    optionValueField="value"
+                    optionTextField="text"
+                    placeholder="Select Group"
+            
+                    class="w-100"
+             
+                  ></ngx-select>
+                  </div>
                   <div class="col-md-4 mb-3">
                     <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Summary Dashboard Id</label>
                     <ngx-select
@@ -215,6 +255,51 @@
           
           </div>
           </div>
+
+          <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'filter-tab'}" id="filter-tab"
+          role="tabpanel" aria-labelledby="filter-tabpane">
+      
+          
+          <div class="row">
+   
+            
+            <div class="col-md-5 mb-3">
+              <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Parameter</label>
+              <ngx-select
+              id="parameterName"
+              [allowClear]="true"
+              formControlName="filterParameter"
+              [items]="listofDynamicParam"
+              optionValueField="value"
+              optionTextField="text"
+              placeholder="Select Parameter"
+              (selectionChanges)="dynamicparameterValue($event)"
+              style="width: 100%;"
+            ></ngx-select>
+            
+            </div>
+        
+            <div class="col-md-2 mb-3 d-flex align-items-end">
+              <button type="button" class="btn btn-primary w-100" (click)="onAdd()">Add</button>
+            </div>
+          </div>
+        
+          <div class="col-md-12 mb-3">
+            <label for="description" class="col-createChart-label fw-bold fs-6">Description</label>
+            <textarea
+            id="description"
+            formControlName="filterDescription"  
+            class="form-control"
+            rows="3"
+            placeholder="Enter description"
+           
+          >{{ selectedParameterValue }}</textarea>
+          </div>
+
+
+        
+          
+        </div>
     
           <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab" role="tabpanel" aria-labelledby="settings-tabpane">
             <!-- Themes Section -->

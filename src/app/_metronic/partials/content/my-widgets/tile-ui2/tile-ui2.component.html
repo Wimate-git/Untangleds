@@ -10,19 +10,19 @@
    
   
          [style.color]="item.fontColor" style=" font-weight: bold; margin-bottom: 10px;">
-          {{ item.parameterName }}
+          {{ item.parameterNameRead }}
         </div>
         <div      [style.font-size]="item.fontSize" 
    
   
         [style.color]="item.fontColor"class="value" tabindex="0" style=" font-weight: bold; color: #333333;">
-          {{ item.multi_value[2]?.processed_value }} <!-- Access the second element in multi_value array -->
+          {{ item.multi_value[0]?.processed_value }} <!-- Access the second element in multi_value array -->
         </div>
         <div     [style.font-size]="item.fontSize" 
    
   
         [style.color]="item.fontColor"class="value" tabindex="0" style=" font-weight: bold; color: #333333;">
-          {{ item.multi_value[1]?.value }} <!-- Access the second element in multi_value array -->
+          {{ item.multi_value[1]?.value }}:{{ item.multi_value[1]?.processed_value }} <!-- Access the second element in multi_value array -->
         </div>
          </div>
         <div 
