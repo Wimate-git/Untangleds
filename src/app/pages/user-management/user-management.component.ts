@@ -81,6 +81,8 @@ export class UserManagementComponent implements OnInit{
   errorForUniqueEmail:any = ''
   errorForInvalidEmail:any = ''
 
+  dynamicIDArray:any = ['None']
+
 
   //Swal need to be added
   @ViewChild('noticeSwal')
@@ -161,6 +163,8 @@ rdtListWorkAround :any =[{
   adminLogin:boolean = false
   Allpermission: any;
   cloneUserOperation: boolean = false;
+  redirectionURL: string = '';
+  lookup_All_temp: any = [];
 
   constructor(private apiService: UserService,private configService:SharedService,private fb:FormBuilder
     ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal,private DynamicApi:DynamicApiService,
@@ -993,58 +997,13 @@ rdtListWorkAround :any =[{
         text: '',
     };
 
-    //for editing reading Device type fields
+
 
     let updateDevice_type: any = [];
     let updateDevice: any = [];
     let updateLocation :any = [];
 
-    // if(value.device_type_permission.length <= 0 || value.device_permission.length <= 0 || value.location_permission.length <= 0){
-    //   return Swal.fire({title:'Fill all the Permission Required Fields'})
-    // }
-
-
-
-    // try{
-    //   for (let temp = 0; temp < value.device_type_permission.length; temp++) {
-    //     if (value.device_type_permission && value.device_type_permission[temp].value) {
-    //       updateDevice_type.push(value.device_type_permission[temp].value.split("-")[0])
-    //     }
-  
-    //     else {
-    //       updateDevice_type.push(value.device_type_permission[temp].split("-")[0])
-    //     }
-  
-    //   }
-    // }
-    // catch(err){
-    //   console.log("Error populating device_type_permission",err);
-    // }
    
-
-
-    // for (let temp = 0; temp < value.device_permission.length; temp++) {
-    //   if (value.device_permission && value.device_permission[temp].value) {
-    //     updateDevice.push(value.device_permission[temp].value.split("-")[0])
-    //   }
-
-    //   else {
-    //     updateDevice.push(value.device_permission[temp].split("-")[0])
-    //   }
-
-    // }
-
-    // for (let temp = 0; temp < value.location_permission.length; temp++) {
-    //   if (value.location_permission && value.location_permission[temp].value) {
-    //     updateLocation.push(value.location_permission[temp].value.split("-")[0])
-    //   }
-
-    //   else {
-    //     updateLocation.push(value.location_permission[temp])
-    //   }
-
-    // }
-
     let companyidTemp = '';
     if(this.createUserField.value.allowNewCompanyID == null || this.createUserField.value.allowNewCompanyID == false){
       console.log("Iam entered in the companyID disable :",this.createUserField.get('disabled_companyid')?.value);
@@ -1075,6 +1034,9 @@ rdtListWorkAround :any =[{
     var tempObj:any;
 
     if (key == "editUser") {
+
+      this.dynamicRedirectChanged(this.createUserField.value.location_object)
+
       this.allUserDetails = {
      
         userID: this.createUserField.value.userID,
@@ -1116,6 +1078,7 @@ rdtListWorkAround :any =[{
         device_timeout: this.createUserField.value.device_timeout == null ? false : this.createUserField.value.device_timeout,
         alert_timeout: this.createUserField.value.alert_timeout == null ? false : this.createUserField.value.alert_timeout,
         profile_picture: this.base64textString_temp,
+        redirectionURL:this.redirectionURL,
         location_object:this.createUserField.value.location_object,
         default_module:this.createUserField.value.default_module,
         updated: new Date()
@@ -1420,6 +1383,8 @@ rdtListWorkAround :any =[{
 
     if (key == "update") {
 
+      this.dynamicRedirectChanged(this.createUserField.value.location_object)
+
      
       this.allUserDetails = {
         userID: (this.createUserField.value.userID).toLowerCase(),
@@ -1462,9 +1427,13 @@ rdtListWorkAround :any =[{
         // device_timeout: this.createUserField.value.device_timeout == null ? false : this.createUserField.value.device_timeout,
         // alert_timeout: this.createUserField.value.alert_timeout == null ? false : this.createUserField.value.alert_timeout,
         profile_picture: this.base64textString_temp,
+        redirectionURL:this.redirectionURL,
         cognito_update: this.createUserField.value.cognito_update == null ? false : this.createUserField.value.cognito_update,
         updated: new Date()
       }
+
+
+      
 
 
       tempObj = {
@@ -2004,6 +1973,9 @@ rdtListWorkAround :any =[{
 
   openModal(getValues: any, getKey: any) {
 
+
+    this.redirectionURL = ''
+
     this.disableFields = false
 
     console.log("Openmodal value are here ",getValues);
@@ -2176,6 +2148,14 @@ rdtListWorkAround :any =[{
           'device_timeout': getValues.device_timeout,
           'alert_timeout': getValues.alert_timeout,
         })
+
+
+        this.redirectionURL = getValues.redirectionURL
+
+
+        this.dynamicRedirectID(getValues.default_module)
+
+
           console.log("Final thing on openModal :",this.createUserField.value);
         this.cd.detectChanges()
       }
@@ -3159,20 +3139,181 @@ rdtListWorkAround :any =[{
       
   }
 
-
-
-
-
-
   onModuleSelect(option: any) {
-
     const selectedValues = this.createUserField.get('location_permission')?.value;
-    console.log('Selected Location Permissions:', selectedValues);
+    console.log('Selected Location Permissions:', selectedValues);    
+  }
 
-    
+  dynamicRedirectChanged(event:any){
+
+    let eventData;
+    if(event && event.target && event.target.value){
+      eventData = event.target.value
+    }
+    else{
+      eventData = event
+    }
+
+     let dashUrl = '/dashboard'
+    let projecturl = '/project-dashboard'
+
+    const selectedModule = this.createUserField.get('default_module')?.value
+
+    console.log("iam triggered here ",selectedModule);
+
+    switch(selectedModule){
+      case 'Dashboard - Group':
+        this.redirectionURL =  dashUrl
+        this.dynamicIDArray = []
+        break;
+      case 'Project - Group':
+        this.redirectionURL = projecturl
+        this.dynamicIDArray = []
+        break
+      case 'Forms':
+        this.redirectionURL =  '/view-dreamboard/Forms/'+eventData
+        break;
+      case 'Summary Dashboard':
+        this.redirectionURL =  '/summary-engine/'+eventData
+        break;
+      case 'Dashboard':
+        this.redirectionURL =  '/dashboard/dashboardFrom/'+eventData
+        break;
+      case 'Projects':
+        this.redirectionURL =  '/project-dashboard/project-template-dashboard/'+eventData
+        break;
+      case 'Project - Detail':
+        this.redirectionURL =  '/view-dreamboard/Project%20Detail/'+eventData
+        break;
   }
   
+}
+
+
+
+fetchDynamicLookupData(pk:any,sk:any):any {
+  console.log("I am called Bro");
+  
+  return new Promise((resolve, reject) => {
+    this.api.GetMaster(pk, sk)
+      .then(response => {
+        if (response && response.options) {
+          // Check if response.options is a string
+          if (typeof response.options === 'string') {
+            let data = JSON.parse(response.options);
+            console.log("d1 =", data);
+            
+            if (Array.isArray(data)) {
+              const promises = []; // Array to hold promises for recursive calls
+
+              for (let index = 0; index < data.length; index++) {
+                const element = data[index];
+
+                if (element !== null && element !== undefined) {
+                  // Extract values from each element and push them to lookup_data_user
+                  const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
+                  const { P1, P2, P3, P4, P5 } = element[key]; // Extract values from the nested object
+                  this.lookup_All_temp.push({ P1, P2, P3, P4, P5}); // Push an array containing P1, P2, P3, P4, P5, P6
+                  console.log("d2 =", this.lookup_All_temp);
+                } else {
+                  break;
+                }
+              }
+
+              // Sort the lookup_data_user array based on P5 values in descending order
+              this.lookup_All_temp.sort((a: { P5: number; }, b: { P5: number; }) => b.P5 - a.P5);
+              console.log("Lookup sorting", this.lookup_All_temp);
+
+              // Continue fetching recursively
+              promises.push(this.fetchAllUsersData(sk + 1)); // Store the promise for the recursive call
+              
+              // Wait for all promises to resolve
+              Promise.all(promises)
+                .then(() => resolve(this.lookup_All_temp)) // Resolve with the final lookup data
+                .catch(reject); // Handle any errors from the recursive calls
+            } else {
+              console.error('Invalid data format - not an array.');
+              reject(new Error('Invalid data format - not an array.'));
+            }
+          } else {
+            console.error('response.options is not a string.');
+            reject(new Error('response.options is not a string.'));
+          }
+        } else {
+          console.log("All the users are here", this.lookup_All_temp);
+          resolve(this.lookup_All_temp); // Resolve with the current lookup data
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        reject(error); // Reject the promise on error
+      });
+  });
+}
+
+
+
+
+
+
+  async dynamicRedirectID(event:any){
+
+    console.log("Event is triggered");
+
+
+    let dashUrl = '/dashboard'
+    let projecturl = '/project-dashboard'
+
+    let eventData;
+    if(event && event.target && event.target.value){
+      eventData = event.target.value
+    }
+    else{
+      eventData = event
+    }
+
+    this.lookup_All_temp = []
   
 
+    switch(eventData){
+      case 'Dashboard - Group':
+        this.redirectionURL =  dashUrl
+        this.dynamicIDArray = []
+        break;
+      case 'Project - Group':
+        this.redirectionURL = projecturl
+        this.dynamicIDArray = []
+        break
+      case 'Forms':
+        this.dynamicIDArray = this.formList.filter((item:any)=>item != 'All')
+        break
+      case 'Summary Dashboard':
+        const result = await this.fetchDynamicLookupData(`${this.SK_clientID}#summary#lookup`,1)
+        this.dynamicIDArray = []
+        this.dynamicIDArray = result.map((item:any)=>item.P1)
+        break;
+      case 'Dashboard':
+        const result1 =  await this.fetchDynamicLookupData(`${this.SK_clientID}#formgroup#lookup`,1)
+        this.dynamicIDArray = []
+        this.dynamicIDArray = result1.map((item:any)=>item.P1)
+        break;
+      case 'Projects':
+        const result2 = await this.fetchDynamicLookupData(`${this.SK_clientID}#folder#lookup`,1)
+        this.dynamicIDArray = []
+        this.dynamicIDArray = result2.map((item:any)=>item.P1)
+        break;
+      case 'Project - Detail':
+        const result3 = await this.fetchDynamicLookupData(`${this.SK_clientID}#project#lookup`,1)
+        this.dynamicIDArray = []
+        this.dynamicIDArray = result3.map((item:any)=>item.P1)
+        break;
+      default:
+        this.dynamicIDArray = []
+        break
+    }
+
+
+    this.cd.detectChanges()
+  }
 
 } 

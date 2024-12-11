@@ -520,35 +520,37 @@
                                         <div class="container " id="SimpleJSTree"></div>
                                     </div>
         
-        
-                                    <div class="col-md-4">
-                                        <label class="fw-semibold fs-6 mb-2">
-                                            Redirection</label>
-                               
-                                        <input type="text" name="location_object" formControlName="location_object" class="
-                                       form-control form-control-lg form-control-solid
-                                       mb-3 mb-lg-0
-                                     ">
-                                      
-                                    </div>
-        
+
                                     <div class="col-md-4">
                                         <label class="fw-semibold fs-6 mb-2"> Default Module</label>
                                     
                                         <select class="form-select form-select-solid form-select-lg fw-bold"
                                             placeholder="select default module" name="default_module"
-                                            formControlName="default_module">
+                                            formControlName="default_module" (change)="dynamicRedirectID($event)" >
         
-                                            <option [value]="item" *ngFor="let item of ['MagicBoard','PowerBoard','DreamBoard']">
+                                            <option [value]="item" *ngFor="let item of ['None','Forms','Dashboard','Dashboard - Group','Summary Dashboard','Projects','Project - Group','Project - Detail']">
                                                 {{ item }}
                                             </option>
                                         </select>
                                     </div>
-        
 
-                                  
-                                  
         
+                                    <div class="col-md-4">
+                                        <label class="fw-semibold fs-6 mb-2">
+                                            Redirection ID</label>
+
+                                            <select class="form-select form-select-solid form-select-lg fw-bold"
+                                            placeholder="select default module" name="location_object"
+                                            formControlName="location_object" (change)="dynamicRedirectChanged($event)" >
+                                            
+                                            <option value="" disabled selected>Select ID</option>
+                                            <option [value]="item" *ngFor="let item of dynamicIDArray">
+                                                {{ item }}
+                                            </option>
+                                        </select>                   
+                                    </div>
+
+
         
                                 </div>
                             </div>

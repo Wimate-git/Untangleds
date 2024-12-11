@@ -179,6 +179,12 @@ export class LoginComponent implements OnInit, OnDestroy {
           }
 
 
+            //Redirection logic is here 
+            if(metaData && metaData.redirectionURL && metaData.redirectionURL != 'None'){
+              this.returnUrl = metaData.redirectionURL
+            }
+
+
           localStorage.setItem('userAttributes', JSON.stringify(metaData));
 
           if (result && result.metadata && result.metadata.profile_picture) {
