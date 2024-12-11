@@ -220,8 +220,8 @@ generateUniqueId(): number {
          id: uniqueId,
          x: 0,
          y: 0,
-         cols: 20,
-         rows: 20,
+         rows: 13,  // The number of rows in the grid
+         cols: 25, 
          rowHeight: 100,
          colWidth: 100,
          fixedColWidth: true,

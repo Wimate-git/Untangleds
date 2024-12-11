@@ -5,7 +5,13 @@
   
     transform: translate(50%, -50%);
   }
-
+  .processed-value-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Ensure it takes up full width of its parent */
+    height: auto; /* Remove 100% height to make it responsive */
+  }
   .grid-item-content {
     background-color: gray;
     color: white;

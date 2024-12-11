@@ -159,7 +159,7 @@ export class Tile1ConfigComponent implements OnInit {
     this.createKPIWidget = this.fb.group({
       formlist: ['', Validators.required],
       parameterName: ['', Validators.required],
-      groupBy: ['', Validators.required],
+      // groupBy: ['', Validators.required],
       primaryValue: ['', Validators.required],
       groupByFormat: ['', Validators.required],
       constantValue: [''],
@@ -171,7 +171,7 @@ export class Tile1ConfigComponent implements OnInit {
       selectedRangeType: ['',Validators.required],
       themeColor: ['', Validators.required],
       // New fields for font size and font color
-      fontSize: [14, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
+      fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['#000000', Validators.required], // Default to black
       selectFromTime:[''],
       selectToTime:[''],
@@ -279,8 +279,8 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         id: uniqueId,
         x: 0,
         y: 0,
-        rows: 20,  // The number of rows in the grid
-        cols: 20,  // The number of columns in the grid
+        rows: 13,  // The number of rows in the grid
+        cols: 25,  // The number of columns in the grid
         rowHeight: 100, // The height of each row in pixels
         colWidth: 100,  // The width of each column in pixels
         fixedColWidth: true,  // Enable fixed column widths
@@ -290,7 +290,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         selectToTime: this.createKPIWidget.value.selectToTime,
         formlist: this.createKPIWidget.value.formlist,
         parameterName: this.createKPIWidget.value.parameterName,
-        groupBy: this.createKPIWidget.value.groupBy,
+        // groupBy: this.createKPIWidget.value.groupBy,
         groupByFormat: this.createKPIWidget.value.groupByFormat,
         dashboardIds: this.createKPIWidget.value.dashboardIds,
         selectType:this.createKPIWidget.value.selectType,
@@ -378,7 +378,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         formlist: this.createKPIWidget.value.formlist,
         parameterName: this.createKPIWidget.value.parameterName,
         primaryValue: primaryValue, // Updated primaryValue from form or multi_value
-        groupBy: this.createKPIWidget.value.groupBy,
+        // groupBy: this.createKPIWidget.value.groupBy,
         groupByFormat: this.createKPIWidget.value.groupByFormat,
         constantValue: updatedConstantValue, // Use the updated constantValue
         processed_value: processedValue, // Use the updated processed_value
@@ -496,7 +496,7 @@ alert('cloned tile')
     clonedTile.fixedRowHeight = tile.fixedRowHeight;
     clonedTile.grid_type = tile.grid_type;
     clonedTile.formlist = tile.formlist;
-    clonedTile.groupBy = tile.groupBy;
+    // clonedTile.groupBy = tile.groupBy;
     clonedTile.groupByFormat = tile.groupByFormat;
     // clonedTile.predefinedSelectRange = tile.predefinedSelectRange;
     clonedTile.selectedRangeType = tile.selectedRangeType;
@@ -513,6 +513,7 @@ alert('cloned tile')
     this.dashboardChange.emit(this.grid_details);
 
     if(this.grid_details)
+      
       {
         alert('grid details is there')
         this.updateSummary('add_tile')
@@ -593,7 +594,7 @@ openKPIModal(tile: any, index: number) {
     this.createKPIWidget.patchValue({
       formlist: tile.formlist,
       parameterName: tile.parameterName,
-      groupBy: tile.groupBy,
+      // groupBy: tile.groupBy,
       primaryValue: value, // Set the 'value' extracted from multi_value as primaryValue
       groupByFormat: tile.groupByFormat,
       constantValue: constantValue, // Use the extracted constantValue

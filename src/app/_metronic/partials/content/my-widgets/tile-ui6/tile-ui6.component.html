@@ -6,40 +6,45 @@
   >
 
  <!-- Display the parameterName -->
- <div class="row text_3d" style="display: flex; flex-direction: column; align-items: flex-start;">
+ <div class="row text_3d" style="display: flex; flex-direction: column; align-items: center;">
+
+  <!-- Display the parameterName -->
   <div [style.font-size]="item.fontSize" 
-   
-  
-  [style.color]="item.fontColor" style=" font-weight: bold; ">
+       [style.color]="item.fontColor" 
+       style="font-weight: bold; margin-top: 6px; margin-bottom: 6px; text-align: center;">
     {{ item.parameterNameRead }}
   </div>
 
+  <!-- Display processed_value from multi_value[1] -->
   <div [style.font-size]="item.fontSize" 
-   
-  
-  [style.color]="item.fontColor" class="value" tabindex="0" style=" font-weight: bold; color: #333333;">
-    {{ item.multi_value[1]?.value }}:{{ item.multi_value[1]?.processed_value }} <!-- Access the second element in multi_value array -->
+       [style.color]="item.fontColor" 
+       class="value" 
+       tabindex="0" 
+       style="font-weight: bold; color: #333333; margin-top: 6px; margin-bottom: 6px; text-align: center;">
+    {{ item.multi_value[1]?.value }}:{{ item.multi_value[1]?.processed_value }}
   </div>
 
+  <!-- Display processed_value from multi_value[0] -->
   <div [style.font-size]="item.fontSize" 
-   
-  
-  [style.color]="item.fontColor" class="value" tabindex="0" style="font-weight: bold; color: #333333;">
-    {{ item.multi_value[0]?.processed_value }} <!-- Access the third element in multi_value array -->
-    <i
-      class="bi bi-arrow-up fs-2x"
-      style="font-size: 20px; color: green;"
-      aria-label="Increase">
-    </i>
+       [style.color]="item.fontColor" 
+       class="value" 
+       tabindex="0" 
+       style="font-weight: bold; color: #333333; margin-top: 6px; margin-bottom: 6px; text-align: center;">
+    {{ item.multi_value[0]?.processed_value }}
+    <i class="bi bi-arrow-up fs-2x" style="font-size: 20px; color: green;" aria-label="Increase"></i>
   </div>
 
+  <!-- Display processed_value from multi_value[2] -->
   <div [style.font-size]="item.fontSize" 
-   
-  
-  [style.color]="item.fontColor" class="value" tabindex="0" style=" font-weight: bold; color: #333333;">
-    {{ item.multi_value[2]?.value }}:{{ item.multi_value[2]?.processed_value }} <!-- Access the fourth element in multi_value array -->
+       [style.color]="item.fontColor" 
+       class="value" 
+       tabindex="0" 
+       style="font-weight: bold; color: #333333; margin-top: 6px; margin-bottom: 6px; text-align: center;">
+    {{ item.multi_value[2]?.value }}:{{ item.multi_value[2]?.processed_value }}
   </div>
+
 </div>
+
 
 
  <!-- Edit icon button -->

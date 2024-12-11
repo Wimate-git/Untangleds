@@ -21,6 +21,8 @@ export class TileUi2Component {
   iframeUrl: any;
   selectedMarkerIndex: any;
   tile1Config: any;
+  descriptionData: any;
+  primaryValue: any;
 
   constructor(
     private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer
@@ -30,7 +32,31 @@ export class TileUi2Component {
    ngOnChanges(changes: SimpleChanges): void {
  
     console.log("tile data check ",this.item)
+
+    let description = this.item.filterDescription; // This will contain your string
+
+    // Use regular expression to capture the value after "=="
+    let regex = /\$\{single-select-[^\}]+\}==(.+)/;
+    
+    // Match the string and extract the value
+    let match = description.match(regex);
+    
+    if (match) {
+      // The value you want is in match[1]
+      let value = match[1].trim(); // Remove any leading or trailing spaces
+      
+      // Remove surrounding quotes if any (both single and double quotes)
+      value = value.replace(/^['"]+|['"]+$/g, '');
+      
+      console.log(value); // This will log 'Open' without quotes
+      this.descriptionData = value;
+      console.log('this.descriptionData check', this.descriptionData); // Logs the cleaned value
+    } else {
+      this.primaryValue = this.item.multi_value[0].value
+
+    }
     this.tile1Config = this.item
+
 
   
  

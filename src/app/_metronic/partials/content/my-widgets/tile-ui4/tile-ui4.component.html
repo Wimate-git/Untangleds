@@ -8,34 +8,31 @@
       
       <!-- Up Arrow Icon -->
 
-      <div class="row text_3d" style="display: flex; flex-direction: column; align-items: flex-start;">
-      <!-- Display the parameterName -->
-      <div 
-      [style.font-size]="item.fontSize" 
-   
-  
-      [style.color]="item.fontColor"
-        style=" font-weight: bold;">
-        {{ item.parameterNameRead }}
+      <div class="row text_3d" style="display: flex; flex-direction: column; align-items: center;">
+
+        <!-- Display the parameterName -->
+        <div 
+          [style.font-size]="item.fontSize" 
+          [style.color]="item.fontColor"
+          style="font-weight: bold; margin-top: 10px; margin-bottom: 10px; text-align: center;">
+          {{ item.parameterNameRead }}
+        </div>
+      
+        <!-- Display processed_value from multi_value -->
+        <div class="value" tabindex="0" 
+          [style.font-size]="item.fontSize" 
+          [style.color]="item.fontColor"
+          style="font-weight: bold; color: #333333; text-align: center; margin-top: 6px; margin-bottom: 6px;">
+          {{ item.multi_value[0]?.processed_value }}
+          <i 
+            class="bi bi-arrow-up fs-2x" 
+            style="font-size: 20px; color:green;" 
+            aria-label="Increase">
+          </i>
+        </div>
+      
       </div>
-  
-      <!-- Display processed_value from multi_value -->
-      <div 
-        class="value" 
-        tabindex="0" 
-        [style.font-size]="item.fontSize" 
-   
-  
- [style.color]="item.fontColor"
-        style="font-weight: bold; color: #333333;">
-        {{ item.multi_value[0]?.processed_value }}
-        <i 
-        class="bi bi-arrow-up fs-2x" 
-        style="font-size: 20px; color:green;" 
-        aria-label="Increase">
-      </i>
-      </div>
-    </div>
+      
 
   
       <!-- Edit icon button -->

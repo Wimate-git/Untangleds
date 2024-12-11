@@ -244,7 +244,7 @@ export class Chart1ConfigComponent implements OnInit {
           this.fb.group({
             formlist: ['', Validators.required],
             parameterName: ['', Validators.required],
-            groupBy: ['', Validators.required],
+            // groupBy: ['', Validators.required],
             primaryValue: ['', Validators.required],
             groupByFormat: ['', Validators.required],
             constantValue: [''],
@@ -497,7 +497,7 @@ alert('cloned tile')
     clonedTile.fixedRowHeight = tile.fixedRowHeight;
     clonedTile.grid_type = tile.grid_type;
     clonedTile.formlist = tile.formlist;
-    clonedTile.groupBy = tile.groupBy;
+    // clonedTile.groupBy = tile.groupBy;
     clonedTile.groupByFormat = tile.groupByFormat;
     clonedTile.predefinedSelectRange = tile.predefinedSelectRange;
     clonedTile.selectedRangeType = tile.selectedRangeType;
@@ -688,7 +688,7 @@ repopulate_fields(getValues: any) {
         this.all_fields.push(this.fb.group({
           formlist: parsedChartConfig[i].formlist,
           parameterName: parsedChartConfig[i].parameterName,
-          groupBy: parsedChartConfig[i].groupBy,
+          // groupBy: parsedChartConfig[i].groupBy,
           primaryValue: parsedChartConfig[i].primaryValue,
           groupByFormat: parsedChartConfig[i].groupByFormat,
           constantValue: parsedChartConfig[i].constantValue,
@@ -1003,13 +1003,14 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     { value: 'average', text: 'Average' },
     { value: 'latest', text: 'Latest' },
     { value: 'previous', text: 'Previous' },
-    { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
-    { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
-    { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
-    { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
+    // { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
+    // { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
+    // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
+    // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
     { value: 'Constant', text: 'Constant' },
     { value: 'Live', text: 'Live' },
     { value: 'Count', text: 'Count' },
+    { value: 'Count_Multiple', text: 'Count Multiple' },
 
 
   ]
@@ -1234,7 +1235,7 @@ toggleCheckbox(theme: any): void {
       text: ''
     },
     tooltip: {
-      valueSuffix: '%'
+      // valueSuffix: '%'
     },
     exporting: {
       enabled: false
@@ -1244,6 +1245,7 @@ toggleCheckbox(theme: any): void {
     },
     plotOptions: {
       series: {
+        innerSize: '40%',
         allowPointSelect: true,
         cursor: 'pointer',
         showInLegend: true,
@@ -1253,7 +1255,7 @@ toggleCheckbox(theme: any): void {
         }, {
           enabled: true,
           distance: -40,
-          format: '{point.percentage:.1f}%',
+          // format: '{point.percentage:.1f}%',
           style: {
             fontSize: '1.2em',
             textOutline: 'none',
@@ -1261,7 +1263,7 @@ toggleCheckbox(theme: any): void {
           },
           filter: {
             operator: '>',
-            property: 'percentage',
+            property: 'count',
             value: 10
           }
         }]
@@ -1288,7 +1290,7 @@ toggleCheckbox(theme: any): void {
       itemStyle: {
         color: 'var(--bs-body-color)'
       },
-      name: 'Percentage',
+      name: 'Count',
       colorByPoint: true,
       data: []
     }]

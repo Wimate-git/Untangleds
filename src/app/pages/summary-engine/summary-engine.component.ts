@@ -5,7 +5,7 @@ import { AbstractControl, FormControl, FormGroup, UntypedFormArray, UntypedFormB
 
 import { Config } from 'datatables.net';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DisplayGrid, GridsterConfig, GridsterItem, GridsterItemComponentInterface } from 'angular-gridster2';
+import { CompactType, DisplayGrid, GridsterConfig, GridsterItem, GridsterItemComponentInterface, GridType } from 'angular-gridster2';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 
 import { LocationPermissionService } from 'src/app/location-permission.service';
@@ -141,6 +141,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   viewModeQP: boolean = false;
   tilesListDefault: string;
   defaultValue: string;
+  gridService: any;
 
 
 
@@ -556,6 +557,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   editTileIndex5: number | null;
   editTileIndex6: number | null;
   showIdField = false;
+  gridChanged: boolean = false;
   selectedTabset: string = 'dataTab';
   @ViewChild('bulletChart') bulletChart: ElementRef;
   isFullScreen = false; // Track the fullscreen state
@@ -566,12 +568,17 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
 
   reloadPage() {
     this.isLoading = true;  // Set loading state to true
-    this.spinner.show();     // Show the spinner
+    // this.spinner.show();     // Show the spinner
 
-    setTimeout(() => {
-      window.location.reload();  // Reload the page
-    }, 2000);  // Adjust delay to show spinner for a brief moment
-  }
+    this.route.paramMap.subscribe(params => {
+      this.routeId = params.get('id');
+      if (this.routeId) {
+        this.openModalHelpher(this.routeId);
+        this.editButtonCheck = true
+
+      }// Adjust delay to show spinner for a brief moment
+    })
+}
 
   toggleFullView() {
     this.isFullScreen = !this.isFullScreen;  // Toggle the full-screen state
@@ -635,19 +642,61 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
 
   private updateOptions(): void {
 
-    this.options = {
-      itemInitCallback: this.onItemInit.bind(this),
-      itemResizeCallback: this.itemResize.bind(this),
+    // this.options = {
+    //   itemInitCallback: this.onItemInit.bind(this),
+    //   itemResizeCallback: this.itemResize.bind(this),
    
+    //   draggable: {
+    //     enabled: this.isEditModeView, // Draggable only in edit mode
+    //   },
+    //   resizable: {
+    //     enabled: this.isEditModeView, // Resizable only in edit mode
+    //   },
+      
+    //   margin: 10,
+    //   outerMargin: true,
+    //   minCols: 100,
+    //   maxCols: 2000,
+    //   minRows: 100,
+    //   maxRows: 2000,
+    //   maxItemCols: 10000,
+    //   minItemCols: 1,
+    //   maxItemRows: 10000,
+    //   minItemRows: 1,
+    //   maxItemArea: 250000,
+    //   minItemArea: 1,
+    //   setGridSize: true,
+    //   pushItems: true,
+    //   fixedColWidth: 105 * 4,
+    //     fixedRowHeight: 200 * 4,
+    //   gridType: GridType.ScrollVertical,
+    //    GridType: GridType.ScrollHorizontal,
+    //   compactType: CompactType.None,
+
+    //   displayGrid: DisplayGrid.OnDragAndResize,
+
+    // };
+    this.options = {
       draggable: {
         enabled: this.isEditModeView, // Draggable only in edit mode
       },
       resizable: {
         enabled: this.isEditModeView, // Resizable only in edit mode
       },
-      gridType: 'fit',
+      itemInitCallback: this.onItemInit.bind(this),
+      itemResizeCallback: this.itemResize.bind(this),
+    
+      gridType: GridType.ScrollVertical,
+      compactType: CompactType.None,
       margin: 10,
       outerMargin: true,
+      outerMarginTop: null,
+      outerMarginRight: null,
+      outerMarginBottom: null,
+      outerMarginLeft: null,
+      useTransformPositioning: true,
+      mobileBreakpoint: 640,
+      useBodyForBreakpoint: false,
       minCols: 100,
       maxCols: 2000,
       minRows: 100,
@@ -658,16 +707,70 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
       minItemRows: 1,
       maxItemArea: 250000,
       minItemArea: 1,
-      setGridSize: true,
-      pushItems: true,
-
-      displayGrid: DisplayGrid.OnDragAndResize,
-
+      defaultItemCols: 1,
+      defaultItemRows: 1,
+      fixedColWidth: 105 * 2, // Reduced from 420 to 210
+      fixedRowHeight: 200 * 2, // Reduced from 800 to 400
+      keepFixedHeightInMobile: false,
+      keepFixedWidthInMobile: false,
+      scrollSensitivity: 10,
+      scrollSpeed: 20,
+      enableEmptyCellClick: false,
+      enableEmptyCellContextMenu: false,
+      enableEmptyCellDrop: false,
+      enableEmptyCellDrag: false,
+      enableOccupiedCellDrop: false,
+      emptyCellDragMaxCols: 50,
+      emptyCellDragMaxRows: 50,
+      ignoreMarginInRow: false,
+    
+      swap: false,
+      pushItems: false,
+      disablePushOnDrag: false,
+      disablePushOnResize: false,
+      pushDirections: { north: true, east: true, south: true, west: true },
+      pushResizeItems: false,
+      displayGrid: DisplayGrid.None,
+      disableWindowResize: false,
+      disableWarnings: false,
+      scrollToNewItems: false // enables resizing of elements
     };
+    
+    
 
     // Log to ensure options are updated correctly
     console.log('Options updated:', this.options);
   }
+
+
+  // Update the button color based on grid changes
+  updateButtonColor() {
+    // Here, we check the gridChanged flag to update the button color
+    this.gridChanged = true; // Set to true if the layout has changed (dragged/resized)
+  }
+
+  // Save method to persist the layout (your existing function)
+  saveGridLayout(): void {
+    this.grid_details = this.dashboard;
+    console.log('this.grid_details from global save', this.grid_details);
+
+    if (this.grid_details) {
+      this.updateSummary('', 'add_tile');
+    }
+
+    // Trigger change detection to ensure the UI updates
+    this.cdr.detectChanges();
+  }
+
+  loadGridLayout(): void {
+    const savedLayout = localStorage.getItem('gridLayout');
+    if (savedLayout) {
+      this.dashboard = JSON.parse(savedLayout);
+    }
+  }
+
+
+
 
 
 
@@ -797,7 +900,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
 
   constructor(private summaryConfiguration: SharedService, private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector,
-    private spinner: NgxSpinnerService, private zone: NgZone
+    private spinner: NgxSpinnerService, private zone: NgZone,
   ) {
 
 
@@ -1040,7 +1143,10 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
 
 
     this.initializeTileFields6()
+   
 
+    // Load saved layout
+    this.loadGridLayout();
     // this.addJsonValidation();
     this.showTable()
     this.addFromService()
@@ -2531,6 +2637,7 @@ this.createSummaryField.patchValue({
         });
     });
   }
+  
   
   loadData() {
     this.lookup_data_summary1 = [];

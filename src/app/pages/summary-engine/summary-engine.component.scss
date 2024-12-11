@@ -624,6 +624,33 @@ input[type="color"]:focus {
   border-radius: 4px;
 }
 
+.save-button-container {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.gridster-container {
+  padding-top: 50px; /* To prevent content from overlapping with the button */
+}
+
+.btn-danger {
+  background-color: red;
+  border-color: red;
+}
+
+.btn-success {
+  background-color: green;
+  border-color: green;
+}
+
+
 
 
 

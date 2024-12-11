@@ -220,8 +220,8 @@ if (key === 'tile3') {
        id: uniqueId,
        x: 0,
        y: 0,
-       cols: 20,
-       rows: 20,
+       rows: 13,  // The number of rows in the grid
+       cols: 25, 
        rowHeight: 100, // The height of each row in pixels
        colWidth: 100,  // The width of each column in pixels
        fixedColWidth: true,  // Enable fixed column widths

@@ -19,14 +19,14 @@ export class ChartUi3Component implements OnInit{
       if (typeof this.item.highchartsOptionsJson === 'string') {
         try {
           this.chartOptions = JSON.parse(this.item.highchartsOptionsJson);
-          console.log('this.chartOptions for line chart', this.chartOptions);
+       
         } catch (error) {
           console.error('Error parsing JSON:', error);
         }
       } else {
         // If it's already an object, assign it directly
         this.chartOptions = this.item.highchartsOptionsJson;
-        console.log('this.chartOptions', this.chartOptions);
+        console.log('this.chartOptions from column', this.chartOptions);
       }
       
 
@@ -76,9 +76,9 @@ export class ChartUi3Component implements OnInit{
   }
 
   createBarChart() {
-
+    console.log('culomnchart dynamic data check', this.chartOptions);
   
-    Highcharts.chart(`pieChart${this.index+1}`, this.chartOptions);
+    Highcharts.chart(`Columnchart${this.index+1}`, this.chartOptions);
   }
   
 

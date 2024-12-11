@@ -317,7 +317,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         colWidth: 100,
         fixedColWidth: true,
         fixedRowHeight: true,
-        grid_type: 'Barchart',
+        grid_type: 'Columnchart',
   
         chart_title: this.createChart.value.chart_title || '',  // Ensure this value exists
         fontSize: `${this.createChart.value.fontSize || 16}px`,  // Provide a fallback font size
@@ -929,13 +929,14 @@ repopulate_fields(getValues: any) {
     { value: 'average', text: 'Average' },
     { value: 'latest', text: 'Latest' },
     { value: 'previous', text: 'Previous' },
-    { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
-    { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
-    { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
-    { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
+    // { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
+    // { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
+    // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
+    // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
     { value: 'Constant', text: 'Constant' },
     { value: 'Live', text: 'Live' },
     { value: 'Count', text: 'Count' },
+    { value: 'Count_Multiple', text: 'Count Multiple' },
 
 
   ]
@@ -1270,16 +1271,11 @@ toggleCheckbox(theme: any): void {
       //   '#E67E22', '#ECF0F1', '#95A5A6', '#34495E', '#F1C40F', '#E74C3C', '#9B59B6',
       //   '#1ABC9C', '#2ECC71'],
       series: [
-        {
-          name: 'Data Series 1',
-          data: [1, 3, 2, 4]
-        }, {
-          name: 'Data Series 2',
-          data: [2, 4, 3, 5]
-        }, {
-          name: 'Data Series 3',
-          data: [3, 2, 4, 6]
-        }
+      //   {
+      //     name: 'Sales',
+      //     data: [150, 200, 180, 220, 300, 350, 280, 400, 500, 450, 300, 600]
+      // }
+      
       ],
       lineWidth:  2,
 

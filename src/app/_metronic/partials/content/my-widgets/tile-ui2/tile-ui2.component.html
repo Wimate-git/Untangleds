@@ -4,27 +4,33 @@
          [style.background]="item.themeColor"
          style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out;"
        >
-
-         <div class="row text_3d"  style="display: flex; flex-direction: column; align-items: flex-start;">
-         <div     [style.font-size]="item.fontSize" 
-   
-  
-         [style.color]="item.fontColor" style=" font-weight: bold; margin-bottom: 10px;">
+       <div class="row text_3d" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <!-- Parameter Name -->
+        <div [style.font-size]="item.fontSize" 
+             [style.color]="item.fontColor" 
+             style="font-weight: bold; margin-bottom: 10px; text-align: center;">
           {{ item.parameterNameRead }}
         </div>
-        <div      [style.font-size]="item.fontSize" 
-   
-  
-        [style.color]="item.fontColor"class="value" tabindex="0" style=" font-weight: bold; color: #333333;">
-          {{ item.multi_value[0]?.processed_value }} <!-- Access the second element in multi_value array -->
+      
+        <!-- Processed Value 1 -->
+        <div [style.font-size]="item.fontSize" 
+             [style.color]="item.fontColor" 
+             class="value" 
+             tabindex="0" 
+             style="font-weight: bold; color: #333333; text-align: center;">
+             {{ descriptionData || primaryValue}}:{{ item.multi_value[0]?.processed_value }}
         </div>
-        <div     [style.font-size]="item.fontSize" 
-   
-  
-        [style.color]="item.fontColor"class="value" tabindex="0" style=" font-weight: bold; color: #333333;">
-          {{ item.multi_value[1]?.value }}:{{ item.multi_value[1]?.processed_value }} <!-- Access the second element in multi_value array -->
+      
+        <!-- Processed Value 2 -->
+        <div [style.font-size]="item.fontSize" 
+             [style.color]="item.fontColor" 
+             class="value" 
+             tabindex="0" 
+             style="font-weight: bold; color: #333333; text-align: center;">
+          {{ item.multi_value[1]?.value }}:{{ item.multi_value[1]?.processed_value }}
         </div>
-         </div>
+      </div>
+      
         <div 
         class="action-menu-container d-flex align-items-center" 
         style="position: absolute; top: 10px; right: 10px; gap: 10px; z-index: 1000;">

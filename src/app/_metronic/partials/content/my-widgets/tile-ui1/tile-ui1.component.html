@@ -8,23 +8,21 @@
     <div class="row text_3d" style="display: flex; flex-direction: column; align-items: flex-start;">
       <!-- Parameter Name -->
       <div 
-      [style.font-size]="item.fontSize" 
-   
-  
-      [style.color]="item.fontColor"
-       style="font-weight: bold; margin-bottom: 10px;">
-        {{ item.parameterNameRead}}
+        [style.font-size]="item.fontSize" 
+        [style.color]="item.fontColor"
+        style="font-weight: bold; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        {{ item.parameterNameRead }}
       </div>
       
       <!-- Processed Value -->
-      <div     [style.font-size]="item.fontSize" 
-   
-  
-      [style.color]="item.fontColor" tabindex="0" style=" font-weight: bold;">
-        {{ item.multi_value[0]?.processed_value }}
+      <div class="processed-value-container" 
+        [style.font-size]="item.fontSize" 
+        [style.color]="item.fontColor" 
+        tabindex="0" 
+        style="font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        {{ descriptionData || primaryValue}}:{{ item.multi_value[0]?.processed_value }}
       </div>
     </div>
-
 
     <!-- Action Menu -->
     <div class="action-menu-container d-flex align-items-center"
@@ -40,8 +38,7 @@
       </button>
       <button 
       *ngIf="!isEditModeView && shouldShowButton && !hideButton"
-
-      (click)="helperDashboard(item, index,modalContent,item.selectType)"
+      (click)="helperDashboard(item, index, modalContent, item.selectType)"
       class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
       aria-haspopup="menu" 
       aria-expanded="false" 
@@ -70,6 +67,9 @@
     </div>
   </div>
 </div>
+
+
+
 <ng-template #modalContent>
   <app-custom-info-ui
 

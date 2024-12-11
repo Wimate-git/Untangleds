@@ -238,7 +238,7 @@ export class Chart2ConfigComponent implements OnInit{
           this.fb.group({
             formlist: ['', Validators.required],
             parameterName: ['', Validators.required],
-            groupBy: ['', Validators.required],
+            // groupBy: ['', Validators.required],
             primaryValue: ['', Validators.required],
             groupByFormat: ['', Validators.required],
             constantValue: [''],
@@ -485,7 +485,7 @@ alert('cloned tile')
     clonedTile.fixedRowHeight = tile.fixedRowHeight;
     clonedTile.grid_type = tile.grid_type;
     clonedTile.formlist = tile.formlist;
-    clonedTile.groupBy = tile.groupBy;
+    // clonedTile.groupBy = tile.groupBy;
     clonedTile.groupByFormat = tile.groupByFormat;
     clonedTile.predefinedSelectRange = tile.predefinedSelectRange;
     clonedTile.selectedRangeType = tile.selectedRangeType;
@@ -676,7 +676,7 @@ repopulate_fields(getValues: any) {
         this.all_fields.push(this.fb.group({
           formlist: parsedChartConfig[i].formlist,
           parameterName: parsedChartConfig[i].parameterName,
-          groupBy: parsedChartConfig[i].groupBy,
+          // groupBy: parsedChartConfig[i].groupBy,
           primaryValue: parsedChartConfig[i].primaryValue,
           groupByFormat: parsedChartConfig[i].groupByFormat,
           constantValue: parsedChartConfig[i].constantValue,
@@ -929,13 +929,14 @@ repopulate_fields(getValues: any) {
     { value: 'average', text: 'Average' },
     { value: 'latest', text: 'Latest' },
     { value: 'previous', text: 'Previous' },
-    { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
-    { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
-    { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
-    { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
+    // { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
+    // { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
+    // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
+    // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
     { value: 'Constant', text: 'Constant' },
     { value: 'Live', text: 'Live' },
     { value: 'Count', text: 'Count' },
+    { value: 'Count_Multiple', text: 'Count Multiple' },
 
 
   ]
@@ -1151,14 +1152,11 @@ toggleCheckbox(theme: any): void {
 
 
 
-
   defaultHighchartsOptionsJson = {
-
     chart: {
       backgroundColor: 'var(--bs-body-bg)',
-      renderTo: 'scatter',
+      renderTo: 'lineChart',  // Specify your div's id dynamically
       type: 'line',
-      //zoomType: 'xy',
     },
     exporting: {
       enabled: false
@@ -1166,96 +1164,72 @@ toggleCheckbox(theme: any): void {
     title: {
       style: {
         color: 'var(--bs-body-color)'
-       },
-      text: ''
+      },
+      text: ''  // Default title
     },
     subTitle: {
-      text: ''
+      text: ''  // Subtitle if any
     },
     xAxis: {
-      // categories: graph_data1, 
-      labels:{
+      labels: {
         style: {
           color: 'var(--bs-body-color)'
-         }
+        }
       },
-      type: 'datetime',
+      type: 'datetime',  // Use datetime if you're plotting on a time axis
       title: {
         style: {
           color: 'var(--bs-body-color)'
-         },
+        },
         text: null
       }
     },
     yAxis: {
-      labels:{
+      labels: {
         style: {
           color: 'var(--bs-body-color)'
-         }
+        }
       },
       title: {
         style: {
           color: 'var(--bs-body-color)'
-         },
+        },
         text: null
       }
     },
-
     tooltip: {
       borderColor: '#2c3e50',
       shared: true,
-      // formatter: function(tooltip:any) {
-      //   const header:any = `<span style="color: blue;">${moment.utc(this.x).format('LT')}</span><br/>`
-
-      //   return header + (tooltip.bodyFormatter(this.points).join(''))
-      // }
-      
-      headerFormat: `<div>Date: {point.key}</div>`,
-      pointFormat: `<div>{series.name}: {point.y}</div>`,
+      // headerFormat: `<div>Date: {point.key}</div>`,
+      // pointFormat: `<div>{series.name}: {point.y}</div>`
     },
-
     plotOptions: {
       series: {
-        turboThreshold: 0, // Comment out this code to display error
+        turboThreshold: 0,  // Avoid this if you don't need large datasets
         marker: {
           enabled: true,
-          radius: 7
+          radius: 7  // Markers for each data point
         }
       }
     },
-    // colors: [   '#6993FF', '#1BC5BD', '#8950FC', '#FFA800', '#F64E60', '#212121', '#F3F6F9',
-    //   '#3A3B3C', '#D4E157', '#FF7043', '#AB47BC', '#29B6F6', '#66BB6A', '#EF5350',
-    //   '#8D6E63', '#FFCA28', '#8E44AD', '#3498DB', '#2ECC71', '#E74C3C', '#F39C12',
-    //   '#D35400', '#2C3E50', '#16A085', '#27AE60', '#2980B9', '#8E44AD', '#2C3E50',
-    //   '#E67E22', '#ECF0F1', '#95A5A6', '#34495E', '#F1C40F', '#E74C3C', '#9B59B6',
-    //   '#1ABC9C', '#2ECC71'],
     series: [
-      {
-        name: 'Product A',
-        data: [100, 120, 150, 180, 200, 220, 250, 270, 300, 320, 350, 400]
-    }, {
-        name: 'Product B',
-        data: [80, 90, 110, 140, 160, 180, 210, 230, 250, 270, 290, 350]
-    }
-    ],
-    lineWidth:  2,
 
-
+    ],  // Start with no data
+    lineWidth: 2,  // Line thickness
+  
     credits: {
-      enabled: false
+      enabled: false  // Disable Highcharts credits
     },
     responsive: {
       rules: [{
         condition: {
-          maxWidth: 10000//maxWidth: 800
+          maxWidth: 10000  // Adjust if you need to handle responsive
         },
         chartOptions: {
           legend: {
-
             itemStyle: {
               color: 'var(--bs-body-color)'
-             },
-          
+            },
             layout: 'horizontal',
             align: 'center',
             verticalAlign: 'bottom'
@@ -1263,9 +1237,8 @@ toggleCheckbox(theme: any): void {
         }
       }]
     }
-
-
-  }
+  };
+  
 
   // Method to initialize the chart using the form's JSON value
 initializeChart(): void {

@@ -4,37 +4,46 @@
     [style.background]="item.themeColor" 
     style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out;"
    >
-    <div class="row text_3d" style="display: flex; flex-direction: column; align-items: flex-start;">
-
- <!-- Display the parameterName -->
- <div   [style.font-size]="item.fontSize" 
-   
+   <div class="row text_3d" style="display: flex; flex-direction: column; align-items: center;">
   
- [style.color]="item.fontColor"  style=" font-weight: bold;">
-   {{ item.parameterNameRead }}
- </div>
-
- <div   [style.font-size]="item.fontSize" 
-   
-  
- [style.color]="item.fontColor"  class="value" tabindex="0" style=" font-weight: bold; color: #333333;">
-  {{ item.multi_value[1]?.value }}:{{ item.multi_value[1]?.processed_value }} <!-- Access the second element in multi_value array -->
-</div>
-
- <!-- Display processed_value from multi_value -->
- <div   [style.font-size]="item.fontSize" 
-   
-  
- [style.color]="item.fontColor"  class="value" tabindex="0" style=" font-weight: bold; color: #333333;">
-{{ item.multi_value[0]?.processed_value }} <!-- Access the second element in multi_value array -->
- </div>
- <div   [style.font-size]="item.fontSize" 
-   
-  
- [style.color]="item.fontColor"  class="value" tabindex="0" style=" font-weight: bold; color: #333333;">
-  {{ item.multi_value[2]?.value }}:{{ item.multi_value[2]?.processed_value }} <!-- Access the second element in multi_value array -->
-</div>
+    <!-- Display the parameterName -->
+    <div [style.font-size]="item.fontSize" 
+         [style.color]="item.fontColor"  
+         style=" text-align: center; margin-top: 6px; margin-bottom: 6px;">
+      {{ item.parameterNameRead }}
     </div>
+    
+    <!-- Display processed_value from multi_value[1] -->
+    <div [style.font-size]="item.fontSize" 
+    [style.color]="item.fontColor"  
+    class="value" 
+    tabindex="0" 
+    style="color: #333333; text-align: center; margin-top: 6px; margin-bottom: 6px;">
+ {{ item.multi_value[1]?.value }}:{{ item.multi_value[1]?.processed_value }}
+</div>
+
+    
+    <!-- Display processed_value from multi_value[0] -->
+    <div [style.font-size]="item.fontSize" 
+         [style.color]="item.fontColor"  
+         class="value" 
+         tabindex="0" 
+         style="font-weight: bold; color: #333333; text-align: center; margin-top: 6px; margin-bottom: 6px;">
+         {{ descriptionData || primaryValue}}:{{ item.multi_value[0]?.processed_value }}
+    </div>
+    
+    <!-- Display processed_value from multi_value[2] -->
+    <div [style.font-size]="item.fontSize" 
+         [style.color]="item.fontColor"  
+         class="value" 
+         tabindex="0" 
+         style=" color: #333333; text-align: center; margin-top: 6px; margin-bottom: 6px;">
+      {{ item.multi_value[2]?.value }}:{{ item.multi_value[2]?.processed_value }}
+    </div>
+  
+  </div>
+  
+  
 
  <!-- Edit icon button -->
 

@@ -77,8 +77,8 @@ export class ChartUi2Component implements OnInit{
 
   createLineChart() {
 
-  
-    Highcharts.chart(`pieChart${this.index+1}`, this.chartOptions);
+  console.log('this.chartOptions from function',this.chartOptions)
+    Highcharts.chart(`lineChart${this.index+1}`, this.chartOptions);
   }
   
 

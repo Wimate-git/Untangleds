@@ -13,4 +13,17 @@
     border-radius: 8px;
     overflow: hidden;
   }
+  .row {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers the content horizontally */
+    justify-content: center; /* Centers vertically if needed */
+    text-align: center; /* Ensures that text inside elements is centered */
+  }
+  
+  .value {
+    font-weight: bold;
+    color: #333333;
+    margin-bottom: 10px; /* Add spacing between values */
+  }
   
