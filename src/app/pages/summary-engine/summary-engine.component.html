@@ -440,10 +440,10 @@
     <a class="myMenu-item" *ngIf="!isSummaryEngine()" (click)="toggleFullView()" style="cursor: pointer;" [attr.title]="isFullView ? 'Exit Full View' : 'Full View'">
       <i style="color: white;" class="fa" [ngClass]="isFullView ? 'fa-compress' : 'fa-expand'"></i>
     </a>
-    <a class="myMenu-item" *ngIf="!isSummaryEngine()" (click)="reloadPage()" style="cursor: pointer;" [attr.title]="isFullView ? 'Exit Full View' : 'Full View'">
+    <a class="myMenu-item" *ngIf="!isSummaryEngine()" (click)="reloadPage()" style="cursor: pointer;" [attr.title]="'Refresh Data'">
       <i style="color: white;" class="fa" [ngClass]="isFullView ? 'fa-refresh' : 'fa-refresh'"></i>
     </a>
-    <a class="myMenu-item" *ngIf="!isSummaryEngine()" (click)="saveGridLayout()" style="cursor: pointer;" [attr.title]="isFullView ? 'Exit Full View' : 'Full View'">
+    <a class="myMenu-item" *ngIf="!isSummaryEngine()" (click)="saveGridLayout()" style="cursor: pointer;" [attr.title]="'Save Dashboard'">
       <i style="color: white;" class="fa" [ngClass]="isFullView ? 'fa-save' : 'fa-save'"></i>
     </a>
     

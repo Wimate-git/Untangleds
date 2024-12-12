@@ -142,6 +142,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   tilesListDefault: string;
   defaultValue: string;
   gridService: any;
+  resizeObserver: ResizeObserver;
 
 
 
@@ -902,6 +903,13 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector,
     private spinner: NgxSpinnerService, private zone: NgZone,
   ) {
+    this.resizeObserver = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        if (entry.contentRect) {
+          this.onWidthChange(entry.contentRect.width);
+        }
+      }
+    });
 
 
 
@@ -909,6 +917,17 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
 
   someMethod() {
     const localeService = this.injector.get(NgxDaterangepickerLocaleService);
+  }
+  onWidthChange(newWidth: number) {
+    // console.log('Container width changed:', newWidth);
+    this.changedOptions()
+  
+  }
+
+    changedOptions(): void {
+    if (this.options.api && this.options.api.optionsChanged) {
+      this.options.api.optionsChanged();
+    }
   }
 
   localeTime = {
