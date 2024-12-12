@@ -104,7 +104,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     { name: 'Form Group', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Location Management', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Project Configuration', view: false, update: false, xlsxView: false, xlsxUpdate: false },
-    { name: 'Summary Engine', view: false, update: false, xlsxView: false, xlsxUpdate: false },
+    // { name: 'Summary Engine', view: false, update: false, xlsxView: false, xlsxUpdate: false },
 
     // Add more permissions as needed
   ];
@@ -114,6 +114,9 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   selectedFormGroups: any[] = [];
   dynamicform: any;
   formList_: any;
+  formData: any;
+  formfieldData: any;
+  dynamic_field: any;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -147,6 +150,9 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       'Read',
       'Update',
       'Delete',
+      'Xlsx template download',
+      'Xlsx template update',
+      'Xlsx data download'
     ]
 
     this.datatableConfig = {}
@@ -173,13 +179,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
                 recordsFiltered: filteredData.length,
                 data: filteredData // Return filtered data
             });
-            // callback({
-            //   draw: dataTablesParameters.draw, // Echo the draw parameter
-            //   recordsTotal: responseData.length, // Total number of records
-            //   recordsFiltered: responseData.length, // Filtered records (you may want to adjust this)
-            //   data: responseData // The actual data array
-            // });
-
+        
             console.log("Response is in this form ", responseData);
           })
           .catch((error: any) => {
@@ -256,24 +256,77 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
     await this.fetchFormgrouplookup(1)
 
-    // await this.addFromService()
   }
 
-  // onSelectAllChanged(index: number, event: Event): void {
-  //   const target = event.target as HTMLInputElement;
-  //   const isChecked = target.checked;
-  
-  //   // Check if the "Select All" row is changed
-  //   if (this.permissionsArray.at(index).get('name')?.value === 'Select All') {
-  //     this.permissionsArray.controls.forEach((control, idx) => {
-  //       // Skip "Select All" itself
-  //       if (idx !== index) {
-  //         control.get('view')?.setValue(isChecked);
-  //         control.get('update')?.setValue(isChecked);
-  //       }
-  //     });
-  //   }
-  // }
+
+  dynamicFormSelect(selectForm:any):void{
+
+
+    console.log("SELECTION OF FORMS:",selectForm)
+
+    this.api.GetMaster(this.client+'#dynamic_form#'+selectForm+'#main',1).then((formres:any)=>{
+
+      // console.log("FORMS MAIN TABLE:",(formres.metadata))
+
+      this.formData = JSON.parse((JSON.parse(JSON.stringify(formres.metadata))))
+
+      this.formfieldData = this.formData.formFields
+
+      this.formfieldData = this.formData.formFields.filter((field: any) => field.label !== "Empty Placeholder");
+
+      console.log("FORMS AFTER STRINGIFY:", this.formfieldData);
+
+    }).catch((error)=>{
+     
+      console.log("ERRROR:",error)
+    })
+
+  }
+
+  populateFilterEquation(): void {
+
+    const errorAlertform: SweetAlertOptions = {
+      icon: 'error',
+      title: 'Error!',
+      text: 'This option is already added.',
+    };
+    // Get the selected field value
+    const selectedField = this.permissionForm.get('field')?.value;
+
+    if (selectedField) {
+
+      const currentValue = this.permissionForm.get('fieldValue')?.value || '';
+
+        // Append the new field value with a space separator
+    //  const updatedValue = currentValue ? `${currentValue} \${${selectedField}}` : `\${${selectedField}}`;
+    //     // Set the formatted value in the Filter Equation field
+    //     this.permissionForm.patchValue({
+    //         fieldValue: updatedValue
+    //     });
+    if (currentValue.includes(`\${${selectedField}}`)) {
+      // this.permissionError = 'This field is already added.';
+      this.showAlert(errorAlertform)
+  } else {
+      // Append the new field value with a space separator
+      const updatedValue = currentValue 
+          ? `${currentValue} \${${selectedField}}` 
+          : `\${${selectedField}}`;
+
+      // Set the formatted value in the Filter Equation field
+      this.permissionForm.patchValue({
+          fieldValue: updatedValue
+      });
+  }
+    } else {
+        // Optionally, show an error or notification if no field is selected
+        // this.permissionError = 'Please select a Field Label first.';
+    }
+    this.permissionForm.patchValue({
+      field: '',
+    });
+}
+
+
 
   onSelectAllChanged(event: Event): void {
     const target = event.target as HTMLInputElement;
@@ -419,8 +472,10 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       powerboardId: [[]],
       magicboardId: [[]],
       permissionsList: this.fb.array([],Validators.required),
-      dynamicEntries: this.fb.array([],Validators.required),
+      dynamicEntries: this.fb.array([]),
       dynamicForm: [[]],
+      field:[],
+      fieldValue:[],
       permission: [[]],
       createdTime: [Math.ceil(((new Date()).getTime()) / 1000)],
       updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
@@ -437,6 +492,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     // Get the values from the form
     const dynamicForm = this.permissionForm.get('dynamicForm')?.value;
     const permission = this.permissionForm.get('permission')?.value;
+    const fieldValue = this.permissionForm.get('fieldValue')?.value;
 
     const errorAlert_1: SweetAlertOptions = {
       icon: 'error',
@@ -449,7 +505,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       title: 'Error!',
       text: 'This dynamic form has already been added.',
     };
-    if (dynamicForm.length > 0 && permission.length > 0) {
+    if (dynamicForm?.length > 0 && permission?.length > 0 && fieldValue?.length > 0) {
 
       // Check for duplicate entries
       const isDuplicate = this.dynamicEntries.controls.some((entry: any) => {
@@ -467,7 +523,8 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
         // Push a new group to the dynamic entries array if no duplicates
         this.dynamicEntries.push(this.fb.group({
           dynamicForm: [dynamicForm, Validators.required],
-          permission: [permission, Validators.required]
+          permission: [permission, Validators.required],
+          fieldValue: [fieldValue, Validators.required]
         }));
 
         console.log("ADD DYNAMIC DATA:", this.dynamicEntries);
@@ -477,10 +534,14 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       }
       this.permissionForm.get('dynamicForm')?.reset();
       this.permissionForm.get('permission')?.reset();
+      this.permissionForm.get('fieldValue')?.reset();
     }
     else {
       // this.dynamicFormError ='Dymanic form required'
       // this.permissionError = 'Permission required'
+      this.permissionForm.get('dynamicForm')?.reset();
+      this.permissionForm.get('permission')?.reset();
+      this.permissionForm.get('fieldValue')?.reset();
       this.showAlert(errorAlert_1)
     }
   }
@@ -494,8 +555,13 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     // Set the values back into the form for editing
     if (entry) {
       console.log("ON CLICK ON EDIT:", entry)
+      const dynamicFormValue = entry.get('dynamicForm')?.value;
       this.permissionForm.get('dynamicForm')?.setValue(entry.get('dynamicForm')?.value);
       this.permissionForm.get('permission')?.setValue(entry.get('permission')?.value);
+      this.permissionForm.get('fieldValue')?.setValue(entry.get('fieldValue')?.value); // Set fieldValue
+
+
+      this.dynamicFormSelect(dynamicFormValue)
 
     }
     // Optionally, you can remove the entry after loading it for editing
@@ -536,7 +602,8 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     dynamicEntriesData.forEach(entry => {
       dynamicEntriesArray.push(this.fb.group({
         dynamicForm: [entry.dynamicForm, Validators.required],
-        permission: [entry.permission, Validators.required]
+        permission: [entry.permission, Validators.required],
+        // fieldValue:[entry.fieldValue,Validators.required]
       }));
     });
   }
@@ -607,11 +674,13 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
             permission: [this.data_temp[0].permission],
             permissionsList: this.fb.array([]),
             dynamicEntries: this.fb.array([]),
+            field: this.data_temp[0].field,
+            fieldValue:this.data_temp[0].fieldValue,
             createdTime: [this.data_temp[0].createdTime],
             updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
           });
 
-          
+          // alert(this.permissionForm.invalid)
           this.updatePermissions();
 
           this.populateDynamicEntries(JSON.parse(this.data_temp[0].dynamicEntries))
@@ -628,7 +697,8 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
   create() {         // click on create new 
     this.update = false
-    this.error = '';       // Model heading and button text change flag
+    this.error = '';    
+    this.formList=[]   // Model heading and button text change flag
     this.initForm()
   }
 

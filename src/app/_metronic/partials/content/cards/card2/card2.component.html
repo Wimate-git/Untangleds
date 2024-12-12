@@ -2,7 +2,7 @@
   <!-- [ngStyle]="{
     'background-image': 'linear-gradient(to top, #f3e7e9 0%, #e3eeff 99%, #e3eeff 100%)',
   }" -->
-  <div class="card-header border-0 pt-4 cursor-pointer"  (click)="onStatusClick({ title: title })">
+  <div class="card-header border-0 pt-4 cursor-pointer"  (click)="onStatusClick({ title: budget })">
     <div class="card-title m-0">
       <div class="symbol symbol-50px w-40px ">
         <img *ngIf="!icon_"[src]="icon" alt="card2" class="p-3" />
@@ -12,16 +12,16 @@
       </div>
     </div>
 
-    <div class="card-toolbar cursor-pointer"  (click)="onStatusClick({ title: title })">
+    <div class="card-toolbar cursor-pointer"  (click)="onStatusClick({ title: budget })">
       <span class="badge fw-bolder me-auto px-3 py-2 cursor-pointer" [ngClass]="'badge-light-' + badgeColor"
-        (click)="onStatusClick({ title: title })">
+        (click)="onStatusClick({ title: budget })">
         {{ status }}
       </span>
 
     </div>
   </div>
 
-  <div class="card-body p-5 cursor-pointer"  (click)="onStatusClick({ title: title })">
+  <div class="card-body p-5 cursor-pointer"  (click)="onStatusClick({ title: budget })">
 
     <div class="fs-3 fw-bolder text-gray-900">{{ title }}</div>
 

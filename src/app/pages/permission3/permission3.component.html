@@ -361,7 +361,7 @@
                         <div *ngIf="activeTab === 'Header'">
 
                             <div class="row">
-                                <div class="col-md-5 mb-4">
+                                <div class="col-md-3 mb-4">
                                     <label class="fw-semibold fs-6 mb-2">Dynamic Form</label>
                                     <!-- <input type="text" class="form-control form-control-solid" name="dynamicForm"
                                         placeholder="Enter dynamic form" formControlName="dynamicForm" /> -->
@@ -379,7 +379,8 @@
                                                       background-image: none;
                                                       border-radius: 4px;
                                                       " class="form-select form-select-solid form-select"
-                                            [placeholder]="'Select dynamic form'" [settings]="dropdownSettings_"
+                                                      (onSelect)="dynamicFormSelect($event)"
+                                            [placeholder]="'dynamic form'" [settings]="dropdownSettings_"
                                             [data]="formList" name="dynamicForm"
                                             [formControl]="$any(permissionForm.controls['dynamicForm'])">
                                         </ng-multiselect-dropdown>
@@ -388,7 +389,33 @@
                                     <span style="color: #fc1900;">{{dynamicFormError}}</span>
                                 </div>
                                 
-                                <div class="col-md-5 mb-4">
+                                <div class="col-md-3 mb-4">
+                                    <label class="fw-semibold fs-6 mb-2">Field Label</label>
+                                    <!-- <input type="text" class="form-control form-control-solid" name="newInput1"
+                                        placeholder="Enter value for New Input 1" formControlName="newInput1" /> -->
+                                        <select
+                                        class="form-select form-select-solid form-select"
+                                        name="field"
+                                        placeholder="Select field"
+                                        formControlName="field"
+                                    >
+                                        <option value="" disabled [selected]="true">Select field</option>
+                                        <option *ngFor="let item of formfieldData" [value]="item.label + '.' + item.name">
+                                            {{ item.label }}
+                                        </option>
+                                        </select>
+                                </div>
+                                <div class="col-md-2 mb-6 d-flex align-items-end">
+                                    <button type="button" class="btn btn-light-primary w-30 d-flex align-items-center justify-content-center" (click)="populateFilterEquation()">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                </div>
+                                <div class="col-md-4 mb-4 filter-equation">
+                                    <label class="fw-semibold fs-6 mb-2">Filter equation</label>
+                                    <input type="text" class="form-control form-control-solid" name="fieldValue"
+                                        placeholder="value" formControlName="fieldValue" />
+                                </div>
+                                <div class="col-md-3 mb-4">
                                     <label class="fw-semibold fs-6 mb-2">Permission</label>
                                     <!-- <input type="text" class="form-control form-control-solid" name="permission"
                                         placeholder="Enter permission" formControlName="permission" /> -->
@@ -405,14 +432,15 @@
                                                       cursor: pointer;
                                                       background-image: none;
                                                       border-radius: 4px;
-                                                      " class="form-select form-select-solid form-select"
-                                            [placeholder]="'Select permission'" [settings]="dropdownSettings"
+                                                      " class="form-select form-select-solid form-select-sm"
+                                            [placeholder]="'permission'" [settings]="dropdownSettings"
                                             [data]="form_permission" name="permission"
                                             [formControl]="$any(permissionForm.controls['permission'])">
                                         </ng-multiselect-dropdown>
                                     </div>
                                     <span style="color: #fc1900;">{{permissionError}}</span>
                                 </div>
+                        
                                 <div class="col-md-2 mb-4 d-flex align-items-end">
                                     <button type="button" class="btn btn-primary w-100"
                                         (click)="addDynamicData()">Add</button>
@@ -424,13 +452,18 @@
                                         <tr>
                                             <th class="fw-bold">Dynamic Form</th>
                                             <th class="fw-bold">Permission</th>
+                                            <th class="fw-bold">Filter Equation</th>
                                             <th class="fw-bold">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr *ngFor="let entry of dynamicEntries.controls; let i = index">
                                             <td>{{ entry.get('dynamicForm')?.value }}</td>
-                                            <td>{{ entry.get('permission')?.value }}</td>
+                                            <td class="text-truncate filter-equation-cell" title="{{ entry.get('permission')?.value }}">
+                                                {{ entry.get('permission')?.value }}</td>
+                                            <td class="text-truncate filter-equation-cell" title="{{ entry.get('fieldValue')?.value }}">
+                                                {{ entry.get('fieldValue')?.value }}
+                                              </td>
                                             <td>
                                                 <button type="button" class="btn btn-sm btn-warning me-2"
                                                     (click)="editEntry(i)">

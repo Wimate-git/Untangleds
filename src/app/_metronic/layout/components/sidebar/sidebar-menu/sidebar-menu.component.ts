@@ -27,6 +27,7 @@ export class SidebarMenuComponent implements OnInit {
   client: any;
   user: any;
   permission_data: any;
+  permission_list: any;
 
   constructor(
     private router: Router,
@@ -60,6 +61,10 @@ export class SidebarMenuComponent implements OnInit {
 
     if(permisson_response && permisson_response.metadata){
       this.permission_data = JSON.parse(JSON.parse(JSON.stringify(permisson_response.metadata)))
+
+
+      this.permission_list= this.permission_data.permissionsList
+
     }
     
 
@@ -185,6 +190,9 @@ async generatedreamboard() {
   return this.menuItems;
 }
 
+hasPermission(moduleName: string): boolean {
+  return this.permission_list?.some((item: { name: string; view: any; }) => item.name === moduleName && item.view);
+}
 // Your menuItems structure
 menuItems: MenuItem[] = [];
 

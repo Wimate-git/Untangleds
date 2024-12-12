@@ -1,0 +1,19 @@
+.filter-equation {
+    margin-left: -60px; /* Adjust this value as needed to reduce the gap */
+}
+
+.filter-equation-cell {
+    max-width: 200px; /* Adjust the max-width as needed */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .filter-equation-cell:hover {
+    white-space: normal; /* Expand on hover to display full content */
+    overflow: visible;
+    background-color: #f8f9fa; /* Optional: Highlight background on hover */
+    position: relative; /* Ensure proper stacking when expanded */
+    z-index: 1;
+  }
+  

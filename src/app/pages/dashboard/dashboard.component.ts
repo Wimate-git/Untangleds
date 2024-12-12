@@ -143,15 +143,16 @@ export class DashboardComponent implements OnInit {
             }
             return {
               icon: this.iconData || ' ',
-              name: item.P1 || ' ',  // Fallback in case P1 is empty
+              name: item.P2 || ' ',  // Fallback in case P1 is empty
               job: item.P3 || ' ',   // Fallback in case P3 is empty
               avgEarnings: new Date(item.P7 * 1000).toLocaleDateString('en-GB', {
                 day: '2-digit',
                 month: 'short',
                 year: 'numeric'
               }),  // Convert timestamp to a readable date format
-              totalEarnings: item.P5 || '',  // Fallback in case P5 is empty
+              totalEarnings: item.P1 || '',  // Fallback in case P5 is empty
               online: '', // Placeholder for 'online' status
+              
             };
           })
         );
@@ -212,14 +213,14 @@ export class DashboardComponent implements OnInit {
             }
             return {
               icon: this.iconData || ' ',
-              name: item.P1 || ' ',  // Fallback in case P1 is empty
+              name: item.P2 || ' ',  // Fallback in case P1 is empty
               job: item.P3 || ' ',   // Fallback in case P3 is empty
               avgEarnings: new Date(item.P7 * 1000).toLocaleDateString('en-GB', {
                 day: '2-digit',
                 month: 'short',
                 year: 'numeric'
               }),  // Convert timestamp to a readable date format
-              totalEarnings: item.P5 || '',  // Fallback in case P5 is empty
+              totalEarnings: item.P1 || '',  // Fallback in case P5 is empty
               online: '', // Placeholder for 'online' status
             };
           })
