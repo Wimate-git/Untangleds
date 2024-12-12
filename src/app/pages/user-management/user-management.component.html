@@ -543,13 +543,15 @@
                                             placeholder="select default module" name="location_object"
                                             formControlName="location_object" (change)="dynamicRedirectChanged($event)" >
                                             
-                                            <option value="" disabled selected>Select ID</option>
+                                            <option value="" disabled  selected>Select ID</option>
                                             <option [value]="item" *ngFor="let item of dynamicIDArray">
                                                 {{ item }}
                                             </option>
                                         </select>                   
                                     </div>
 
+
+                                  
 
         
                                 </div>

@@ -459,7 +459,7 @@ rdtListWorkAround :any =[{
       'mobile': ['', Validators.compose([Validators.required])],
       'mobile_privacy': ['', Validators.required],
       'key': [''],
-      'location_object': [null],
+      'location_object': [''],
       'default_module': [''],
       // 'admin': ['', Validators.required],
       // 'user_type': ['', Validators.required],
@@ -1512,6 +1512,8 @@ rdtListWorkAround :any =[{
     //create new user with mail confirmation
     if (key == 'html') {
       console.log('user fields', this.createUserField);
+
+      this.dynamicRedirectChanged(this.createUserField.value.location_object)
 
       // let length_device_permission = this.createUserField.value.device_permission.length;
       // let temp_device_permi_list = [];
@@ -3259,6 +3261,9 @@ fetchDynamicLookupData(pk:any,sk:any):any {
   async dynamicRedirectID(event:any){
 
     console.log("Event is triggered");
+
+
+    this.createUserField.get('location_object')?.setValue("")
 
 
     let dashUrl = '/dashboard'

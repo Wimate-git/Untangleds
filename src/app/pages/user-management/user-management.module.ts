@@ -10,7 +10,7 @@ import { NgxSpinner, NgxSpinnerModule } from "ngx-spinner";
 import { Crud2Module } from "src/app/modules/crud2/crud.module";
 import { MultiSelectModule } from "primeng/multiselect";
 import { SweetAlert2Module } from "@sweetalert2/ngx-sweetalert2";
-
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 
 
@@ -38,7 +38,8 @@ import { SweetAlert2Module } from "@sweetalert2/ngx-sweetalert2";
     NgxSpinnerModule,
     SweetAlert2Module.forChild(),
   
-    MultiSelectModule
+    MultiSelectModule,
+    SelectButtonModule,
     
     
 ]
