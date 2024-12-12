@@ -131,7 +131,7 @@ export class DashboardFormComponent implements OnInit {
                     month: 'short',
                     year: 'numeric'
                 }) : '',  // Handle cases where values may be empty
-                totalEarnings: data[5] || '',  // Fallback if index 5 is empty
+                totalEarnings: data[0] || '',  // Fallback if index 5 is empty
                 online: ''  // Placeholder for online status
             }));
 
