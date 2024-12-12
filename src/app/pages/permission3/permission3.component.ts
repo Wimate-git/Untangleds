@@ -603,7 +603,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       dynamicEntriesArray.push(this.fb.group({
         dynamicForm: [entry.dynamicForm, Validators.required],
         permission: [entry.permission, Validators.required],
-        // fieldValue:[entry.fieldValue,Validators.required]
+        fieldValue:[entry.fieldValue]
       }));
     });
   }
