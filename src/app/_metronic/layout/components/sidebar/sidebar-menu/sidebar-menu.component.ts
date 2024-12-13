@@ -229,6 +229,20 @@ export class SidebarMenuComponent implements OnInit {
     return this.permission_list?.some((item: { name: string; view: any; }) => item.name === moduleName && item.view);
   }
 
+  hasAnyConfigurationPermission(): boolean {
+    const configModules = [
+      'Communication',
+      'Notification Matrix',
+      'Client',
+      'Company',
+      'User Management',
+      'Permission',
+      'Form Group',
+      'Project Configuration',
+      'Location Management',
+    ];
+    return configModules.some((module) => this.hasPermission(module));
+  }
   // Your menuItems structure
   menuItems: MenuItem[] = [];
 
