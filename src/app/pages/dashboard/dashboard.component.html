@@ -6,6 +6,9 @@
   <h3>Sorry ! No Data available</h3>
 </div> -->
 
+<swal #noticeSwal [swalOptions]="swalOptions">
+</swal>
+
 <div class="row g-6 g-xl-4" *ngIf="cards_2.length > 0">
   <div class="col-md-6 col-xl-4" *ngFor="let card of cards_2">
     <app-card2 [componentSource]="'dashboard'"

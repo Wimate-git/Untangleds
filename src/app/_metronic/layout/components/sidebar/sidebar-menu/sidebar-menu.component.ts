@@ -1,4 +1,4 @@
-import { Component, OnInit ,ChangeDetectorRef} from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { APIService } from 'src/app/API.service';
 import { filter } from 'rxjs';
@@ -27,6 +27,7 @@ export class SidebarMenuComponent implements OnInit {
   client: any;
   user: any;
   permission_data: any;
+
   permission_list: any;
 
   constructor(
@@ -41,47 +42,53 @@ export class SidebarMenuComponent implements OnInit {
 
     setTimeout(async () => {
 
-    this.login_detail = localStorage.getItem('userAttributes')
+      this.login_detail = localStorage.getItem('userAttributes')
 
-    console.log("SIDE MENU ITEM LOGIN DETAIL FROM LOCAL STORAGE:", this.login_detail)
+      console.log("SIDE MENU ITEM LOGIN DETAIL FROM LOCAL STORAGE:", this.login_detail)
 
-    this.loginDetail_string = JSON.parse(this.login_detail)
-    console.log("AFTER JSON STRINGIFY", this.loginDetail_string)
+      this.loginDetail_string = JSON.parse(this.login_detail)
+      console.log("AFTER JSON STRINGIFY", this.loginDetail_string)
 
-    this.client = this.loginDetail_string.clientID
-    this.user = this.loginDetail_string.username
-    this.permission_data = this.loginDetail_string.permission_ID
+      this.client = this.loginDetail_string.clientID
+      this.user = this.loginDetail_string.username
+      this.permission_data = this.loginDetail_string.permission_ID
 
-    this.loginDetail_string = JSON.parse(this.login_detail)
-    console.log("SIDE ITEM AFTER JSON PARSE", this.loginDetail_string)
+      this.loginDetail_string = JSON.parse(this.login_detail)
+      console.log("SIDE ITEM AFTER JSON PARSE", this.loginDetail_string)
 
-    const permisson_response = await this.apiService.GetMaster(this.client + '#permission#' + this.permission_data + '#main', 1);
+      const permisson_response = await this.apiService.GetMaster(this.client + '#permission#' + this.permission_data + '#main', 1);
 
-    console.log("PERMISSION RESPONSE SIDE MENU:", permisson_response)
+      console.log("PERMISSION RESPONSE SIDE MENU:", permisson_response)
 
-    if(permisson_response && permisson_response.metadata){
-      this.permission_data = JSON.parse(JSON.parse(JSON.stringify(permisson_response.metadata)))
-
-
-      this.permission_list= this.permission_data.permissionsList
-
-    }
-    
-
-    // console.log("SIDE MENU GET PERMISSION DATA RESPONSE:", this.permission_data.dreamBoardIDs)
-
-    this.generatedreamboard()
+      if (permisson_response && permisson_response.metadata) {
+        this.permission_data = JSON.parse(JSON.parse(JSON.stringify(permisson_response.metadata)))
 
 
-    this.router.events
-      .pipe(filter((event: any) => event instanceof NavigationEnd))
-      .subscribe(() => {
+        console.log("USER PERMISSION DATA:", this.permission_data)
 
-        console.log("Session is called from Init ");
+        this.permission_list = this.permission_data.permissionsList
 
-        this.authService.checkSession(); // Call your session check method
-      });
-    }, 1000); 
+
+
+        console.log("PERMISSION LIST:", this.permission_list)
+
+      }
+
+
+      // console.log("SIDE MENU GET PERMISSION DATA RESPONSE:", this.permission_data.dreamBoardIDs)
+
+      this.generatedreamboard()
+
+
+      this.router.events
+        .pipe(filter((event: any) => event instanceof NavigationEnd))
+        .subscribe(() => {
+
+          console.log("Session is called from Init ");
+
+          this.authService.checkSession(); // Call your session check method
+        });
+    }, 1000);
   }
 
   dreamboardLookupData(sk: number): Promise<[string, string, string, number][]> {
@@ -143,58 +150,87 @@ export class SidebarMenuComponent implements OnInit {
     });
   }
 
-async generatedreamboard() {
-  const submenu: MenuItem[] = [];
+  async generatedreamboard() {
+    const submenu: MenuItem[] = [];
 
-  try {
-    // Initialize or clear previous data
-    this.path = [];
-    this.dreamdata = [];
+    try {
+      // Initialize or clear previous data
+      this.path = [];
+      this.dreamdata = [];
 
-    // Fetch data for dreamboard
-    await this.dreamboardLookupData(1);
-    const pathArray = this.path;
-    console.log("Path Array:", pathArray);
+      // Fetch data for dreamboard
+      await this.dreamboardLookupData(1);
+      const pathArray = this.path;
+      console.log("Path Array:", pathArray);
 
-    // Ensure permission_data.dreamBoardIDs has data
-    if (Array.isArray(this.permission_data.dreamBoardIDs) && this.permission_data.dreamBoardIDs.length > 0) {
+      // Ensure permission_data.dreamBoardIDs has data
+      if (this.permission_data !== 'All') {
+        if (Array.isArray(this.permission_data.dreamBoardIDs) && this.permission_data.dreamBoardIDs.length > 0) {
 
-      const includeAll = this.permission_data.dreamBoardIDs.includes('All');
-      for (const pathValue of pathArray) {
-        // if (this.permission_data.dreamBoardIDs.includes(pathValue)) {
-      if (includeAll || this.permission_data.dreamBoardIDs.includes(pathValue)) {
-          submenu.push({
-            title: `${pathValue}`,
-            link: `view-dreamboard/${pathValue}/All`,
-            icon: '',
-            subMenu: [],
-          });
+          const includeAll = this.permission_data.dreamBoardIDs.includes('All');
+          for (const pathValue of pathArray) {
+            // if (this.permission_data.dreamBoardIDs.includes(pathValue)) {
+            if (includeAll || this.permission_data.dreamBoardIDs.includes(pathValue)) {
+              submenu.push({
+                title: `${pathValue}`,
+                link: `view-dreamboard/${pathValue}/All`,
+                icon: '',
+                subMenu: [],
+              });
+            }
+          }
+          this.menuItems = [
+            {
+              title: 'Modules',
+              icon: 'element-7',
+              subMenu: submenu.length > 0 ? submenu : [{ title: 'No Module Available', link: '' }]
+            }
+          ];
         }
       }
-      this.menuItems = [
-        {
-          title: 'Modules',
-          icon: 'element-7',
-          subMenu: submenu.length > 0 ? submenu : [{ title: 'No Module Available', link: '' }]
-        }
-      ];
+      else{
+
+        for (const pathValue of pathArray) {
+          // if (this.permission_data.dreamBoardIDs.includes(pathValue)) {
+          // if (includeAll || this.permission_data.dreamBoardIDs.includes(pathValue)) {
+            submenu.push({
+              title: `${pathValue}`,
+              link: `view-dreamboard/${pathValue}/All`,
+              icon: '',
+              subMenu: [],
+            });
+          }
+        // }
+        this.menuItems = [
+          {
+            title: 'Modules',
+            icon: 'element-7',
+            subMenu: submenu.length > 0 ? submenu : [{ title: 'No Module Available', link: '' }]
+          }
+        ];
+      }
+
+      console.log("Updated menuItems:", this.menuItems);
+
+      this.cdRef.detectChanges();
+
+    } catch (error) {
+      console.error('Error while generating dreamboard:', error);
     }
-    console.log("Updated menuItems:", this.menuItems);
 
-    this.cdRef.detectChanges();
-
-  } catch (error) {
-    console.error('Error while generating dreamboard:', error);
+    return this.menuItems;
   }
 
-  return this.menuItems;
-}
 
-hasPermission(moduleName: string): boolean {
-  return this.permission_list?.some((item: { name: string; view: any; }) => item.name === moduleName && item.view);
-}
-// Your menuItems structure
-menuItems: MenuItem[] = [];
+  hasPermission(moduleName: string): boolean {
+    if (this.permission_data === 'All') {
+      return true; // Grant access to all modules if 'All' exists in the list
+    }
+    return this.permission_list?.some((item: { name: string; view: any; }) => item.name === moduleName && item.view);
+  }
+
+  // Your menuItems structure
+  menuItems: MenuItem[] = [];
 
 
 }

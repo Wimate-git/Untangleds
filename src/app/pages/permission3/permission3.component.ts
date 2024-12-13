@@ -2,7 +2,7 @@ import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, O
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { Observable } from 'rxjs';
 import { DataTablesResponse, IUserModel, UserService } from 'src/app/_fake/services/user-service';
-import { SweetAlertOptions } from 'sweetalert2';
+import Swal,{ SweetAlertOptions } from 'sweetalert2';
 import { Config } from 'datatables.net';
 import {
   Validators,
@@ -122,6 +122,8 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   formData: any;
   formfieldData: any;
   dynamic_field: any;
+  cloneUserOperation: boolean = false;
+  editOperation: boolean;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -277,9 +279,13 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
       this.formfieldData = this.formData.formFields
 
-      this.formfieldData = this.formData.formFields.filter((field: any) => field.label !== "Empty Placeholder");
+      this.formfieldData = this.formfieldData.filter((field: any) => field.validation.lookup_table === true);
 
-      console.log("FORMS AFTER STRINGIFY:", this.formfieldData);
+      console.log("Filtered Form Fields:", this.formfieldData);
+
+      // this.formfieldData = this.formData.formFields.filter((field: any) => field.label !== "Empty Placeholder");
+
+      // console.log("FORMS AFTER STRINGIFY:", this.formfieldData);
 
     }).catch((error)=>{
      
@@ -490,6 +496,26 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     this.addPermissions();
   }
 
+
+  async onCloneUser(){
+    this.cloneUserOperation = true
+
+    this.permissionForm.get('permissionID')?.reset()
+    
+    this.update = false
+
+
+    Swal.fire({
+      toast: true,
+      position: 'bottom',
+      icon: 'success', // or another icon like 'info', 'error', etc.
+      title: 'Permission Configuration Cloned Successfully',
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true
+    });
+    
+}
 
   addDynamicData() {
 

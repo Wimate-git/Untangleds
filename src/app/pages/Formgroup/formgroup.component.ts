@@ -620,7 +620,8 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
 
   create() {         // click on create new 
     this.update = false
-    this.selectedImage = null;         // Model heading and button text change flag
+    this.selectedImage = null;  
+    this.previewObjDisplay = '';       // Model heading and button text change flag
     this.initForm()
   }
 

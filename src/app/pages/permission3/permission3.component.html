@@ -47,6 +47,10 @@
         <div class="modal-header">
             <h4 *ngIf="!update" class="modal-title" id="modal-basic-title">Add Permission Configuration</h4>
             <h4 *ngIf="update" class="modal-title" id="modal-basic-title">Edit Permission Configuration</h4>
+            <button *ngIf="update" [disabled]="cloneUserOperation" type="button" placement="bottom" class="btn btn-sm btn-warning copy-btn ms-1" (click)="onCloneUser()">
+                <span class="copy-icon"><i class="fa-regular fa-copy fs-6 text-white pt-1"></i></span> <!-- Copy icon (clipboard) -->
+                <span class="copy-text"> Clone Permission</span> <!-- Text that appears on hover -->
+            </button>
             <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
         </div>
         <div class="modal-body">
