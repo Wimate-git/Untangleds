@@ -97,6 +97,17 @@
       </div>
     </div>
 
+    <div class="menu-item">
+      <a class="menu-link without-sub" routerLinkActive="active"
+         routerLink="/reportStudio">
+        <span class="menu-bullet">
+          <!-- <app-keenicon name="profile-circle" ></app-keenicon> -->
+          <i class="fa-solid fa-square-poll-vertical fs-2"></i>
+        </span>
+        <span class="menu-title">Report Studio</span>
+      </a>
+    </div>
+
 
     <div class="menu-item" *ngIf="hasPermission('Communication')">
       <a class="menu-link without-sub" routerLinkActive="active" routerLink="/Communication">
@@ -113,7 +124,7 @@
         <span class="menu-bullet">
           <i class="bi bi-envelope-exclamation-fill"></i>
         </span>
-        <span class="menu-title">Notification Matrix</span>
+        <span class="menu-title">Escalation Matrix</span>
       </a>
     </div>
 

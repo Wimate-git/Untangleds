@@ -13,6 +13,11 @@ const Routing: Routes = [
     path: 'Project Configuration/project',
     loadChildren: () => import('./project/project.module').then((m) => m.ProjectModule),
   },
+
+  {
+    path: 'reportStudio',
+    loadChildren: () => import('./report-studio/report-studio.module').then((m) => m.ReportStudioModule),
+  },
   {
     path: 'project-dashboard/project-template-dashboard/:projectgroup',
     loadChildren: () => import('./project-template-dashboard/project-template-dashboard.module').then((m) => m.ProjectTemplateDashboardModule),

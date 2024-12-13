@@ -13,6 +13,9 @@
 
 @import './custom-multiselect.scss';
 
+@import '../node_modules/ag-grid-community/styles/ag-grid.css';
+@import '../node_modules/ag-grid-community/styles/ag-theme-alpine.css';
+
 
 /* Style for the multiselect */
 .p-multiselect {

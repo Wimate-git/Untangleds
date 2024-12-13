@@ -1,0 +1,328 @@
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true"><p style="color: white" >Loading… please enjoy this virtual cup of coffee! ☕ </p></ngx-spinner>
+
+<div class="card card-custom">
+    <div class="card-header border-0 pt-6" style="align-items: center;padding: 0 1.6rem">
+        <h2 class="p-0 m-0">Report Studio</h2>
+    </div>
+
+    <hr>
+    
+
+
+    <form [formGroup]="reportsFeilds" class="ps-2">
+            <div class="form-group row ps-4 mb-7 mt-5" >
+                <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold" >Form Name</label>
+                    <div class="col-3">
+                        <div class="custom-multiselect">
+
+                            <p-multiSelect
+                            [options]="formList" 
+                            placeholder="select Form"
+                            [(ngModel)]="selectedForms"
+                            value ="value"
+                            formControlName="form_permission"
+                            (onChange)="multiSelectChange()"
+                            required>
+                            </p-multiSelect>
+                        </div>
+                    </div>
+            </div>
+
+
+           <!-- Date Type Field -->
+        <div class="form-group row ps-4 mb-7">
+            <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Date Type</label>
+            <div class="col-3">
+                <select formControlName="dateType" class="form-select form-select-solid form-select-lg">
+                    <option [value]="null" [selected]="true" disabled>Select Date Type</option>
+                    <option value="is">is</option>
+                    <option value=">=">&gt;=</option>
+                    <option value="<=">&lt;=</option>
+                    <option value="between">between</option>
+                    <option value="between time">between time</option>
+                    <option value="less than days ago">less than days ago</option>
+                    <option value="more than days ago">more than days ago</option>
+                    <option value="in the past">in the past</option>
+                    <option value="days ago">days ago</option>
+                    <option value="today">today</option>
+                    <option value="yesterday">yesterday</option>
+                    <option value="this week">this week</option>
+                    <option value="last week">last week</option>
+                    <option value="last 2 weeks">last 2 weeks</option>
+                    <option value="this month">this month</option>
+                    <option value="last month">last month</option>
+                    <option value="this year">this year</option>
+                    <option value="any">any</option>
+                    <option value="latest 10">latest 10</option>
+                </select>
+            </div>
+        </div>
+
+     
+        <div *ngIf="dateTypeConfig[dateType?.value]?.showDate" class="mb-7">
+            <div class="form-group row ps-4 mb-2">
+                <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Select Date</label>
+                <div class="col-3">
+                    <input type="date" formControlName="singleDate" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="dateTypeConfig[dateType?.value]?.showStartDate" class="mb-7">
+          <div class="form-group row ps-4 mb-2">
+              <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Start Date</label>
+              <div class="col-3">
+                  <!-- Dynamically change the type based on dateType -->
+                  <input [type]="dateTypeConfig[dateType?.value]?.isBetweenTime ? 'datetime-local' : 'date'" formControlName="startDate" class="form-control">
+              </div>
+          </div>
+          <br>
+          <div class="form-group row ps-4">
+              <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">End Date</label>
+              <div class="col-3">
+                  <!-- Dynamically change the type based on dateType -->
+                  <input [type]="dateTypeConfig[dateType?.value]?.isBetweenTime ? 'datetime-local' : 'date'" formControlName="endDate" class="form-control">
+              </div>
+          </div>
+      </div>
+
+   
+        <div  *ngIf="dateTypeConfig[dateType?.value]?.showDaysAgo" class="mb-7">
+            <div class="form-group row ps-4 mb-2">
+                <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Number of Days</label>
+                <div class="col-3">
+                    <input type="number" formControlName="daysAgo" class="form-control" placeholder="Enter number of days">
+                </div>
+            </div>
+        </div>
+
+
+         <!-- Filter Data Section with Radio Buttons -->
+<div class="form-group row ps-4 mb-7">
+  <label class="required col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Filter Data</label>
+  <div class="col-3 d-flex gap-7 align-items-center">
+    <div class="form-check">
+      <input class="form-check-input" type="radio" id="filterAll" formControlName="filterOption" value="all" (change)="onFilterChange($event,'html')">
+      <label class="form-check-label" for="filterAll">All</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" id="filterOnCondition" formControlName="filterOption" value="onCondition" (change)="onFilterChange($event,'html')">
+      <label class="form-check-label" for="filterOnCondition">On Condition</label>
+    </div>
+  </div>
+</div>
+
+
+
+ <!-- Dynamic Form Fields Based on Selected Forms -->
+<form [formGroup]="formFieldsGroup" class="card card-custom p-2 mt-5" *ngIf="conditionflag">
+  <div formArrayName="forms" style="display: flex; flex-wrap: wrap;">
+      <div *ngFor="let form of forms().controls; let formIndex=index" >
+        <div [formGroupName]="formIndex" class="form-group" style="border: 1px solid blue; padding: 10px; width: 600px; margin: 5px;">
+         
+          <h5>{{ getFormNameByIndex(formIndex) }}</h5>
+          
+     
+          <div formArrayName="conditions">
+            <div *ngFor="let conditionGroup of conditions(formIndex).controls; let condIndex=index" [formGroupName]="condIndex">
+
+
+              <div style="display: flex;flex-wrap: wrap;justify-content: space-between;">
+                <div class="mb-3" style="width: 30%;">
+                  <label class="required">Select Field</label>
+                  <select formControlName="condition" class="form-control">
+                    <option *ngFor="let field of getAvailableFields(formIndex)" [value]="field.name" >{{ field.label }}</option>
+                  </select>                  
+                </div>
+      
+                <div class="mb-3" style="width: 30%;">
+                  <label class="required">Operator</label>
+                  <select formControlName="operator" placeholder="Select operator" class="form-control">
+                    <option value="" disabled selected>Select operator</option>
+                    <option value="==">Equals</option>
+                    <option value=">">Not equals</option>
+                    <option value=">">Greater than</option>
+                    <option value="<">Less than</option>
+                    <option value="<=">Less than equals to</option>
+                    <option value=">=">Greater than equals to</option>
+                  </select>
+                </div>
+      
+                <div class="mb-3" style="width: 30%;">
+                  <label class="required">Value</label>
+                  <input type="text" formControlName="value" placeholder="value"  class="form-control" />
+                </div>
+              </div>
+
+
+            
+    
+         
+              <div *ngIf="condIndex < conditions(formIndex).length - 1" class="mb-3" style="width: 30%;">
+                <label class="required">Between Operator</label>
+                <select formControlName="operatorBetween" placeholder="Select operator" class="form-control">
+                  <option value="" disabled selected>Select operator</option>
+                  <option value="&&">AND</option>
+                  <option value="||">OR</option>
+                </select>
+              </div>
+    
+              <button *ngIf="condIndex != 0" type="button" class="btn btn-danger btn-sm mb-2" (click)="removeCondition(formIndex, condIndex)">Remove Condition</button>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" (click)="addCondition(formIndex)">Add Condition</button>
+          
+        </div>
+      </div>
+    </div>
+ 
+</form>
+
+
+
+
+        <div class="mb-7">
+            <div class="form-group row ps-4 mb-2">
+                <div class="col-3">
+
+                </div>
+                <div class="col-3">
+                    <button type="submit" [disabled]="reportsFeilds.invalid" class="btn fw-bold custom-success translatey me-5" (click)="onSubmit()">Apply</button>
+                    <button type="submit" class="btn fw-bold custom-primary" (click)="clearFeilds()">Clear</button>
+                    <button type="submit" *ngIf="onSubmitFlag" class="btn fw-bold btn-primary translatey ms-5" (click)="saveQuery(openModal1)">Save</button>
+                    <button type="submit" *ngIf="saveButton" class="btn fw-bold btn-primary translatey ms-5" (click)="editQuery(openModal1)">Edit</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+</div>
+
+
+
+<div *ngFor="let table of tableDataWithFormFilters">
+    <div class="card card-custom p-2 mt-5">
+        <h3 class="text-center text-primary">{{ table.formFilter }}</h3> 
+  
+      
+
+        <ag-grid-angular
+        style="width: 100%; height: 100%;"  
+        class="ag-theme-alpine"
+        [rowData]="table.rows"    
+        [columnDefs]="createColumnDefs(table.rows)" 
+        [domLayout]="'autoHeight'"  
+        [pagination]="true"
+        [paginationPageSize]="10" 
+        [suppressHorizontalScroll]="false" 
+        
+        > 
+      </ag-grid-angular>
+    </div>
+  </div>
+
+
+
+
+
+<!-- Modal is here for saved Query -->
+  <ng-template #openModal1 let-modal>
+        <div class="modal-header">
+            <h4 *ngIf="showHeading" class="modal-title" id="modal-basic-title">Add Saved Query</h4>
+            <h4 *ngIf="!showHeading" class="modal-title" id="modal-basic-title">Edit Saved Query</h4>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+
+        <div class="modal-body">
+            <div class="d-flex flex-column me-n7 pe-7 mw-1000px" id="kt_modal_update_customer_scroll"
+            data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}"
+            data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_update_customer_header"
+            data-kt-scroll-wrappers="#kt_modal_update_customer_scroll" data-kt-scroll-offset="300px">
+              <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+
+
+                <app-saved-query [editOperation]="showHeading" [savedModulePacket]="savedModulePacket" (closeModal)="dismissModal(modal)"></app-saved-query> 
+
+              </div>
+            </div>
+        </div>
+</ng-template>
+
+
+
+
+
+
+
+
+
+
+<!-- hamburger menu is here -->
+<div style="top: 1%;
+  z-index: 100;
+  right:44px;
+  flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20 gap-2">
+
+<nav class="myMenu" #tooltipContainer>
+  <input type="checkbox" href="#" class="myMenu-open" name="myMenu-open" id="myMenu-open" />
+  <label class="myMenu-open-button" for="myMenu-open">
+    <span class="hamburger hamburger-1"></span>
+    <span class="hamburger hamburger-2"></span>
+    <span class="hamburger hamburger-3"></span>
+  </label>
+  
+
+
+    <!-- (click)="openSummaryTable(content)" -->
+  <a *ngIf="!showHeading" class="myMenu-item"  title="Search dashboard" (click)="openModal(SavedQuery)">
+    <i style="color: white;" class="fa fa-search"></i>
+  </a>
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="width:50px;height:50px">
+    <defs>
+      <filter id="shadowed-goo">
+
+        <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10" />
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+        <feGaussianBlur in="goo" stdDeviation="3" result="shadow" />
+        <feColorMatrix in="shadow" mode="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 -0.2"
+          result="shadow" />
+        <feOffset in="shadow" dx="1" dy="1" result="shadow" />
+        <feComposite in2="shadow" in="goo" result="goo" />
+        <feComposite in2="goo" in="SourceGraphic" result="mix" />
+      </filter>
+      <filter id="goo">
+        <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10" />
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+        <feComposite in2="goo" in="SourceGraphic" result="mix" />
+      </filter>
+    </defs>
+  </svg>
+
+</nav>
+</div>
+
+
+
+
+<!-- Modal definition -->
+<ng-template #SavedQuery let-modal1>
+  <div class="modal-header">
+    <h4 class="modal-title">Saved Query Table</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal1.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <!-- Table inside the modal -->
+    <app-crud-report [componentSource]="'app-report-studio'" 
+                    [datatableConfig]="datatableConfig" 
+                    route="/reportStudio" 
+                    (deleteEvent)="delete($event)" 
+                    (editEvent)="editSavedQuery($event)" 
+                    (createEvent)="create()" 
+                    [reload]="reloadEvent"
+                    [modal]="SavedQuery">
+    </app-crud-report>
+  </div>
+</ng-template>
