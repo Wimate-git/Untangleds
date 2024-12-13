@@ -95,6 +95,11 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
 
   permissionsList = [
+    { name: 'Dashboard', view: false, update: false, xlsxView: false, xlsxUpdate: false },
+    { name: 'Project', view: false, update: false, xlsxView: false, xlsxUpdate: false },
+    { name: 'Dream Board', view: false, update: false, xlsxView: false, xlsxUpdate: false },
+    { name: 'Modules', view: false, update: false, xlsxView: false, xlsxUpdate: false },
+    { name: 'Summary Dashboard', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Communication', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Notification Matrix', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Client', view: false, update: false, xlsxView: false, xlsxUpdate: false },
@@ -151,7 +156,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       'Update',
       'Delete',
       'Xlsx template download',
-      'Xlsx template update',
+      'Xlsx data upload',
       'Xlsx data download'
     ]
 
@@ -459,13 +464,13 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       permissionID: ["", Validators.required],
       label: ["", Validators.required],
       description: ["", Validators.required],
-      time: ["", Validators.required],
-      no_of_request: ["", Validators.required],
-      no_of_records: ["", Validators.required],
-      size: ["", Validators.required],
-      setting: ["", Validators.required],
-      user_grade: ["", Validators.required],
-      api_enable: [false, Validators.required],
+      time: ["",],
+      no_of_request: ["",],
+      no_of_records: ["",],
+      size: ["", ],
+      setting: ["", ],
+      user_grade: ["",],
+      api_enable: [false, ],
       formgroup: [[]],
       dreamBoardIDs: [[], Validators.required],
       advance_report: [[]],

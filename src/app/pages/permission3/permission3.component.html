@@ -94,7 +94,7 @@
                                 Description is required.
                             </div>
                         </div>
-                        <div class="col-md-4 mb-4">
+                        <!-- <div class="col-md-4 mb-4">
                             <label class="required fw-semibold fs-6 mb-2">Time</label>
                             <input type="number" class="form-control form-control-solid" name="time"
                                 placeholder="Enter time" formControlName="time" />
@@ -102,8 +102,8 @@
                                 class="invalid-feedback">
                                 Time is required.
                             </div>
-                        </div>
-                        <div class="col-md-4 mb-6">
+                        </div> -->
+                        <!-- <div class="col-md-4 mb-6">
                             <label class="required fw-semibold fs-6 mb-2">Number Of Request</label>
                             <input type="number" class="form-control form-control-solid" name="no_of_request"
                                 placeholder="Enter no of request" formControlName="no_of_request" />
@@ -111,8 +111,8 @@
                                 class="invalid-feedback">
                                 Number Of Request is required.
                             </div>
-                        </div>
-                        <div class="col-md-4 mb-6">
+                        </div> -->
+                        <!-- <div class="col-md-4 mb-6">
                             <label class="required fw-semibold fs-6 mb-2">Number Of Records</label>
                             <input type="number" class="form-control form-control-solid" name="no_of_records"
                                 placeholder="Enter no of records" formControlName="no_of_records" />
@@ -120,8 +120,8 @@
                                 class="invalid-feedback">
                                 Number Of Records is required.
                             </div>
-                        </div>
-                        <div class="col-md-4 mb-6">
+                        </div> -->
+                        <!-- <div class="col-md-4 mb-6">
                             <label class="required fw-semibold fs-6 mb-2">Size</label>
                             <input type="number" class="form-control form-control-solid" name="size"
                                 placeholder="Enter size" formControlName="size" />
@@ -129,8 +129,8 @@
                                 class="invalid-feedback">
                                 Size is required.
                             </div>
-                        </div>
-                        <div class="col-md-4 mb-6">
+                        </div> -->
+                        <!-- <div class="col-md-4 mb-6">
                             <label class="required fw-semibold fs-6 mb-2">User Grade</label>
                             <select type="number" class="form-select form-select-solid form-select-lg" name="user_grade"
                                 placeholder="Enter size" formControlName="user_grade">
@@ -150,28 +150,6 @@
                             <div *ngIf="permissionForm.controls['user_grade'].invalid && permissionForm.controls['user_grade'].touched"
                                 class="invalid-feedback">
                                 User Grade is required.
-                            </div>
-                        </div>
-                        <!-- <div class="col-md-4 mb-6">
-                            <label class="required fw-semibold fs-6 mb-2">Form ID</label>
-                            <div class="custom-multiselect">
-                                <ng-multiselect-dropdown style="
-                                          display: inline-block; 
-                                          width: 100%;
-                                          padding: 0px ;
-                                          margin-bottom: 0;
-                                          font-weight: 0px;
-                                          line-height: 1.52857143;
-                                          text-align: left;
-                                          vertical-align: middle;
-                                          cursor: pointer;
-                                          background-image: none;
-                                          border-radius: 4px;
-                                          
-                                          " class="form-select form-select-solid form-select"
-                                    [placeholder]="'Select form Id'" [settings]="dropdownSettings" [data]="formList"
-                                    name="formList" [formControl]="$any(permissionForm.controls['formList'])">
-                                </ng-multiselect-dropdown>
                             </div>
                         </div> -->
                         <div class="col-md-4 mb-6">
@@ -220,7 +198,7 @@
                                 </ng-multiselect-dropdown>
                             </div>
                         </div>
-                        <div class="col-md-4 mb-6">
+                        <!-- <div class="col-md-4 mb-6">
                             <label class="fw-semibold fs-6 mb-2">Powerboard ID</label>
                             <div class="custom-multiselect">
                                 <ng-multiselect-dropdown style="
@@ -242,8 +220,8 @@
                                     [formControl]="$any(permissionForm.controls['powerboardId'])">
                                 </ng-multiselect-dropdown>
                             </div>
-                        </div>
-                        <div class="col-md-4 mb-6">
+                        </div> -->
+                        <!-- <div class="col-md-4 mb-6">
                             <label class="fw-semibold fs-6 mb-2">Magicboard ID</label>
                             <div class="custom-multiselect">
                                 <ng-multiselect-dropdown style="
@@ -265,15 +243,15 @@
                                     [formControl]="$any(permissionForm.controls['magicboardId'])">
                                 </ng-multiselect-dropdown>
                             </div>
-                        </div>
-                        <div class="col-md-4 mb-6 form-check form-check-custom form-check-solid form-check-success form-switch
+                        </div> -->
+                        <!-- <div class="col-md-4 mb-6 form-check form-check-custom form-check-solid form-check-success form-switch
                         " style="float: right; padding-left: 20px;">
                             <input class="form-check-input" type="checkbox" name="api_enable"
                                 formControlName="api_enable" />
                             <label class="form-check-label text-gray-700 fw-bold" data-bs-toggle="tooltip">Api
                                 Enable</label>
-                        </div>
-                        <div class="col-md-12 mb-12">
+                        </div> -->
+                        <!-- <div class="col-md-12 mb-12">
                             <label class="required fw-semibold fs-6 mb-2">Other Setting</label>
                             <textarea class="form-control form-control-solid" name="setting" placeholder="Enter setting"
                                 formControlName="setting"></textarea>
@@ -281,7 +259,7 @@
                                 class="invalid-feedback">
                                 Setting is required.
                             </div>
-                        </div>
+                        </div> -->
 
                     </div>
                 </div>
@@ -298,7 +276,7 @@
                             <li class="nav-item">
                                 <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Sidebar' }"
                                     (click)="setActiveTab('Sidebar')" role="tab">
-                                    Configuration
+                                    Modules
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -361,7 +339,7 @@
                         <div *ngIf="activeTab === 'Header'">
 
                             <div class="row">
-                                <div class="col-md-3 mb-4">
+                                <div class="col-md-5 mb-4">
                                     <label class="fw-semibold fs-6 mb-2">Dynamic Form</label>
                                     <!-- <input type="text" class="form-control form-control-solid" name="dynamicForm"
                                         placeholder="Enter dynamic form" formControlName="dynamicForm" /> -->
@@ -388,34 +366,7 @@
                                     
                                     <span style="color: #fc1900;">{{dynamicFormError}}</span>
                                 </div>
-                                
-                                <div class="col-md-3 mb-4">
-                                    <label class="fw-semibold fs-6 mb-2">Field Label</label>
-                                    <!-- <input type="text" class="form-control form-control-solid" name="newInput1"
-                                        placeholder="Enter value for New Input 1" formControlName="newInput1" /> -->
-                                        <select
-                                        class="form-select form-select-solid form-select"
-                                        name="field"
-                                        placeholder="Select field"
-                                        formControlName="field"
-                                    >
-                                        <option value="" disabled [selected]="true">Select field</option>
-                                        <option *ngFor="let item of formfieldData" [value]="item.label + '.' + item.name">
-                                            {{ item.label }}
-                                        </option>
-                                        </select>
-                                </div>
-                                <div class="col-md-2 mb-6 d-flex align-items-end">
-                                    <button type="button" class="btn btn-light-primary w-30 d-flex align-items-center justify-content-center" (click)="populateFilterEquation()">
-                                        <i class="bi bi-plus"></i>
-                                    </button>
-                                </div>
-                                <div class="col-md-4 mb-4 filter-equation">
-                                    <label class="fw-semibold fs-6 mb-2">Filter equation</label>
-                                    <input type="text" class="form-control form-control-solid" name="fieldValue"
-                                        placeholder="value" formControlName="fieldValue" />
-                                </div>
-                                <div class="col-md-3 mb-4">
+                                <div class="col-md-5 mb-4">
                                     <label class="fw-semibold fs-6 mb-2">Permission</label>
                                     <!-- <input type="text" class="form-control form-control-solid" name="permission"
                                         placeholder="Enter permission" formControlName="permission" /> -->
@@ -440,9 +391,37 @@
                                     </div>
                                     <span style="color: #fc1900;">{{permissionError}}</span>
                                 </div>
+                                
+                                <div class="col-md-3 mb-4">
+                                    <label class="fw-semibold fs-6 mb-2">Field Label</label>
+                                    <!-- <input type="text" class="form-control form-control-solid" name="newInput1"
+                                        placeholder="Enter value for New Input 1" formControlName="newInput1" /> -->
+                                        <select
+                                        class="form-select form-select-solid form-select"
+                                        name="field"
+                                        placeholder="Select field"
+                                        formControlName="field"
+                                    >
+                                        <option value="" disabled [selected]="true">Select field</option>
+                                        <option *ngFor="let item of formfieldData" [value]="item.label + '.' + item.name">
+                                            {{ item.label }}
+                                        </option>
+                                        </select>
+                                </div>
+                                <div class="col-md-2 mb-6 d-flex align-items-end">
+                                    <button type="button" class="btn btn-light-primary w-30 d-flex align-items-center justify-content-center" (click)="populateFilterEquation()">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                </div>
+                                <div class="col-md-5 mb-4 filter-equation">
+                                    <label class="fw-semibold fs-6 mb-2">Filter equation</label>
+                                    <input type="text" class="form-control form-control-solid" name="fieldValue"
+                                        placeholder="value" formControlName="fieldValue" />
+                                </div>
+                               
                         
                                 <div class="col-md-2 mb-4 d-flex align-items-end">
-                                    <button type="button" class="btn btn-primary w-100"
+                                    <button type="button" class="btn btn-primary w-60"
                                         (click)="addDynamicData()">Add</button>
                                 </div>
                             </div>
