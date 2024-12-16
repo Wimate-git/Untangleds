@@ -100,6 +100,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     { name: 'Dream Board', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Modules', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Summary Dashboard', view: false, update: false, xlsxView: false, xlsxUpdate: false },
+    { name: 'Report Studio', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Communication', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Notification Matrix', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Client', view: false, update: false, xlsxView: false, xlsxUpdate: false },
@@ -159,7 +160,8 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       'Delete',
       'Xlsx template download',
       'Xlsx data upload',
-      'Xlsx data download'
+      'Xlsx data download',
+      'None'
     ]
 
     this.datatableConfig = {}
@@ -268,7 +270,8 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
   dynamicFormSelect(selectForm:any):void{
 
-
+    this.formfieldData = []
+    this.permissionForm.get('fieldValue')?.reset();
     console.log("SELECTION OF FORMS:",selectForm)
 
     this.api.GetMaster(this.client+'#dynamic_form#'+selectForm+'#main',1).then((formres:any)=>{
@@ -357,10 +360,15 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
     this.selectedFormGroups.push(selectedItem); // Add selected item
 
-
     console.log("Current Selected Form Groups:", this.selectedFormGroups);
 
+    if(selectedItem == 'All'){
+     this.DynamicFormlist()
+    }
+    else{
+
     this.handleFormGroupSelection(selectedItem);
+    }
   }
 
   async onFormGroupDeSelect(deselectedItem: any){
@@ -411,6 +419,26 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     console.log("All deselected Form Groups:", deselectedItems);
     this.formList = []
     // Handle logic for when all items are deselected if needed
+  }
+
+  async DynamicFormlist() {
+    try {
+      await this.api.GetMaster(this.client + "#dynamic_form#lookup", 1).then((result: any) => {
+        if (result) {
+          const helpherObj = JSON.parse(result.options)
+
+          this.formList = helpherObj.map((item: any) => item[0])
+
+          console.log("FORMGORUP COMPONENT FETCH FORM LIST:", this.formList)
+
+          this.formList.unshift("All");
+        }
+      })
+    }
+    catch (err) {
+      console.log("Error fetching the dynamic form data ", err);
+    }
+
   }
 
   async handleFormGroupSelection(value: any): Promise<void> {
@@ -536,7 +564,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       title: 'Error!',
       text: 'This dynamic form has already been added.',
     };
-    if (dynamicForm?.length > 0 && permission?.length > 0 && fieldValue?.length > 0) {
+    if (dynamicForm?.length > 0 && permission?.length > 0) {
 
       // Check for duplicate entries
       const isDuplicate = this.dynamicEntries.controls.some((entry: any) => {
@@ -547,7 +575,6 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
       if (isDuplicate) {
         // Show error message for duplicate entry
-        // alert('This dynamic form has already been added.');
 
         this.showAlert(errorAlert_)
       } else {
@@ -566,13 +593,14 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       this.permissionForm.get('dynamicForm')?.reset();
       this.permissionForm.get('permission')?.reset();
       this.permissionForm.get('fieldValue')?.reset();
+      this.formfieldData=[]
     }
     else {
-      // this.dynamicFormError ='Dymanic form required'
-      // this.permissionError = 'Permission required'
-      this.permissionForm.get('dynamicForm')?.reset();
-      this.permissionForm.get('permission')?.reset();
-      this.permissionForm.get('fieldValue')?.reset();
+     
+      // this.permissionForm.get('dynamicForm')?.reset();
+      // this.permissionForm.get('permission')?.reset();
+      // this.permissionForm.get('fieldValue')?.reset();
+      this.formfieldData=[]
       this.showAlert(errorAlert_1)
     }
   }

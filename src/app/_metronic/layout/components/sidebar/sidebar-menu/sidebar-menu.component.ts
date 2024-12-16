@@ -231,6 +231,7 @@ export class SidebarMenuComponent implements OnInit {
 
   hasAnyConfigurationPermission(): boolean {
     const configModules = [
+      'Report Studio',
       'Communication',
       'Notification Matrix',
       'Client',

@@ -47,7 +47,9 @@
         </span>
         <span class="menu-title" style="font-size: 13.975px;">Dream Board</span>
       </a>
+      </div>
 
+<div *ngIf="hasPermission('Modules')">
       <div class="menu-item menu-accordion" *ngFor="let item of menuItems"
         [attr.data-kt-menu-trigger]="item.subMenu?.length ? 'click' : null" routerLinkActive="here show">
         <span class="menu-link">
@@ -89,6 +91,7 @@
         </div>
       </div>
     </div>
+    <!-- </div> -->
 
     <!-- Separator -->
     <div class="menu-item" *ngIf="hasAnyConfigurationPermission()">
