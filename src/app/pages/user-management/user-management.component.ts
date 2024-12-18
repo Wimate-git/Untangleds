@@ -165,6 +165,8 @@ rdtListWorkAround :any =[{
   cloneUserOperation: boolean = false;
   redirectionURL: string = '';
   lookup_All_temp: any = [];
+  tempUserName: string;
+  tempUserID: string;
 
   constructor(private apiService: UserService,private configService:SharedService,private fb:FormBuilder
     ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal,private DynamicApi:DynamicApiService,
@@ -1039,7 +1041,7 @@ rdtListWorkAround :any =[{
 
       this.allUserDetails = {
      
-        userID: this.createUserField.value.userID,
+        userID: this.createUserField.get('userID')?.getRawValue(),
         password: this.createUserField.value.name,
         clientID:clientTemp,
         allowOtherClient: this.createUserField.value.allowOtherClient,
@@ -1047,7 +1049,7 @@ rdtListWorkAround :any =[{
         allowOtherCompanyID: this.createUserField.value.allowOtherCompanyID,
         allowNewCompanyID: this.createUserField.value.allowNewCompanyID,
         companyID: companyidTemp,
-        username: this.createUserField.value.username,
+        username: this.createUserField.get('userID')?.getRawValue(),
         description: this.createUserField.value.description,
         mobile: this.createUserField.value.mobile,
         mobile_privacy: this.createUserField.value.mobile_privacy,
@@ -1131,30 +1133,6 @@ rdtListWorkAround :any =[{
       // If temp1 is null or undefined
       temp4 = '...(0)';
     }
-
-
-    // let temp5 = this.allUserDetails.device_type_permission.map((value: any) => {
-    //   let matchedItem = this.rdtListWorkAround.find((item: { value: any; }) => item.value === value);
-    //   return matchedItem ? matchedItem.text : null;
-    // }).filter((text: string | null) => text !== null);
-    // let temp6 = '';
-
-    // if (temp5) {
-    //   // If temp1 is not null or undefined
-    //   if (temp5.length === 1) {
-    //     temp6 = temp5[0];
-    //   } else if (temp5.length > 1) {
-    //     temp6 = temp5[0] + '...(' + (temp5.length) + ')';
-    //   } else {
-    //     temp6 = '...(0)';
-    //   }
-    // } else {
-    //   // If temp1 is null or undefined
-    //   temp6 = '...(0)';
-    // }
-
-
-
    
 
 
@@ -1987,6 +1965,9 @@ rdtListWorkAround :any =[{
     this.switchBetweenDropdown_company_id = false;
     this.disabled_companyID_textField = true;
 
+    this.tempUserName = ''
+    this.tempUserID = ''
+
     this.dataUser = getValues;
     this.editOperation = false;
     // console.log('getvalues inside openModal', getValues);
@@ -2102,6 +2083,9 @@ rdtListWorkAround :any =[{
 
        this.editOperation = true;
 
+
+       //[{value:getValues.clientID,disabled:true}]
+
         this.createUserField = this.fb.group({
           'userID': getValues.userID,
           'name': getValues.name,
@@ -2114,8 +2098,8 @@ rdtListWorkAround :any =[{
           'allowNewClient': [{value:getValues.allowNewClient}],
           'allowOtherCompanyID': getValues.allowOtherCompanyID,
           'allowNewCompanyID': [{value:false,disabled:!this.Allpermission}],
-          'companyID': getValues.companyID,
-          'username': getValues.username,
+          'companyID': [{value:getValues.clientID,disabled:true}],
+          'username':  getValues.username,
           'description': getValues.description,
           'mobile': getValues.testMobile,
           'mobile_privacy': getValues.mobile_privacy,
