@@ -21,6 +21,7 @@
           <div class="card" style="width: 100%; height: 100vh; background-color: var(--bs-app-bg-color) !important;">
             <div class="card-body p-0 pb-0"
               style="background-color: var(--bs-app-bg-color) !important; padding: 0 !important;">
+          
               <gridster style="background: var(--bs-app-bg-color)!important;border-radius: 5px;padding: 0px; "
                 [options]="options"     >
   
@@ -28,34 +29,53 @@
                  
          
                   <div *ngIf="item.grid_type === 'tile'" >
-                   <app-tile-ui1 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete1($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton"></app-tile-ui1>
+                   <app-tile-ui1 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"></app-tile-ui1>
                
                   </div>
-                  
-                    
-                    
-                    <div *ngIf="item.grid_type === 'tile2'" >
-                      <app-tile-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal1)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete2($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton"></app-tile-ui2>
+                                <div *ngIf="item.grid_type === 'tile2'" >
+                      <app-tile-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal1)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"></app-tile-ui2>
                     </div>
-  
+                    
                     <div *ngIf="item.grid_type === 'tile3'" >
-                      <app-tile-ui3 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal2)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete3($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton"></app-tile-ui3>
+                      <app-tile-ui3 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal2)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"></app-tile-ui3>
                  
                     </div>
-  
                     <div *ngIf="item.grid_type === 'tile4'">
-                      <app-tile-ui4 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal3)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete4($event)" [isEditModeView]="isEditModeView"  [hideButton]="hideButton"></app-tile-ui4>
+                      <app-tile-ui4 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal3)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView"  [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"></app-tile-ui4>
                     </div>
-                    
-  
-  
-                    <div *ngIf="item.grid_type === 'tile5'" >
-                      <app-tile-ui5 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal4)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete5($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" ></app-tile-ui5>
+                    <div *ngIf="item.grid_type === 'tile5'">
+                      <app-tile-ui5 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal4)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView"  [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"></app-tile-ui5>
                     </div>
                     <div *ngIf="item.grid_type === 'tile6'" >
-                      <app-tile-ui6 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal5)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton"></app-tile-ui6>
+                      <app-tile-ui6 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal5)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"></app-tile-ui6>
                     </div>
-                    <div *ngIf="item.grid_type === 'chart'"  >
+                              <div *ngIf="item.grid_type === 'chart'"  >
+                      <app-chart-ui1 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal1)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"></app-chart-ui1>
+                    </div>
+                    <div *ngIf="item.grid_type === 'Linechart'"  >
+                      <app-chart-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal2)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store"></app-chart-ui2>
+                    </div>
+                    <div *ngIf="item.grid_type === 'Columnchart'"  >
+                      <app-chart-ui3 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal3)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store"></app-chart-ui3>
+                    </div>
+                    
+                    <div *ngIf="item.grid_type === 'Areachart'"  >
+                      <app-chart-ui4 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal4)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store"></app-chart-ui4>
+                    </div>
+                    
+                    <div *ngIf="item.grid_type === 'Barchart'"  >
+                      <app-chart-ui5 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal5)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store"></app-chart-ui5>
+                    </div> 
+                    <div *ngIf="item.grid_type === 'title'" >
+                      <app-title-ui [item]="item" [index]="i" (customEvent)="helperTile($event,TitleModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [all_Packet_store]="all_Packet_store"></app-title-ui>
+  
+                 
+                    
+                 
+                 
+                    </div> 
+                    
+                    <!-- <div *ngIf="item.grid_type === 'chart'"  >
                       <app-chart-ui1 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal1)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" ></app-chart-ui1>
                     </div>
                     <div *ngIf="item.grid_type === 'Linechart'"  >
@@ -70,6 +90,9 @@
                     </div>
                     <div *ngIf="item.grid_type === 'Columnchart'"  >
                       <app-chart-ui5 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal5)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" ></app-chart-ui5>
+                    </div> -->
+                    <div *ngIf="item.grid_type === 'dynamicTile'"  >
+                      <app-dynamic-tile-ui [item]="item" [index]="i" (customEvent)="helperTile($event,DynamicTileModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton" ></app-dynamic-tile-ui>
                     </div>
   
   
@@ -106,80 +129,15 @@
                     </div> -->
   
   
-  
+<!--   
                     <div *ngIf="item.grid_type === 'title'" >
                       <app-title-ui [item]="item" [index]="i" (customEvent)="helperTile($event,TitleModal)" (customEvent1)="emitDuplicateTitle($event)" (customEvent2)="emitDeleteTitle($event)" [isEditModeView]="isEditModeView"></app-title-ui>
   
-                      <!-- <div 
-                      class="gridster-item title-widget"
-                      tabindex="0"
-                      [style.background-color]="item.themeColor"
-                
-                      (mouseenter)="isHovered = true"
-                      (mouseleave)="isHovered = false"
-                    >
-                      <div class="row ">
-                  
-                        <div class="text_3d"
-                      
-                        [style.font-size]="item.fontSize" 
-                        [style.font-weight]="item.fontWeight" 
-                        [style.text-align]="item.textAlign" 
-                        [style.color]="item.textColor"
-  
-                        >
-                        {{ item.customLabel }}
-                      </div>
-                     
-                      </div>
+                 
                     
-            
-                      <div 
-                        class="action-menu-container d-flex align-items-center" 
-                        style="position: absolute; top: 10px; right: 10px; gap: 10px;">
-                       
-                        <button 
-                          *ngIf="isEditModeView " 
-                          (click)="openTitleModal(TitleModal, item, i)" 
-                          class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
-                          aria-haspopup="menu" 
-                          aria-expanded="false" 
-                          style="background: none; border: none; cursor: pointer;">
-                          <i class="bi bi-pencil" style="color:black;"></i> 
-                        </button>
-                    
-                     
-                        <div 
-                        *ngIf="isEditModeView" 
-                        class="dropdown" 
-                        (mouseenter)="onMouseEnter()"
-                        (mouseleave)="onMouseLeave()"
-                      >
-                      <button
-                
-                      [matMenuTriggerFor]="menu"
-                      class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" data-bs-auto-close="outside" >
-                      <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>
-                    </button>
-                  
-                    <mat-menu #menu="matMenu" class="mat-elevation-z4">
-                      <button mat-menu-item (click)="duplicateTile5(item, i)">
-                        <i class="bi bi-files fs-4"></i>
-                        <span>Duplicate</span>
-                      </button>
-                      <button mat-menu-item (click)="deleteTile(item, i)">
-                        <i class="bi bi-trash fs-4"></i>
-                        <span>Delete</span>
-                      </button>
-                    </mat-menu>
-                      </div>
-                      
-                      </div>
+                 
+                 
                     </div> -->
-                    
-                 
-                 
-                    </div>
   
   
   
@@ -424,18 +382,19 @@
     </label>
   
     <!-- Existing Menu Items -->
-    <a title="Add Dashboard" class="myMenu-item" (click)="openModal('new',null, summaryModal)"> <i style="color: white;" class="fa fa-plus"></i> </a>
-    <a class="myMenu-item" #myLink *ngIf="editButtonCheck" title="Edit Dashboard" (click)="openModal('edit',all_Packet_store, summaryModal)"> <i style="color: white;" class="fa fa-edit"></i> </a>
-    <!-- <a class="myMenu-item" data-bs-toggle="modal" data-bs-placement="left" title="Home" data-bs-target="#myModal" routerLink="/summary-engine">
-      <i style="color: white;" class="fa fa-home"></i> </a> -->
-    <a  class="myMenu-item" (click)="openSummaryTable(content)" title="Search dashboard">
+    <a title="Add Dashboard" class="myMenu-item" (click)="openModal('new',null, summaryModal)">
+      <i style="color: white;" class="fa fa-plus"></i>
+    </a>
+    <a class="myMenu-item" #myLink *ngIf="editButtonCheck" title="Edit Dashboard" (click)="openModal('edit',all_Packet_store, summaryModal)">
+      <i style="color: white;" class="fa fa-edit"></i>
+    </a>
+    <a class="myMenu-item" (click)="openSummaryTable(content)" title="Search dashboard">
       <i style="color: white;" class="fa fa-search"></i>
     </a>
-  
     <a *ngIf="!isSummaryEngine()" class="myMenu-item" (click)="toggleMode()" style="cursor: pointer;" [attr.title]="isEditModeView ? 'View Mode' : 'Edit Mode'">
       <i style="color: white;" class="fa" [ngClass]="isEditModeView ? 'fa-eye' : 'fa-pencil-alt'"></i>
     </a>
-  
+    
     <!-- New Full View Icon -->
     <a class="myMenu-item" *ngIf="!isSummaryEngine()" (click)="toggleFullView()" style="cursor: pointer;" [attr.title]="isFullView ? 'Exit Full View' : 'Full View'">
       <i style="color: white;" class="fa" [ngClass]="isFullView ? 'fa-compress' : 'fa-expand'"></i>
@@ -446,9 +405,15 @@
     <a class="myMenu-item" *ngIf="!isSummaryEngine()" (click)="saveGridLayout()" style="cursor: pointer;" [attr.title]="'Save Dashboard'">
       <i style="color: white;" class="fa" [ngClass]="isFullView ? 'fa-save' : 'fa-save'"></i>
     </a>
+
+    <a class="myMenu-item" *ngIf="!isSummaryEngine()" (click)="openCloneDashboard(stepperModal, '')" 
+    style="cursor: pointer;" [attr.title]="'Duplicate Dashboard'">
+   <i style="color: white;" class="fa" [ngClass]="'fa-clone'"></i>
+ </a>
+ 
+   
+
     
-
-
   
     <!-- SVG Filter (Retained) -->
     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="width:50px;height:50px">
@@ -470,6 +435,7 @@
       </defs>
     </svg>
   </nav>
+  
   
   </div>
   
@@ -786,6 +752,7 @@
                 <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
                 <div>Label: Value 3</div>
               </div>
+
               <!-- <div class="grid-item" tabindex="0" (click)="openChartModal1(ChartModal1,modal)" style="background: #2a3439; padding: 20px; border-radius: 8px; color: white;">
                 <div>Label</div>
                 <div tabindex="0">Label: Value 2</div>
@@ -812,7 +779,7 @@
       </div>
       <!-- <button (click)="createChartGauge()">click me</button> -->
   
-      <div *ngIf="showGrid && selectedTile !== 'Title' &&  selectedTile !== 'Chart'" class="grid-container">
+      <div *ngIf="showGrid && selectedTile !== 'Title' &&  selectedTile !== 'Chart' &&  selectedTile !== 'DynamicTile'" class="grid-container">
         <div class="grid-item highlight" tabindex="0" (click)="openKPIModal(KPIModal,modal);modal.dismiss"  style="background: linear-gradient(to right, #ff7e5f, #feb47b); padding: 20px; border-radius: 8px; color: white;">
           <div>Label</div>
           <div class="value" tabindex="0">Value</div>
@@ -843,6 +810,7 @@
           <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
           <div>Label: Value 3</div>
         </div>
+
         <!-- <div class="grid-item" tabindex="0" (click)="openChartModal1(ChartModal1,modal)" style="background: #2a3439; padding: 20px; border-radius: 8px; color: white;">
           <div>Label</div>
           <div tabindex="0">Label: Value 2</div>
@@ -932,6 +900,32 @@
             </div>
   
           </div>
+        </div>
+      </div>
+
+      <div *ngIf="showGrid" class="container" style="margin-top: 10px;">
+        <div class="row">
+          <!-- Grid item spanning full width -->
+          <div class="col-md-12">
+
+            <div  *ngIf="showDynamicTileGrid" 
+            class="grid-item" 
+            tabindex="0" 
+            (click)="openDynamicTileModal(DynamicTileModal, modal)" 
+            style="background: linear-gradient(to right, #373B44, #4286F4); 
+                   padding: 20px; 
+                   border-radius: 8px; 
+                   color: white; 
+                   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); 
+                   transition: transform 0.2s;">
+        <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Label</div>
+        <div class="value" tabindex="0" style="font-size: 20px; font-weight: 600;">Value</div>
+      </div>
+      
+      
+      
+          </div>
+  
         </div>
       </div>
       
@@ -1414,12 +1408,12 @@
   
   <ng-template #KPIModal let-modal >
   
-    <app-tile1-config [dashboard]="dashboard" (dashboardChange)="getGridDetails($event)" (update_PowerBoard_config)="updateSummaryHelper($event)" [modal]="modal" [all_Packet_store]="all_Packet_store" (send_all_Packet_store)="allPacketStoreReceiver($event)"></app-tile1-config>
+    <app-tile1-config [dashboard]="dashboard" (dashboardChange)="getGridDetails($event)" (update_PowerBoard_config)="updateSummaryHelper2($event)" [modal]="modal" [all_Packet_store]="all_Packet_store" (send_all_Packet_store)="allPacketStoreReceiver($event)"></app-tile1-config>
   
   </ng-template>
   <ng-template #KPIModal1 let-modal >
   
-    <app-tile2-config [dashboard]="dashboard" (dashboardChange)="getGridDetails1($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper1($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver1($event)"></app-tile2-config>
+    <app-tile2-config [dashboard]="dashboard" (dashboardChange)="getGridDetails1($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver1($event)"></app-tile2-config>
   
   </ng-template>
   <ng-template #KPIModal2 let-modal >
@@ -1472,6 +1466,17 @@
   <ng-template #ChartModal5 let-modal >
   
     <app-chart5-config  [dashboard]="dashboard" (dashboardChange)="getGridDetails2($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver2($event)"></app-chart5-config>
+  
+  </ng-template>
+  <ng-template #stepperModal let-modal >
+  
+    <app-clone-dashboard [lookup_data_summary1]="lookup_data_summary1" [all_Packet_store]="all_Packet_store" (duplicateDashboardData)="duplicateSummaryDashboardData($event)" [modal]="modal" ></app-clone-dashboard>
+  
+  </ng-template>
+
+  <ng-template #DynamicTileModal let-modal >
+  
+    <app-dynamic-tile-config  [dashboard]="dashboard" (dashboardChange)="getGridDetails2($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver2($event)" ></app-dynamic-tile-config>
   
   </ng-template>
   </div>

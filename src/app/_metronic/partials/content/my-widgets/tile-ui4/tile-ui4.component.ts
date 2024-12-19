@@ -14,8 +14,9 @@ export class TileUi4Component {
   @Input() index:any
   @Input() isEditModeView:any;
   @Output() customEvent = new EventEmitter<{ arg1: any; arg2: number }>();
-  @Output() customEvent1 = new EventEmitter<{ arg1: any; arg2: number }>();
-  @Output() customEvent2 = new EventEmitter<{ arg1: any; arg2: number }>();
+  @Output() customEvent1 = new EventEmitter<{ data: { arg1: any; arg2: number }; all_Packet_store: any }>();
+  @Output() customEvent2 = new EventEmitter<{ data: { arg1: any; arg2: number }; all_Packet_store: any }>();
+  @Input()  all_Packet_store: any;
   @Input () hideButton:any
   iframeUrl: any;
   selectedMarkerIndex: any;
@@ -30,22 +31,36 @@ export class TileUi4Component {
   this.customEvent.emit(data); // Emitting an event with two arguments
 
   }
-  edit_each_duplicate(value1: any,value2: number) {
+  edit_each_duplicate(value1: any, value2: number) {
     const data = { arg1: value1, arg2: value2 }; // Two arguments
-  this.customEvent1.emit(data); // Emitting an event with two arguments
-
+    console.log('Data check from dynamic UI:', data);
+  
+    // Combine data with all_Packet_store
+    const payload = {
+      data,
+      all_Packet_store: this.all_Packet_store, // Include all_Packet_store
+    };
+  
+    console.log('Combined payload:', payload);
+  
+    // Emit the payload
+    this.customEvent1.emit(payload);
   }
   deleteTile(value1: any,value2: number) {
     const data = { arg1: value1, arg2: value2 }; // Two arguments
-  this.customEvent2.emit(data); // Emitting an event with two arguments
-
-  }
+    const payloadDelete = {
+      data,
+      all_Packet_store: this.all_Packet_store, // Include all_Packet_store
+    };
+  this.customEvent2.emit(payloadDelete); // Emitting an event with two arguments
+}
 
   get shouldShowButton(): boolean {
     return this.item.dashboardIds !== "";
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
     console.log("tile data check ",this.item)
     this.tile1Config = this.item

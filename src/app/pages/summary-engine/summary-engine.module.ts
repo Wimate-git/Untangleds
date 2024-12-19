@@ -31,6 +31,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CrudSummaryComponent } from './crud-summary/crud-summary.component';
 import { MyWidgetsModule } from 'src/app/_metronic/partials';
+import { HttpClientModule } from '@angular/common/http';
 
 
  // Import Keen UI Module
@@ -72,6 +73,7 @@ import { MyWidgetsModule } from 'src/app/_metronic/partials';
     NgxSpinnerModule,
     MatTooltipModule,
     NgbTooltipModule,
+    HttpClientModule,
    
     
 

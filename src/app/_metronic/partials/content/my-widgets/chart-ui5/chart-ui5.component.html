@@ -31,7 +31,7 @@ style="position: absolute; top: 10px; right: 10px; gap: 10px;z-index: 50;">
 </div>
 </div>
 
-<div *ngIf="item.grid_type === 'Columnchart'" id="pieChart{{index + 1}}"  [style.width.px]="chartWidth" [style.height.px]="chartHeight">
+<div *ngIf="item.grid_type === 'Barchart'" id="pieChart{{index + 1}}"  [style.width.px]="chartWidth" [style.height.px]="chartHeight">
 
   <div class="custom-label" *ngIf="item.custom_Label">
     {{ item.custom_Label }}

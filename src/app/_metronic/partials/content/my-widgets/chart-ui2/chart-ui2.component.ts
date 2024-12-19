@@ -13,6 +13,7 @@ export class ChartUi2Component implements OnInit{
   @Input() chartWidth:any
   @Input() chartHeight:any
   ngOnChanges(changes: SimpleChanges): void {
+    console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
       console.log("DynamicLine chart",this.item)
 
@@ -52,8 +53,11 @@ export class ChartUi2Component implements OnInit{
   @Input() index:any
   @Input() isEditModeView:any;
   @Output() customEvent = new EventEmitter<{ arg1: any; arg2: number }>();
-  @Output() customEvent1 = new EventEmitter<{ arg1: any; arg2: number }>();
-  @Output() customEvent2 = new EventEmitter<{ arg1: any; arg2: number }>();
+  @Output() customEvent1 = new EventEmitter<{ data: { arg1: any; arg2: number }; all_Packet_store: any }>();
+  @Output() customEvent2 = new EventEmitter<{ data: { arg1: any; arg2: number }; all_Packet_store: any }>();
+
+  // @Output() customEvent2 = new EventEmitter<{ arg1: any; arg2: number }>();
+  @Input()  all_Packet_store: any;
 
   edit_each_tileUI(value1: any,value2: number) {
     const data = { arg1: value1, arg2: value2 }; // Two arguments
@@ -61,14 +65,29 @@ export class ChartUi2Component implements OnInit{
   this.customEvent.emit(data); // Emitting an event with two arguments
 
   }
-  edit_each_duplicate(value1: any,value2: number) {
+  edit_each_duplicate(value1: any, value2: number) {
     const data = { arg1: value1, arg2: value2 }; // Two arguments
-  this.customEvent1.emit(data); // Emitting an event with two arguments
-
+    console.log('Data check from dynamic UI:', data);
+  
+    // Combine data with all_Packet_store
+    const payload = {
+      data,
+      all_Packet_store: this.all_Packet_store, // Include all_Packet_store
+    };
+  
+    console.log('Combined payload:', payload);
+  
+    // Emit the payload
+    this.customEvent1.emit(payload);
   }
+  
   deleteTile(value1: any,value2: number) {
     const data = { arg1: value1, arg2: value2 }; // Two arguments
-  this.customEvent2.emit(data); // Emitting an event with two arguments
+    const payloadDelete = {
+      data,
+      all_Packet_store: this.all_Packet_store, // Include all_Packet_store
+    };
+  this.customEvent2.emit(payloadDelete); // Emitting an event with two arguments
 
   }
   ngOnInit(){

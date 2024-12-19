@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -39,6 +39,9 @@ constructor(private summaryConfiguration: SharedService,private api: APIService,
   
 }
 
+ngOnChanges(changes: SimpleChanges): void {
+  console.log('dashboardChange',this.all_Packet_store)
+}
   openTitleModal( tile?: any, index?: number) {
  
     if (tile) {
@@ -138,10 +141,10 @@ constructor(private summaryConfiguration: SharedService,private api: APIService,
     this.cdr.detectChanges();
   
     // Call updateSummary to reflect the addition of the duplicated title
-    this.updateSummary( 'add_tile');
+    this.updateSummary('','add_tile')
   }
-  updateSummary(arg2:any){
-    this.update_PowerBoard_config.emit(arg2)
+  updateSummary(data: any, arg2: any) {
+    this.update_PowerBoard_config.emit({ data, arg2 });
   }
 
   // Editor styles
@@ -258,7 +261,7 @@ updateTextColor(event: Event): void {
     this.dashboardChange.emit(this.grid_details);
     if(this.grid_details)
       {
-        this.updateSummary('add_tile');
+        this.updateSummary('','add_tile');
       }
   }
 }
@@ -296,7 +299,7 @@ updateTitle() {
 
     if(this.grid_details)
       {
-        this.updateSummary('update_tile')
+        this.updateSummary(this.all_Packet_store,'update_tile');
       }
     // Trigger updates
   // Open the modal for additional actions

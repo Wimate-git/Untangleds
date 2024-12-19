@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -92,6 +92,10 @@ export class Chart4ConfigComponent implements OnInit{
 
 
 
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('dashboardChange',this.all_Packet_store)
   }
 
   convertTo12HourFormat(time: string): string {
@@ -316,7 +320,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         colWidth: 100,
         fixedColWidth: true,
         fixedRowHeight: true,
-        grid_type: 'Columnchart',
+        grid_type: 'Areachart',
   
         chart_title: this.createChart.value.chart_title || '',  // Ensure this value exists
         fontSize: `${this.createChart.value.fontSize || 16}px`,  // Provide a fallback font size
@@ -350,7 +354,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
   
       // Optionally update the summary if required
       if (this.grid_details) {
-        this.updateSummary('add_tile');
+        this.updateSummary('','add_tile');
       }
   
       // Optionally reset the form fields after adding the tile
@@ -444,7 +448,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
       this.dashboardChange.emit(this.grid_details);
   
       if (this.grid_details) {
-        this.updateSummary('update_tile');
+        this.updateSummary('','update_tile');
       }
   
       console.log('this.dashboard check from updateTile', this.dashboard);
@@ -503,7 +507,7 @@ alert('cloned tile')
     if(this.grid_details)
       {
         alert('grid details is there')
-        this.updateSummary('add_tile')
+        this.updateSummary(this.all_Packet_store,'update_tile');
       }
 
     // Trigger change detection to ensure the UI updates
@@ -512,12 +516,9 @@ alert('cloned tile')
     // Update summary to handle the addition of the duplicated tile
 
   }
-updateSummary(arg2:any){
-  this.update_PowerBoard_config.emit(arg2)
-
-
-
-}
+  updateSummary(data: any, arg2: any) {
+    this.update_PowerBoard_config.emit({ data, arg2 });
+  }
 
 
 themes = [

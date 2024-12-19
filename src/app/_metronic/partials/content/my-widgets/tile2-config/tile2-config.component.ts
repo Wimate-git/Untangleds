@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -70,6 +70,9 @@ ngOnInit(): void {
   this.dynamicData()
   this.dashboardIds(1)
   
+}
+ngOnChanges(changes: SimpleChanges): void {
+  console.log('dashboardChange tile2',this.all_Packet_store)
 }
 
 async dashboardIds(sk: any) {
@@ -275,7 +278,8 @@ generateUniqueId(): number {
        this.dashboardChange.emit(this.grid_details);
        if(this.grid_details)
          {
-           this.updateSummary('add_tile');
+
+          this.updateSummary('','update_tile');
          }
    
        this.createKPIWidget1.patchValue({
@@ -304,11 +308,10 @@ generateUniqueId(): number {
     selectedSettingsTab(tab: string) {
       this.selectedTabset = tab;
     }
-    updateSummary(arg2:any){
-      this.update_PowerBoard_config.emit(arg2)
-    
-    
-    
+    updateSummary(data: any, arg2: any) {
+      console.log('data checking tile2',data)
+      console.log('arg2 checkimng',arg2)
+      this.update_PowerBoard_config.emit({ data, arg2 });
     }
 
      themes = [
@@ -605,7 +608,7 @@ generateUniqueId(): number {
   
       if(this.grid_details)
         {
-          this.updateSummary('update_tile')
+          this.updateSummary(this.all_Packet_store,'update_tile');
         }
       console.log('this.dashboard check from updateTile', this.dashboard);
       console.log("Updated all_Packet_store.grid_details:", this.all_Packet_store.grid_details);
@@ -775,7 +778,7 @@ generateUniqueId(): number {
     this.cdr.detectChanges();
 
     // Update summary to handle the addition of the duplicated tile
-    this.updateSummary('add_tile');
+    this.updateSummary('','add_tile');
   }
 
   onFontColorChange(event: Event): void {

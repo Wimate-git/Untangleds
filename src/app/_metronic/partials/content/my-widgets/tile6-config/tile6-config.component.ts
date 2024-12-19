@@ -494,7 +494,7 @@ constructor(private summaryConfiguration: SharedService,private api: APIService,
       this.dashboardChange.emit(this.grid_details);
       if(this.grid_details)
         {
-          this.updateSummary('add_tile');
+          this.updateSummary(this.all_Packet_store,'update_tile');
         }
       console.log('his.dashboard check from updateTile', this.dashboard)
 
@@ -507,8 +507,8 @@ constructor(private summaryConfiguration: SharedService,private api: APIService,
       console.error("Edit index is null. Unable to update the tile.");
     }
   }
-  updateSummary(arg2:any){
-    this.update_PowerBoard_config.emit(arg2)
+  updateSummary(data: any, arg2: any) {
+    this.update_PowerBoard_config.emit({ data, arg2 });
   }
   duplicateTile5(tile: any, index: number): void {
     if (!tile || index < 0 || index >= this.dashboard.length) {
@@ -567,7 +567,7 @@ constructor(private summaryConfiguration: SharedService,private api: APIService,
     this.cdr.detectChanges();
 
     // Update summary to handle the addition of the duplicated tile
-    this.updateSummary('add_tile');
+    this.updateSummary('','add_tile');
   }
 
   dynamicparameterValue(event: any): void {
@@ -628,7 +628,7 @@ constructor(private summaryConfiguration: SharedService,private api: APIService,
        id: uniqueId,
        x: 0,
        y: 0,
-       rows: 25,  // The number of rows in the grid
+       rows: 13,  // The number of rows in the grid
        cols: 25, 
        rowHeight: 200, // The height of each row in pixels
        colWidth: 200,  // The width of each column in pixels
@@ -689,7 +689,7 @@ constructor(private summaryConfiguration: SharedService,private api: APIService,
      this.dashboardChange.emit(this.grid_details);
      if(this.grid_details)
        {
-         this.updateSummary('add_tile');
+         this.updateSummary('','add_tile');
        }
 
      console.log('this.dashboard after adding new tile', this.dashboard);

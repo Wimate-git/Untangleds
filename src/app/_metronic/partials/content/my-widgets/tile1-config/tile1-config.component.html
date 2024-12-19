@@ -73,6 +73,23 @@
                       style="width: 100%;">
                     </ngx-select>
                   </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label for="parameterName" class="col-form-label fw-bold fs-6 required">Format Type</label>
+                    <ngx-select
+                      id="parameterName"
+                      [allowClear]="true"
+                      formControlName="formatType"
+                      [items]="FormatTypeValues"
+                      optionValueField="value"
+                      optionTextField="text"
+                      placeholder="Select Parameter"
+                  
+                      style="width: 100%;">
+                    </ngx-select>
+                  </div>
+
+
             
                   <!-- <div class="col-md-4 mb-3">
                     <label for="groupBy" class="col-form-label fw-bold fs-6 required">Group By</label>
@@ -229,25 +246,22 @@
               </div>
               <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'filter-tab'}" id="filter-tab"
               role="tabpanel" aria-labelledby="filter-tabpane">
-          
               
               <div class="row">
-       
-                
                 <div class="col-md-5 mb-3">
                   <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Parameter</label>
                   <ngx-select
-                  id="parameterName"
-                  [allowClear]="true"
-                  formControlName="filterParameter"
-                  [items]="listofDynamicParam"
-                  optionValueField="value"
-                  optionTextField="text"
-                  placeholder="Select Parameter"
-                  (selectionChanges)="dynamicparameterValue($event)"
-                  style="width: 100%;"
-                ></ngx-select>
-                
+                    id="parameterName"
+                    [allowClear]="true"
+                    formControlName="filterParameter"
+                    [items]="listofDynamicParam"
+                    optionValueField="value"
+                    optionTextField="text"
+                    placeholder="Select Parameter"
+                    (selectionChanges)="dynamicparameterValue($event)"
+                    [multiple]="true" 
+                    style="width: 100%;"
+                  ></ngx-select>
                 </div>
             
                 <div class="col-md-2 mb-3 d-flex align-items-end">
@@ -258,19 +272,18 @@
               <div class="col-md-12 mb-3">
                 <label for="description" class="col-createChart-label fw-bold fs-6">Description</label>
                 <textarea
-                id="description"
-                formControlName="filterDescription"  
-                class="form-control"
-                rows="3"
-                placeholder="Enter description"
-                (selectionChanges)="descriptionValue($event)"
-              >{{ selectedParameterValue }}</textarea>
+                  id="description"
+                  formControlName="filterDescription"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Enter description"
+                  (selectionChanges)="descriptionValue($event)"
+                >
+                  {{ selectedParameterValue }}
+                </textarea>
               </div>
-    
-    
-            
-              
             </div>
+            
             
               <!-- Settings Tab Content -->
               <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab" role="tabpanel" aria-labelledby="settings-tabpane">

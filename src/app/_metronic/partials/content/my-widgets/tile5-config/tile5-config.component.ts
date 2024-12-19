@@ -319,7 +319,7 @@ export class Tile5ConfigComponent implements OnInit {
          id: uniqueId,
          x: 0,
          y: 0,
-         rows: 25,  // The number of rows in the grid
+         rows: 13,  // The number of rows in the grid
          cols: 25, 
          rowHeight: 200, // The height of each row in pixels
          colWidth: 200,  // The width of each column in pixels
@@ -393,7 +393,7 @@ export class Tile5ConfigComponent implements OnInit {
        this.dashboardChange.emit(this.grid_details);
        if(this.grid_details)
          {
-           this.updateSummary('add_tile');
+           this.updateSummary('','add_tile');
          }
  
        console.log('this.dashboard after adding new tile', this.dashboard);
@@ -405,8 +405,8 @@ export class Tile5ConfigComponent implements OnInit {
  
      }
     }
-    updateSummary(arg2:any){
-      this.update_PowerBoard_config.emit(arg2)
+    updateSummary(data: any, arg2: any) {
+      this.update_PowerBoard_config.emit({ data, arg2 });
     }
     updateTile4() {
       if (this.editTileIndex4 !== null) {
@@ -490,7 +490,7 @@ export class Tile5ConfigComponent implements OnInit {
     
         if(this.grid_details)
           {
-            this.updateSummary('update_tile')
+            this.updateSummary(this.all_Packet_store,'update_tile');
           }
   
         console.log("Updated all_Packet_store.grid_details:", this.all_Packet_store.grid_details);
@@ -790,7 +790,7 @@ dateRangeLabel =[
     this.cdr.detectChanges();
 
     // Update summary to handle the addition of the duplicated tile
-    this.updateSummary('add_tile');
+    this.updateSummary('','add_tile');
   }
 
 }

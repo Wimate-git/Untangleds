@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Injector, NgZone, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, inject, Injector, NgZone, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { SharedService } from '../shared.service';
 import { APIService } from 'src/app/API.service';
 import { AbstractControl, FormControl, FormGroup, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
@@ -46,6 +46,9 @@ import { Chart3ConfigComponent } from 'src/app/_metronic/partials/content/my-wid
 import { Chart4ConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/chart4-config/chart4-config.component';
 import Funnel from 'highcharts/modules/funnel';
 import { Chart5ConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/chart5-config/chart5-config.component';
+import { CloneDashboardComponent } from 'src/app/_metronic/partials/content/my-widgets/clone-dashboard/clone-dashboard.component';
+import { DynamicTileConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/dynamic-tile-config/dynamic-tile-config.component';
+import { HttpClient } from '@angular/common/http';
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
 
@@ -129,6 +132,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   @ViewChild(Chart4ConfigComponent, { static: false }) ChartConfig4Component: Chart4ConfigComponent;
   @ViewChild(Chart5ConfigComponent, { static: false }) ChartConfig5Component: Chart5ConfigComponent;
   @ViewChild('summaryModal') summaryModal!: TemplateRef<any>;
+  @ViewChild(DynamicTileConfigComponent, { static: false }) DynamicTileConfigComponent: DynamicTileConfigComponent;
+  @ViewChild(CloneDashboardComponent, { static: false }) CloneDashboardComponent: CloneDashboardComponent;
  
   
 
@@ -143,6 +148,10 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   defaultValue: string;
   gridService: any;
   resizeObserver: ResizeObserver;
+  formattedDashboard: any[];
+  parsedSummaryData: any;
+  summaryValues: any;
+  body: { clientId: any; routeId: string | null; };
 
 
 
@@ -359,6 +368,34 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     Highcharts.chart('columnChart', barchartOptions);
   }
 
+  // @HostListener('window:scroll', ['$event'])
+  // onWindowScroll(event: Event) {
+  //   this.showMenuForTimeout();
+  // }
+
+  // // Listen to touchstart events on document
+  // @HostListener('document:touchstart', ['$event'])
+  // onTouchStart(event: Event) {
+  //   this.showMenuForTimeout();
+  // }
+
+  // // Listen to mousemove events on document
+  // @HostListener('document:mousemove', ['$event'])
+  // onMouseMove(event: MouseEvent) {
+  //   this.showMenuForTimeout();
+  // }
+
+  // Method to show the menu for 3 seconds whenever there's an event
+  showMenuForTimeout() {
+    this.disableMenuQP = false; // Show the menu
+    this.cdr.detectChanges();  // Ensure that changes are reflected immediately
+
+    setTimeout(() => {
+      this.disableMenuQP = true; // Hide the menu after 3 seconds
+      this.cdr.detectChanges();  // Ensure that changes are reflected
+    }, 3000);
+  }
+
   
   
 
@@ -568,18 +605,46 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   isLoading = false; // Add loading state
 
   reloadPage() {
-    this.isLoading = true;  // Set loading state to true
-    // this.spinner.show();     // Show the spinner
-
-    this.route.paramMap.subscribe(params => {
-      this.routeId = params.get('id');
-      if (this.routeId) {
-        this.openModalHelpher(this.routeId);
-        this.editButtonCheck = true
-
-      }// Adjust delay to show spinner for a brief moment
-    })
-}
+    this.isLoading = true; // Set loading state to true
+    console.log('this.routeId check', this.routeId);
+    console.log('client id check', this.SK_clientID);
+  
+    // Define the API Gateway URL
+    const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+  
+    // Prepare the request body
+    const requestBody = {
+      body: JSON.stringify({
+        clientId: this.SK_clientID,
+        routeId: this.routeId,
+      }),
+    };
+  
+    console.log('requestBody checking',requestBody)
+  
+    // Send a POST request to the Lambda function with the body
+    this.http.post(apiUrl, requestBody).subscribe(
+      (response) => {
+        console.log('Lambda function triggered successfully:', response);
+  
+        // Proceed with route parameter handling
+        this.route.paramMap.subscribe(params => {
+          this.routeId = params.get('id');
+          if (this.routeId) {
+            this.openModalHelpher(this.routeId);
+            this.editButtonCheck = true;
+          }
+        });
+  
+        this.isLoading = false; // Reset loading state
+      },
+      (error) => {
+        console.error('Error triggering Lambda function:', error);
+        this.isLoading = false; // Reset loading state
+      }
+    );
+  }
+  
 
   toggleFullView() {
     this.isFullScreen = !this.isFullScreen;  // Toggle the full-screen state
@@ -617,6 +682,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   contractLookupId: any;
   loading: boolean = false;
   showTitleGrid: boolean;
+  showDynamicTileGrid:boolean
   showChartGrid:boolean;
   editTitleIndex: number | null;
   isDuplicateID: boolean = false;
@@ -756,7 +822,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     console.log('this.grid_details from global save', this.grid_details);
 
     if (this.grid_details) {
-      this.updateSummary('', 'add_tile');
+      this.updateSummary('', 'saveDashboard');
     }
 
     // Trigger change detection to ensure the UI updates
@@ -821,7 +887,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     }
 
   }
-  deleteTile(item: any, index: number): void {
+  deleteTile(item: any, index: number, all_Packet_store: any): void {
     Swal.fire({
       title: 'Are you sure?',
       text: 'Do you really want to delete this tile? This action cannot be undone.',
@@ -833,26 +899,40 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
       cancelButtonText: 'Cancel',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.dashboard.splice(index, 1); // Remove the tile from the dashboard array
-        console.log('Tile deleted:', item);
-        console.log('Updated dashboard:', this.dashboard);
-
-        // Optional: Update summary after deletion
-        this.updateSummary('', 'delete_tile');
-
-        // Trigger change detection to update the UI
-        this.cdr.detectChanges();
-
-        // Show success message
-        Swal.fire({
-          title: 'Deleted!',
-          text: 'The tile has been successfully deleted.',
-          icon: 'success',
-          confirmButtonColor: '#3085d6',
-        });
+        console.log('Before deletion:', this.dashboard);
+        console.log('all_Packet_store test before deleteTile',all_Packet_store)
+  
+        // Step 1: Validate the index and remove the tile
+        if (index >= 0 && index < this.dashboard.length) {
+          this.dashboard = this.dashboard.filter((_, i) => i !== index);
+          console.log('After deletion:', this.dashboard);
+  
+          // Step 2: Update grid_details in all_Packet_store
+          all_Packet_store.grid_details = [...this.dashboard];
+          console.log('Updated all_Packet_store.grid_details:', all_Packet_store.grid_details);
+          console.log('all_Packet_store test from deleteTile',all_Packet_store)
+  
+          // Step 3: Call updateSummary to save changes
+          this.updateSummary(all_Packet_store, 'delete_tile');
+  
+          // Step 4: Trigger change detection to update the UI
+          this.cdr.detectChanges();
+  
+          // Step 5: Show success message
+          Swal.fire({
+            title: 'Deleted!',
+            text: 'The tile has been successfully deleted.',
+            icon: 'success',
+            confirmButtonColor: '#3085d6',
+          });
+        } else {
+          console.error('Invalid index:', index);
+        }
       }
     });
   }
+  
+  
 
 
   onMouseEnter(): void {
@@ -901,7 +981,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
 
   constructor(private summaryConfiguration: SharedService, private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector,
-    private spinner: NgxSpinnerService, private zone: NgZone,
+    private spinner: NgxSpinnerService, private zone: NgZone,private http: HttpClient
   ) {
     this.resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
@@ -975,6 +1055,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     console.log('SummaryEngineComponent destroyed.');
   }
   ngAfterViewInit(): void {
+    console.log('this.allCompanyDetails',this.createSummaryField.value)
     if (this.routeId) {
       this.editButtonCheck = true
 
@@ -986,6 +1067,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     this.addFromService()
 
     console.log("this.lookup_data_summary1", this.lookup_data_summary1)
+    console.log('create summary fields',this.createSummaryField.value)
     // this.createChartGauge();
 
     this.createKPIWidget.statusChanges.subscribe(status => {
@@ -1002,7 +1084,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     // this.createBulletChart();
 
     // this.createPieChart()
-
+  
   }
 
 
@@ -1157,6 +1239,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     });
 
     this.initializeCompanyFields();
+    
 
 
 
@@ -1273,6 +1356,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     { value: 'Tiles', label: 'Tiles' },
     { value: 'Title', label: 'Title' },
     { value: 'Chart', label: 'Chart' },
+    { value: 'DynamicTile', label: 'DynamicTile' },
+    
 
     // { value: 'Pharagraph', label: 'Pharagraph' },
     // { value: 'Image', label: 'Image' },
@@ -1288,11 +1373,12 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
 
 
       // Update visibility based on the selected tile
-      this.showGrid = this.selectedTile === 'Tiles' || this.selectedTile === 'Title' || this.selectedTile === 'Chart';
+      this.showGrid = this.selectedTile === 'Tiles' || this.selectedTile === 'Title' || this.selectedTile === 'Chart'|| this.selectedTile === 'DynamicTile';
 
      
       this.showTitleGrid = this.selectedTile === 'Title'; // Show specific grid for Title
-      this.showChartGrid = this.selectedTile === 'Chart'
+      this.showChartGrid = this.selectedTile === 'Chart';
+      this.showDynamicTileGrid =  this.selectedTile === 'DynamicTile'
       setTimeout(() => {
         this.createPieChart()
       }, 500);
@@ -1511,7 +1597,8 @@ setTimeout(() => {
       .then((result: any) => {
         if (result && result.metadata) {
           const parsedMetadata = JSON.parse(result.metadata);
-          console.log('parsedMetadata check', parsedMetadata);
+          this.parsedSummaryData = parsedMetadata
+          console.log('parsedMetadata check', this.parsedSummaryData);
           this.all_Packet_store = parsedMetadata;
           this.createdTime = this.all_Packet_store.created;
           this.createdUserName = this.all_Packet_store.createdUser;
@@ -1660,7 +1747,7 @@ setTimeout(() => {
 
     }
 
-    else if(event.arg1.grid_type=='Barchart'){
+    else if(event.arg1.grid_type=='Columnchart'){
       this.modalService.open(KPIModal, { size: 'lg' });
       console.log('event check', event)
       setTimeout(() => {
@@ -1677,7 +1764,7 @@ setTimeout(() => {
       }, 500);
 
     }
-    else if(event.arg1.grid_type=='Columnchart'){
+    else if(event.arg1.grid_type=='Barchart'){
       this.modalService.open(KPIModal, { size: 'lg' });
       console.log('event check', event)
       setTimeout(() => {
@@ -1685,6 +1772,28 @@ setTimeout(() => {
       }, 500);
 
     }
+    else if(event.arg1.grid_type=='dynamicTile'){
+      this.modalService.open(KPIModal, { size: 'lg' });
+      console.log('event check dynamic tile', event)
+    
+      // Access the component instance and trigger `openKPIModal`
+      setTimeout(() => {
+       
+        this.DynamicTileConfigComponent.openDynamicTileModal(event.arg1, event.arg2);
+      }, 500);
+    }
+
+    else if(event.arg1.grid_type=='title'){
+      this.modalService.open(KPIModal, { size: 'lg' });
+      console.log('event check dynamic tile', event)
+    
+      // Access the component instance and trigger `openKPIModal`
+      setTimeout(() => {
+       
+        this.titleConfigComponent.openTitleModal(event.arg1, event.arg2);
+      }, 500);
+    }
+
     
 
     
@@ -1697,72 +1806,109 @@ setTimeout(() => {
 
 
 
-  emitDuplicate(event: any) {
-    if(event.arg1.grid_type=='tile'){
+  emitDuplicate(event: { data: { arg1: any; arg2: number }; all_Packet_store: any }) {
+    const { arg1, arg2 } = event.data;
+    const { all_Packet_store } = event;
+    if(arg1.grid_type=='tile'){
       console.log('event check', event)
         
-  this.dashboard.push(event.arg1)
-  this.updateSummary('','update_tile')
+  this.dashboard.push(arg1)
+  this.updateSummary('','add_Tile')
     }
-    else if(event.arg1.grid_type=='tile2'){
+    else if(event.data.arg1.grid_type=='tile2'){
       console.log('event check', event)
-      this.dashboard.push(event.arg1)
-      this.updateSummary('','update_tile')
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push(event.data.arg1)
+      this.updateSummary(event.all_Packet_store,'add_Tile')
     }
-    else if(event.arg1.grid_type=='tile3'){
+    else if(event.data.arg1.grid_type=='tile3'){
       console.log('event check', event)
-      this.dashboard.push(event.arg1)
-      this.updateSummary('','update_tile')
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push(event.data.arg1)
+      this.updateSummary(event.all_Packet_store,'add_Tile')
     }
-    else if(event.arg1.grid_type=='tile4'){
+    else if(event.data.arg1.grid_type=='tile4'){
       console.log('event check', event)
-      this.dashboard.push(event.arg1)
-      this.updateSummary('','update_tile')
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push(event.data.arg1)
+      this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
-    else if(event.arg1.grid_type=='tile5'){
+    else if(event.data.arg1.grid_type=='tile5'){
       console.log('event check', event)
-      this.dashboard.push(event.arg1)
-      this.updateSummary('','update_tile')
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push(event.data.arg1)
+      this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
-    else if(event.arg1.grid_type=='tile6'){
+    else if(event.data.arg1.grid_type=='tile6'){
       console.log('event check', event)
-      this.dashboard.push(event.arg1)
-  this.updateSummary('','update_tile')
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push(event.data.arg1)
+      this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
-    else if(event.arg1.grid_type=='chart'){
+    else if(event.data.arg1.grid_type=='chart'){
       console.log('event check', event)
-      this.dashboard.push(event.arg1)
-  this.updateSummary('','update_tile')
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push(event.data.arg1)
+      this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
-    else if(event.arg1.grid_type=='Linechart'){
+    else if(event.data.arg1.grid_type=='Linechart'){
       console.log('event check', event)
-      this.dashboard.push(event.arg1)
-  this.updateSummary('','update_tile')
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push(event.data.arg1)
+      this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
-    else if(event.arg1.grid_type=='Barchart'){
+        else if(event.data.arg1.grid_type=='Columnchart'){
       console.log('event check', event)
-      this.dashboard.push(event.arg1)
-  this.updateSummary('','update_tile')
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push(event.data.arg1)
+      this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
-    else if(event.arg1.grid_type=='Areachart'){
+        else if(event.data.arg1.grid_type=='Areachart'){
       console.log('event check', event)
-      this.dashboard.push(event.arg1)
-  this.updateSummary('','update_tile')
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push(event.data.arg1)
+      this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
-    else if(event.arg1.grid_type=='Columnchart'){
+    else if(event.data.arg1.grid_type=='Barchart'){
       console.log('event check', event)
-      this.dashboard.push(event.arg1)
-  this.updateSummary('','update_tile')
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push(event.data.arg1)
+      this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
-   
+  //   else if(event.arg1.grid_type=='Areachart'){
+  //     console.log('event check', event)
+  //     this.dashboard.push(event.arg1)
+  // this.updateSummary('','update_tile')
+
+  //   }
+
+    else if(event.data.arg1.grid_type=='dynamicTile'){
+      console.log('event check from dynamic', event.data.arg1)
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push(event.data.arg1)
+      console.log('this.dashboard from dynamic',event.all_Packet_store)
+
+  this.updateSummary(event.all_Packet_store,'add_Tile')
+
+    }
+    else if(event.data.arg1.grid_type=='title'){
+      console.log('event check from dynamic', event.data.arg1)
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push(event.data.arg1)
+      console.log('this.dashboard from dynamic',event.all_Packet_store)
+
+  this.updateSummary(event.all_Packet_store,'add_Tile')
+
+    }
+    // this.updateSummary(event.data, event.arg2);
 
   }
 
@@ -1771,50 +1917,51 @@ setTimeout(() => {
 
 
   emitDuplicateTitle(event: any) {
-    console.log('event check', event)
+    console.log('event check ', event)
     this.dashboard.push(event.arg1)
     this.updateSummary('','update_tile')
 
   }
 
 
-  emitDelete1(event: any) {
-    console.log('event check', event)
-    this.deleteTile(event.arg1, event.arg2)
+  // emitDelete1(event: any) {
+  //   console.log('event check', event)
+  //   this.deleteTile(event.arg1, event.arg2)
+
+  // }
+
+  // emitDelete2(event: any) {
+  //   console.log('event check', event)
+  //   this.deleteTile(event.arg1, event.arg2)
+
+  // }
+
+  // emitDelete3(event: any) {
+  //   console.log('event check', event)
+  //   this.deleteTile(event.arg1, event.arg2)
+
+  // }
+  // emitDelete4(event: any) {
+  //   console.log('event check', event)
+  //   this.deleteTile(event.arg1, event.arg2)
+
+  // }
+  // emitDelete5(event: any) {
+  //   console.log('event check', event)
+  //   this.deleteTile(event.arg1, event.arg2)
+
+  // }
+  emitDelete6(event: { data: { arg1: any; arg2: number }; all_Packet_store: any }) {
+    console.log('event check from delete', event.all_Packet_store)
+    console.log('event.data.arg1 check',event.data.arg1)
+    this.deleteTile(event.data.arg1, event.data.arg2,event.all_Packet_store)
 
   }
+  // emitDeleteTitle(event: any) {
+  //   console.log('event check', event)
+  //   this.deleteTile(event.arg1, event.arg2)
 
-  emitDelete2(event: any) {
-    console.log('event check', event)
-    this.deleteTile(event.arg1, event.arg2)
-
-  }
-
-  emitDelete3(event: any) {
-    console.log('event check', event)
-    this.deleteTile(event.arg1, event.arg2)
-
-  }
-  emitDelete4(event: any) {
-    console.log('event check', event)
-    this.deleteTile(event.arg1, event.arg2)
-
-  }
-  emitDelete5(event: any) {
-    console.log('event check', event)
-    this.deleteTile(event.arg1, event.arg2)
-
-  }
-  emitDelete6(event: any) {
-    console.log('event check', event)
-    this.deleteTile(event.arg1, event.arg2)
-
-  }
-  emitDeleteTitle(event: any) {
-    console.log('event check', event)
-    this.deleteTile(event.arg1, event.arg2)
-
-  }
+  // }
 
   bindDataToGridster(data: any) {
     console.log('bindDataToGridster data checking', data);
@@ -2167,6 +2314,7 @@ setTimeout(() => {
 
   }
   getGridDetails2(data: any) {
+    console.log('data checking from emit',data)
     this.dashboard = data;
     console.log('this.dashboard check', this.dashboard)
     //console.log('myh grid',this.grid_details)
@@ -2198,10 +2346,20 @@ setTimeout(() => {
     this.updateSummary('', event)
   }
 
-  updateSummaryHelper2(event: any) {
-    console.log('event check for save', event)
-    this.updateSummary('', event)
+  updateSummaryHelper2(event: { data: any; arg2: any }) {
+    console.log('Data received:', event.data);
+    console.log('Arg2 received:', event.arg2);
+  
+    // Reinitialize this.allCompanyDetails using the received data
+    this.allCompanyDetails = event.data;
+  
+    console.log('Updated allCompanyDetails before updateSummary:', this.allCompanyDetails);
+  
+    // Pass the unpacked arguments to updateSummary
+    this.updateSummary(event.data, event.arg2);
   }
+  
+  
 
   allPacketStoreReceiver(event: any) {
     console.log(event)
@@ -2219,6 +2377,121 @@ setTimeout(() => {
     this.all_Packet_store = event
 
   }
+  duplicateSummaryDashboardData(event: any) {
+    console.log('Duplicate dashboard event:', event);
+  
+    // Call the summary creation function with the duplicated data
+    this.createNewSummaryDuplicate(event);
+  }
+  createNewSummaryDuplicate(duplicateData: any) {
+    this.defaultValue = 'Tiles';
+  
+    // Validate the input
+    if (this.isDuplicateID || this.isDuplicateName || this.createSummaryField.invalid) {
+      return; // Prevent saving if there are errors
+    }
+  
+    const tempClient = `${this.SK_clientID}#summary#lookup`;
+    console.log('tempClient checking', tempClient);
+  
+    const createdDate = Math.ceil(new Date().getTime() / 1000); // Created date
+    const updatedDate = Math.ceil(new Date().getTime() / 1000); // Updated date
+  
+    // Prepare summary details using duplicateData
+    this.allCompanyDetails = {
+      summaryID: duplicateData.summaryID,
+      summaryName: duplicateData.summaryName,
+      summaryDesc: duplicateData.summaryDesc,
+      summaryIcon: duplicateData.summaryIcon,
+      iconObject: duplicateData.iconObject,
+      crDate: createdDate,
+      upDate: updatedDate,
+      createdUser: this.getLoggedUser.username, // Set the creator's username
+    };
+  
+    console.log('Summary data:', this.allCompanyDetails);
+  
+    const createdDateISO = new Date(createdDate * 1000).toISOString();
+    const updatedDateISO = new Date(updatedDate * 1000).toISOString();
+  
+    // Prepare tempObj for API call
+    const tempObj = {
+      PK: `${this.SK_clientID}#${this.allCompanyDetails.summaryID}#summary#main`,
+      SK: 1,
+      metadata: JSON.stringify({
+        summaryID: this.allCompanyDetails.summaryID,
+        summaryName: this.allCompanyDetails.summaryName,
+        summaryDesc: this.allCompanyDetails.summaryDesc,
+        summaryIcon: this.allCompanyDetails.summaryIcon,
+        grid_details:duplicateData.grid_details,
+        created: createdDateISO,
+        updated: updatedDateISO,
+        createdUser: this.allCompanyDetails.createdUser,
+        iconObject: this.allCompanyDetails.iconObject,
+        tilesList: this.defaultValue,
+      }),
+    };
+  
+    console.log('TempObj is here:', tempObj);
+  
+    const items = {
+      P1: this.allCompanyDetails.summaryID,
+      P2: this.allCompanyDetails.summaryName,
+      P3: this.allCompanyDetails.summaryDesc,
+      P4: updatedDate,
+      P5: createdDate,
+      P6: this.allCompanyDetails.createdUser,
+      P7: this.getLoggedUser.username,
+      P8: JSON.stringify(this.allCompanyDetails.iconObject),
+      P9: this.allCompanyDetails.summaryIcon,
+    };
+  
+    // API call to create the summary
+    this.api
+      .CreateMaster(tempObj)
+      .then(async (value: any) => {
+        await this.createLookUpSummary(items, 1, tempClient);
+  
+        console.log('Value from create master:', value);
+  
+        if (items || value) {
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: 'New summary successfully created',
+            showConfirmButton: true,
+            confirmButtonText: 'OK',
+            allowOutsideClick: false,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              if (items.P1) {
+                this.dashboardOpen(items.P1);
+              }
+              if (this.modalRef) {
+                this.modalRef.close();
+              }
+            }
+          });
+        } else {
+          Swal.fire({
+            position: 'top-end',
+            icon: 'error',
+            title: 'Failed to create summary',
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      })
+      .catch((err) => {
+        console.log('Error in creation:', err);
+        this.toast.open('Error in adding new Summary Configuration', 'Check again', {
+          duration: 5000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top',
+        });
+      });
+  }
+  
 
 
 
@@ -2376,139 +2649,139 @@ setTimeout(() => {
   }
 
 
-  createNewSummary() {
-    this.defaultValue = 'Tiles'
-    if (this.isDuplicateID || this.isDuplicateName || this.createSummaryField.invalid) {
-      return; // Prevent saving if there are errors
-    }
+//   createNewSummary() {
+//     this.defaultValue = 'Tiles'
+//     if (this.isDuplicateID || this.isDuplicateName || this.createSummaryField.invalid) {
+//       return; // Prevent saving if there are errors
+//     }
 
 
 
-    let tempClient = this.SK_clientID + "#summary" + "#lookup";
-    console.log('tempClient checking', tempClient);
+//     let tempClient = this.SK_clientID + "#summary" + "#lookup";
+//     console.log('tempClient checking', tempClient);
 
 
-    const createdDate = Math.ceil((new Date()).getTime() / 1000); // Created date
-    const updatedDate = Math.ceil((new Date()).getTime() / 1000); // Updated date
+//     const createdDate = Math.ceil((new Date()).getTime() / 1000); // Created date
+//     const updatedDate = Math.ceil((new Date()).getTime() / 1000); // Updated date
 
-    // Prepare summary details
-    this.allCompanyDetails = {
-      summaryID: this.createSummaryField.value.summaryID,
-      summaryName: this.createSummaryField.value.summaryName,
-      summaryDesc: this.createSummaryField.value.summarydesc,
+//     // Prepare summary details
+//     this.allCompanyDetails = {
+//       summaryID: this.createSummaryField.value.summaryID,
+//       summaryName: this.createSummaryField.value.summaryName,
+//       summaryDesc: this.createSummaryField.value.summarydesc,
 
-      // jsonData: parsedJsonData,
-      summaryIcon: this.createSummaryField.value.iconSelect,
-      iconObject: this.previewObjDisplay,
+//       // jsonData: parsedJsonData,
+//       summaryIcon: this.createSummaryField.value.iconSelect,
+//       iconObject: this.previewObjDisplay,
 
-      // Add the selected icon
-      crDate: createdDate, // Created date
-      upDate: updatedDate,  // Updated date
-      createdUser: this.getLoggedUser.username // Set the creator's username
-    };
+//       // Add the selected icon
+//       crDate: createdDate, // Created date
+//       upDate: updatedDate,  // Updated date
+//       createdUser: this.getLoggedUser.username // Set the creator's username
+//     };
 
-    console.log("summary data ", this.allCompanyDetails);
+//     console.log("summary data ", this.allCompanyDetails);
 
-    // Prepare ISO date strings
-    const createdDateISO = new Date(this.allCompanyDetails.crDate * 1000).toISOString();
-    const updatedDateISO = new Date(this.allCompanyDetails.upDate * 1000).toISOString();
+//     // Prepare ISO date strings
+//     const createdDateISO = new Date(this.allCompanyDetails.crDate * 1000).toISOString();
+//     const updatedDateISO = new Date(this.allCompanyDetails.upDate * 1000).toISOString();
 
-    // Prepare tempObj for API call
-    const tempObj = {
-      PK: this.SK_clientID + "#" + this.allCompanyDetails.summaryID + "#summary" + "#main",
-      SK: 1,
-      metadata: JSON.stringify({
-        summaryID: this.allCompanyDetails.summaryID,
-        summaryName: this.allCompanyDetails.summaryName,
-        summaryDesc: this.allCompanyDetails.summaryDesc,
-        // jsonData: this.allCompanyDetails.jsonData,
-        summaryIcon: this.createSummaryField.value.iconSelect,
-        // Include selected icon in the metadata
-        created: createdDateISO, // Created date in ISO format
-        updated: updatedDateISO,   // Updated date in ISO format
-        createdUser: this.allCompanyDetails.createdUser, // Use the persisted createdUser
-        iconObject: this.allCompanyDetails.iconObject,
-        tilesList:this.defaultValue 
+//     // Prepare tempObj for API call
+//     const tempObj = {
+//       PK: this.SK_clientID + "#" + this.allCompanyDetails.summaryID + "#summary" + "#main",
+//       SK: 1,
+//       metadata: JSON.stringify({
+//         summaryID: this.allCompanyDetails.summaryID,
+//         summaryName: this.allCompanyDetails.summaryName,
+//         summaryDesc: this.allCompanyDetails.summaryDesc,
+//         // jsonData: this.allCompanyDetails.jsonData,
+//         summaryIcon: this.createSummaryField.value.iconSelect,
+//         // Include selected icon in the metadata
+//         created: createdDateISO, // Created date in ISO format
+//         updated: updatedDateISO,   // Updated date in ISO format
+//         createdUser: this.allCompanyDetails.createdUser, // Use the persisted createdUser
+//         iconObject: this.allCompanyDetails.iconObject,
+//         tilesList:this.defaultValue 
 
-      })
-    };
-    // Now, patch the 'tilesList' form control after creating the summary
-this.createSummaryField.patchValue({
-  tilesList: this.defaultValue // Set the value to 'Widget'
-});
+//       })
+//     };
+//     // Now, patch the 'tilesList' form control after creating the summary
+// this.createSummaryField.patchValue({
+//   tilesList: this.defaultValue // Set the value to 'Widget'
+// });
 
-    console.log("TempObj is here ", tempObj);
-    const temobj1: any = JSON.stringify(this.createSummaryField.value.iconSelect)
-    // Prepare items for further processing
-    console.log("this.createSummaryField.value.iconSelec", this.createSummaryField.value.iconSelect)
-    console.log("temobj1", temobj1)
-    const items = {
-      P1: this.createSummaryField.value.summaryID,
-      P2: this.createSummaryField.value.summaryName,
-      P3: this.createSummaryField.value.summarydesc,
-      P4: updatedDate,  // Updated date
-      P5: createdDate,   // Created date
-      P6: this.allCompanyDetails.createdUser,  // Created by user
-      P7: this.getLoggedUser.username,          // Updated by user
-      P8: JSON.stringify(this.previewObjDisplay),
-      P9: this.createSummaryField.value.iconSelect // Add selected icon
-    };
+//     console.log("TempObj is here ", tempObj);
+//     const temobj1: any = JSON.stringify(this.createSummaryField.value.iconSelect)
+//     // Prepare items for further processing
+//     console.log("this.createSummaryField.value.iconSelec", this.createSummaryField.value.iconSelect)
+//     console.log("temobj1", temobj1)
+//     const items = {
+//       P1: this.createSummaryField.value.summaryID,
+//       P2: this.createSummaryField.value.summaryName,
+//       P3: this.createSummaryField.value.summarydesc,
+//       P4: updatedDate,  // Updated date
+//       P5: createdDate,   // Created date
+//       P6: this.allCompanyDetails.createdUser,  // Created by user
+//       P7: this.getLoggedUser.username,          // Updated by user
+//       P8: JSON.stringify(this.previewObjDisplay),
+//       P9: this.createSummaryField.value.iconSelect // Add selected icon
+//     };
 
-    // API call to create the summary
-    this.api.CreateMaster(tempObj).then(async (value: any) => {
-      await this.createLookUpSummary(items, 1, tempClient);
+//     // API call to create the summary
+//     this.api.CreateMaster(tempObj).then(async (value: any) => {
+//       await this.createLookUpSummary(items, 1, tempClient);
 
-      this.datatableConfig = {};
-      this.lookup_data_summary = [];
+//       this.datatableConfig = {};
+//       this.lookup_data_summary = [];
 
-      console.log('value check from create master', value);
-      if (items || value) {
-        console.log('items check from create master', items);
+//       console.log('value check from create master', value);
+//       if (items || value) {
+//         console.log('items check from create master', items);
 
-        // Call the loadData function
-        this.loadData();
+//         // Call the loadData function
+//         this.loadData();
 
-        // Show a success alert and handle the "OK" button click
-        Swal.fire({
-          position: 'center', // Center the alert
-          icon: 'success', // Alert type
-          title: 'New summary successfully created', // Title text
-          showConfirmButton: true, // Display the OK button
-          confirmButtonText: 'OK', // Customize the OK button text
-          allowOutsideClick: false, // Prevent closing the alert by clicking outside
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // This block is executed when the "OK" button is clicked
-            if (items && items.P1) {
-              this.dashboardOpen(items.P1);
-          // Pass item.P1 to viewItem
-            }
-            if (this.modalRef) {
-              this.modalRef.close(); // Close the modal
-            }
-          }
-        });
-      }
+//         // Show a success alert and handle the "OK" button click
+//         Swal.fire({
+//           position: 'center', // Center the alert
+//           icon: 'success', // Alert type
+//           title: 'New summary successfully created', // Title text
+//           showConfirmButton: true, // Display the OK button
+//           confirmButtonText: 'OK', // Customize the OK button text
+//           allowOutsideClick: false, // Prevent closing the alert by clicking outside
+//         }).then((result) => {
+//           if (result.isConfirmed) {
+//             // This block is executed when the "OK" button is clicked
+//             if (items && items.P1) {
+//               this.dashboardOpen(items.P1);
+//           // Pass item.P1 to viewItem
+//             }
+//             if (this.modalRef) {
+//               this.modalRef.close(); // Close the modal
+//             }
+//           }
+//         });
+//       }
 
-      else {
-        Swal.fire({
-          position: 'top-end',
-          icon: 'error',
-          title: 'Failed to create summary',
-          showConfirmButton: false,
-          timer: 1500
-        });
-      }
+//       else {
+//         Swal.fire({
+//           position: 'top-end',
+//           icon: 'error',
+//           title: 'Failed to create summary',
+//           showConfirmButton: false,
+//           timer: 1500
+//         });
+//       }
 
-    }).catch(err => {
-      console.log('err for creation', err);
-      this.toast.open("Error in adding new Summary Configuration ", "Check again", {
-        duration: 5000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top',
-      });
-    });
-  }
+//     }).catch(err => {
+//       console.log('err for creation', err);
+//       this.toast.open("Error in adding new Summary Configuration ", "Check again", {
+//         duration: 5000,
+//         horizontalPosition: 'right',
+//         verticalPosition: 'top',
+//       });
+//     });
+//   }
 
 
 
@@ -2912,204 +3185,307 @@ this.createSummaryField.patchValue({
     throw new Error('Method not implemented.');
   }
 
+  // updateSummary(value: any, key: any) {
+  //   this.createSummaryField.get('summaryID')?.enable();
+  //   this.allCompanyDetails = this.constructAllCompanyDetails();
+  //   console.log('Updated allCompanyDetails:', this.allCompanyDetails);
+  
+  //   this.formattedDashboard = this.formatDashboardTiles(this.dashboard);
+  //   console.log('Formatted Dashboard:', this.formattedDashboard);
+  
+  //   let tempObj = {
+  //     PK: `${this.SK_clientID}#${this.allCompanyDetails.summaryID}#summary#main`,
+  //     SK: 1,
+  //     metadata: JSON.stringify({
+  //       ...this.allCompanyDetails,
+  //       grid_details: this.formattedDashboard
+  //     })
+  //   };
+  
+  //   this.validateAndSubmit(tempObj, key);
+  // }
   updateSummary(value: any, key: any) {
     this.createSummaryField.get('summaryID')?.enable();
-
-    // Constructing the allCompanyDetails object
-    this.allCompanyDetails = {
+  
+    // Update allCompanyDetails if not already populated
+    if (!this.allCompanyDetails) {
+      this.allCompanyDetails = this.constructAllCompanyDetails();
+    }
+  
+    console.log('Updated allCompanyDetails:', this.allCompanyDetails);
+  
+    // Format the dashboard tiles
+    this.formattedDashboard = this.formatDashboardTiles(this.dashboard);
+    console.log('Formatted Dashboard:', this.formattedDashboard);
+  
+    // Construct tempObj
+    let tempObj = {
+      PK: `${this.SK_clientID}#${this.allCompanyDetails.summaryID}#summary#main`,
+      SK: 1,
+      metadata: JSON.stringify({
+        ...this.allCompanyDetails,
+        grid_details: this.formattedDashboard
+      })
+    };
+  
+    console.log('TempObj being validated and submitted:', tempObj);
+  
+    // Validate and submit the object
+    this.validateAndSubmit(tempObj, key);
+  }
+  
+  
+  private validateAndSubmit(tempObj: any, actionKey: string) {
+    console.log('actionKey checking', actionKey);
+  
+    if (!tempObj.PK || !tempObj.SK) {
+      Swal.fire({
+        position: 'top-end',
+        icon: 'error',
+        title: `Failed to ${actionKey} summary. PK and SK are required.`,
+        showConfirmButton: false,
+        timer: 1500
+      });
+      return;
+    }
+  
+    this.api.UpdateMaster(tempObj).then(response => {
+      console.log('API Response:', response);
+      if (response && response.metadata) {
+        const successTitle =
+          actionKey === 'create'
+            ? 'Summary created'
+            : actionKey === 'saveDashboard'
+              ? 'Dashboard saved'
+              : actionKey === 'add_Tile'
+                ? 'Tile added'
+                : actionKey === 'delete_tile' || actionKey === 'deleteTile'
+                  ? 'Tile deleted'
+                  : 'Summary updated';
+  
+        // Debugging statement to confirm condition
+        console.log('Action key condition check:', actionKey === 'update');
+  
+        if (actionKey === 'update') {
+          // For "Summary updated successfully", reload window after confirmation
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: `${successTitle} successfully`,
+            showConfirmButton: true
+          }).then((result) => {
+            console.log('Swal confirmation result:', result); // Debugging
+            if (result.isConfirmed) {
+              // Route param subscription to handle the modal logic
+              this.route.paramMap.subscribe(params => {
+                this.routeId = params.get('id');
+                if (this.routeId) {
+                  this.openModalHelpher(this.routeId);
+                  this.editButtonCheck = true;
+                  console.log('Route ID found, opening modal:', this.routeId);
+                }
+              });
+            }
+          });
+        } else {
+          // Show success message for other actions without reloading
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: `${successTitle} successfully`,
+            showConfirmButton: true
+          });
+        }
+  
+        this.loadData();
+        if (this.modalRef) this.modalRef.close();
+      } else {
+        throw new Error('Invalid response structure');
+      }
+    }).catch(err => {
+      console.error('Error:', err);
+      Swal.fire({
+        position: 'top-end',
+        icon: 'error',
+        title: `Failed to ${actionKey} summary`,
+        text: err.message,
+        showConfirmButton: false,
+        timer: 1500
+      });
+    });
+  }
+  
+  
+  
+  private formatField(value: any): string {
+    try {
+      if (typeof value === 'string') {
+        const parsed = JSON.parse(value);
+        return JSON.stringify(parsed);
+      }
+      return JSON.stringify(value || []);
+    } catch (error) {
+      console.error('Error formatting field:', value, error);
+      return '[]';
+    }
+  }
+  
+  private formatDashboardTiles(dashboard: any[]): any[] {
+    return dashboard.map(tile => ({
+      ...tile,
+      multi_value: this.formatField(tile.multi_value),
+      chartConfig: this.formatField(tile.chartConfig),
+      filterParameter: this.formatField(tile.filterParameter),
+      tileConfig: this.formatField(tile.tileConfig)
+    }));
+  }
+  private constructAllCompanyDetails(): any {
+    return {
       summaryID: this.createSummaryField.value.summaryID,
       summaryName: this.createSummaryField.value.summaryName,
       summaryDesc: this.createSummaryField.value.summarydesc,
       summaryIcon: this.createSummaryField.value.iconSelect,
       iconObject: this.previewObjDisplay,
-      updated: new Date().toISOString(), // Use ISO format for consistency
-      createdUser: this.createdUserName,
+      updated: new Date().toISOString(),
+      createdUser: this.getLoggedUser?.username || this.createdUserName
+    };
+  }
+  
+
+  createNewSummary() {
+    this.defaultValue = 'Tiles'
+    if (this.isDuplicateID || this.isDuplicateName || this.createSummaryField.invalid) {
+      return; // Prevent saving if there are errors
+    }
+
+
+
+    let tempClient = this.SK_clientID + "#summary" + "#lookup";
+    console.log('tempClient checking', tempClient);
+
+
+    const createdDate = Math.ceil((new Date()).getTime() / 1000); // Created date
+    const updatedDate = Math.ceil((new Date()).getTime() / 1000); // Updated date
+
+    // Prepare summary details
+    this.allCompanyDetails = {
+      summaryID: this.createSummaryField.value.summaryID,
+      summaryName: this.createSummaryField.value.summaryName,
+      summaryDesc: this.createSummaryField.value.summarydesc,
+
+      // jsonData: parsedJsonData,
+      summaryIcon: this.createSummaryField.value.iconSelect,
+      iconObject: this.previewObjDisplay,
+
+      // Add the selected icon
+      crDate: createdDate, // Created date
+      upDate: updatedDate,  // Updated date
+      createdUser: this.getLoggedUser.username // Set the creator's username
     };
 
-    // Construct grid_details in normal JSON format, with conditional parsing/stringifying for multi_value
-    const formattedDashboard = this.dashboard.map(tile => {
-      let multiValueFormatted;
-    
-      // Process multi_value
-      if (typeof tile.multi_value === 'string') {
-        try {
-          multiValueFormatted = JSON.parse(tile.multi_value);
-          multiValueFormatted = JSON.stringify(multiValueFormatted);
-        } catch (error) {
-          console.error('Error parsing multi_value:', error);
-          multiValueFormatted = '[]';
-        }
-      } else {
-        multiValueFormatted = JSON.stringify(tile.multi_value || []);
-      }
-    
-      // Process chartConfig with multiple objects
-      let chartConfigFormatted;
-      if (typeof tile.chartConfig === 'string') {
-        try {
-          // Parse the JSON string
-          const parsedConfig = JSON.parse(tile.chartConfig);
-          if (Array.isArray(parsedConfig)) {
-            // Stringify each object if it's an array
-            chartConfigFormatted = JSON.stringify(parsedConfig);
-          } else {
-            console.error('chartConfig is not an array:', tile.chartConfig);
-            chartConfigFormatted = '[]'; // Default to an empty array if invalid
-          }
-        } catch (error) {
-          console.error('Error parsing chartConfig string:', error);
-          chartConfigFormatted = '[]';
-        }
-      } else if (Array.isArray(tile.chartConfig)) {
-        // If already an array of objects, stringify the entire array
-        chartConfigFormatted = JSON.stringify(tile.chartConfig);
-      } else {
-        console.error('chartConfig is not a valid array or string:', tile.chartConfig);
-        chartConfigFormatted = '[]'; // Default to an empty array if invalid
-      }
-    
-      return {
-        ...tile,
-        multi_value: multiValueFormatted,
-        chartConfig: chartConfigFormatted // Update chartConfig as stringified
-      };
-    });
-    
-    
-    
+    console.log("summary data ", this.allCompanyDetails);
 
+    // Prepare ISO date strings
+    const createdDateISO = new Date(this.allCompanyDetails.crDate * 1000).toISOString();
+    const updatedDateISO = new Date(this.allCompanyDetails.upDate * 1000).toISOString();
 
-    let tempObj: any = {
-      PK: `${this.SK_clientID}#${this.allCompanyDetails.summaryID}#summary#main`,
-      SK: 1, // Use a simple number as requested
-      metadata: {
-        summaryID: this.createSummaryField.value.summaryID,
-        summaryName: this.createSummaryField.value.summaryName,
-        summaryDesc: this.createSummaryField.value.summarydesc,
-        updated: new Date().toISOString(), // Ensure the updated field is formatted
-        createdUser: this.createdUserName,
+    // Prepare tempObj for API call
+    const tempObj = {
+      PK: this.SK_clientID + "#" + this.allCompanyDetails.summaryID + "#summary" + "#main",
+      SK: 1,
+      metadata: JSON.stringify({
+        summaryID: this.allCompanyDetails.summaryID,
+        summaryName: this.allCompanyDetails.summaryName,
+        summaryDesc: this.allCompanyDetails.summaryDesc,
+        // jsonData: this.allCompanyDetails.jsonData,
         summaryIcon: this.createSummaryField.value.iconSelect,
-        iconObject: this.previewObjDisplay, // Directly use the icon object
-        grid_details: formattedDashboard // Use the array with conditionally formatted multi_value
-      }
+        // Include selected icon in the metadata
+        created: createdDateISO, // Created date in ISO format
+        updated: updatedDateISO,   // Updated date in ISO format
+        createdUser: this.allCompanyDetails.createdUser, // Use the persisted createdUser
+        iconObject: this.allCompanyDetails.iconObject,
+        tilesList:this.defaultValue 
+
+      })
+    };
+    // Now, patch the 'tilesList' form control after creating the summary
+this.createSummaryField.patchValue({
+  tilesList: this.defaultValue // Set the value to 'Widget'
+});
+
+    console.log("TempObj is here ", tempObj);
+    const temobj1: any = JSON.stringify(this.createSummaryField.value.iconSelect)
+    // Prepare items for further processing
+    console.log("this.createSummaryField.value.iconSelec", this.createSummaryField.value.iconSelect)
+    console.log("temobj1", temobj1)
+    const items = {
+      P1: this.createSummaryField.value.summaryID,
+      P2: this.createSummaryField.value.summaryName,
+      P3: this.createSummaryField.value.summarydesc,
+      P4: updatedDate,  // Updated date
+      P5: createdDate,   // Created date
+      P6: this.allCompanyDetails.createdUser,  // Created by user
+      P7: this.getLoggedUser.username,          // Updated by user
+      P8: JSON.stringify(this.previewObjDisplay),
+      P9: this.createSummaryField.value.iconSelect // Add selected icon
     };
 
-    // Logging the constructed metadata object
-    console.log('Constructed metadata with conditionally formatted multi_value:', JSON.stringify(tempObj.metadata, null, 2));
-    tempObj.metadata = JSON.stringify(tempObj.metadata);
+    // API call to create the summary
+    this.api.CreateMaster(tempObj).then(async (value: any) => {
+      await this.createLookUpSummary(items, 1, tempClient);
 
-    // Validate PK and SK before proceeding
-    if (!tempObj.PK || typeof tempObj.PK !== 'string') {
-      console.error("Invalid PK:", tempObj.PK);
-      return Swal.fire({
-        position: 'top-end',
-        icon: 'error',
-        title: 'Failed to update summary. PK must be a valid non-null string.',
-        showConfirmButton: false,
-        timer: 1500
-      });
-    }
+      this.datatableConfig = {};
+      this.lookup_data_summary = [];
 
-    // Validate SK
-    if (tempObj.SK == null || typeof tempObj.SK !== 'number') {
-      console.error("Invalid SK:", tempObj.SK);
-      return Swal.fire({
-        position: 'top-end',
-        icon: 'error',
-        title: 'Failed to update summary. SK must be a valid non-null integer.',
-        showConfirmButton: false,
-        timer: 1500
-      });
-    }
+      console.log('value check from create master', value);
+      if (items || value) {
+        console.log('items check from create master', items);
 
-    // API call to update the master
-    console.log('tempObj before API call:', JSON.stringify(tempObj, null, 2)); // Log the tempObj
+        // Call the loadData function
+        this.loadData();
 
-    this.api.UpdateMaster(tempObj).then(async response => {
-      console.log('API Response:', response); // Log the API response
-
-      if (response && response.metadata) {
-        try {
-          const parsedMetadata = JSON.parse(response.metadata); // Parse the metadata
-          console.log('Parsed Metadata:', parsedMetadata); // Log parsed metadata
-
-          // Fetch updated data
-          await this.fetchTimeMachineById(1, this.createSummaryField.value.summaryID, 'update', {
-            P1: this.createSummaryField.value.summaryID,
-            P2: this.createSummaryField.value.summaryName,
-            P3: this.createSummaryField.value.summarydesc,
-            P4: Math.ceil(new Date().getTime() / 1000), // Updated date
-            P5: Math.floor(new Date(this.createdTime).getTime() / 1000),
-            P6: this.createdUserName,
-            P7: this.getLoggedUser.username,
-            P8: JSON.stringify(this.previewObjDisplay),
-            P9: this.createSummaryField.value.iconSelect
-          });
-
-          console.log('Data fetched successfully.'); // Log after successful fetch
-
-          this.all_Packet_store = parsedMetadata; // Update the local state
-          this.datatableConfig = {};
-          this.lookup_data_summary = [];
-          this.cd.detectChanges();
-if(key=='add_tile'){
-  Swal.fire({
-    position: 'center', // Center the alert
-    icon: 'success', // Alert type
-    title: 'Tile Added successfully', // Title text
-    showConfirmButton: true, // Display the OK button
-    confirmButtonText: 'OK', // Customize the OK button text
-  });
-}else if(key=='update_tile'){
-  Swal.fire({
-    position: 'center', // Center the alert
-    icon: 'success', // Alert type
-    title: 'Tile updated successfully', // Title text
-    showConfirmButton: true, // Display the OK button
-    confirmButtonText: 'OK', // Customize the OK button text
-  });
-
-}
-
-
-
-          this.addFromService();
-
-          if (this.modalRef) {
-            this.modalRef.close();
+        // Show a success alert and handle the "OK" button click
+        Swal.fire({
+          position: 'center', // Center the alert
+          icon: 'success', // Alert type
+          title: 'New summary successfully created', // Title text
+          showConfirmButton: true, // Display the OK button
+          confirmButtonText: 'OK', // Customize the OK button text
+          allowOutsideClick: false, // Prevent closing the alert by clicking outside
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // This block is executed when the "OK" button is clicked
+            if (items && items.P1) {
+              this.dashboardOpen(items.P1);
+          // Pass item.P1 to viewItem
+            }
+            if (this.modalRef) {
+              this.modalRef.close(); // Close the modal
+            }
           }
-        } catch (error: any) {
-          console.error('Error in processing:', error); // Log processing errors
-          Swal.fire({
-            position: 'top-end',
-            icon: 'error',
-            title: 'Error in processing data: ' + error.message,
-            showConfirmButton: true,
-          });
-        }
-      } else {
-        console.error('Response structure is invalid:', response); // Log invalid response structure
+        });
+      }
+
+      else {
         Swal.fire({
           position: 'top-end',
           icon: 'error',
-          title: 'Error in updating Company Configuration',
-          showConfirmButton: true,
+          title: 'Failed to create summary',
+          showConfirmButton: false,
+          timer: 1500
         });
       }
+
     }).catch(err => {
-      console.error('Error calling UpdateMaster:', err); // Log the error details
-      Swal.fire({
-        position: 'top-end',
-        icon: 'error',
-        title: 'Failed to update summary. Please try again.',
-        text: err.message, // Provide additional context for the error
-        showConfirmButton: false,
-        timer: 1500
+      console.log('err for creation', err);
+      this.toast.open("Error in adding new Summary Configuration ", "Check again", {
+        duration: 5000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
       });
     });
-
-    this.loadData(); // Call this at the end to refresh data if needed
   }
+  
 
 
 
@@ -4225,6 +4601,14 @@ if(key=='add_tile'){
     this.modalService.open(ChartModal5, { size: 'lg' });
     modal.dismiss();
   }
+  openCloneDashboard(stepperModal: TemplateRef<any>,modal:any) {
+    this.modalService.open(stepperModal, {  });
+    modal.dismiss();
+  }
+  openDynamicTileModal(DynamicTileModal:TemplateRef<any>,modal:any){
+    this.modalService.open(DynamicTileModal, {size: 'lg' });
+    modal.dismiss();
 
+  }
 
 }

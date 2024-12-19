@@ -1,0 +1,72 @@
+<div class="modal-header">
+    <h4 class="modal-title">Clone Dashboard</h4>
+    <button type="button" class="btn-close" aria-label="Close"   (click)="modal.dismiss()"></button>
+  </div>
+  
+  <!-- Modal body with Tabs -->
+  <div class="fv-row"  >
+    <div class="modal-body">
+      <div class="card-body pt-0">
+
+        <form *ngIf="duplicateForm" [formGroup]="duplicateForm" (ngSubmit)="onSubmit()">
+          <div class="row mb-3">
+            <div class="col-12">
+              <label for="summaryId" class="form-label required">Summary ID</label>
+              <input 
+                type="text" 
+                id="summaryId" 
+                class="form-control form-control-solid" 
+                formControlName="summaryId" 
+                placeholder="Enter Unique Summary ID"
+                (keyup)="checkDuplicateSummaryId()"> <!-- Trigger duplicate check on keyup -->
+              
+              <!-- Validation messages -->
+              <div *ngIf="duplicateForm.get('summaryId')?.touched && duplicateForm.get('summaryId')?.invalid" class="text-danger">
+                <div *ngIf="duplicateForm.get('summaryId')?.errors?.required">Summary ID is required.</div>
+              </div>
+            
+              <!-- Duplicate warning message -->
+              <div *ngIf="isDuplicate" class="text-danger">Summary ID already exists. Please enter a unique value.</div>
+            </div>
+            
+          </div>
+          <div class="row mb-3">
+            <div class="col-12">
+              <label for="summaryName" class="form-label">Summary Name</label>
+              <input 
+                type="text" 
+                id="summaryName" 
+                class="form-control form-control-solid" 
+                formControlName="summaryName" 
+                placeholder="Enter Summary Name">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-12">
+              <label for="summaryDescription" class="form-label">Summary Description</label>
+              <input 
+                id="summaryDescription" 
+                class="form-control form-control-solid" 
+                formControlName="summaryDescription" 
+                rows="1" 
+                placeholder="Enter Summary Description">
+            </div>
+          </div>
+      
+          <div class="mt-3 text-end">
+            <button type="button" class="btn btn-secondary me-2" (click)="modal.dismiss()">Discard</button>
+            <button type="submit" class="btn btn-primary" [disabled]="duplicateForm.invalid">Go To Dashboard</button>
+          </div>
+        </form>
+        
+        
+        
+        
+        
+      
+      </div>
+      
+  
+
+    </div>
+  </div>

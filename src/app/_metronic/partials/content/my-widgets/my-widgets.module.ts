@@ -45,6 +45,9 @@ import { Chart4ConfigComponent } from './chart4-config/chart4-config.component';
 import { ChartUi5Component } from './chart-ui5/chart-ui5.component';
 import { Chart5ConfigComponent } from './chart5-config/chart5-config.component';
 import { CustomInfoUiComponent } from './custom-info-ui/custom-info-ui.component';
+import { CloneDashboardComponent } from './clone-dashboard/clone-dashboard.component';
+import { DynamicTileUiComponent } from './dynamic-tile-ui/dynamic-tile-ui.component';
+import { DynamicTileConfigComponent } from './dynamic-tile-config/dynamic-tile-config.component';
 
 
 
@@ -69,7 +72,10 @@ import { CustomInfoUiComponent } from './custom-info-ui/custom-info-ui.component
     Chart4ConfigComponent,
     ChartUi5Component,
     Chart5ConfigComponent,
-    CustomInfoUiComponent
+    CustomInfoUiComponent,
+    CloneDashboardComponent,
+    DynamicTileUiComponent,
+    DynamicTileConfigComponent
 
 
   ],
@@ -127,7 +133,10 @@ import { CustomInfoUiComponent } from './custom-info-ui/custom-info-ui.component
     Chart4ConfigComponent,
     ChartUi5Component,
     Chart5ConfigComponent,
-    CustomInfoUiComponent
+    CustomInfoUiComponent,
+    CloneDashboardComponent,
+    DynamicTileUiComponent,
+    DynamicTileConfigComponent
   
 
     

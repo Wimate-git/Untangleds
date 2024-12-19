@@ -197,32 +197,36 @@ html, body {
     transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
   }
   .myMenu-open:checked ~ .myMenu-item:nth-child(3) {
-    transition-duration: 190ms;
-    transform: translate3d(0,90px, 0);
+    transition-duration: 150ms;
+    transform: translate3d(0,70px, 0);
   }
   .myMenu-open:checked ~ .myMenu-item:nth-child(4) {
-    transition-duration: 290ms;
-    transform: translate3d(0,180px,0);
+    transition-duration: 250ms;
+    transform: translate3d(0,140px,0);
   }
   .myMenu-open:checked ~ .myMenu-item:nth-child(5) {
-    transition-duration: 390ms;
-    transform: translate3d(0,270px,  0);
+    transition-duration: 350ms;
+    transform: translate3d(0,210px,  0);
   }
   .myMenu-open:checked ~ .myMenu-item:nth-child(6) {
-    transition-duration: 490ms;
-    transform: translate3d(0,360px, 0);
+    transition-duration: 450ms;
+    transform: translate3d(0,280px, 0);
   }
   .myMenu-open:checked ~ .myMenu-item:nth-child(7) {
-    transition-duration: 590ms;
-    transform: translate3d(0,450px, 0);
+    transition-duration: 550ms;
+    transform: translate3d(0,350px, 0);
   }
   .myMenu-open:checked ~ .myMenu-item:nth-child(8) {
-    transition-duration: 690ms;
-    transform: translate3d(0,540px, 0);
+    transition-duration: 650ms;
+    transform: translate3d(0,420px, 0);
   }
   .myMenu-open:checked ~ .myMenu-item:nth-child(9) {
-    transition-duration: 790ms;
-    transform: translate3d(0,630px, 0);
+    transition-duration: 750ms;
+    transform: translate3d(0,490px, 0);
+  }
+  .myMenu-open:checked ~ .myMenu-item:nth-child(10) {
+    transition-duration: 850ms;
+    transform: translate3d(0,560px, 0);
   }
 
 

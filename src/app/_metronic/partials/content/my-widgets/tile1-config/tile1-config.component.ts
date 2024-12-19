@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -65,6 +65,8 @@ export class Tile1ConfigComponent implements OnInit {
   p1ValuesSummary: any;
   selectedParameterValue: string;
   parameterNameRead: any;
+  multipleCheck: any;
+  selectedTexts: any;
 
 
  
@@ -84,6 +86,9 @@ export class Tile1ConfigComponent implements OnInit {
     this.dashboardIds(1)
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('dashboardChange',this.all_Packet_store)
+  }
   convertTo12HourFormat(time: string): string {
     if (!time) return '';
     const [hours, minutes] = time.split(':').map(Number);
@@ -153,13 +158,11 @@ export class Tile1ConfigComponent implements OnInit {
     { value: 'Last Year', text: 'Last Year' },
     
   ]
-  
   initializeTileFields(): void {
     // Initialize the form group
     this.createKPIWidget = this.fb.group({
       formlist: ['', Validators.required],
       parameterName: ['', Validators.required],
-      // groupBy: ['', Validators.required],
       primaryValue: ['', Validators.required],
       groupByFormat: ['', Validators.required],
       constantValue: [''],
@@ -167,21 +170,20 @@ export class Tile1ConfigComponent implements OnInit {
       processed_value: [''],
       selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
       selectedRangeLabelWithDates: [''],
-      // predefinedSelectRange: [{ startDate: moment().startOf('day'), endDate: moment().endOf('day') }],
-      selectedRangeType: ['',Validators.required],
+      selectedRangeType: ['', Validators.required],
       themeColor: ['', Validators.required],
-      // New fields for font size and font color
       fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['#000000', Validators.required], // Default to black
-      selectFromTime:[''],
-      selectToTime:[''],
-      dashboardIds:[''],
-      selectType:[''],
-      filterParameter:[''],
-      filterDescription:[''],
-
+      selectFromTime: [''],
+      selectToTime: [''],
+      dashboardIds: [''],
+      selectType: [''],
+      filterParameter: [[]], // Initialize as an array to handle multiple or single values
+      filterDescription: [''],
+      formatType:['']
     });
   }
+  
   
   async dynamicData(){
     try {
@@ -272,45 +274,48 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   }
 
   addTile(key: any) {
+    this.multipleCheck = this.createKPIWidget.value.filterParameter;
+    console.log('this.multipleCheck checking', this.multipleCheck);
+  
     if (key === 'tile') {
       const uniqueId = this.generateUniqueId();
+  
+      // Convert filterParameter array to a DynamoDB-compatible string
+      // const formattedFilterParameter = this.multipleCheck
+      //   .map((param: string) => `\${${param}}`) // Format each value as ${value}
+      //   .join(''); // Join them into a single string without commas
   
       const newTile = {
         id: uniqueId,
         x: 0,
         y: 0,
-        rows: 13,  // The number of rows in the grid
-        cols: 25,  // The number of columns in the grid
+        rows: 13, // The number of rows in the grid
+        cols: 25, // The number of columns in the grid
         rowHeight: 100, // The height of each row in pixels
-        colWidth: 100,  // The width of each column in pixels
-        fixedColWidth: true,  // Enable fixed column widths
+        colWidth: 100, // The width of each column in pixels
+        fixedColWidth: true, // Enable fixed column widths
         fixedRowHeight: true,
-        grid_type: "tile",
+        grid_type: 'tile',
         selectFromTime: this.createKPIWidget.value.selectFromTime,
         selectToTime: this.createKPIWidget.value.selectToTime,
         formlist: this.createKPIWidget.value.formlist,
         parameterName: this.createKPIWidget.value.parameterName,
-        // groupBy: this.createKPIWidget.value.groupBy,
         groupByFormat: this.createKPIWidget.value.groupByFormat,
         dashboardIds: this.createKPIWidget.value.dashboardIds,
-        selectType:this.createKPIWidget.value.selectType,
-        filterParameter:this.createKPIWidget.value.filterParameter,
-        filterDescription:this.createKPIWidget.value.filterDescription,
-        parameterNameRead: this.parameterNameRead, 
-
-     
-        // predefinedSelectRange: {
-        //   startDate: this.createKPIWidget.value.predefinedSelectRange[0].format('YYYY-MM-DD'),
-        //   endDate: this.createKPIWidget.value.predefinedSelectRange[1].format('YYYY-MM-DD'),
-        // },
+        selectType: this.createKPIWidget.value.selectType,
+        filterParameter: this.createKPIWidget.value.filterParameter, // Use the formatted string
+        filterDescription: this.createKPIWidget.value.filterDescription,
+        parameterNameRead: this.parameterNameRead,
         selectedRangeType: this.createKPIWidget.value.selectedRangeType,
         themeColor: this.createKPIWidget.value.themeColor,
-        fontSize: `${this.createKPIWidget.value.fontSize}px`,// Added fontSize
+        fontSize: `${this.createKPIWidget.value.fontSize}px`, // Added fontSize
         fontColor: this.createKPIWidget.value.fontColor, // Added fontColor
+        formatType:this.createKPIWidget.value.formatType,
         multi_value: [
           {
             value: this.createKPIWidget.value.primaryValue, // Renamed key to 'value'
-            constantValue: this.createKPIWidget.value.constantValue !== undefined && this.createKPIWidget.value.constantValue !== null
+            constantValue: this.createKPIWidget.value.constantValue !== undefined &&
+              this.createKPIWidget.value.constantValue !== null
               ? this.createKPIWidget.value.constantValue
               : 0,
             processed_value: this.createKPIWidget.value.processed_value || '',
@@ -327,11 +332,11 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
       this.dashboard.push(newTile);
   
       console.log('this.dashboard after adding new tile', this.dashboard);
-     
+  
       this.grid_details = this.dashboard;
       this.dashboardChange.emit(this.grid_details);
       if (this.grid_details) {
-        this.updateSummary('add_tile');
+        this.updateSummary('','add_tile');
       }
   
       // Optionally reset the form if needed after adding the tile
@@ -340,6 +345,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
       });
     }
   }
+  
   
   onFontColorChange(event: Event): void {
     const color = (event.target as HTMLInputElement).value;
@@ -415,7 +421,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
       this.dashboardChange.emit(this.grid_details);
   
       if (this.grid_details) {
-        this.updateSummary('update_tile');
+        this.updateSummary(this.all_Packet_store,'update_tile');
       }
   
       // Reset editTileIndex after the update
@@ -427,42 +433,120 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   
 
 
-  dynamicparameterValue(event: any): void {
-    console.log('event check for dynamic param',event)
-    console.log('event[0].text check',event[0].text)
-    const filterParameter=this.createKPIWidget.get('filterParameter')
-    console.log('filterParameter check',filterParameter)
-    if (event && event[0] && event[0].text) {
-    if(filterParameter){
+  // dynamicparameterValue(event: any): void {
+  //   console.log('event check for dynamic param',event)
+  //   console.log('event[0].text check',event[0].text)
+  //   const filterParameter=this.createKPIWidget.get('filterParameter')
+  //   console.log('filterParameter check',filterParameter)
+  //   if (event && event[0] && event[0].text) {
+  //   if(filterParameter){
 
-      filterParameter.setValue(event[0].text)
-      this.cdr.detectChanges();   
-    }
-  }else{
-    console.log('failed to set value')
-  }
+  //     filterParameter.setValue(event[0].text)
+  //     this.cdr.detectChanges();   
+  //   }
+  // }else{
+  //   console.log('failed to set value')
+  // }
    
 
-    if (event && event[0].value) {
-      // Format the value as ${field-key}
-      const formattedValue = "${"+event[0].value+"}"; 
-      console.log('formattedValue check',formattedValue) // You can customize the formatting as needed
-      this.selectedParameterValue = formattedValue;
+  //   if (event && event[0].value) {
+  //     // Format the value as ${field-key}
+  //     const formattedValue = "${"+event[0].value+"}"; 
+  //     console.log('formattedValue check',formattedValue) // You can customize the formatting as needed
+  //     this.selectedParameterValue = formattedValue;
 
   
-      console.log('Formatted Selected Item:', this.selectedParameterValue);
-    } else {
-      console.log('Event structure is different:', event);
-    }
+  //     console.log('Formatted Selected Item:', this.selectedParameterValue);
+  //   } else {
+  //     console.log('Event structure is different:', event);
+  //   }
 
+  // }
+
+  dynamicparameterValue(event: any): void {
+    console.log('Event check for dynamic param:', event);
+    // this.selectedTexts = event.map((item: any) => {
+    //   if (item && item.data && item.data.text) {
+    //     return item.data.text; // Extract the `text` property
+    //   } else {
+    //     console.warn('Unexpected item structure:', item);
+    //     return ''; // Fallback for unexpected item structure
+    //   }
+    // }).filter((value: any) => value); // Remove empty or undefined values
+
+    // // Log the extracted texts
+    // console.log('Selected Text Values:', this.selectedTexts);
+  
+    if (event && Array.isArray(event)) {
+      if (event.length === 1) {
+        // Handle single selection
+        const singleItem = event[0];
+        if (singleItem && singleItem.data && singleItem.data.text) {
+          const formattedValue = singleItem.data.text; // Use only the text value
+          console.log('Single Selected Item:', formattedValue);
+  
+          // Update the form control with the single value
+          const filterParameter = this.createKPIWidget.get('filterParameter');
+          if (filterParameter) {
+            filterParameter.setValue(formattedValue);
+            this.cdr.detectChanges(); // Trigger change detection
+          }
+  
+          this.selectedParameterValue = formattedValue;
+        } else {
+          console.warn('Unexpected item structure for single selection:', singleItem);
+        }
+      } else {
+        // Handle multiple selections
+        const formattedValues = event.map((item: any) => {
+          if (item && item.data && item.data.text) {
+            return item.data.text; // Use only the text value
+          } else {
+            console.warn('Unexpected item structure:', item);
+            return ''; // Fallback for unexpected item structure
+          }
+        }).filter(value => value).join(', '); // Join values into a single string
+  
+        console.log('Formatted Multiple Items:', formattedValues);
+  
+        // Update the form control with the concatenated values
+        const filterParameter = this.createKPIWidget.get('filterParameter');
+        console.log('filterParameter check',filterParameter)
+        if (filterParameter) {
+          filterParameter.setValue(formattedValues);
+          this.cdr.detectChanges(); // Trigger change detection
+        }
+  
+        this.selectedParameterValue = formattedValues;
+      }
+    } else {
+      console.warn('Invalid event structure:', event);
+    }
   }
+  
+  
 
   onAdd(): void {
-    // Set the `selectedParameterValue` to the `name` of the selected parameter
-    this.selectedParameterValue = this.selectedParameterValue;
-    console.log('this.selectedParameterValue check',this.selectedParameterValue)
+    // Capture the selected parameters (which will be an array due to multi-selection)
+    const selectedParameters = this.createKPIWidget.value.filterParameter;
+    console.log('selectedParameters checking',selectedParameters)
+    
+    // If multiple parameters are selected, join them as a comma-separated string
+    if (Array.isArray(selectedParameters)) {
+      // Join the selected parameters into a string with the same formatting as before
+      this.selectedParameterValue = selectedParameters.map(param => `${param}`).join(', ');
+    } else {
+      // If only one parameter is selected, use it directly
+      this.selectedParameterValue = selectedParameters;
+    }
   
-    // Update the form control value for filterDescription
+    console.log('this.selectedParameterValue check', this.selectedParameterValue);
+     this.selectedParameterValue = this.selectedParameterValue
+    .split(', ') // Split the string by comma and space
+    .map(value => `\${${value}}`) // Wrap each value in ${}
+    .join(''); // Join them back with ', '
+  
+    // Update the form control value for filterDescription with the formatted string
     this.createKPIWidget.patchValue({
       filterDescription: `${this.selectedParameterValue}`,
     });
@@ -470,7 +554,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     // Manually trigger change detection to ensure the UI reflects the changes
     this.cdr.detectChanges();
   }
-
+  
   selectedSettingsTab(tab: string) {
     this.selectedTabset = tab;
   }
@@ -516,7 +600,7 @@ alert('cloned tile')
       
       {
         alert('grid details is there')
-        this.updateSummary('add_tile')
+        this.updateSummary('','add_tile')
       }
 
     // Trigger change detection to ensure the UI updates
@@ -525,12 +609,9 @@ alert('cloned tile')
     // Update summary to handle the addition of the duplicated tile
 
   }
-updateSummary(arg2:any){
-  this.update_PowerBoard_config.emit(arg2)
-
-
-
-}
+  updateSummary(data: any, arg2: any) {
+    this.update_PowerBoard_config.emit({ data, arg2 });
+  }
 
 
 themes = [
@@ -574,7 +655,7 @@ openKPIModal(tile: any, index: number) {
       parsedMultiValue = tile.multi_value;
     }
 
-    // Extract value and constantValue from parsed multi_value, assuming the new structure
+    // Extract value and constantValue from parsed multi_value
     const value = parsedMultiValue.length > 0 ? parsedMultiValue[0]?.value || '' : '';
     const constantValue = parsedMultiValue[0]?.constantValue !== undefined ? parsedMultiValue[0].constantValue : 0;
     const parsedValue = parsedMultiValue[0]?.processed_value !== undefined ? parsedMultiValue[0].processed_value : 0;
@@ -582,44 +663,46 @@ openKPIModal(tile: any, index: number) {
     // Preprocess fontSize to remove "px" and convert to number
     const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14; // Default to 14px if undefined
 
-    // Initialize form fields and pre-select values
-    this.initializeTileFields();
+    // Helper function to check if a string is valid JSON
+    const isValidJson = (str: string): boolean => {
+      try {
+        JSON.parse(str);
+        return true;
+      } catch {
+        return false;
+      }
+    };
 
-    // const predefinedRange = {
-    //   startDate: new Date(tile.predefinedSelectRange.startDate),
-    //   endDate: new Date(tile.predefinedSelectRange.endDate),
-    // };
-    // console.log('predefinedRange check', predefinedRange);
+    let parsedParameterValue: any = [];
+    if (typeof tile.filterParameter === 'string' && isValidJson(tile.filterParameter)) {
+      parsedParameterValue = JSON.parse(tile.filterParameter);
+    } else if (typeof tile.filterParameter === 'string') {
+      console.warn('Invalid JSON for filterParameter, using as raw string:', tile.filterParameter);
+      parsedParameterValue = [tile.filterParameter];
+    } else {
+      parsedParameterValue = Array.isArray(tile.filterParameter) ? tile.filterParameter : [tile.filterParameter];
+    }
+    console.log('parsedParameterValue checking', parsedParameterValue);
+    tile.filterParameter = parsedParameterValue;
 
     this.createKPIWidget.patchValue({
       formlist: tile.formlist,
       parameterName: tile.parameterName,
-      // groupBy: tile.groupBy,
-      primaryValue: value, // Set the 'value' extracted from multi_value as primaryValue
+      primaryValue: value,
       groupByFormat: tile.groupByFormat,
-      constantValue: constantValue, // Use the extracted constantValue
+      constantValue: constantValue,
       processed_value: parsedValue,
-      // predefinedSelectRange: predefinedRange,
-      selectedRangeCalendarTimeRight: tile.selectedRangeCalendarTimeRight, // Patch the selected range object
-      selectedRangeType: tile.selectedRangeType, // Patch the selectedRangeType
-      // startDate: tile.predefinedSelectRange?.startDate || '', // Patch the startDate if it exists
-      // endDate: tile.predefinedSelectRange?.endDate || '',
+      selectedRangeCalendarTimeRight: tile.selectedRangeCalendarTimeRight,
+      selectedRangeType: tile.selectedRangeType,
       themeColor: tile.themeColor,
-      fontSize: fontSizeValue, // Preprocessed fontSize value
+      fontSize: fontSizeValue,
       fontColor: tile.fontColor,
-      selectFromTime:tile.selectFromTime,
-      selectToTime:tile.selectToTime,
-      dashboardIds:tile.dashboardIds,
-      selectType:tile.selectType,
-      filterParameter:tile.filterParameter,
-      filterDescription:tile.filterDescription
-
-
-
-
-
-
-
+      selectFromTime: tile.selectFromTime,
+      selectToTime: tile.selectToTime,
+      dashboardIds: tile.dashboardIds,
+      selectType: tile.selectType,
+      filterParameter: tile.filterParameter, // Always an array
+      filterDescription: tile.filterDescription,
     });
 
     this.isEditMode = true; // Set to edit mode
@@ -643,6 +726,7 @@ openKPIModal(tile: any, index: number) {
     console.log('Matching theme found and selected:', matchingTheme);
   }
 }
+
 
 
 
@@ -760,6 +844,13 @@ openKPIModal(tile: any, index: number) {
     { value: 'Count', text: 'Count' },
 
   ]
+
+
+  FormatTypeValues = [
+    { value: 'Default', text: 'Default' },
+    { value: 'Rupee', text: 'Rupee' },
+    // { value: 'max', text: 'Maximum' },
+]
 
   SelectTypeSummary =[
     { value: 'NewTab', text: 'New Tab' },

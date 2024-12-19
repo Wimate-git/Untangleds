@@ -283,7 +283,7 @@ if (key === 'tile3') {
      this.dashboardChange.emit(this.grid_details);
      if(this.grid_details)
        {
-         this.updateSummary('add_tile');
+         this.updateSummary('','add_tile');
        }
 
      console.log('this.dashboard after adding new tile', this.dashboard);
@@ -300,11 +300,8 @@ if (key === 'tile3') {
     this.widgetIdCounter++;
     return Date.now() + this.widgetIdCounter; // Use timestamp and counter for uniqueness
   }
-  updateSummary(arg2:any){
-    this.update_PowerBoard_config.emit(arg2)
-  
-  
-  
+  updateSummary(data: any, arg2: any) {
+    this.update_PowerBoard_config.emit({ data, arg2 });
   }
   updateTile2(key: any) {
     if (this.editTileIndex2 !== null) {
@@ -380,7 +377,7 @@ if (key === 'tile3') {
       this.dashboardChange.emit(this.grid_details);
   
       if (this.grid_details) {
-        this.updateSummary('update_tile');
+        this.updateSummary(this.all_Packet_store,'update_tile');
       }
   
       // Reset editTileIndex after the update
@@ -763,7 +760,7 @@ edit_Tile3(tile?: any, index?: number) {
     this.cdr.detectChanges();
 
     // Update summary to handle the addition of the duplicated tile
-    this.updateSummary('add_tile');
+    this.updateSummary('','add_tile');
   }
   onFontColorChange(event: Event): void {
     const color = (event.target as HTMLInputElement).value;
