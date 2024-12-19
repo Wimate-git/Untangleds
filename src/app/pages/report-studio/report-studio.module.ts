@@ -6,13 +6,16 @@ import { CommonModule } from "@angular/common";
 import { NgMultiSelectDropDownModule } from "ng-multiselect-dropdown";
 import { NgbCollapseModule, NgbDropdownModule, NgbModule, NgbNavModule, NgbTooltipModule } from "@ng-bootstrap/ng-bootstrap";
 import { NgxSpinner, NgxSpinnerModule } from "ngx-spinner";
-import { Crud2Module } from "src/app/modules/crud2/crud.module";
 import { SweetAlert2Module } from "@sweetalert2/ngx-sweetalert2";
 import { ReportStudioComponent } from "./report-studio.component";
 import { AgGridAngular } from 'ag-grid-angular';
 import { MultiSelectModule } from "primeng/multiselect";
 import { SavedQueryComponent } from "./saved-query/saved-query.component";
 import { CrudreportModule } from "./crud-report/crud.module";
+import { MatButtonModule } from "@angular/material/button";
+import { MatIconModule } from "@angular/material/icon";
+import { MatMenuModule } from "@angular/material/menu";
+import { MatTooltipModule } from "@angular/material/tooltip";
 
 
 const routes: Routes = [
@@ -41,7 +44,11 @@ const routes: Routes = [
     NgxSpinnerModule,
     MultiSelectModule,
     SweetAlert2Module.forChild(),
-    CrudreportModule
+    CrudreportModule,
+    MatButtonModule,
+    MatIconModule,
+    MatMenuModule,
+    MatTooltipModule,
 ]
 })
 export class ReportStudioModule { }

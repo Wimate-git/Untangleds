@@ -261,3 +261,49 @@
   transition-duration: 790ms;
   transform: translate3d(0,630px, 0);
 }
+
+
+
+
+
+
+
+.export-buttons-container {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.export-button {
+  font-size: 1rem; /* Bootstrap's base font size is typically 1rem */
+  padding: 0.375rem 0.75rem; /* Matching Bootstrap's padding for btn-primary */
+  border-radius: 0.25rem; /* Default border radius for btn-primary */
+  text-transform: none;
+  margin-left: 14px;
+  font-weight: 800; /* Similar weight to btn-primary */
+  line-height: 1.5; /* Ensures proper vertical alignment */
+  min-height: 43.67px;
+  min-width: 77.77px; /* Ensure a minimum width to match Bootstrap's button width */
+  justify-content: center; /* Align the content (icon + text) properly */
+}
+/* Hover effect */
+.export-button:hover {
+  background-color: #4caf50;
+  transform: translateY(-2px);
+  transition: all 0.3s ease-in-out;
+}
+
+/* Active effect */
+.export-button:active {
+  transform: translateY(0);
+  background-color: #388e3c;
+}
+
+.mat-menu-item {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.mat-menu-item mat-icon {
+  margin-right: 8px;
+}

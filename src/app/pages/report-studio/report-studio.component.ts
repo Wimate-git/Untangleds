@@ -1,6 +1,6 @@
-import { AfterViewInit, ChangeDetectorRef, Component, DestroyRef, EventEmitter, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, DestroyRef, ElementRef, EventEmitter, OnDestroy, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ColDef, GridApi, GridReadyEvent, Column } from 'ag-grid-community';
+import { ColDef, GridApi, GridReadyEvent, Column, GridOptions } from 'ag-grid-community';
 import { APIService } from 'src/app/API.service';
 import { SharedService } from '../shared.service';
 import { HttpClient } from '@angular/common/http';
@@ -15,6 +15,12 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModuleDisplayService } from './services/module-display.service';
 import { Config } from 'datatables.net';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
+import { AgGridAngular } from 'ag-grid-angular';
+import * as XLSX from 'xlsx';  
+import * as pdfMake from "pdfmake/build/pdfmake";
+import { vfs } from 'pdfmake/build/vfs_fonts';
+(pdfMake as any).vfs = vfs;
+
 
 interface ListItem {
   [key: string]: {
@@ -34,7 +40,7 @@ interface ListItem {
 
 export class ReportStudioComponent implements AfterViewInit,OnDestroy{
   @ViewChild('openModal1') openModal1: TemplateRef<any>;
-  @ViewChild('SavedQuery') SavedQuery: TemplateRef<any>;  // Reference to the modal template
+  @ViewChild('SavedQuery') SavedQuery: TemplateRef<any>;  
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
   modalRef: any;
 
@@ -62,7 +68,8 @@ export class ReportStudioComponent implements AfterViewInit,OnDestroy{
    datatableConfig: Config = {};
 
 
-
+   selectedValues: any[] = [];
+   formGroup: FormGroup;
 
 
    
@@ -92,12 +99,18 @@ export class ReportStudioComponent implements AfterViewInit,OnDestroy{
   private routeSub: Subscription;
   original_lookup_data: any = [];
   editSavedDataArray: any = [];
-
+  validForms: any;
+  visibiltyflag: boolean = false;
+  dropdownKeys: any = [];
+  populateFormData: any = [];
+columns: any;
+  showTable: boolean = false;
 
    constructor(private fb:FormBuilder,private api:APIService,private configService:SharedService,private scheduleAPI:scheduleApiService,
     private toast:MatSnackBar,private spinner:NgxSpinnerService,private cd:ChangeDetectorRef,private modalService: NgbModal,private moduleDisplayService: ModuleDisplayService,
     private route: ActivatedRoute,private router:Router
-   ){}
+   ){
+   }
 
 
 
@@ -118,15 +131,15 @@ export class ReportStudioComponent implements AfterViewInit,OnDestroy{
     this.username = this.getLoggedUser.username;
     this.permissionID = this.getLoggedUser.permission_ID
 
-    this.addFromService()
+    // this.addFromService()
 
 
-     // Initialize form group for dynamic fields
+
      this.formFieldsGroup = this.fb.group({
-      forms: this.fb.array([])  // This array will hold the dynamic form groups for each selected form
+      forms: this.fb.array([]) 
     });
 
-    // Initialize the form group with form controls
+
     this.reportsFeilds = this.fb.group({
       dateType: ['', Validators.required],
       singleDate: ['', Validators.required],
@@ -134,10 +147,12 @@ export class ReportStudioComponent implements AfterViewInit,OnDestroy{
       endDate: ['', Validators.required],
       daysAgo: ['', Validators.required],
       form_permission: [[], Validators.required], 
+      form_data_selected:[[]],
       filterOption: ['all'],
+      columnOption: ['all']
     });
 
-     // Listen to changes in dateType to adjust validations
+
      this.reportsFeilds.get('dateType')?.valueChanges.subscribe(value => {
       this.onDateTypeChange(value);
     });
@@ -153,10 +168,8 @@ export class ReportStudioComponent implements AfterViewInit,OnDestroy{
         this.editSavedQuery( this.savedQuery)
       }
     });
-
-
-
   }   
+
 
 
   async checkPermissions(){
@@ -164,11 +177,15 @@ export class ReportStudioComponent implements AfterViewInit,OnDestroy{
       await this.api.GetMaster(`${this.SK_clientID}#permission#${this.permissionID}#main`, 1).then((result: any) => {
         if (result) {
           const helpherObj = JSON.parse(result.metadata).advance_report;
-          const advance_report = helpherObj && helpherObj.advance_report
-
-          console.log("Advance report is here ",advance_report);
-    
           this.adminAccess = helpherObj.includes('All Report ID Access') == true
+
+          console.log("All the form with the permissions are here ",JSON.parse(JSON.parse(result.metadata).dynamicEntries));
+          const tempholder = JSON.parse(JSON.parse(result.metadata).dynamicEntries)
+
+          this.validForms = tempholder.filter((item:any)=>item.permission.includes('Read') == true)
+
+          this.formList = this.validForms.map((item:any)=>item.dynamicForm[0])
+
         }
       });
     } catch (err) {
@@ -324,7 +341,7 @@ conditions(formIndex: number): FormArray {
 
 addForm(): void {
   this.forms().push(this.fb.group({
-    conditions: this.fb.array([this.createCondition()]) // Start with one condition
+    conditions: this.fb.array([this.createCondition()])
   }));
 }
 
@@ -371,11 +388,79 @@ getFormNameByIndex(index: number): string {
 multiSelectChange(): void {
   const formsArray = this.forms();
   formsArray.clear();  
+  this.visibiltyflag = false
   this.reportsFeilds.get('filterOption')?.setValue('all');
+  this.reportsFeilds.get('columnOption')?.setValue('all');
+  this.populateFormBuilder = []
+  this.populateFormData = []
   this.conditionflag = false
   this.selectedForms.forEach(() => {
     this.addForm(); 
   });
+}
+
+
+
+async onColumnChange(event: any,getValue:any){
+  this.selectedValues = []
+
+  let selectedValue
+  if(getValue == 'html'){
+    selectedValue = (event.target as HTMLInputElement).value;
+  }
+  else{
+    selectedValue = event;
+  }
+
+
+
+  if(selectedValue == 'onCondition' && this.populateFormData.length == 0){
+    this.spinner.show()
+
+    try{
+      let tempMetadata:any = []
+      for(let item of this.selectedForms){
+        const formName = item
+        const result = await this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${item}#main`,1)
+
+        if(result){
+          let tempResult = JSON.parse(result.metadata || '').formFields
+          tempMetadata = {}
+          tempMetadata[item] = tempResult.map((item: any) => {
+            return { name: item.name, label: item.label , formName:formName};  
+          });
+        }
+        this.populateFormData.push(tempMetadata)
+      }
+      
+      console.log("Data to be added in dropdowns ",this.populateFormData);
+    }
+    catch(error){
+      this.spinner.hide()
+      console.log("Error in fetching form Builder data ",error);
+    }
+
+    this.spinner.hide()
+
+  }
+  else{
+    this.visibiltyflag = false
+  }
+
+
+  if(selectedValue == 'onCondition'){
+    this.visibiltyflag = true
+
+    this.dropdownKeys = this.populateFormData.map((item: {}) => Object.keys(item)[0]);
+  
+    this.selectedValues = new Array(this.dropdownKeys.length).fill(null);
+  
+    console.log("Dropdown keys are here ",this.dropdownKeys);
+  }
+ 
+
+ this.cd.detectChanges()
+  
 }
 
 
@@ -404,18 +489,20 @@ let selectedValue
 
   if(selectedValue == 'onCondition'){
     this.spinner.show()
+
     console.log("Selected form data is here ",this.selectedForms);
 
     try{
       let tempMetadata:any = []
       for(let item of this.selectedForms){
+        const formName = item
         const result = await this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${item}#main`,1)
 
         if(result){
           let tempResult = JSON.parse(result.metadata || '').formFields
           tempMetadata = {}
           tempMetadata[item] = tempResult.map((item: any) => {
-            return { name: item.name, label: item.label };  // Correct syntax
+            return { name: item.name, label: item.label,  formName:formName };  
           });
         }
         this.populateFormBuilder.push(tempMetadata)
@@ -450,7 +537,7 @@ let selectedValue
 
   
 
-  selectedForms: string[] = [];
+  selectedForms: any = [];
   operators = ['=', '!=', '<', '>', '<=', '>='];
 
 
@@ -469,12 +556,11 @@ let selectedValue
    onGridReady(params: GridReadyEvent) {
      this.gridApi = params.api;
    }
- 
-   // Function to get selected rows
+
    getSelectedRows() {
      const selectedNodes = this.gridApi.getSelectedNodes();
      const selectedData = selectedNodes.map(node => node.data);
-     console.log('Selected Rows:', selectedData);  // log selected rows or perform any other operation
+     console.log('Selected Rows:', selectedData);  
    }
 
 
@@ -489,10 +575,9 @@ let selectedValue
       const operator = condition.operator;
       const formattedCondition = `\${${condition.condition}} ${operator} '${condition.value}'`;
   
-      // Append the current condition to the final string
+   
       conditionString += formattedCondition;
-  
-      // Add the logical operator between conditions (if not the last one)
+
       if (index !== conditions.length - 1) {
         const logicalOperator = condition.operatorBetween ? condition.operatorBetween : '';
         conditionString += ` ${logicalOperator} `;
@@ -506,18 +591,39 @@ let selectedValue
    async onSubmit() {
 
     let body: any;
-    this.tableData = [];  // Clear previous data
+    this.showTable = true
+    this.tableData = []; 
+
+
+
+    let formMap
+
+    if(this.visibiltyflag){
+      console.log('Selected columns are here ',this.selectedValues);
+
+
+      formMap = this.selectedValues.reduce((acc, group) => {
+        group.forEach((item: { formName: string | number; label: any; }) => {
+            if (!acc[item.formName]) {
+                acc[item.formName] = [];
+            }
+            acc[item.formName].push(item.label);
+        });
+        return acc;
+      }, {});
+      console.log("Form mapped data is here ",formMap);
+    }
   
     this.spinner.show();
   
-    // Check if the date type is 'between' or 'between time'
+  
     if (['between', 'between time'].includes(this.reportsFeilds.get('dateType')?.value)) {
       const startEpoch = new Date(this.reportsFeilds.get('startDate')?.value).getTime();
       const endEpoch = new Date(this.reportsFeilds.get('endDate')?.value).getTime();
 
 
       if (startEpoch >=  endEpoch) {
-         // Display error message if invalid
+      
           Swal.fire({
             title: "Error",
             text: "Please ensure that the start date is earlier than the end date and all fields are filled correctly.",
@@ -534,7 +640,7 @@ let selectedValue
         conditionValue: [startEpoch, endEpoch]
       };
     }
-    // Check if the date type is 'is', '>=', or '<='
+
     else if (['is', '>=', '<='].includes(this.reportsFeilds.get('dateType')?.value)) {
       const singleEpoch = new Date(this.reportsFeilds.get('singleDate')?.value).getTime();
       body = { 
@@ -543,7 +649,7 @@ let selectedValue
         conditionValue: singleEpoch
       };
     }
-    // Default case (daysAgo)
+
     else {
       body = { 
         dateType: this.reportsFeilds.get('dateType')?.value,
@@ -552,12 +658,12 @@ let selectedValue
       };
     }
   
-    // Get the selected form filters
+
     const tempArray = this.reportsFeilds.get('form_permission')?.value;
 
     this.onSubmitFlag = true
   
-    // Grouping data by formFilter
+
     const groupedData: { [key: string]: any[] } = {};
   
     for (let item of tempArray) {
@@ -570,11 +676,10 @@ let selectedValue
       console.log("Request body is here ", body);
   
       try {
-        // Use firstValueFrom to convert Observable to Promise
+
         const response = await this.scheduleAPI.sendData(body);
         console.log('Response from Lambda:', response);
-  
-        // Add response to the grouped data
+
         if (!groupedData[formFilter]) {
           groupedData[formFilter] = [];
         }
@@ -585,22 +690,21 @@ let selectedValue
       }
     }
   
-    // Hide spinner after the loop
+
     this.spinner.hide();
     console.log("Data to be populated on Table is ", groupedData);
-  
-    // Prepare data for ag-Grid after grouping
-    await this.prepareData(groupedData);
+
+    await this.prepareData(groupedData,formMap);
   }
   
 
-  async prepareData(groupedData: { [key: string]: any[] }) {
-    const tableDataWithFormFilters = [];
+  async prepareData(groupedData: { [key: string]: any[] },formMap:any) {
+    const tableDataWithFormFilters:any = [];
 
     const formConditions = this.formFieldsGroup.value.forms
   
     let index = 0;
-    // Iterate through each formFilter and prepare data for each table
+
     for (let formFilter in groupedData) {
 
 
@@ -619,9 +723,9 @@ let selectedValue
       let tempMetaArray = responses[0].map((item:any)=>item.metadata)
 
 
-      //Conditional filter code is here 
+
       if(this.conditionflag){
-        let tempArray = []
+        let tempArray:any = []
         const conditionalString =  await this.buildConditionString(formConditions[index].conditions)
         for(let data of tempMetaArray){
 
@@ -638,9 +742,24 @@ let selectedValue
 
 
       let rows = await this.mapLabels(tempMetaArray,dynamicMetadata) 
-     
- 
-      //Assign filtered rows to metadata of responses
+
+      if (rows && Array.isArray(rows) && rows.length > 0 && this.visibiltyflag && formMap) {
+        rows = rows.map(item => {
+          let filteredItem: any = {}; // Initialize the filtered item
+          // Loop through the fields in formMap[`${formFilter}`]
+          formMap[`${formFilter}`].forEach((key: string) => {
+            // Check if the row item has the field key and add it to filteredItem
+            if (item.hasOwnProperty(key)) {
+              filteredItem[key] = item[key];
+            }
+          });
+          return filteredItem;
+        });
+      }
+
+
+    
+  
       responses[0].metadata = rows
 
      
@@ -648,39 +767,38 @@ let selectedValue
         rows[i].formFilter = formFilter
       }
 
-
       console.log("Rows are here ",rows);
       console.log("Filtered rows are here ",rows);
 
 
   
-      // Push the row data for each formFilter
+
       tableDataWithFormFilters.push({ formFilter, rows });
 
-      //Useing for conditional indexed based selection
+
       index++;
     }
   
-    // Store the final table data to use in the template
+
     this.tableDataWithFormFilters = tableDataWithFormFilters;
 
-    // Optionally log the rowData for debugging
+
     console.log("Table rows are here ",this.tableDataWithFormFilters);
     this.cd.detectChanges()
   }
 
 
-  // Helper function to check if a string is Base64
+  
 isBase64(value: string): boolean {
   const regex = /^data:image\/(png|jpeg|jpg|gif|bmp);base64,/;
   return regex.test(value);
 }
   
   createColumnDefs(rowData: any[]): ColDef[] {
-    const columns = [];
+    const columns:any = [];
   
     if (rowData.length > 0) {
-      // Get the keys from the first row (metadata keys)
+
       const sampleRow = rowData[0];
   
       // Add 'formFilter' column manually
@@ -690,6 +808,7 @@ isBase64(value: string): boolean {
         flex: 1,
         filter: true,
         minWidth: 150,  // Add a minimum width for the formFilter column
+        hide: true
       });
   
       // Iterate through metadata keys to create dynamic columns
@@ -698,6 +817,8 @@ isBase64(value: string): boolean {
           // Check if the value in the row is Base64 (image data)
           const isBase64Image = this.isBase64(sampleRow[key]);
 
+
+        
           
           columns.push({
             headerName: this.formatHeaderName(key), // Format the header name
@@ -771,7 +892,12 @@ isBase64(value: string): boolean {
 
 
   clearFeilds() {
+    this.tableDataWithFormFilters = []
+    this.showTable = false
+    this.selectedForms = []
+    this.conditionflag = false
     this.reportsFeilds.reset()
+    this.cd.detectChanges()
   }
 
    async evaluateTemplate(template:any,metadata:any) {
@@ -819,7 +945,7 @@ isBase64(value: string): boolean {
         if (mappedResponse.hasOwnProperty(fieldName)) {
           // If the field name contains 'signature', process as an image
           if (fieldName.toLowerCase().includes('signature')) {
-           
+            mappedResponse[label] = mappedResponse[fieldName];
           } else {
             mappedResponse[label] = mappedResponse[fieldName];
           }
@@ -918,14 +1044,14 @@ isBase64(value: string): boolean {
 
 
 
-    async deleteNM(value: any) {
+    async deleteNM(getValue: any) {
 
-      console.log("Value to be deleted is here ",value);
+      console.log("Value to be deleted is here ",getValue);
 
-      const deleteData = this.original_lookup_data.filter((item:any)=>item.P1)
+      const deleteData = this.original_lookup_data.filter((item:any)=>item.P1 == getValue)
     
         let temp = {
-          PK: this.SK_clientID+"#savedquery#"+value+"#main",
+          PK: this.SK_clientID+"#savedquery#"+getValue+"#main",
           SK: 1
         }
   
@@ -934,23 +1060,25 @@ isBase64(value: string): boolean {
 
         console.log("Deleted items is ",item);
         console.log("deleted temp is here ",temp);
-        
+
+   
+       
 
             try{
             
-            // await this.api.DeleteMaster(temp).then(async value => {
-            //   await this.fetchTimeMachineById(1, value, 'delete', item)
+            await this.api.DeleteMaster(temp).then(async value => {
+     
+              await this.fetchTimeMachineById(1, getValue, 'delete', item)
 
+              this.reloadEvent.next(true)
 
-            //   this.reloadEvent.next(true)
-
-            //   // return Swal.fire({
-            //   //   title: 'Saved Query Deleted Successfully!',
-            //   //   text: 'The saved query has been successfully removed from the system.',
-            //   //   icon: 'success',  // You can change this to 'error' or 'warning' depending on the context
-            //   //   background: 'red',  // Green background to indicate success
-            //   // });
-            // })
+              // return Swal.fire({
+              //   title: 'Saved Query Deleted Successfully!',
+              //   text: 'The saved query has been successfully removed from the system.',
+              //   icon: 'success',  // You can change this to 'error' or 'warning' depending on the context
+              //   background: 'red',  // Green background to indicate success
+              // });
+            })
           }
           catch(error){
             console.log("Error deleting ",error);
@@ -975,7 +1103,7 @@ isBase64(value: string): boolean {
               data[findIndex][`L${findIndex + 1}`] = item;
     
               // Create a new array to store the re-arranged data without duplicates
-              const newData = [];
+              const newData:any = [];
             
               // Loop through each object in the data array
               for (let i = 0; i < data.length; i++) {
@@ -988,7 +1116,7 @@ isBase64(value: string): boolean {
                   const newObj = { [newKey]: data[i][originalKey] };
             
                   // Check if the new key already exists in the newData array
-                  const existingIndex = newData.findIndex(obj => Object.keys(obj)[0] === newKey);
+                  const existingIndex = newData.findIndex((obj: {}) => Object.keys(obj)[0] === newKey);
             
                   if (existingIndex !== -1) {
                     // Merge the properties of the existing object with the new object
@@ -1156,7 +1284,7 @@ isBase64(value: string): boolean {
               let data = JSON.parse(response.options);
               
               if (Array.isArray(data)) {
-                const promises = []; // Array to hold promises for recursive calls
+                const promises:any = []; // Array to hold promises for recursive calls
   
                 for (let index = 0; index < data.length; index++) {
                   const element = data[index];
@@ -1217,6 +1345,245 @@ isBase64(value: string): boolean {
     });
   }
   
+
+
+
+
+
+
+  //Export option is here 
+  @ViewChildren(AgGridAngular) agGrids!: QueryList<AgGridAngular>;
+  // Method to export all tables as CSV
+  exportAllTablesAsCSV() {
+    const allCsvData:any = [];
+
+    // Iterate over all ag-Grid instances
+    this.agGrids.toArray().forEach((gridInstance, index) => {
+      // Fetch the grid API
+      const gridApi = gridInstance.api;
+      const csvData = gridApi.getDataAsCsv();
+
+      // Add the formFilter title before each table's data
+      const tableHeader = `\n\n--- Table: ${this.tableDataWithFormFilters[index].formFilter} ---\n`;
+      allCsvData.push(tableHeader + csvData);
+    });
+
+    // Combine all the CSV data into one string
+    const finalCsv = allCsvData.join('\n');
+
+    // Create a Blob and trigger the download
+    const blob = new Blob([finalCsv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'combined-tables.csv';
+    link.click();
+  }
+
+
+
+  exportAllTablesAsExcel() {
+    const wb = XLSX.utils.book_new();  // Create a new workbook
+
+    // Iterate over all ag-Grid instances
+    this.agGrids.toArray().forEach((gridInstance, index) => {
+      // Fetch the grid API
+      const gridApi = gridInstance.api;
+
+      // Generate CSV data from the grid
+      const csvData = gridApi.getDataAsCsv();
+
+      // Convert CSV string to SheetJS workbook (Excel)
+      const ws = XLSX.utils.aoa_to_sheet(this.csvToArray(csvData || ''));
+
+      // Add the worksheet to the workbook with the name of the formFilter
+      XLSX.utils.book_append_sheet(wb, ws, this.tableDataWithFormFilters[index].formFilter);
+    });
+
+    // Generate the Excel file
+    const excelFile = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+
+    // Create a Blob and trigger the download
+    const blob = new Blob([excelFile], { type: 'application/octet-stream' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'combined-tables.xlsx';
+    link.click();
+  }
+
+  // Helper function to convert CSV string to 2D array (needed by SheetJS)
+  csvToArray(csv: string): any[] {
+    const rows = csv.split('\n').map(row => row.split(','));
+    return rows;
+  }
+
+
+    createColumnDefsPDF(rows: any[]): string[] {
+    if (!rows || rows.length === 0) {
+      return [];  // Return an empty array if there are no rows
+    }
+  
+    // Get the first row in the data to determine the column names
+    const firstRow = rows[0];
+  
+    // Extract the keys (column names) from the first row
+    const columnDefs = Object.keys(firstRow);
+  
+    // Return the array of column names
+    return columnDefs;
+  }
+
+  csvToArrayd(csv: string): string[][] {
+    const rows = csv.split('\n');  // Split CSV into rows
+    return rows.map(row => row.split(','));  // Split each row by commas
+  }
+
+  
+
+ 
+
+
+  exportAllTablesAsPDF() {
+    const tableDataWithFormFilters = this.tableDataWithFormFilters; // Assuming this is your table data
+  
+    const docDefinition: any = {
+      content: [],
+      defaultStyle: {
+        fontSize: 10,
+      },
+      styles: {
+        tableHeader: {
+          bold: true,
+          fontSize: 14,
+          margin: [0, 5],
+          alignment: 'center',
+          fillColor: '#4CAF50',  // Green background for header
+          color: '#fff',         // White text for header
+          padding: [5, 10],      // Add padding to header cells
+          border: [true, true, true, true],  // Border around header cells
+        },
+        tableBody: {
+          fontSize: 10,
+          margin: [0, 5],
+          padding: [5, 10],        // Add padding to body cells
+          alignment: 'center',     // Center align text for better readability
+        },
+        tableRow: {
+          fontSize: 10,
+          margin: [0, 5],
+          border: [true, true, true, true],  // Border for body cells
+          padding: [5, 10],  // Padding inside table cells
+        },
+        alternatingRow: {
+          fontSize: 10,
+          margin: [0, 5],
+          fillColor: '#f9f9f9',  // Light gray background for alternating rows
+          border: [true, true, true, true],
+          padding: [5, 10],  // Padding inside alternating row cells
+        },
+        footer: {
+          fontSize: 10,
+          alignment: 'center',
+          margin: [0, 10],
+        },
+        title: {
+          fontSize: 18,
+          bold: true,
+          alignment: 'center',
+          margin: [0, 10],
+          color: '#333',  // Darker color for the title
+        }
+      },
+      footer: function(currentPage: number, pageCount: number) {
+        return [
+          {
+            text: `Untangled Pro Page ${currentPage} of ${pageCount}`, // Page number
+            alignment: 'center', // Center the page number
+            margin: [0, 10],
+          }
+        ];
+      },
+    };
+  
+    tableDataWithFormFilters.forEach((tableData: { rows: any[]; formFilter: any; }, index: number) => {
+      const columns = this.createColumnDefsPDF(tableData.rows);
+  
+      // Adjust the page size based on the number of columns
+      const columnCount = columns.length;
+      if (columnCount <= 6) {
+        docDefinition.pageSize = 'A4'; // Set page size to A4 if columns are less than or equal to 6
+      } else if (columnCount <= 10) {
+        docDefinition.pageSize = 'A3'; // Set page size to A3 if columns are between 7 and 10
+      } else if (columnCount <= 15) {
+        docDefinition.pageSize = 'A2'; // Set page size to A2 if columns are between 11 and 15
+      } else {
+        docDefinition.pageSize = 'A1'; // Set page size to A1 if columns are greater than 15
+      }
+  
+      // Add title (formFilter as table title)
+      const title = `${tableData.formFilter}`;
+      docDefinition.content.push({
+        text: title,
+        style: 'tableHeader',
+        margin: [0, 10],
+      });
+  
+  
+      // Prepare the table body
+      const tableBody = [];
+  
+      // Add header row
+      tableBody.push(columns.map((col: any) => ({
+        text: col.toString(),
+        style: 'tableHeader',
+      })));
+  
+      // Add data rows
+      tableData.rows.forEach((row: any) => {
+        const rowData = columns.map((col: any) => {
+          let cellData: any = row[col];
+  
+          if (typeof cellData === 'object' && cellData !== null) {
+            return ''; // Treat object as empty string
+          }
+  
+          // Check if cellData contains a base64 image string
+          else if (cellData && typeof cellData === 'string' && cellData.includes('data:image')) {
+            return {
+              image: cellData,   // Use the Base64 image data
+              width: 50,         // Set image width (adjust as needed)
+              height: 50,        // Set image height (adjust as needed)
+            };
+          }
+  
+          // Return empty string for null or undefined
+          return cellData ?? '';
+        });
+        tableBody.push(rowData);
+      });
+  
+      // Add the table to the content
+      docDefinition.content.push({
+        table: {
+          body: tableBody,
+          headerRows: 1, // First row is header
+          widths: Array(columns.length).fill('auto'), // Dynamically set column widths based on content
+        },
+        layout: 'lightHorizontalLines', // Layout style
+        margin: [0, 10],
+      });
+  
+      // Add page break between tables if not the last table
+      if (index < tableDataWithFormFilters.length - 1) {
+        docDefinition.content.push({
+          text: '', pageBreak: 'before',
+        });
+      }
+    });
+  
+    // Generate the PDF using pdfMake
+    pdfMake.createPdf(docDefinition).download('combined-tables.pdf');
+  }
+
 } 
 
 

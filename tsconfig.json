@@ -25,6 +25,10 @@
       "dom"
     ]
   },
+  "include": [
+    "src/**/*.ts",
+    "src/pdfmake.d.ts"  
+  ],
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
