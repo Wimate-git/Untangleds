@@ -271,7 +271,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   dynamicFormSelect(selectForm:any):void{
 
     this.formfieldData = []
-    this.permissionForm.get('fieldValue')?.reset();
+    // this.permissionForm.get('fieldValue')?.reset();
     console.log("SELECTION OF FORMS:",selectForm)
 
     this.api.GetMaster(this.client+'#dynamic_form#'+selectForm+'#main',1).then((formres:any)=>{
@@ -311,16 +311,10 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
       const currentValue = this.permissionForm.get('fieldValue')?.value || '';
 
-        // Append the new field value with a space separator
-    //  const updatedValue = currentValue ? `${currentValue} \${${selectedField}}` : `\${${selectedField}}`;
-    //     // Set the formatted value in the Filter Equation field
-    //     this.permissionForm.patchValue({
-    //         fieldValue: updatedValue
-    //     });
-    if (currentValue.includes(`\${${selectedField}}`)) {
-      // this.permissionError = 'This field is already added.';
-      this.showAlert(errorAlertform)
-  } else {
+  //   if (currentValue.includes(`\${${selectedField}}`)) {
+  //     // this.permissionError = 'This field is already added.';
+  //     this.showAlert(errorAlertform)
+  // } else {
       // Append the new field value with a space separator
       const updatedValue = currentValue 
           ? `${currentValue} \${${selectedField}}` 
@@ -330,7 +324,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       this.permissionForm.patchValue({
           fieldValue: updatedValue
       });
-  }
+  // }
     } else {
         // Optionally, show an error or notification if no field is selected
         // this.permissionError = 'Please select a Field Label first.';
