@@ -393,7 +393,7 @@ export class UserExportComponent {
       console.log('File uploaded successfully:', this.selectedFile);
       modal.close();
     } catch (err) {
-      this.error = 'Error uploading file. Please try again.';
+      this.error = 'Error uploading file. Please try again.',err;
     } finally {
       this.isUploading = false;
       this.spinner.hide()
