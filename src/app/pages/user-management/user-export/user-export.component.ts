@@ -52,6 +52,7 @@ export class UserExportComponent {
   @Input() adminLogin:any;
   @Input() SK_clientID:any;
   @Input() lookup_data_user:any;
+  @Input() combinationOfUser:any;
 
   selectedFile: any;
   isDragging = false;
@@ -131,7 +132,7 @@ export class UserExportComponent {
     this.selectedFile = file;
 
     try {
-      const validationResult = await this.excelValidator.validateExcelFile(file,this.listofSK,this.uniqueList,this.adminLogin,this.SK_clientID);
+      const validationResult = await this.excelValidator.validateExcelFile(file,this.listofSK,this.uniqueList,this.adminLogin,this.SK_clientID,this.combinationOfUser);
       if (!validationResult.isValid) {
         this.validationErrors = this.excelValidator.formatValidationErrors(validationResult.errors);
       }

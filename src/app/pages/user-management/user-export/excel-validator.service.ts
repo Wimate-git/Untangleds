@@ -222,7 +222,7 @@ export class ExcelValidatorService {
     }
   };
 
-  async validateExcelFile(file: File, existingUsernames: string[],uniqueList: any[],adminLogin:any,SK_clientID:any): Promise<{ isValid: boolean; errors: ValidationError[],createRows:any,updateRows:any }> {
+  async validateExcelFile(file: File, existingUsernames: string[],uniqueList: any[],adminLogin:any,SK_clientID:any,combinationOfUser:any): Promise<{ isValid: boolean; errors: ValidationError[],createRows:any,updateRows:any }> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       const errors: ValidationError[] = [];
@@ -282,7 +282,18 @@ export class ExcelValidatorService {
                   editOperation = true
                   console.log("User exisst here so Update this user");
 
-
+                  if(combinationOfUser && Array.isArray(combinationOfUser)){
+                    const tempHolder = combinationOfUser.find((item:any)=>item.user == cellValue.toLowerCase())
+                    if(SK_clientID != tempHolder.clientID){
+                      errors.push({
+                        row: rowIndex + 1,
+                        column: header,
+                        columnLetter,
+                        value: cellValue,
+                        error: `Username already present in ${tempHolder.clientID}`
+                      });
+                    }
+                  }
                 }
 
 

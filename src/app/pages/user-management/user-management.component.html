@@ -23,7 +23,7 @@
             <!--begin::Toolbar-->
             <div class="d-flex justify-content-end">
 
-                <app-user-export [listofSK]="listofSK" [uniqueList]="[listofClientIDs,listofCompanyIDs,listofEmails,listofUserID,listofMobileID,listofPermissionIDs]" [adminLogin]="adminLogin" [SK_clientID]="SK_clientID" [lookup_data_user]="lookup_data_user" (newItemEvent)="reloadTable()" ></app-user-export>
+                <app-user-export [listofSK]="listofSK" [uniqueList]="[listofClientIDs,listofCompanyIDs,listofEmails,listofUserID,listofMobileID,listofPermissionIDs]" [adminLogin]="adminLogin" [SK_clientID]="SK_clientID" [lookup_data_user]="lookup_data_user" [combinationOfUser]="combinationOfUser" (newItemEvent)="reloadTable()" ></app-user-export>
 
                 <!--begin::Add user-->
                 <a [ngbTooltip]="'Add new user'" type="button" class="btn btn-primary" data-action="create">

@@ -169,6 +169,7 @@ rdtListWorkAround :any =[{
   lookup_All_temp: any = [];
   tempUserName: string;
   tempUserID: string;
+  combinationOfUser: any = [];
 
   constructor(private apiService: UserService,private configService:SharedService,private fb:FormBuilder
     ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal,private DynamicApi:DynamicApiService,
@@ -649,6 +650,10 @@ rdtListWorkAround :any =[{
       
       console.log("All the unique details of user are here ", this.lookup_All_User);
 
+      this.combinationOfUser = this.lookup_All_User.map((item:any)=>{
+        return {user:item.P1,clientID:item.P2}
+      })
+
       this.listofUserID = this.lookup_All_User.map((item:any)=>item.P5)
 
       this.listofEmails = this.lookup_All_User.map((item:any)=>item.P3)
@@ -656,6 +661,8 @@ rdtListWorkAround :any =[{
       this.listofMobileID = this.lookup_All_User.map((item:any)=>item.P4)
 
       this.listofSK = this.lookup_All_User.map((item:any)=>item.P1)
+
+      // console.log("Combination of users ",this.combinationOfUser);
 
   } catch (err) {
       console.error("Error fetching all the clients", err);
