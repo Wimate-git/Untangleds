@@ -22,10 +22,13 @@
         <div class="card-toolbar">
             <!--begin::Toolbar-->
             <div class="d-flex justify-content-end">
+
+                <app-user-export [listofSK]="listofSK" [uniqueList]="[listofClientIDs,listofCompanyIDs,listofEmails,listofUserID,listofMobileID,listofPermissionIDs]" [adminLogin]="adminLogin" [SK_clientID]="SK_clientID" [lookup_data_user]="lookup_data_user" (newItemEvent)="reloadTable()" ></app-user-export>
+
                 <!--begin::Add user-->
-                <button type="button" class="btn btn-primary" data-action="create">
+                <a [ngbTooltip]="'Add new user'" type="button" class="btn btn-primary" data-action="create">
                     Add
-                </button>
+                </a>
                 <!--end::Add user-->
                 </div>
                 <!--end::Toolbar-->

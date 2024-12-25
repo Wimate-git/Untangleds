@@ -1,0 +1,40 @@
+.btn:hover{
+    transform: translateY(-2px);
+    transition: 0.5s;
+} 
+
+.custom-primary{
+    background-color:  #ff6f1e; 
+    color: #fff; 
+}
+
+.custom-primary:hover {
+    background-color: #ff6f1e; 
+    color: #fff; 
+    opacity: 1.0;
+    transform: translateY(-2px);
+    transition: 0.5s;
+  }
+
+
+
+
+  .upload-container {
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .upload-container.dragover {
+    border-color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.05);
+  }
+
+  .selected-file {
+    max-width: 100%;
+  }

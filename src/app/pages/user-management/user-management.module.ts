@@ -11,6 +11,7 @@ import { Crud2Module } from "src/app/modules/crud2/crud.module";
 import { MultiSelectModule } from "primeng/multiselect";
 import { SweetAlert2Module } from "@sweetalert2/ngx-sweetalert2";
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { UserExportComponent } from "./user-export/user-export.component";
 
 
 
@@ -37,7 +38,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
     NgbModule,
     NgxSpinnerModule,
     SweetAlert2Module.forChild(),
-  
+    UserExportComponent,
     MultiSelectModule,
     SelectButtonModule,
     

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Config } from 'datatables.net';
 import moment from 'moment';
@@ -57,6 +57,8 @@ interface ListItem {
 
 
 export class UserManagementComponent implements OnInit{
+
+ 
 
   isCollapsed1 = false;
   @ViewChild('closeUser') closeUser: any;
@@ -173,6 +175,11 @@ rdtListWorkAround :any =[{
     private locationPermissionService:LocationPermissionService){}
 
 
+    reloadTable(){
+      console.log("Table is reloaded here ");
+      this.reloadEvent.next(true)
+    }
+
 
   async ngOnInit(){
 
@@ -194,6 +201,8 @@ rdtListWorkAround :any =[{
     this.showTable()
 
     this.getTreeInputData()
+
+    
   }
 
 
