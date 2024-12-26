@@ -34,8 +34,7 @@ export class ExcelValidatorService {
   private isBinary(value: any): boolean {
     return ['0', '1', 0, 1].includes(value);
   }
-
-  private columnValidations:any = {
+  private columnValidations: any = {
     'UserName': {
       required: true,
       validate: (value: any) => {
@@ -108,7 +107,9 @@ export class ExcelValidatorService {
       required: true,
       validate: (value: any) => {
         if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
-        if (this.isString(value) && ['Visible','Invisible'].includes(value) == false) return { isValid: false, error: 'Must be Either Visible or Invisible' };
+        if (this.isString(value) && ['Visible', 'Invisible'].includes(value) === false) {
+          return { isValid: false, error: 'Must be Either Visible or Invisible' };
+        }
         return { isValid: true };
       }
     },
@@ -167,60 +168,68 @@ export class ExcelValidatorService {
     'SMS': {
       required: false,
       validate: (value: any) => {
-        if (!value) return { isValid: true };
-        if (this.isString(value) && ['true','false'].includes(value.toLowerCase()) == false) return { isValid: false, error: 'Must be Either true or false' };
+        if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
+        if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
+        if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
         return { isValid: true };
       }
     },
     'Telegram': {
       required: false,
       validate: (value: any) => {
-        if (!value) return { isValid: true };
-        if (this.isString(value) && ['true','false'].includes(value.toLowerCase()) == false) return { isValid: false, error: 'Must be Either true or false' };
+        if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
+        if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
+        if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
         return { isValid: true };
       }
     },
     'Escalation Email': {
       required: false,
       validate: (value: any) => {
-        if (!value) return { isValid: true };
-        if (this.isString(value) && ['true','false'].includes(value.toLowerCase()) == false) return { isValid: false, error: 'Must be Either true or false' };
+        if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
+        if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
+        if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
         return { isValid: true };
       }
     },
     'Escalation SMS': {
       required: false,
       validate: (value: any) => {
-        if (!value) return { isValid: true };
-        if (this.isString(value) && ['true','false'].includes(value.toLowerCase()) == false) return { isValid: false, error: 'Must be Either true or false' };
+        if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
+        if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
+        if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
         return { isValid: true };
       }
     },
     'Escalation Telegram': {
       required: false,
       validate: (value: any) => {
-        if (!value) return { isValid: true };
-        if (this.isString(value) && ['true','false'].includes(value.toLowerCase()) == false) return { isValid: false, error: 'Must be Either true or false' };
+        if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
+        if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
+        if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
         return { isValid: true };
       }
     },
     'Account': {
       required: false,
       validate: (value: any) => {
-        if (!value) return { isValid: true };
-        if (this.isString(value) && ['true','false'].includes(value.toLowerCase()) == false) return { isValid: false, error: 'Must be Either true or false' };
+        if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
+        if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
+        if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
         return { isValid: true };
       }
     },
     'Cognito Update': {
       required: false,
       validate: (value: any) => {
-        if (!value) return { isValid: true };
-        if (this.isString(value) && ['true','false'].includes(value.toLowerCase()) == false) return { isValid: false, error: 'Must be Either true or false' };
+        if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
+        if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
+        if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
         return { isValid: true };
       }
     }
   };
+  
 
   async validateExcelFile(file: File, existingUsernames: string[],uniqueList: any[],adminLogin:any,SK_clientID:any,combinationOfUser:any): Promise<{ isValid: boolean; errors: ValidationError[],createRows:any,updateRows:any }> {
     return new Promise((resolve, reject) => {
@@ -257,7 +266,14 @@ export class ExcelValidatorService {
   
           // Validate each data row
           for (let rowIndex = 1; rowIndex < data.length; rowIndex++) {
+
             const row = data[rowIndex] as any[];
+
+            console.log("Row is here ",row);
+
+            if(row.length == 0){
+              return
+            }
             
             let editOperation = false;
             headers.forEach((header, colIndex) => {

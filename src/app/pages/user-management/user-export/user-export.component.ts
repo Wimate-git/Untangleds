@@ -142,7 +142,9 @@ export class UserExportComponent {
         console.log("Data to be processed is here ",this.validExcelData);
       }
     } catch (err:any) {
-      this.error = err.message || 'Error validating file';
+      console.log("Error message is here ",err);
+
+      this.error = err.message || 'Error validating file',err;
       this.selectedFile = null;
     }
   }
@@ -388,6 +390,12 @@ export class UserExportComponent {
           await this.updateUser(user)
         }
       }
+
+      Swal.fire({
+        icon: 'success', // or another icon like 'info', 'error', etc.
+        title: `File Uploaded Successfully: ${tempcreateHolder.length} users added,  ${tempupdateHolder.length} users updated.`,
+        showConfirmButton: true,
+      })
 
       this.reloadTable()         
       console.log('File uploaded successfully:', this.selectedFile);
