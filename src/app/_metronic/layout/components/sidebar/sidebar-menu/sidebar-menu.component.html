@@ -100,7 +100,7 @@
       </div>
     </div>
 
-    <div class="menu-item">
+    <div class="menu-item"  *ngIf="hasPermission('Report Studio')">
       <a class="menu-link without-sub" routerLinkActive="active"
          routerLink="/reportStudio">
         <span class="menu-bullet">
