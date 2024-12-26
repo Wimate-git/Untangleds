@@ -411,6 +411,8 @@ export class UserExportComponent {
 
   async updateUser(userFields: any) {
 
+    console.log("All the users data is here ",this.lookup_data_user);
+
     try{
       console.log("User Details are here ",userFields);
       let tempObj:any = {}
@@ -435,12 +437,12 @@ export class UserExportComponent {
             start_node: userFields[13],
             default_module:userFields[14],
             redirectionURL:userFields[15],
-            alert_sms: userFields[16],
-            alert_telegram: userFields[17],
-            escalation_email: userFields[18],
+            alert_sms: userFields[16] ,
+            alert_telegram: userFields[17] ,
+            escalation_email: userFields[18] ,
             escalation_sms: userFields[19],
-            escalation_telegram: userFields[20],
-            cognito_update:userFields[21],
+            escalation_telegram: userFields[20] ,
+            cognito_update:userFields[21] ,
             enable_user: userFields[22],
             updated: new Date()
           }
@@ -668,13 +670,13 @@ export class UserExportComponent {
             start_node: userFields[13],
             default_module:userFields[14],
             redirectionURL:userFields[15],
-            alert_sms: userFields[16],
-            alert_telegram: userFields[17],
-            escalation_email: userFields[18],
-            escalation_sms: userFields[19],
-            escalation_telegram: userFields[20],
-            cognito_update:userFields[21],
-            enable_user: userFields[22],
+            alert_sms: userFields[16] ,
+            alert_telegram: userFields[17] ,
+            escalation_email: userFields[18] ,
+            escalation_sms: userFields[19] ,
+            escalation_telegram: userFields[20] ,
+            cognito_update:userFields[21] ,
+            enable_user: userFields[22] ,
             updated: new Date()
           }
   

@@ -169,8 +169,8 @@ export class ExcelValidatorService {
       required: false,
       validate: (value: any) => {
         if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
-        if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
-        if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+        if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
+        // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
         return { isValid: true };
       }
     },
@@ -178,8 +178,9 @@ export class ExcelValidatorService {
       required: false,
       validate: (value: any) => {
         if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
-        if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
-        if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+        // if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
+        if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
+        // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
         return { isValid: true };
       }
     },
@@ -187,8 +188,9 @@ export class ExcelValidatorService {
       required: false,
       validate: (value: any) => {
         if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
-        if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
-        if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+        if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
+        // if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
+        // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
         return { isValid: true };
       }
     },
@@ -196,8 +198,9 @@ export class ExcelValidatorService {
       required: false,
       validate: (value: any) => {
         if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
-        if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
-        if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+        if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
+        // if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
+        // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
         return { isValid: true };
       }
     },
@@ -205,8 +208,9 @@ export class ExcelValidatorService {
       required: false,
       validate: (value: any) => {
         if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
-        if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
-        if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+        if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
+        // if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
+        // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
         return { isValid: true };
       }
     },
@@ -214,8 +218,9 @@ export class ExcelValidatorService {
       required: false,
       validate: (value: any) => {
         if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
-        if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
-        if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+        if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
+        // if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
+        // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
         return { isValid: true };
       }
     },
@@ -223,8 +228,9 @@ export class ExcelValidatorService {
       required: false,
       validate: (value: any) => {
         if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
-        if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
-        if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+        if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
+        // if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
+        // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
         return { isValid: true };
       }
     }
