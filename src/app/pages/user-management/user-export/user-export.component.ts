@@ -378,14 +378,15 @@ export class UserExportComponent {
 
       this.spinner.show()
 
-      if(tempcreateHolder && Array.isArray(tempcreateHolder)){
+
+      if(tempcreateHolder && Array.isArray(tempcreateHolder) && tempcreateHolder.length > 0){
         for(let user of tempcreateHolder){
           await this.createNewUser(user)
         }
       }
 
 
-      if(tempupdateHolder && Array.isArray(tempupdateHolder)){
+      if(tempupdateHolder && Array.isArray(tempupdateHolder) && tempupdateHolder.length > 0){
         for(let user of tempupdateHolder){
           await this.updateUser(user)
         }
@@ -533,6 +534,9 @@ export class UserExportComponent {
 
 
   async updateCognitoAttributes(userFields: any) {
+
+    console.log("User fields are here ",userFields);
+
     try {
       // Prepare the authentication data
       let authenticationData = {
@@ -751,7 +755,7 @@ export class UserExportComponent {
           await this.api.CreateMaster(tempObj);
 
           // Send dynamic lambda request
-          const body = { type: "userVerify", username: masterUser.P1, name: userFields.name, email: masterUser.P3 };
+          const body = { type: "userVerify", username: masterUser.P1, name: userFields.password, email: masterUser.P3 };
           await this.DynamicApi.sendData(body).toPromise();  // Use toPromise for async/await
 
 

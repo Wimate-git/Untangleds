@@ -58,6 +58,11 @@
         </div>
       </div>
 
+      <span class="update-note">
+        <strong>Note:</strong> When updating the user, the following fields <strong>cannot</strong> be changed: Password, Email, UserID and Client ID<br>
+        All other fields can be updated as needed.
+      </span>
+
       <!-- Generic Error -->
       <div *ngIf="error" class="alert alert-danger">
         <strong>Error:</strong> {{ error }}

@@ -117,7 +117,7 @@ export class ExcelValidatorService {
       required: false,
       validate: (value: any) => {
         if (!value) return { isValid: true };
-        if (!this.isString(value)) return { isValid: false, error: 'Must be text if provided' };
+        if (this.isString(value)) return { isValid: false, error: 'Must be Number if provided' };
         return { isValid: true };
       }
     },
@@ -272,7 +272,7 @@ export class ExcelValidatorService {
             console.log("Row is here ",row);
 
             if(row.length == 0){
-              return
+              break
             }
             
             let editOperation = false;
@@ -343,7 +343,7 @@ export class ExcelValidatorService {
                     column: header,
                     columnLetter,
                     value: cellValue,
-                    error: `${cellValue} ${header} does not exist `
+                    error: `${header} does not exist `
                   });
                 }
 
@@ -417,6 +417,11 @@ export class ExcelValidatorService {
           } else {
             createRows.push(row);
           }
+
+          console.log("Updated rows are here ",updateRows);
+          console.log("Created rows are here ",createRows);
+
+
           }
   
           resolve({
