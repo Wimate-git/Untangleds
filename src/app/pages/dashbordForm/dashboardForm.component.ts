@@ -84,6 +84,8 @@ export class DashboardFormComponent implements OnInit {
 
         this.permissionForm = JSON.parse(this.permission_data.dynamicEntries)   // Dymaic Entries 
 
+        console.log("PERMISSION FORM:",this.permissionForm)
+
         await this.api.GetMaster(this.client + "#formgroup#" + this.form_group + '#main', 1).then((result: any) => {
 
             this.groupFormResponse = JSON.parse(result.metadata)
@@ -117,7 +119,16 @@ export class DashboardFormComponent implements OnInit {
             console.log("Error:", error)
         })
 
-        const matchingItems = allowedForms.filter((item: any) => this.groupFormResponse.formList.includes(item));
+        let matchingItems = []
+        if(allowedForms.includes('All') ){
+            matchingItems =this.groupForm.filter((item: any) => this.groupFormResponse.formList.includes(item));
+        }
+        else{
+         matchingItems = allowedForms.filter((item: any) => this.groupFormResponse.formList.includes(item));
+        }
+
+       
+        console.log("Match Item:", matchingItems)
 
         // If you want to push the matching items to another array
         this.resultArray =[]

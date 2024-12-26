@@ -541,6 +541,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
   addDynamicData() {
 
+    this.permissionForm.markAsDirty();
     // this.addbutton = false
     // Get the values from the form
     const dynamicForm = this.permissionForm.get('dynamicForm')?.value;
@@ -601,10 +602,12 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
   removeDynamicData(index: number) {
     this.dynamicEntries.removeAt(index);
+    this.permissionForm.markAsDirty();
   }
 
   editEntry(index: number) {
     const entry = this.dynamicEntries.at(index) as FormGroup;
+    this.permissionForm.markAsDirty();
     // Set the values back into the form for editing
     if (entry) {
       console.log("ON CLICK ON EDIT:", entry)

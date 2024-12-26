@@ -62,7 +62,7 @@
                         <!--begin::Input-->
                         <input *ngIf="!update" type="text" class="form-control form-control-solid" name="formgroupId" placeholder="Enter formgroup Id"
                             formControlName="formgroupId" (keyup)="checkUniqueUid($event)" data-bs-toggle="tooltip" data-bs-placement="top" required />
-                        <input *ngIf="update" type="text" class="form-control form-control-solid" name="formgroupId" placeholder="Enter dreamboard Id"
+                        <input *ngIf="update" type="text" class="form-control form-control-solid" name="formgroupId" placeholder="Enter formgroup Id"
                             formControlName="formgroupId"  data-bs-toggle="tooltip" data-bs-placement="top" readonly required />
                         <span style="color: #fc1900;">{{error}}</span>
                         <div *ngIf="formgroupForm.controls['formgroupId'].invalid && formgroupForm.controls['formgroupId'].touched"

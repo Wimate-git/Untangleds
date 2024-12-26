@@ -486,6 +486,7 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
 
   edit(P1: any) {
     this.update = true
+     this.error=''
     this.previewObjDisplay = '';
     console.log("EDIT ID:", P1)
     this.data_temp = []
@@ -562,64 +563,9 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
 
   }
 
-  //   async edit(P1: any) {
-  //     this.update = true;
-  //     console.log("EDIT ID:", P1);
-  //     this.data_temp = [];
-
-  //     const request_data = {
-  //         bucket_name: "dreamboard-dynamic",
-  //         operation_type: "generate",
-  //         "key": 'public/' + this.client + '/fileuploads/formgroup/' + P1 + '/',
-  //     };
-
-  //     try {
-  //         // Call your API endpoint that triggers the Lambda function
-  //         const response = await fetch('https://3luwbeeuk0.execute-api.ap-south-1.amazonaws.com/s1/s3Bucket', {
-  //             method: 'POST',
-  //             body: JSON.stringify(request_data)
-  //         });
-
-  //         const data = await response.json();
-  //         console.log(data);
-
-  //         const data_ = JSON.parse(data.body);
-  //         const data_1 = JSON.parse(data_.data);
-  //         console.log('data_1 :', data_1);
-
-  //         this.url = data_1[0].url;
-  //         console.log("URL:", this.url);
-
-  //         // Fetching master data
-  //         const res: any = await this.api.GetMaster(this.client + '#formgroup#' + P1 + '#main', 1);
-  //         if (res && res !== undefined) {
-  //             this.data_temp.push(JSON.parse(res.metadata));
-  //             console.log("Permission data on edit", this.data_temp);
-
-  //             if (this.data_temp) {
-  //                 this.selectedImage = this.url;
-
-  //                 this.formgroupForm = this.fb.group({
-  //                     formgroupId: [this.data_temp[0].formgroupId],
-  //                     label: [this.data_temp[0].label],
-  //                     description: [this.data_temp[0].description],
-  //                     formList: [this.data_temp[0].formList],
-  //                     selectedImage: [this.url],
-  //                     createdUser: [this.data_temp[0].createdUser],
-  //                     updatedUser: [this.data_temp[0].updatedUser],
-  //                     createdTime: [this.data_temp[0].createdTime],
-  //                     updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
-  //                 });
-  //             }
-  //         }
-  //     } catch (error) {
-  //         console.log("Error during API calls:", error);
-  //     }
-  // }
-
-
   create() {         // click on create new 
     this.update = false
+    this.error=''
     this.selectedImage = null;  
     this.previewObjDisplay = '';       // Model heading and button text change flag
     this.initForm()
@@ -659,6 +605,8 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
     const createFn = async () => {
+
+       this.error = ''
 
       if (!this.formgroupForm.valid) {
         console.log('Form is not valid:', this.formgroupForm.errors);
@@ -779,8 +727,10 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (this.match == true) {
       updateFn();
+      this.error = ''
     } else {
       createFn();
+       this.error = ''
     }
   }
 
@@ -978,7 +928,7 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
     // Iterate over each object in the uid array
     for (let uniqueID = 0; uniqueID < this.lookup_data_user.length; uniqueID++) {
       if (inputUid === this.lookup_data_user[uniqueID].P1) {
-        this.error = "Dreamboard ID already exists";
+        this.error = "Formgroup ID already exists";
         break; // Exit loop if a match is found
       }
     }
