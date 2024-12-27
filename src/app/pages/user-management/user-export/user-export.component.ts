@@ -757,7 +757,7 @@ export class UserExportComponent {
           await this.api.CreateMaster(tempObj);
 
           // Send dynamic lambda request
-          const body = { type: "userVerify", username: masterUser.P1, name: userFields.password, email: masterUser.P3 };
+          const body = { type: "userVerify", username: masterUser.P1, name: this.allUserDetails.password, email: masterUser.P3 };
           await this.DynamicApi.sendData(body).toPromise();  // Use toPromise for async/await
 
 
