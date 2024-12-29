@@ -13,10 +13,16 @@ export class TileUi1Component implements OnInit{
   @Input() item:any
   @Input() index:any
   @Input() isEditModeView:any;
+  @Input() summaryDashboardUpdate:any;
+  @Input() hidingLink:any;
+  @Input() isFullscreen: boolean = false; 
+  
+  
   @Output() customEvent = new EventEmitter<{ arg1: any; arg2: number }>();
   @Output() customEvent1 = new EventEmitter<{ data: { arg1: any; arg2: number }; all_Packet_store: any }>();
   @Output() customEvent2 = new EventEmitter<{ data: { arg1: any; arg2: number }; all_Packet_store: any }>();
   @Input()  all_Packet_store: any;
+ 
   @Input () hideButton:any
   iframeUrl: any;
   selectedMarkerIndex: any;
@@ -35,6 +41,7 @@ export class TileUi1Component implements OnInit{
  
     console.log("tile data check from tile1 ",this.item)
    
+
    
     let description = this.item.filterDescription; // This will contain your string
     console.log('description check', description);

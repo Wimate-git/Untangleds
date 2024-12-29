@@ -67,6 +67,9 @@ export class Tile1ConfigComponent implements OnInit {
   parameterNameRead: any;
   multipleCheck: any;
   selectedTexts: any;
+  @Input()isGirdMoved: any;
+  permissionIdsList: any;
+  p1ValuesSummaryPemission: any;
 
 
  
@@ -84,10 +87,12 @@ export class Tile1ConfigComponent implements OnInit {
     this.setupRanges();
     this.dynamicData()
     this.dashboardIds(1)
+    // this.permissionIds(1)
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange',this.all_Packet_store)
+    console.log('isGirdMoved check',this.isGirdMoved)
   }
   convertTo12HourFormat(time: string): string {
     if (!time) return '';
@@ -261,6 +266,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   }
   
   
+
   
 
 
@@ -354,6 +360,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   
   updateTile(key: any) {
     console.log('key checking from update', key);
+    this.isGirdMoved=true
   
     if (this.editTileIndex !== null) {
       console.log('this.editTileIndex check', this.editTileIndex);
@@ -402,6 +409,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         filterParameter: this.createKPIWidget.value.filterParameter,
         filterDescription: this.createKPIWidget.value.filterDescription,
         parameterNameRead: this.parameterNameRead,
+        formatType:this.createKPIWidget.value.formatType,
       };
   
       console.log('Updated tile:', updatedTile);
@@ -703,6 +711,8 @@ openKPIModal(tile: any, index: number) {
       selectType: tile.selectType,
       filterParameter: tile.filterParameter, // Always an array
       filterDescription: tile.filterDescription,
+        formatType:tile.formatType,
+
     });
 
     this.isEditMode = true; // Set to edit mode

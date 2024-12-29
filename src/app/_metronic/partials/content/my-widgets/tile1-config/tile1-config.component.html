@@ -365,7 +365,8 @@
           class="btn btn-warning" 
        
           (click)="updateTile('tile');modal.dismiss() " 
-          *ngIf="isEditMode" 
+          *ngIf="isEditMode && isGirdMoved" 
+         
           [disabled]="createKPIWidget?.invalid">
           Update
         </button>

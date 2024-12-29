@@ -1,9 +1,22 @@
 
 
+<div class="d-flex align-items-center me-2 mb-7" *ngIf="!isSummaryEngine()">
+  <!-- Green button -->
+  <button *ngIf="!isGirdMoved && summaryDashboardUpdate" type="button" class="btn fw-bold btn-success translateyr"
+    ngbTooltip="To save dashboard position" (click)="positionSave()">All changes are saved</button>
+  
+  <!-- Red button -->
+  <button *ngIf="isGirdMoved && summaryDashboardUpdate" type="button" class="btn fw-bold btn-danger translateyr"
+    ngbTooltip="Unsaved changes. Click to save." (click)="positionSave()">
+    {{ getLastSavedMessage() }}.
+  </button>
+</div>
+<div class="page-content" #pageContent [ngClass]="{'full-screen-page': isFullScreen&&editButtonCheck}" >
+  <div class="" id="kt_wrapper" >
+    <div class="" id="kt_content" *ngIf="!isSummaryEngine()">
 
-<div class="page-content" #pageContent [ngClass]="{'full-screen-page': isFullScreen&&editButtonCheck}">
-  <div class="" id="kt_wrapper" *ngIf="editButtonCheck">
-    <div class="" id="kt_content">
+      
+      
       <div>
         <!-- <div class="d-flex justify-content-start mb-8">
           <button class="btn btn-success btn-lg  me-md-2" type="button" (click)="toggleMode()">
@@ -15,6 +28,8 @@
         <div class="save-button-container">
           <button (click)="saveGridLayout()" class="btn btn-primary">Save Grid Layout</button>
         </div> -->
+
+
       
         <div #gridsterContainer>
 
@@ -28,10 +43,22 @@
                 <gridster-item *ngFor="let item of dashboard; let i = index;" [item]="item" [style.background]="item.themeColor"  class="rounded">
                  
          
-                  <div *ngIf="item.grid_type === 'tile'" >
-                   <app-tile-ui1 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"></app-tile-ui1>
-               
+                  <div *ngIf="item.grid_type === 'tile'">
+                    <app-tile-ui1 
+                      [item]="item" 
+                      [index]="i" 
+                      [isFullscreen]="isFullscreen" 
+                      [isEditModeView]="isEditModeView" 
+                      [hideButton]="hideButton" 
+                      [all_Packet_store]="all_Packet_store" 
+                      [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                      [hidingLink]="hidingLink"
+                      (customEvent)="helperTile($event, KPIModal)" 
+                      (customEvent1)="emitDuplicate($event)" 
+                      (customEvent2)="emitDelete6($event)">
+                    </app-tile-ui1>
                   </div>
+                  
                                 <div *ngIf="item.grid_type === 'tile2'" >
                       <app-tile-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal1)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"></app-tile-ui2>
                     </div>
@@ -351,7 +378,7 @@
   
   
   <ngx-spinner 
-    *ngIf="loading" 
+
     bdColor="rgba(0, 0, 0, 0.8)" 
     size="medium" 
     color="#fff" 
@@ -385,18 +412,25 @@
     <a title="Add Dashboard" class="myMenu-item" (click)="openModal('new',null, summaryModal)">
       <i style="color: white;" class="fa fa-plus"></i>
     </a>
-    <a class="myMenu-item" #myLink *ngIf="editButtonCheck" title="Edit Dashboard" (click)="openModal('edit',all_Packet_store, summaryModal)">
-      <i style="color: white;" class="fa fa-edit"></i>
-    </a>
+<a class="myMenu-item" #myLink 
+   *ngIf="editButtonCheck && summaryDashboardUpdate" 
+   title="Edit Dashboard" 
+   (click)="openModal('edit', all_Packet_store, summaryModal)">
+    <i style="color: white;" class="fa fa-edit"></i>
+</a>
     <a class="myMenu-item" (click)="openSummaryTable(content)" title="Search dashboard">
       <i style="color: white;" class="fa fa-search"></i>
     </a>
-    <a *ngIf="!isSummaryEngine()" class="myMenu-item" (click)="toggleMode()" style="cursor: pointer;" [attr.title]="isEditModeView ? 'View Mode' : 'Edit Mode'">
-      <i style="color: white;" class="fa" [ngClass]="isEditModeView ? 'fa-eye' : 'fa-pencil-alt'"></i>
-    </a>
+    <a *ngIf="!isSummaryEngine() && summaryDashboardUpdate" 
+    class="myMenu-item" 
+    (click)="toggleMode()" 
+    style="cursor: pointer;" 
+    [attr.title]="isEditModeView ? 'View Mode' : 'Edit Mode'">
+   <i style="color: white;" class="fa" [ngClass]="isEditModeView ? 'fa-eye' : 'fa-pencil-alt'"></i>
+ </a>
     
     <!-- New Full View Icon -->
-    <a class="myMenu-item" *ngIf="!isSummaryEngine()" (click)="toggleFullView()" style="cursor: pointer;" [attr.title]="isFullView ? 'Exit Full View' : 'Full View'">
+    <a class="myMenu-item" *ngIf="!isSummaryEngine()"   (click)="toggleFullScreenFullView()" style="cursor: pointer;" [attr.title]="isFullView ? 'Exit Full View' : 'Full View'">
       <i style="color: white;" class="fa" [ngClass]="isFullView ? 'fa-compress' : 'fa-expand'"></i>
     </a>
     <a class="myMenu-item" *ngIf="!isSummaryEngine()" (click)="reloadPage()" style="cursor: pointer;" [attr.title]="'Refresh Data'">
@@ -964,7 +998,7 @@
   
   <!-- Modal Footer -->
   <div class="modal-footer">
-    <button type="button" class="btn btn-danger" (click)="modal.dismiss()">Cancel</button>
+    <!-- <button type="button" class="btn btn-danger" (click)="modal.dismiss()">Cancel</button> -->
     
     <!-- Conditionally display the Save button for Add Summary -->
     <button *ngIf="selectedTab === 'add-dashboard' && !showModal" 
@@ -1408,7 +1442,7 @@
   
   <ng-template #KPIModal let-modal >
   
-    <app-tile1-config [dashboard]="dashboard" (dashboardChange)="getGridDetails($event)" (update_PowerBoard_config)="updateSummaryHelper2($event)" [modal]="modal" [all_Packet_store]="all_Packet_store" (send_all_Packet_store)="allPacketStoreReceiver($event)"></app-tile1-config>
+    <app-tile1-config [dashboard]="dashboard" (dashboardChange)="getGridDetails($event)" (update_PowerBoard_config)="updateSummaryHelper2($event)" [modal]="modal" [all_Packet_store]="all_Packet_store" (send_all_Packet_store)="allPacketStoreReceiver($event)"[isGirdMoved]="isGirdMoved"></app-tile1-config>
   
   </ng-template>
   <ng-template #KPIModal1 let-modal >

@@ -152,6 +152,13 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   parsedSummaryData: any;
   summaryValues: any;
   body: { clientId: any; routeId: string | null; };
+  p1ValuesSummaryPemission: any;
+  permissionIdsList: any;
+  fetchedData: any;
+  dataMap: any;
+  parsedPermission: any;
+  permissionIdsListList: any;
+  permissionIdLocal: any;
 
 
 
@@ -598,6 +605,12 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   gridChanged: boolean = false;
   selectedTabset: string = 'dataTab';
   @ViewChild('bulletChart') bulletChart: ElementRef;
+  isGirdMoved: boolean = false
+  isGridDuplicated: boolean = true; 
+  summaryDashboardUpdate = false;
+ hidingLink = false
+ isFullscreen: boolean = false;
+
   isFullScreen = false; // Track the fullscreen state
 
   isFullView = false;   // Track if the icon is in full view mode
@@ -644,15 +657,55 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
       }
     );
   }
-  
+  setFullscreen(): void {
+    localStorage.setItem('fullscreen', 'true');
 
-  toggleFullView() {
-    this.isFullScreen = !this.isFullScreen;  // Toggle the full-screen state
-    this.isFullView = !this.isFullView;      // Toggle the icon state (expand/compress)
-
-    // Save the state to localStorage
-    localStorage.setItem('isFullScreen', JSON.stringify(this.isFullScreen));
   }
+
+  checkAndSetFullscreen(): void {
+    const isFullscreen = localStorage.getItem('fullscreen') === 'true';
+    console.log('isFullscreen check',isFullscreen)
+ 
+    this.hidingLink = true
+    this.isFullscreen = isFullscreen;
+    //     this.isEditModeView = this.summaryDashboardUpdate; // Default to view mode if update is false
+    // this.updateOptions();
+
+    if (isFullscreen) {
+      this.toggleFullScreenFullView();
+    }
+    else{
+      this.hidingLink = false
+    }
+  }
+  exitFullScreen(){
+    localStorage.removeItem('fullscreen');
+  }
+  toggleFullScreenFullView() {
+
+    this.isFullScreen = !this.isFullScreen;
+    this.hidingLink = !this.hidingLink
+
+
+
+
+if(!this.isFullScreen){
+
+
+}else{
+ 
+}
+// this.initializeModal()
+  }
+
+  // toggleFullView() {
+  //   this.isFullScreen = !this.isFullScreen;  // Toggle the full-screen state
+  //   this.isFullView = !this.isFullView;      // Toggle the icon state (expand/compress)
+  
+  //   // Save the state to localStorage
+  //   localStorage.setItem('isFullScreen', JSON.stringify(true));
+  //   this.cdr.detectChanges(); 
+  // }
 
 
 
@@ -691,6 +744,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   responseData: any;
   hoverWidget: any = false;
   hideButton:boolean=false;
+  lastSavedTime: Date | null = null;
 
   toggleDropdown(event: Event): void {
     this.zone.run(() => {
@@ -708,51 +762,27 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private updateOptions(): void {
-
-    // this.options = {
-    //   itemInitCallback: this.onItemInit.bind(this),
-    //   itemResizeCallback: this.itemResize.bind(this),
-   
-    //   draggable: {
-    //     enabled: this.isEditModeView, // Draggable only in edit mode
-    //   },
-    //   resizable: {
-    //     enabled: this.isEditModeView, // Resizable only in edit mode
-    //   },
-      
-    //   margin: 10,
-    //   outerMargin: true,
-    //   minCols: 100,
-    //   maxCols: 2000,
-    //   minRows: 100,
-    //   maxRows: 2000,
-    //   maxItemCols: 10000,
-    //   minItemCols: 1,
-    //   maxItemRows: 10000,
-    //   minItemRows: 1,
-    //   maxItemArea: 250000,
-    //   minItemArea: 1,
-    //   setGridSize: true,
-    //   pushItems: true,
-    //   fixedColWidth: 105 * 4,
-    //     fixedRowHeight: 200 * 4,
-    //   gridType: GridType.ScrollVertical,
-    //    GridType: GridType.ScrollHorizontal,
-    //   compactType: CompactType.None,
-
-    //   displayGrid: DisplayGrid.OnDragAndResize,
-
-    // };
     this.options = {
       draggable: {
         enabled: this.isEditModeView, // Draggable only in edit mode
+        stop: () => {
+          console.log('Grid moved');
+          this.isGirdMoved = true; // Set flag to indicate grid was moved
+        },
       },
       resizable: {
         enabled: this.isEditModeView, // Resizable only in edit mode
+        stop: () => {
+          console.log('Grid resized');
+          this.isGirdMoved = true; // Set flag to indicate grid was resized
+        },
       },
       itemInitCallback: this.onItemInit.bind(this),
       itemResizeCallback: this.itemResize.bind(this),
-    
+      itemChangeCallback: () => {
+        console.log('Grid item changed');
+        this.isGirdMoved = true; // Set flag to indicate grid item changed
+      },
       gridType: GridType.ScrollVertical,
       compactType: CompactType.None,
       margin: 10,
@@ -776,8 +806,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
       minItemArea: 1,
       defaultItemCols: 1,
       defaultItemRows: 1,
-      fixedColWidth: 105 * 2, // Reduced from 420 to 210
-      fixedRowHeight: 200 * 2, // Reduced from 800 to 400
+      fixedColWidth: 210, // Reduced from 420 to 210
+      fixedRowHeight: 400, // Reduced from 800 to 400
       keepFixedHeightInMobile: false,
       keepFixedWidthInMobile: false,
       scrollSensitivity: 10,
@@ -790,7 +820,6 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
       emptyCellDragMaxCols: 50,
       emptyCellDragMaxRows: 50,
       ignoreMarginInRow: false,
-    
       swap: false,
       pushItems: false,
       disablePushOnDrag: false,
@@ -800,22 +829,35 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
       displayGrid: DisplayGrid.None,
       disableWindowResize: false,
       disableWarnings: false,
-      scrollToNewItems: false // enables resizing of elements
+      scrollToNewItems: false, // Enables resizing of elements
     };
-    
-    
-
-    // Log to ensure options are updated correctly
-    console.log('Options updated:', this.options);
+  
+    console.log('Options updated:', this.options); // Debugging log
   }
+  
+  
+  @HostListener('window:beforeunload', ['$event'])
+// saveStateBeforeUnload(event: Event): void {
+//   localStorage.setItem('isGirdMoved', JSON.stringify(this.isGirdMoved));
+// }
+
 
 
   // Update the button color based on grid changes
-  updateButtonColor() {
-    // Here, we check the gridChanged flag to update the button color
-    this.gridChanged = true; // Set to true if the layout has changed (dragged/resized)
-  }
+  // updateButtonColor() {
+  //   // Here, we check the gridChanged flag to update the button color
+  //   this.gridChanged = true; // Set to true if the layout has changed (dragged/resized)
+  // }
 
+  onGridChange(): void {
+    console.log('Grid change detected');
+    this.isGirdMoved = true; // Set the grid state to moved
+  }
+  // gridChanged(): void {
+  //   console.log('Grid change detected');
+  //   this.isGirdMoved = true; // Set the grid state to moved
+  // }
+  
   // Save method to persist the layout (your existing function)
   saveGridLayout(): void {
     this.grid_details = this.dashboard;
@@ -919,12 +961,12 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
           this.cdr.detectChanges();
   
           // Step 5: Show success message
-          Swal.fire({
-            title: 'Deleted!',
-            text: 'The tile has been successfully deleted.',
-            icon: 'success',
-            confirmButtonColor: '#3085d6',
-          });
+          // Swal.fire({
+          //   title: 'Deleted!',
+          //   text: 'The tile has been successfully deleted.',
+          //   icon: 'success',
+          //   confirmButtonColor: '#3085d6',
+          // });
         } else {
           console.error('Invalid index:', index);
         }
@@ -1057,6 +1099,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   ngAfterViewInit(): void {
     console.log('this.allCompanyDetails',this.createSummaryField.value)
     if (this.routeId) {
+      this.checkAndSetFullscreen();
       this.editButtonCheck = true
 
       this.openModalHelpher(this.routeId)
@@ -1221,11 +1264,15 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     // this.dropdownSettings = this.devicesList.getMultiSelectSettings();
     this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
     console.log('this.getLoggedUser check', this.getLoggedUser)
+    this.permissionIdLocal = this.getLoggedUser.permission_ID
+    console.log('this.permissionIdLocal checking',this.permissionIdLocal)
+  
     // this.getWorkFlowDetails = this.summaryConfiguration.getLoggedUserDetails()
     // console.log('this.getLoggedUser check',this.getWorkFlowDetails)
 
     this.SK_clientID = this.getLoggedUser.clientID;
     console.log('this.SK_clientID check', this.SK_clientID)
+    this.fetchPermissionIdMain(1, this.permissionIdLocal);
     this.route.paramMap.subscribe(params => {
       this.routeId = params.get('id');
       if (this.routeId) {
@@ -1264,14 +1311,33 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     this.cdr.detectChanges();
     this.fetchLiveContractlookup(1)
     this.fetchContractOrderMasterlookup(1)
-    const savedFullScreen = localStorage.getItem('isFullScreen');
-    if (savedFullScreen) {
-      this.isFullScreen = JSON.parse(savedFullScreen);
-    } else {
-      this.isFullScreen = true;  // Default to full screen if not in localStorage
-    }
+    this.permissionIds(1)
+    // const savedFullScreen = localStorage.getItem('isFullScreen');
+    // // this.isFullScreen = savedState ? JSON.parse(savedState) : false;
 
-    
+    // this.cdr.detectChanges(); 
+    // if (savedFullScreen) {
+    //   this.isFullScreen = JSON.parse(savedFullScreen);
+    // } else {
+    //   this.isFullScreen = true;  // Default to full screen if not in localStorage
+    // }
+
+    // const savedState = localStorage.getItem('isGirdMoved');
+    // if (savedState) {
+    //   this.isGirdMoved = JSON.parse(savedState);
+    //   localStorage.removeItem('isGirdMoved'); // Clean up storage
+    // }
+  const savedGridMoved = localStorage.getItem('isGirdMoved');
+  this.isGirdMoved = savedGridMoved ? JSON.parse(savedGridMoved) : false;
+
+  // Retrieve `lastSavedTime` if needed
+  const savedLastTime = localStorage.getItem('lastSavedTime');
+  if (savedLastTime) {
+    this.lastSavedTime = new Date(savedLastTime);
+  } else {
+    this.lastSavedTime = null;
+  }
+
 
   }
   selectFormParams(event: any) {
@@ -1288,6 +1354,139 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
 
+  async permissionIds(sk: any) {
+    console.log("I am called Bro");
+    try {
+        const response = await this.api.GetMaster(this.SK_clientID + "#permission#lookup", sk);
+
+        if (response && response.options) {
+            if (typeof response.options === 'string') {
+                let data = JSON.parse(response.options);
+                console.log("d1 =", data);
+
+                if (Array.isArray(data)) {
+                    for (let index = 0; index < data.length; index++) {
+                        const element = data[index];
+
+                        if (element !== null && element !== undefined) {
+                            const key = Object.keys(element)[0];
+                            const { P1, P2, P3 } = element[key];
+
+                            // Ensure dashboardIdsList is initialized
+                            if (!this.permissionIdsList) {
+                                this.permissionIdsList = [];
+                            }
+
+                            // Check if P1 exists before pushing
+                            if (P1 !== undefined && P1 !== null) {
+                                this.permissionIdsList.push({ P1, P2, P3 });
+                                console.log("Pushed to dashboardIdsList: ", { P1, P2, P3 });
+                                console.log('this.dashboardIdsList check', this.permissionIdsList);
+                            } else {
+                                console.warn("Skipping element because P1 is not defined or null");
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+
+                    // Fetch permission data for each P1 value
+                    this.p1ValuesSummaryPemission = this.permissionIdsList.map((item: { P1: any; }) => item.P1);
+                    console.log('P1 values: dashboard permission', this.p1ValuesSummaryPemission);
+
+                    // Call fetchPermissionIdMain for each P1 value
+                    for (const p1Value of this.p1ValuesSummaryPemission) {
+                 
+                    }
+
+                    // Continue fetching recursively
+                    await this.permissionIds(sk + 1);
+                } else {
+                    console.error('Invalid data format - not an array.');
+                }
+            } else {
+                console.error('response.options is not a string.');
+            }
+        } else {
+            console.log("Lookup to be displayed", this.permissionIdsList);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+
+async fetchPermissionIdMain(clientID: number, p1Value: string) {
+  console.log('p1Value checking', p1Value);
+  console.log('clientID checking', clientID);
+  console.log('this.SK_clientID checking from permission', this.SK_clientID);
+
+  try {
+      // Construct the primary key (PK) for the main table
+      const pk = `${this.SK_clientID}#permission#${p1Value}#main`;
+      console.log(`Fetching main table data for PK: ${pk}`);
+
+      // Fetch data from the main table (API call or service call)
+      const result: any = await this.api.GetMaster(pk, clientID);
+      console.log('Result fetched for the permission:', result);
+
+      // Parse and process the metadata
+      if (result && result.metadata) {
+          this.parsedPermission = JSON.parse(result.metadata);
+          console.log('Parsed permission metadata:', this.parsedPermission);
+
+          this.permissionIdsListList = this.parsedPermission.permissionsList;
+          console.log('Parsed permission list:', this.permissionIdsListList);
+
+          // Find specific permission
+          const summaryDashboardItem = this.permissionIdsListList.find(
+              (item: { name: string; update: boolean; view: boolean }) => item.name === 'Summary Dashboard'
+          );
+          console.log('Summary Dashboard Item:', summaryDashboardItem);
+
+          if (summaryDashboardItem) {
+              this.summaryDashboardUpdate = summaryDashboardItem.update;
+              // Set default mode based on `update` permission
+              this.isEditModeView = this.summaryDashboardUpdate; // Default to view mode if update is false
+              this.updateOptions(); // Ensure options reflect the correct mode
+          }
+
+          this.processFetchedData(result);
+      } else {
+          console.warn('Result metadata is null or undefined.');
+      }
+  } catch (error) {
+      // Handle any errors during the fetch
+      console.error(`Error fetching data for PK (${p1Value}):`, error);
+  }
+}
+
+
+processFetchedData(result: any): void {
+  // Check if the result is valid
+  if (!result || Object.keys(result).length === 0) {
+      console.warn('No data found for the given PK.');
+      return;
+  }
+
+  // Example: Log the result
+  console.log('Processing fetched data:', result);
+
+  // Example: Add the fetched data to a local array
+  if (!this.fetchedData) {
+      this.fetchedData = [];
+  }
+  this.fetchedData.push(result);
+
+  // Example: Update a local map for quick lookup
+  if (!this.dataMap) {
+      this.dataMap = new Map();
+  }
+  this.dataMap.set(result.PK, result);
+
+  // Perform additional processing if required
+  // For instance, update UI components or trigger change detection
+}
 
 
   groupByOptions = [
@@ -1416,7 +1615,31 @@ setTimeout(() => {
       this.showChartGrid = false;
     }
   }
+  getLastSavedMessage(): string {
+    if (this.lastSavedTime) {
+      const timeDifference = moment(this.lastSavedTime).fromNow();
+      return `Unsaved changes. Click here to save (Last saved ${timeDifference})`;
+    } else {
+      return 'Unsaved changes. Click here to save.';
+    }
+  }
+  
+  
+  positionSave(): void {
+    // Save the grid position
+    console.log('Grid position saved');
+    this.isGirdMoved = false; // Reset the moved flag
+    this.lastSavedTime = new Date(); // Update the last saved time
+  
+    // Persist `isGirdMoved` and `lastSavedTime` in localStorage
+    localStorage.setItem('isGirdMoved', JSON.stringify(this.isGirdMoved));
+    localStorage.setItem('lastSavedTime', this.lastSavedTime.toISOString());
+  
+    this.updateSummary('', 'Save');
+  }
+  
 
+  
 
 
   isSummaryEngine(): boolean {
@@ -1431,32 +1654,33 @@ setTimeout(() => {
   }
 
   viewItem(id: string): void {
-    // Navigate to the desired rout
-    this.isFullScreen = !this.isFullScreen;  // Toggle the full-screen state
-    this.isFullView = !this.isFullView;      // Toggle the icon state (expand/compress)
+    // Toggle the full-screen state
+    // this.isFullScreen = !this.isFullScreen;
+    // this.isFullView = !this.isFullView;
 
-    // Save the state to localStorage
-    localStorage.setItem('isFullScreen', JSON.stringify(this.isFullScreen));
+    // // Save the state to localStorage
+    // localStorage.setItem('isFullScreen', JSON.stringify(this.isFullScreen));
+
+    // Navigate to the desired route
+    this.setFullscreen()
     this.router.navigate([`/summary-engine/${id}`]);
-
-
+    this.cdr.detectChanges();
 
     // Set the state to Edit Mode
     this.showModal = true; // Open modal in edit mode
-
-    // Open the modal with appropriate flag and content
-    // this.openModal('edit_ts', this.all_Packet_store, this.summaryModal);
   }
+
   
   dashboardOpen(id: string): void {
     // Navigate to the desired rout
-    this.isFullScreen = !this.isFullScreen;  // Toggle the full-screen state
-    this.isFullView = !this.isFullView;      // Toggle the icon state (expand/compress)
+    // this.isFullScreen = !this.isFullScreen;  // Toggle the full-screen state
+    // this.isFullView = !this.isFullView;      // Toggle the icon state (expand/compress)
 
-    // Save the state to localStorage
-    localStorage.setItem('isFullScreen', JSON.stringify(this.isFullScreen));
+    // // Save the state to localStorage
+    // localStorage.setItem('isFullScreen', JSON.stringify(true));
+    this.setFullscreen()
     this.router.navigate([`/summary-engine/${id}`]);
-
+    this.cdr.detectChanges(); 
 
 
     // Set the state to Edit Mode
@@ -1466,23 +1690,24 @@ setTimeout(() => {
     this.openModal('edit_ts', this.all_Packet_store, this.summaryModal);
   }
   
-  toggleFullScreen() {
-    this.isFullScreen = !this.isFullScreen;
-    localStorage.setItem('isFullScreen', JSON.stringify(this.isFullScreen));
-  }
+  // toggleFullScreen() {
+  //   this.isFullScreen = !this.isFullScreen;
+  //   localStorage.setItem('isFullScreen', JSON.stringify(true));
+  //   this.cdr.detectChanges(); 
+  // }
   
-  setFullScreen(): void {
-    document.body.style.overflow = 'hidden'; // Hide overflow to simulate fullscreen
-    document.body.requestFullscreen?.(); // Optional: Fullscreen API to enter fullscreen mode (browser-specific)
-    // Add any other fullscreen-related styles or classes
-  }
+  // setFullScreen(): void {
+  //   document.body.style.overflow = 'hidden'; // Hide overflow to simulate fullscreen
+  //   document.body.requestFullscreen?.(); // Optional: Fullscreen API to enter fullscreen mode (browser-specific)
+  //   // Add any other fullscreen-related styles or classes
+  // }
   
   // Method to exit fullscreen
-  exitFullScreen(): void {
-    document.body.style.overflow = 'auto'; // Restore overflow
-    document.exitFullscreen?.(); // Optional: Fullscreen API to exit fullscreen mode (browser-specific)
-    // Remove fullscreen-related styles or classes
-  }
+  // exitFullScreen(): void {
+  //   document.body.style.overflow = 'auto'; // Restore overflow
+  //   document.exitFullscreen?.(); // Optional: Fullscreen API to exit fullscreen mode (browser-specific)
+  //   // Remove fullscreen-related styles or classes
+  // }
 
   
   redirectDashboard(id: string): void {
@@ -1811,76 +2036,77 @@ setTimeout(() => {
     const { all_Packet_store } = event;
     if(arg1.grid_type=='tile'){
       console.log('event check', event)
-        
+      this.isGirdMoved = false; 
   this.dashboard.push(arg1)
-  this.updateSummary('','add_Tile')
+ 
+  // this.updateSummary('','add_Tile')
     }
     else if(event.data.arg1.grid_type=='tile2'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      this.updateSummary(event.all_Packet_store,'add_Tile')
+      // this.updateSummary(event.all_Packet_store,'add_Tile')
     }
     else if(event.data.arg1.grid_type=='tile3'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      this.updateSummary(event.all_Packet_store,'add_Tile')
+      // this.updateSummary(event.all_Packet_store,'add_Tile')
     }
     else if(event.data.arg1.grid_type=='tile4'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      this.updateSummary(event.all_Packet_store,'add_Tile')
+      // this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
     else if(event.data.arg1.grid_type=='tile5'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      this.updateSummary(event.all_Packet_store,'add_Tile')
+      // this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
     else if(event.data.arg1.grid_type=='tile6'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      this.updateSummary(event.all_Packet_store,'add_Tile')
+      // this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
     else if(event.data.arg1.grid_type=='chart'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      this.updateSummary(event.all_Packet_store,'add_Tile')
+      // this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
     else if(event.data.arg1.grid_type=='Linechart'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      this.updateSummary(event.all_Packet_store,'add_Tile')
+      // this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
         else if(event.data.arg1.grid_type=='Columnchart'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      this.updateSummary(event.all_Packet_store,'add_Tile')
+      // this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
         else if(event.data.arg1.grid_type=='Areachart'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      this.updateSummary(event.all_Packet_store,'add_Tile')
+      // this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
     else if(event.data.arg1.grid_type=='Barchart'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      this.updateSummary(event.all_Packet_store,'add_Tile')
+      // this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
   //   else if(event.arg1.grid_type=='Areachart'){
@@ -1896,7 +2122,7 @@ setTimeout(() => {
       this.dashboard.push(event.data.arg1)
       console.log('this.dashboard from dynamic',event.all_Packet_store)
 
-  this.updateSummary(event.all_Packet_store,'add_Tile')
+  // this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
     else if(event.data.arg1.grid_type=='title'){
@@ -1905,7 +2131,7 @@ setTimeout(() => {
       this.dashboard.push(event.data.arg1)
       console.log('this.dashboard from dynamic',event.all_Packet_store)
 
-  this.updateSummary(event.all_Packet_store,'add_Tile')
+  // this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
     // this.updateSummary(event.data, event.arg2);
@@ -2356,6 +2582,7 @@ setTimeout(() => {
     console.log('Updated allCompanyDetails before updateSummary:', this.allCompanyDetails);
   
     // Pass the unpacked arguments to updateSummary
+    this.isGirdMoved = true;
     this.updateSummary(event.data, event.arg2);
   }
   
@@ -2866,41 +3093,109 @@ setTimeout(() => {
     return '200px';  // Default height
   }
 
-  fetchCompanyLookupdata(page: number, pageSize: number): Promise<any> {
-    console.log("Fetching paginated data for page:", page, "pageSize:", pageSize);
+  // fetchCompanyLookupdata(page: number, pageSize: number): Promise<any> {
+  //   console.log("Fetching paginated data for page:", page, "pageSize:", pageSize);
   
+  //   return new Promise((resolve, reject) => {
+  //     this.api.GetMaster(this.SK_clientID + "#summary" + "#lookup", page)
+  //       .then(response => {
+  //         if (response && response.options) {
+  //           if (typeof response.options === 'string') {
+  //             let data = JSON.parse(response.options);
+  //             console.log("Fetched data:", data);
+  
+  //             if (Array.isArray(data)) {
+  //               for (let index = 0; index < data.length; index++) {
+  //                 const element = data[index];
+  //                 if (element) {
+  //                   const key = Object.keys(element)[0];
+  //                   const { P1, P2, P3, P4, P5, P6, P7, P8 } = element[key];
+  //                   this.lookup_data_summary.push({ P1, P2, P3, P4, P5, P6, P7, P8 });
+  //                 }
+  //               }
+  
+  //               console.log("Aggregated lookup data:", this.lookup_data_summary);
+  
+  //               // Sort the data by P5 in descending order (optional)
+  //               this.lookup_data_summary.sort((a:any, b:any) => b.P5 - a.P5);
+  
+  //               // Slice the data for pagination
+  //               const totalRecords = this.lookup_data_summary.length;
+  //               const start = (page - 1) * pageSize;
+  //               const paginatedData = this.lookup_data_summary.slice(start, start + pageSize);
+  
+  //               resolve({
+  //                 data: paginatedData,
+  //                 totalRecords: totalRecords
+  //               });
+  //             } else {
+  //               console.error('Invalid data format - not an array.');
+  //               reject(new Error('Invalid data format - not an array.'));
+  //             }
+  //           } else {
+  //             console.error('response.options is not a string.');
+  //             reject(new Error('response.options is not a string.'));
+  //           }
+  //         } else {
+  //           console.log("All data fetched:", this.lookup_data_summary);
+  
+  //           // Return paginated results
+  //           const totalRecords = this.lookup_data_summary.length;
+  //           const start = (page - 1) * pageSize;
+  //           const paginatedData = this.lookup_data_summary.slice(start, start + pageSize);
+  
+  //           resolve({
+  //             data: paginatedData,
+  //             totalRecords: totalRecords
+  //           });
+  //         }
+  //       })
+  //       .catch(error => {
+  //         console.error('Error fetching data:', error);
+  //         reject(error);
+  //       });
+  //   });
+  // }
+  fetchCompanyLookupdata(sk:any):any {
+    console.log("I am called Bro");
+    
     return new Promise((resolve, reject) => {
-      this.api.GetMaster(this.SK_clientID + "#summary" + "#lookup", page)
+      this.api.GetMaster(this.SK_clientID + "#summary" + "#lookup", sk)
         .then(response => {
           if (response && response.options) {
+            // Check if response.options is a string
             if (typeof response.options === 'string') {
               let data = JSON.parse(response.options);
-              console.log("Fetched data:", data);
-  
+              console.log("d1 =", data);
+              
               if (Array.isArray(data)) {
+                const promises = []; // Array to hold promises for recursive calls
+  
                 for (let index = 0; index < data.length; index++) {
                   const element = data[index];
-                  if (element) {
-                    const key = Object.keys(element)[0];
-                    const { P1, P2, P3, P4, P5, P6, P7, P8 } = element[key];
-                    this.lookup_data_summary.push({ P1, P2, P3, P4, P5, P6, P7, P8 });
+  
+                  if (element !== null && element !== undefined) {
+                    // Extract values from each element and push them to lookup_data_user
+                    const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
+                    const { P1, P2, P3, P4, P5, P6,P7 ,P8} = element[key]; // Extract values from the nested object
+                   this.lookup_data_summary.push({ P1, P2, P3, P4, P5, P6,P7,P8 }); // Push an array containing P1, P2, P3, P4, P5, P6
+                    console.log("d2 =", this.lookup_data_summary);
+                  } else {
+                    break;
                   }
                 }
   
-                console.log("Aggregated lookup data:", this.lookup_data_summary);
+                // Sort the lookup_data_user array based on P5 values in descending order
+                this.lookup_data_summary.sort((a: { P5: number; }, b: { P5: number; }) => b.P5 - a.P5);
+                console.log("Lookup sorting", this.lookup_data_summary);
   
-                // Sort the data by P5 in descending order (optional)
-                this.lookup_data_summary.sort((a:any, b:any) => b.P5 - a.P5);
-  
-                // Slice the data for pagination
-                const totalRecords = this.lookup_data_summary.length;
-                const start = (page - 1) * pageSize;
-                const paginatedData = this.lookup_data_summary.slice(start, start + pageSize);
-  
-                resolve({
-                  data: paginatedData,
-                  totalRecords: totalRecords
-                });
+                // Continue fetching recursively
+                promises.push(this.fetchCompanyLookupdata(sk + 1)); // Store the promise for the recursive call
+                
+                // Wait for all promises to resolve
+                Promise.all(promises)
+                  .then(() => resolve(this.lookup_data_summary)) // Resolve with the final lookup data
+                  .catch(reject); // Handle any errors from the recursive calls
               } else {
                 console.error('Invalid data format - not an array.');
                 reject(new Error('Invalid data format - not an array.'));
@@ -2910,26 +3205,19 @@ setTimeout(() => {
               reject(new Error('response.options is not a string.'));
             }
           } else {
-            console.log("All data fetched:", this.lookup_data_summary);
-  
-            // Return paginated results
-            const totalRecords = this.lookup_data_summary.length;
-            const start = (page - 1) * pageSize;
-            const paginatedData = this.lookup_data_summary.slice(start, start + pageSize);
-  
-            resolve({
-              data: paginatedData,
-              totalRecords: totalRecords
-            });
+            console.log("All the users are here", this.lookup_data_summary);
+
+            this.listofSK = this.lookup_data_summary.map((item:any)=>item.P1)
+
+            resolve(this.lookup_data_summary); // Resolve with the current lookup data
           }
         })
         .catch(error => {
-          console.error('Error fetching data:', error);
-          reject(error);
+          console.error('Error:', error);
+          reject(error); // Reject the promise on error
         });
     });
   }
-  
   
   loadData() {
     this.lookup_data_summary1 = [];
@@ -3072,41 +3360,165 @@ setTimeout(() => {
         });
     });
   }
+  // this.datatableConfig = {};
+  // this.lookup_data_summary = [];
+  // this.fetchCompanyLookupdata(page, pageSize)
+  // const page = Math.floor(dataTablesParameters.start / dataTablesParameters.length) + 1;
+  // const pageSize = dataTablesParameters.length;
 
+  // async showTable() {
+  //   console.log("Show DataTable is called BTW");
+  
+  //   this.datatableConfig = {};
+  //   this.lookup_data_summary = [];
+  
+  //   this.datatableConfig = {
+  //     serverSide: true,
+  //     processing: true,
+  //     order: [[3, 'desc']], // Set default sorting by 'Updated' column in descending order
+  //     ajax: (dataTablesParameters: any, callback) => {
+  //       const page = Math.floor(dataTablesParameters.start / dataTablesParameters.length) + 1;
+  //       const pageSize = dataTablesParameters.length;
+  
+  //       // Fetch paginated data with server-side sorting
+  //       this.fetchCompanyLookupdata(page, pageSize)
+  //         .then((resp: any) => {
+  //           console.log('resp check',resp)
+  //           // Ensure data is sorted by Updated (P4) in descending order
+  //           this.responseData = (resp.data || []).sort((a:any, b:any) => b.P4 - a.P4);
+  //           console.log('this.responseData check',this.responseData)
+  //           const totalRecords = resp.totalRecords || 0;
+            
+  //           console.log('totalRecords check',totalRecords)
+  
+  //           // Provide the response to DataTable
+  //           callback({
+  //             draw: dataTablesParameters.draw,
+  //             recordsTotal: totalRecords,
+  //             recordsFiltered: totalRecords,
+  //             data: this.responseData,
+  //           });
+  
+  //           console.log("Sorted Paginated Response Data:", this.responseData);
+  //         })
+  //         .catch((error: any) => {
+  //           console.error('Error fetching user lookup data:', error);
+  
+  //           // Provide an empty dataset in case of an error
+  //           callback({
+  //             draw: dataTablesParameters.draw,
+  //             recordsTotal: 0,
+  //             recordsFiltered: 0,
+  //             data: [],
+  //           });
+  //         });
+  //     },
+  //     columns: [
+  //       { title: '<span style="color: black;">ID</span>', data: 'P1', render: function (data, type, full) {
+  //         const colorClasses = ['success', 'info', 'warning', 'danger'];
+  //         const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
+          
+  //         const initials = data[0].toUpperCase();
+  //         const symbolLabel = `
+  //           <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
+  //             ${initials}
+  //           </div>
+  //         `;
+  //         return `<span style="color:Black; font-weight: bold;">${data}</span>`;
+  //     }}
+  //     ,
+  //       { title: '<span style="color: black;">Name</span>', data: 'P2' },
+  //       { title: '<span style="color: black;">Description</span>', data: 'P3' },
+  //       {
+  //         title: '<span style="color: black;">Updated</span>',
+  //         data: 'P4',
+  //         render: function (data) {
+  //           const updatedDate = new Date(data * 1000);
+  //           const formattedDate = new Intl.DateTimeFormat('en-US', {
+  //             weekday: 'short',
+  //             day: '2-digit',
+  //             month: 'short',
+  //           }).format(updatedDate);
+  //           const formattedTime = updatedDate.toLocaleTimeString('en-US', {
+  //             hour12: false,
+  //             hour: '2-digit',
+  //             minute: '2-digit',
+  //           });
+  //           return `${formattedDate} ${formattedTime}`;
+  //         },
+  //       },
+  //       {
+  //         title: '<span style="color: black;">Created</span>',
+  //         data: 'P5',
+  //         render: function (data) {
+  //           const createdDate = new Date(data * 1000);
+  //           const formattedDate = new Intl.DateTimeFormat('en-US', {
+  //             weekday: 'short',
+  //             day: '2-digit',
+  //             month: 'short',
+  //           }).format(createdDate);
+  //           const formattedTime = createdDate.toLocaleTimeString('en-US', {
+  //             hour12: false,
+  //             hour: '2-digit',
+  //             minute: '2-digit',
+  //           });
+  //           return `${formattedDate} ${formattedTime}`;
+  //         },
+  //       },
+  //       { title: '<span style="color: black;">Created UserName</span>', data: 'P6' },
+  //       { title: '<span style="color: black;">Updated UserName</span>', data: 'P7' },
+  //     ],
+  //     createdRow: (row, data, dataIndex) => {
+  //       $('td:eq(0)', row).addClass('');
+  //     },
+  //   };
+  // }
+  
   async showTable() {
     console.log("Show DataTable is called BTW");
   
     this.datatableConfig = {};
     this.lookup_data_summary = [];
-  
     this.datatableConfig = {
       serverSide: true,
-      processing: true,
-      order: [[3, 'desc']], // Set default sorting by 'Updated' column in descending order
       ajax: (dataTablesParameters: any, callback) => {
-        const page = Math.floor(dataTablesParameters.start / dataTablesParameters.length) + 1;
-        const pageSize = dataTablesParameters.length;
+        this.datatableConfig = {};
+        const start = dataTablesParameters.start;
+        const length = dataTablesParameters.length;
   
-        // Fetch paginated data with server-side sorting
-        this.fetchCompanyLookupdata(page, pageSize)
+        this.fetchCompanyLookupdata(1)
           .then((resp: any) => {
-            // Ensure data is sorted by Updated (P4) in descending order
-            this.responseData = (resp.data || []).sort((a:any, b:any) => b.P4 - a.P4);
-            const totalRecords = resp.totalRecords || 0;
+            console.log("resp check", resp);
+            const responseData = resp || []; // Default to an empty array if resp is null
+            console.log("responseData", responseData);
   
-            // Provide the response to DataTable
+            // Example filtering for search
+            const searchValue = dataTablesParameters.search.value.toLowerCase();
+            const filteredData = Array.from(
+              new Set(
+                responseData
+                  .filter((item: { P1: string }) => item.P1.toLowerCase().includes(searchValue))
+                  .map((item: any) => JSON.stringify(item)) // Stringify the object to make it unique
+              )
+            ).map((item: any) => JSON.parse(item)); // Parse back to object
+  
+            console.log("responseData checking", responseData);
+            console.log("filteredData check", filteredData);
+  
+            // Implement pagination by slicing the filtered data
+            const paginatedData = filteredData.slice(start, start + length);
+  
             callback({
               draw: dataTablesParameters.draw,
-              recordsTotal: totalRecords,
-              recordsFiltered: totalRecords,
-              data: this.responseData,
+              recordsTotal: filteredData.length, // Total records after search
+              recordsFiltered: filteredData.length, // Total records after filtering
+              data: paginatedData, // Data for the current page
             });
   
-            console.log("Sorted Paginated Response Data:", this.responseData);
+            console.log("Paginated Data for current page", paginatedData);
           })
           .catch((error: any) => {
-            console.error('Error fetching user lookup data:', error);
-  
+            console.error("Error fetching user lookup data:", error);
             // Provide an empty dataset in case of an error
             callback({
               draw: dataTablesParameters.draw,
@@ -3117,21 +3529,47 @@ setTimeout(() => {
           });
       },
       columns: [
-        { title: '<span style="color: black;">ID</span>', data: 'P1', render: function (data, type, full) {
-          const colorClasses = ['success', 'info', 'warning', 'danger'];
-          const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
-          
-          const initials = data[0].toUpperCase();
-          const symbolLabel = `
-            <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
-              ${initials}
-            </div>
-          `;
-          return `<span style="color:Black; font-weight: bold;">${data}</span>`;
-      }}
-      ,
-        { title: '<span style="color: black;">Name</span>', data: 'P2' },
-        { title: '<span style="color: black;">Description</span>', data: 'P3' },
+        {
+          title: '<span style="color: black;">ID</span>',
+          data: 'P1',
+          render: function (data, type, full) {
+            const colorClasses = ['success', 'info', 'warning', 'danger'];
+            const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
+            const initials = data[0].toUpperCase();
+        
+            const symbolLabel = `
+              <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
+                ${initials}
+              </div>
+            `;
+        
+            return `
+              <div class="d-flex align-items-center">
+                <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
+                  <a href="javascript:;">
+                    ${symbolLabel}
+                  </a>
+                </div>
+                <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
+                  <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
+                </div>
+              </div>
+            `;
+          },
+        },
+        
+        // {
+        //   title: '<span style="color: black;">Client ID</span>',
+        //   data: 'P2',
+        // },
+        {
+          title: '<span style="color: black;">Name</span>',
+          data: 'P2',
+        },
+        {
+          title: '<span style="color: black;">Description</span>',
+          data: 'P3',
+        },
         {
           title: '<span style="color: black;">Updated</span>',
           data: 'P4',
@@ -3168,15 +3606,21 @@ setTimeout(() => {
             return `${formattedDate} ${formattedTime}`;
           },
         },
-        { title: '<span style="color: black;">Created UserName</span>', data: 'P6' },
-        { title: '<span style="color: black;">Updated UserName</span>', data: 'P7' },
+        {
+          title: '<span style="color: black;">Created UserName</span>',
+          data: 'P6',
+        },
+        {
+          title: '<span style="color: black;">Updated UserName</span>',
+          data: 'P7',
+        },
       ],
       createdRow: (row, data, dataIndex) => {
         $('td:eq(0)', row).addClass('');
       },
+      pageLength: 10, // Set default page size to 10
     };
   }
-  
   
 
 
@@ -3236,6 +3680,7 @@ setTimeout(() => {
   
   
   private validateAndSubmit(tempObj: any, actionKey: string) {
+    this.isGirdMoved = false;
     console.log('actionKey checking', actionKey);
   
     if (!tempObj.PK || !tempObj.SK) {
@@ -3252,19 +3697,18 @@ setTimeout(() => {
     this.api.UpdateMaster(tempObj).then(response => {
       console.log('API Response:', response);
       if (response && response.metadata) {
-        const successTitle =
-          actionKey === 'create'
-            ? 'Summary created'
-            : actionKey === 'saveDashboard'
-              ? 'Dashboard saved'
-              : actionKey === 'add_Tile'
-                ? 'Tile added'
-                : actionKey === 'delete_tile' || actionKey === 'deleteTile'
-                  ? 'Tile deleted'
-                  : 'Summary updated';
+        // Refined success title logic
+        const successTitle = {
+          create: 'Summary created',
+          saveDashboard: 'Dashboard saved',
+          add_tile: 'Widget Added ',
+          update_tile:'Widget Updated',
+          delete_tile: 'Tile deleted',
+          deleteTile: 'Tile deleted',
+          update: 'Summary updated'
+        }[actionKey] || 'Dashboard changes saved ';
   
-        // Debugging statement to confirm condition
-        console.log('Action key condition check:', actionKey === 'update');
+        console.log('Action key condition check:', actionKey);
   
         if (actionKey === 'update') {
           // For "Summary updated successfully", reload window after confirmation
@@ -4502,36 +4946,27 @@ this.createSummaryField.patchValue({
   }
 
   toggleMode(): void {
-    // Log the current mode before toggling
     console.log('Current Mode (Before Toggle):', this.isEditModeView ? 'Edit Mode' : 'View Mode');
-
-    // Start spinner
-    this.loading = true;
-    this.spinner.show();
-
-    // Simulate async task (e.g., fetching data, updating UI state)
+    this.spinner.show()
     setTimeout(() => {
-      // Toggle the mode
-      this.isEditModeView = !this.isEditModeView;
+      this.spinner.hide()
+    }, 1000);
+    // Check if update permission is allowed
+    if (!this.summaryDashboardUpdate) {
+        console.warn('Update permission is false. Staying in view mode.');
+        this.isEditModeView = false; // Ensure grid stays in view mode
+        this.updateOptions(); // Reflect the correct mode in options
+        return; // Exit function early
+    }
 
-      // Update the grid options based on the current mode
-      this.updateOptions();
+    // Toggle between edit and view modes
+    this.isEditModeView = !this.isEditModeView;
+    this.updateOptions(); // Update grid options
+    console.log('Current Mode (After Toggle):', this.isEditModeView ? 'Edit Mode' : 'View Mode');
+    localStorage.setItem('editModeState', this.isEditModeView.toString()); // Save state
+ 
+}
 
-      // Log the updated mode after toggling
-      console.log('Current Mode (After Toggle):', this.isEditModeView ? 'Edit Mode' : 'View Mode');
-      console.log('Updated Options:', this.options);
-
-      // Save the updated state to localStorage
-      localStorage.setItem('editModeState', this.isEditModeView.toString());
-
-      // Stop spinner after operation is complete
-      this.spinner.hide();
-      this.loading = false;
-
-      // Trigger change detection to ensure the UI reflects changes immediately
-      this.cdr.detectChanges();
-    }, 1500); // Simulated delay (adjust as needed)
-  }
   // gridTitle: { cols: number; rows: number; y: number; x: number; themeColor: string }[] = [
   //   { cols: 2, rows: 1, y: 0, x: 0, themeColor: '#3498db' },
   //   { cols: 2, rows: 1, y: 0, x: 2, themeColor: '#e74c3c' },
