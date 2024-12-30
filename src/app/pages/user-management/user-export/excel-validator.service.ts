@@ -39,6 +39,8 @@ export class ExcelValidatorService {
       required: true,
       validate: (value: any) => {
         if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
+        if (/\s/.test(value)) return { isValid: false, error: 'Cannot contain Whitespaces' };
+        if (/[A-Z]/.test(value)) return { isValid: false, error: 'Cannot contain uppercase letters' };
         if (value.length < 3) return { isValid: false, error: 'Must be at least 3 characters long' };
         return { isValid: true };
       }
@@ -213,27 +215,27 @@ export class ExcelValidatorService {
         // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
         return { isValid: true };
       }
-    },
-    'Account': {
-      required: false,
-      validate: (value: any) => {
-        if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
-        if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
-        // if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
-        // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
-        return { isValid: true };
-      }
-    },
-    'Cognito Update': {
-      required: false,
-      validate: (value: any) => {
-        if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
-        if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
-        // if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
-        // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
-        return { isValid: true };
-      }
     }
+    // 'Account': {
+    //   required: false,
+    //   validate: (value: any) => {
+    //     if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
+    //     if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
+    //     // if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
+    //     // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+    //     return { isValid: true };
+    //   }
+    // },
+    // 'Cognito Update': {
+    //   required: false,
+    //   validate: (value: any) => {
+    //     if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
+    //     if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
+    //     // if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
+    //     // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+    //     return { isValid: true };
+    //   }
+    // }
   };
   
 

@@ -1777,7 +1777,7 @@ rdtListWorkAround :any =[{
             console.log('Response from Lambda:', response);
 
 
-            this.toast.open("Mail Sent Successfully", " ", {
+            this.toast.open("A confirmation email has been successfully sent to the user.", " ", {
 
               duration: 2000,
               horizontalPosition: 'right',

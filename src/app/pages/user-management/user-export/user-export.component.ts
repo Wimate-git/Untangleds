@@ -167,8 +167,7 @@ export class UserExportComponent {
       Heading = [
         ['UserName', 'Password', 'Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Mobile',
           'Mobile Privacy', 'Telegram Channel ID', 'Permission ID', 'Location Permission', 'FormID Permission', 'Start Node',  'Default Module',
-          'Redirection ID', 'SMS', 'Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram',
-          'Account', 'Cognito Update'
+          'Redirection ID', 'SMS', 'Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram'
         ],
         ['', '', '', '', '', '', '',
           '', '', '', '', '', '', '',
@@ -284,8 +283,7 @@ export class UserExportComponent {
       Heading = [
         ['UserName', 'Password', 'Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Mobile',
           'Mobile Privacy', 'Telegram Channel ID', 'Permission ID', 'Location Permission', 'FormID Permission', 'Start Node',  'Default Module',
-          'Redirection ID', 'SMS', 'Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram',
-          'Account', 'Cognito Update'
+          'Redirection ID', 'SMS', 'Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram'
         ]
       ];
       filename = 'Users.xlsx';
@@ -314,9 +312,7 @@ export class UserExportComponent {
         user.alert_telegram || '',
         user.escalation_email || '',
         user.escalation_sms || '',
-        user.escalation_telegram || '',
-        user.enable_user || '',
-        user.cognito_update || ''
+        user.escalation_telegram || ''
       ];
     });
   
@@ -442,8 +438,8 @@ export class UserExportComponent {
             escalation_email: userFields[18] ,
             escalation_sms: userFields[19],
             escalation_telegram: userFields[20] ,
-            cognito_update:userFields[21] ,
-            enable_user: userFields[22],
+            // cognito_update:userFields[21] ,
+            // enable_user: userFields[22],
             updated: new Date()
           }
   
@@ -675,8 +671,8 @@ export class UserExportComponent {
             escalation_email: userFields[18] ,
             escalation_sms: userFields[19] ,
             escalation_telegram: userFields[20] ,
-            cognito_update:userFields[21] ,
-            enable_user: userFields[22] ,
+            // cognito_update:userFields[21] ,
+            // enable_user: userFields[22] ,
             updated: new Date()
           }
   
@@ -839,82 +835,6 @@ export class UserExportComponent {
     }
   }
   
-
-
-
-
-  // async addtoCognitoTable(getValues: any) {
-  //   //adding to cognito table
-  //   console.log('cogntio table', getValues);
-  //   if (getValues) {
-
-  //     //aceesing iDs from env.ts
-  //     let poolData = {
-  //       UserPoolId: "ap-south-1_aaPSwPS14", // user pool id here
-  //       ClientId: "42pb85v3sv84jdrfi1rub7a4e5"// client id here
-  //     };
-
-  //     console.log('poolData after user added to cognito', poolData);
-
-  //     this.userPool = new CognitoUserPool(poolData);
-
-  //     let attributeList = [];
-
-  //     let formData: any = {
-  //       "email": String(getValues.email),
-  //       'custom:userID': String(getValues.userID),
-  //       'custom:password': String(getValues.password),
-  //       'custom:clientID': String(getValues.clientID),
-  //       'custom:companyID': String(getValues.companyID),
-  //       'custom:username': String(getValues.username),
-  //       'custom:description': String(getValues.description),
-  //       'custom:mobile': JSON.stringify(getValues.mobile), // Check if this needs to be a string
-  //       'custom:mobile_privacy': String(getValues.mobile_privacy),
-  //       'custom:user_type': JSON.stringify(getValues.user_type),
-  //       'custom:enable_user': String(getValues.enable_user ?? false),
-  //       'custom:disable_user': String(getValues.disable_user ?? false),
-  //       'custom:alert_email': String(getValues.alert_email ?? false),
-  //       'custom:alert_sms': String(getValues.alert_sms ?? false),
-  //       'custom:alert_telegram': String(getValues.alert_telegram ?? false),
-  //       'custom:escalation_email': String(getValues.escalation_email ?? false),
-  //       'custom:escalation_sms': String(getValues.escalation_sms ?? false),
-  //       'custom:escalation_telegram': String(getValues.escalation_telegram ?? false),
-  //       'custom:telegramID': String(getValues.telegramID),
-  //       'custom:permission_id': String(getValues.permission_ID),
-  //       'custom:defaultdevloc': String(getValues.default_dev_loc ?? ''),
-  //   }
-
-  //     //looping key,value
-  //     for (let key in formData) {
-
-  //       let attrData = {
-  //         Name: key,
-  //         Value: formData[key]
-  //       }
-  //       //console.log('attribute data', attrData)
-  //       let attribute = new CognitoUserAttribute(attrData);
-  //       attributeList.push(attribute)
-  //     }
-
-  //     //}
-  //     //console.log('attribute list', attributeList);
-  //     this.userPool.signUp(getValues.username, getValues.password, attributeList, [], (
-  //       err: { message: any; },
-  //       result: any
-  //     ) => {
-  //       // this.isLoading = false;
-  //       if (err) {
-  //         //console.log('err on signup', err);
-  //         alert(err.message || JSON.stringify(err));
-  //       }
-  //       console.log('result after user is added', result);
-
-  //     });
-  //   }
-  //   else {
-  //    //Error part
-  //   }
-  // }
 
 
   async createLookUpRdt(item: any, pageNumber: number,tempclient:any){
