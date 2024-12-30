@@ -58,6 +58,10 @@ export class ChartUi3Component implements OnInit{
 
   // @Output() customEvent2 = new EventEmitter<{ arg1: any; arg2: number }>();
   @Input()  all_Packet_store: any;
+  @Input() summaryDashboardUpdate:any;
+  @Input() hidingLink:any;
+  @Input () hideButton:any
+  @Input() isFullscreen: boolean = false; 
 
   edit_each_tileUI(value1: any,value2: number) {
     const data = { arg1: value1, arg2: value2 }; // Two arguments
@@ -80,7 +84,9 @@ export class ChartUi3Component implements OnInit{
     // Emit the payload
     this.customEvent1.emit(payload);
   }
-  
+  get shouldShowButton(): boolean {
+    return this.item.dashboardIds !== "";
+  }
   deleteTile(value1: any,value2: number) {
     const data = { arg1: value1, arg2: value2 }; // Two arguments
     const payloadDelete = {

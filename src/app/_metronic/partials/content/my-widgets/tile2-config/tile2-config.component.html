@@ -32,7 +32,7 @@
             <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'dataTab'}" id="dataTab" role="tabpanel" aria-labelledby="home-tab">
           <div class="row g-3"> <!-- g-3 adds consistent gap between columns -->
             <div class="col-md-4"> <!-- Column for the first dropdown -->
-              <label class="col-form-label fw-bold fs-6">Forms</label>
+              <label class="col-form-label fw-bold fs-6 required">Forms</label>
               <ngx-select
                 [allowClear]="true"
                 name="icon"
@@ -46,7 +46,7 @@
               </ngx-select>
             </div>
             <div class="col-md-4">
-              <label for="parameterName" class="col-form-label fw-bold fs-6">Parameter</label>
+              <label for="parameterName" class="col-form-label fw-bold fs-6 required">Form Fields</label>
               <ngx-select
                 id="parameterName"
                 [allowClear]="true"
@@ -238,7 +238,7 @@
      
               
               <div class="col-md-5 mb-3">
-                <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Parameter</label>
+                <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields</label>
                 <ngx-select
                 id="parameterName"
                 [allowClear]="true"
@@ -259,7 +259,7 @@
             </div>
           
             <div class="col-md-12 mb-3">
-              <label for="description" class="col-createChart-label fw-bold fs-6">Description</label>
+              <label for="description" class="col-createChart-label fw-bold fs-6">Equation</label>
               <textarea
               id="description"
               formControlName="filterDescription"  

@@ -37,7 +37,7 @@
         <i class="bi bi-pencil" style="color: black;"></i>
       </button>
       <button 
-      *ngIf="shouldShowButton && !hideButton && summaryDashboardUpdate && hidingLink && !isFullscreen"
+      *ngIf="!isEditModeView  && !hideButton && shouldShowButton && summaryDashboardUpdate "
       (click)="helperDashboard(item, index, modalContent, item.selectType)"
       class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
       aria-haspopup="menu" 

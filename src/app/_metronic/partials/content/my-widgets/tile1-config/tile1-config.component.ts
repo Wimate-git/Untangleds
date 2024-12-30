@@ -279,6 +279,86 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
 
   }
 
+  // addTile(key: any) {
+  //   this.multipleCheck = this.createKPIWidget.value.filterParameter;
+  //   console.log('this.multipleCheck checking', this.multipleCheck);
+  
+  //   if (key === 'tile') {
+  //     const uniqueId = this.generateUniqueId();
+  
+  //     // Convert filterParameter array to a DynamoDB-compatible string
+  //     // const formattedFilterParameter = this.multipleCheck
+  //     //   .map((param: string) => `\${${param}}`) // Format each value as ${value}
+  //     //   .join(''); // Join them into a single string without commas
+  
+  //     const newTile = {
+  //       id: uniqueId,
+  //       x: 0,
+  //       y: 0,
+  //       rows: 13, // The number of rows in the grid
+  //       cols: 25, // The number of columns in the grid
+  //       rowHeight: 100, // The height of each row in pixels
+  //       colWidth: 100, // The width of each column in pixels
+  //       fixedColWidth: true, // Enable fixed column widths
+  //       fixedRowHeight: true,
+  //       grid_type: 'tile',
+  //       selectFromTime: this.createKPIWidget.value.selectFromTime,
+  //       selectToTime: this.createKPIWidget.value.selectToTime,
+  //       formlist: this.createKPIWidget.value.formlist,
+  //       parameterName: this.createKPIWidget.value.parameterName,
+  //       groupByFormat: this.createKPIWidget.value.groupByFormat,
+  //       dashboardIds: this.createKPIWidget.value.dashboardIds,
+  //       selectType: this.createKPIWidget.value.selectType,
+  //       filterParameter: this.createKPIWidget.value.filterParameter, // Use the formatted string
+  //       filterDescription: this.createKPIWidget.value.filterDescription,
+  //       parameterNameRead: this.parameterNameRead,
+  //       selectedRangeType: this.createKPIWidget.value.selectedRangeType,
+  //       themeColor: this.createKPIWidget.value.themeColor,
+  //       fontSize: `${this.createKPIWidget.value.fontSize}px`, // Added fontSize
+  //       fontColor: this.createKPIWidget.value.fontColor, // Added fontColor
+  //       formatType:this.createKPIWidget.value.formatType,
+  //       multi_value: [
+  //         {
+  //           value: this.createKPIWidget.value.primaryValue, // Renamed key to 'value'
+  //           constantValue: this.createKPIWidget.value.constantValue !== undefined &&
+  //             this.createKPIWidget.value.constantValue !== null
+  //             ? this.createKPIWidget.value.constantValue
+  //             : 0,
+  //           processed_value: this.createKPIWidget.value.processed_value || '',
+  //         },
+  //       ],
+  //     };
+  
+  //     // Initialize this.dashboard if it hasn't been set yet
+  //     if (!this.dashboard) {
+  //       this.dashboard = [];
+  //     }
+  
+  //     // Push the new tile to dashboard
+  //     this.dashboard.push(newTile);
+  
+  //     console.log('this.dashboard after adding new tile', this.dashboard);
+  
+  //     this.grid_details = this.dashboard;
+  //     console.log('this.grid_details checking',this.grid_details)
+  //     this.dashboardChange.emit(this.grid_details);
+  //     if (this.grid_details) {
+  //       this.updateSummary('','add_tile');
+  //       if(this.grid_details[0]){
+  //         window.location.reload()
+  //         this.cdr.detectChanges()
+  //       }else {
+      
+  //       }
+  //     }
+
+  //     // Optionally reset the form if needed after adding the tile
+  //     this.createKPIWidget.patchValue({
+  //       widgetid: uniqueId,
+  //     });
+  //   }
+  // }
+
   addTile(key: any) {
     this.multipleCheck = this.createKPIWidget.value.filterParameter;
     console.log('this.multipleCheck checking', this.multipleCheck);
@@ -286,20 +366,15 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     if (key === 'tile') {
       const uniqueId = this.generateUniqueId();
   
-      // Convert filterParameter array to a DynamoDB-compatible string
-      // const formattedFilterParameter = this.multipleCheck
-      //   .map((param: string) => `\${${param}}`) // Format each value as ${value}
-      //   .join(''); // Join them into a single string without commas
-  
       const newTile = {
         id: uniqueId,
         x: 0,
         y: 0,
-        rows: 13, // The number of rows in the grid
-        cols: 25, // The number of columns in the grid
-        rowHeight: 100, // The height of each row in pixels
-        colWidth: 100, // The width of each column in pixels
-        fixedColWidth: true, // Enable fixed column widths
+        rows: 13,
+        cols: 25,
+        rowHeight: 100,
+        colWidth: 100,
+        fixedColWidth: true,
         fixedRowHeight: true,
         grid_type: 'tile',
         selectFromTime: this.createKPIWidget.value.selectFromTime,
@@ -309,40 +384,41 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         groupByFormat: this.createKPIWidget.value.groupByFormat,
         dashboardIds: this.createKPIWidget.value.dashboardIds,
         selectType: this.createKPIWidget.value.selectType,
-        filterParameter: this.createKPIWidget.value.filterParameter, // Use the formatted string
+        filterParameter: this.createKPIWidget.value.filterParameter,
         filterDescription: this.createKPIWidget.value.filterDescription,
         parameterNameRead: this.parameterNameRead,
         selectedRangeType: this.createKPIWidget.value.selectedRangeType,
         themeColor: this.createKPIWidget.value.themeColor,
-        fontSize: `${this.createKPIWidget.value.fontSize}px`, // Added fontSize
-        fontColor: this.createKPIWidget.value.fontColor, // Added fontColor
-        formatType:this.createKPIWidget.value.formatType,
+        fontSize: `${this.createKPIWidget.value.fontSize}px`,
+        fontColor: this.createKPIWidget.value.fontColor,
+        formatType: this.createKPIWidget.value.formatType,
         multi_value: [
           {
-            value: this.createKPIWidget.value.primaryValue, // Renamed key to 'value'
-            constantValue: this.createKPIWidget.value.constantValue !== undefined &&
-              this.createKPIWidget.value.constantValue !== null
-              ? this.createKPIWidget.value.constantValue
-              : 0,
+            value: this.createKPIWidget.value.primaryValue,
+            constantValue: this.createKPIWidget.value.constantValue || 0,
             processed_value: this.createKPIWidget.value.processed_value || '',
           },
         ],
       };
   
-      // Initialize this.dashboard if it hasn't been set yet
       if (!this.dashboard) {
         this.dashboard = [];
       }
   
-      // Push the new tile to dashboard
       this.dashboard.push(newTile);
   
       console.log('this.dashboard after adding new tile', this.dashboard);
   
-      this.grid_details = this.dashboard;
-      this.dashboardChange.emit(this.grid_details);
+      this.grid_details = this.dashboard; // Update grid_details dynamically
+      console.log('this.grid_details checking', this.grid_details);
+  
+      this.dashboardChange.emit(this.grid_details); // Emit the updated dashboard to parent component or listeners
+  
       if (this.grid_details) {
-        this.updateSummary('','add_tile');
+        this.updateSummary('', 'add_tile');
+  
+        // Use ChangeDetectorRef to update the view dynamically
+        this.cdr.detectChanges(); // Ensure changes are reflected in the UI
       }
   
       // Optionally reset the form if needed after adding the tile
@@ -353,25 +429,26 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   }
   
   
+  
   onFontColorChange(event: Event): void {
     const color = (event.target as HTMLInputElement).value;
     this.createKPIWidget.patchValue({ fontColor: color });
   }
   
   updateTile(key: any) {
-    console.log('key checking from update', key);
-    this.isGirdMoved=true
+    console.log('Key checking from update:', key);
+    this.isGirdMoved = true;
   
-    if (this.editTileIndex !== null) {
-      console.log('this.editTileIndex check', this.editTileIndex);
+    if (this.editTileIndex !== null && this.editTileIndex >= 0) {
+      console.log('this.editTileIndex check:', this.editTileIndex);
       console.log('Tile checking for update:', this.dashboard[this.editTileIndex]);
   
-      const multiValue = this.dashboard[this.editTileIndex].multi_value || [];
+      const multiValue = this.dashboard[this.editTileIndex]?.multi_value || [];
       const primaryValue = this.createKPIWidget.value.primaryValue || multiValue[0]?.value || ''; // Get primaryValue from form or multi_value[0]
       const constantValue = multiValue[0]?.constantValue || 0;
       const processedValue = this.createKPIWidget.value.processed_value || ''; // Form value
       const updatedConstantValue = this.createKPIWidget.value.constantValue || constantValue; // Form value
-      
+  
       console.log('Extracted primaryValue:', primaryValue);
       console.log('Form Value for processed_value:', processedValue);
       console.log('Form Value for constantValue:', updatedConstantValue);
@@ -391,7 +468,6 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         formlist: this.createKPIWidget.value.formlist,
         parameterName: this.createKPIWidget.value.parameterName,
         primaryValue: primaryValue, // Updated primaryValue from form or multi_value
-        // groupBy: this.createKPIWidget.value.groupBy,
         groupByFormat: this.createKPIWidget.value.groupByFormat,
         constantValue: updatedConstantValue, // Use the updated constantValue
         processed_value: processedValue, // Use the updated processed_value
@@ -409,7 +485,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         filterParameter: this.createKPIWidget.value.filterParameter,
         filterDescription: this.createKPIWidget.value.filterDescription,
         parameterNameRead: this.parameterNameRead,
-        formatType:this.createKPIWidget.value.formatType,
+        formatType: this.createKPIWidget.value.formatType,
       };
   
       console.log('Updated tile:', updatedTile);
@@ -424,18 +500,26 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
       console.log('Updated dashboard:', this.dashboard);
   
       // Update grid_details and emit the event
-      this.all_Packet_store.grid_details[this.editTileIndex] = { ...this.all_Packet_store.grid_details[this.editTileIndex], ...updatedTile };
+      if (this.all_Packet_store?.grid_details) {
+        this.all_Packet_store.grid_details[this.editTileIndex] = {
+          ...this.all_Packet_store.grid_details[this.editTileIndex],
+          ...updatedTile,
+        };
+      } else {
+        console.error('grid_details is undefined or null in all_Packet_store.');
+      }
+  
       this.grid_details = this.dashboard;
       this.dashboardChange.emit(this.grid_details);
   
       if (this.grid_details) {
-        this.updateSummary(this.all_Packet_store,'update_tile');
+        this.updateSummary(this.all_Packet_store, 'update_tile');
       }
   
       // Reset editTileIndex after the update
       this.editTileIndex = null;
     } else {
-      console.error('Edit index is null. Unable to update the tile.');
+      console.error('Edit index is null or invalid. Unable to update the tile.');
     }
   }
   

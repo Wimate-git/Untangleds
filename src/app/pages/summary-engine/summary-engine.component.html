@@ -60,11 +60,13 @@
                   </div>
                   
                                 <div *ngIf="item.grid_type === 'tile2'" >
-                      <app-tile-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal1)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"></app-tile-ui2>
+                      <app-tile-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal1)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"   [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" ></app-tile-ui2>
                     </div>
                     
                     <div *ngIf="item.grid_type === 'tile3'" >
-                      <app-tile-ui3 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal2)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"></app-tile-ui3>
+                      <app-tile-ui3 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal2)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"></app-tile-ui3>
                  
                     </div>
                     <div *ngIf="item.grid_type === 'tile4'">
@@ -77,13 +79,15 @@
                       <app-tile-ui6 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal5)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"></app-tile-ui6>
                     </div>
                               <div *ngIf="item.grid_type === 'chart'"  >
-                      <app-chart-ui1 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal1)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"></app-chart-ui1>
+                      <app-chart-ui1 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal1)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"></app-chart-ui1>
                     </div>
                     <div *ngIf="item.grid_type === 'Linechart'"  >
                       <app-chart-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal2)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store"></app-chart-ui2>
                     </div>
                     <div *ngIf="item.grid_type === 'Columnchart'"  >
-                      <app-chart-ui3 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal3)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store"></app-chart-ui3>
+                      <app-chart-ui3 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal3)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton" [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"></app-chart-ui3>
                     </div>
                     
                     <div *ngIf="item.grid_type === 'Areachart'"  >
@@ -94,7 +98,8 @@
                       <app-chart-ui5 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal5)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store"></app-chart-ui5>
                     </div> 
                     <div *ngIf="item.grid_type === 'title'" >
-                      <app-title-ui [item]="item" [index]="i" (customEvent)="helperTile($event,TitleModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [all_Packet_store]="all_Packet_store"></app-title-ui>
+                      <app-title-ui [item]="item" [index]="i" (customEvent)="helperTile($event,TitleModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"></app-title-ui>
   
                  
                     
@@ -611,10 +616,10 @@
   <!-- Summary ID Input -->
   <div class="col-md-4">
     <label class="col-form-label fw-bold fs-6 required d-flex align-items-center">
-      ID 
-      <span class="fs-4 text-primary" 
-            data-bs-toggle="tooltip" 
-            data-bs-placement="top" 
+      ID
+      <span class="fs-4 text-primary"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
             [title]="showModal ? '' : 'Enter a unique identifier for the summary.'">
         <i class="bi bi-info-circle fs-5"></i>
       </span>
@@ -623,15 +628,17 @@
            class="form-control form-control-solid"
            placeholder="Enter Summary ID"
            formControlName="summaryID"
-           [readonly]="showModal" 
+           [readonly]="showModal"
            required
-           (keyup)="checkUniqueIdentifier()">
+           (input)="onIDChange($event)">
     <span *ngIf="errorForUniqueID" style="color: #fc1900;">{{ errorForUniqueID }}</span>
     <div *ngIf="createSummaryField.get('summaryID')?.hasError('required') && createSummaryField.get('summaryID')?.touched"
          class="invalid-feedback">
       Summary ID is required
     </div>
   </div>
+  
+  
   
   <!-- Summary Name Input -->
   <div class="col-md-4">
@@ -656,6 +663,7 @@
       Summary Name is required
     </div>
   </div>
+  
   
   <!-- Summary Description Input -->
   <div class="col-md-4">

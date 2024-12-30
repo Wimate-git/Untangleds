@@ -159,6 +159,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   parsedPermission: any;
   permissionIdsListList: any;
   permissionIdLocal: any;
+  idInputSubject: any;
+  previousValue: string;
 
 
 
@@ -686,7 +688,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     this.isFullScreen = !this.isFullScreen;
     this.hidingLink = !this.hidingLink
 
-
+this.updateOptions()
 
 
 if(!this.isFullScreen){
@@ -1127,6 +1129,7 @@ if(!this.isFullScreen){
     // this.createBulletChart();
 
     // this.createPieChart()
+    
   
   }
 
@@ -1276,7 +1279,7 @@ if(!this.isFullScreen){
     this.route.paramMap.subscribe(params => {
       this.routeId = params.get('id');
       if (this.routeId) {
-        this.openModalHelpher(this.routeId);
+        // this.openModalHelpher(this.routeId);
         this.editButtonCheck = true
 
       }
@@ -1672,23 +1675,25 @@ setTimeout(() => {
 
   
   dashboardOpen(id: string): void {
-    // Navigate to the desired rout
-    // this.isFullScreen = !this.isFullScreen;  // Toggle the full-screen state
-    // this.isFullView = !this.isFullView;      // Toggle the icon state (expand/compress)
+    // Save state in sessionStorage to trigger modal after reload
+    // sessionStorage.setItem('openModalAfterReload', JSON.stringify({
+    //   modalId: 'edit_ts',
+    //   packetStore: this.all_Packet_store,
+    //   modalReference: 'summaryModal',
+    // }));
+  
+    // Navigate to the new URL and reload the page
+    this.router.navigate([`/summary-engine/${id}`]).then(() => {
+      location.reload(); // Reload the window after navigation
+    });
 
-    // // Save the state to localStorage
-    // localStorage.setItem('isFullScreen', JSON.stringify(true));
-    this.setFullscreen()
-    this.router.navigate([`/summary-engine/${id}`]);
-    this.cdr.detectChanges(); 
+    // setTimeout(() => {
 
+    // }, 3000);
 
-    // Set the state to Edit Mode
-    this.showModal = true; // Open modal in edit mode
-
-    // Open the modal with appropriate flag and content
-    this.openModal('edit_ts', this.all_Packet_store, this.summaryModal);
   }
+  
+  
   
   // toggleFullScreen() {
   //   this.isFullScreen = !this.isFullScreen;
@@ -1828,8 +1833,17 @@ setTimeout(() => {
           this.createdTime = this.all_Packet_store.created;
           this.createdUserName = this.all_Packet_store.createdUser;
 
-          console.log('Before Parsing:', this.all_Packet_store.grid_details);
-
+          console.log('Before Parsing:', this.all_Packet_store);
+          // alert("hiii")
+          console.log('this.all_Packet_store.grid_details.length check',this.all_Packet_store.grid_details.length)
+   if(this.all_Packet_store.grid_details.length==0){
+    this.openModal('edit_ts', this.all_Packet_store, this.summaryModal);
+   }
+            // setTimeout(() => {
+     
+            // }, 2000);
+          
+          
           // Check if `grid_details` is not empty and `multi_value` is present
           if (this.all_Packet_store.grid_details && this.all_Packet_store.grid_details.length > 0) {
             this.all_Packet_store.grid_details.forEach((gridItem: { multi_value: any; }, index: any) => {
@@ -1851,6 +1865,7 @@ setTimeout(() => {
 
             // Reassign the updated grid_details to dashboard
             this.dashboard = this.all_Packet_store.grid_details;
+       
             console.log('this.dashboard after parsing', this.dashboard);
           } else {
             console.log('grid_details is undefined or empty.');
@@ -2256,6 +2271,7 @@ setTimeout(() => {
 
   openModal(flag: string, getValues?: any, content?: any): void {
     console.log('getValues inside openModal', getValues);
+
     this.selectedTab = this.showModal ? 'add-widget' : 'add-dashboard';
 
     // Reset common modal state
@@ -2584,6 +2600,10 @@ setTimeout(() => {
     // Pass the unpacked arguments to updateSummary
     this.isGirdMoved = true;
     this.updateSummary(event.data, event.arg2);
+    // setTimeout(() => {
+    //   window.location.reload()
+    // }, 1000);
+   
   }
   
   
@@ -3262,25 +3282,35 @@ setTimeout(() => {
   }
 
 
-  checkUniqueIdentifier(): void {
-    const enteredID = this.createSummaryField.get('summaryID')?.value?.trim();
-
+  checkUniqueIdentifier(enteredID: string): void {
     if (!enteredID) {
       this.errorForUniqueID = null; // Reset error if input is empty
+      this.isDuplicateID = false;
       return;
     }
 
     const isDuplicateID = this.lookup_data_summaryCopy.some(item => item.P1 === enteredID);
-    console.log('this.lookup_data_summaryCopy checking from validation', this.lookup_data_summaryCopy);
+    console.log('Validation for ID:', enteredID, this.lookup_data_summaryCopy);
 
     if (isDuplicateID) {
-      this.errorForUniqueID = `ID "${enteredID}" is already in use. Please enter a unique ID.`;
+      this.errorForUniqueID = `ID "${enteredID}" is already Exist. Please enter a unique ID.`;
       this.isDuplicateID = true; // Update the flag for the save button
     } else {
       this.errorForUniqueID = null;
       this.isDuplicateID = false; // Reset the flag
     }
   }
+
+  onIDChange(event: Event): void {
+    const currentID = (event.target as HTMLInputElement).value.trim();
+
+    // Validate only if the input value has changed
+    if (currentID !== this.previousValue) {
+      this.previousValue = currentID; // Update previous value
+      this.checkUniqueIdentifier(currentID);
+    }
+  }
+
 
   checkUniqueName(): void {
     const enteredName = this.createSummaryField.get('summaryName')?.value?.trim();
@@ -3293,15 +3323,20 @@ setTimeout(() => {
     const isDuplicateName = this.lookup_data_summaryCopy.some(item => item.P2 === enteredName);
 
     if (isDuplicateName) {
-      this.errorForUniqueName = `Name "${enteredName}" is already in use. Please enter a unique name.`;
-      this.isDuplicateName = true; // Update the flag for the save button
+      this.errorForUniqueName = `Name "${enteredName}" is already Exist. Please enter a unique name.`;
+      this.isDuplicateName = true;
+      this.cdr.detectChanges();  // Update the flag for the save button
     } else {
       this.errorForUniqueName = null;
       this.isDuplicateName = false; // Reset the flag
     }
   }
 
-
+  // resetModal(): void {
+  //   this.createSummaryField.reset(); // Reset form fields
+  //   this.errorForUniqueName = null; // Clear error state
+  //   this.isDuplicateName = false;  // Reset duplicate flag
+  // }
 
   fetchCompanyLookupdataOnit(sk: any): any {
     console.log("I am called snn");
@@ -3530,7 +3565,7 @@ setTimeout(() => {
       },
       columns: [
         {
-          title: '<span style="color: black;">ID</span>',
+          title: '<span style="color: black;">Dashboard ID</span>',
           data: 'P1',
           render: function (data, type, full) {
             const colorClasses = ['success', 'info', 'warning', 'danger'];
@@ -3649,6 +3684,8 @@ setTimeout(() => {
   //   this.validateAndSubmit(tempObj, key);
   // }
   updateSummary(value: any, key: any) {
+    let tempClient = this.SK_clientID + "#summary" + "#lookup";
+    console.log('value checking from updatesummary',value)
     this.createSummaryField.get('summaryID')?.enable();
   
     // Update allCompanyDetails if not already populated
@@ -3676,6 +3713,24 @@ setTimeout(() => {
   
     // Validate and submit the object
     this.validateAndSubmit(tempObj, key);
+    const createdDate = Math.ceil(new Date().getTime() / 1000); // Created date
+    const updatedDate = Math.ceil(new Date().getTime() / 1000); 
+    const items = {
+      P1: this.allCompanyDetails.summaryID,
+      P2: this.allCompanyDetails.summaryName,
+      P3: this.allCompanyDetails.summaryDesc,
+      P4: createdDate,  // Updated date
+      P5: updatedDate,   // Created date
+      P6: this.allCompanyDetails.createdUser,  // Created by user
+      P7: this.getLoggedUser.username,          // Updated by user
+      P8: JSON.stringify(this.previewObjDisplay),
+      P9: this.allCompanyDetails.iconSelect // Add selected icon
+    };
+console.log('items checking from update Summary',items)
+  //  this.createLookUpSummary(items, 1, tempClient);
+  this.cd.detectChanges(); 
+   this.fetchTimeMachineById(1,items.P1,'update',items)
+   this.cd.detectChanges(); 
   }
   
   
@@ -3824,7 +3879,8 @@ setTimeout(() => {
       // Add the selected icon
       crDate: createdDate, // Created date
       upDate: updatedDate,  // Updated date
-      createdUser: this.getLoggedUser.username // Set the creator's username
+      createdUser: this.getLoggedUser.username, // Set the creator's username
+      grid_details: []
     };
 
     console.log("summary data ", this.allCompanyDetails);
@@ -3848,7 +3904,8 @@ setTimeout(() => {
         updated: updatedDateISO,   // Updated date in ISO format
         createdUser: this.allCompanyDetails.createdUser, // Use the persisted createdUser
         iconObject: this.allCompanyDetails.iconObject,
-        tilesList:this.defaultValue 
+        tilesList:this.defaultValue ,
+        grid_details:[]
 
       })
     };
@@ -3873,6 +3930,7 @@ this.createSummaryField.patchValue({
       P8: JSON.stringify(this.previewObjDisplay),
       P9: this.createSummaryField.value.iconSelect // Add selected icon
     };
+    console.log('items checking from create Summary',items)
 
     // API call to create the summary
     this.api.CreateMaster(tempObj).then(async (value: any) => {
@@ -3901,6 +3959,7 @@ this.createSummaryField.patchValue({
             // This block is executed when the "OK" button is clicked
             if (items && items.P1) {
               this.dashboardOpen(items.P1);
+       
           // Pass item.P1 to viewItem
             }
             if (this.modalRef) {
@@ -4037,7 +4096,9 @@ this.createSummaryField.patchValue({
             data = newData;
             // Update the local state or service with the new data
             this.lookup_data_summary = data; // Assuming this is the variable bound to your UI
+            this.refreshFunction()
             this.cd.detectChanges(); // Trigger change detection if needed
+       
 
           } else if (type === 'delete') {
             data.splice(findIndex, 1);
@@ -4074,7 +4135,17 @@ this.createSummaryField.patchValue({
     }
   }
 
+refreshFunction(){
+  if (this.routeId) {
+    console.log('this.routeId check',this.routeId)
+    this.checkAndSetFullscreen();
+    this.editButtonCheck = true
 
+    this.openModalHelpher(this.routeId)
+  } else {
+    this.editButtonCheck = false
+  }
+}
 
   // addFromService() {
 

@@ -17,6 +17,9 @@ export class TileUi2Component {
   @Output() customEvent1 = new EventEmitter<{ data: { arg1: any; arg2: number }; all_Packet_store: any }>();
   @Output() customEvent2 = new EventEmitter<{ data: { arg1: any; arg2: number }; all_Packet_store: any }>();
   @Input()  all_Packet_store: any;
+  @Input() summaryDashboardUpdate:any;
+  @Input() hidingLink:any;
+  @Input() isFullscreen: boolean = false; 
 
   @Input () hideButton:any
   iframeUrl: any;
