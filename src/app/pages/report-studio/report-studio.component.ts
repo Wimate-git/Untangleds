@@ -68,7 +68,7 @@ export class ReportStudioComponent implements AfterViewInit,OnDestroy{
    datatableConfig: Config = {};
 
 
-   selectedValues: any[] = [];
+   selectedValues: any ;
    formGroup: FormGroup;
 
 
@@ -105,6 +105,8 @@ export class ReportStudioComponent implements AfterViewInit,OnDestroy{
   populateFormData: any = [];
 columns: any;
   showTable: boolean = false;
+  selectedItem: any = [];
+  tempResHolder: any;
 
    constructor(private fb:FormBuilder,private api:APIService,private configService:SharedService,private scheduleAPI:scheduleApiService,
     private toast:MatSnackBar,private spinner:NgxSpinnerService,private cd:ChangeDetectorRef,private modalService: NgbModal,private moduleDisplayService: ModuleDisplayService,
@@ -147,7 +149,7 @@ columns: any;
       endDate: ['', Validators.required],
       daysAgo: ['', Validators.required],
       form_permission: [[], Validators.required], 
-      form_data_selected:[[]],
+      form_data_selected: this.fb.array([]), // Create FormArray
       filterOption: ['all'],
       columnOption: ['all']
     });
@@ -401,71 +403,196 @@ multiSelectChange(): void {
 
 
 
-async onColumnChange(event: any,getValue:any){
-  this.selectedValues = []
+// async onColumnChange(event: any,getValue:any){
+  
+//   console.log('Get value is here ',getValue)
 
-  let selectedValue
-  if(getValue == 'html'){
+//   let selectedValue
+//   if(getValue == 'html'){
+//     this.selectedValues = []
+//     selectedValue = (event.target as HTMLInputElement).value;
+//   }
+//   else{
+//     selectedValue = event;
+//   }
+
+
+//   if(selectedValue == 'onCondition' && this.populateFormData.length == 0){
+//     this.spinner.show()
+
+//     try{
+//       let tempMetadata:any = []
+//       for(let item of this.selectedForms){
+//         const formName = item
+//         const result = await this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${item}#main`,1)
+
+//         if(result){
+//           let tempResult = JSON.parse(result.metadata || '').formFields
+//           tempMetadata = {}
+//           tempMetadata[item] = tempResult.map((item: any) => {
+//             return { name: item.name, label: item.label , formName:formName};  
+//           });
+//         }
+//         this.populateFormData.push(tempMetadata)
+//       }
+      
+//       console.log("Data to be added in dropdowns ",this.populateFormData);
+//     }
+//     catch(error){
+//       this.spinner.hide()
+//       console.log("Error in fetching form Builder data ",error);
+//     }
+
+//     this.spinner.hide()
+
+//   }
+//   else{
+//     this.visibiltyflag = false
+//   }
+
+
+//   if(selectedValue == 'onCondition'){
+//     this.visibiltyflag = true
+
+//     this.dropdownKeys = this.populateFormData.map((item: {}) => Object.keys(item)[0]);
+
+//     if(getValue == 'html'){
+//       this.selectedItem = new Array(this.dropdownKeys.length).fill(null);
+//     }
+   
+
+//     console.log("Selected Dropdown values are ",this.selectedValues);
+//     console.log("Dropdown keys are here ",this.dropdownKeys);
+//   }
+ 
+
+//  this.cd.detectChanges()
+  
+// }
+
+
+
+
+get formDataSelected(): FormArray {
+  return this.reportsFeilds.get('form_data_selected') as FormArray;
+}
+
+async onColumnChange(event: any, getValue: string): Promise<void> {
+
+  this.reportsFeilds.get('columnOption')?.patchValue('onCondition')
+  console.log('Get value is here ', getValue);
+
+  let selectedValue: any;
+
+  // Determine how to get the selected value based on 'getValue'
+  if (getValue === 'html') {
     selectedValue = (event.target as HTMLInputElement).value;
-  }
-  else{
+  } else {
     selectedValue = event;
   }
 
+  // Handle case when selected value is 'onCondition' and populate dropdown data
+  if (selectedValue === 'onCondition' && this.populateFormData.length === 0) {
+    this.spinner.show();
+    try {
+      let tempMetadata: any = [];
+      for (let item of this.selectedForms) {
+        const formName = item;
+        const result = await this.api.GetMaster(
+          `${this.SK_clientID}#dynamic_form#${item}#main`, 1
+        );
 
-
-  if(selectedValue == 'onCondition' && this.populateFormData.length == 0){
-    this.spinner.show()
-
-    try{
-      let tempMetadata:any = []
-      for(let item of this.selectedForms){
-        const formName = item
-        const result = await this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${item}#main`,1)
-
-        if(result){
-          let tempResult = JSON.parse(result.metadata || '').formFields
-          tempMetadata = {}
-          tempMetadata[item] = tempResult.map((item: any) => {
-            return { name: item.name, label: item.label , formName:formName};  
+        if (result) {
+          let tempResult = JSON.parse(result.metadata || '').formFields;
+          tempMetadata = {};
+          tempMetadata[item] = tempResult.map((field: any) => {
+            return { name: field.name, label: field.label, formName: formName };
           });
         }
-        this.populateFormData.push(tempMetadata)
+        this.populateFormData.push(tempMetadata);
       }
-      
-      console.log("Data to be added in dropdowns ",this.populateFormData);
+
+    
+
+      this.populateFormData = Array.from(new Set(this.populateFormData))
+      console.log("Data to be added in dropdowns ", this.populateFormData);
+
+    } catch (error) {
+      this.spinner.hide();
+      console.log("Error in fetching form Builder data ", error);
     }
-    catch(error){
-      this.spinner.hide()
-      console.log("Error in fetching form Builder data ",error);
+    this.spinner.hide();
+  } else {
+    this.visibiltyflag = false;
+  }
+
+  // Update visibility and set up dropdown keys
+  if (selectedValue === 'onCondition') {
+    console.log("Succeessfullt came here ");
+    this.visibiltyflag = true;
+    this.dropdownKeys = this.populateFormData.map((item: any) => Object.keys(item)[0]);
+
+    // Ensure form control array has the same number of form controls as dropdowns
+    if (getValue === 'html') {
+      this.selectedItem = new Array(this.dropdownKeys.length).fill(null); // Ensure empty array for selection
+      this.initializeFormControls(); // Ensure FormArray is correctly populated
     }
-
-    this.spinner.hide()
-
+    else{
+      console.log("Populated is called ");
+      this.initializeFormControls1()
+    }
+    console.log("Dropdown keys are here ", this.dropdownKeys);
   }
-  else{
-    this.visibiltyflag = false
-  }
 
-
-  if(selectedValue == 'onCondition'){
-    this.visibiltyflag = true
-
-    this.dropdownKeys = this.populateFormData.map((item: {}) => Object.keys(item)[0]);
-  
-    this.selectedValues = new Array(this.dropdownKeys.length).fill(null);
-  
-    console.log("Dropdown keys are here ",this.dropdownKeys);
-  }
- 
-
- this.cd.detectChanges()
-  
+  this.cd.detectChanges();
 }
+
+// Helper function to initialize form controls dynamically based on dropdown count
+initializeFormControls(): void {
+  const formArray = this.reportsFeilds.get('form_data_selected') as FormArray;
+  this.dropdownKeys.forEach((_: any, i: number) => {
+    if (formArray.at(i) === undefined) {
+      formArray.push(this.fb.control([])); // Each FormControl is initialized as an empty array
+    }
+  });
+}
+
+
+
+  // Helper function to initialize form controls dynamically based on dropdown count
+  initializeFormControls1(): void {
+    const formArray = this.reportsFeilds.get('form_data_selected') as FormArray;
+
+    // Clear out the FormArray if any existing controls exist
+    while (formArray.length) {
+      formArray.removeAt(0);
+    }
+
+    console.log("Create the form here ",this.selectedValues);
+
+    // Loop over the new data and add FormControls
+    this.selectedValues.forEach((dropdownData: any[], i: any) => {
+      // Each entry in populateFormData is an array, representing the options for the respective dropdown
+      const selectedValues = dropdownData.map(item => item); // You can choose the property to store
+
+      // Create a new FormControl with the selected values (or empty array if no selection)
+      formArray.push(this.fb.control(selectedValues));
+    });
+
+    console.log('Form Controls Initialized:', this.reportsFeilds.value);
+  }
+
+// Ensure to type-cast the AbstractControl to FormControl for correct methods
+getFormControl(index: number): FormControl {
+  return this.formDataSelected.at(index) as FormControl;
+}
+
 
 
 async onFilterChange(event: any,getValue:any) {
 
+
+  this.reportsFeilds.get('filterOption')?.patchValue('onCondition')
 
   if (this.selectedForms.length == 0) {
     Swal.fire({
@@ -595,14 +722,23 @@ let selectedValue
     this.tableData = []; 
 
 
+    console.log("Saved Query is here ",this.savedQuery);
+    
+   
 
     let formMap
+    let formValues
 
     if(this.visibiltyflag){
+     
+      formValues = this.reportsFeilds.value.form_data_selected;
+      this.selectedValues = formValues
+
       console.log('Selected columns are here ',this.selectedValues);
 
 
-      formMap = this.selectedValues.reduce((acc, group) => {
+
+      formMap = this.selectedValues.reduce((acc: { [x: string]: any[]; }, group: { formName: string | number; label: any; }[]) => {
         group.forEach((item: { formName: string | number; label: any; }) => {
             if (!acc[item.formName]) {
                 acc[item.formName] = [];
@@ -611,11 +747,13 @@ let selectedValue
         });
         return acc;
       }, {});
-      console.log("Form mapped data is here ",formMap);
+      console.log("Form mapped data is here on Submit",formMap);
     }
   
     this.spinner.show();
-  
+
+    // this.selectedItem = this.selectedValues;
+    
   
     if (['between', 'between time'].includes(this.reportsFeilds.get('dateType')?.value)) {
       const startEpoch = new Date(this.reportsFeilds.get('startDate')?.value).getTime();
@@ -661,7 +799,12 @@ let selectedValue
 
     const tempArray = this.reportsFeilds.get('form_permission')?.value;
 
-    this.onSubmitFlag = true
+    if(this.savedQuery == undefined || this.savedQuery == ''){
+      this.onSubmitFlag = true
+    }
+    else{
+      this.onSubmitFlag = false
+    }
   
 
     const groupedData: { [key: string]: any[] } = {};
@@ -742,6 +885,10 @@ let selectedValue
 
 
       let rows = await this.mapLabels(tempMetaArray,dynamicMetadata) 
+
+      console.log("After mapping labels are here ",rows);
+
+      console.log("formMap",formMap);
 
       if (rows && Array.isArray(rows) && rows.length > 0 && this.visibiltyflag && formMap) {
         rows = rows.map(item => {
@@ -894,9 +1041,19 @@ isBase64(value: string): boolean {
   clearFeilds() {
     this.tableDataWithFormFilters = []
     this.showTable = false
+    this.saveButton = false
+    this.onSubmitFlag = false
     this.selectedForms = []
     this.conditionflag = false
     this.reportsFeilds.reset()
+    this.populateFormData= []
+    this.visibiltyflag = false
+    this.savedQuery = ''
+
+    if(this.modalName == 'Reports'){
+      this.router.navigate(['/reportStudio']);
+    }
+
     this.cd.detectChanges()
   }
 
@@ -1000,8 +1157,11 @@ isBase64(value: string): boolean {
 
 
   saveQuery(content: TemplateRef<any>){
+
+    console.log("Selected column visibility ",this.selectedItem);
+
     //Creating packet for reports module to pass
-    this.savedModulePacket = [this.reportsFeilds.value,this.formFieldsGroup.value]
+    this.savedModulePacket = [this.reportsFeilds.value,this.formFieldsGroup.value,this.selectedValues]
     this.modalService.open(content);
     this.moduleDisplayService.showModule()
   }
@@ -1009,6 +1169,9 @@ isBase64(value: string): boolean {
 
   editQuery(content: TemplateRef<any>){
     //Creating packet for reports module to pass
+    this.editSavedDataArray.columnVisibility = this.selectedValues
+    this.editSavedDataArray.reportMetadata = this.reportsFeilds.value
+    this.editSavedDataArray.conditionMetadata = this.formFieldsGroup.value
     this.savedModulePacket = this.editSavedDataArray
     this.modalService.open(content);
     this.moduleDisplayService.showModule()
@@ -1167,61 +1330,106 @@ isBase64(value: string): boolean {
         console.error('Error:', error);
       }
     }
+
+
+    async editRoute(P1: any){
+      if(this.modalName == 'Reports'){
+        this.router.navigate(['/reportStudio'], { queryParams: { savedQuery: P1 } });
+      }
+    }
+
+
   
     async editSavedQuery(P1: any) {
 
       console.log("Edit si being called");
 
+      this.populateFormData= []
+
+
       this.spinner.show()
-      if(this.modalName == 'Reports'){
-        this.router.navigate(['/reportStudio'], { queryParams: { savedQuery: P1 } });
-      }
+     
       
       try{
-        const result = await this.api.GetMaster(`${this.SK_clientID}#savedquery#${P1}#main`,1)
-
+       this.api.GetMaster(`${this.SK_clientID}#savedquery#${P1}#main`,1).then(async (result)=>{
         if(result && result.metadata){
-          const tempResHolder = JSON.parse(result.metadata)
+          this.tempResHolder = JSON.parse(result.metadata)
+ 
+          this.tempResHolder.reportMetadata = JSON.parse(this.tempResHolder.reportMetadata)
+          this.tempResHolder.conditionMetadata = JSON.parse(this.tempResHolder.conditionMetadata).forms
+          this.tempResHolder.columnVisibility = JSON.parse(this.tempResHolder.columnVisibility)
+           this.editSavedDataArray = this.tempResHolder
+ 
+           console.log("Result for the edit is here ",this.tempResHolder);
+           const reportMetadata = this.tempResHolder.reportMetadata
+           const conditionMetadata = this.tempResHolder.conditionMetadata
+           const columnVisibility = this.tempResHolder.columnVisibility
+ 
+           console.log("conditionMetadata is here ",conditionMetadata);
+ 
+           this.reportsFeilds.patchValue({
+             dateType: reportMetadata.dateType,
+             singleDate: reportMetadata.singleDate,
+             startDate: reportMetadata.startDate,
+             endDate:reportMetadata.endDate ,
+             daysAgo:reportMetadata.daysAgo ,
+             form_permission:reportMetadata.form_permission , 
+             filterOption:reportMetadata.filterOption ,
+           })        
+           
+           this.selectedItem = []
 
-          this.editSavedDataArray = tempResHolder
+            this.selectedValues = JSON.parse(JSON.stringify(columnVisibility))
+           
+            
 
-          console.log("Result for the edit is here ",tempResHolder);
-          const reportMetadata = JSON.parse(tempResHolder.reportMetadata)
-          const conditionMetadata = JSON.parse(tempResHolder.conditionMetadata).forms
-
-          console.log("conditionMetadata is here ",conditionMetadata);
-
-          this.reportsFeilds.patchValue({
-            dateType: reportMetadata.dateType,
-            singleDate: reportMetadata.singleDate,
-            startDate: reportMetadata.startDate,
-            endDate:reportMetadata.endDate ,
-            daysAgo:reportMetadata.daysAgo ,
-            form_permission:reportMetadata.form_permission , 
-            filterOption:reportMetadata.filterOption ,
-          })        
-
-          this.saveButton = true
-          
-          if(reportMetadata.filterOption != 'all'){
-
-            await this.onFilterChange('onCondition','')
-
-
-            this.forms().clear();
-
-            console.log("conditionMetadata - - - - -- - -- - ",conditionMetadata);
+            console.log("Star selected ",this.selectedValues);
+            console.log("Star selected orginal",this.editSavedDataArray.columnVisibility);
              
-              conditionMetadata.forEach((formData: any) => {
-                this.populateForm(formData);
-              });
-          }
-        }
-        
-        this.onSubmit()
-        this.spinner.hide()
-        this.onSubmitFlag = false
-        this.dismissModal1(this.modalRef);
+           if(Array.isArray(this.selectedValues) && this.selectedValues.length > 0){
+             this.visibiltyflag = true
+           }
+ 
+           this.saveButton = true
+           
+           if(reportMetadata.filterOption != 'all'){
+ 
+             await this.onFilterChange('onCondition','')
+ 
+             this.forms().clear();
+ 
+             console.log("conditionMetadata - - - - -- - -- - ",conditionMetadata);
+              
+               conditionMetadata.forEach((formData: any) => {
+                 this.populateForm(formData);
+               });
+           }
+           else{
+              this.conditionflag = false
+           }
+           if(reportMetadata.columnOption != 'all'){
+
+            this.reportsFeilds.get('form_data_selected')?.patchValue([])
+
+            console.log("Column Option is false");
+
+            await this.onColumnChange('onCondition','savedQuery')
+           }
+           else{
+            this.visibiltyflag = false
+           }
+         }
+         this.onSubmit()
+         this.spinner.hide()
+         this.onSubmitFlag = false
+         this.dismissModal1(this.modalRef);
+
+         this.cd.detectChanges()
+
+      
+       })
+
+      
      
       }
       catch(error){

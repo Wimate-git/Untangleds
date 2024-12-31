@@ -63,7 +63,7 @@
             <div class="form-group row ps-4 mb-2">
                 <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Select Date</label>
                 <div class="col-3">
-                    <input type="date" formControlName="singleDate" class="form-control">
+                    <input type="datetime-local" formControlName="singleDate" class="form-control">
                 </div>
             </div>
         </div>
@@ -196,24 +196,42 @@
 
 
 
-<div class="card card-custom p-2 mt-5" *ngIf="visibiltyflag">
+<!-- <div class="card card-custom p-2 mt-5" *ngIf="visibiltyflag && selectedItem">
   <div class="row">
-    <div class="col-3" *ngFor="let item of populateFormData; let i = index">
+    <div class="col-3"  *ngFor="let item of populateFormData; let i = index">
 
-        <label class="required">{{dropdownKeys[i]}}</label>
+        <label class="required">{{dropdownKeys[i]}}</label>V
         <div class="custom-multiselect">
           <p-multiSelect
             [options]="item[dropdownKeys[i]]"
             formControlName="form_data_selected"
-            [(ngModel)]="selectedValues[i]"
+            [(ngModel)]="selectedItem[i]"
             placeholder="Select Columns"
             >
           </p-multiSelect>
         </div>
       </div>
   </div>
+</div> -->
+
+<div class="card card-custom p-2 mt-5" *ngIf="visibiltyflag">
+  <div class="row">
+    <div class="col-3" *ngFor="let item of populateFormData; let i = index">
+      <label class="required">{{ dropdownKeys[i] }}</label>
+      <div class="custom-multiselect">
+        <p-multiSelect
+          [options]="item[dropdownKeys[i]]"
+          [formControl]="getFormControl(i)"
+          placeholder="Select Columns"
+        >
+        </p-multiSelect>
+      </div>
+    </div>
+  </div>
 </div>
 
+
+<!-- [(ngModel)]="selectedItem[i]" -->
 
 
 
@@ -380,7 +398,7 @@
                     [datatableConfig]="datatableConfig" 
                     route="/reportStudio" 
                     (deleteEvent)="delete($event)" 
-                    (editEvent)="editSavedQuery($event)" 
+                    (editEvent)="editRoute($event)" 
                     (createEvent)="create()" 
                     [reload]="reloadEvent"
                     [modal]="SavedQuery">

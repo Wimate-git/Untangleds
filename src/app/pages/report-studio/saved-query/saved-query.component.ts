@@ -134,9 +134,12 @@ export class SavedQueryComponent implements OnInit {
       queryName:this.createSavedQuery.value.queryName,
       queryDesc:this.createSavedQuery.value.queryDesc,
       userIDs:this.createSavedQuery.value.userIDs,
-      reportMetadata:this.savedModulePacket.reportMetadata,
-      conditionMetadata:this.savedModulePacket.conditionMetadata
+      reportMetadata:JSON.stringify(this.savedModulePacket.reportMetadata),
+      conditionMetadata:JSON.stringify(this.savedModulePacket.conditionMetadata) || JSON.stringify([]),
+      columnVisibility:JSON.stringify(this.savedModulePacket.columnVisibility)
     }
+
+    console.log("Saved query is here ",savedQueryTemp);
 
 
     const tempObj = {
@@ -185,12 +188,16 @@ export class SavedQueryComponent implements OnInit {
 
       console.log("Success alert data is here ",successAlert);
 
+      console.log("Saved Query column visibility ",this.savedModulePacket[2]);
+
+
       const savedQueryTemp = {
         queryName:this.createSavedQuery.value.queryName,
         queryDesc:this.createSavedQuery.value.queryDesc,
         userIDs:this.createSavedQuery.value.userIDs,
         reportMetadata:JSON.stringify(this.savedModulePacket[0]),
-        conditionMetadata:JSON.stringify(this.savedModulePacket[1])
+        conditionMetadata:JSON.stringify(this.savedModulePacket[1]),
+        columnVisibility:JSON.stringify(this.savedModulePacket[2])
       }
 
       const tempObj = {
