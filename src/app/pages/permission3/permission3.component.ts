@@ -284,6 +284,32 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
       this.formfieldData = this.formfieldData.filter((field: any) => field.validation.lookup_table === true);
 
+      this.formfieldData.unshift({
+        "name": "",
+        "options": [],  // Assuming no options required
+        "columnWidth": 3,  // Assuming a default column width
+        "label": "System.Username",
+        "placeholder": "Enter System Username",  // Example placeholder
+        "type": "text",  // Assuming it's a text input
+        "validation": {
+            "lookup": false,
+            "formName_table": null,
+            "font_size": null,
+            "minLength": null,
+            "font_style": null,
+            "required": false,
+            "alignment_heading": null,
+            "hide": false,
+            "field": null,
+            "form": null,
+            "lookup_table": false,
+            "unique": false,
+            "disabled": false,
+            "user": false,
+            "maxLength": null
+        }
+    });
+
       console.log("Filtered Form Fields:", this.formfieldData);
 
       // this.formfieldData = this.formData.formFields.filter((field: any) => field.label !== "Empty Placeholder");
@@ -755,6 +781,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     this.update = false
     this.error = '';    
     this.formList=[]   // Model heading and button text change flag
+    this.formfieldData =[]
     this.initForm()
   }
 
