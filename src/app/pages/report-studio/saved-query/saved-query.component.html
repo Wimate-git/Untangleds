@@ -10,8 +10,9 @@
                         form-control form-control-lg form-control-solid
                         mb-3 mb-lg-0
                       " placeholder="Enter Name" name="queryName" formControlName="queryName"
-                        required>
+                        required  (keyup)="checkUniqueIdentifier($event)">
 
+                        <span style="color: #fc1900;">{{errorForUniqueID}}</span>                        
                     <div *ngIf="
                           createSavedQuery.get('queryName')?.hasError('required') &&
                           createSavedQuery.get('queryName')?.touched

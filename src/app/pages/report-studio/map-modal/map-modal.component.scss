@@ -1,0 +1,50 @@
+/* map-modal.component.css */
+
+/* Make the modal header more modern with better spacing */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: none; /* Remove border */
+  background-color: #f8f9fa; /* Light background */
+  position: relative;
+}
+
+/* Title styling */
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #343a40; /* Dark color for title */
+}
+
+
+/* Map container with some border and padding */
+#mapContainer {
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff; /* White background for the map container */
+}
+
+/* Styling for modal footer buttons */
+.modal-footer {
+  justify-content: flex-end;
+  padding: 1rem;
+  background-color: #f8f9fa; /* Same as header */
+  border-top: 1px solid #ddd;
+}
+
+.btn-secondary {
+  background-color: #6c757d; /* Bootstrap secondary color */
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 0.5rem 1.25rem;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268; /* Darker shade of the secondary color */
+}

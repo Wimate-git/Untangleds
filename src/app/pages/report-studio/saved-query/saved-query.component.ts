@@ -26,6 +26,7 @@ export class SavedQueryComponent implements OnInit {
   displayModule = false;
   @Input() editOperation:boolean;
   @Input() savedModulePacket:any = []
+  @Input() listofSavedIds:any;
   createSavedQuery:FormGroup;
   isCollapsed1 = false;
 
@@ -41,6 +42,8 @@ export class SavedQueryComponent implements OnInit {
   lookup_users: any = [];
   maxlength: number = 500;
   username: any;
+  errorForUniqueID: string = '';
+  currentSelectedQuery: any = '';
 
   constructor(private moduleDisplayService: ModuleDisplayService,private fb:FormBuilder,private cd:ChangeDetectorRef,private notifyConfig:SharedService,
     private api:APIService
@@ -67,6 +70,8 @@ export class SavedQueryComponent implements OnInit {
       this.dynamicFormPopulate(this.savedModulePacket)
     }
 
+    this.errorForUniqueID = '';
+
   }
 
 
@@ -81,14 +86,30 @@ export class SavedQueryComponent implements OnInit {
 
 
   dynamicFormPopulate(values:any){
+
+    this.currentSelectedQuery = values.queryName
+
     this.createSavedQuery = this.fb.group({
-      queryName:[values.queryName,Validators.required],
+      queryName:{ value: values.queryName, disabled: this.editOperation },
       queryDesc:[values.queryDesc,Validators.required],
       userIDs:[values.userIDs,Validators.required]
     })
   }
 
 
+  checkUniqueIdentifier(getID: any) {
+
+    const tempUser = getID.target.value
+    this.errorForUniqueID = '';
+    console.log("All the List of savedIDs ",this.listofSavedIds);
+
+    for (let uniqueID = 0; uniqueID < this.listofSavedIds.length; uniqueID++) {
+      if (tempUser.toLowerCase() == this.listofSavedIds[uniqueID].toLowerCase()) {
+        this.createSavedQuery.setErrors({ invalidForm: true });
+        this.errorForUniqueID = "Saved Query already exist"
+    }
+    }
+  }
 
 
   dynamicFormInitializer(){
@@ -131,7 +152,7 @@ export class SavedQueryComponent implements OnInit {
 
 
     const savedQueryTemp = {
-      queryName:this.createSavedQuery.value.queryName,
+      queryName:this.currentSelectedQuery,
       queryDesc:this.createSavedQuery.value.queryDesc,
       userIDs:this.createSavedQuery.value.userIDs,
       reportMetadata:JSON.stringify(this.savedModulePacket.reportMetadata),

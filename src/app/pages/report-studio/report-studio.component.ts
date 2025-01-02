@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { scheduleApiService } from '../schedule-api.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { firstValueFrom, Subscription } from 'rxjs';
+import { catchError, firstValueFrom, from, map, Observable, of, shareReplay, Subject, Subscription, take, takeUntil } from 'rxjs';
 import { PrimeNGConfig } from 'primeng/api';
 import Swal from 'sweetalert2';
 import { ImageModalComponent } from './image-modal/image-modal.component';
@@ -19,6 +19,7 @@ import { AgGridAngular } from 'ag-grid-angular';
 import * as XLSX from 'xlsx';  
 import * as pdfMake from "pdfmake/build/pdfmake";
 import { vfs } from 'pdfmake/build/vfs_fonts';
+import { MapModalComponent } from './map-modal/map-modal.component';
 (pdfMake as any).vfs = vfs;
 
 
@@ -43,6 +44,8 @@ export class ReportStudioComponent implements AfterViewInit,OnDestroy{
   @ViewChild('SavedQuery') SavedQuery: TemplateRef<any>;  
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
   modalRef: any;
+
+  pageSizeOptions = [10, 25, 50, 100];
 
   reportsFeilds: FormGroup;
 
@@ -82,6 +85,7 @@ export class ReportStudioComponent implements AfterViewInit,OnDestroy{
     'less than days ago': { showDaysAgo: true },
     'more than days ago': { showDaysAgo: true },
     'days ago': { showDaysAgo: true },
+    'in the past': { showDaysAgo: true },
   };
   tableDataWithFormFilters: any = [];
 
@@ -108,6 +112,11 @@ columns: any;
   selectedItem: any = [];
   tempResHolder: any;
 
+    // Ensure the listener is not added multiple times
+    private isImageClickListenerAdded = false;
+    private isLocationClickListenerAdded = false;
+    private isMarkerClickListenerAdded = false;
+
    constructor(private fb:FormBuilder,private api:APIService,private configService:SharedService,private scheduleAPI:scheduleApiService,
     private toast:MatSnackBar,private spinner:NgxSpinnerService,private cd:ChangeDetectorRef,private modalService: NgbModal,private moduleDisplayService: ModuleDisplayService,
     private route: ActivatedRoute,private router:Router
@@ -117,11 +126,43 @@ columns: any;
 
 
     ngAfterViewInit() {
+
+      // this.addImageClickListener();
+      this.addLocationClickListener();
+      this.addMarkerClickListener();
+
     // Listen for the custom 'image-click' event
     window.addEventListener('image-click', (event: any) => {
       const imageBase64 = event.detail;
       this.openImageModal(imageBase64);
     });
+
+    // // window.addEventListener('location-click', this.handleLocationClick);
+    // window.addEventListener('location-click', (event: Event) => this.handleLocationClick(event as CustomEvent));
+
+
+    //   // window.addEventListener('location-click', this.handleLocationClick);
+    //   window.addEventListener('marker-click', (event: Event) => this.handleTrackLocationClick(event as CustomEvent));
+
+   
+  }
+
+
+
+  // Method to add location click listener
+  addLocationClickListener() {
+    if (!this.isLocationClickListenerAdded) {
+      window.addEventListener('location-click', (event: Event) => this.handleLocationClick(event as CustomEvent));
+      this.isLocationClickListenerAdded = true;
+    }
+  }
+
+  // Method to add marker click listener
+  addMarkerClickListener() {
+    if (!this.isMarkerClickListenerAdded) {
+      window.addEventListener('marker-click', (event: Event) => this.handleTrackLocationClick(event as CustomEvent));
+      this.isMarkerClickListenerAdded = true;
+    }
   }
 
 
@@ -167,6 +208,8 @@ columns: any;
       console.log("Received saved query:", this.savedQuery);
 
       if(this.savedQuery){
+        this.spinner.show()
+        this.selectedValues = []
         this.editSavedQuery( this.savedQuery)
       }
     });
@@ -181,7 +224,6 @@ columns: any;
           const helpherObj = JSON.parse(result.metadata).advance_report;
           this.adminAccess = helpherObj.includes('All Report ID Access') == true
 
-          console.log("All the form with the permissions are here ",JSON.parse(JSON.parse(result.metadata).dynamicEntries));
           const tempholder = JSON.parse(JSON.parse(result.metadata).dynamicEntries)
 
           this.validForms = tempholder.filter((item:any)=>item.permission.includes('Read') == true)
@@ -403,74 +445,6 @@ multiSelectChange(): void {
 
 
 
-// async onColumnChange(event: any,getValue:any){
-  
-//   console.log('Get value is here ',getValue)
-
-//   let selectedValue
-//   if(getValue == 'html'){
-//     this.selectedValues = []
-//     selectedValue = (event.target as HTMLInputElement).value;
-//   }
-//   else{
-//     selectedValue = event;
-//   }
-
-
-//   if(selectedValue == 'onCondition' && this.populateFormData.length == 0){
-//     this.spinner.show()
-
-//     try{
-//       let tempMetadata:any = []
-//       for(let item of this.selectedForms){
-//         const formName = item
-//         const result = await this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${item}#main`,1)
-
-//         if(result){
-//           let tempResult = JSON.parse(result.metadata || '').formFields
-//           tempMetadata = {}
-//           tempMetadata[item] = tempResult.map((item: any) => {
-//             return { name: item.name, label: item.label , formName:formName};  
-//           });
-//         }
-//         this.populateFormData.push(tempMetadata)
-//       }
-      
-//       console.log("Data to be added in dropdowns ",this.populateFormData);
-//     }
-//     catch(error){
-//       this.spinner.hide()
-//       console.log("Error in fetching form Builder data ",error);
-//     }
-
-//     this.spinner.hide()
-
-//   }
-//   else{
-//     this.visibiltyflag = false
-//   }
-
-
-//   if(selectedValue == 'onCondition'){
-//     this.visibiltyflag = true
-
-//     this.dropdownKeys = this.populateFormData.map((item: {}) => Object.keys(item)[0]);
-
-//     if(getValue == 'html'){
-//       this.selectedItem = new Array(this.dropdownKeys.length).fill(null);
-//     }
-   
-
-//     console.log("Selected Dropdown values are ",this.selectedValues);
-//     console.log("Dropdown keys are here ",this.dropdownKeys);
-//   }
- 
-
-//  this.cd.detectChanges()
-  
-// }
-
-
 
 
 get formDataSelected(): FormArray {
@@ -479,20 +453,34 @@ get formDataSelected(): FormArray {
 
 async onColumnChange(event: any, getValue: string): Promise<void> {
 
-  this.reportsFeilds.get('columnOption')?.patchValue('onCondition')
-  console.log('Get value is here ', getValue);
 
   let selectedValue: any;
 
-  // Determine how to get the selected value based on 'getValue'
-  if (getValue === 'html') {
+   // Determine how to get the selected value based on 'getValue'
+   if (getValue === 'html') {
     selectedValue = (event.target as HTMLInputElement).value;
   } else {
     selectedValue = event;
   }
 
+
+
+  if(selectedValue == "all"){
+    this.reportsFeilds.get('columnOption')?.patchValue('all')
+    this.visibiltyflag = false
+    return
+  }
+
+
+  this.reportsFeilds.get('columnOption')?.patchValue('onCondition')
+  console.log('Get value is here ', this.selectedValues);
+
+
+
+ 
+
   // Handle case when selected value is 'onCondition' and populate dropdown data
-  if (selectedValue === 'onCondition' && this.populateFormData.length === 0) {
+  if ((selectedValue === 'onCondition' && this.populateFormData.length === 0) || this.selectedValues) {
     this.spinner.show();
     try {
       let tempMetadata: any = [];
@@ -591,26 +579,37 @@ getFormControl(index: number): FormControl {
 
 async onFilterChange(event: any,getValue:any) {
 
-
-  this.reportsFeilds.get('filterOption')?.patchValue('onCondition')
-
-  if (this.selectedForms.length == 0) {
-    Swal.fire({
-        title: "Oops!",
-        text: "You need to select at least one form before to add conditions. Please select the forms to continue.",
-        icon: "warning",
-        confirmButtonText: "Got it"
-    });
-    return;
-}
-  
-let selectedValue
+  let selectedValue
   if(getValue == 'html'){
     selectedValue = (event.target as HTMLInputElement).value;
   }
   else{
     selectedValue = event;
   }
+
+  if(selectedValue == "all"){
+    this.reportsFeilds.get('filterOption')?.patchValue('all')
+    this.conditionflag = false
+    return
+  }
+
+
+  if (Array.isArray(this.selectedForms) == false || (this.selectedForms.length == 0 && selectedValue == "onCondition")) {
+    Swal.fire({
+        title: "Oops!",
+        text: "You need to select at least one form before to add conditions. Please select the forms to continue.",
+        icon: "warning",
+        confirmButtonText: "Got it"
+    });
+
+    this.reportsFeilds.get('filterOption')?.patchValue('all')
+   
+
+    return;
+  }
+
+
+  this.reportsFeilds.get('filterOption')?.patchValue('onCondition')
   
  
 
@@ -627,9 +626,11 @@ let selectedValue
 
         if(result){
           let tempResult = JSON.parse(result.metadata || '').formFields
+          console.log("tempResult is ",tempResult);
+
           tempMetadata = {}
           tempMetadata[item] = tempResult.map((item: any) => {
-            return { name: item.name, label: item.label,  formName:formName };  
+            return { name: item.name, label: item.label,  formName:formName ,options:item.options , type:item.type , validation:item.validation};  
           });
         }
         this.populateFormBuilder.push(tempMetadata)
@@ -658,6 +659,188 @@ let selectedValue
       const formFields = this.populateFormBuilder.find((form: { [x: string]: any; }) => form[formName]);
       return formFields ? formFields[formName] : [];
     }
+
+
+    isDropdown(formIndex: number,index:any): boolean {
+      try{
+        const selectedField = this.forms().at(formIndex).get('conditions')?.value[index]?.condition; 
+        const formName = this.getFormNameByIndex(formIndex);
+        const formFields = this.populateFormBuilder.find((form: { [key: string]: any }) => form[formName]);
+        const field = formFields[formName].find((f: { name: string }) => f.name === selectedField);
+        return field?.type === 'select';
+      }
+
+      catch(error){
+        console.log("Error in dynamic dropdown ");
+        return false
+      }
+    }
+  
+
+
+    private optionsCache = new Map<string, Observable<any[]>>();
+    private destroy$ = new Subject<void>();
+    
+    getAvailableFieldOptions(formIndex: number, condIndex: any): Observable<any[]> {
+      const selectedField = this.forms().at(formIndex).get('conditions')?.value[condIndex]?.condition;
+      const formName = this.getFormNameByIndex(formIndex);
+      
+      // Create a unique cache key
+      const cacheKey = `${formName}-${selectedField}`;
+    
+      // Return cached value if exists
+      if (this.optionsCache.has(cacheKey)) {
+        return this.optionsCache.get(cacheKey)!;
+      }
+    
+      // Get field configuration
+      const formFields = this.populateFormBuilder.find(
+        (form: { [key: string]: any }) => form[formName]
+      );
+      const field = formFields[formName].find(
+        (f: { name: string }) => f.name === selectedField
+      );
+    
+      // Create the observable
+      const options$ = new Observable<any[]>(observer => {
+        if (!field) {
+          observer.next([]);
+          observer.complete();
+          return;
+        }
+    
+        if (field.validation && field.validation?.user === true) {
+          const lookupKey = `${this.SK_clientID}#user#lookup`;
+    
+          console.log("User list dropdown is here ");
+    
+          // Make API call and transform result
+          from(this.fetchUserLookupdata(1, lookupKey)).pipe(
+            map((result: any) => {
+              if (result) {
+                console.log("Users List is ", result);
+                return Array.from(new Set(result.map((item: any) => item.P1)));
+              }
+              return [];
+            }),
+            catchError(error => {
+              console.error('Error fetching users:', error);
+              return of([]);
+            }),
+            take(1) // Ensure the observable completes after first emission
+          ).subscribe({
+            next: (value) => {
+              observer.next(value);
+              observer.complete();
+            },
+            error: (error) => {
+              observer.error(error);
+            }
+          });
+        }
+    
+        else if (field.validation?.lookup === true && field.validation?.form) {
+          const lookupKey = `${this.SK_clientID}#${field.validation.form}#lookup`;
+    
+          // Make API call and transform result
+          from(this.api.GetMaster(lookupKey, 1)).pipe(
+            map(result => {
+              if (result?.options) {
+                const options = JSON.parse(result.options);
+                return this.extractSpecificSingleSelectValue(options, field.validation.field).sort();
+              }
+              return [];
+            }),
+            catchError(error => {
+              console.error('Error fetching options:', error);
+              return of([]);
+            }),
+            take(1) // Ensure the observable completes after first emission
+          ).subscribe({
+            next: (value) => {
+              observer.next(value);
+              observer.complete();
+            },
+            error: (error) => {
+              observer.error(error);
+            }
+          });
+        } else {
+          // Return static options if not a lookup field
+          observer.next(field.options || []);
+          observer.complete();
+        }
+      }).pipe(
+        shareReplay(1), // Cache the last emitted value and share it among all subscribers
+        takeUntil(this.destroy$) // Make sure to unsubscribe on destroy
+      );
+    
+      // Store in cache
+      this.optionsCache.set(cacheKey, options$);
+      
+      return options$;
+    }
+    
+    // Clear cache when form field changes
+    onFieldChange(formIndex: number, condIndex: number) {
+      const selectedField = this.forms().at(formIndex).get('conditions')?.value[condIndex]?.condition;
+      const formName = this.getFormNameByIndex(formIndex);
+      const cacheKey = `${formName}-${selectedField}`;
+      this.optionsCache.delete(cacheKey);
+    }
+    
+    // Template helper to track by option value
+    trackByOption(index: number, option: any): any {
+      return option;
+    }
+    
+  
+
+
+
+    extractSpecificSingleSelectValue = (options: string[][],valueFilter:any): string[] => {
+      const specificSingleSelectArray: string[] = [];
+      
+      options.forEach(optionGroup => {
+        optionGroup.forEach(option => {
+          if (option.includes(valueFilter) && option.includes('#')) {  // Checking for exact match
+            specificSingleSelectArray.push(option.split('#')[1]);
+          }
+        });
+      });
+    
+      return specificSingleSelectArray;
+    };
+
+  //   selectedField(event:any,formIndex:any){
+  //     console.log("Event is ",event);
+  //     const selectedValue = event.target.value;  // Get the selected field value
+  //     console.log('Selected Field:', selectedValue);
+
+  //     this.updateFieldValueInput(formIndex, selectedValue);
+  //   }
+
+
+
+  // updateFieldValueInput(formIndex: number, selectedField: string): void {
+  
+  //   console.log("Condition Group is here ",this.formFieldsGroup);
+    
+  //   const formName = this.getFormNameByIndex(formIndex);
+  //   console.log("FormName is ",formName);
+  //   const formFields = this.populateFormBuilder.find((form: { [x: string]: any; }) => form[formName]);
+  //   console.log("Form Fields ",formFields);
+  //   const tempFormFields = formFields[formName]
+
+  //   const field = tempFormFields.find((f: { name: string; }) => f.name === selectedField);
+  //   if(field && field.type == 'select'){
+  //       console.log("Dropdown found here ");
+
+  //     } else {
+       
+  //     }
+  // }
+
 
 
   formFieldsGroup: FormGroup;
@@ -700,7 +883,24 @@ let selectedValue
   
     conditions.forEach((condition: { operator: any; condition: any; value: any; operatorBetween: any; }, index: number) => {
       const operator = condition.operator;
-      const formattedCondition = `\${${condition.condition}} ${operator} '${condition.value}'`;
+
+
+      let formattedCondition = ''
+      if(condition.operator == 'includes'){
+        formattedCondition = `\${${condition.condition}}.${operator}('${condition.value}')`;
+      }
+      else if(condition.operator == 'startsWith'){
+        formattedCondition = `\${${condition.condition}}.${operator}('${condition.value}')`;
+      }
+      else if(condition.operator == 'endsWith'){
+        formattedCondition = `\${${condition.condition}}.${operator}('${condition.value}')`;
+      }
+      else{
+        formattedCondition = `\${${condition.condition}} ${operator} '${condition.value}'`;
+      }
+
+
+     
   
    
       conditionString += formattedCondition;
@@ -739,7 +939,8 @@ let selectedValue
 
 
       formMap = this.selectedValues.reduce((acc: { [x: string]: any[]; }, group: { formName: string | number; label: any; }[]) => {
-        group.forEach((item: { formName: string | number; label: any; }) => {
+        
+        group && group.forEach((item: { formName: string | number; label: any; }) => {
             if (!acc[item.formName]) {
                 acc[item.formName] = [];
             }
@@ -834,7 +1035,6 @@ let selectedValue
     }
   
 
-    this.spinner.hide();
     console.log("Data to be populated on Table is ", groupedData);
 
     await this.prepareData(groupedData,formMap);
@@ -871,9 +1071,6 @@ let selectedValue
         let tempArray:any = []
         const conditionalString =  await this.buildConditionString(formConditions[index].conditions)
         for(let data of tempMetaArray){
-
-          console.log("Data before eval is here ",data);
-
           if(await this.evaluateTemplate(conditionalString,data) == true){
             tempArray.push(data)
           }
@@ -894,7 +1091,7 @@ let selectedValue
         rows = rows.map(item => {
           let filteredItem: any = {}; // Initialize the filtered item
           // Loop through the fields in formMap[`${formFilter}`]
-          formMap[`${formFilter}`].forEach((key: string) => {
+          formMap[`${formFilter}`] && formMap[`${formFilter}`].forEach((key: string) => {
             // Check if the row item has the field key and add it to filteredItem
             if (item.hasOwnProperty(key)) {
               filteredItem[key] = item[key];
@@ -921,16 +1118,14 @@ let selectedValue
   
 
       tableDataWithFormFilters.push({ formFilter, rows });
-
-
       index++;
     }
   
 
     this.tableDataWithFormFilters = tableDataWithFormFilters;
-
-
     console.log("Table rows are here ",this.tableDataWithFormFilters);
+    this.spinner.hide()
+
     this.cd.detectChanges()
   }
 
@@ -940,12 +1135,81 @@ isBase64(value: string): boolean {
   const regex = /^data:image\/(png|jpeg|jpg|gif|bmp);base64,/;
   return regex.test(value);
 }
+ 
+
+
+  // createColumnDefs(rowData: any[]): ColDef[] {
+  //   const columns: any = [];
+    
+  //   if (rowData.length > 0) {
+  //     const sampleRow = rowData[0];
+    
+  //     // Add 'formFilter' column manually
+  //     columns.push({
+  //       headerName: 'Form Filter',
+  //       field: 'formFilter',
+  //       flex: 1,
+  //       filter: true,
+  //       minWidth: 150,  // Add a minimum width for the formFilter column
+  //       hide: true
+  //     });
+
+    
+  //     // Iterate through metadata keys to create dynamic columns
+  //     for (let key in sampleRow) {
+
+  //       if (key !== 'formFilter' && key !== 'PK' && key !== 'SK' && key != 'Updated Date') {
+  //         // Check if the value in the row is Base64 (image data)
+  //         const isBase64Image = this.isBase64(sampleRow[key]);
+  //         const isLocation = this.isLocation(key,sampleRow[key]);
+
+
+  //         // Choose renderer based on condition
+  //           let cellRenderer = null;
+  //           if (isBase64Image) {
+  //             cellRenderer = this.imageCellRenderer;
+  //           } else if (isLocation) {
+  //             cellRenderer = this.locationCellRenderer;
+  //           }
   
+  //         columns.push({
+  //           headerName: this.formatHeaderName(key), // Format the header name
+  //           field: key,
+  //           flex: 1,            // Allow the column to flex (resize relative to others)
+  //           minWidth: 150,   
+  //           filter: true,       // Enable filtering for this column
+  //           sortable: true,     // Enable sorting for this column
+  //           cellRenderer: cellRenderer, // Apply custom cellRenderer for Base64 images
+  //           cellRendererParams: {
+  //             context: this  // Pass the component context to the cell renderer
+  //           }
+  //         });
+  //       }
+  //     }
+  
+  //     // Check if 'updatedDate' field exists and sort it
+  //     if (sampleRow.hasOwnProperty('Updated Date')) {
+  //       columns.push({
+  //         headerName: 'Updated Date',
+  //         field: 'Updated Date',
+  //         flex: 1,
+  //         filter: 'agDateColumnFilter',  // Use date filter
+  //         sortable: true,
+  //         minWidth: 200,  // Customize width
+  //         sort: 'desc',   // Set default sort order to descending (latest first)
+  //       });
+  //     }
+
+  //   }
+  
+  //   return columns;
+  // }
+
   createColumnDefs(rowData: any[]): ColDef[] {
-    const columns:any = [];
+    const columns: any = [];
   
     if (rowData.length > 0) {
-
+      // Check columns based on actual data across all rows
       const sampleRow = rowData[0];
   
       // Add 'formFilter' column manually
@@ -954,37 +1218,129 @@ isBase64(value: string): boolean {
         field: 'formFilter',
         flex: 1,
         filter: true,
-        minWidth: 150,  // Add a minimum width for the formFilter column
+        minWidth: 150,
         hide: true
       });
   
-      // Iterate through metadata keys to create dynamic columns
-      for (let key in sampleRow) {
-        if (key !== 'formFilter' && key !== 'PK' && key !== 'SK') {
-          // Check if the value in the row is Base64 (image data)
-          const isBase64Image = this.isBase64(sampleRow[key]);
-
-
-        
-          
+      // Iterate through all rows to identify potential dynamic columns (e.g., Base64 images or locations)
+      const dynamicColumns = this.getDynamicColumns(rowData);
+  
+      // Merge static columns with dynamic columns
+      for (let key in dynamicColumns) {
+        if (key !== 'formFilter' && key !== 'PK' && key !== 'SK' && key != 'Updated Date') {
+          const { isBase64Image, isLocation, isTrackLocation } = dynamicColumns[key];
+  
+          // Choose renderer based on conditions
+          let cellRenderer = null;
+          if (isBase64Image) {
+            cellRenderer = this.imageCellRenderer;
+          } else if (isLocation) {
+            cellRenderer = this.locationCellRenderer;
+          } else if (isTrackLocation) {
+            cellRenderer = this.trackLocationCellRenderer;
+          }
+  
           columns.push({
-            headerName: this.formatHeaderName(key), // Format the header name
+            headerName: this.formatHeaderName(key),
             field: key,
-            flex: 1,            // Allow the column to flex (resize relative to others)
-            minWidth: 150,   
-            filter: true,       // Enable filtering for this column
-            sortable: true,     // Enable sorting for this column
-            cellRenderer: isBase64Image ? this.imageCellRenderer : null, // Apply custom cellRenderer for Base64 images
+            flex: 1,
+            minWidth: 150,
+            filter: true,
+            sortable: true,
+            cellRenderer: cellRenderer,
             cellRendererParams: {
-              context: this  // Pass the component context to the cell rendere
+              context: this  // Ensure context is passed correctly to the renderer
             }
           });
         }
+      }
+  
+      // Check if 'Updated Date' field exists and sort it
+      if (sampleRow.hasOwnProperty('Updated Date')) {
+        columns.push({
+          headerName: 'Updated Date',
+          field: 'Updated Date',
+          flex: 1,
+          filter: 'agDateColumnFilter',
+          sortable: true,
+          minWidth: 200,
+          sort: 'desc',
+        });
       }
     }
   
     return columns;
   }
+  
+  getDynamicColumns(rowData: any[]): any {
+    const dynamicColumns: any = {};
+  
+    // Iterate through all rows and identify dynamic columns based on data presence
+    rowData.forEach(row => {
+      for (let key in row) {
+        // Check if the column is Base64 image, location, or TrackLocation
+        const isBase64Image = this.isBase64(row[key]);
+        const isLocation = this.isLocation(key, row[key]);
+        const isTrackLocation = this.isTrackLocation(key,row[key]);
+  
+        if (!dynamicColumns[key]) {
+          dynamicColumns[key] = { isBase64Image, isLocation, isTrackLocation };
+        } else {
+          // If the column already exists, just update the state (no need to overwrite)
+          dynamicColumns[key].isBase64Image = dynamicColumns[key].isBase64Image || isBase64Image;
+          dynamicColumns[key].isLocation = dynamicColumns[key].isLocation || isLocation;
+          dynamicColumns[key].isTrackLocation = dynamicColumns[key].isTrackLocation || isTrackLocation;
+        }
+      }
+    });
+  
+    return dynamicColumns;
+  }
+  
+
+  isTrackLocation(key:any,value: any): boolean {
+    return key == 'trackLocation' && Array.isArray(value) && value.every(coord => coord.latitude !== null && coord.longitude !== null);
+  }
+
+
+      trackLocationCellRenderer(params: any) {
+
+        // console.log("Params are here ",params);
+
+        if(params && params.value){
+          const coordinates = params.value; 
+        
+            // Create a clickable link for the location
+            const link = document.createElement('a');
+            link.href = 'javascript:void(0)';
+            link.innerHTML = coordinates;
+
+            // Add click event listener to dispatch a custom event
+            link.addEventListener('click', () => {
+                // Dispatch a custom event with location data
+                const event = new CustomEvent('marker-click', {
+                    detail: { coordinates: coordinates }
+                });
+                window.dispatchEvent(event);
+            });
+
+            return link;
+        }
+
+        return null
+      }
+
+
+      isLocation(key: any,getValue:any){
+        if(key == 'Geographic Location' && getValue.includes(',')){
+          return true
+        }
+        return false
+      }
+
+
+ 
+
   
 
 
@@ -1000,12 +1356,77 @@ isBase64(value: string): boolean {
     return `<img src="${imageBase64}" style="max-width: 100%; max-height: 100px;cursor: pointer;" class="image-click" onclick="window.dispatchEvent(new CustomEvent('image-click', { detail: '${imageBase64}' }))" />`;
   }
 
+  locationCellRenderer(params: any) {
+
+    // Ensure the value is a comma-separated string of latitude and longitude
+    const coordinates = typeof params.value == 'string' ? params.value.split(','):"";
+    const lat = coordinates[0];  // First part is latitude
+    const lon = coordinates[1];  // Second part is longitude
+
+    // If latitude and longitude are missing, default to 'No Location'
+    const locationText = lat && lon ? `${lat}, ${lon}` : 'No Location';
+
+    // Create a clickable link for the location
+    const link = document.createElement('a');
+    link.href = 'javascript:void(0)';
+    link.innerHTML = locationText;
+
+    // Add click event listener to dispatch a custom event
+    link.addEventListener('click', () => {
+        // Dispatch a custom event with location data
+        const event = new CustomEvent('location-click', {
+            detail: { latitude: lat, longitude: lon }
+        });
+        window.dispatchEvent(event);
+    });
+
+    return link;
+}
+
 
 
   // This method opens the modal and passes the imageBase64 string
   openImageModal(imageBase64: string) {
     const modalRef = this.modalService.open(ImageModalComponent);
     modalRef.componentInstance.imageSrc = imageBase64;  // Pass the Base64 string to the modal component
+  }
+
+
+
+
+   // This function will be called when the location-click event is fired
+   handleLocationClick(event: CustomEvent) {
+    console.log("Event ",event);
+
+    const { latitude, longitude } = event.detail;
+    console.log('Location clicked:', latitude, longitude);
+    
+    // Open the modal with the location data
+    this.openLocationModal(latitude, longitude);
+  }
+
+
+  handleTrackLocationClick(event: CustomEvent) {
+    console.log("Event Marker",event);
+
+    const { coordinates } = event.detail;
+    
+    // Open the modal with the location data
+    this.openTrackLocationModal(coordinates);
+  }
+
+
+  openTrackLocationModal(lat: string) {
+    const modalRef = this.modalService.open(MapModalComponent, { size: 'lg' });
+    modalRef.componentInstance.coordinates = lat;
+  }
+
+
+
+  openLocationModal(lat: string, lon: string) {
+    const modalRef = this.modalService.open(MapModalComponent, { size: 'lg' });
+    modalRef.componentInstance.latitude = lat;
+    modalRef.componentInstance.longitude = lon;
   }
 
  
@@ -1050,12 +1471,17 @@ isBase64(value: string): boolean {
     this.visibiltyflag = false
     this.savedQuery = ''
 
+    this.selectedValues = []
+
     if(this.modalName == 'Reports'){
       this.router.navigate(['/reportStudio']);
     }
 
     this.cd.detectChanges()
   }
+
+
+
 
    async evaluateTemplate(template:any,metadata:any) {
     // Use regex to match variable-value pairs
@@ -1075,7 +1501,6 @@ isBase64(value: string): boolean {
 
     // Evaluate the expression safely
     try {
-        console.log("Template is here ",template);
         const result = eval(template);
         return result;
     } catch (error) {
@@ -1091,13 +1516,21 @@ isBase64(value: string): boolean {
 }
 
 
+
+
+
   async mapLabels(responses:any, metadata:any) {
     const mappedResponses = responses.map((response: any) => {
       const mappedResponse = { ...response };
   
       metadata.forEach((field: { name: any; label: any; }) => {
         const fieldName = field.name;   
-        const label = field.label;      
+        const label = field.label;
+        
+        
+        //Merge Both Latitude and longitude
+        this.mergeAndAddLocation(mappedResponse)
+
   
         if (mappedResponse.hasOwnProperty(fieldName)) {
           // If the field name contains 'signature', process as an image
@@ -1111,6 +1544,9 @@ isBase64(value: string): boolean {
           mappedResponse[label] = 'N/A';
         }
       });
+
+       
+
   
       if (mappedResponse.hasOwnProperty('created_time')) {
         const createdDate = new Date(mappedResponse.created_time);
@@ -1128,32 +1564,25 @@ isBase64(value: string): boolean {
   
       if (mappedResponse.hasOwnProperty('dynamic_table_values')) {
         delete mappedResponse.dynamic_table_values;
-        // const dynamicTables = mappedResponse.dynamic_table_values;
-        // Object.keys(dynamicTables).forEach(tableKey => {
-        //   const dynamicTable = dynamicTables[tableKey];
-  
-        //   if (Array.isArray(dynamicTable) && dynamicTable.length > 0) {
-        //     // Extract the headers (keys of the first object) and rows (values of the objects)
-        //     const dynamicHeaders = Object.keys(dynamicTable[0]);
-        //     const dynamicRows = dynamicTable.map(row =>
-        //       dynamicHeaders.map(header => row[header])
-        //     );
-  
-        //     // Structure the dynamic table
-        //     mappedResponse[tableKey] = {
-        //       headers: dynamicHeaders,
-        //       rows: dynamicRows
-        //     };
-        //   }
-        // });
-      }
-  
+      }   
       return mappedResponse;
     });
   
     return mappedResponses;
   }
 
+
+// Helper function to merge latitude and longitude into 'location'
+mergeAndAddLocation(mappedResponse: any) {
+  const latitudeKey = Object.keys(mappedResponse).find(key => key.toLowerCase().includes('latitude'));
+  const longitudeKey = Object.keys(mappedResponse).find(key => key.toLowerCase().includes('longitude'));
+
+  if (latitudeKey && longitudeKey && mappedResponse[latitudeKey] && mappedResponse[longitudeKey]) {
+    mappedResponse['Geographic Location'] = `${mappedResponse[latitudeKey]},${mappedResponse[longitudeKey]}`;
+    delete mappedResponse[latitudeKey];
+    delete mappedResponse[longitudeKey];
+  }
+}
 
 
   saveQuery(content: TemplateRef<any>){
@@ -1344,11 +1773,7 @@ isBase64(value: string): boolean {
 
       console.log("Edit si being called");
 
-      this.populateFormData= []
-
-
-      this.spinner.show()
-     
+      this.populateFormData= []     
       
       try{
        this.api.GetMaster(`${this.SK_clientID}#savedquery#${P1}#main`,1).then(async (result)=>{
@@ -1357,7 +1782,7 @@ isBase64(value: string): boolean {
  
           this.tempResHolder.reportMetadata = JSON.parse(this.tempResHolder.reportMetadata)
           this.tempResHolder.conditionMetadata = JSON.parse(this.tempResHolder.conditionMetadata).forms
-          this.tempResHolder.columnVisibility = JSON.parse(this.tempResHolder.columnVisibility)
+          this.tempResHolder.columnVisibility = this.tempResHolder && this.tempResHolder.columnVisibility && JSON.parse(this.tempResHolder.columnVisibility)
            this.editSavedDataArray = this.tempResHolder
  
            console.log("Result for the edit is here ",this.tempResHolder);
@@ -1375,18 +1800,21 @@ isBase64(value: string): boolean {
              daysAgo:reportMetadata.daysAgo ,
              form_permission:reportMetadata.form_permission , 
              filterOption:reportMetadata.filterOption ,
+             columnOption:reportMetadata.columnOption
            })        
            
            this.selectedItem = []
 
-            this.selectedValues = JSON.parse(JSON.stringify(columnVisibility))
+            if(columnVisibility){
+              this.selectedValues = JSON.parse(JSON.stringify(columnVisibility))
+            }
+          
            
             
 
             console.log("Star selected ",this.selectedValues);
-            console.log("Star selected orginal",this.editSavedDataArray.columnVisibility);
              
-           if(Array.isArray(this.selectedValues) && this.selectedValues.length > 0){
+           if(reportMetadata.columnOption != 'all' && Array.isArray(this.selectedValues) && this.selectedValues.length > 0){
              this.visibiltyflag = true
            }
  
@@ -1407,7 +1835,7 @@ isBase64(value: string): boolean {
            else{
               this.conditionflag = false
            }
-           if(reportMetadata.columnOption != 'all'){
+           if(this.selectedValues != undefined && Array.isArray(this.selectedValues) && this.selectedValues.length > 0 && reportMetadata.columnOption != 'all'){
 
             this.reportsFeilds.get('form_data_selected')?.patchValue([])
 
@@ -1418,18 +1846,16 @@ isBase64(value: string): boolean {
            else{
             this.visibiltyflag = false
            }
+
+           this.onSubmit()
+           this.onSubmitFlag = false
+           this.dismissModal1(this.modalRef);
+  
+         
          }
-         this.onSubmit()
-         this.spinner.hide()
-         this.onSubmitFlag = false
-         this.dismissModal1(this.modalRef);
-
-         this.cd.detectChanges()
-
-      
        })
-
-      
+       this.spinner.hide()
+       this.cd.detectChanges()
      
       }
       catch(error){
@@ -1476,6 +1902,12 @@ isBase64(value: string): boolean {
       console.log('Component destroyed!');
       // Perform any cleanup here
       // e.g., unsubscribe from observables or clear any data
+      // window.removeEventListener('location-click', this.handleLocationClick);
+      window.removeEventListener('location-click', (event: Event) => this.handleLocationClick(event as CustomEvent));
+
+      this.destroy$.next();
+      this.destroy$.complete();
+      this.optionsCache.clear();
 
       this.datatableConfig = {}
     }
@@ -1531,6 +1963,8 @@ isBase64(value: string): boolean {
             this.original_lookup_data = this.lookup_data_savedQuery
 
             this.listofSavedIds = this.lookup_data_savedQuery.map((item:any)=>item.P1)
+
+            console.log("All the unique IDs are here ",this.listofSavedIds);
 
             this.lookup_data_savedQuery = this.lookup_data_savedQuery.map((item: any) => {
               if (item.P2 && item.P2.username === this.username) {

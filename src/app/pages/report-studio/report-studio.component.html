@@ -141,6 +141,9 @@
                     <option value="" disabled selected>Select operator</option>
                     <option value="==">Equals</option>
                     <option value=">">Not equals</option>
+                    <option value="includes">Contains</option>
+                    <option value="startsWith">Starts with</option>
+                    <option value="endsWith">Ends with</option>
                     <option value=">">Greater than</option>
                     <option value="<">Less than</option>
                     <option value="<=">Less than equals to</option>
@@ -148,10 +151,72 @@
                   </select>
                 </div>
       
-                <div class="mb-3" style="width: 30%;">
+                <!-- <div class="mb-3" style="width: 30%;">
                   <label class="required">Value</label>
                   <input type="text" formControlName="value" placeholder="value"  class="form-control" />
-                </div>
+                </div> -->
+
+
+
+          <!-- Conditionally Render Value Field: Input or Dropdown -->
+          <!-- <div class="mb-3" style="width: 30%;">
+            <label class="required">Value</label>
+            
+  
+            <ng-container *ngIf="isDropdown(formIndex,condIndex)">
+              <select formControlName="value" class="form-control">
+                <option *ngFor="let option of getAvailableFieldOptions(formIndex,condIndex) | async" [value]="option">{{ option }}</option>
+              </select>
+            </ng-container>
+            
+
+            <ng-container *ngIf="!isDropdown(formIndex,condIndex)">
+              <input type="text" formControlName="value" placeholder="Enter value" class="form-control" />
+            </ng-container>
+          </div> -->
+
+
+
+          <div class="mb-3" style="width: 30%;">
+            <label class="required">Value</label>
+            
+            <ng-container *ngIf="isDropdown(formIndex,condIndex)">
+              <select 
+                formControlName="value" 
+                class="form-control"
+                (change)="onFieldChange(formIndex, condIndex)"
+              >
+                <option value="" disabled>Select an option</option>
+                <ng-container *ngIf="getAvailableFieldOptions(formIndex,condIndex) | async as options; else loading">
+                  <option 
+                    *ngFor="let option of options; trackBy: trackByOption" 
+                    [value]="option"
+                  >
+                    {{ option }}
+                  </option>
+                </ng-container>
+                <ng-template #loading>
+                  <option disabled>Loading...</option>
+                </ng-template>
+              </select>
+            </ng-container>
+
+
+
+            
+            <ng-container *ngIf="!isDropdown(formIndex,condIndex)">
+              <input 
+                type="text" 
+                formControlName="value" 
+                placeholder="Enter value" 
+                class="form-control" 
+              />
+            </ng-container>
+          </div>
+            
+
+
+
               </div>
 
 
@@ -288,7 +353,8 @@
         [columnDefs]="createColumnDefs(table.rows)" 
         [domLayout]="'autoHeight'"  
         [pagination]="true"
-        [paginationPageSize]="10" 
+        [paginationPageSize]="10"
+        [paginationPageSizeSelector]="pageSizeOptions"
         [suppressHorizontalScroll]="false" 
         > 
       </ag-grid-angular>
@@ -321,7 +387,7 @@
               <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
 
 
-                <app-saved-query [editOperation]="showHeading" [savedModulePacket]="savedModulePacket" (closeModal)="dismissModal(modal)"></app-saved-query> 
+                <app-saved-query [editOperation]="showHeading" [savedModulePacket]="savedModulePacket" [listofSavedIds]="listofSavedIds" (closeModal)="dismissModal(modal)"></app-saved-query> 
 
               </div>
             </div>

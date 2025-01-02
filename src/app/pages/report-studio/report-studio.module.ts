@@ -16,6 +16,8 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { MatMenuModule } from "@angular/material/menu";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import { GoogleMapsModule } from '@angular/google-maps';
+import { DropdownModule } from "primeng/dropdown";
 
 
 const routes: Routes = [
@@ -38,6 +40,7 @@ const routes: Routes = [
     NgMultiSelectDropDownModule,
     NgbNavModule,
     NgbDropdownModule,
+    DropdownModule,
     NgbCollapseModule,
     NgbTooltipModule,
     NgbModule,
@@ -49,6 +52,7 @@ const routes: Routes = [
     MatIconModule,
     MatMenuModule,
     MatTooltipModule,
+    GoogleMapsModule
 ]
 })
 export class ReportStudioModule { }
