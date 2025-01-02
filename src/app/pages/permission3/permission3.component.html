@@ -202,8 +202,8 @@
                                 </ng-multiselect-dropdown>
                             </div>
                         </div>
-                        <!-- <div class="col-md-4 mb-6">
-                            <label class="fw-semibold fs-6 mb-2">Powerboard ID</label>
+                        <div class="col-md-4 mb-6">
+                            <label class="fw-semibold fs-6 mb-2">Advance Report Permission</label>
                             <div class="custom-multiselect">
                                 <ng-multiselect-dropdown style="
                                           display: inline-block; 
@@ -219,12 +219,35 @@
                                           border-radius: 4px;
                                           
                                           " class="form-select form-select-solid form-select"
-                                    [placeholder]="'Select powerboard Id'" [settings]="dropdownSettings"
-                                    [data]="powerboardId" name="powerboardId"
-                                    [formControl]="$any(permissionForm.controls['powerboardId'])">
+                                    [placeholder]="'Select report permission'" [settings]="dropdownSettings"
+                                    [data]="advance_report" name="advance_report"
+                                    [formControl]="$any(permissionForm.controls['advance_report'])">
                                 </ng-multiselect-dropdown>
                             </div>
-                        </div> -->
+                        </div>
+                        <div class="col-md-4 mb-6">
+                            <label class="fw-semibold fs-6 mb-2">User Restriction</label>
+                            <div class="custom-multiselect">
+                                <ng-multiselect-dropdown style="
+                                          display: inline-block; 
+                                          width: 100%;
+                                          padding: 0px ;
+                                          margin-bottom: 0;
+                                          font-weight: 0px;
+                                          line-height: 1.52857143;
+                                          text-align: left;
+                                          vertical-align: middle;
+                                          cursor: pointer;
+                                          background-image: none;
+                                          border-radius: 4px;
+                                          
+                                          " class="form-select form-select-solid form-select"
+                                    [placeholder]="'Select user'" [settings]="dropdownSettings"
+                                    [data]="userList" name="userList"
+                                    [formControl]="$any(permissionForm.controls['userList'])">
+                                </ng-multiselect-dropdown>
+                            </div>
+                        </div>
                         <!-- <div class="col-md-4 mb-6">
                             <label class="fw-semibold fs-6 mb-2">Magicboard ID</label>
                             <div class="custom-multiselect">
@@ -295,6 +318,7 @@
                                     Dynamic Form
                                 </a>
                             </li>
+                           
                         </ul>
                     </div>
                     <div class="card-body">

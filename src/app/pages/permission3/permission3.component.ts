@@ -17,7 +17,7 @@ import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { SharedService } from '../shared.service';
 import { permission } from 'process';
 
-type Tabs = 'Sidebar' | 'Header' | 'Toolbar';
+type Tabs = 'Sidebar' | 'Header' | 'Toolbar' | 'User';
 interface ListItem {
   [key: string]: {
     P1: any;
@@ -125,6 +125,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   dynamic_field: any;
   cloneUserOperation: boolean = false;
   editOperation: boolean;
+  userList: any[]=[];
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -264,6 +265,8 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     await this.fetchmagicboardlookup(1)
 
     await this.fetchFormgrouplookup(1)
+
+    await this.fetchUserList(1)
 
   }
 
@@ -530,6 +533,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       advance_report: [[]],
       powerboardId: [[]],
       magicboardId: [[]],
+      userList:[[]],
       permissionsList: this.fb.array([],Validators.required),
       dynamicEntries: this.fb.array([]),
       dynamicForm: [[]],
@@ -757,6 +761,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
             permissionsList: this.fb.array([]),
             dynamicEntries: this.fb.array([]),
             field: this.data_temp[0].field,
+            userList:[this.data_temp[0].userList],
             fieldValue:this.data_temp[0].fieldValue,
             createdTime: [this.data_temp[0].createdTime],
             updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
@@ -1095,6 +1100,61 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
         this.formgroupIDs.unshift("All");
 
         console.log("All the formgroup Id are here ", this.formgroupIDs);
+
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle the error as needed
+    }
+  }
+
+  async fetchUserList(sk: any) {
+    try {
+      const response = await this.api.GetMaster(this.client + "#user#lookup", sk);
+
+      if (response && response.options) {
+        // Check if response.listOfItems is a string
+        if (typeof response.options === 'string') {
+          let data = JSON.parse(response.options);
+          console.log("d1 =", data)
+          if (Array.isArray(data)) {
+            for (let index = 0; index < data.length; index++) {
+              const element = data[index];
+
+              if (element !== null && element !== undefined) {
+                // Extract values from each element and push them to lookup_data_temp1
+                const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
+                const { P1, P2, P3, P4, P5, P6, P7 } = element[key]; // Extract values from the nested object
+                this.userList.push({ P1, P2, P3, P4, P5, P6, P7 }); // Push an array containing P1, P2, and P3 values
+                console.log("d2 =", this.userList)
+              } else {
+                break;
+              }
+            }
+            //this.lookup_data_temp1.sort((a, b) => b.P5 - a.P5);
+            this.userList.sort((a: any, b: any) => {
+              return b.P4 - a.P4; // Compare P5 values in descending order
+            });
+            console.log("Lookup sorting", this.userList);
+            // Continue fetching recursively
+            await this.fetchUserList(sk + 1);
+          } else {
+            console.error('Invalid data format - not an array.');
+          }
+        } else {
+          console.error('response.listOfItems is not a string.');
+        }
+      } else {
+
+
+        this.userList = this.userList.map((item: any) => item.P1)
+
+        this.userList.unshift("Logged-in User")
+
+
+        this.userList.unshift("All");
+       
+        console.log("All the formgroup Id are here ", this.userList);
 
       }
     } catch (error) {
