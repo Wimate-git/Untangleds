@@ -170,6 +170,7 @@ rdtListWorkAround :any =[{
   tempUserName: string;
   tempUserID: string;
   combinationOfUser: any = [];
+  tempUpdateUser: any;
 
   constructor(private apiService: UserService,private configService:SharedService,private fb:FormBuilder
     ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal,private DynamicApi:DynamicApiService,
@@ -1065,7 +1066,7 @@ rdtListWorkAround :any =[{
         allowOtherCompanyID: this.createUserField.value.allowOtherCompanyID,
         allowNewCompanyID: this.createUserField.value.allowNewCompanyID,
         companyID: companyidTemp,
-        username: this.createUserField.get('userID')?.getRawValue(),
+        username:this.tempUpdateUser,
         description: this.createUserField.value.description,
         mobile: this.createUserField.value.mobile,
         mobile_privacy: this.createUserField.value.mobile_privacy,
@@ -1104,7 +1105,7 @@ rdtListWorkAround :any =[{
       }
 
       tempObj = {
-        PK:this.createUserField.value.username+"#user"+"#main",
+        PK:this.tempUpdateUser+"#user"+"#main",
         SK: 1,
         metadata:JSON.stringify(this.allUserDetails)
       }
@@ -1154,7 +1155,7 @@ rdtListWorkAround :any =[{
 
     const date = Math.ceil(((new Date()).getTime()) / 1000)
   const items ={
-  P1: this.createUserField.value.username,
+  P1: this.tempUpdateUser,
   P2: this.allUserDetails.mobile,
   P3: this.allUserDetails.email,
   P4: this.allUserDetails.permission_ID,
@@ -1167,7 +1168,7 @@ rdtListWorkAround :any =[{
 
 
   const masterUser = {
-    P1:this.createUserField.value.username,
+    P1:this.tempUpdateUser,
     P2:this.allUserDetails.clientID,
     P3:this.allUserDetails.email,
     P5:this.createUserField.value.userID,
@@ -1200,9 +1201,9 @@ rdtListWorkAround :any =[{
 
         if (value) {
 
-          await this.fetchTimeMachineById(1,this.createUserField.value.username, 'update', items);
+          await this.fetchTimeMachineById(1,this.tempUpdateUser, 'update', items);
 
-          await this.fetchAllusersData(1,this.createUserField.value.username,'update',masterUser)
+          await this.fetchAllusersData(1,this.tempUpdateUser,'update',masterUser)
 
           // await this.loading()
           // await this.showTable()
@@ -1262,7 +1263,7 @@ rdtListWorkAround :any =[{
   updateCognitoAttributes() {
 
     let authenticationData = {
-      Username: this.createUserField.value.username,
+      Username: this.tempUpdateUser,
       Password: this.createUserField.value.name,
     };
 
@@ -1275,7 +1276,7 @@ rdtListWorkAround :any =[{
 
 
     let poolDetails: any = {
-      Username: this.createUserField.value.username,
+      Username: this.tempUpdateUser,
       Pool: userPool
     }
 
@@ -1287,7 +1288,7 @@ rdtListWorkAround :any =[{
       'custom:password': this.createUserField.value.name,
       'custom:clientID': this.allUserDetails.clientID,
       'custom:companyID': this.allUserDetails.companyID,
-      'custom:username': this.createUserField.value.username,
+      'custom:username': this.tempUpdateUser,
       'custom:description': this.createUserField.value.description,
       'custom:mobile': JSON.stringify(this.createUserField.value.mobile),
       'custom:mobile_privacy': this.createUserField.value.mobile_privacy,
@@ -2102,6 +2103,8 @@ rdtListWorkAround :any =[{
 
        //[{value:getValues.clientID,disabled:true}]
 
+       this.tempUpdateUser = getValues.username
+
         this.createUserField = this.fb.group({
           'userID': getValues.userID,
           'name': getValues.name,
@@ -2115,7 +2118,7 @@ rdtListWorkAround :any =[{
           'allowOtherCompanyID': getValues.allowOtherCompanyID,
           'allowNewCompanyID': [{value:false,disabled:!this.Allpermission}],
           'companyID': [{value:getValues.clientID,disabled:true}],
-          'username':  getValues.username,
+          'username':  {value:getValues.username,disabled:this.editOperation},
           'description': getValues.description,
           'mobile': getValues.testMobile,
           'mobile_privacy': getValues.mobile_privacy,
