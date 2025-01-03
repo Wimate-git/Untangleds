@@ -52,6 +52,9 @@ import { HttpClient } from '@angular/common/http';
 import { FilterTileConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/filter-tile-config/filter-tile-config.component';
 import { TableWidgetConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/table-widget-config/table-widget-config.component';
 
+import { AgGridAngular } from 'ag-grid-angular';
+import { GridApi ,Column} from 'ag-grid-community';
+
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
 
@@ -88,6 +91,7 @@ interface TreeNode {
   powerboard_view_device: any,
   icon: any;
   chartIdsFromChild1: string[];
+
 
 
   // Optional property for node type
@@ -167,6 +171,11 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   permissionIdLocal: any;
   idInputSubject: any;
   previousValue: string;
+  columnDefs: any;
+  private gridApi!: GridApi;
+  private gridColumnApi!: Column;
+  columnApi: any;
+  rowData: { location: string; 'text-1732683302774': string; '1732683476': string; }[];
 
 
 
@@ -281,6 +290,13 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     };
   Highcharts.chart('lineChart', linechartOptions);
   }
+  onGridReady(params: any): void {
+    this.gridApi = params.api; // Initialize Grid API
+    this.gridColumnApi = params.columnApi; // Initialize Column API
+    params.api.sizeColumnsToFit(); 
+    console.log('Grid API initialized:', this.gridApi); // Debugging
+  }
+  
 
   createBarChart() {
     const barchartOptions: any = {
@@ -415,7 +431,11 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   
 
 
-
+  defaultColDef = {
+    resizable: true, // Allow columns to be resized
+    sortable: true, // Enable sorting
+    filter: true, // Enable filtering
+  };
   openTileModal() {
     const modalElement = this.tileModal.nativeElement;
     const modalInstance = new Modal(modalElement, { backdrop: 'static', keyboard: false });
@@ -1323,6 +1343,18 @@ if(!this.isFullScreen){
     this.fetchLiveContractlookup(1)
     this.fetchContractOrderMasterlookup(1)
     this.permissionIds(1)
+         this.rowData = [
+        {
+          'location': 'India',
+          'text-1732683302774': '+91',
+          '1732683476': '2023-12-31'
+        },
+        {
+          'location': 'USA',
+          'text-1732683302774': '+1',
+          '1732683476': '2023-12-30'
+        }
+      ];
     // const savedFullScreen = localStorage.getItem('isFullScreen');
     // // this.isFullScreen = savedState ? JSON.parse(savedState) : false;
 

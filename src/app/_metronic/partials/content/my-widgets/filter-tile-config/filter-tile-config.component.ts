@@ -591,13 +591,16 @@ console.log('this.conditionsFilter',this.conditionsFilter);
   
       const updatedTile = {
         ...this.dashboard[this.editTileIndex], // Retain existing properties
-  
+        fontSize: `${this.createChart.value.fontSize}px`,
+        fontColor: this.createChart.value.fontColor,
+
         // Update specific properties
         custom_Label:this.createChart.value.custom_Label ,
         dateType: this.createChart.value.dateType || '',
         filterTileConfig: conditionsFilter, // Updated filter configuration
         addFieldsEnabled: this.createChart.value.add_fields || false, // Add fields toggle state
         noOfParams: this.dashboard[this.editTileIndex].noOfParams, // Retain existing parameter count
+        themeColor:this.createChart.value.themeColor,
       };
   
       console.log('updatedTile checking', updatedTile);
@@ -745,6 +748,7 @@ openFilterModal(tile: any, index: number) {
     // Parse the filterTileConfig
     this.parsedfilterTileConfig = JSON.parse(tile.filterTileConfig);
     console.log('this.parsedfilterTileConfig check', this.parsedfilterTileConfig);
+ 
 
     // Initialize form with dynamic bindings
     this.createChart = this.fb.group({
@@ -756,35 +760,21 @@ openFilterModal(tile: any, index: number) {
       dateType: [tile.dateType],
       toggleCheck: [tile.toggleCheck],
       all_fields: this.fb.array([]), // Initialize empty array
-      custom_Label:tile.custom_Label
+      custom_Label: tile.custom_Label,
+      themeColor: [tile.themeColor || ''], // Bind themeColor
     });
 
     const allFieldsArray = this.createChart.get('all_fields') as FormArray;
 
     // Populate all_fields from parsedfilterTileConfig index-wise
-
-
-    console.log('Populated all_fields:', allFieldsArray.controls);
-
-    this.makeTrueCheck = tile.addFieldsEnabled; // Set checkbox state
-    this.isEditMode = true;
-
-    // Call addControls programmatically to handle noOfParams and other updates
-    this.addControls(
-      { target: { checked: tile.addFieldsEnabled } },
-      'html',
-      tile.noOfParams || 0, // Use noOfParams from the tile
-      this.formlistValues
-    );
-
     this.parsedfilterTileConfig.forEach((packet: any[], fieldIndex: number) => {
       const conditionsArray = this.fb.array(
         packet.map((condition: any, conditionIndex: number) =>
           this.fb.group({
-            formField: [condition.formField || '', Validators.required], // Index-wise readback
-            operator: [condition.operator || '', Validators.required], // Index-wise readback
-            filterValue: [condition.filterValue || '', Validators.required], // Index-wise readback
-            operatorBetween: [condition.operatorBetween || '', Validators.required], // Index-wise readback
+            formField: [condition.formField || '', Validators.required],
+            operator: [condition.operator || '', Validators.required],
+            filterValue: [condition.filterValue || '', Validators.required],
+            operatorBetween: [condition.operatorBetween || '', Validators.required],
           })
         )
       );
@@ -799,6 +789,13 @@ openFilterModal(tile: any, index: number) {
       console.log(`Populated field at index ${fieldIndex}:`, allFieldsArray.at(fieldIndex).value);
     });
 
+    // Update the themes array based on tile.themeColor
+    this.themes.forEach(theme => {
+      theme.selected = theme.color === tile.themeColor;
+    });
+
+    console.log('Updated themes:', this.themes);
+
     // Listen for changes in add_fields and update form dynamically
     this.createChart.get('add_fields')?.valueChanges.subscribe((isEnabled) => {
       const noOfParamsControl = this.createChart.get('noOfParams');
@@ -808,6 +805,7 @@ openFilterModal(tile: any, index: number) {
         noOfParamsControl?.disable(); // Disable noOfParams
       }
     });
+    this.isEditMode = true; // Set to edit mode
   } else {
     this.selectedTile = null;
     this.isEditMode = false;
@@ -816,6 +814,7 @@ openFilterModal(tile: any, index: number) {
     }
   }
 }
+
 
 
 
@@ -1349,26 +1348,15 @@ datesUpdatedRange($event: any,index:any): void {
 
 
 
+toggleCheckbox1(theme: any) {
+  // Deselect all themes
+  this.themes.forEach(t => (t.selected = false));
 
-toggleCheckbox1(themeOrEvent: any): void {
-  // If it's a color picker input (e.g., from a custom input field)
-  if (themeOrEvent.target) {
-    this.selectedColor = themeOrEvent.target.value;  // Get the color from the input field
-  } else {
-    // Predefined theme selection (from color boxes)
-    const theme = themeOrEvent;
+  // Select the current theme
+  theme.selected = true;
 
-    // Clear the selected state for all themes (ensure only one is selected)
-    this.themes.forEach(t => t.selected = false);  // Reset selection for all themes
-
-    // Toggle the selection state of the clicked theme
-    theme.selected = true;  // Select the clicked theme
-
-    this.selectedColor = theme.color;  // Set selected color based on the clicked theme
-  }
-
-  // Update the form control with the selected color
-  this.createChart.get('themeColor')?.setValue(this.selectedColor);
+  // Update the form value for themeColor
+  this.createChart.patchValue({ themeColor: theme.color });
 }
 
   onColorChange1(event: Event) {

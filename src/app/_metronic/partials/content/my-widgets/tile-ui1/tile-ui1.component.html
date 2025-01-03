@@ -6,7 +6,7 @@
 
     <!-- Content -->
     <div class="row text_3d" style="display: flex; flex-direction: column; align-items: flex-start;">
-      <div 
+      <div class="processed-value-container"
       [style.font-size]="item.fontSize" 
       [style.color]="item.fontColor"
       style="font-weight: bold; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -26,7 +26,7 @@
         [style.color]="item.fontColor" 
         tabindex="0" 
         style="font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-        <!-- {{ descriptionData || primaryValue}}:{{ item.multi_value[0]?.processed_value }} -->
+        {{ descriptionData || primaryValue}}:{{ item.multi_value[0]?.processed_value }}
       </div>
     </div>
 
