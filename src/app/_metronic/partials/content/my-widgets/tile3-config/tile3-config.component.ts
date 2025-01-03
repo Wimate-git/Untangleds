@@ -188,13 +188,14 @@ export class Tile3ConfigComponent implements OnInit{
       'processed_value2': [''],
       // selectedColor: [this.selectedColor]'
       'themeColor': ['', Validators.required],
-      fontSize: [14, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
+      fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['#000000', Validators.required], 
       dashboardIds:[''],
       selectType:[''],
       filterParameter:[''],
       filterDescription:[''],
-      selectedRangeType:['']
+      selectedRangeType:[''],
+      custom_Label:['',Validators.required]
 
     })
   }
@@ -243,6 +244,7 @@ if (key === 'tile3') {
        filterDescription:this.createKPIWidget2.value.filterDescription,
        selectedRangeType:this.createKPIWidget2.value.selectedRangeType,
        parameterNameRead: this.parameterNameRead, 
+       custom_Label:this.createKPIWidget2.value.custom_Label,
        // Default value, change this to whatever you prefer
        // You can also handle default value for this if needed
 
@@ -358,6 +360,7 @@ if (key === 'tile3') {
         filterParameter: this.createKPIWidget2.value.filterParameter,
         filterDescription: this.createKPIWidget2.value.filterDescription,
         parameterNameRead: this.parameterNameRead,
+        custom_Label:this.createKPIWidget2.value.custom_Label
       };
   
       console.log('Updated tile:', updatedTile);
@@ -613,7 +616,8 @@ edit_Tile3(tile?: any, index?: number) {
         selectType:tile.selectType,
         filterParameter:tile.filterParameter,
         filterDescription:tile.filterDescription,
-        selectedRangeType:tile.selectedRangeType
+        selectedRangeType:tile.selectedRangeType,
+        custom_Label:tile.custom_Label
 
       });
 

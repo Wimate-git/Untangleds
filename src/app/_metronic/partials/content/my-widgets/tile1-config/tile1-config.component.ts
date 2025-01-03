@@ -185,7 +185,8 @@ export class Tile1ConfigComponent implements OnInit {
       selectType: [''],
       filterParameter: [[]], // Initialize as an array to handle multiple or single values
       filterDescription: [''],
-      formatType:['']
+      formatType:[''],
+      custom_Label:['',Validators.required]
     });
   }
   
@@ -392,6 +393,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         fontSize: `${this.createKPIWidget.value.fontSize}px`,
         fontColor: this.createKPIWidget.value.fontColor,
         formatType: this.createKPIWidget.value.formatType,
+        custom_Label:this.createKPIWidget.value.custom_Label,
         multi_value: [
           {
             value: this.createKPIWidget.value.primaryValue,
@@ -486,6 +488,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         filterDescription: this.createKPIWidget.value.filterDescription,
         parameterNameRead: this.parameterNameRead,
         formatType: this.createKPIWidget.value.formatType,
+        custom_Label:this.createKPIWidget.value.custom_Label,
       };
   
       console.log('Updated tile:', updatedTile);
@@ -796,6 +799,7 @@ openKPIModal(tile: any, index: number) {
       filterParameter: tile.filterParameter, // Always an array
       filterDescription: tile.filterDescription,
         formatType:tile.formatType,
+        custom_Label:tile.custom_Label
 
     });
 

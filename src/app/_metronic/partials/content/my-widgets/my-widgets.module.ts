@@ -48,6 +48,12 @@ import { CustomInfoUiComponent } from './custom-info-ui/custom-info-ui.component
 import { CloneDashboardComponent } from './clone-dashboard/clone-dashboard.component';
 import { DynamicTileUiComponent } from './dynamic-tile-ui/dynamic-tile-ui.component';
 import { DynamicTileConfigComponent } from './dynamic-tile-config/dynamic-tile-config.component';
+import { FilterTileUiComponent } from './filter-tile-ui/filter-tile-ui.component';
+import { FilterTileConfigComponent } from './filter-tile-config/filter-tile-config.component';
+import { TableWidgetUiComponent } from './table-widget-ui/table-widget-ui.component';
+import { TableWidgetConfigComponent } from './table-widget-config/table-widget-config.component';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { AgGridAngular } from 'ag-grid-angular';
 
 
 
@@ -75,11 +81,17 @@ import { DynamicTileConfigComponent } from './dynamic-tile-config/dynamic-tile-c
     CustomInfoUiComponent,
     CloneDashboardComponent,
     DynamicTileUiComponent,
-    DynamicTileConfigComponent
+    DynamicTileConfigComponent,
+    FilterTileUiComponent,
+    FilterTileConfigComponent,
+    TableWidgetUiComponent,
+    TableWidgetConfigComponent
+
 
 
   ],
   imports: [
+    AgGridAngular,
     CommonModule,
     MatMenuModule,
     NgxDaterangepickerBootstrapModule.forRoot(),
@@ -105,6 +117,8 @@ import { DynamicTileConfigComponent } from './dynamic-tile-config/dynamic-tile-c
     NgxSpinnerModule,
     MatTooltipModule,
     NgbTooltipModule,
+    MultiSelectModule,
+  
   ],
   exports:[
 
@@ -136,7 +150,11 @@ import { DynamicTileConfigComponent } from './dynamic-tile-config/dynamic-tile-c
     CustomInfoUiComponent,
     CloneDashboardComponent,
     DynamicTileUiComponent,
-    DynamicTileConfigComponent
+    DynamicTileConfigComponent,
+    FilterTileUiComponent,
+    FilterTileConfigComponent,
+    TableWidgetUiComponent,
+    TableWidgetConfigComponent
   
 
     

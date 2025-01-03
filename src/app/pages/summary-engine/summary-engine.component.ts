@@ -49,6 +49,9 @@ import { Chart5ConfigComponent } from 'src/app/_metronic/partials/content/my-wid
 import { CloneDashboardComponent } from 'src/app/_metronic/partials/content/my-widgets/clone-dashboard/clone-dashboard.component';
 import { DynamicTileConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/dynamic-tile-config/dynamic-tile-config.component';
 import { HttpClient } from '@angular/common/http';
+import { FilterTileConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/filter-tile-config/filter-tile-config.component';
+import { TableWidgetConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/table-widget-config/table-widget-config.component';
+
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
 
@@ -134,6 +137,9 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   @ViewChild('summaryModal') summaryModal!: TemplateRef<any>;
   @ViewChild(DynamicTileConfigComponent, { static: false }) DynamicTileConfigComponent: DynamicTileConfigComponent;
   @ViewChild(CloneDashboardComponent, { static: false }) CloneDashboardComponent: CloneDashboardComponent;
+  @ViewChild(FilterTileConfigComponent, { static: false }) FilterTileConfigComponent: FilterTileConfigComponent;
+  @ViewChild(TableWidgetConfigComponent, { static: false }) TableWidgetConfigComponent: TableWidgetConfigComponent;
+  
  
   
 
@@ -738,6 +744,8 @@ if(!this.isFullScreen){
   loading: boolean = false;
   showTitleGrid: boolean;
   showDynamicTileGrid:boolean
+  showFilterGrid:boolean
+  showTableGrid:boolean
   showChartGrid:boolean;
   editTitleIndex: number | null;
   isDuplicateID: boolean = false;
@@ -1559,6 +1567,9 @@ processFetchedData(result: any): void {
     { value: 'Title', label: 'Title' },
     { value: 'Chart', label: 'Chart' },
     { value: 'DynamicTile', label: 'DynamicTile' },
+    {value:'FilterTile',label:'FilterTile'},
+    {value:'TableTile',label:'TableTile'}
+
     
 
     // { value: 'Pharagraph', label: 'Pharagraph' },
@@ -1575,12 +1586,17 @@ processFetchedData(result: any): void {
 
 
       // Update visibility based on the selected tile
-      this.showGrid = this.selectedTile === 'Tiles' || this.selectedTile === 'Title' || this.selectedTile === 'Chart'|| this.selectedTile === 'DynamicTile';
+      this.showGrid = this.selectedTile === 'Tiles' || this.selectedTile === 'Title' || this.selectedTile === 'Chart'|| this.selectedTile === 'DynamicTile' || this.selectedTile === 'FilterTile' || this.selectedTile === 'TableTile' ;
 
      
       this.showTitleGrid = this.selectedTile === 'Title'; // Show specific grid for Title
       this.showChartGrid = this.selectedTile === 'Chart';
       this.showDynamicTileGrid =  this.selectedTile === 'DynamicTile'
+            this.showFilterGrid =  this.selectedTile === 'FilterTile'
+               this.showTableGrid =  this.selectedTile === 'TableTile'
+
+            
+
       setTimeout(() => {
         this.createPieChart()
       }, 500);
@@ -1921,6 +1937,19 @@ setTimeout(() => {
         this.tileConfig1Component.openKPIModal(event.arg1, event.arg2);
       }, 500);
     }
+    if(event.arg1.grid_type=='TableWidget'){
+      this.modalService.open(KPIModal, { size: 'lg' });
+
+    
+      // Access the component instance and trigger `openKPIModal`
+      setTimeout(() => {
+       
+        this.TableWidgetConfigComponent.openTableModal(event.arg1, event.arg2);
+      }, 500);
+    }
+
+
+    
     else if(event.arg1.grid_type=='tile2'){
       console.log('modal check',KPIModal)
       this.modalService.open(KPIModal, { size: 'lg' });
@@ -2034,6 +2063,19 @@ setTimeout(() => {
       }, 500);
     }
 
+    else if(event.arg1.grid_type=='filterTile'){
+      this.modalService.open(KPIModal, { size: 'lg' });
+      console.log('event check dynamic tile', event)
+      console.log('event.arg1 checking',event.arg1)
+      console.log('event.arg2 checking',event.arg2)
+    
+      // Access the component instance and trigger `openKPIModal`
+      setTimeout(() => {
+       
+        this.FilterTileConfigComponent.openFilterModal(event.arg1, event.arg2);
+      }, 500);
+    }
+
     
 
     
@@ -2056,7 +2098,19 @@ setTimeout(() => {
  
   // this.updateSummary('','add_Tile')
     }
+    else if(event.data.arg1.grid_type=='TableWidget'){
+      console.log('event check', event)
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push(event.data.arg1)
+      // this.updateSummary(event.all_Packet_store,'add_Tile')
+    }
     else if(event.data.arg1.grid_type=='tile2'){
+      console.log('event check', event)
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push(event.data.arg1)
+      // this.updateSummary(event.all_Packet_store,'add_Tile')
+    }
+    else if(event.data.arg1.grid_type=='filterTile'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
@@ -3835,7 +3889,10 @@ console.log('items checking from update Summary',items)
       multi_value: this.formatField(tile.multi_value),
       chartConfig: this.formatField(tile.chartConfig),
       filterParameter: this.formatField(tile.filterParameter),
-      tileConfig: this.formatField(tile.tileConfig)
+      tileConfig: this.formatField(tile.tileConfig),
+      filterTileConfig:this.formatField(tile.filterTileConfig),
+      tableWidget_Config:this.formatField(tile.tableWidget_Config)
+
     }));
   }
   private constructAllCompanyDetails(): any {
@@ -5116,5 +5173,18 @@ refreshFunction(){
     modal.dismiss();
 
   }
+
+  openFilterModal(FilterModal:TemplateRef<any>,modal:any){
+    this.modalService.open(FilterModal, {size: 'lg' });
+    modal.dismiss();
+
+  }
+  openTableModal(tableModal:TemplateRef<any>,modal:any){
+    this.modalService.open(tableModal, {size: 'lg' });
+    modal.dismiss();
+
+  }
+
+  
 
 }

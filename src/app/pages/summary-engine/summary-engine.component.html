@@ -11,6 +11,12 @@
     {{ getLastSavedMessage() }}.
   </button>
 </div>
+<!-- <div class="d-flex align-items-center me-2 mb-7" *ngIf="!isSummaryEngine()">
+
+  <button *ngIf="!isGirdMoved && summaryDashboardUpdate" type="button" class="btn fw-bold btn-primary translateyr"
+  ngbTooltip="Apply filter for Dashboard" >Filter</button>
+</div> -->
+
 <div class="page-content" #pageContent [ngClass]="{'full-screen-page': isFullScreen&&editButtonCheck}" >
   <div class="" id="kt_wrapper" >
     <div class="" id="kt_content" *ngIf="!isSummaryEngine()">
@@ -57,6 +63,12 @@
                       (customEvent1)="emitDuplicate($event)" 
                       (customEvent2)="emitDelete6($event)">
                     </app-tile-ui1>
+                  </div>
+
+
+                  <div *ngIf="item.grid_type === 'TableWidget'" >
+                    <app-table-widget-ui [item]="item" [index]="i" (customEvent)="helperTile($event,tableModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"   [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                    [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" ></app-table-widget-ui>
                   </div>
                   
                                 <div *ngIf="item.grid_type === 'tile2'" >
@@ -126,7 +138,21 @@
                     <div *ngIf="item.grid_type === 'dynamicTile'"  >
                       <app-dynamic-tile-ui [item]="item" [index]="i" (customEvent)="helperTile($event,DynamicTileModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton" ></app-dynamic-tile-ui>
                     </div>
-  
+                    <div  *ngIf="item.grid_type === 'filterTile'">
+                      <app-filter-tile-ui    [item]="item" 
+                      [index]="i" 
+                      [isFullscreen]="isFullscreen" 
+                      [isEditModeView]="isEditModeView" 
+                      [hideButton]="hideButton" 
+                      [all_Packet_store]="all_Packet_store" 
+                      [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                      [hidingLink]="hidingLink"
+                      (customEvent)="helperTile($event, FilterModal)" 
+                      (customEvent1)="emitDuplicate($event)" 
+                      (customEvent2)="emitDelete6($event)"
+                      ></app-filter-tile-ui >
+                 
+                    </div>
   
                     <!-- <div class="grid-item" tabindex="0"  (click)="openKPIModal6(KPIModal6,'')" >
                       <div>Bullet Chart</div>
@@ -821,7 +847,7 @@
       </div>
       <!-- <button (click)="createChartGauge()">click me</button> -->
   
-      <div *ngIf="showGrid && selectedTile !== 'Title' &&  selectedTile !== 'Chart' &&  selectedTile !== 'DynamicTile'" class="grid-container">
+      <div *ngIf="showGrid && selectedTile !== 'Title' &&  selectedTile !== 'Chart' &&  selectedTile !== 'DynamicTile' && selectedTile !== 'FilterTile' && selectedTile !== 'TableTile' " class="grid-container">
         <div class="grid-item highlight" tabindex="0" (click)="openKPIModal(KPIModal,modal);modal.dismiss"  style="background: linear-gradient(to right, #ff7e5f, #feb47b); padding: 20px; border-radius: 8px; color: white;">
           <div>Label</div>
           <div class="value" tabindex="0">Value</div>
@@ -970,6 +996,79 @@
   
         </div>
       </div>
+
+      <div *ngIf="showGrid" class="container" style="margin-top: 10px;">
+        <div class="row" style="display: flex; justify-content: center; align-items: center;">
+          <!-- Grid item spanning full width -->
+          <div class="col-md-12 d-flex justify-content-center align-items-center">
+            <div *ngIf="showFilterGrid">
+              <button
+                class="grid-item col bg-light-primary px-6 py-8 rounded-2 mb-7"
+                style="width: 350px; height: 250px; display: flex; justify-content: center; align-items: center; border: 0;"
+              >
+                <div
+                  class="grid-item highlight"
+                  tabindex="0"
+                  (click)="openFilterModal(FilterModal, modal)"
+                  style="
+                    width: 300px;
+                    height: 200px;
+                    background: linear-gradient(to right, #B24592, #F15F79);
+                    padding: 20px;
+                    border-radius: 8px;
+                    color: white;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                  "
+                >
+                  <div class="value fw-bold" tabindex="0">Filter Tile</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+
+
+      <div *ngIf="showGrid" class="container" style="margin-top: 10px;">
+        <div class="row" style="display: flex; justify-content: center; align-items: center;">
+          <!-- Grid item spanning full width -->
+          <div class="col-md-12 d-flex justify-content-center align-items-center">
+            <div *ngIf="showTableGrid">
+              <button
+                class="grid-item col bg-light-primary px-6 py-8 rounded-2 mb-7"
+                style="width: 350px; height: 250px; display: flex; justify-content: center; align-items: center; border: 0;"
+              >
+                <div
+                  class="grid-item highlight"
+                  tabindex="0"
+                  (click)="openTableModal(tableModal, modal)"
+                  style="
+                    width: 300px;
+                    height: 200px;
+                    background: linear-gradient(to right, #B24592, #F15F79);
+                    padding: 20px;
+                    border-radius: 8px;
+                    color: white;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                  "
+                >
+                  <div class="value fw-bold" tabindex="0">Table Widget</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+
+
+
+
       
         
       </div>
@@ -1453,6 +1552,16 @@
     <app-tile1-config [dashboard]="dashboard" (dashboardChange)="getGridDetails($event)" (update_PowerBoard_config)="updateSummaryHelper2($event)" [modal]="modal" [all_Packet_store]="all_Packet_store" (send_all_Packet_store)="allPacketStoreReceiver($event)"[isGirdMoved]="isGirdMoved"></app-tile1-config>
   
   </ng-template>
+  <ng-template #FilterModal let-modal >
+  
+    <app-filter-tile-config  (dashboardChange)="getGridDetails2($event)" [dashboard]="dashboard" [modal]="modal" [all_Packet_store]="all_Packet_store" (update_PowerBoard_config)="updateSummaryHelper2($event)" (send_all_Packet_store1)="allPacketStoreReceiver2($event)"></app-filter-tile-config>
+  
+  </ng-template>
+  <ng-template #tableModal let-modal >
+  
+    <app-table-widget-config (send_all_Packet_store)="allPacketStoreReceiver($event)"  [modal]="modal" [dashboard]="dashboard" (dashboardChange)="getGridDetails($event)" [all_Packet_store]="all_Packet_store" (update_PowerBoard_config)="updateSummaryHelper2($event)" [isGirdMoved]="isGirdMoved"></app-table-widget-config >
+  
+  </ng-template>
   <ng-template #KPIModal1 let-modal >
   
     <app-tile2-config [dashboard]="dashboard" (dashboardChange)="getGridDetails1($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver1($event)"></app-tile2-config>
@@ -1521,6 +1630,7 @@
     <app-dynamic-tile-config  [dashboard]="dashboard" (dashboardChange)="getGridDetails2($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver2($event)" ></app-dynamic-tile-config>
   
   </ng-template>
+ 
   </div>
   
   

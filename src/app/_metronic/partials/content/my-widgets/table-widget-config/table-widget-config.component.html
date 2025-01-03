@@ -1,0 +1,290 @@
+<div class="modal-header">
+    <h4 class="modal-title">Table Tile</h4>
+    <button type="button" class="btn-close" aria-label="Close"   (click)="modal.dismiss()"></button>
+  </div>
+  
+  <!-- Modal body with Tabs -->
+  <div class="fv-row" [formGroup]="createKPIWidget" >
+    <div class="modal-body">
+      <div class="card-body pt-0">
+  
+        <!-- Tab Navigation -->
+
+  
+        <!-- Tab Content -->
+        <div class="tab-content mt-3" id="modalTabsContent">
+          <!-- General Tab Content -->
+
+            <div class="row g-3">
+              <!-- Form Fields -->
+              <div class="col-md-4 mb-3">
+                <label for="formlist" class="col-form-label fw-bold fs-6 required">
+                  Forms
+                  <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
+                    <i class="bi bi-info-circle fs-5"></i>
+                  </span>
+                </label>
+                <ngx-select
+            
+                  id="formlist"
+                  [allowClear]="true"
+                  name="icon"
+                  formControlName="formlist"
+                  [items]="listofDeviceIds"
+                  optionValueField="value"
+                  optionTextField="text"
+                  (focus)="setUserSatus()"
+                  (selectionChanges)="selectFormParams($event)"
+                  placeholder="Select Form">
+                </ngx-select>
+              </div>
+        
+        
+            
+              <div class="col-md-4 mb-3">
+                <label for="parameterName" class="col-form-label fw-bold fs-6 required">Form Fields</label>
+                <div class="custom-multiselect">
+                  <p-multiSelect
+                    [options]="listofDynamicParam"
+                    formControlName="form_data_selected"
+                
+                    optionLabel="text" 
+                    placeholder="Select Columns"
+                    (onChange)="parameterValue($event)">
+                  </p-multiSelect>
+                </div>
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label for="custom_Label" class="col-form-label fw-bold fs-6  required">Custom Label</label>
+                <input type="text" class="form-control form-control-solid"  name="custom_Label"
+                  formControlName="custom_Label">
+              </div>
+              <div class="col-md-4 mb-3" *ngIf="!hideRowDataField">
+                <label for="custom_Label" class="col-form-label fw-bold fs-6 required">Row Data</label>
+                <input type="text" class="form-control form-control-solid" name="custom_Label"
+                  formControlName="rowData">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="groupByFormat" class="col-form-label fw-bold fs-6 required">Group By Format</label>
+                <input
+                  id="groupByFormat"
+                  type="text"
+                  class="form-control form-control-solid"
+                  placeholder="Select GroupByFormat"
+                  [formControl]="groupByFormatControl"
+                  (click)="openModalCalender()"
+                  readonly>
+              </div>
+              <div class="card card-custom p-2 mt-5">
+                <h3 class="text-center text-primary"></h3> 
+              
+        
+                <ag-grid-angular
+                style="width: 100%; height: 100%;"  
+                class="ag-theme-alpine"
+                [rowData]="table.rows"    
+                [columnDefs]="table.columnDefs" 
+                [domLayout]="'autoHeight'"  
+                [pagination]="true"
+                [paginationPageSize]="10" 
+                [suppressHorizontalScroll]="false" 
+              > 
+              </ag-grid-angular>
+              
+            </div>
+              
+
+          
+        </div>
+        
+  
+      </div>
+  
+      <div class="modal-footer" style="margin-top: 20px;">
+        <button type="button" class="btn btn-secondary" (click)="modal.dismiss()"  >Close</button>
+  <button type="button" class="btn btn-primary"      *ngIf="!isEditMode"     (click)="addTile('TableWidget');modal.dismiss()" [disabled]="createKPIWidget?.invalid" >Save</button>
+  <button 
+      type="button" 
+      class="btn btn-warning" 
+   
+
+    
+      (click)="updateTile('TableWidget');modal.dismiss() " 
+      *ngIf="isEditMode" [disabled]="createKPIWidget?.invalid">
+      Update
+    </button>
+      </div>
+    </div>
+  </div>
+  </div>
+
+
+
+  <!-- <ng-template #calendarModal let-modal>
+    <div class="modal-header">
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body right-side-modal">
+      <div class="card-body pt-0">
+        <div class="container1">
+          <div class="list-row">
+            <div class="list-column">
+              <div class="list-item active" (click)="selectValue('Year', modal)" (mouseenter)="showTooltip('Year')" (mouseleave)="hideTooltip()">
+                <div class="title">Year</div>
+                <div class="example">E.g., 2003, 2004</div>
+              </div>
+              <div class="list-item" (click)="selectValue('QuarterYear', modal)" (mouseenter)="showTooltip('QuarterYear')" (mouseleave)="hideTooltip()">
+                <div class="title">Quarter & Year</div>
+                <div class="example">E.g., Q1 2004</div>
+              </div>
+              <div class="list-item" (click)="selectValue('MonthYear', modal)" (mouseenter)="showTooltip('MonthYear')" (mouseleave)="hideTooltip()">
+                <div class="title">Month & Year</div>
+                <div class="example">E.g., March 2004</div>
+              </div>
+              <div class="list-item" (click)="selectValue('WeekYear', modal)" (mouseenter)="showTooltip('WeekYear')" (mouseleave)="hideTooltip()">
+                <div class="title">Week & Year</div>
+                <div class="example">E.g., W1 2004</div>
+              </div>
+              <div class="list-item" (click)="selectValue('FullDate', modal)" (mouseenter)="showTooltip('FullDate')" (mouseleave)="hideTooltip()">
+                <div class="title">Full Date</div>
+                <div class="example">E.g., 1/1/2000</div>
+              </div>
+              <div class="list-item" (click)="selectValue('DateTime', modal)" (mouseenter)="showTooltip('DateTime')" (mouseleave)="hideTooltip()">
+                <div class="title">Date & Time</div>
+                <div class="example">E.g., 01 Jan, 2000 00:00:07 hrs</div>
+              </div>
+            </div>
+            <div class="list-column">
+              <div class="list-item" (click)="selectValue('Quarter', modal)">
+                <div class="title">Quarter</div>
+                <div class="example">E.g., Q1, Q2</div>
+              </div>
+              <div class="list-item" (click)="selectValue('Month', modal)">
+                <div class="title">Month</div>
+                <div class="example">E.g., January, February</div>
+              </div>
+              <div class="list-item" (click)="selectValue('Week', modal)">
+                <div class="title">Week</div>
+                <div class="example">E.g., Week 1, Week 2</div>
+              </div>
+              <div class="list-item" (click)="selectValue('WeekDay', modal)">
+                <div class="title">Week Day</div>
+                <div class="example">E.g., Sunday, Monday</div>
+              </div>
+              <div class="list-item" (click)="selectValue('DayOfMonth', modal)">
+                <div class="title">Day of Month</div>
+                <div class="example">E.g., 1 to 31</div>
+              </div>
+              <div class="list-item" (click)="selectValue('HourOfDay', modal)">
+                <div class="title">Hour of Day</div>
+                <div class="example">E.g., 0 to 23 hrs</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </ng-template> -->
+
+
+    <ng-template #calendarModal let-modal>
+      <div class="modal-header">
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+      </div>
+      <div class="modal-body right-side-modal">
+        <div class="card-body pt-0">
+          <div class="container1">
+            <div class="list-row">
+              <div class="list-column">
+                <div class="list-item active" (click)="selectValue('Last 24 Hours', modal)" (mouseenter)="showTooltip('Last 24 Hours')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last 24 Hours</div>
+                  <div class="example">E.g., Last 24 hours of data</div>
+                </div>
+                <div class="list-item" (click)="selectValue('Today', modal)" (mouseenter)="showTooltip('Today')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Today</div>
+                  <div class="example">E.g., Data from 00:00 hrs to now</div>
+                </div>
+                <div class="list-item" (click)="selectValue('Yesterday', modal)" (mouseenter)="showTooltip('Yesterday')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Yesterday</div>
+                  <div class="example">E.g., Data from previous day</div>
+                </div>
+                <div class="list-item" (click)="selectValue('Last 7 days', modal)" (mouseenter)="showTooltip('Last 7 days')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last 7 days</div>
+                  <div class="example">E.g., Data for past 7 days</div>
+                </div>
+                <div class="list-item" (click)="selectValue('Last 30 days', modal)" (mouseenter)="showTooltip('Last 30 days')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last 30 days</div>
+                  <div class="example">E.g., Data for the past 30 days</div>
+                </div>
+                <div class="list-item" (click)="selectValue('This Week', modal)" (mouseenter)="showTooltip('This Week')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">This Week</div>
+                  <div class="example">E.g., Current week (Monday to Sunday)</div>
+                </div>
+                <div class="list-item" (click)="selectValue('Last 5 Weeks', modal)" (mouseenter)="showTooltip('Last 5 Weeks')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last 5 Weeks</div>
+                  <div class="example">E.g., Data for past 5 weeks</div>
+                </div>
+                <div class="list-item" (click)="selectValue('This Month', modal)" (mouseenter)="showTooltip('This Month')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">This Month</div>
+                  <div class="example">E.g., Data for current month</div>
+                </div>
+              </div>
+            
+              <div class="list-column">
+                <div class="list-item" (click)="selectValue('Last Month', modal)" (mouseenter)="showTooltip('Last Month')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last Month</div>
+                  <div class="example">E.g., Data for previous month</div>
+                </div>
+                <div class="list-item" (click)="selectValue('This Quarter', modal)" (mouseenter)="showTooltip('This Quarter')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">This Quarter</div>
+                  <div class="example">E.g., Current quarter (Q1/Q2/Q3/Q4)</div>
+                </div>
+                <div class="list-item" (click)="selectValue('Last Quarter', modal)" (mouseenter)="showTooltip('Last Quarter')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last Quarter</div>
+                  <div class="example">E.g., Data from the previous quarter</div>
+                </div>
+                <div class="list-item" (click)="selectValue('This BiAnnual', modal)" (mouseenter)="showTooltip('This BiAnnual')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">This BiAnnual</div>
+                  <div class="example">E.g., Current half-year period</div>
+                </div>
+                <div class="list-item" (click)="selectValue('Last BiAnnual', modal)" (mouseenter)="showTooltip('Last BiAnnual')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last BiAnnual</div>
+                  <div class="example">E.g., Previous half-year period</div>
+                </div>
+                <div class="list-item" (click)="selectValue('This Year', modal)" (mouseenter)="showTooltip('This Year')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">This Year</div>
+                  <div class="example">E.g., Data for the current year</div>
+                </div>
+                <div class="list-item" (click)="selectValue('Last Year', modal)" (mouseenter)="showTooltip('Last Year')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last Year</div>
+                  <div class="example">E.g., Data from the previous year</div>
+                </div>
+                <div class="list-item" (click)="selectValue('Last 5 Years', modal)" (mouseenter)="showTooltip('Last 5 Years')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last 5 Years</div>
+                  <div class="example">E.g., Data for the past 5 years</div>
+                </div>
+              </div>
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+    </ng-template>

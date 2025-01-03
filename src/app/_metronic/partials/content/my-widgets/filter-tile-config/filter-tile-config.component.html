@@ -1,0 +1,295 @@
+<div class="modal-header">
+    <h4 class="modal-title">Filter Tile</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="container" *ngIf="createChart">
+    <div [formGroup]="createChart">
+
+        <div class="row align-items-center">
+            <!-- Enable Dashboard Filter -->
+            <div class="col-lg-6 col-md-6 col-sm-6 mb-4 mt-4">
+                <div class="d-flex align-items-center">
+                  <label for="toggleCheck" class="col-form-label fw-bold fs-6 required me-2">
+                    Enable Dashboard Filter
+                  </label>
+                  <div class="form-check form-switch">
+                    <input
+                    class="form-check-input"
+                    type="checkbox"
+                    name="add_fields"
+                    [checked]="makeTrueCheck"
+                    formControlName="add_fields"
+                    (change)="addControls($event, 'html', formlistValues.length, formlistValues)"
+                    id="toggleCheck"
+                  >
+                  
+                  </div>
+                </div>
+              </div>
+              
+          
+            <!-- Date Type -->
+            <div class="col-lg-6 col-md-6 col-sm-6 mb-4 mt-4">
+              <div class="form-group row align-items-center">
+                <label 
+                  for="dateTypeSelect" 
+                  class="col-lg-4 col-md-4 col-sm-4 col-form-label text-lg-end text-md-start text-sm-start fw-bold required">
+                  Date Type
+                </label>
+                <div class="col-lg-8 col-md-8 col-sm-8">
+                  <select 
+                    formControlName="dateType" 
+                    id="dateTypeSelect" 
+                    class="form-select form-select-solid form-select-lg"
+                    aria-label="Select Date Type">
+                    <option [value]="null" [selected]="true" disabled>Select Date Type</option>
+                    <option value="is">is</option>
+                    <option value=">=">&gt;=</option>
+                    <option value="<=">&lt;=</option>
+                    <option value="between">between</option>
+                    <option value="between time">between time</option>
+                    <option value="less than days ago">less than days ago</option>
+                    <option value="more than days ago">more than days ago</option>
+                    <option value="in the past">in the past</option>
+                    <option value="days ago">days ago</option>
+                    <option value="today">today</option>
+                    <option value="yesterday">yesterday</option>
+                    <option value="this week">this week</option>
+                    <option value="last week">last week</option>
+                    <option value="last 2 weeks">last 2 weeks</option>
+                    <option value="this month">this month</option>
+                    <option value="last month">last month</option>
+                    <option value="this year">this year</option>
+                    <option value="any">any</option>
+                    <option value="latest 10">latest 10</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+
+          <div class="row">
+
+         <div class="col-md-6 mb-3">
+                        <label for="custom_Label" class="col-form-label fw-bold fs-6  required">Custom Label</label>
+                        <input type="text" class="form-control form-control-solid"  name="custom_Label"
+                          formControlName="custom_Label">
+                      </div>
+
+          </div>
+          
+
+      
+      
+
+
+
+    </div>
+
+  </div>
+  
+  <!-- Modal body with Tabs -->
+  <div class="card shadow-none rounded-0 w-100" [formGroup]="createChart" *ngIf="createChart" style="margin-top: 10px;">
+  
+    <div class="card card-custom">
+  
+      <div class="modal-body">
+        <div class="card-body pt-0">
+          <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap mb-4"
+          id="myTab_settings" role="tablist">
+          <div class="col-6" role="Data">
+            <li class="nav-item">
+              <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab"
+                aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Filter</a>
+            </li>
+          </div>
+
+
+          <div class="col-6" role="Theme">
+            <li class="nav-item">
+              <a class="nav-link text-active-primary me-6" id="theme-tabpane" data-bs-toggle="tab" role="tab" aria-controls="theme-tab" aria-selected="false" (click)="selectedSettingsTab('theme-tab')">Theme</a>
+            </li>
+          </div>
+
+        </ul>
+          <!-- Tab Navigation -->
+    
+  
+          <!-- Tab Content -->
+        
+            <!-- General Tab Content -->
+            <div class="tab-content mt-3" id="modalTabsContent">
+              <!-- General Tab Content -->
+              <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'dataTab'}" id="dataTab"
+                role="tabpanel" aria-labelledby="home-tab">
+            <div formArrayName="all_fields">
+                <div *ngFor="let field of all_fields.controls; let fieldIndex = index" [formGroupName]="fieldIndex" 
+                     style="border: 2px solid rgb(21, 163, 219); padding: 10px; margin: 5px; border-radius: 5px;">
+                  <h5 class="fw-bold mb-3">{{ field.get('parameterName')?.value || 'No Heading' }}</h5>
+              
+                  <!-- Render the conditions -->
+                  <div formArrayName="conditions">
+                    <div *ngFor="let condition of getFormArrayControls(field); let conditionIndex = index">
+                      <!-- Render the condition row -->
+                       <div [formGroupName]="conditionIndex">
+                      <div  class="row g-3" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+                        <div class="mb-3" style="width: 30%;">
+                          <label class="col-form-label fw-bold fs-6 required">Select Field</label>
+                          <select formControlName="formField" class="form-control">
+                            <option value="" disabled selected>Select Field</option>
+                            <ng-container *ngFor="let option of dynamicParamMap.get(fieldIndex) || []">
+                              <option [value]="option.value">{{ option.text }}</option>
+                            </ng-container>
+                          </select>
+                        </div>
+              
+                        <div class="mb-3" style="width: 30%;">
+                          <label class="col-form-label fw-bold fs-6 required">Operator</label>
+                          <select formControlName="operator" placeholder="Select operator" class="form-control">
+                            <option value="" disabled selected>Select operator</option>
+                            <option value="==">Equals</option>
+                            <option value="!=">Not equals</option>
+                            <option value=">">Greater than</option>
+                            <option value="<">Less than</option>
+                            <option value="<=">Less than equals to</option>
+                            <option value=">=">Greater than equals to</option>
+                          </select>
+                        </div>
+              
+                        <div class="mb-3" style="width: 30%;">
+                          <label class="col-form-label fw-bold fs-6 required">Value</label>
+                          <input type="text" formControlName="filterValue" placeholder="value" class="form-control" />
+                        </div>
+                      </div>
+              
+                      <!-- Remove Condition Button (for all conditions except the first) -->
+                      <div *ngIf="conditionIndex > 0" class="d-flex mt-2">
+                        <button type="button" class="btn btn-danger btn-sm" (click)="removeCondition(fieldIndex, conditionIndex)">
+                          Remove Condition
+                        </button>
+                      </div>
+              
+                      <!-- Render the Between Operator after the first condition -->
+                      <div *ngIf="conditionIndex < getFormArrayControls(field).length - 1" class="mb-3" style="width: 30%; ">
+                        <label class="col-form-label fw-bold fs-6 required">Between Operator</label>
+                        <select formControlName="operatorBetween" (change)="betweenoperator($event)" placeholder="Select Operator" class="form-control">
+                          <option value="&&">AND</option>
+                          <option value="||">OR</option>
+                        </select>
+                      </div>
+                    </div>
+                    </div>
+                  </div>
+              
+                  <!-- Add Condition Button -->
+                  <div class="d-flex mt-3">
+                    <button type="button" class="btn btn-primary btn-sm me-4" (click)="addCondition(fieldIndex)">
+                      Add Condition
+                    </button>
+                  </div>
+                </div>
+              </div>
+              </div>
+
+              <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'theme-tab'}" id="theme-tab" role="tabpanel" aria-labelledby="theme-tabpane">
+          
+                <div class="row g-3" [formGroup]="createChart">
+                  <!-- Existing Themes Section -->
+                  <div class="col-md-12 mb-3">
+                    <label class="col-form-label fw-bold fs-6 required">Themes:</label>
+                    <div class="color-boxes">
+                      <div
+                        *ngFor="let theme of themes"
+                        class="color-box"
+                        [ngStyle]="{ 'background-image': theme.color }"
+                        (click)="toggleCheckbox1(theme)"
+                        [class.checked]="theme.selected">
+                        <!-- Tick Mark -->
+                        <div *ngIf="theme.selected" class="checkmark">✔</div>
+                      </div>
+                    </div>
+                  </div>
+              
+                  <!-- Font Size Input -->
+                  <div class="col-md-6 mb-3">
+                    <label for="fontSize" class="col-form-label fw-bold fs-6 required">Font Size</label>
+                    <input
+                      id="fontSize"
+                      type="number"
+                      class="form-control form-control-solid"
+                      placeholder="Enter Font Size (e.g., 14)"
+                      formControlName="fontSize"
+                      min="8"
+                      max="72">
+                      <div *ngIf="createChart.get('fontSize')?.errors?.min || createChart.get('fontSize')?.errors?.max" class="text-danger mt-1">
+                        Font size must be between 8 and 72.
+                      </div>
+                  </div>
+              
+                  <!-- Font Color Input -->
+                  <div class="col-md-6 mb-3">
+                    <label for="fontColor" class="col-form-label fw-bold fs-6 required">Font Color</label>
+                    <div class="d-flex align-items-center">
+                      <!-- Color Picker Input -->
+                      <input
+                        id="fontColor"
+                        type="color"
+                        class="form-control form-control-color me-3"
+                        [value]="createChart.get('fontColor')?.value"
+                        (input)="onFontColorChange($event)"
+                        style="width: 50px; height: 38px; padding: 0; border-radius: 5px; border: 1px solid #ced4da;">
+                      <!-- Display Selected Color Code -->
+                      <input
+                        type="text"
+                        class="form-control form-control-solid"
+                        formControlName="fontColor"
+                        readonly
+                        style="flex: 1;"
+                        placeholder="Selected Color Code">
+                    </div>
+                  </div>
+    
+                  
+                  
+                </div>
+              </div>
+            </div>
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+
+  
+            <!-- Settings Tab Content -->
+
+          
+          
+          
+
+        </div>
+  
+  
+        <div class="modal-footer" style="margin-top: 20px;">
+          <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+          <button type="button" class="btn btn-primary"  (click)="addTile('filterTile');modal.dismiss()" *ngIf="!isEditMode"  
+        >Save</button>
+          <button type="button" class="btn btn-warning"  (click)="updateTile('filterTile');modal.dismiss() "
+          *ngIf="isEditMode">
+            Update
+          </button>
+        </div>
+      </div>
+  
+  
+    </div>
+  
+  </div>

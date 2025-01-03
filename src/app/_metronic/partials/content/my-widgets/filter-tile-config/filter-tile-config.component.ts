@@ -1,23 +1,21 @@
-import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
+import { AbstractControl, FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import dayjs, { Dayjs } from 'dayjs';
-import Highcharts from 'highcharts';
-import moment from 'moment';
+import { AgGridAngular } from 'ag-grid-angular';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { APIService } from 'src/app/API.service';
 import { LocationPermissionService } from 'src/app/location-permission.service';
 import { SharedService } from 'src/app/pages/shared.service';
 
 @Component({
-  selector: 'app-dynamic-tile-config',
+  selector: 'app-filter-tile-config',
 
-  templateUrl: './dynamic-tile-config.component.html',
-  styleUrl: './dynamic-tile-config.component.scss'
+  templateUrl: './filter-tile-config.component.html',
+  styleUrl: './filter-tile-config.component.scss'
 })
-export class DynamicTileConfigComponent implements OnInit{
+export class FilterTileConfigComponent implements OnInit{
   createChart:FormGroup
 
  
@@ -41,12 +39,11 @@ export class DynamicTileConfigComponent implements OnInit{
   formList: any;
   listofDeviceIds: any;
   listofDynamicParam: any;
-  @ViewChild('calendarModalChart') calendarModalChart: any;
+makeTrueCheck:any = false
   showIdField = false;
   dropsDown = 'down';
   opensCenter = 'center';
-  tooltips: { date: Dayjs; text: string }[] = [];
-  invalidDates: Dayjs[] = [];
+
   tooltip: string | null = null;
   grid_details: any;
   selectedRangeCalendarTimeRight: any;
@@ -59,8 +56,7 @@ export class DynamicTileConfigComponent implements OnInit{
   selectedSimpleCalendarUpCenter: any;
   selectedSimpleCalendarAutoUpLeft: any;
   selectedRangeCalendarTimeInline: any;
-  maxDate?: Dayjs;
-  minDate?: Dayjs;
+
   shouldShowProcessedValue: boolean = false;
   chartDatatype: FormGroup;
   calenderIndex: any;
@@ -80,21 +76,30 @@ export class DynamicTileConfigComponent implements OnInit{
   dynamicparameterLab: any;
   dynamicparameterLabMap: any;
   fields: any;
+  gridDetailExtract: any;
+  formlistValues: any[];
+  hasAddedCondition: boolean[] = []; // Tracks the state for each field index
+  conditionsFilter: any;
+  parsedfilterTileConfig: any;
+
 
 
  
   ngOnInit() {
 
     this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
+    this.SK_clientID = this.getLoggedUser.clientID;
+    console.log('this.SK_clientID check', this.SK_clientID)
     console.log('this.getLoggedUser check', this.getLoggedUser)
+    // console.log('dashboardChange ngOnInit',this.all_Packet_store)
+
     // this.getWorkFlowDetails = this.summaryConfiguration.getLoggedUserDetails()
     // console.log('this.getLoggedUser check',this.getWorkFlowDetails)
 
 
-    this.SK_clientID = this.getLoggedUser.clientID;
-    console.log('this.SK_clientID check', this.SK_clientID)
+  
     this.initializeTileFields()
-    this.setupRanges();
+
     this.dynamicData()
     this.dashboardIds(1)
     this.createChart.get('toggleCheck')?.valueChanges.subscribe((isChecked) => {
@@ -106,6 +111,7 @@ export class DynamicTileConfigComponent implements OnInit{
         this.createChart.get('selectType')?.disable();
       }
     });
+    this.checkData()
   
 
 
@@ -114,8 +120,122 @@ export class DynamicTileConfigComponent implements OnInit{
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('dashboardChange',this.all_Packet_store)
+    console.log('dashboardChange ngonchanges',this.all_Packet_store)
+    this.checkData()
+
+
   }
+
+  checkData(){
+    this.gridDetailExtract = this.all_Packet_store.grid_details
+    console.log('this.gridDetailExtract check',this.gridDetailExtract)
+// Initialize the formlist values array
+
+
+// Extract formlist from gridDetailExtract
+if (this.gridDetailExtract && Array.isArray(this.gridDetailExtract)) {
+    this.formlistValues = this.gridDetailExtract.map((packet: { formlist: any }) => packet.formlist);
+    console.log('this.formlistValues check',this.formlistValues)
+}
+
+// Initialize formlistValues as an empty array if not already initialized
+this.formlistValues = this.formlistValues || [];
+
+// Iterate through each packet in gridDetailExtract
+if (Array.isArray(this.gridDetailExtract)) {
+    this.gridDetailExtract.forEach((packet: any) => {
+        // Check if chartConfig exists in the current packet and is not empty
+        if (packet.chartConfig && packet.chartConfig !== "[]") {
+            try {
+                // Parse the chartConfig JSON
+                const parsedChartConfig = JSON.parse(packet.chartConfig);
+
+                // Validate parsedChartConfig is an array
+                if (Array.isArray(parsedChartConfig)) {
+                    // Extract formlist values from parsedChartConfig
+                    const chartConfigFormlist = parsedChartConfig.map((config: { formlist: any }) => config.formlist);
+
+                    // Add the extracted values to formlistValues
+                    this.formlistValues = [...this.formlistValues, ...chartConfigFormlist];
+                    console.log('this.formlistValues check extract',this.formlistValues)
+                } else {
+                    console.warn('Parsed chartConfig is not an array:', parsedChartConfig);
+                }
+            } catch (error) {
+                console.error('Error parsing chartConfig:', error);
+            }
+        }
+    });
+
+    // Remove duplicates from formlistValues if needed
+// Remove undefined values and duplicates from formlistValues
+this.formlistValues = [...new Set(this.formlistValues.filter(value => value !== undefined))];
+this.fetchDynamicFormDataForAll(this.formlistValues);
+
+
+// Log the cleaned-up formlistValues
+console.log('Cleaned-up formlist values:', this.formlistValues);
+
+
+
+} else {
+    console.warn('gridDetailExtract is not an array or is undefined.');
+}
+
+// Check and extract formlist from chartConfig
+// Initialize formlistValues as an empty array if not already done
+
+
+
+  }
+
+  fetchDynamicFormDataForAll(values: string[]) {
+    values.forEach((value, index) => {
+      this.fetchDynamicFormData(value, index);
+    });
+  }
+  fetchDynamicFormData(value: string, index: number) {
+    console.log("Fetching data for:", value);
+  
+    const apiUrl = `${this.SK_clientID}#dynamic_form#${value}#main`;
+    this.api.GetMaster(apiUrl, 1)
+      .then((result: any) => {
+        if (result && result.metadata) {
+          const parsedMetadata = JSON.parse(result.metadata);
+          const formFields = parsedMetadata.formFields;
+  
+          const dynamicParamList = formFields.map((field: any) => ({
+            value: field.name,
+            text: field.label,
+          }));
+  
+          // Add created_time and updated_time if present
+          if (parsedMetadata.created_time) {
+            dynamicParamList.push({
+              value: parsedMetadata.created_time.toString(),
+              text: 'Created Time',
+            });
+          }
+          if (parsedMetadata.updated_time) {
+            dynamicParamList.push({
+              value: parsedMetadata.updated_time.toString(),
+              text: 'Updated Time',
+            });
+          }
+  
+          // Store the dynamicParamList in a map by index
+          this.dynamicParamMap.set(index, dynamicParamList);
+          this.cdr.detectChanges();
+        } else {
+          console.warn(`No metadata found for ${value}`);
+        }
+      })
+      .catch((err) => {
+        console.error(`Error fetching data for ${value}:`, err);
+      });
+  }
+  
+  
 
   convertTo12HourFormat(time: string): string {
     if (!time) return '';
@@ -129,67 +249,22 @@ export class DynamicTileConfigComponent implements OnInit{
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector,
     private spinner: NgxSpinnerService,private zone: NgZone
   ){
-    this.selectedRangeCalendarTimeRight = {
-      startDate: dayjs().startOf('day'),
-      endDate: dayjs().endOf('day'),
-    };
-    this.selectedRangeCalendarCenter = {
-      startDate: dayjs().startOf('day'),
-      endDate: dayjs().endOf('day'),
-    };
-    this.selectedRangeCalendarAutoLeft = {
-      startDate: dayjs().startOf('day'),
-      endDate: dayjs().endOf('day'),
-    };
-    this.selectedSingleCalendarTimeRight = dayjs().startOf('day');
-    this.selectedSingleCalendarCenter = dayjs().startOf('day');
-    this.selectedSingleCalendarAutoLeft = dayjs().startOf('day');
-    this.selectedSimpleCalendarTimeUpRight = {
-      startDate: dayjs().startOf('day'),
-      endDate: dayjs().endOf('day'),
-    };
-    this.selectedSimpleCalendarUpCenter = {
-      startDate: dayjs().startOf('day'),
-      endDate: dayjs().endOf('day'),
-    };
-    this.selectedSimpleCalendarAutoUpLeft = {
-      startDate: dayjs().startOf('day'),
-      endDate: dayjs().endOf('day'),
-    };
-    this.selectedRangeCalendarTimeInline = {
-      startDate: dayjs().startOf('day'),
-      endDate: dayjs().endOf('day'),
-    };
+
   }
-  setupRanges(): void {
-    this.ranges = {
-      Today: [moment().startOf('day'), moment().endOf('day')],
-      Yesterday: [moment().subtract(1, 'day').startOf('day'), moment().subtract(1, 'day').endOf('day')],
-      'Last 7 Days': [moment().subtract(6, 'days').startOf('day'), moment().endOf('day')],
-      'Last 30 Days': [moment().subtract(29, 'days').startOf('day'), moment().endOf('day')],
-      'This Month': [moment().startOf('month'), moment().endOf('month')],
-      'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-      'This Year': [moment().startOf('year'), moment().endOf('year')],
-      'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')],
-      // ... add other ranges as needed
-    };
-  }
+
   initializeTileFields(): void {
     console.log('i am initialize')
     // Initialize the form group
     this.createChart = this.fb.group({
-      add_fields:[''],
+      add_fields:['',Validators.required],
       all_fields:new FormArray([]),
   
       widgetid: [this.generateUniqueId()],
-      chart_title:[''],
+      dateType:['', Validators.required],
       themeColor: ['', Validators.required],
       fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['', Validators.required], 
-      toggleCheck: [false], // Default toggle state
-// Default unchecked
-      dashboardIds: [''],
-      selectType: [''],
+      custom_Label:['', Validators.required]
     
       // themeColor: ['#000000', Validators.required],
   
@@ -235,69 +310,162 @@ export class DynamicTileConfigComponent implements OnInit{
     }
   }
 
-  addControls(event: any, _type: string) {
-    // console.log('this.dynamicparameterLabMap before adding controls:', this.dynamicparameterLabMap);
-    console.log('Event received in addControls:', event);
+  // addControls(event: any, _type: string,count:any) {
+  //   // console.log('this.dynamicparameterLabMap before adding controls:', this.dynamicparameterLabMap);
+  //   console.log('Event received in addControls:', event);
   
-    let noOfParams: any = '';
+  //   let noOfParams: any = '';
   
-    if (_type === 'html' && event && event.target) {
-      if (event.target.value >= 0) {
-        noOfParams = JSON.parse(event.target.value);
-      } else {
-        return this.toast.open("Negative values not allowed", "Check again", {
-          duration: 5000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top',
-        });
-      }
+  //   if (_type === 'html' && event && event.target) {
+  //     if (event.target.value >= 0) {
+  //       noOfParams = JSON.parse(event.target.value);
+  //     } else {
+  //       return this.toast.open("Negative values not allowed", "Check again", {
+  //         duration: 5000,
+  //         horizontalPosition: 'right',
+  //         verticalPosition: 'top',
+  //       });
+  //     }
+  //   } else if (_type === 'ts') {
+  //     if (event >= 0) {
+  //       noOfParams = event;
+  //     }
+  //   }
+  //   console.log('noOfParams check:', noOfParams);
+  
+  //   // Ensure all_fields has the correct number of controls
+  //   if (this.createChart.value.all_fields.length < noOfParams) {
+  //     for (let i = this.all_fields.length; i < noOfParams; i++) {
+  //       // Access the dynamic label for the current index
+  //       // const dynamicLabel = this.dynamicparameterLabMap?.[i] || ''; // Default to empty if not found
+  //       // console.log(`Index: ${i}, dynamicLabel: ${dynamicLabel}`);
+  
+  //       this.all_fields.push(
+  //         this.fb.group({
+  //           formField: ['', Validators.required],
+  //           operator:['', Validators.required],
+  //           filterValue:['', Validators.required],
+  //           parameterName: ['', Validators.required],
+  //           operatorBetween:['', Validators.required],
+         
+  //           custom_Label: ['', Validators.required],
+  //       // Dynamically set from the map
+  //         })
+  //       );
+  //     }
+  //   } else {
+  //     if (noOfParams !== "" && noOfParams !== undefined && noOfParams !== null) {
+  //       for (let i = this.all_fields.length; i >= noOfParams; i--) {
+  //         this.all_fields.removeAt(i);
+  //       }
+  //     }
+  //   }
+  
+  //   // Update noOfParams for use in addTile
+  //   this.noOfParams = noOfParams;
+  // }
+  
+  addControls(event: any, _type: string, count: number, formValue: any) {
+    console.log('formValue checking', formValue);
+    this.makeTrueCheck = event.target.checked;
+    console.log('Checkbox State:', this.makeTrueCheck);
+  
+    let noOfParams = count;
+  
+    // Update noOfParams control value in the form based on _type
+    const formControl = this.createChart.get('noOfParams');
+  
+    if (_type === 'html') {
+      noOfParams = this.makeTrueCheck ? count : 0;
+      formControl?.setValue(noOfParams);
     } else if (_type === 'ts') {
-      if (event >= 0) {
-        noOfParams = event;
-      }
-    }
-    console.log('noOfParams check:', noOfParams);
-  
-    // Ensure all_fields has the correct number of controls
-    if (this.createChart.value.all_fields.length < noOfParams) {
-      for (let i = this.all_fields.length; i < noOfParams; i++) {
-        // Access the dynamic label for the current index
-        // const dynamicLabel = this.dynamicparameterLabMap?.[i] || ''; // Default to empty if not found
-        // console.log(`Index: ${i}, dynamicLabel: ${dynamicLabel}`);
-  
-        this.all_fields.push(
-          this.fb.group({
-            formlist: ['', Validators.required],
-            parameterName: ['', Validators.required],
-            primaryValue: ['', Validators.required],
-            groupByFormat: ['', Validators.required],
-            constantValue: [''],
-            processed_value: [''],
-            selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
-            selectedRangeType: [''],
-            selectFromTime: [''],
-            selectToTime: [''],
-            // parameterValue: [''],
-            fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
-            filterForm: [''],
-            filterParameter: [''],
-            filterDescription: [''],
-            custom_Label: ['', Validators.required],
-        // Dynamically set from the map
-          })
-        );
-      }
-    } else {
-      if (noOfParams !== "" && noOfParams !== undefined && noOfParams !== null) {
-        for (let i = this.all_fields.length; i >= noOfParams; i--) {
-          this.all_fields.removeAt(i);
-        }
-      }
+      // Logic for TypeScript (programmatic)
+      noOfParams = count; // Directly use the provided count for TypeScript
+      formControl?.setValue(noOfParams); // Ensure noOfParams is updated in the form
     }
   
-    // Update noOfParams for use in addTile
-    this.noOfParams = noOfParams;
+    const allFieldsArray = this.createChart.get('all_fields') as FormArray;
+  
+    // Dynamically add or remove form array groups based on noOfParams
+    while (allFieldsArray.length < noOfParams) {
+      const index = allFieldsArray.length; // Get the current index
+      allFieldsArray.push(
+        this.fb.group({
+          parameterName: [formValue[index] || '', Validators.required], // Populate with formValue
+          conditions: this.fb.array([
+            this.fb.group({
+              formField: ['', Validators.required],
+              operator: ['', Validators.required],
+              filterValue: ['', Validators.required],
+              operatorBetween: ['', Validators.required],
+            }),
+          ]),
+        })
+      );
+    }
+  
+    while (allFieldsArray.length > noOfParams) {
+      allFieldsArray.removeAt(allFieldsArray.length - 1);
+    }
+  
+    console.log('Updated all_fields:', allFieldsArray.controls);
   }
+  
+  
+  
+  addCondition(fieldIndex: number) {
+    console.log('fieldIndex check',fieldIndex)
+    const parentGroup = this.all_fields.at(fieldIndex) as FormGroup;
+    const conditions = parentGroup.get('conditions') as FormArray;
+  
+    // Add a new condition
+    conditions.push(
+      this.fb.group({
+        formField: ['', Validators.required],
+        operator: ['', Validators.required],
+        filterValue: ['', Validators.required],
+        operatorBetween: ['',Validators.required]
+      })
+    );
+  
+    console.log(`Condition added at index ${fieldIndex}`);
+  }
+  
+  removeCondition(fieldIndex: number, conditionIndex: number) {
+    const parentGroup = this.all_fields.at(fieldIndex) as FormGroup;
+    const conditions = parentGroup.get('conditions') as FormArray;
+  
+    // Remove the condition at the specified index
+    conditions.removeAt(conditionIndex);
+  
+    console.log(`Condition removed from index ${fieldIndex}, condition ${conditionIndex}`);
+  }
+  
+  
+
+  
+  
+  
+  
+
+  
+  
+  getFormArrayControls(field: AbstractControl | null): AbstractControl[] {
+    if (field) {
+      const formArray = field.get('conditions') as FormArray;
+      return formArray?.controls || [];
+    }
+    return [];
+  }
+  
+  
+  getConditions(field: AbstractControl) {
+    return (field.get('conditions') as FormArray)?.controls || [];
+  }
+
+  
+  
+  
   
   
   
@@ -314,25 +482,32 @@ export class DynamicTileConfigComponent implements OnInit{
   
 
   addTile(key: any) {
-    console.log('this.noOfParams check', this.noOfParams);
-    console.log('this.createChart.value.all_fields', this.createChart.value.all_fields.filterParameter);
-  
-    if (key === 'dynamicTile') {
+ 
+  console.log('this.createChart.value.all_fields',this.createChart.value.all_fields)
+    if (key === 'filterTile') {
       const uniqueId = this.generateUniqueId();
       console.log('this.createChart.value:', this.createChart.value); // Log form values for debugging
       this.fields = this.createChart.value.all_fields;
+      this.conditionsFilter = this.fields.map((field: { conditions: any[] }) => {
+        return field.conditions.map(condition => ({
+          ...condition,
+          operatorBetween: condition.operatorBetween , // Preserve value or set default
+        }));
+      });
+console.log('this.conditionsFilter',this.conditionsFilter);
       console.log('this.fields check before label update', this.fields);
   
       // Map through fields to include corresponding labels from dynamicparameterLabMap
-      this.fields = this.fields.map((field:any, index:any) => {
-        const label = this.dynamicparameterLabMap[index] || ''; // Get the label for the current index
-        return { ...field, label }; // Add the label to the current field object
-      });
+      // this.fields = this.fields.map((field:any, index:any) => {
+      //   const label = this.dynamicparameterLabMap[index] || ''; // Get the label for the current index
+      //   return { ...field, label }; // Add the label to the current field object
+      // });
   
       console.log('this.fields check after label update', this.fields);
   
       const newTile = {
         id: uniqueId,
+     
         x: 0,
         y: 0,
         rows: 13, // The number of rows in the grid
@@ -341,15 +516,20 @@ export class DynamicTileConfigComponent implements OnInit{
         colWidth: 100,
         fixedColWidth: true,
         fixedRowHeight: true,
-        grid_type: 'dynamicTile',
-        chart_title: this.createChart.value.chart_title || '', // Ensure this value exists
-        toggleCheck: this.createChart.value.toggleCheck,
-        tileConfig: this.fields || [], // Updated fields with labels
+        grid_type: 'filterTile',
+        dateType: this.createChart.value.dateType || '', // Ensure this value exists
+        filterTileConfig:this.conditionsFilter ,   
+        addFieldsEnabled: this.createChart.value.add_fields,
         themeColor: this.createChart.value.themeColor,
         fontSize: `${this.createChart.value.fontSize}px`, // Added fontSize
         fontColor: this.createChart.value.fontColor,
-        dashboardIds: this.createChart.value.dashboardIds,
-        selectType: this.createChart.value.selectType,
+        custom_Label:this.createChart.value.custom_Label,
+        
+  
+        // filterTile: this.fields || [], // Updated fields with labels
+
+       
+     
         noOfParams: this.noOfParams || 0, // Ensure noOfParams has a valid value
       };
   
@@ -372,10 +552,15 @@ export class DynamicTileConfigComponent implements OnInit{
   
       this.createChart.patchValue({
         widgetid: uniqueId,
-        chart_title: '', // Reset chart title field (or leave it if needed)
-        highchartsOptionsJson: {}, // Reset chart options (or leave it if needed)
+      // Reset chart title field (or leave it if needed)
+ // Reset chart options (or leave it if needed)
       });
     }
+  }
+
+  betweenoperator(event:any){
+    console.log('event checking ',event)
+
   }
   
   
@@ -386,63 +571,38 @@ export class DynamicTileConfigComponent implements OnInit{
   
   updateTile(key: any) {
     console.log('key checking from update', key);
-    // console.log('highchartsOptionsJson checking',highchartsOptionsJson)
-  //  let tempParsed = this.createChart.value.highchartsOptionsJson
+  
     if (this.editTileIndex !== null) {
       console.log('this.editTileIndex check', this.editTileIndex);
       console.log('Tile checking for update:', this.dashboard[this.editTileIndex]);
   
-//   if (typeof tempParsed === 'string') {
-//     tempParsed = JSON.parse(tempParsed);
-// }
-
-// Update the chart options dynamically
-// const updatedHighchartsOptionsJson = {
-//   ...tempParsed,
-//   title: {
-//     ...tempParsed.title,
-//     text: this.createChart.value.chart_title || ''  // Update the title dynamically
-//   }
-// };
-// console.log('updatedHighchartsOptionsJson check',updatedHighchartsOptionsJson)
-// // this.chartFinalOptions =JSON.stringify(updatedHighchartsOptionsJson,null,4)
-// // console.log('this.chartFinalOptions check',this.chartFinalOptions)
-      // Update the multi_value array with the new processed_value and constantValue
-
+      // Map `all_fields` to `filterTileConfig`
+      const fields = this.createChart.value.all_fields || [];
+      const conditionsFilter = fields.map((field: { conditions: any[] }) =>
+        field.conditions.map((condition: any) => ({
+          formField: condition.formField || '',
+          operator: condition.operator || '',
+          filterValue: condition.filterValue || '',
+          operatorBetween: condition.operatorBetween || '',
+        }))
+      );
   
-      // Add defensive checks for predefinedSelectRange
-
+      console.log('Mapped conditionsFilter for update:', conditionsFilter);
   
-      
-      console.log('this.dashboard',this.dashboard)
-      // Now update the tile with the updated multi_value
       const updatedTile = {
-        ...this.dashboard[this.editTileIndex], // Keep existing properties
-
-        dashboardIds:this.createChart.value.dashboardIds,
-        selectType: this.createChart.value.selectType,
-        toggleCheck:this.createChart.value.toggleCheck,
-        themeColor: this.createChart.value.themeColor,
-        fontSize: `${this.createChart.value.fontSize}px`,
-        fontColor: this.createChart.value.fontColor,
-   
-    chart_title: this.createChart.value.chart_title,
-    // fontSize: this.createChart.value.fontSize,
-    // themeColor: this.createChart.value.themeColor,
-    // fontColor: this.createChart.value.fontColor,
-    tileConfig: this.createChart.value.all_fields,
-    // highchartsOptionsJson: this.chartFinalOptions,
-    // filterForm:this.createChart.value.filterForm,
-    // filterParameter:this.createChart.value.filterParameter,
-    // filterDescription:this.createChart.value.filterDescription,
-    // Include noOfParams
-    noOfParams:this.dashboard[this.editTileIndex].noOfParams,
-
-
+        ...this.dashboard[this.editTileIndex], // Retain existing properties
+  
+        // Update specific properties
+        custom_Label:this.createChart.value.custom_Label ,
+        dateType: this.createChart.value.dateType || '',
+        filterTileConfig: conditionsFilter, // Updated filter configuration
+        addFieldsEnabled: this.createChart.value.add_fields || false, // Add fields toggle state
+        noOfParams: this.dashboard[this.editTileIndex].noOfParams, // Retain existing parameter count
       };
+  
       console.log('updatedTile checking', updatedTile);
   
-      // Update the dashboard array using a non-mutative approach
+      // Update the dashboard array with the modified tile
       this.dashboard = [
         ...this.dashboard.slice(0, this.editTileIndex),
         updatedTile,
@@ -450,25 +610,29 @@ export class DynamicTileConfigComponent implements OnInit{
       ];
   
       console.log('Updated Tile Details:', this.dashboard[this.editTileIndex]);
-      console.log('this.all_Packet_store.grid_details check',this.all_Packet_store.grid_details)
+      console.log('this.all_Packet_store.grid_details check', this.all_Packet_store.grid_details);
   
-      // Update the grid_details as well
+      // Update `grid_details` to reflect the updated tile
       this.all_Packet_store.grid_details[this.editTileIndex] = {
         ...this.all_Packet_store.grid_details[this.editTileIndex],
         ...updatedTile,
       };
+  
       console.log(
         '  this.all_Packet_store.grid_details[this.editTileIndex]',
         this.all_Packet_store.grid_details[this.editTileIndex]
       );
+  
       console.log('this.dashboard checking from gitproject', this.dashboard);
+  
+      // Emit the updated dashboard and update grid details
       this.grid_details = this.dashboard;
-      console.log('this.grid_details checkb for update',this.grid_details)
-      
+      console.log('this.grid_details check for update', this.grid_details);
       this.dashboardChange.emit(this.grid_details);
   
+      // Trigger update summary if grid details exist
       if (this.grid_details) {
-        this.updateSummary(this.all_Packet_store,'update_tile');
+        this.updateSummary(this.all_Packet_store, 'update_tile');
       }
   
       console.log('this.dashboard check from updateTile', this.dashboard);
@@ -480,6 +644,12 @@ export class DynamicTileConfigComponent implements OnInit{
       console.error('Edit index is null. Unable to update the tile.');
     }
   }
+  
+  toggleAddFields(event: any, tile: any) {
+    tile.addFieldsEnabled = event.target.checked;
+    console.log('Updated tile state:', tile);
+  }
+  
   
 
   selectedSettingsTab(tab: string) {
@@ -562,41 +732,82 @@ themes = [
 ];
 
 
-openDynamicTileModal(tile: any, index: number) {
-  console.log('Index checking:', index);
+openFilterModal(tile: any, index: number) {
+  console.log('Tile checking data from openFilterModal', tile);
+  const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14;
 
   if (tile) {
     this.selectedTile = tile;
     this.editTileIndex = index !== undefined ? index : null;
-    console.log('this.editTileIndex checking from openChartModal1', this.editTileIndex);
-    console.log('Tile Object:', tile);
 
     this.paramCount = tile.noOfParams || 1;
 
-    const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14;
+    // Parse the filterTileConfig
+    this.parsedfilterTileConfig = JSON.parse(tile.filterTileConfig);
+    console.log('this.parsedfilterTileConfig check', this.parsedfilterTileConfig);
 
-    // // Set the selected theme based on tile.themeColor
-    // this.themes.forEach((theme) => {
-    //   theme.selected = theme.color === tile.themeColor;
-    // });
-
-    console.log('Themes after selection:', this.themes);
-
+    // Initialize form with dynamic bindings
     this.createChart = this.fb.group({
-      add_fields: this.paramCount,
-      chart_title: tile.chart_title || '',
-      themeColor: tile.themeColor || 'linear-gradient(to right, #ffffff, #000000)', // Fallback for themeColor
-   
-      dashboardIds:tile.dashboardIds,
       fontSize: fontSizeValue,
       selectType: tile.selectType,
       fontColor: tile.fontColor || '#000000',
-      toggleCheck:tile.toggleCheck,
-
-      all_fields: this.repopulate_fields(tile),
+      add_fields: [tile.addFieldsEnabled],
+      noOfParams: [{ value: tile.noOfParams, disabled: !tile.addFieldsEnabled }],
+      dateType: [tile.dateType],
+      toggleCheck: [tile.toggleCheck],
+      all_fields: this.fb.array([]), // Initialize empty array
+      custom_Label:tile.custom_Label
     });
-console.log('this.isEditMode check',this.isEditMode)
+
+    const allFieldsArray = this.createChart.get('all_fields') as FormArray;
+
+    // Populate all_fields from parsedfilterTileConfig index-wise
+
+
+    console.log('Populated all_fields:', allFieldsArray.controls);
+
+    this.makeTrueCheck = tile.addFieldsEnabled; // Set checkbox state
     this.isEditMode = true;
+
+    // Call addControls programmatically to handle noOfParams and other updates
+    this.addControls(
+      { target: { checked: tile.addFieldsEnabled } },
+      'html',
+      tile.noOfParams || 0, // Use noOfParams from the tile
+      this.formlistValues
+    );
+
+    this.parsedfilterTileConfig.forEach((packet: any[], fieldIndex: number) => {
+      const conditionsArray = this.fb.array(
+        packet.map((condition: any, conditionIndex: number) =>
+          this.fb.group({
+            formField: [condition.formField || '', Validators.required], // Index-wise readback
+            operator: [condition.operator || '', Validators.required], // Index-wise readback
+            filterValue: [condition.filterValue || '', Validators.required], // Index-wise readback
+            operatorBetween: [condition.operatorBetween || '', Validators.required], // Index-wise readback
+          })
+        )
+      );
+
+      allFieldsArray.push(
+        this.fb.group({
+          parameterName: [this.formlistValues[fieldIndex] || `Parameter ${fieldIndex + 1}`, Validators.required],
+          conditions: conditionsArray,
+        })
+      );
+
+      console.log(`Populated field at index ${fieldIndex}:`, allFieldsArray.at(fieldIndex).value);
+    });
+
+    // Listen for changes in add_fields and update form dynamically
+    this.createChart.get('add_fields')?.valueChanges.subscribe((isEnabled) => {
+      const noOfParamsControl = this.createChart.get('noOfParams');
+      if (isEnabled) {
+        noOfParamsControl?.enable(); // Enable noOfParams
+      } else {
+        noOfParamsControl?.disable(); // Disable noOfParams
+      }
+    });
   } else {
     this.selectedTile = null;
     this.isEditMode = false;
@@ -605,6 +816,10 @@ console.log('this.isEditMode check',this.isEditMode)
     }
   }
 }
+
+
+
+
 
 
 
@@ -760,48 +975,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   onMouseLeave(): void {
     this.isHovered = false;
   }
-  fetchDynamicFormData(value: any, index: number) {
-    console.log("Fetching data for:", value);
 
-    // Simulating API call
-    this.api
-      .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
-      .then((result: any) => {
-        if (result && result.metadata) {
-          const parsedMetadata = JSON.parse(result.metadata);
-          const formFields = parsedMetadata.formFields;
-
-          // Prepare parameter list
-          const dynamicParamList = formFields.map((field: any) => ({
-            value: field.name,
-            text: field.label,
-          }));
-
-          // Add created_time and updated_time
-          if (parsedMetadata.created_time) {
-            dynamicParamList.push({
-              value: parsedMetadata.created_time.toString(),
-              text: 'Created Time',
-            });
-          }
-          if (parsedMetadata.updated_time) {
-            dynamicParamList.push({
-              value: parsedMetadata.updated_time.toString(),
-              text: 'Updated Time',
-            });
-          }
-
-          // Store parameters in the map
-          this.dynamicParamMap.set(index, dynamicParamList);
-
-          // Trigger change detection
-          this.cdr.detectChanges();
-        }
-      })
-      .catch((err) => {
-        console.error("Error fetching data:", err);
-      });
-  }
   
   
 
@@ -1121,21 +1295,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     return this.createChart.get('groupByFormat') as FormControl; // Cast to FormControl
   }
 
-  openModalCalender(fieldIndex: number) {
-    console.log('Field Index:', fieldIndex);
-    this.calenderIndex = fieldIndex;
-  
-    const modalRef = this.modalService.open(this.calendarModalChart);
-    modalRef.result.then(
-      (result) => {
-        console.log('Modal closed with:', result);
-        // Handle modal close
-      },
-      (reason) => {
-        console.log('Modal dismissed with:', reason);
-      }
-    );
-  }
+
   
   
 
@@ -1144,23 +1304,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     console.log('Handling post modal close logic with value:', selectedValue);
     // You can update your UI or state here based on the selectedValue
   }
-  isTooltipDate = (m: Dayjs) => {
-    // Ensure tooltips is an array and has valid data
-    if (!Array.isArray(this.tooltips) || this.tooltips.length === 0) {
-      return false;
-    }
-  
-    const tooltip = this.tooltips.find((tt) => tt.date.isSame(m, 'day'));
-    return tooltip ? tooltip.text : false;
-  };
-  
-  
-  isCustomDate = (date: Dayjs) => {
-    return date.month() === 0 || date.month() === 6 ? 'mycustomdate' : false;
-  };
-  isInvalidDate = (m: Dayjs) => {
-    return this.invalidDates.some((d) => d.isSame(m, 'day'));
-  };
+
   showTooltip(item: string) {
     this.tooltip = item;
   }
@@ -1235,16 +1379,7 @@ toggleCheckbox1(themeOrEvent: any): void {
   }
 
 
-  locale = {
-    firstDay: 1,
-    startDate: dayjs().startOf('day'),
-    endDate: dayjs().endOf('day'),
-    format: 'DD.MM.YYYY',
-    applyLabel: 'Apply',
-    cancelLabel: 'Cancel',
-    fromLabel: 'From',
-    toLabel: 'To',
-  };
+
 
 
 
@@ -1253,28 +1388,7 @@ toggleCheckbox1(themeOrEvent: any): void {
 
 
   // Method to initialize the chart using the form's JSON value
-initializeChart(): void {
-  const highchartsOptionsJson = this.highchartsForm.value.highchartsOptionsJson;
-  console.log('highchartsOptionsJson check',highchartsOptionsJson)
 
-  if (highchartsOptionsJson) {  // Check if the JSON string is neither null nor undefined
-    try {
-      // Parse the JSON entered in the textarea
-      const highchartsOptions = JSON.parse(highchartsOptionsJson);
-
-      // Check if the options are valid and initialize the chart
-      if (highchartsOptions && typeof highchartsOptions === 'object') {
-        Highcharts.chart('chartContainer', highchartsOptions); // Create the Highcharts chart
-      } else {
-        console.error('Invalid Highcharts options');
-      }
-    } catch (e) {
-      console.error('Invalid JSON:', e); // Catch invalid JSON errors
-    }
-  } else {
-    console.error('Highcharts options are empty or undefined');
-  }
-}
 
 
 }

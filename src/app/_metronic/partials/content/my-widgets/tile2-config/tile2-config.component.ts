@@ -187,13 +187,14 @@ generateUniqueId(): number {
       // selectedColor: [this.selectedColor],
       'themeColor': ['', Validators.required],
       'processed_value1':[''],
-      fontSize: [14, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
+      fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['#000000', Validators.required], 
       dashboardIds:[''],
       selectType:[''],
       filterParameter:[''],
       filterDescription:[''],
-      selectedRangeType:['',Validators.required]
+      selectedRangeType:['',Validators.required],
+      custom_Label:['',Validators.required]
 
     })
   }
@@ -242,6 +243,7 @@ generateUniqueId(): number {
          filterDescription:this.createKPIWidget1.value.filterDescription,
          selectedRangeType:this.createKPIWidget1.value.selectedRangeType,
          parameterNameRead: this.parameterNameRead, 
+         custom_Label:this.createKPIWidget1.value.custom_Label,
 
 
 
@@ -380,7 +382,8 @@ generateUniqueId(): number {
         selectType:tile.selectType,
         filterParameter:tile.filterParameter,
         filterDescription:tile.filterDescription,
-        selectedRangeType:tile.selectedRangeType
+        selectedRangeType:tile.selectedRangeType,
+        custom_Label:tile.custom_Label
 
 
 
@@ -583,7 +586,8 @@ generateUniqueId(): number {
         selectType:this.createKPIWidget1.value.selectType,
         filterParameter:this.createKPIWidget1.value.filterParameter,
         filterDescription:this.createKPIWidget1.value.filterDescription,
-        selectedRangeType:this.createKPIWidget1.value.selectedRangeType
+        selectedRangeType:this.createKPIWidget1.value.selectedRangeType,
+        custom_Label:this.createKPIWidget1.value.custom_Label
       };
 
       // Log the updated details of the tile
