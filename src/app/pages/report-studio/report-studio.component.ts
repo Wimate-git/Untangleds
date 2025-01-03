@@ -1246,7 +1246,7 @@ isBase64(value: string): boolean {
             flex: 1,
             minWidth: 150,
             filter: true,
-            sortable: true,
+            // sortable: true,
             cellRenderer: cellRenderer,
             cellRendererParams: {
               context: this  // Ensure context is passed correctly to the renderer
@@ -1303,32 +1303,74 @@ isBase64(value: string): boolean {
   }
 
 
+      // trackLocationCellRenderer(params: any) {
+
+      //   // console.log("Params are here ",params);
+
+      //   if(params && params.value){
+      //     const coordinates = params.value; 
+        
+      //       // Create a clickable link for the location
+      //       const link = document.createElement('a');
+      //       link.href = 'javascript:void(0)';
+      //       link.innerHTML = coordinates;
+
+      //       // Add click event listener to dispatch a custom event
+      //       link.addEventListener('click', () => {
+      //           // Dispatch a custom event with location data
+      //           const event = new CustomEvent('marker-click', {
+      //               detail: { coordinates: coordinates }
+      //           });
+      //           window.dispatchEvent(event);
+      //       });
+
+      //       return link;
+      //   }
+
+      //   return null
+      // }
+
+
+
       trackLocationCellRenderer(params: any) {
 
-        // console.log("Params are here ",params);
-
-        if(params && params.value){
-          const coordinates = params.value; 
-        
-            // Create a clickable link for the location
-            const link = document.createElement('a');
-            link.href = 'javascript:void(0)';
-            link.innerHTML = coordinates;
-
-            // Add click event listener to dispatch a custom event
-            link.addEventListener('click', () => {
+        // Check if params and params.value exist
+        if (params && params.value) {
+            const coordinates = params.value;
+    
+            // Create a container for the icon
+            const container = document.createElement('div');
+            container.style.display = 'flex';
+            container.style.alignItems = 'center';
+            container.style.justifyContent = 'center';
+    
+            // Create the Bootstrap location icon (location pin)
+            const locationIcon = document.createElement('i');
+            locationIcon.className = 'fa-solid fa-map-location-dot';  // Bootstrap icon class for location pin
+            locationIcon.style.fontSize = '24px';  // Adjust font size for better visibility
+            locationIcon.style.cursor = 'pointer'; // Change cursor to pointer to indicate clickability
+            locationIcon.style.color = '#1F509A';
+    
+            // Add click event listener to dispatch a custom event with location data
+            locationIcon.addEventListener('click', () => {
                 // Dispatch a custom event with location data
                 const event = new CustomEvent('marker-click', {
                     detail: { coordinates: coordinates }
                 });
                 window.dispatchEvent(event);
             });
-
-            return link;
+    
+            // Append the icon to the container
+            container.appendChild(locationIcon);
+    
+            return container;
         }
-
-        return null
-      }
+    
+        // Return null if params or params.value is missing
+        return null;
+    }
+    
+    
 
 
       isLocation(key: any,getValue:any){
@@ -1356,32 +1398,73 @@ isBase64(value: string): boolean {
     return `<img src="${imageBase64}" style="max-width: 100%; max-height: 100px;cursor: pointer;" class="image-click" onclick="window.dispatchEvent(new CustomEvent('image-click', { detail: '${imageBase64}' }))" />`;
   }
 
-  locationCellRenderer(params: any) {
+//   locationCellRenderer(params: any) {
 
-    // Ensure the value is a comma-separated string of latitude and longitude
-    const coordinates = typeof params.value == 'string' ? params.value.split(','):"";
-    const lat = coordinates[0];  // First part is latitude
-    const lon = coordinates[1];  // Second part is longitude
+//     // Ensure the value is a comma-separated string of latitude and longitude
+//     const coordinates = typeof params.value == 'string' ? params.value.split(','):"";
+//     const lat = coordinates[0];  // First part is latitude
+//     const lon = coordinates[1];  // Second part is longitude
 
-    // If latitude and longitude are missing, default to 'No Location'
-    const locationText = lat && lon ? `${lat}, ${lon}` : 'No Location';
+//     // If latitude and longitude are missing, default to 'No Location'
+//     const locationText = lat && lon ? `${lat}, ${lon}` : 'No Location';
 
-    // Create a clickable link for the location
-    const link = document.createElement('a');
-    link.href = 'javascript:void(0)';
-    link.innerHTML = locationText;
+//     // Create a clickable link for the location
+//     const link = document.createElement('a');
+//     link.href = 'javascript:void(0)';
+//     link.innerHTML = locationText;
 
-    // Add click event listener to dispatch a custom event
-    link.addEventListener('click', () => {
-        // Dispatch a custom event with location data
-        const event = new CustomEvent('location-click', {
-            detail: { latitude: lat, longitude: lon }
-        });
-        window.dispatchEvent(event);
+//     // Add click event listener to dispatch a custom event
+//     link.addEventListener('click', () => {
+//         // Dispatch a custom event with location data
+//         const event = new CustomEvent('location-click', {
+//             detail: { latitude: lat, longitude: lon }
+//         });
+//         window.dispatchEvent(event);
+//     });
+
+//     return link;
+// }
+
+locationCellRenderer(params: any) {
+
+  // Ensure the value is a comma-separated string of latitude and longitude
+  const coordinates = typeof params.value == 'string' ? params.value.split(',') : "";
+  const lat = coordinates[0];  // First part is latitude
+  const lon = coordinates[1];  // Second part is longitude
+
+
+  const locationText = lat && lon ? `${lat}, ${lon}` : null;
+
+  // Create a container for the icon
+  const container = document.createElement('div');
+  container.style.display = 'flex';
+  container.style.alignItems = 'center';
+  container.style.justifyContent = 'center';
+
+
+  // Create the Bootstrap location icon
+  const locationIcon = document.createElement('i');
+  locationIcon.className = 'bi bi-geo-alt-fill';  
+  locationIcon.style.fontSize = '24px';  
+  locationIcon.style.cursor = 'pointer';  
+  locationIcon.style.marginRight = '8px'; 
+  locationIcon.style.color = 'red';
+
+  // Add click event listener to dispatch a custom event with location data
+  locationIcon.addEventListener('click', () => {
+    // Dispatch a custom event with location data
+    const event = new CustomEvent('location-click', {
+        detail: { latitude: lat, longitude: lon }
     });
+    window.dispatchEvent(event);
+  });
 
-    return link;
+  // Append the icon to the container (no need for a link now)
+  container.appendChild(locationIcon);
+
+  return container;
 }
+
 
 
 
@@ -1579,9 +1662,10 @@ mergeAndAddLocation(mappedResponse: any) {
 
   if (latitudeKey && longitudeKey && mappedResponse[latitudeKey] && mappedResponse[longitudeKey]) {
     mappedResponse['Geographic Location'] = `${mappedResponse[latitudeKey]},${mappedResponse[longitudeKey]}`;
-    delete mappedResponse[latitudeKey];
-    delete mappedResponse[longitudeKey];
   }
+
+  delete mappedResponse[latitudeKey || ''];
+  delete mappedResponse[longitudeKey || ''];
 }
 
 
