@@ -436,19 +436,21 @@
                                         </option>
                                         </select>
                                 </div>
-                                <div class="col-md-2 mb-6 d-flex align-items-end">
+                                <div class="col-md-2 mb-19 d-flex align-items-end">
                                     <button type="button" class="btn btn-light-primary w-30 d-flex align-items-center justify-content-center" (click)="populateFilterEquation()">
                                         <i class="bi bi-plus"></i>
                                     </button>
                                 </div>
                                 <div class="col-md-5 mb-4 filter-equation">
                                     <label class="fw-semibold fs-6 mb-2">Filter equation</label>
-                                    <input type="text" class="form-control form-control-solid" name="fieldValue"
-                                        placeholder="value" formControlName="fieldValue" />
+                                    <!--<input type="text" class="form-control form-control-solid" name="fieldValue"
+                                        placeholder="value" formControlName="fieldValue" />-->
+                                        <textarea type="text" class="form-control form-control-solid" name="fieldValue" rows="3"
+                                        placeholder="value" formControlName="fieldValue"></textarea>
                                 </div>
                                
                         
-                                <div class="col-md-2 mb-4 d-flex align-items-end">
+                                <div class="col-md-2 mb-16 d-flex align-items-end">
                                     <button type="button" class="btn btn-primary w-60"
                                         (click)="addDynamicData()">Add</button>
                                 </div>

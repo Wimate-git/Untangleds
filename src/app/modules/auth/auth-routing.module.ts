@@ -5,6 +5,7 @@ import { LoginComponent } from './components/login/login.component';
 import { RegistrationComponent } from './components/registration/registration.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { LogoutComponent } from './components/logout/logout.component';
+import { WebComplaintsComponent } from './components/web-Complaint/web-Complaint.component';
 
 const routes: Routes = [
   {
@@ -19,6 +20,11 @@ const routes: Routes = [
       {
         path: 'login',
         component: LoginComponent,
+        data: { returnUrl: window.location.pathname },
+      },
+      {
+        path: 'web-Complaint',
+        component:WebComplaintsComponent,
         data: { returnUrl: window.location.pathname },
       },
       {
