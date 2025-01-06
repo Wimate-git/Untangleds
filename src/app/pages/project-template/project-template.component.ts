@@ -154,29 +154,29 @@ export class ProjectTemplateComponent implements OnInit, AfterViewInit, OnDestro
       { value: 'youtube', label: 'YouTube', class1: "fs-2x text-dark", class2: "symbol-label bg-light-dark" },
       { value: 'dribbble', label: 'Dribbble', class1: "fs-2x text-primary", class2: "symbol-label bg-light-primary" },
       { value: 'twitter', label: 'Twitter', class1: "fs-2x text-success", class2: "symbol-label bg-light-success" },
-      { value: 'tiktok', label: 'TikTok', class1: "fs-2x text-danger", class2: "symbol-label bg-light-danger" }
-    // { value: 'abstract-33', label: 'Abstract 33', class1: "fs-2x text-danger", class2:"symbol-label bg-light-danger"},
-    // { value: 'abstract-27', label: 'Abstract 27', class1: "fs-2x text-success" ,class2:"symbol-label bg-light-success" },
-    // { value: 'abstract-25', label: 'Abstract 25', class1: "fs-2x text-warning", class2: "symbol-label bg-light-warning" },
-    //   { value: 'abstract-19', label: 'Abstract 19', class1: "fs-2x text-success", class2: "symbol-label bg-light-success" },
-    //   { value: 'abstract-21', label: 'Abstract 21', class1: "fs-2x text-primary", class2: "symbol-label bg-light-primary" },
-    //   { value: 'abstract-35', label: 'Abstract 35', class1: "fs-2x text-secondary", class2: "symbol-label bg-light-secondary" },
-    //   { value: 'abstract-34', label: 'Abstract 34', class1: "fs-2x text-dark", class2: "symbol-label bg-light-dark" },
-    //   { value: 'abstract-20', label: 'Abstract 20', class1: "fs-2x text-muted", class2: "symbol-label bg-light-muted" },
-    //   { value: 'abstract-36', label: 'Abstract 36', class1: "fs-2x text-success", class2: "symbol-label bg-light-success" },
-    //   { value: 'abstract-22', label: 'Abstract 22', class1: "fs-2x text-danger", class2: "symbol-label bg-light-danger" },
-    //   { value: 'abstract-23', label: 'Abstract 23', class1: "fs-2x text-info", class2: "symbol-label bg-light-info" },
-    //   { value: 'abstract-37', label: 'Abstract 37', class1: "fs-2x text-warning", class2: "symbol-label bg-light-warning" },
-    //   { value: 'abstract-44', label: 'Abstract 44', class1: "fs-2x text-primary", class2: "symbol-label bg-light-primary" },
-    //   { value: 'abstract', label: 'Abstract', class1: "fs-2x text-secondary", class2: "symbol-label bg-light-secondary" },
-    //   { value: 'abstract-45', label: 'Abstract 45', class1: "fs-2x text-dark", class2: "symbol-label bg-light-dark" },
-    //   { value: 'abstract-47', label: 'Abstract 47', class1: "fs-2x text-muted", class2: "symbol-label bg-light-muted" },
-    //   { value: 'abstract-46', label: 'Abstract 46', class1: "fs-2x text-danger", class2: "symbol-label bg-light-danger" },
-    //   { value: 'abstract-42', label: 'Abstract 42', class1: "fs-2x text-info", class2: "symbol-label bg-light-info" },
-    //   { value: 'abstract-43', label: 'Abstract 43', class1: "fs-2x text-warning", class2: "symbol-label bg-light-warning" },
-    //   { value: 'abstract-41', label: 'Abstract 41', class1: "fs-2x text-success", class2: "symbol-label bg-light-success" },
-    //   { value: 'abstract-40', label: 'Abstract 40', class1: "fs-2x text-primary", class2: "symbol-label bg-light-primary" },
-    //   { value: 'abstract-27', label: 'Abstract 27', class1: "fs-2x text-secondary", class2: "symbol-label bg-light-secondary" },
+      { value: 'tiktok', label: 'TikTok', class1: "fs-2x text-danger", class2: "symbol-label bg-light-danger" },
+      { value: 'abstract-33', label: 'Abstract 33', class1: "fs-2x text-danger", class2:"symbol-label bg-light-danger"},
+      { value: 'abstract-27', label: 'Abstract 27', class1: "fs-2x text-success" ,class2:"symbol-label bg-light-success" },
+      { value: 'abstract-25', label: 'Abstract 25', class1: "fs-2x text-warning", class2: "symbol-label bg-light-warning" },
+      { value: 'abstract-19', label: 'Abstract 19', class1: "fs-2x text-success", class2: "symbol-label bg-light-success" },
+      { value: 'abstract-21', label: 'Abstract 21', class1: "fs-2x text-primary", class2: "symbol-label bg-light-primary" },
+      { value: 'abstract-35', label: 'Abstract 35', class1: "fs-2x text-secondary", class2: "symbol-label bg-light-secondary" },
+      { value: 'abstract-34', label: 'Abstract 34', class1: "fs-2x text-dark", class2: "symbol-label bg-light-dark" },
+      { value: 'abstract-20', label: 'Abstract 20', class1: "fs-2x text-muted", class2: "symbol-label bg-light-muted" },
+      { value: 'abstract-36', label: 'Abstract 36', class1: "fs-2x text-success", class2: "symbol-label bg-light-success" },
+      { value: 'abstract-22', label: 'Abstract 22', class1: "fs-2x text-danger", class2: "symbol-label bg-light-danger" },
+      { value: 'abstract-23', label: 'Abstract 23', class1: "fs-2x text-info", class2: "symbol-label bg-light-info" },
+      { value: 'abstract-37', label: 'Abstract 37', class1: "fs-2x text-warning", class2: "symbol-label bg-light-warning" },
+      { value: 'abstract-44', label: 'Abstract 44', class1: "fs-2x text-primary", class2: "symbol-label bg-light-primary" },
+      { value: 'abstract',    label: 'Abstract',    class1: "fs-2x text-secondary", class2: "symbol-label bg-light-secondary" },
+      { value: 'abstract-45', label: 'Abstract 45', class1: "fs-2x text-dark", class2: "symbol-label bg-light-dark" },
+      { value: 'abstract-47', label: 'Abstract 47', class1: "fs-2x text-muted", class2: "symbol-label bg-light-muted" },
+      { value: 'abstract-46', label: 'Abstract 46', class1: "fs-2x text-danger", class2: "symbol-label bg-light-danger" },
+      { value: 'abstract-42', label: 'Abstract 42', class1: "fs-2x text-info", class2: "symbol-label bg-light-info" },
+      { value: 'abstract-43', label: 'Abstract 43', class1: "fs-2x text-warning", class2: "symbol-label bg-light-warning" },
+      { value: 'abstract-41', label: 'Abstract 41', class1: "fs-2x text-success", class2: "symbol-label bg-light-success" },
+      { value: 'abstract-40', label: 'Abstract 40', class1: "fs-2x text-primary", class2: "symbol-label bg-light-primary" },
+      { value: 'abstract-27', label: 'Abstract 27', class1: "fs-2x text-secondary", class2: "symbol-label bg-light-secondary" },
     // { value: 'abstract-26', label: 'Abstract 26', class: `ki-duotone ki-abstract-26 ${this.getRandomColor()}` },
     // { value: 'abstract-32', label: 'Abstract 32', class: `ki-duotone ki-abstract-32 ${this.getRandomColor()}` },
     // { value: 'abstract-18', label: 'Abstract 18', class: `ki-duotone ki-abstract-18 ${this.getRandomColor()}` },
@@ -193,11 +193,11 @@ export class ProjectTemplateComponent implements OnInit, AfterViewInit, OnDestro
         description: ["", Validators.required],
         formList:[[], Validators.required],
         color: ["", Validators.required],
-        iconSelect:[''],
+        iconSelect:['',Validators.required],
         iconObject:[''],
-        label: [''],
-        forms: [''],
-        field: [''],
+        label: ['',Validators.required],
+        forms: ['',Validators.required],
+        field: ['',Validators.required],
         label_1:['',Validators.required],
         label_2:['',Validators.required],
         label_3:['',Validators.required],
@@ -215,32 +215,67 @@ export class ProjectTemplateComponent implements OnInit, AfterViewInit, OnDestro
 }
 
 
+// addValues() {
+//   // Get selected values from the dropdowns
+
+//   const selectedLabel = this.projectForm.get('label')?.value;
+//   const selectedForm = this.projectForm.get('forms')?.value;
+//   const selectedField = this.projectForm.get('field')?.value;
+
+//   if (!selectedLabel || !selectedForm || !selectedField) {
+//       alert('Please select all fields before adding!');
+//       return;
+//   }
+
+//   // Concatenate the values into a string
+//   // const valueToAdd = `Form: ${selectedForm}, Field: ${selectedField}`;
+
+//   const valueToAdd = `${selectedForm}.${selectedField}`;
+
+//   // Update the corresponding input field
+//   this.projectForm.get(selectedLabel)?.setValue(valueToAdd);
+
+//   this.projectForm.patchValue({
+//     label: '',
+//     forms: '',
+//     field: '',
+// });
+// }
+
 addValues() {
   // Get selected values from the dropdowns
-
   const selectedLabel = this.projectForm.get('label')?.value;
   const selectedForm = this.projectForm.get('forms')?.value;
   const selectedField = this.projectForm.get('field')?.value;
 
+  // Validate the selections
   if (!selectedLabel || !selectedForm || !selectedField) {
-      alert('Please select all fields before adding!');
-      return;
+    alert('Please select all fields before adding!');
+    return;
   }
 
-  // Concatenate the values into a string
-  // const valueToAdd = `Form: ${selectedForm}, Field: ${selectedField}`;
+  // Create the value to add
+  // const valueToAdd = `${selectedForm}.${selectedField}`;
 
-  const valueToAdd = `${selectedForm}.${selectedField}`;
+  const valueToAdd = `\${${selectedForm}.${selectedField}}`;
 
-  // Update the corresponding input field
-  this.projectForm.get(selectedLabel)?.setValue(valueToAdd);
+  // Get the current value of the selected label field
+  const currentValue = this.projectForm.get(selectedLabel)?.value || '';
 
+  // Append the new value, separated by a space
+  const updatedValue = currentValue ? `${currentValue} ${valueToAdd}` : valueToAdd;
+
+  // Update the form control with the concatenated value
+  this.projectForm.get(selectedLabel)?.setValue(updatedValue);
+
+  // Clear the dropdowns after adding the value
   this.projectForm.patchValue({
     label: '',
     forms: '',
     field: '',
-});
+  });
 }
+
   
   previewIcon(event: any) {
     // Find the icon based on the selected value
@@ -448,12 +483,15 @@ addValues() {
   }
 
   edit(P1: any) {
+
+    this.initForm()
     this.update = true
     this.previewObjDisplay = '';
     this.selectedFormGroups =[]
     console.log("EDIT ID:", P1)
     this.data_temp = []
 
+  
     this.api.GetMaster(this.client + '#projectTemplate#' + P1 + '#main', 1).then((res: any) => {
 
       if (res && res !== undefined) {
@@ -465,10 +503,10 @@ addValues() {
 
           this.previewObjDisplay = this.data_temp[0].iconObject
 
-          this.projectForm = this.fb.group({
+          this.projectForm.patchValue({
             labelID: [this.data_temp[0].labelID],
             description: [this.data_temp[0].description],
-            formList: [this.data_temp[0].formList],
+            formList: this.data_temp[0].formList,
             iconSelect:[this.data_temp[0].iconSelect],
             iconObject:[this.data_temp[0].iconObject],
             color:[this.data_temp[0].color],
@@ -640,7 +678,7 @@ addValues() {
           P5: this.selectedColor,
           P6: this.updateResponse.createdUser,
           P7: this.updateResponse.updatedUser,
-          P8: this.updateResponse.updatedTime,
+          P8: Math.ceil(((new Date()).getTime()) / 1000),
           P9: this.updateResponse.label_1,
           P10: this.updateResponse.label_2,
           P11: this.updateResponse.label_3

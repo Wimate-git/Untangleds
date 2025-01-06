@@ -250,9 +250,12 @@
                         <div class="row align-items-center mb-4 mt-2">
                             <label class="col-md-2 required fw-semibold fs-6">Label 1</label>
                             <div class="col-md-10 d-flex align-items-center">
-                                <input type="text" class="form-control form-control-solid me-2" name="label_1"
-                                    formControlName="label_1" placeholder="Add label 1"/>
-                               
+                                <!-- <input type="text" class="form-control form-control-solid me-2" name="label_1"
+                                    formControlName="label_1" placeholder="Add label 1"/> -->
+
+                                <textarea type="text" class="form-control form-control-solid me-2" name="label_1"
+                                formControlName="label_1" placeholder="Add label 1"></textarea>    
+                            
                             </div>
                             <div *ngIf="projectForm.controls['label_1'].invalid && projectForm.controls['label_1'].touched"
                                 class="invalid-feedback">
@@ -262,9 +265,12 @@
                         <div class="row align-items-center mb-4">
                             <label class="col-md-2 required fw-semibold fs-6">Label 2</label>
                             <div class="col-md-10 d-flex align-items-center">
-                                <input type="text" class="form-control form-control-solid me-2" name="label_2"
-                                    formControlName="label_2" placeholder="Add label 2"/>
-                                
+                                <!-- <input type="text" class="form-control form-control-solid me-2" name="label_2"
+                                    formControlName="label_2" placeholder="Add label 2"/> -->
+
+                                <textarea type="text" class="form-control form-control-solid me-2" name="label_2"
+                                formControlName="label_2" placeholder="Add label 2"></textarea>    
+                            
                             </div>
                             <div *ngIf="projectForm.controls['label_2'].invalid && projectForm.controls['label_2'].touched"
                                 class="invalid-feedback">
@@ -274,9 +280,12 @@
                         <div class="row align-items-center mb-4">
                             <label class="col-md-2 required fw-semibold fs-6">Label 3</label>
                             <div class="col-md-10 d-flex align-items-center">
-                                <input type="text" class="form-control form-control-solid me-2" name="label_3"
-                                    formControlName="label_3" placeholder="Add label 3"/>
+                                <!-- <input type="text" class="form-control form-control-solid me-2" name="label_3"
+                                    formControlName="label_3" placeholder="Add label 3"/> -->
                                
+                                <textarea type="text" class="form-control form-control-solid me-2" name="label_3"
+                                formControlName="label_3" placeholder="Add label 3"></textarea>
+                                    
                             </div>
                             <div *ngIf="projectForm.controls['label_3'].invalid && projectForm.controls['label_3'].touched"
                                 class="invalid-feedback">

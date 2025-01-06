@@ -186,8 +186,8 @@ export class FolderConfigurationComponent implements OnInit, AfterViewInit, OnDe
         description: ["", Validators.required],
         color: ["", Validators.required],
         formList:[[],Validators.required],
-        iconSelect:[''],
-        iconObject:[''],
+        iconSelect:['',Validators.required],
+        iconObject:['',Validators.required],
         remarks:[''],
         createdTime: [Math.ceil(((new Date()).getTime()) / 1000)],
         updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
@@ -599,13 +599,24 @@ export class FolderConfigurationComponent implements OnInit, AfterViewInit, OnDe
           formList: this.updateResponse.formList,
           iconSelect:this.updateResponse.iconSelect,
           iconObject:this.updateResponse.iconObject,
-          color:this.updateResponse.color,
+          color:this.selectedColor,
           remarks:this.updateResponse.remarks,
           createdUser: this.updateResponse.createdUser,
           updatedUser: this.updateResponse.updatedUser,
           createdTime: this.updateResponse.createdTime,
           updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
 
+        };
+
+        this.formgroupItem = {
+          P1: this.folderForm.value.labelID,
+          P2: this.folderForm.value.description,
+          P3: JSON.stringify(this.folderForm.value.formList),
+          P4: JSON.stringify(this.folderForm.value.iconObject),
+          P5: this.selectedColor,
+          P6: this.folderForm.value.createdUser,
+          P7: this.folderForm.value.updatedUser,
+          P8: Math.ceil(((new Date()).getTime()) / 1000)
         };
 
         await this.updatedreamboardlookup(1, matchingRecord.P1, 'update', this.formgroupItem)
