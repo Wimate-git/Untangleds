@@ -16,12 +16,12 @@ import { ModuleDisplayService } from './services/module-display.service';
 import { Config } from 'datatables.net';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { AgGridAngular } from 'ag-grid-angular';
-import * as XLSX from 'xlsx';  
+// import * as XLSX from 'xlsx';  
 import * as pdfMake from "pdfmake/build/pdfmake";
 import { vfs } from 'pdfmake/build/vfs_fonts';
 import { MapModalComponent } from './map-modal/map-modal.component';
 (pdfMake as any).vfs = vfs;
-
+import XLSX from 'xlsx-js-style';  // Import xlsx-js-style
 
 interface ListItem {
   [key: string]: {
@@ -116,6 +116,8 @@ columns: any;
     private isImageClickListenerAdded = false;
     private isLocationClickListenerAdded = false;
     private isMarkerClickListenerAdded = false;
+  dyanmicFormDataArray: any = [];
+  tableFormName: any = [];
 
    constructor(private fb:FormBuilder,private api:APIService,private configService:SharedService,private scheduleAPI:scheduleApiService,
     private toast:MatSnackBar,private spinner:NgxSpinnerService,private cd:ChangeDetectorRef,private modalService: NgbModal,private moduleDisplayService: ModuleDisplayService,
@@ -453,7 +455,6 @@ get formDataSelected(): FormArray {
 
 async onColumnChange(event: any, getValue: string): Promise<void> {
 
-
   let selectedValue: any;
 
    // Determine how to get the selected value based on 'getValue'
@@ -481,6 +482,8 @@ async onColumnChange(event: any, getValue: string): Promise<void> {
 
   // Handle case when selected value is 'onCondition' and populate dropdown data
   if ((selectedValue === 'onCondition' && this.populateFormData.length === 0) || this.selectedValues) {
+    this.populateFormData = []
+
     this.spinner.show();
     try {
       let tempMetadata: any = [];
@@ -493,9 +496,28 @@ async onColumnChange(event: any, getValue: string): Promise<void> {
         if (result) {
           let tempResult = JSON.parse(result.metadata || '').formFields;
           tempMetadata = {};
+          let geoFlag = false
+          let trackFlag = false
+
           tempMetadata[item] = tempResult.map((field: any) => {
+
+            if((field.name.startsWith("map-") || field.type == 'map') && geoFlag == false){
+              geoFlag = true
+              return { name: field.name, label: "Geographic Location", formName: formName };
+            }
+            else if(field && field.name && field.validation && field.validation.isTrackHistory && trackFlag == false){
+              trackFlag = true
+            }
             return { name: field.name, label: field.label, formName: formName };
           });
+
+          if(trackFlag){
+            //Adding Dummy name
+            tempMetadata[item].push({ name: "track-3274927276", label: "trackLocation", formName: formName })
+          }
+         
+       
+          console.log("tempMetadata[item] ",tempMetadata[item]);
         }
         this.populateFormData.push(tempMetadata);
       }
@@ -572,7 +594,7 @@ initializeFormControls(): void {
 
 // Ensure to type-cast the AbstractControl to FormControl for correct methods
 getFormControl(index: number): FormControl {
-  return this.formDataSelected.at(index) as FormControl;
+    return this.formDataSelected.at(index) as FormControl;
 }
 
 
@@ -619,6 +641,8 @@ async onFilterChange(event: any,getValue:any) {
     console.log("Selected form data is here ",this.selectedForms);
 
     try{
+      this.populateFormBuilder = []
+
       let tempMetadata:any = []
       for(let item of this.selectedForms){
         const formName = item
@@ -1080,6 +1104,8 @@ async onFilterChange(event: any,getValue:any) {
 
       console.log("After filter data is here ",tempMetaArray);
 
+      this.dyanmicFormDataArray.push({ [formFilter]: dynamicMetadata });
+
 
       let rows = await this.mapLabels(tempMetaArray,dynamicMetadata) 
 
@@ -1114,6 +1140,8 @@ async onFilterChange(event: any,getValue:any) {
       console.log("Rows are here ",rows);
       console.log("Filtered rows are here ",rows);
 
+
+      console.log("Dyanmic Data array list this.dyanmicFormDataArray ",this.dyanmicFormDataArray);
 
   
 
@@ -1227,7 +1255,7 @@ isBase64(value: string): boolean {
   
       // Merge static columns with dynamic columns
       for (let key in dynamicColumns) {
-        if (key !== 'formFilter' && key !== 'PK' && key !== 'SK' && key != 'Updated Date') {
+        if (key !== 'formFilter' && key !== 'PK' && key !== 'SK' && key != 'Updated Date' && key != 'id' && key != 'dynamic_table_values') {
           const { isBase64Image, isLocation, isTrackLocation } = dynamicColumns[key];
   
           // Choose renderer based on conditions
@@ -1606,7 +1634,7 @@ locationCellRenderer(params: any) {
     const mappedResponses = responses.map((response: any) => {
       const mappedResponse = { ...response };
   
-      metadata.forEach((field: { name: any; label: any; }) => {
+      metadata.forEach((field: any) => {
         const fieldName = field.name;   
         const label = field.label;
         
@@ -1619,17 +1647,18 @@ locationCellRenderer(params: any) {
           // If the field name contains 'signature', process as an image
           if (fieldName.toLowerCase().includes('signature')) {
             mappedResponse[label] = mappedResponse[fieldName];
-          } else {
+          }
+          else {
             mappedResponse[label] = mappedResponse[fieldName];
           }
           delete mappedResponse[fieldName];
-        } else {
+        } 
+        else {
           mappedResponse[label] = 'N/A';
         }
       });
 
-       
-
+      
   
       if (mappedResponse.hasOwnProperty('created_time')) {
         const createdDate = new Date(mappedResponse.created_time);
@@ -1643,11 +1672,9 @@ locationCellRenderer(params: any) {
         delete mappedResponse.updated_time;
       }
   
-      delete mappedResponse.id;
+      // delete mappedResponse.id;
   
-      if (mappedResponse.hasOwnProperty('dynamic_table_values')) {
-        delete mappedResponse.dynamic_table_values;
-      }   
+     
       return mappedResponse;
     });
   
@@ -2106,41 +2133,256 @@ mergeAndAddLocation(mappedResponse: any) {
   }
 
 
-
-  exportAllTablesAsExcel() {
-    const wb = XLSX.utils.book_new();  // Create a new workbook
-
-    // Iterate over all ag-Grid instances
-    this.agGrids.toArray().forEach((gridInstance, index) => {
-      // Fetch the grid API
+  async exportAllTablesAsExcel() {
+    const wb = XLSX.utils.book_new(); 
+  
+    // Use `map` instead of `forEach` to handle async operations properly
+    const tableExports = await Promise.all(this.agGrids.toArray().map(async (gridInstance, index) => {
       const gridApi = gridInstance.api;
-
-      // Generate CSV data from the grid
       const csvData = gridApi.getDataAsCsv();
+      console.log("CSV data is here ",csvData);
+      const data = this.csvToArray(csvData || '');
 
-      // Convert CSV string to SheetJS workbook (Excel)
-      const ws = XLSX.utils.aoa_to_sheet(this.csvToArray(csvData || ''));
+      console.log("Data is here ",data);
+  
+      const headers = data[0].map((header: string) => header.replace(/[\r\n]+/g, '').replace(/^"|"$/g, '').trim());
 
-      // Add the worksheet to the workbook with the name of the formFilter
-      XLSX.utils.book_append_sheet(wb, ws, this.tableDataWithFormFilters[index].formFilter);
-    });
+      console.log("Headers are here ",headers);
+  
+      const ws = XLSX.utils.aoa_to_sheet(data);
 
+       // Add the worksheet to the workbook with the name of the formFilter
+       XLSX.utils.book_append_sheet(wb, ws, this.tableDataWithFormFilters[index].formFilter);
+
+
+      try{
+        const trackLocationColumnIndex = headers.indexOf('TrackLocation');
+        console.log('Index is here ',trackLocationColumnIndex);
+        if (trackLocationColumnIndex !== -1) {
+          const trackLocationData = this.extractTrackLocationData(data, trackLocationColumnIndex, index);
+          const trackLocationSheet = XLSX.utils.aoa_to_sheet(trackLocationData);
+          XLSX.utils.book_append_sheet(wb, trackLocationSheet, `TrackLocation ${this.tableDataWithFormFilters[index].formFilter}`);
+        }
+    
+        const tableColumnIndex = this.tableDataWithFormFilters[index].rows[0].hasOwnProperty('dynamic_table_values');
+        console.log("Table column Index is here ",tableColumnIndex);
+        if (tableColumnIndex) {
+          const tableData: any = await this.extractMiniTableData(data, tableColumnIndex, index);
+
+          for (const tableKey in tableData) {
+            const filteredFormName = this.tableFormName.find((item:any)=>Object.keys(item)[0] == tableKey)
+            console.log("Filtered FormName ",filteredFormName);
+
+            if (tableData.hasOwnProperty(tableKey)) {
+              const miniTableData = tableData[tableKey];
+              const miniTableSheet = XLSX.utils.aoa_to_sheet(miniTableData);
+              XLSX.utils.book_append_sheet(wb, miniTableSheet, `${filteredFormName[tableKey]} ${this.tableDataWithFormFilters[index].formFilter}`);
+            }
+          }
+        }
+      }
+      catch(error){
+        console.log("Error in processing mini table and track Location ",error);
+      }
+  
+   
+  
+      // Style the header row
+      for (let i = 0; i < headers.length; i++) {
+        const cellAddress = { r: 0, c: i };  // Row 0 (header row)
+        const cellRef = XLSX.utils.encode_cell(cellAddress);
+  
+        if (!ws[cellRef]) ws[cellRef] = {};  // Ensure the cell exists
+  
+        // Apply styles to header cells
+        ws[cellRef].s = {
+          fill: {
+            fgColor: { rgb: 'FFA500' }  // Orange background
+          },
+          font: {
+            color: { rgb: 'FFFFFF' },   // White font color
+            bold: true                  // Bold text
+          },
+          alignment: {
+            horizontal: 'center',      // Center header text
+            vertical: 'center'
+          }
+        };
+      }
+  
+    }));
+  
     // Generate the Excel file
     const excelFile = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-
+  
     // Create a Blob and trigger the download
     const blob = new Blob([excelFile], { type: 'application/octet-stream' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'combined-tables.xlsx';
+    link.download = `${this.selectedForms[0]}${this.selectedForms.length > 1 ? `(${this.selectedForms.length})...` : ''}.xlsx`;
     link.click();
   }
+  
+  // Method to extract mini table data
+  async extractMiniTableData(data: any[], tableColumnIndex: number, index: number) {
+    const tableData: any = {};
+  
+    // Extract dynamic_table_values from the current record
+    let tempHolder = this.tableDataWithFormFilters[index]["rows"].map((item: any) => item?.dynamic_table_values || []);
+  
+    console.log("tempHolder before filtering:", tempHolder);
+  
+    // Remove any invalid data (e.g., empty arrays)
+    tempHolder = tempHolder.filter((ele: any) => !Array.isArray(ele));  // Fix filtering logic
+  
+    console.log("tempHolder after filtering:", tempHolder);
+  
+    // Iterate over each record and extract the dynamic tables
+    tempHolder.forEach((record: any) => {
+      const dynamicTables = record; // Record could have multiple tables
+  
+      if (dynamicTables) {
+        // Iterate through each dynamic table in the current record
+        Object.keys(dynamicTables).forEach((tableKey) => {
+          const tableRows = dynamicTables[tableKey];
+  
+          if (tableRows && Array.isArray(tableRows) && tableRows.length > 0) {
+            // If the table exists, gather the headers from the first row of the dynamic table
+            const headers = Object.keys(tableRows[0]);
+  
+            // Prepare the rows for the table (flatten each row to match the headers)
+            const rows = tableRows.map((row: any) => headers.map((header: string) => row[header] || ""));
+  
+            // Ensure the headers are the first row of the sheet
+            rows.unshift(headers);
+  
+            // Accumulate the rows for each table across all records
+            if (!tableData[tableKey]) {
+              tableData[tableKey] = rows;
+            } else {
+              tableData[tableKey] = tableData[tableKey].concat(rows.slice(1)); // Avoid adding headers again
+            }
+          }
+        });
+      }
+    });
+  
+    console.log('Iterated Table data is here ', tableData);
+  
+    // Fetch dynamic form data labels and apply them
+    await Promise.all(Object.keys(tableData).map(async (item: any) => {
+      const filterData = this.dyanmicFormDataArray[index][this.tableDataWithFormFilters[index].formFilter]?.find((element: any) => item.startsWith(element.name));
+  
+      if (filterData && filterData.validation?.formName_table) {
+        const tableFormName = filterData.validation.formName_table;
+        const result = await this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${tableFormName}#main`, 1);
+  
+        if (result && result.metadata) {
+          this.tableFormName.push({[item]:tableFormName});
 
-  // Helper function to convert CSV string to 2D array (needed by SheetJS)
-  csvToArray(csv: string): any[] {
-    const rows = csv.split('\n').map(row => row.split(','));
-    return rows;
+          const dynamicFormFields = JSON.parse(result.metadata).formFields;
+          let rowsHeader = tableData[item][0].map((i: any) => {
+            const res = dynamicFormFields.find((field: any) => field.name === i);
+            return res ? res.label : i;  // Apply label or keep the original header
+          });
+  
+          tableData[item][0] = rowsHeader;  // Replace headers with labels
+        }
+      }
+  
+      console.log("Filtered Dynamic data is here ", filterData);
+    }));
+  
+    console.log('After adding Labels Table data is here ', tableData);
+  
+    return tableData;
   }
+  
+
+extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: any) {
+
+  console.log("Multiple rows are here ",this.tableDataWithFormFilters[index]["rows"]);
+
+  let tempHolder = this.tableDataWithFormFilters[index]["rows"].map((item: any) =>{
+    return {trackLocation:item.trackLocation, id:item.id}
+  });
+
+  tempHolder = tempHolder.filter((item:any)=>Array.isArray(item.trackLocation) && item.trackLocation.length > 0)
+  console.log("Temp holder is here ", tempHolder);
+
+  const trackLocationRows: any[] = [];
+
+  // Define headers for the "TrackLocation" sheet
+  const headers = [
+    "ID","Date and Time", "Label ID", "Label Name", "Latitude", "Longitude", "Name", "Type"
+  ];
+
+  // Check if the first entry in tempHolder has the data we need (ensure it's an array and not empty)
+  const trackLocationArray = tempHolder[0].trackLocation;
+
+  if (Array.isArray(trackLocationArray) && trackLocationArray.length > 0) {
+    // Add headers as the first row
+    trackLocationRows.push(headers);
+
+    // Iterate over each row in tempHolder and extract "TrackLocation" data
+    tempHolder.forEach((row: any) => {
+      // If the trackLocation is a valid array
+      const trackLocationObjects = row.trackLocation;
+
+      if (Array.isArray(trackLocationObjects) && trackLocationObjects.length > 0) {
+        // For each object in the trackLocation array, extract the relevant fields
+        trackLocationObjects.forEach((obj: any) => {
+          const rowValues = [
+            row.id || '',               //ID
+            obj.Date_and_time || '',    // Date and Time
+            obj.label_id || '',         // Label ID
+            obj.label_name || '',       // Label Name
+            obj.latitude || '',         // Latitude
+            obj.longitude || '',        // Longitude
+            obj.name || '',             // Name
+            obj.type || ''              // Type
+          ];
+
+          // Push the extracted values to the rows
+          trackLocationRows.push(rowValues);
+        });
+      }
+    });
+  }
+
+  console.log("Track Location rows extracted: ", trackLocationRows);
+
+  // Return the rows to be used in the new sheet
+  return trackLocationRows;
+}
+
+
+  
+
+// Helper function to convert CSV string to 2D array (needed by SheetJS)
+csvToArray(csv: string): any[] {
+  // Split the CSV string by newlines (\r?\n) and map each row using splitCsv
+  const rows = csv
+    .split(/\r?\n/)  // Split by both \n (Unix) and \r\n (Windows) line breaks
+    .map(row => this.splitCsv(row))  // Convert each row into an array using splitCsv
+    .filter(row => row.length > 0);  // Filter out any empty rows
+  
+  return rows;
+}
+
+// Split the CSV row into individual fields while handling quoted values properly
+splitCsv(csv: string): string[] {
+  const regex = /"(.*?)"|\s*([^",\s]+)\s*/g;  // Regex to match quoted and unquoted fields
+  const result: string[] = [];
+  let match;
+
+  while ((match = regex.exec(csv)) !== null) {
+    // The first capture group will be the quoted value, the second will be unquoted
+    result.push(match[1] || match[2]); // Add the match to the result
+  }
+
+  return result;
+}
 
 
     createColumnDefsPDF(rows: any[]): string[] {
