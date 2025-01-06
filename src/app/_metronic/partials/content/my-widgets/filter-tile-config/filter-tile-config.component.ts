@@ -81,7 +81,15 @@ makeTrueCheck:any = false
   hasAddedCondition: boolean[] = []; // Tracks the state for each field index
   conditionsFilter: any;
   parsedfilterTileConfig: any;
+  showDaysAgoField: boolean;
 
+  private readonly daysAgoOptions = [
+    'less than days ago',
+    'more than days ago',
+    'in the past',
+    'days ago'
+  ];
+  formValueSave: any;
 
 
  
@@ -114,10 +122,57 @@ makeTrueCheck:any = false
     this.checkData()
   
 
-
+    this.initializeShowDaysAgoField();
+    this.createChart.get('dateType')?.valueChanges.subscribe(value => {
+      this.showDaysAgoField = this.daysAgoOptions.includes(value);
+    });
+    this.createChart.get('dateType')?.valueChanges.subscribe(value => {
+      this.onDateTypeChange(value);
+    });
 
 
   }
+
+  onDateTypeChange(value: string) {
+
+    this.createChart.get('singleDate')?.clearValidators();
+    this.createChart.get('startDate')?.clearValidators();
+    this.createChart.get('endDate')?.clearValidators();
+  
+
+    const config = this.dateTypeConfig[value];
+
+    if (config) {
+      if (config.showDate) {
+        this.createChart.get('singleDate')?.setValidators([Validators.required]);
+      }
+
+      if (config.showStartDate) {
+        this.createChart.get('startDate')?.setValidators([Validators.required]);
+      }
+
+      if (config.showEndDate) {
+        this.createChart.get('endDate')?.setValidators([Validators.required]);
+      }
+
+      if (config.showDaysAgo) {
+        this.createChart.get('daysAgo')?.setValidators([Validators.required, Validators.min(1)]);
+      }
+    }
+
+    this.createChart.get('singleDate')?.updateValueAndValidity();
+    this.createChart.get('startDate')?.updateValueAndValidity();
+    this.createChart.get('endDate')?.updateValueAndValidity();
+    this.createChart.get('daysAgo')?.updateValueAndValidity();
+  }
+  dateTypeConfig :any= {
+    'is': { showDate: true },
+    '>=': { showDate: true },
+    '<=': { showDate: true },
+    'between': { showStartDate: true, showEndDate: true , isBetweenTime: false },
+    'between time': { showStartDate: true, showEndDate: true , isBetweenTime: true },
+  
+  };
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange ngonchanges',this.all_Packet_store)
@@ -125,7 +180,13 @@ makeTrueCheck:any = false
 
 
   }
-
+  get dateType() {
+    return this.createChart.get('dateType');
+  }
+  private initializeShowDaysAgoField(): void {
+    const initialDateType = this.createChart.get('dateType')?.value;
+    this.showDaysAgoField = this.daysAgoOptions.includes(initialDateType);
+  }
   checkData(){
     this.gridDetailExtract = this.all_Packet_store.grid_details
     console.log('this.gridDetailExtract check',this.gridDetailExtract)
@@ -264,7 +325,11 @@ console.log('Cleaned-up formlist values:', this.formlistValues);
       themeColor: ['', Validators.required],
       fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['', Validators.required], 
-      custom_Label:['', Validators.required]
+      custom_Label:['', Validators.required],
+      daysAgo:[''],
+      startDate:[''],
+      endDate:[''],
+      singleDate:['']
     
       // themeColor: ['#000000', Validators.required],
   
@@ -364,52 +429,61 @@ console.log('Cleaned-up formlist values:', this.formlistValues);
   //   // Update noOfParams for use in addTile
   //   this.noOfParams = noOfParams;
   // }
-  
   addControls(event: any, _type: string, count: number, formValue: any) {
     console.log('formValue checking', formValue);
+  
+    this.formValueSave = formValue;
+  
+    // Determine checkbox state
     this.makeTrueCheck = event.target.checked;
     console.log('Checkbox State:', this.makeTrueCheck);
   
     let noOfParams = count;
   
-    // Update noOfParams control value in the form based on _type
+    // Update `noOfParams` control value in the form
     const formControl = this.createChart.get('noOfParams');
-  
     if (_type === 'html') {
       noOfParams = this.makeTrueCheck ? count : 0;
-      formControl?.setValue(noOfParams);
     } else if (_type === 'ts') {
-      // Logic for TypeScript (programmatic)
-      noOfParams = count; // Directly use the provided count for TypeScript
-      formControl?.setValue(noOfParams); // Ensure noOfParams is updated in the form
+      noOfParams = count;
     }
+    formControl?.setValue(noOfParams);
   
+    // Access the `all_fields` FormArray
     const allFieldsArray = this.createChart.get('all_fields') as FormArray;
   
-    // Dynamically add or remove form array groups based on noOfParams
+    // Dynamically add or remove form groups based on `noOfParams`
     while (allFieldsArray.length < noOfParams) {
-      const index = allFieldsArray.length; // Get the current index
+      const index = allFieldsArray.length; // Determine the current index
+  
+      // Add new form group to `all_fields`
       allFieldsArray.push(
         this.fb.group({
-          parameterName: [formValue[index] || '', Validators.required], // Populate with formValue
+          parameterName: [formValue[index] || '', Validators.required], // Populate with `formValue`
           conditions: this.fb.array([
             this.fb.group({
               formField: ['', Validators.required],
               operator: ['', Validators.required],
               filterValue: ['', Validators.required],
               operatorBetween: ['', Validators.required],
+              parameterName: [formValue[index] || '', Validators.required], // Add `parameterName` inside `conditions`
             }),
           ]),
         })
       );
     }
   
+    // Remove extra groups if the `noOfParams` is reduced
     while (allFieldsArray.length > noOfParams) {
       allFieldsArray.removeAt(allFieldsArray.length - 1);
     }
   
     console.log('Updated all_fields:', allFieldsArray.controls);
   }
+  
+  
+  
+  
   
   
   
@@ -524,6 +598,14 @@ console.log('this.conditionsFilter',this.conditionsFilter);
         fontSize: `${this.createChart.value.fontSize}px`, // Added fontSize
         fontColor: this.createChart.value.fontColor,
         custom_Label:this.createChart.value.custom_Label,
+        daysAgo:this.createChart.value.daysAgo,
+        startDate:this.createChart.value.startDate,
+        endDate:this.createChart.value.endDate,
+        singleDate:this.createChart.value.singleDate,
+
+        // // startDate:[''],
+        // endDate:[''],
+        // singleDate:['']
         
   
         // filterTile: this.fields || [], // Updated fields with labels
@@ -596,11 +678,16 @@ console.log('this.conditionsFilter',this.conditionsFilter);
 
         // Update specific properties
         custom_Label:this.createChart.value.custom_Label ,
+        daysAgo:this.createChart.value.daysAgo,
         dateType: this.createChart.value.dateType || '',
         filterTileConfig: conditionsFilter, // Updated filter configuration
         addFieldsEnabled: this.createChart.value.add_fields || false, // Add fields toggle state
         noOfParams: this.dashboard[this.editTileIndex].noOfParams, // Retain existing parameter count
         themeColor:this.createChart.value.themeColor,
+        // daysAgo:this.createChart.value.daysAgo,
+        startDate:this.createChart.value.startDate,
+        endDate:this.createChart.value.endDate,
+        singleDate:this.createChart.value.singleDate,
       };
   
       console.log('updatedTile checking', updatedTile);
@@ -754,6 +841,7 @@ openFilterModal(tile: any, index: number) {
     this.createChart = this.fb.group({
       fontSize: fontSizeValue,
       selectType: tile.selectType,
+      daysAgo:tile.daysAgo,
       fontColor: tile.fontColor || '#000000',
       add_fields: [tile.addFieldsEnabled],
       noOfParams: [{ value: tile.noOfParams, disabled: !tile.addFieldsEnabled }],
@@ -762,6 +850,10 @@ openFilterModal(tile: any, index: number) {
       all_fields: this.fb.array([]), // Initialize empty array
       custom_Label: tile.custom_Label,
       themeColor: [tile.themeColor || ''], // Bind themeColor
+      // daysAgo:tile.daysAgo,
+      startDate:tile.startDate,
+      endDate:tile.endDate,
+      singleDate:tile.singleDate,
     });
 
     const allFieldsArray = this.createChart.get('all_fields') as FormArray;

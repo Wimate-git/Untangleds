@@ -50,7 +50,7 @@
                     <option value="between time">between time</option>
                     <option value="less than days ago">less than days ago</option>
                     <option value="more than days ago">more than days ago</option>
-                    <option value="in the past">in the past</option>
+                    <option value="in the past">in the past</option> 
                     <option value="days ago">days ago</option>
                     <option value="today">today</option>
                     <option value="yesterday">yesterday</option>
@@ -66,6 +66,43 @@
                 </div>
               </div>
             </div>
+            
+            <div *ngIf="dateType?.value === 'days ago' || dateType?.value === 'less than days ago' || dateType?.value === 'more than days ago' || dateType?.value === 'in the past'" class="mb-7">
+              <div class="form-group row ps-4 mb-2">
+                <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Number of Days</label>
+                <div class="col-3">
+                  <input type="number" formControlName="daysAgo" class="form-control" placeholder="Enter number of days">
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="dateType?.value === 'between time' || dateType?.value === 'between' " class="mb-7">
+              <div class="form-group row ps-4 mb-2">
+                  <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Start Date</label>
+                  <div class="col-3">
+                      <!-- Dynamically change the type based on dateType -->
+                      <input [type]="dateTypeConfig[dateType?.value]?.isBetweenTime ? 'datetime-local' : 'date'" formControlName="startDate" class="form-control">
+                  </div>
+              </div>
+              <br>
+              <div class="form-group row ps-4">
+                  <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">End Date</label>
+                  <div class="col-3">
+                      <!-- Dynamically change the type based on dateType -->
+                      <input [type]="dateTypeConfig[dateType?.value]?.isBetweenTime ? 'datetime-local' : 'date'" formControlName="endDate" class="form-control">
+                  </div>
+              </div>
+          </div>
+          <div *ngIf="dateType?.value === '<=' || dateType?.value === '>='  || dateType?.value === 'is' "  class="mb-7">
+            <div class="form-group row ps-4 mb-2">
+                <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Select Date</label>
+                <div class="col-3">
+                    <input type="date" formControlName="singleDate" class="form-control">
+                </div>
+            </div>
+        </div>
+            
+            
             
           </div>
 
