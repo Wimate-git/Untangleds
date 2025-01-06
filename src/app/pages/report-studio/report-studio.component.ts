@@ -2317,8 +2317,9 @@ extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: any) {
     "ID","Date and Time", "Label ID", "Label Name", "Latitude", "Longitude", "Name", "Type"
   ];
 
+
   // Check if the first entry in tempHolder has the data we need (ensure it's an array and not empty)
-  const trackLocationArray = tempHolder[0].trackLocation;
+  const trackLocationArray = Array.isArray(tempHolder) && tempHolder.length > 0 ? tempHolder[0].trackLocation:[];
 
   if (Array.isArray(trackLocationArray) && trackLocationArray.length > 0) {
     // Add headers as the first row
