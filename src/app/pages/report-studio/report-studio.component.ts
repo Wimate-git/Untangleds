@@ -1702,7 +1702,9 @@ mergeAndAddLocation(mappedResponse: any) {
 
     //Creating packet for reports module to pass
     this.savedModulePacket = [this.reportsFeilds.value,this.formFieldsGroup.value,this.selectedValues]
-    this.modalService.open(content);
+    this.modalService.open(content,{
+      backdrop: 'static',
+  });
     this.moduleDisplayService.showModule()
   }
 
@@ -1713,7 +1715,9 @@ mergeAndAddLocation(mappedResponse: any) {
     this.editSavedDataArray.reportMetadata = this.reportsFeilds.value
     this.editSavedDataArray.conditionMetadata = this.formFieldsGroup.value
     this.savedModulePacket = this.editSavedDataArray
-    this.modalService.open(content);
+    this.modalService.open(content,{
+      backdrop:'static'
+    });
     this.moduleDisplayService.showModule()
   }
 
