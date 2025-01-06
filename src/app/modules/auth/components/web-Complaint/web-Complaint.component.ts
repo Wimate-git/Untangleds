@@ -56,7 +56,7 @@ export class WebComplaintsComponent
 
 this.withoutlogin =
 {
-  'formName': 'Testing Web Complaint',
+  'formName': 'Web Complaint',
   'title': 'How Can we help you',
   'searchButton': 'yes',
   'searchbutton_name': 'Search',
@@ -81,7 +81,7 @@ this.loginDetail = {
   "device_timeout": false,
   "enable_user": false,
   "companyID": "tree_creation",
-  "password": "Swap@05prajapati",
+  "password": "123456789",
   "escalation_sms": true,
   "report_to": null,
   "alert_telegram": true,
