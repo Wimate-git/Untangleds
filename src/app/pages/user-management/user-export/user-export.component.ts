@@ -200,7 +200,7 @@ export class UserExportComponent {
       // Apply style (orange background, white font)
       if (cell) {
         // If it's a required field (like 'UserName' and 'Password'), make it red, otherwise orange
-        const isRequired = ['UserName', 'Password','Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Mobile','Mobile Privacy','Permission ID','Location Permission', 'FormID Permission','Start Node'].includes(Heading[0][colIndex]);
+        const isRequired = ['UserName', 'Password','Client ID', 'Company ID', 'Email', 'User ID', 'Description','Permission ID','Location Permission', 'FormID Permission'].includes(Heading[0][colIndex]);
         cell.s = {
           fill: {
             fgColor: { rgb: isRequired ? "FF0000" : "FFA500" }, // Red for required, orange for optional
@@ -339,7 +339,7 @@ export class UserExportComponent {
       const cell = ws[cellAddress];
   
       if (cell) {
-        const isRequired = ['UserName', 'Password','Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Mobile','Mobile Privacy','Permission ID','Location Permission', 'FormID Permission','Start Node'].includes(Heading[0][colIndex]);
+        const isRequired = ['UserName', 'Password','Client ID', 'Company ID', 'Email', 'User ID', 'Description','Permission ID','Location Permission', 'FormID Permission'].includes(Heading[0][colIndex]);
         cell.s = {
           fill: {
             fgColor: { rgb: isRequired ? "FF0000" : "FFA500" }, // Red for required, orange for optional
@@ -493,7 +493,7 @@ export class UserExportComponent {
           const date = Math.ceil(((new Date()).getTime()) / 1000)
           const items ={
           P1: (this.allUserDetails.username).toLowerCase(),
-          P2: this.allUserDetails.mobile,
+          P2: this.allUserDetails.mobile || 'N/A',
           P3: this.allUserDetails.email,
           P4: this.allUserDetails.permission_ID,
           P5:temp4,
@@ -505,7 +505,7 @@ export class UserExportComponent {
             P1:(this.allUserDetails.username).toLowerCase(),
             P2:this.allUserDetails.clientID,
             P3:this.allUserDetails.email,
-            P4:this.allUserDetails.mobile,
+            P4:this.allUserDetails.mobile || 'N/A',
             P5:(this.allUserDetails.userID).toLowerCase()
           }
     
@@ -726,7 +726,7 @@ export class UserExportComponent {
           const date = Math.ceil(((new Date()).getTime()) / 1000)
           const items ={
           P1: (this.allUserDetails.username).toLowerCase(),
-          P2: this.allUserDetails.mobile,
+          P2: this.allUserDetails.mobile || 'N/A',
           P3: this.allUserDetails.email,
           P4: this.allUserDetails.permission_ID,
           P5:temp4,
@@ -738,7 +738,7 @@ export class UserExportComponent {
             P1:(this.allUserDetails.username).toLowerCase(),
             P2:this.allUserDetails.clientID,
             P3:this.allUserDetails.email,
-            P4:this.allUserDetails.mobile,
+            P4:this.allUserDetails.mobile || 'N/A',
             P5:(this.allUserDetails.userID).toLowerCase()
           }
     

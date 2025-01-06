@@ -97,16 +97,16 @@ export class ExcelValidatorService {
       }
     },
     'Mobile': {
-      required: true,
+      required: false,
       validate: (value: any) => {
-        if (!this.isNumber(value)) return { isValid: false, error: 'Must be a number' };
-        const phoneRegex = /^\d{10}$/;
-        if (!phoneRegex.test(value.toString())) return { isValid: false, error: 'Must be exactly 10 digits' };
+        // if (!this.isNumber(value)) return { isValid: false, error: 'Must be a number' };
+        // const phoneRegex = /^\d{10}$/;
+        // if (!phoneRegex.test(value.toString())) return { isValid: false, error: 'Must be exactly 10 digits' };
         return { isValid: true };
       }
     },
     'Mobile Privacy': {
-      required: true,
+      required: false,
       validate: (value: any) => {
         if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
         if (this.isString(value) && ['Visible', 'Invisible'].includes(value) === false) {
@@ -145,7 +145,7 @@ export class ExcelValidatorService {
       }
     },
     'Start Node': {
-      required: true,
+      required: false,
       validate: (value: any) => {
         if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
         return { isValid: true };
@@ -380,15 +380,15 @@ export class ExcelValidatorService {
 
 
              
-                     if (header === 'Mobile' && validation.required && uniqueList[4].includes(cellValue.toString()) == true  && !editOperation) {
-                      errors.push({
-                        row: rowIndex + 1,
-                        column: header,
-                        columnLetter,
-                        value: cellValue,
-                        error: `${cellValue} ${header} already exist `
-                      });
-                    }
+                    //  if (header === 'Mobile' && validation.required && uniqueList[4].includes(cellValue.toString()) == true  && !editOperation) {
+                    //   errors.push({
+                    //     row: rowIndex + 1,
+                    //     column: header,
+                    //     columnLetter,
+                    //     value: cellValue,
+                    //     error: `${cellValue} ${header} already exist `
+                    //   });
+                    // }
 
 
                      //Check for companyID

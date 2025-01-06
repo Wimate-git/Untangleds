@@ -318,21 +318,13 @@
                                     </div>
         
                                     <div class="col-md-4">
-                                        <label class="required fw-semibold fs-6 mb-2"> Mobile</label>
+                                        <label class="fw-semibold fs-6 mb-2"> Mobile</label>
         
                                         <input type="text" class="
                                             form-control form-control-lg form-control-solid
                                             mb-3 mb-lg-0
-                                          " placeholder="Enter mobile number" name="mobile" formControlName="mobile"
-                                            (keypress)="keyPress($event);" (keyup)="uniqueMobile($event)" minlength=10 maxlength=10 required >
+                                          " placeholder="Enter mobile number" name="text" formControlName="mobile" >
         
-                                            <span style="color: #fc1900;">{{errorForUniquemobileID}}</span>
-                                        <div *ngIf="
-                                               createUserField.get('mobile')?.hasError('required') &&
-                                               createUserField.get('mobile')?.touched 
-                                          " class="fv-plugins-message-container invalid-feedback">
-                                            Mobile Number is required
-                                        </div>
                                     </div>
         
         
@@ -342,21 +334,16 @@
                             <div class="container">
                                 <div class="row mb-7">
                                     <div class="col-md-4">
-                                        <label class="required fw-semibold fs-6 mb-2"> Mobile Privacy</label>
+                                        <label class="fw-semibold fs-6 mb-2"> Mobile Privacy</label>
         
                                         <select class="form-select form-select-solid form-select-lg fw-bold"
                                             placeholder="Enter mobile_privacy" name="mobile_privacy"
-                                            formControlName="mobile_privacy" required>
+                                            formControlName="mobile_privacy">
                                             <option value="Visible">Visible</option>
                                             <option value="Invisible">Invisible</option>
                                         </select>
         
-                                        <div *ngIf="
-                                         createUserField.get('mobile_privacy')?.hasError('required') &&
-                                         createUserField.get('mobile_privacy')?.touched
-                                      " class="fv-plugins-message-container invalid-feedback">
-                                            Mobile Privacy is required
-                                        </div>
+                                      
         
         
                                     </div>
@@ -488,23 +475,17 @@
 
 
                                     <div class="col-md-4">
-                                        <label class="required fw-semibold fs-6 mb-2">Start Node</label>
+                                        <label class="fw-semibold fs-6 mb-2">Start Node</label>
         
                                         <select class="form-select form-select-solid form-select-lg fw-bold"
                                             placeholder="select start node" name="start_node" formControlName="start_node"
-                                            required>
+                                            >
                                             <option>Default</option>
                                             <option [value]="item" *ngFor="let item of startNode">
                                             {{item}}</option>
                                         </select>
         
-                                        <div *ngIf="
-                                        createUserField.get('start_node')?.hasError('required') &&
-                                        createUserField.get('start_node')?.touched
-                                  " class="fv-plugins-message-container invalid-feedback">
-                                            Start Node is required
-                                        </div>
-        
+                                       
                                     </div>
           
                                 </div>

@@ -180,7 +180,9 @@ rdtListWorkAround :any =[{
     reloadTable(){
       console.log("Table is reloaded here ");
       this.reloadEvent.next(true)
+      this.addFromService()
     }
+
 
 
   async ngOnInit(){
@@ -469,8 +471,8 @@ rdtListWorkAround :any =[{
       'companyID': ['', Validators.required],
       'username': ['', Validators.required],
       'description': ['', Validators.required],
-      'mobile': ['', Validators.compose([Validators.required])],
-      'mobile_privacy': ['', Validators.required],
+      'mobile': [''],
+      'mobile_privacy': [''],
       'key': [''],
       'location_object': [''],
       'default_module': [''],
@@ -491,7 +493,7 @@ rdtListWorkAround :any =[{
       'default_dev': [''],
       'default_loc': [''],
       'default_type': ['', Validators.required],
-      'start_node': ['', Validators.required],
+      'start_node': [''],
       'alert_levels': ['', Validators.required],
       'permission_ID': ['', Validators.required],
       'report_to': ['', Validators.required],
@@ -1156,7 +1158,7 @@ rdtListWorkAround :any =[{
     const date = Math.ceil(((new Date()).getTime()) / 1000)
   const items ={
   P1: this.tempUpdateUser,
-  P2: this.allUserDetails.mobile,
+  P2: this.allUserDetails.mobile || 'N/A',
   P3: this.allUserDetails.email,
   P4: this.allUserDetails.permission_ID,
   P5:temp4,
@@ -1172,7 +1174,7 @@ rdtListWorkAround :any =[{
     P2:this.allUserDetails.clientID,
     P3:this.allUserDetails.email,
     P5:this.createUserField.value.userID,
-    P4:this.allUserDetails.mobile
+    P4:this.allUserDetails.mobile || 'N/A'
   }
    
 
@@ -1444,7 +1446,7 @@ rdtListWorkAround :any =[{
         const date = Math.ceil(((new Date()).getTime()) / 1000)
       const items ={
       P1: this.allUserDetails.PK,
-      P2: this.allUserDetails.mobile,
+      P2: this.allUserDetails.mobile || 'N/A',
       P3: this.allUserDetails.email,
       P4: this.allUserDetails.permission_ID,
       }
@@ -1737,7 +1739,7 @@ rdtListWorkAround :any =[{
       const date = Math.ceil(((new Date()).getTime()) / 1000)
       const items ={
       P1: (this.createUserField.value.username).toLowerCase(),
-      P2: this.allUserDetails.mobile,
+      P2: this.allUserDetails.mobile || 'N/A',
       P3: this.allUserDetails.email,
       P4: this.allUserDetails.permission_ID,
       P5:temp4,
@@ -1749,7 +1751,7 @@ rdtListWorkAround :any =[{
         P1:(this.createUserField.value.username).toLowerCase(),
         P2:this.allUserDetails.clientID,
         P3:this.allUserDetails.email,
-        P4:this.allUserDetails.mobile,
+        P4:this.allUserDetails.mobile || 'N/A',
         P5:(this.createUserField.value.userID).toLowerCase()
       }
 
