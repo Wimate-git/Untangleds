@@ -159,6 +159,8 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       'Read',
       'Update',
       'Delete',
+      'Create draft',
+      'Update draft',
       'Xlsx template download',
       'Xlsx data upload',
       'Xlsx data download',
