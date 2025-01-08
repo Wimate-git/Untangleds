@@ -102,11 +102,11 @@
   <label class="required col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Filter Data</label>
   <div class="col-3 d-flex gap-7 align-items-center">
     <div class="form-check">
-      <input class="form-check-input" type="radio" id="filterAll" formControlName="filterOption" value="all" (change)="onFilterChange($event,'html')">
+      <input class="form-check-input" type="radio" id="filterAll" formControlName="filterOption" value="all" (change)="onFilterChange($event,'html','create')">
       <label class="form-check-label" for="filterAll">All</label>
     </div>
     <div class="form-check">
-      <input class="form-check-input" type="radio" id="filterOnCondition" formControlName="filterOption" value="onCondition" (change)="onFilterChange($event,'html')">
+      <input class="form-check-input" type="radio" id="filterOnCondition" formControlName="filterOption" value="onCondition" (change)="onFilterChange($event,'html','create')">
       <label class="form-check-label" for="filterOnCondition">On Condition</label>
     </div>
   </div>
@@ -350,12 +350,14 @@
         style="width: 100%; height: 100%;"  
         class="ag-theme-alpine"
         [rowData]="table.rows"    
-        [columnDefs]="createColumnDefs(table.rows)" 
+        [columnDefs]="createColumnDefs(table.rows,table.formFilter)" 
         [domLayout]="'autoHeight'"  
         [pagination]="true"
         [paginationPageSize]="10"
         [paginationPageSizeSelector]="pageSizeOptions"
         [suppressHorizontalScroll]="false" 
+        (gridReady)="onGridReady($event,table.formFilter)" 
+        [gridOptions]="gridOptions" 
         > 
       </ag-grid-angular>
     </div>
@@ -387,7 +389,7 @@
               <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
 
 
-                <app-saved-query [editOperation]="showHeading" [savedModulePacket]="savedModulePacket" [listofSavedIds]="listofSavedIds" (closeModal)="dismissModal(modal)"></app-saved-query> 
+                <app-saved-query [editOperation]="showHeading" [savedModulePacket]="savedModulePacket" [listofSavedIds]="listofSavedIds" [tableState]="tableTempState" (closeModal)="dismissModal(modal)"></app-saved-query> 
 
               </div>
             </div>

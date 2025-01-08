@@ -92,7 +92,8 @@ export class MapModalComponent implements AfterViewInit {
       lat: item.latitude,
       lng: item.longitude,
       name: item.name,
-      type: item.type
+      type: item.type,
+      Date_and_time:item.Date_and_time
     }));
 
     console.log("Markers Data: ", markersData);
@@ -153,6 +154,7 @@ export class MapModalComponent implements AfterViewInit {
       <div style="padding:10px">
         <h4>${markerInfo.name}</h4>
         <p>Type: ${markerInfo.type}</p>
+        <p>Date: ${markerInfo.Date_and_time}</p>
       </div>
     `;
 

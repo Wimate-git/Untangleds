@@ -5,6 +5,7 @@ import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SharedService } from '../../shared.service';
 import { APIService } from 'src/app/API.service';
+import { table } from 'console';
 
 
 interface ListItem {
@@ -27,6 +28,7 @@ export class SavedQueryComponent implements OnInit {
   @Input() editOperation:boolean;
   @Input() savedModulePacket:any = []
   @Input() listofSavedIds:any;
+  @Input() tableState:any;
   createSavedQuery:FormGroup;
   isCollapsed1 = false;
 
@@ -60,7 +62,15 @@ export class SavedQueryComponent implements OnInit {
     this.getLoggedUser = this.notifyConfig.getLoggedUserDetails()
     this.SK_clientID = this.getLoggedUser.clientID;
     this.username = this.getLoggedUser.username
-    console.log("Saved Module packet will be here ",this.savedModulePacket);
+    console.log("Saved Module packet will be here ",JSON.parse(JSON.stringify(this.savedModulePacket)));
+    console.log("Table state is here ",JSON.parse(JSON.stringify(this.tableState)));
+
+
+    // const savedState = localStorage.getItem("tableState");
+
+    // console.log("Saved State from localStorage ",savedState);
+
+
     this.dynamicFormInitializer()
     await this.addFromService()
 
@@ -157,8 +167,11 @@ export class SavedQueryComponent implements OnInit {
       userIDs:this.createSavedQuery.value.userIDs,
       reportMetadata:JSON.stringify(this.savedModulePacket.reportMetadata),
       conditionMetadata:JSON.stringify(this.savedModulePacket.conditionMetadata) || JSON.stringify([]),
-      columnVisibility:JSON.stringify(this.savedModulePacket.columnVisibility)
+      columnVisibility:JSON.stringify(this.savedModulePacket.columnVisibility),
+      tableState:JSON.stringify(JSON.parse(JSON.stringify(this.tableState)))
     }
+
+    console.log("Table state is here ",JSON.parse(JSON.stringify(this.tableState)));
 
     console.log("Saved query is here ",savedQueryTemp);
 
@@ -218,8 +231,14 @@ export class SavedQueryComponent implements OnInit {
         userIDs:this.createSavedQuery.value.userIDs,
         reportMetadata:JSON.stringify(this.savedModulePacket[0]),
         conditionMetadata:JSON.stringify(this.savedModulePacket[1]),
-        columnVisibility:JSON.stringify(this.savedModulePacket[2])
+        columnVisibility:JSON.stringify(this.savedModulePacket[2]),
+        tableState:JSON.stringify(JSON.parse(JSON.stringify(this.tableState)))
       }
+
+
+      console.log("Table state is here ",JSON.parse(JSON.stringify(this.tableState)));
+
+      console.log("Metadata to be created is ",savedQueryTemp);
 
       const tempObj = {
         PK: this.SK_clientID+"#savedquery#"+savedQueryTemp.queryName+"#main",

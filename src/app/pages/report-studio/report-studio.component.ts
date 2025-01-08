@@ -1,13 +1,13 @@
 import { AfterViewInit, ChangeDetectorRef, Component, DestroyRef, ElementRef, EventEmitter, OnDestroy, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ColDef, GridApi, GridReadyEvent, Column, GridOptions } from 'ag-grid-community';
+import { ColDef, GridApi, GridReadyEvent, Column, GridOptions, ColumnState, ColumnMovedEvent } from 'ag-grid-community';
 import { APIService } from 'src/app/API.service';
 import { SharedService } from '../shared.service';
 import { HttpClient } from '@angular/common/http';
 import { scheduleApiService } from '../schedule-api.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { catchError, firstValueFrom, from, map, Observable, of, shareReplay, Subject, Subscription, take, takeUntil } from 'rxjs';
+import { catchError, firstValueFrom, from, map, Observable, of, shareReplay, Subject, Subscription, take, takeUntil, timeout } from 'rxjs';
 import { PrimeNGConfig } from 'primeng/api';
 import Swal from 'sweetalert2';
 import { ImageModalComponent } from './image-modal/image-modal.component';
@@ -47,6 +47,8 @@ export class ReportStudioComponent implements AfterViewInit,OnDestroy{
 
   pageSizeOptions = [10, 25, 50, 100];
 
+  tableTempState:any = []
+
   reportsFeilds: FormGroup;
 
    // Grid API reference
@@ -74,7 +76,7 @@ export class ReportStudioComponent implements AfterViewInit,OnDestroy{
    selectedValues: any ;
    formGroup: FormGroup;
 
-
+   gridOptions: GridOptions;
    
   dateTypeConfig :any= {
     'is': { showDate: true },
@@ -118,11 +120,21 @@ columns: any;
     private isMarkerClickListenerAdded = false;
   dyanmicFormDataArray: any = [];
   tableFormName: any = [];
+  gridColumnApi: any;
+  tableState: any = [];
+  editOperation: boolean = false;
 
    constructor(private fb:FormBuilder,private api:APIService,private configService:SharedService,private scheduleAPI:scheduleApiService,
     private toast:MatSnackBar,private spinner:NgxSpinnerService,private cd:ChangeDetectorRef,private modalService: NgbModal,private moduleDisplayService: ModuleDisplayService,
     private route: ActivatedRoute,private router:Router
    ){
+    this.gridOptions = <GridOptions>{
+      context: {
+        componentParent: this
+      },
+      // onGridReady: this.onGridReady.bind(this),
+      onColumnMoved: this.onColumnMoved,
+    };
    }
 
 
@@ -171,6 +183,10 @@ columns: any;
 
 
    ngOnInit() {
+
+
+    this.editOperation = false
+
     this.getLoggedUser = this.configService.getLoggedUserDetails()
     this.SK_clientID = this.getLoggedUser.clientID;
     this.username = this.getLoggedUser.username;
@@ -215,6 +231,7 @@ columns: any;
         this.editSavedQuery( this.savedQuery)
       }
     });
+    
   }   
 
 
@@ -599,7 +616,8 @@ getFormControl(index: number): FormControl {
 
 
 
-async onFilterChange(event: any,getValue:any) {
+async onFilterChange(event: any,getValue:any,key:any) {
+
 
   let selectedValue
   if(getValue == 'html'){
@@ -630,10 +648,8 @@ async onFilterChange(event: any,getValue:any) {
     return;
   }
 
-
-  this.reportsFeilds.get('filterOption')?.patchValue('onCondition')
   
- 
+  this.reportsFeilds.get('filterOption')?.patchValue('onCondition')
 
   if(selectedValue == 'onCondition'){
     this.spinner.show()
@@ -668,6 +684,7 @@ async onFilterChange(event: any,getValue:any) {
     }
 
     this.spinner.hide()
+    console.log("Condition flag is true");
     this.conditionflag = true
   }
   else{
@@ -676,6 +693,7 @@ async onFilterChange(event: any,getValue:any) {
 
  this.cd.detectChanges()
 }
+
 
 
     getAvailableFields(formIndex: number) {
@@ -887,9 +905,19 @@ async onFilterChange(event: any,getValue:any) {
  
  
    // Grid Ready Event
-   onGridReady(params: GridReadyEvent) {
-     this.gridApi = params.api;
-   }
+  //  onGridReady(params: GridReadyEvent) {
+  //    this.gridApi = params.api;     
+  //  }
+
+     // This method will be called once the grid is ready
+  onGridReady(params: any,formFilter: string) {
+    // this.gridApi = params.api;
+    // this.gridColumnApi = params.columnApi;
+
+    const gridApi = params.api;
+    this.gridInstances[formFilter] = gridApi; 
+    console.log(`Grid API saved for ${formFilter}`, gridApi);
+  }
 
    getSelectedRows() {
      const selectedNodes = this.gridApi.getSelectedNodes();
@@ -1062,6 +1090,21 @@ async onFilterChange(event: any,getValue:any) {
     console.log("Data to be populated on Table is ", groupedData);
 
     await this.prepareData(groupedData,formMap);
+
+
+    try{
+        setTimeout(() => {
+          this.loadColumnState()
+        }, 2000);
+      
+    }
+    catch(error){
+      console.log('Error while Loading Column State ',error);
+    }
+
+    this.cd.detectChanges()
+  
+
   }
   
 
@@ -1152,9 +1195,10 @@ async onFilterChange(event: any,getValue:any) {
 
     this.tableDataWithFormFilters = tableDataWithFormFilters;
     console.log("Table rows are here ",this.tableDataWithFormFilters);
+
+ 
     this.spinner.hide()
 
-    this.cd.detectChanges()
   }
 
 
@@ -1233,7 +1277,7 @@ isBase64(value: string): boolean {
   //   return columns;
   // }
 
-  createColumnDefs(rowData: any[]): ColDef[] {
+  createColumnDefs(rowData: any[],formName:any): ColDef[] {
     const columns: any = [];
   
     if (rowData.length > 0) {
@@ -1247,7 +1291,8 @@ isBase64(value: string): boolean {
         flex: 1,
         filter: true,
         minWidth: 150,
-        hide: true
+        hide: true,
+        FormName:formName
       });
   
       // Iterate through all rows to identify potential dynamic columns (e.g., Base64 images or locations)
@@ -1274,6 +1319,7 @@ isBase64(value: string): boolean {
             flex: 1,
             minWidth: 150,
             filter: true,
+            FormName:formName,
             // sortable: true,
             cellRenderer: cellRenderer,
             cellRendererParams: {
@@ -1293,6 +1339,7 @@ isBase64(value: string): boolean {
           sortable: true,
           minWidth: 200,
           sort: 'desc',
+          FormName:formName
         });
       }
     }
@@ -1327,7 +1374,7 @@ isBase64(value: string): boolean {
   
 
   isTrackLocation(key:any,value: any): boolean {
-    return key == 'trackLocation' && Array.isArray(value) && value.every(coord => coord.latitude !== null && coord.longitude !== null);
+    return key == 'trackLocation' && Array.isArray(value);
   }
 
 
@@ -1568,29 +1615,33 @@ locationCellRenderer(params: any) {
   }
 
 
-
-
   clearFeilds() {
-    this.tableDataWithFormFilters = []
-    this.showTable = false
-    this.saveButton = false
-    this.onSubmitFlag = false
-    this.selectedForms = []
-    this.conditionflag = false
-    this.reportsFeilds.reset()
-    this.populateFormData= []
-    this.visibiltyflag = false
-    this.savedQuery = ''
 
-    this.selectedValues = []
+    this.editOperation = false;
+    this.tableState = {};
 
-    if(this.modalName == 'Reports'){
+    this.forms().clear()
+  
+    this.tableDataWithFormFilters = [];
+    this.showTable = false;
+    this.saveButton = false;
+    this.onSubmitFlag = false;
+    this.selectedForms = [];
+    this.conditionflag = false;
+    this.reportsFeilds.reset();
+    this.populateFormData = [];
+    this.visibiltyflag = false;
+    this.savedQuery = '';
+  
+    this.selectedValues = [];
+  
+    if (this.modalName == 'Reports') {
       this.router.navigate(['/reportStudio']);
     }
-
-    this.cd.detectChanges()
+  
+    this.cd.detectChanges();
   }
-
+  
 
 
 
@@ -1698,10 +1749,14 @@ mergeAndAddLocation(mappedResponse: any) {
 
   saveQuery(content: TemplateRef<any>){
 
+    this.editOperation = true
+
     console.log("Selected column visibility ",this.selectedItem);
 
+    console.log("Table temp State is here ",this.tableTempState);
+
     //Creating packet for reports module to pass
-    this.savedModulePacket = [this.reportsFeilds.value,this.formFieldsGroup.value,this.selectedValues]
+    this.savedModulePacket = [this.reportsFeilds.value,this.formFieldsGroup.value,this.selectedValues, this.tableTempState]
     this.modalService.open(content,{
       backdrop: 'static',
   });
@@ -1710,10 +1765,14 @@ mergeAndAddLocation(mappedResponse: any) {
 
 
   editQuery(content: TemplateRef<any>){
+
+    this.editOperation = false
+
     //Creating packet for reports module to pass
     this.editSavedDataArray.columnVisibility = this.selectedValues
     this.editSavedDataArray.reportMetadata = this.reportsFeilds.value
     this.editSavedDataArray.conditionMetadata = this.formFieldsGroup.value
+    this.editSavedDataArray.tableState = JSON.parse(JSON.stringify(this.tableState))
     this.savedModulePacket = this.editSavedDataArray
     this.modalService.open(content,{
       backdrop:'static'
@@ -1893,17 +1952,24 @@ mergeAndAddLocation(mappedResponse: any) {
       try{
        this.api.GetMaster(`${this.SK_clientID}#savedquery#${P1}#main`,1).then(async (result)=>{
         if(result && result.metadata){
+
           this.tempResHolder = JSON.parse(result.metadata)
+
+          console.log("Result is here ",this.tempResHolder);
  
           this.tempResHolder.reportMetadata = JSON.parse(this.tempResHolder.reportMetadata)
           this.tempResHolder.conditionMetadata = JSON.parse(this.tempResHolder.conditionMetadata).forms
           this.tempResHolder.columnVisibility = this.tempResHolder && this.tempResHolder.columnVisibility && JSON.parse(this.tempResHolder.columnVisibility)
+          this.tempResHolder.tableState = this.tempResHolder && this.tempResHolder.tableState && JSON.parse(this.tempResHolder.tableState)
            this.editSavedDataArray = this.tempResHolder
  
            console.log("Result for the edit is here ",this.tempResHolder);
            const reportMetadata = this.tempResHolder.reportMetadata
            const conditionMetadata = this.tempResHolder.conditionMetadata
            const columnVisibility = this.tempResHolder.columnVisibility
+
+           //Get the table State
+           this.tableState = this.tempResHolder.tableState && JSON.parse(JSON.stringify(this.tempResHolder.tableState))
  
            console.log("conditionMetadata is here ",conditionMetadata);
  
@@ -1936,18 +2002,30 @@ mergeAndAddLocation(mappedResponse: any) {
            this.saveButton = true
            
            if(reportMetadata.filterOption != 'all'){
+
+            this.forms().clear();
  
-             await this.onFilterChange('onCondition','')
+             await this.onFilterChange('onCondition','','edit')
  
-             this.forms().clear();
+             
  
              console.log("conditionMetadata - - - - -- - -- - ",conditionMetadata);
               
                conditionMetadata.forEach((formData: any) => {
                  this.populateForm(formData);
                });
+
+               
            }
            else{
+
+            this.selectedForms.forEach((formData: any) => {
+              this.addForm(); 
+            });
+
+      
+
+  
               this.conditionflag = false
            }
            if(this.selectedValues != undefined && Array.isArray(this.selectedValues) && this.selectedValues.length > 0 && reportMetadata.columnOption != 'all'){
@@ -2011,6 +2089,17 @@ mergeAndAddLocation(mappedResponse: any) {
       operatorBetween: [conditionData.operatorBetween]  // Optional field
     });
   }
+
+
+    // Create a new condition form group
+    populateConditionEmpty(conditionData: any): FormGroup {
+      return this.fb.group({
+        condition: ['', Validators.required],
+        operator: ['', Validators.required],
+        value: ['', Validators.required],
+        operatorBetween: ['']  // Optional field
+      });
+    }
 
 
     ngOnDestroy() {
@@ -2556,6 +2645,92 @@ splitCsv(csv: string): string[] {
     // Generate the PDF using pdfMake
     pdfMake.createPdf(docDefinition).download('combined-tables.pdf');
   }
+
+
+
+
+  onColumnResized(event: any) {
+    // this.saveColumnState();  // Save the state after column resizing
+  }
+
+  gridInstances: { [key: string]: any } = {}; // Store grid instances by formFilter
+
+
+
+     loadColumnState() {
+      // if (this.loadingColumnState) {
+      //   return;
+      // }
+
+      // this.loadingColumnState = true;
+
+    const savedState =  this.tableState;
+    console.log("Loaded state from localStorage", savedState);
+
+    // Apply saved column state to each formFilter
+    Object.keys(savedState).forEach(formFilter => {
+      const savedColumnState = savedState[formFilter];
+      if (savedColumnState && this.gridInstances[formFilter]) {
+        this.gridInstances[formFilter].applyColumnState({ state: savedColumnState, applyOrder: true });
+        console.log(`Applied column state for ${formFilter}`);
+      }
+    });
+
+  }
+  
+
+  onColumnMoved = (event: any) => {
+
+    // if (this.editOperation || this.loadingColumnState) {
+    //   return;
+    // }
+
+    console.log('Column moved:', event);
+    const formFilter = event && event.column && event.column.colDef.FormName;
+    console.log("Selected form Filter is here ",formFilter);
+
+    const gridID = event.column && event.column.stubContext && event.column.stubContext.gridId
+
+    console.log("Grid id is here ",gridID);
+    
+    this.saveColumnState(formFilter,gridID); // Save column state after column is moved for this formFilter
+
+    
+  };
+
+    // Save column state for a specific formFilter
+    saveColumnState(formFilter: string, gridID: any) {
+      // if (this.editOperation || this.loadingColumnState) {
+      //   return;
+      // }
+  
+      console.log("Saving column state for", formFilter);
+  
+      // Retrieve the gridApi specific to this formFilter
+      const gridApi = this.gridInstances[formFilter];
+      if (gridApi) {
+        const columnState = gridApi.getColumnState(); // Get column state for the current grid
+        console.log("Column State for", formFilter, columnState);
+  
+        // Ensure tableState is initialized
+        if (!this.tableState) {
+          this.tableState = {};
+        }
+  
+        // Deep copy the column state to avoid reference issues
+        this.tableState[formFilter] = [...columnState]; // Store the column state for the specific formFilter
+  
+        // Save to localStorage if tableState has any data
+        if (Object.keys(this.tableState).length > 0) {
+          this.tableTempState = { ...this.tableState }; 
+          console.log("Saving table state to localStorage:", this.tableState);
+          // this.loadingColumnState = true;
+
+          // localStorage.setItem("tableState", JSON.stringify(this.tableState));
+        }
+      }
+    }
+  
 
 } 
 
