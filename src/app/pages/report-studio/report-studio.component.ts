@@ -2019,6 +2019,8 @@ mergeAndAddLocation(mappedResponse: any) {
            }
            else{
 
+            this.forms().clear();
+
             this.selectedForms.forEach((formData: any) => {
               this.addForm(); 
             });

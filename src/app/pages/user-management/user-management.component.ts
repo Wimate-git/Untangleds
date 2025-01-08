@@ -3126,6 +3126,7 @@ rdtListWorkAround :any =[{
       this.cloneUserOperation = true
 
       this.createUserField.get('username')?.reset()
+      this.createUserField.get('username')?.enable()
       this.createUserField.get('name')?.reset()
       this.createUserField.get('userID')?.reset()
       this.createUserField.get('email')?.reset()
