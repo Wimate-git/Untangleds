@@ -1,0 +1,41 @@
+
+
+<!-- <div class="modal-header">
+    <h4 class="modal-title">Approval History</h4>
+
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.close()"></button>
+  </div> -->
+  <div class="modal-body">
+    <div class="approval-history-container">
+      <div class="approval-history-header">
+        <h3>Approval History</h3>
+      </div>
+  
+      <div class="approval-history-list">
+        <div *ngFor="let approval of approvalHistory" class="approval-card">
+          <!-- Dynamically change icon color and type based on the approval status -->
+          <div class="approval-icon">
+            <!-- Check if the status contains "Approved" or "Rejected" -->
+            <i *ngIf="approval[0].includes('Approved')" class="fa-solid fa-circle-check fs-1" style="color: green;"></i>
+            <i *ngIf="approval[0].includes('Pending')" class="fa-solid fa-clock-rotate-left fs-1" style="color: orange;"></i>
+            <i *ngIf="approval[0].includes('Rejected')" class="fa-solid fa-circle-xmark fs-1" style="color: red;"></i>
+          </div>
+          <div class="approval-info">
+            <p class="approval-status">{{ approval[0] && approval[0].includes('-') ? approval[0].split('-')[0] : approval[0]}}</p>
+            <span class="approval-time" [title]="'Timestamp: ' + approval[1]">
+                    {{approval[0] && approval[0].includes('-') ? approval[0].split('-')[1] : ''}}
+              </span>
+            <span class="approval-time" [title]="'Timestamp: ' + approval[1]">
+              {{ formatTimestamp(approval[1]) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+
+
+
+  

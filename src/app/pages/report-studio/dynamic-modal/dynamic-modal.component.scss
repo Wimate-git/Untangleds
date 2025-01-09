@@ -1,0 +1,78 @@
+/* approval-history.component.css */
+
+/* Container for the approval history */
+.approval-history-container {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: auto;
+  }
+  
+  .approval-history-header h3 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .approval-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  /* Each approval card */
+  .approval-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .approval-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Icon styling */
+  .approval-icon {
+    margin-right: 12px;
+  }
+  
+  .approval-icon img {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+  }
+  
+  /* Text information */
+  .approval-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .approval-status {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0px;
+  }
+  
+  .approval-time {
+    font-size: 14px;
+    color: #888;
+    margin-top: 4px;
+    cursor: pointer;
+  }
+  
+  /* Tooltip on hover for timestamps */
+  .approval-time:hover {
+    text-decoration: underline;
+  }
+  

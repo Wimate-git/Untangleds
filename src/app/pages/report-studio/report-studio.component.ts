@@ -15,13 +15,14 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModuleDisplayService } from './services/module-display.service';
 import { Config } from 'datatables.net';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
-import { AgGridAngular } from 'ag-grid-angular';
-// import * as XLSX from 'xlsx';  
+import { AgGridAngular } from 'ag-grid-angular'; 
 import * as pdfMake from "pdfmake/build/pdfmake";
 import { vfs } from 'pdfmake/build/vfs_fonts';
 import { MapModalComponent } from './map-modal/map-modal.component';
 (pdfMake as any).vfs = vfs;
-import XLSX from 'xlsx-js-style';  // Import xlsx-js-style
+import XLSX from 'xlsx-js-style';  
+import { MiniTableComponent } from './mini-table/mini-table.component';
+import { DynamicModalComponent } from './dynamic-modal/dynamic-modal.component';
 
 interface ListItem {
   [key: string]: {
@@ -117,17 +118,21 @@ columns: any;
     // Ensure the listener is not added multiple times
     private isImageClickListenerAdded = false;
     private isLocationClickListenerAdded = false;
+    private isminiTableClickListenerAdded = false;
+    private isapprovalClickListenerAdded = false;
     private isMarkerClickListenerAdded = false;
   dyanmicFormDataArray: any = [];
   tableFormName: any = [];
   gridColumnApi: any;
   tableState: any = [];
   editOperation: boolean = false;
+  customColumnsflag: boolean = false;
 
    constructor(private fb:FormBuilder,private api:APIService,private configService:SharedService,private scheduleAPI:scheduleApiService,
     private toast:MatSnackBar,private spinner:NgxSpinnerService,private cd:ChangeDetectorRef,private modalService: NgbModal,private moduleDisplayService: ModuleDisplayService,
     private route: ActivatedRoute,private router:Router
    ){
+
     this.gridOptions = <GridOptions>{
       context: {
         componentParent: this
@@ -141,29 +146,10 @@ columns: any;
 
     ngAfterViewInit() {
 
-      // this.addImageClickListener();
-      this.addLocationClickListener();
-      this.addMarkerClickListener();
-
-    // Listen for the custom 'image-click' event
-    window.addEventListener('image-click', (event: any) => {
-      const imageBase64 = event.detail;
-      this.openImageModal(imageBase64);
-    });
-
-    // // window.addEventListener('location-click', this.handleLocationClick);
-    // window.addEventListener('location-click', (event: Event) => this.handleLocationClick(event as CustomEvent));
-
-
-    //   // window.addEventListener('location-click', this.handleLocationClick);
-    //   window.addEventListener('marker-click', (event: Event) => this.handleTrackLocationClick(event as CustomEvent));
-
    
   }
 
 
-
-  // Method to add location click listener
   addLocationClickListener() {
     if (!this.isLocationClickListenerAdded) {
       window.addEventListener('location-click', (event: Event) => this.handleLocationClick(event as CustomEvent));
@@ -171,7 +157,14 @@ columns: any;
     }
   }
 
-  // Method to add marker click listener
+  addMiniTableClickListener() {
+    if (!this.isminiTableClickListenerAdded) {
+      window.addEventListener('miniTable-click', (event: Event) => this.handleminiTableClick(event as CustomEvent));
+      this.isminiTableClickListenerAdded = true;
+    }
+  }
+
+
   addMarkerClickListener() {
     if (!this.isMarkerClickListenerAdded) {
       window.addEventListener('marker-click', (event: Event) => this.handleTrackLocationClick(event as CustomEvent));
@@ -180,6 +173,14 @@ columns: any;
   }
 
 
+
+
+  addApprovalClickListener() {
+    if (!this.isapprovalClickListenerAdded) {
+      window.addEventListener('approve-click', (event: Event) => this.handleApprovalClick(event as CustomEvent));
+      this.isapprovalClickListenerAdded = true;
+    }
+  }
 
 
    ngOnInit() {
@@ -201,6 +202,11 @@ columns: any;
     });
 
 
+    this.customColumnsGroup = this.fb.group({
+      customForms: this.fb.array([]) 
+    });
+
+
     this.reportsFeilds = this.fb.group({
       dateType: ['', Validators.required],
       singleDate: ['', Validators.required],
@@ -210,7 +216,8 @@ columns: any;
       form_permission: [[], Validators.required], 
       form_data_selected: this.fb.array([]), // Create FormArray
       filterOption: ['all'],
-      columnOption: ['all']
+      columnOption: ['all'],
+      addColumn:['false']
     });
 
 
@@ -223,7 +230,7 @@ columns: any;
     
     this.routeSub = this.route.queryParams.subscribe((params) => {
       this.savedQuery = params['savedQuery'];
-      console.log("Received saved query:", this.savedQuery);
+      // console.log("Received saved query:", this.savedQuery);
 
       if(this.savedQuery){
         this.spinner.show()
@@ -231,6 +238,19 @@ columns: any;
         this.editSavedQuery( this.savedQuery)
       }
     });
+
+
+
+    this.addLocationClickListener();
+    this.addMarkerClickListener();
+    this.addMiniTableClickListener()
+    this.addApprovalClickListener()
+
+  window.addEventListener('image-click', (event: any) => {
+    const imageBase64 = event.detail;
+    this.openImageModal(imageBase64);
+  });   
+
     
   }   
 
@@ -289,7 +309,7 @@ columns: any;
                   data: filteredData // Return filtered data
               });
      
-              console.log("Response is in this form ", filteredData);
+              // console.log("Response is in this form ", filteredData);
             })
             .catch((error: any) => {
               console.error('Error fetching user lookup data:', error);
@@ -451,14 +471,25 @@ getFormNameByIndex(index: number): string {
 multiSelectChange(): void {
   const formsArray = this.forms();
   formsArray.clear();  
+  const customArray = this.customForms()
+  customArray.clear()
   this.visibiltyflag = false
   this.reportsFeilds.get('filterOption')?.setValue('all');
+  this.reportsFeilds.get('addColumn')?.setValue('false');
   this.reportsFeilds.get('columnOption')?.setValue('all');
   this.populateFormBuilder = []
   this.populateFormData = []
   this.conditionflag = false
+  this.customColumnsflag = false
+  this.populateCustomFormBuilder = []
+
   this.selectedForms.forEach(() => {
     this.addForm(); 
+  });
+
+
+  this.selectedForms.forEach(() => {
+    this.addCustomForm(); 
   });
 }
 
@@ -491,7 +522,7 @@ async onColumnChange(event: any, getValue: string): Promise<void> {
 
 
   this.reportsFeilds.get('columnOption')?.patchValue('onCondition')
-  console.log('Get value is here ', this.selectedValues);
+  // console.log('Get value is here ', this.selectedValues);
 
 
 
@@ -515,6 +546,7 @@ async onColumnChange(event: any, getValue: string): Promise<void> {
           tempMetadata = {};
           let geoFlag = false
           let trackFlag = false
+          let table = false
 
           tempMetadata[item] = tempResult.map((field: any) => {
 
@@ -522,19 +554,24 @@ async onColumnChange(event: any, getValue: string): Promise<void> {
               geoFlag = true
               return { name: field.name, label: "Geographic Location", formName: formName };
             }
+            else if((field.name.startsWith("dynamic_table_values") || field.type == 'table') && table == false){
+              table = true
+              return { name: field.name, label: "dynamic_table_values", formName: formName };
+            }
             else if(field && field.name && field.validation && field.validation.isTrackHistory && trackFlag == false){
               trackFlag = true
             }
             return { name: field.name, label: field.label, formName: formName };
           });
 
+
+          tempMetadata[item].push({ name: "approval_history", label: "approval_history", formName: formName })
+
           if(trackFlag){
-            //Adding Dummy name
             tempMetadata[item].push({ name: "track-3274927276", label: "trackLocation", formName: formName })
           }
-         
        
-          console.log("tempMetadata[item] ",tempMetadata[item]);
+          // console.log("tempMetadata[item] ",tempMetadata[item]);
         }
         this.populateFormData.push(tempMetadata);
       }
@@ -542,11 +579,11 @@ async onColumnChange(event: any, getValue: string): Promise<void> {
     
 
       this.populateFormData = Array.from(new Set(this.populateFormData))
-      console.log("Data to be added in dropdowns ", this.populateFormData);
+      // console.log("Data to be added in dropdowns ", this.populateFormData);
 
     } catch (error) {
       this.spinner.hide();
-      console.log("Error in fetching form Builder data ", error);
+      // console.log("Error in fetching form Builder data ", error);
     }
     this.spinner.hide();
   } else {
@@ -555,7 +592,7 @@ async onColumnChange(event: any, getValue: string): Promise<void> {
 
   // Update visibility and set up dropdown keys
   if (selectedValue === 'onCondition') {
-    console.log("Succeessfullt came here ");
+    // console.log("Succeessfullt came here ");
     this.visibiltyflag = true;
     this.dropdownKeys = this.populateFormData.map((item: any) => Object.keys(item)[0]);
 
@@ -565,10 +602,10 @@ async onColumnChange(event: any, getValue: string): Promise<void> {
       this.initializeFormControls(); // Ensure FormArray is correctly populated
     }
     else{
-      console.log("Populated is called ");
+      // console.log("Populated is called ");
       this.initializeFormControls1()
     }
-    console.log("Dropdown keys are here ", this.dropdownKeys);
+    // console.log("Dropdown keys are here ", this.dropdownKeys);
   }
 
   this.cd.detectChanges();
@@ -595,7 +632,7 @@ initializeFormControls(): void {
       formArray.removeAt(0);
     }
 
-    console.log("Create the form here ",this.selectedValues);
+    // console.log("Create the form here ",this.selectedValues);
 
     // Loop over the new data and add FormControls
     this.selectedValues.forEach((dropdownData: any[], i: any) => {
@@ -606,7 +643,7 @@ initializeFormControls(): void {
       formArray.push(this.fb.control(selectedValues));
     });
 
-    console.log('Form Controls Initialized:', this.reportsFeilds.value);
+    // console.log('Form Controls Initialized:', this.reportsFeilds.value);
   }
 
 // Ensure to type-cast the AbstractControl to FormControl for correct methods
@@ -654,7 +691,7 @@ async onFilterChange(event: any,getValue:any,key:any) {
   if(selectedValue == 'onCondition'){
     this.spinner.show()
 
-    console.log("Selected form data is here ",this.selectedForms);
+    // console.log("Selected form data is here ",this.selectedForms);
 
     try{
       this.populateFormBuilder = []
@@ -666,7 +703,7 @@ async onFilterChange(event: any,getValue:any,key:any) {
 
         if(result){
           let tempResult = JSON.parse(result.metadata || '').formFields
-          console.log("tempResult is ",tempResult);
+          // console.log("tempResult is ",tempResult);
 
           tempMetadata = {}
           tempMetadata[item] = tempResult.map((item: any) => {
@@ -676,7 +713,7 @@ async onFilterChange(event: any,getValue:any,key:any) {
         this.populateFormBuilder.push(tempMetadata)
       }
       
-      console.log("Data to be added in dropdowns ",this.populateFormBuilder);
+      // console.log("Data to be added in dropdowns ",this.populateFormBuilder);
     }
     catch(error){
       this.spinner.hide()
@@ -754,13 +791,13 @@ async onFilterChange(event: any,getValue:any,key:any) {
         if (field.validation && field.validation?.user === true) {
           const lookupKey = `${this.SK_clientID}#user#lookup`;
     
-          console.log("User list dropdown is here ");
+          // console.log("User list dropdown is here ");
     
           // Make API call and transform result
           from(this.fetchUserLookupdata(1, lookupKey)).pipe(
             map((result: any) => {
               if (result) {
-                console.log("Users List is ", result);
+                // console.log("Users List is ", result);
                 return Array.from(new Set(result.map((item: any) => item.P1)));
               }
               return [];
@@ -854,47 +891,15 @@ async onFilterChange(event: any,getValue:any,key:any) {
       return specificSingleSelectArray;
     };
 
-  //   selectedField(event:any,formIndex:any){
-  //     console.log("Event is ",event);
-  //     const selectedValue = event.target.value;  // Get the selected field value
-  //     console.log('Selected Field:', selectedValue);
-
-  //     this.updateFieldValueInput(formIndex, selectedValue);
-  //   }
-
-
-
-  // updateFieldValueInput(formIndex: number, selectedField: string): void {
-  
-  //   console.log("Condition Group is here ",this.formFieldsGroup);
-    
-  //   const formName = this.getFormNameByIndex(formIndex);
-  //   console.log("FormName is ",formName);
-  //   const formFields = this.populateFormBuilder.find((form: { [x: string]: any; }) => form[formName]);
-  //   console.log("Form Fields ",formFields);
-  //   const tempFormFields = formFields[formName]
-
-  //   const field = tempFormFields.find((f: { name: string; }) => f.name === selectedField);
-  //   if(field && field.type == 'select'){
-  //       console.log("Dropdown found here ");
-
-  //     } else {
-       
-  //     }
-  // }
-
-
 
   formFieldsGroup: FormGroup;
+  customColumnsGroup:FormGroup;
 
   
 
   selectedForms: any = [];
   operators = ['=', '!=', '<', '>', '<=', '>='];
 
-
- 
-   // Default Column Definitions
    defaultColDef: ColDef = {
      sortable: true,
      filter: true,
@@ -916,13 +921,13 @@ async onFilterChange(event: any,getValue:any,key:any) {
 
     const gridApi = params.api;
     this.gridInstances[formFilter] = gridApi; 
-    console.log(`Grid API saved for ${formFilter}`, gridApi);
+    // console.log(`Grid API saved for ${formFilter}`, gridApi);
   }
 
    getSelectedRows() {
      const selectedNodes = this.gridApi.getSelectedNodes();
      const selectedData = selectedNodes.map(node => node.data);
-     console.log('Selected Rows:', selectedData);  
+    //  console.log('Selected Rows:', selectedData);  
    }
 
 
@@ -973,11 +978,6 @@ async onFilterChange(event: any,getValue:any,key:any) {
     this.showTable = true
     this.tableData = []; 
 
-
-    console.log("Saved Query is here ",this.savedQuery);
-    
-   
-
     let formMap
     let formValues
 
@@ -1000,7 +1000,7 @@ async onFilterChange(event: any,getValue:any,key:any) {
         });
         return acc;
       }, {});
-      console.log("Form mapped data is here on Submit",formMap);
+      // console.log("Form mapped data is here on Submit",formMap);
     }
   
     this.spinner.show();
@@ -1069,12 +1069,12 @@ async onFilterChange(event: any,getValue:any,key:any) {
         body.formFilter = item;
       }
   
-      console.log("Request body is here ", body);
+      // console.log("Request body is here ", body);
   
       try {
 
         const response = await this.scheduleAPI.sendData(body);
-        console.log('Response from Lambda:', response);
+        // console.log('Response from Lambda:', response);
 
         if (!groupedData[formFilter]) {
           groupedData[formFilter] = [];
@@ -1087,7 +1087,7 @@ async onFilterChange(event: any,getValue:any,key:any) {
     }
   
 
-    console.log("Data to be populated on Table is ", groupedData);
+    // console.log("Data to be populated on Table is ", groupedData);
 
     await this.prepareData(groupedData,formMap);
 
@@ -1112,6 +1112,7 @@ async onFilterChange(event: any,getValue:any,key:any) {
     const tableDataWithFormFilters:any = [];
 
     const formConditions = this.formFieldsGroup.value.forms
+    const addCustomColumns = this.customColumnsGroup.value.customForms
   
     let index = 0;
 
@@ -1123,14 +1124,31 @@ async onFilterChange(event: any,getValue:any,key:any) {
       if(res && res.metadata){
         dynamicMetadata = JSON.parse(res.metadata).formFields  
       }
-      console.log("Dynamic form builder data is here ",dynamicMetadata);
+      // console.log("Dynamic form builder data is here ",dynamicMetadata);
 
 
       let responses = groupedData[formFilter];
 
-      console.log("Responses are here ",responses);
 
-      let tempMetaArray = responses[0].map((item:any)=>item.metadata)
+      // let tempMetaArray = responses[0].map((item:any)=>item.metadata)
+
+
+      let tempMetaArray = responses[0].map((item: any) => {
+        let metadata = { ...item.metadata };
+    
+        // Add approval_history from options to metadata
+        if (item.options && item.options.approval_history) {
+            metadata.approval_history = item.options.approval_history;
+        }
+        else{
+          metadata.approval_history = []
+        }
+    
+        return metadata;
+    });
+
+
+    console.log("After getting options ",tempMetaArray);
 
 
 
@@ -1138,21 +1156,49 @@ async onFilterChange(event: any,getValue:any,key:any) {
         let tempArray:any = []
         const conditionalString =  await this.buildConditionString(formConditions[index].conditions)
         for(let data of tempMetaArray){
-          if(await this.evaluateTemplate(conditionalString,data) == true){
+          if(await this.evaluateTemplate(conditionalString,data,'None') == true){
             tempArray.push(data)
           }
         }
         tempMetaArray = tempArray
       }
 
-      console.log("After filter data is here ",tempMetaArray);
+      // console.log("After filter data is here ",tempMetaArray);
 
       this.dyanmicFormDataArray.push({ [formFilter]: dynamicMetadata });
 
 
+      console.log("addCustomColumns[index]",addCustomColumns[index]);
+
+
+      if(this.customColumnsflag && addCustomColumns[index] && addCustomColumns[index].conditions && Array.isArray(addCustomColumns[index].conditions) && addCustomColumns[index].conditions.length > 0 && addCustomColumns[index].conditions[0].columnName != ''){
+        let modifyRows = await this.addModifiedColumns(tempMetaArray,addCustomColumns[index].conditions)
+        console.log("Modified rows are here ",modifyRows);
+
+        if(this.visibiltyflag){
+          for(let col of addCustomColumns[index].conditions){
+            formMap[`${formFilter}`] && formMap[`${formFilter}`].push(col.columnName) 
+          }
+        }
+      }
+
+
+
       let rows = await this.mapLabels(tempMetaArray,dynamicMetadata) 
 
-      console.log("After mapping labels are here ",rows);
+      console.log("Rows are here ",rows);
+
+
+      rows = rows.map((row: any) => {
+        Object.keys(row).forEach((key) => {
+          if (key.startsWith("Empty-Placeholder-") || key.startsWith("Empty Placeholder")) {
+            delete row[key]; 
+          }      
+        });
+        return row;
+      });
+
+      // console.log("After mapping labels are here ",rows);
 
       console.log("formMap",formMap);
 
@@ -1180,11 +1226,11 @@ async onFilterChange(event: any,getValue:any,key:any) {
         rows[i].formFilter = formFilter
       }
 
-      console.log("Rows are here ",rows);
-      console.log("Filtered rows are here ",rows);
+      // console.log("Rows are here ",rows);
+      // console.log("Filtered rows are here ",rows);
 
 
-      console.log("Dyanmic Data array list this.dyanmicFormDataArray ",this.dyanmicFormDataArray);
+      // console.log("Dyanmic Data array list this.dyanmicFormDataArray ",this.dyanmicFormDataArray);
 
   
 
@@ -1194,11 +1240,28 @@ async onFilterChange(event: any,getValue:any,key:any) {
   
 
     this.tableDataWithFormFilters = tableDataWithFormFilters;
-    console.log("Table rows are here ",this.tableDataWithFormFilters);
+    // console.log("Table rows are here ",this.tableDataWithFormFilters);
 
  
     this.spinner.hide()
 
+  }
+
+
+
+
+  async addModifiedColumns(rows:any,customColumns:any){
+
+    if(this.customColumnsflag && customColumns && Array.isArray(customColumns) && customColumns.length > 0 && customColumns[0].columnName != ''){
+      for(let row of rows){
+        for(let col of customColumns){
+          const templateResult = await this.evaluateTemplate(col.equationText,row,'split')
+          row[`${col.columnName}`] = templateResult
+        }
+      }
+    }
+
+    return rows
   }
 
 
@@ -1300,8 +1363,8 @@ isBase64(value: string): boolean {
   
       // Merge static columns with dynamic columns
       for (let key in dynamicColumns) {
-        if (key !== 'formFilter' && key !== 'PK' && key !== 'SK' && key != 'Updated Date' && key != 'id' && key != 'dynamic_table_values') {
-          const { isBase64Image, isLocation, isTrackLocation } = dynamicColumns[key];
+        if (key !== 'formFilter' && key !== 'PK' && key !== 'SK' && key != 'Updated Date' && key != 'id') {
+          const { isBase64Image, isLocation, isTrackLocation,isMiniTable,isApprovalHistory  } = dynamicColumns[key];
   
           // Choose renderer based on conditions
           let cellRenderer = null;
@@ -1311,6 +1374,11 @@ isBase64(value: string): boolean {
             cellRenderer = this.locationCellRenderer;
           } else if (isTrackLocation) {
             cellRenderer = this.trackLocationCellRenderer;
+          }else if (isMiniTable) {
+            cellRenderer = (params: any) => this.miniTableCellRenderer(params, formName);
+          }
+          else if(isApprovalHistory){
+            cellRenderer = this.dynamicModalRenderer;
           }
   
           columns.push({
@@ -1357,14 +1425,18 @@ isBase64(value: string): boolean {
         const isBase64Image = this.isBase64(row[key]);
         const isLocation = this.isLocation(key, row[key]);
         const isTrackLocation = this.isTrackLocation(key,row[key]);
+        const isMiniTable = this.isMiniTable(key,row[key]);
+        const isApprovalHistory = this.isApprovalHistory(key,row[key]);
   
         if (!dynamicColumns[key]) {
-          dynamicColumns[key] = { isBase64Image, isLocation, isTrackLocation };
+          dynamicColumns[key] = { isBase64Image, isLocation, isTrackLocation, isMiniTable, isApprovalHistory };
         } else {
           // If the column already exists, just update the state (no need to overwrite)
           dynamicColumns[key].isBase64Image = dynamicColumns[key].isBase64Image || isBase64Image;
           dynamicColumns[key].isLocation = dynamicColumns[key].isLocation || isLocation;
           dynamicColumns[key].isTrackLocation = dynamicColumns[key].isTrackLocation || isTrackLocation;
+          dynamicColumns[key].isMiniTable = dynamicColumns[key].isMiniTable || isMiniTable;
+          dynamicColumns[key].isApprovalHistory = dynamicColumns[key].isApprovalHistory || isApprovalHistory;
         }
       }
     });
@@ -1378,38 +1450,68 @@ isBase64(value: string): boolean {
   }
 
 
-      // trackLocationCellRenderer(params: any) {
+  isMiniTable(key:any,value: any): boolean {
+    return key == 'dynamic_table_values' &&  Object.keys(value).length > 0;
+  }
 
-      //   // console.log("Params are here ",params);
 
-      //   if(params && params.value){
-      //     const coordinates = params.value; 
-        
-      //       // Create a clickable link for the location
-      //       const link = document.createElement('a');
-      //       link.href = 'javascript:void(0)';
-      //       link.innerHTML = coordinates;
+  isApprovalHistory(key:any,value: any): boolean {
+    return key == 'approval_history' &&  value.length > 0;
+  }
 
-      //       // Add click event listener to dispatch a custom event
-      //       link.addEventListener('click', () => {
-      //           // Dispatch a custom event with location data
-      //           const event = new CustomEvent('marker-click', {
-      //               detail: { coordinates: coordinates }
-      //           });
-      //           window.dispatchEvent(event);
-      //       });
 
-      //       return link;
-      //   }
 
-      //   return null
-      // }
+  miniTableCellRenderer(params: any,formName:any) {
+
+    if (params && params.value && formName) {
+        const tableBody = params.value;
+
+        // Create a container for the icon
+        const container = document.createElement('div');
+        container.style.display = 'flex';
+        container.style.alignItems = 'center';
+        container.style.justifyContent = 'center';
+
+        // Create the Bootstrap location icon (location pin)
+        const locationIcon = document.createElement('i');
+        locationIcon.className = 'fa-solid fa-table';  // Bootstrap icon class for location pin
+        locationIcon.style.fontSize = '24px';  // Adjust font size for better visibility
+        locationIcon.style.cursor = 'pointer'; // Change cursor to pointer to indicate clickability
+        locationIcon.style.color = '#1F509A';
+
+        // Add click event listener to dispatch a custom event with location data
+        locationIcon.addEventListener('click', () => {
+            // Dispatch a custom event with location data
+            const event = new CustomEvent('miniTable-click', {
+                detail: { tableBody: tableBody ,formName:formName},
+                
+            });
+            window.dispatchEvent(event);
+        });
+
+        // Append the icon to the container
+        container.appendChild(locationIcon);
+
+        return container;
+    }
+
+    // Return null if params or params.value is missing
+    return null;
+}
+
+
+
+
+
+
+
+
+
 
 
 
       trackLocationCellRenderer(params: any) {
 
-        // Check if params and params.value exist
         if (params && params.value) {
             const coordinates = params.value;
     
@@ -1444,6 +1546,45 @@ isBase64(value: string): boolean {
         // Return null if params or params.value is missing
         return null;
     }
+
+
+
+
+    dynamicModalRenderer(params: any){
+      if (params && params.value) {
+        const coordinates = params.value;
+
+        // Create a container for the icon
+        const container = document.createElement('div');
+        container.style.display = 'flex';
+        container.style.alignItems = 'center';
+        container.style.justifyContent = 'center';
+
+        // Create the Bootstrap location icon (location pin)
+        const locationIcon = document.createElement('i');
+        locationIcon.className = 'fa-solid fa-layer-group';  // Bootstrap icon class for location pin
+        locationIcon.style.fontSize = '24px';  // Adjust font size for better visibility
+        locationIcon.style.cursor = 'pointer'; // Change cursor to pointer to indicate clickability
+        locationIcon.style.color = '#1F509A';
+
+        // Add click event listener to dispatch a custom event with location data
+        locationIcon.addEventListener('click', () => {
+            // Dispatch a custom event with location data
+            const event = new CustomEvent('approve-click', {
+                detail: { approval_history: coordinates }
+            });
+            window.dispatchEvent(event);
+        });
+
+        // Append the icon to the container
+        container.appendChild(locationIcon);
+
+        return container;
+    }
+
+    // Return null if params or params.value is missing
+    return null;
+    }
     
     
 
@@ -1461,10 +1602,11 @@ isBase64(value: string): boolean {
   
 
 
-  // Helper function to format header names (capitalize words and replace dashes with spaces)
-  formatHeaderName(key: string): string {
-    return key.replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
-  }
+      formatHeaderName(key: string): string {
+        return key
+          .replace(/[-_]/g, ' ')  
+          .replace(/\b\w/g, char => char.toUpperCase()); 
+      }
 
   imageCellRenderer(params: any) {
     const imageBase64 = params.value;  
@@ -1502,22 +1644,21 @@ isBase64(value: string): boolean {
 
 locationCellRenderer(params: any) {
 
-  // Ensure the value is a comma-separated string of latitude and longitude
   const coordinates = typeof params.value == 'string' ? params.value.split(',') : "";
-  const lat = coordinates[0];  // First part is latitude
-  const lon = coordinates[1];  // Second part is longitude
+  const lat = coordinates[0];  
+  const lon = coordinates[1];  
 
 
   const locationText = lat && lon ? `${lat}, ${lon}` : null;
 
-  // Create a container for the icon
+
   const container = document.createElement('div');
   container.style.display = 'flex';
   container.style.alignItems = 'center';
   container.style.justifyContent = 'center';
 
 
-  // Create the Bootstrap location icon
+
   const locationIcon = document.createElement('i');
   locationIcon.className = 'bi bi-geo-alt-fill';  
   locationIcon.style.fontSize = '24px';  
@@ -1525,16 +1666,14 @@ locationCellRenderer(params: any) {
   locationIcon.style.marginRight = '8px'; 
   locationIcon.style.color = 'red';
 
-  // Add click event listener to dispatch a custom event with location data
+
   locationIcon.addEventListener('click', () => {
-    // Dispatch a custom event with location data
     const event = new CustomEvent('location-click', {
         detail: { latitude: lat, longitude: lon }
     });
     window.dispatchEvent(event);
   });
 
-  // Append the icon to the container (no need for a link now)
   container.appendChild(locationIcon);
 
   return container;
@@ -1543,33 +1682,37 @@ locationCellRenderer(params: any) {
 
 
 
-  // This method opens the modal and passes the imageBase64 string
+ 
   openImageModal(imageBase64: string) {
     const modalRef = this.modalService.open(ImageModalComponent);
-    modalRef.componentInstance.imageSrc = imageBase64;  // Pass the Base64 string to the modal component
+    modalRef.componentInstance.imageSrc = imageBase64; 
   }
 
-
-
-
-   // This function will be called when the location-click event is fired
    handleLocationClick(event: CustomEvent) {
-    console.log("Event ",event);
-
     const { latitude, longitude } = event.detail;
-    console.log('Location clicked:', latitude, longitude);
-    
-    // Open the modal with the location data
     this.openLocationModal(latitude, longitude);
   }
 
 
-  handleTrackLocationClick(event: CustomEvent) {
-    console.log("Event Marker",event);
 
+  handleminiTableClick(event: CustomEvent) {
+    const { tableBody,formName } = event.detail;    
+    this.openminiTableModal(tableBody,formName);
+  }
+
+
+
+  handleApprovalClick(event: CustomEvent) {
+    console.log("Event is triggered ");
+    const { approval_history } = event.detail;
+    this.openApprovalModal(approval_history);
+  }
+
+
+
+
+  handleTrackLocationClick(event: CustomEvent) {
     const { coordinates } = event.detail;
-    
-    // Open the modal with the location data
     this.openTrackLocationModal(coordinates);
   }
 
@@ -1579,6 +1722,12 @@ locationCellRenderer(params: any) {
     modalRef.componentInstance.coordinates = lat;
   }
 
+  openApprovalModal(lat: string) {
+    const modalRef = this.modalService.open(DynamicModalComponent);
+    modalRef.componentInstance.approvalHistory = lat;
+  }
+
+
 
 
   openLocationModal(lat: string, lon: string) {
@@ -1587,6 +1736,13 @@ locationCellRenderer(params: any) {
     modalRef.componentInstance.longitude = lon;
   }
 
+
+  openminiTableModal(tableBody: string,formName:any) {
+    const modalRef = this.modalService.open(MiniTableComponent, { size: 'xl' });
+    modalRef.componentInstance.tableBody = tableBody;
+    modalRef.componentInstance.dynamicFormData = this.dyanmicFormDataArray
+    modalRef.componentInstance.formName = formName
+  }
  
 
  
@@ -1621,6 +1777,10 @@ locationCellRenderer(params: any) {
     this.tableState = {};
 
     this.forms().clear()
+    this.customForms().clear()
+
+    this.customColumnsflag = false
+    this.populateCustomFormBuilder = []
   
     this.tableDataWithFormFilters = [];
     this.showTable = false;
@@ -1645,45 +1805,108 @@ locationCellRenderer(params: any) {
 
 
 
-   async evaluateTemplate(template:any,metadata:any) {
-    // Use regex to match variable-value pairs
-    const matches = template.match(/\${(.*?)}/g);
-    // Substitute variables with metadata values
-    matches.forEach((match: string) => {
-        const variableName = match.replace(/\${|}/g, '');
-        const metadataKey = Object.keys(metadata).find(key => key == variableName);
-        const substitutedValue = metadataKey ? metadata[metadataKey] : match;
+//    async evaluateTemplate(template:any,metadata:any,getkey:any) {
+//     // Use regex to match variable-value pairs
+//     const matches = template.match(/\${(.*?)}/g);
 
-        // If the substituted value is a string, wrap it in quotes
-        const formattedValue = typeof substitutedValue === 'string' ? `'${substitutedValue}'` : substitutedValue;
+//     if (!matches) {
+//       return template;
+//   }
 
-        // Replace in the template
-        template = template.replace(match, formattedValue);
-    });
+//     // Substitute variables with metadata values
+//     matches.forEach((match: string) => {
+//         const variableName = match.replace(/\${|}/g, '');
+//         const metadataKey = Object.keys(metadata).find(key => getkey == 'split' ? key == variableName.split('.')[1]:key == variableName);
+//         const substitutedValue = metadataKey ? metadata[metadataKey] : match;
 
-    // Evaluate the expression safely
-    try {
-        const result = eval(template);
-        return result;
-    } catch (error) {
-        console.error("Error evaluating template:", error);
-        Swal.fire({
+//         // If the substituted value is a string, wrap it in quotes
+//         const formattedValue = typeof substitutedValue === 'string' ? `'${substitutedValue}'` : substitutedValue;
+
+//         // Replace in the template
+//         template = template.replace(match, formattedValue);
+//     });
+
+//     // Evaluate the expression safely
+//     try {
+//         const result = eval(template);
+//         return result;
+//     } catch (error) {
+//         console.error("Error evaluating template:", error);
+//         Swal.fire({
+//           title: "Incomplete Fields",
+//           text: "Please fill in all the required conditional fields before proceeding.",
+//           icon: "error",
+//           confirmButtonText: "Okay"
+//       });
+//         return null;
+//     }
+// }
+
+
+
+async evaluateTemplate(template: string, metadata: any, getkey: any) {
+  // Use regex to match variable-value pairs
+  const matches = template.match(/\${(.*?)}/g);
+
+  // If no variables are found, return the template directly
+  if (!matches) {
+    return template;
+  }
+
+  // Substitute variables with metadata values
+  matches.forEach((match: string) => {
+      const variableName = match.replace(/\${|}/g, '');
+      
+      // Handle cases where the key format might be split
+      const metadataKey = Object.keys(metadata).find(key => getkey === 'split' ? key === variableName.split('.')[1] : key === variableName);
+
+      // Substitute the value or keep the original match if no value is found
+      const substitutedValue = metadataKey ? metadata[metadataKey] : match;
+
+      // Wrap string values in quotes to ensure they are correctly evaluated
+      const formattedValue = typeof substitutedValue === 'string' ? `'${substitutedValue}'` : substitutedValue;
+
+      // Replace the matched variable in the template
+      template = template.replace(match, formattedValue);
+  });
+
+
+
+  // Evaluate the expression safely
+  try {
+      // Make sure to evaluate only the final expression and handle potential errors in evaluation
+      const result = eval(template);  // Using `Function` instead of `eval`
+
+      return result;
+  } catch (error) {
+      console.error("Error evaluating template:", error);
+
+      // Show an error message to the user
+      Swal.fire({
           title: "Incomplete Fields",
           text: "Please fill in all the required conditional fields before proceeding.",
           icon: "error",
           confirmButtonText: "Okay"
       });
-        return null;
-    }
+      return null;
+  }
 }
 
 
 
 
 
+
   async mapLabels(responses:any, metadata:any) {
+
+    const uniqueIDKey = metadata.find((field:any)=>field && field.validation && field.validation.unique)
+    console.log("Unique ID key is here ",uniqueIDKey);
+
     const mappedResponses = responses.map((response: any) => {
       const mappedResponse = { ...response };
+
+
+      console.log("Response are here ",mappedResponse);
   
       metadata.forEach((field: any) => {
         const fieldName = field.name;   
@@ -1708,7 +1931,16 @@ locationCellRenderer(params: any) {
           mappedResponse[label] = 'N/A';
         }
       });
+    
 
+      // if(mappedResponse.hasOwnProperty('id')){
+      //   console.log("Field ID is here ",mappedResponse[uniqueIDKey.name]);
+      //   mappedResponse['id'] = mappedResponse[uniqueIDKey.name]
+      // } 
+
+      if(mappedResponse.hasOwnProperty('id') && uniqueIDKey){
+        mappedResponse['id'] = mappedResponse[uniqueIDKey.label]
+      }
       
   
       if (mappedResponse.hasOwnProperty('created_time')) {
@@ -1751,12 +1983,12 @@ mergeAndAddLocation(mappedResponse: any) {
 
     this.editOperation = true
 
-    console.log("Selected column visibility ",this.selectedItem);
+    // console.log("Selected column visibility ",this.selectedItem);
 
-    console.log("Table temp State is here ",this.tableTempState);
+    // console.log("Table temp State is here ",this.tableTempState);
 
     //Creating packet for reports module to pass
-    this.savedModulePacket = [this.reportsFeilds.value,this.formFieldsGroup.value,this.selectedValues, this.tableTempState]
+    this.savedModulePacket = [this.reportsFeilds.value,this.formFieldsGroup.value,this.selectedValues, this.tableTempState,this.customColumnsGroup.value]
     this.modalService.open(content,{
       backdrop: 'static',
   });
@@ -1773,6 +2005,7 @@ mergeAndAddLocation(mappedResponse: any) {
     this.editSavedDataArray.reportMetadata = this.reportsFeilds.value
     this.editSavedDataArray.conditionMetadata = this.formFieldsGroup.value
     this.editSavedDataArray.tableState = JSON.parse(JSON.stringify(this.tableState))
+    this.editSavedDataArray.customColumnMetadata = this.customColumnsGroup.value
     this.savedModulePacket = this.editSavedDataArray
     this.modalService.open(content,{
       backdrop:'static'
@@ -1798,7 +2031,7 @@ mergeAndAddLocation(mappedResponse: any) {
 
 
     delete(id: number) {
-      console.log("Deleted username will be", id);
+      // console.log("Deleted username will be", id);
       this.deleteNM(id);
     }
   
@@ -1812,7 +2045,7 @@ mergeAndAddLocation(mappedResponse: any) {
 
     async deleteNM(getValue: any) {
 
-      console.log("Value to be deleted is here ",getValue);
+      // console.log("Value to be deleted is here ",getValue);
 
       const deleteData = this.original_lookup_data.filter((item:any)=>item.P1 == getValue)
     
@@ -1824,8 +2057,8 @@ mergeAndAddLocation(mappedResponse: any) {
         var item = deleteData[0]
         
 
-        console.log("Deleted items is ",item);
-        console.log("deleted temp is here ",temp);
+        // console.log("Deleted items is ",item);
+        // console.log("deleted temp is here ",temp);
 
    
        
@@ -1945,7 +2178,7 @@ mergeAndAddLocation(mappedResponse: any) {
   
     async editSavedQuery(P1: any) {
 
-      console.log("Edit si being called");
+      // console.log("Edit si being called");
 
       this.populateFormData= []     
       
@@ -1959,19 +2192,21 @@ mergeAndAddLocation(mappedResponse: any) {
  
           this.tempResHolder.reportMetadata = JSON.parse(this.tempResHolder.reportMetadata)
           this.tempResHolder.conditionMetadata = JSON.parse(this.tempResHolder.conditionMetadata).forms
+          this.tempResHolder.customColumnMetadata = JSON.parse(this.tempResHolder.customColumnMetadata).customForms
           this.tempResHolder.columnVisibility = this.tempResHolder && this.tempResHolder.columnVisibility && JSON.parse(this.tempResHolder.columnVisibility)
           this.tempResHolder.tableState = this.tempResHolder && this.tempResHolder.tableState && JSON.parse(this.tempResHolder.tableState)
            this.editSavedDataArray = this.tempResHolder
  
-           console.log("Result for the edit is here ",this.tempResHolder);
+          //  console.log("Result for the edit is here ",this.tempResHolder);
            const reportMetadata = this.tempResHolder.reportMetadata
            const conditionMetadata = this.tempResHolder.conditionMetadata
            const columnVisibility = this.tempResHolder.columnVisibility
+           const customColumnMetadata = this.tempResHolder && this.tempResHolder.customColumnMetadata
 
            //Get the table State
            this.tableState = this.tempResHolder.tableState && JSON.parse(JSON.stringify(this.tempResHolder.tableState))
  
-           console.log("conditionMetadata is here ",conditionMetadata);
+          //  console.log("conditionMetadata is here ",conditionMetadata);
  
            this.reportsFeilds.patchValue({
              dateType: reportMetadata.dateType,
@@ -1981,7 +2216,8 @@ mergeAndAddLocation(mappedResponse: any) {
              daysAgo:reportMetadata.daysAgo ,
              form_permission:reportMetadata.form_permission , 
              filterOption:reportMetadata.filterOption ,
-             columnOption:reportMetadata.columnOption
+             columnOption:reportMetadata.columnOption,
+             addColumn:reportMetadata.addColumn
            })        
            
            this.selectedItem = []
@@ -1993,13 +2229,43 @@ mergeAndAddLocation(mappedResponse: any) {
            
             
 
-            console.log("Star selected ",this.selectedValues);
+            // console.log("Star selected ",this.selectedValues);
              
            if(reportMetadata.columnOption != 'all' && Array.isArray(this.selectedValues) && this.selectedValues.length > 0){
              this.visibiltyflag = true
            }
  
            this.saveButton = true
+
+
+           if(reportMetadata.addColumn != 'false'){
+
+            console.log("Add column is executed ");
+
+            this.customForms().clear()
+
+            await this.addColumns("true",'')
+
+
+            customColumnMetadata.forEach((formData: any) => {
+              this.populateCustomForm(formData);
+            });
+
+            
+           }
+           else{
+            this.customForms().clear();
+
+            this.selectedForms.forEach((formData: any) => {
+              this.addCustomForm(); 
+            });
+
+              this.customColumnsflag = false
+           }
+
+
+
+
            
            if(reportMetadata.filterOption != 'all'){
 
@@ -2009,9 +2275,9 @@ mergeAndAddLocation(mappedResponse: any) {
  
              
  
-             console.log("conditionMetadata - - - - -- - -- - ",conditionMetadata);
+            //  console.log("conditionMetadata - - - - -- - -- - ",conditionMetadata);
               
-               conditionMetadata.forEach((formData: any) => {
+            conditionMetadata.forEach((formData: any) => {
                  this.populateForm(formData);
                });
 
@@ -2034,7 +2300,7 @@ mergeAndAddLocation(mappedResponse: any) {
 
             this.reportsFeilds.get('form_data_selected')?.patchValue([])
 
-            console.log("Column Option is false");
+            // console.log("Column Option is false");
 
             await this.onColumnChange('onCondition','savedQuery')
            }
@@ -2164,13 +2430,13 @@ mergeAndAddLocation(mappedResponse: any) {
               reject(new Error('response.options is not a string.'));
             }
           } else {
-            console.log("All the users are here", this.lookup_data_savedQuery);
+            // console.log("All the users are here", this.lookup_data_savedQuery);
 
             this.original_lookup_data = this.lookup_data_savedQuery
 
             this.listofSavedIds = this.lookup_data_savedQuery.map((item:any)=>item.P1)
 
-            console.log("All the unique IDs are here ",this.listofSavedIds);
+            // console.log("All the unique IDs are here ",this.listofSavedIds);
 
             this.lookup_data_savedQuery = this.lookup_data_savedQuery.map((item: any) => {
               if (item.P2 && item.P2.username === this.username) {
@@ -2235,14 +2501,14 @@ mergeAndAddLocation(mappedResponse: any) {
     const tableExports = await Promise.all(this.agGrids.toArray().map(async (gridInstance, index) => {
       const gridApi = gridInstance.api;
       const csvData = gridApi.getDataAsCsv();
-      console.log("CSV data is here ",csvData);
+      // console.log("CSV data is here ",csvData);
       const data = this.csvToArray(csvData || '');
 
-      console.log("Data is here ",data);
+      // console.log("Data is here ",data);
   
       const headers = data[0].map((header: string) => header.replace(/[\r\n]+/g, '').replace(/^"|"$/g, '').trim());
 
-      console.log("Headers are here ",headers);
+      // console.log("Headers are here ",headers);
   
       const ws = XLSX.utils.aoa_to_sheet(data);
 
@@ -2252,7 +2518,7 @@ mergeAndAddLocation(mappedResponse: any) {
 
       try{
         const trackLocationColumnIndex = headers.indexOf('TrackLocation');
-        console.log('Index is here ',trackLocationColumnIndex);
+        // console.log('Index is here ',trackLocationColumnIndex);
         if (trackLocationColumnIndex !== -1) {
           const trackLocationData = this.extractTrackLocationData(data, trackLocationColumnIndex, index);
           const trackLocationSheet = XLSX.utils.aoa_to_sheet(trackLocationData);
@@ -2260,13 +2526,13 @@ mergeAndAddLocation(mappedResponse: any) {
         }
     
         const tableColumnIndex = this.tableDataWithFormFilters[index].rows[0].hasOwnProperty('dynamic_table_values');
-        console.log("Table column Index is here ",tableColumnIndex);
+        // console.log("Table column Index is here ",tableColumnIndex);
         if (tableColumnIndex) {
           const tableData: any = await this.extractMiniTableData(data, tableColumnIndex, index);
 
           for (const tableKey in tableData) {
             const filteredFormName = this.tableFormName.find((item:any)=>Object.keys(item)[0] == tableKey)
-            console.log("Filtered FormName ",filteredFormName);
+            // console.log("Filtered FormName ",filteredFormName);
 
             if (tableData.hasOwnProperty(tableKey)) {
               const miniTableData = tableData[tableKey];
@@ -2325,12 +2591,12 @@ mergeAndAddLocation(mappedResponse: any) {
     // Extract dynamic_table_values from the current record
     let tempHolder = this.tableDataWithFormFilters[index]["rows"].map((item: any) => item?.dynamic_table_values || []);
   
-    console.log("tempHolder before filtering:", tempHolder);
+    // console.log("tempHolder before filtering:", tempHolder);
   
     // Remove any invalid data (e.g., empty arrays)
     tempHolder = tempHolder.filter((ele: any) => !Array.isArray(ele));  // Fix filtering logic
   
-    console.log("tempHolder after filtering:", tempHolder);
+    // console.log("tempHolder after filtering:", tempHolder);
   
     // Iterate over each record and extract the dynamic tables
     tempHolder.forEach((record: any) => {
@@ -2362,7 +2628,7 @@ mergeAndAddLocation(mappedResponse: any) {
       }
     });
   
-    console.log('Iterated Table data is here ', tableData);
+    // console.log('Iterated Table data is here ', tableData);
   
     // Fetch dynamic form data labels and apply them
     await Promise.all(Object.keys(tableData).map(async (item: any) => {
@@ -2385,10 +2651,10 @@ mergeAndAddLocation(mappedResponse: any) {
         }
       }
   
-      console.log("Filtered Dynamic data is here ", filterData);
+      // console.log("Filtered Dynamic data is here ", filterData);
     }));
   
-    console.log('After adding Labels Table data is here ', tableData);
+    // console.log('After adding Labels Table data is here ', tableData);
   
     return tableData;
   }
@@ -2396,14 +2662,14 @@ mergeAndAddLocation(mappedResponse: any) {
 
 extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: any) {
 
-  console.log("Multiple rows are here ",this.tableDataWithFormFilters[index]["rows"]);
+  // console.log("Multiple rows are here ",this.tableDataWithFormFilters[index]["rows"]);
 
   let tempHolder = this.tableDataWithFormFilters[index]["rows"].map((item: any) =>{
     return {trackLocation:item.trackLocation, id:item.id}
   });
 
   tempHolder = tempHolder.filter((item:any)=>Array.isArray(item.trackLocation) && item.trackLocation.length > 0)
-  console.log("Temp holder is here ", tempHolder);
+  // console.log("Temp holder is here ", tempHolder);
 
   const trackLocationRows: any[] = [];
 
@@ -2446,7 +2712,7 @@ extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: any) {
     });
   }
 
-  console.log("Track Location rows extracted: ", trackLocationRows);
+  // console.log("Track Location rows extracted: ", trackLocationRows);
 
   // Return the rows to be used in the new sheet
   return trackLocationRows;
@@ -2502,7 +2768,7 @@ splitCsv(csv: string): string[] {
   }
 
   
-
+ 
  
 
 
@@ -2667,14 +2933,14 @@ splitCsv(csv: string): string[] {
       // this.loadingColumnState = true;
 
     const savedState =  this.tableState;
-    console.log("Loaded state from localStorage", savedState);
+    // console.log("Loaded state from localStorage", savedState);
 
     // Apply saved column state to each formFilter
     Object.keys(savedState).forEach(formFilter => {
       const savedColumnState = savedState[formFilter];
       if (savedColumnState && this.gridInstances[formFilter]) {
         this.gridInstances[formFilter].applyColumnState({ state: savedColumnState, applyOrder: true });
-        console.log(`Applied column state for ${formFilter}`);
+        // console.log(`Applied column state for ${formFilter}`);
       }
     });
 
@@ -2687,13 +2953,13 @@ splitCsv(csv: string): string[] {
     //   return;
     // }
 
-    console.log('Column moved:', event);
+    // console.log('Column moved:', event);
     const formFilter = event && event.column && event.column.colDef.FormName;
-    console.log("Selected form Filter is here ",formFilter);
+    // console.log("Selected form Filter is here ",formFilter);
 
     const gridID = event.column && event.column.stubContext && event.column.stubContext.gridId
 
-    console.log("Grid id is here ",gridID);
+    // console.log("Grid id is here ",gridID);
     
     this.saveColumnState(formFilter,gridID); // Save column state after column is moved for this formFilter
 
@@ -2706,13 +2972,13 @@ splitCsv(csv: string): string[] {
       //   return;
       // }
   
-      console.log("Saving column state for", formFilter);
+      // console.log("Saving column state for", formFilter);
   
       // Retrieve the gridApi specific to this formFilter
       const gridApi = this.gridInstances[formFilter];
       if (gridApi) {
         const columnState = gridApi.getColumnState(); // Get column state for the current grid
-        console.log("Column State for", formFilter, columnState);
+        // console.log("Column State for", formFilter, columnState);
   
         // Ensure tableState is initialized
         if (!this.tableState) {
@@ -2725,15 +2991,302 @@ splitCsv(csv: string): string[] {
         // Save to localStorage if tableState has any data
         if (Object.keys(this.tableState).length > 0) {
           this.tableTempState = { ...this.tableState }; 
-          console.log("Saving table state to localStorage:", this.tableState);
+          // console.log("Saving table state to localStorage:", this.tableState);
           // this.loadingColumnState = true;
 
           // localStorage.setItem("tableState", JSON.stringify(this.tableState));
         }
       }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+    populateCustomFormBuilder:any = []
+    async addColumns(event:any,getValue:any){
+      let selectedValue
+      if(getValue == 'html'){
+        selectedValue = (event.target as HTMLInputElement).value;
+      }
+      else{
+        selectedValue = event;
+      }
+    
+      if(selectedValue == "false"){
+        this.reportsFeilds.get('addColumn')?.patchValue('false')
+        this.customColumnsflag = false
+        return
+      }
+    
+    
+      if (Array.isArray(this.selectedForms) == false || (this.selectedForms.length == 0 && selectedValue == "true")) {
+        Swal.fire({
+            title: "Oops!",
+            text: "You need to select at least one form before to adding columns. Please select the forms to continue.",
+            icon: "warning",
+            confirmButtonText: "Got it"
+        });
+    
+        this.reportsFeilds.get('addColumn')?.patchValue('false')
+        return;
+      }
+    
+      
+      this.reportsFeilds.get('addColumn')?.patchValue('true')
+    
+      if(selectedValue == 'true'){
+        this.spinner.show()
+    
+        try{
+          this.populateCustomFormBuilder = []
+    
+          let tempMetadata:any = []
+          for(let item of this.selectedForms){
+            const formName = item
+            const result = await this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${item}#main`,1)
+    
+            if(result){
+              let tempResult = JSON.parse(result.metadata || '').formFields
+              // console.log("tempResult is ",tempResult);
+    
+              tempMetadata = {}
+              tempMetadata[item] = tempResult.map((item: any) => {
+                return { name: item.name, label: item.label,  formName:formName ,options:item.options , type:item.type , validation:item.validation};  
+              });
+            }
+            this.populateCustomFormBuilder.push(tempMetadata)
+          }
+          
+          // console.log("Data to be added in dropdowns ",this.populateFormBuilder);
+        }
+        catch(error){
+          this.spinner.hide()
+          console.log("Error in fetching form Builder data ",error);
+        }
+    
+        this.spinner.hide()
+        console.log("Condition flag is true");
+        this.customColumnsflag = true
+      }
+      else{
+        this.customColumnsflag = false
+      }
+    
+     this.cd.detectChanges()
+    }
+
+
+  customForms(): FormArray {
+    return this.customColumnsGroup.get('customForms') as FormArray;
+  }
+
+    getCustomFormNameByIndex(index: number): string {
+      const selectedFormValue = this.selectedForms[index];
+      return selectedFormValue
+    }
+
+
+    customConditions(formIndex: number): FormArray {
+      return (this.customForms().at(formIndex).get('conditions') as FormArray);
+    }
+
+
+    addCustomForm(): void {
+      this.customForms().push(this.fb.group({
+        conditions: this.fb.array([this.createCustomCondition()])
+      }));
+    }
+
+
+    createCustomCondition(): FormGroup {
+      return this.fb.group({
+        columnName: ['', Validators.required],
+        fieldSelector: ['', Validators.required],
+        equationText: ['', Validators.required],
+        predefined: ['', Validators.required]
+      });
+    }
+
+
+    getAvailablecustomFields(formIndex: number) {
+      const formName = this.getFormNameByIndexCustom(formIndex);
+      const formFields = this.populateCustomFormBuilder.find((form: { [x: string]: any; }) => form[formName]);
+      return formFields ? formFields[formName] : [];
+    }
+
+    getFormNameByIndexCustom(index: number): string {
+      const selectedFormValue = this.selectedForms[index];
+      return selectedFormValue
+    }
+
+
+
+
+     // Insert selected field into the equation
+     insertFieldIntoEquation(formIndex: number, condIndex: number) {
+      const condition = (this.customForms().at(formIndex).get('conditions') as FormArray).at(condIndex);
+      const fieldSelector = condition.get('fieldSelector')?.value;
+      const equationText = condition.get('equationText')?.value;
+    
+      if (fieldSelector) {
+        const updatedEquation = `${equationText} \${${fieldSelector}}`; // Enclose the fieldSelector in ${}
+        condition.get('equationText')?.setValue(updatedEquation);
+      }
+    }
+    
+
+
+
+      addCustomCondition(formIndex: number): void {
+        const conditions = this.customForms().at(formIndex).get('conditions') as FormArray;
+        conditions.push(this.createCustomCondition());
+      }
+
+
+      removeCustomCondition(formIndex: number, condIndex: number): void {
+        const conditions = this.customForms().at(formIndex).get('conditions') as FormArray;
+        conditions.removeAt(condIndex);
+      }
+
+
+
+      onPredefinedChange(formIndex: number, condIndex: number): void {
+        const condition = (this.customForms().at(formIndex).get('conditions') as FormArray).at(condIndex);
+        const predefinedValue = condition.get('predefined')?.value;
+      
+
+        let updatedEquation = condition.get('equationText')?.value || '';
+      
+        if (predefinedValue === 'days_difference') {
+            // Get the selected date from the fieldSelector (assuming it is in 'fieldSelector' field)
+            const selectedDateStr = condition.get('fieldSelector')?.value;
+        
+            if (selectedDateStr) {
+         
+                const script = this.generateDaysDifferenceScript(selectedDateStr);
+        
+                updatedEquation = `${updatedEquation} ${script}`;
+            } else {
+                updatedEquation = `${updatedEquation} No Date Provided`;
+            }
+        
+            condition.get('equationText')?.setValue(updatedEquation);
+        } 
+        else if (predefinedValue === 'time_difference') {
+          // Get the selected date from the fieldSelector
+          const selectedDateStr = condition.get('fieldSelector')?.value;
+      
+          if (selectedDateStr) {
+              const script = this.generateTimeDifferenceScript(selectedDateStr);
+              updatedEquation = `${updatedEquation} ${script}`;
+          } else {
+              updatedEquation = `${updatedEquation} No Date Provided`;
+          }
+          condition.get('equationText')?.setValue(updatedEquation);
+      }
+        else {
+
+            condition.get('equationText')?.setValue('');
+        }
+    }
+    
+  
+    generateDaysDifferenceScript(dateStr: string): string {
+        const dateFormat = this.getDateFormat(dateStr);
+        let script = `Math.floor((new Date() - new Date("\${${dateStr}}")) / (1000 * 3600 * 24))`;
+        script = script + "+ ' days'"
+        return script;
+    }
+
+
+    generateTimeDifferenceScript(dateStr: string): string {
+      // The script will calculate time difference and format it in a human-readable way
+      let script = `
+
+        function generateTimeDifferenceScript(){
+           const now = new Date();
+          const selectedDate = new Date("\${${dateStr}}"); 
+          const diffInMs = now - selectedDate;
+      
+          const diffInSecs = Math.floor(diffInMs / 1000);
+          const diffInMins = Math.floor(diffInSecs / 60);
+          const diffInHours = Math.floor(diffInMins / 60);
+          const diffInDays = Math.floor(diffInMs / (1000 * 3600 * 24));
+          const diffInMonths = Math.floor(diffInDays / 30); // Approximate months
+          const diffInYears = Math.floor(diffInDays / 365); // Approximate years
+      
+          // Determine which unit to use for the difference
+          if (diffInSecs < 60) {
+              return diffInSecs + " seconds";
+          } else if (diffInMins < 60) {
+              return diffInMins + " minutes";
+          } else if (diffInHours < 24) {
+              return diffInHours + " hours";
+          } else if (diffInDays < 30) {
+              return diffInDays + " days";
+          } else if (diffInMonths < 12) {
+              return diffInMonths + " months";
+          } else {
+              return diffInYears + " years";
+          }
+        }
+         
+        
+        generateTimeDifferenceScript()
+      
+          
+      `;
+    
+      return script;
+  }
+  
   
 
+    getDateFormat(dateStr: string): string {
+
+        return dateStr;
+    }
+
+
+
+    populateCustomForm(formData: any): void {
+
+      const formGroup = this.fb.group({
+        conditions: this.fb.array([])  // Form array for conditions
+      });
+  
+      // Add conditions to this form group
+      formData.conditions.forEach((conditionData: any) => {
+        (formGroup.get('conditions') as FormArray).push(this.populateCustomCondition(conditionData));
+      });
+  
+      // Add the form group to the 'forms' array
+      this.customForms().push(formGroup);
+  
+      this.customColumnsflag = true
+  
+      this.cd.detectChanges()
+    }
+
+
+     // Create a new condition form group
+   populateCustomCondition(conditionData: any): FormGroup {
+    return this.fb.group({
+      columnName: [conditionData.columnName, Validators.required],
+      fieldSelector: [conditionData.fieldSelector, Validators.required],
+      equationText: [conditionData.equationText, Validators.required],
+      predefined: [conditionData.predefined, Validators.required]
+    });
+  }
+    
 } 
 
 
