@@ -175,7 +175,7 @@ export class DreamIdComponent implements OnInit {
 
             console.log(this.send_data);
             this.iframeSrc = ''; // Temporarily clear the iframeSrc
-            this.changeDetection.detectChanges(); // Trigger change detection
+            // this.changeDetection.detectChanges(); // Trigger change detection
             this.iframeSrc = this.send_data; // Assign the updated URL
           // this.changeDetection.detectChanges();
             this.changeDetection.detectChanges();
@@ -272,7 +272,7 @@ export class DreamIdComponent implements OnInit {
             this.iframeSrc = this.send_data;
             console.log(this.send_data);
             this.iframeSrc = ''; // Temporarily clear the iframeSrc
-            this.changeDetection.detectChanges(); // Trigger change detection
+            // this.changeDetection.detectChanges(); // Trigger change detection
             this.iframeSrc = this.send_data;
             this.changeDetection.detectChanges();
           });
