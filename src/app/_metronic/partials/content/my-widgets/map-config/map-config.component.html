@@ -1,0 +1,500 @@
+<div class="modal-header">
+    <h4 class="modal-title">Map Configuration</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="container" *ngIf="createChart">
+    <div [formGroup]="createChart">
+
+      <div class="row">
+        <div class="col-md-6" >
+          <label class="col-lg-12 col-form-label fw-bold fs-6 ">Parameters
+          </label>
+          <input type="number" class="
+                            form-control form-control-lg form-control-solid
+                            mb-3 mb-lg-0" name="add_fields" formControlName="add_fields"
+            (keyup)="addControls($event,'html')" required>
+        </div>
+        <div class="col-md-6" [formGroup]="createChart">
+          <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Title </label>
+    
+          <input type="text" class="
+                      form-control form-control-lg form-control-solid
+                      mb-3 mb-lg-0
+                    " placeholder="Enter title" formControlName="chart_title" required>
+    
+          <div *ngIf="
+                          
+                                      " class="fv-plugins-message-container invalid-feedback">
+            Title is required
+          </div>
+    
+        </div>
+        <!-- <div class="col-md-2" >
+  
+          <div class="col-lg-12 form-check form-switch">
+  
+            <label class="col-lg-12 col-form-label fw-bold fs-6  mt-7">Enable Redirect</label>
+  
+            <input class="form-check-input mt-10 mb-3 mb-lg-0" formControlName="redirectionEnabled"
+              type="checkbox">
+          </div>
+            
+        </div> -->
+  
+          <!-- Toggle Control -->
+  
+  
+    
+        
+        
+  
+    
+      </div>
+
+
+      <!-- <div class="row mb-3">
+      <div class="col-md-4 mb-3">
+        <div class="col-lg-12 form-check form-switch">
+        <label for="toggleCheck" class="col-lg-12 col-form-label fw-bold fs-6  mt-7">Enable Redirect</label>
+        <input class="form-check-input mt-10 mb-3 mb-lg-0" type="checkbox" formControlName="toggleCheck" id="toggleCheck" />
+        <span>{{ createChart.get('toggleCheck')?.value ? 'Enabled' : 'Disabled' }}</span>
+      </div>
+      </div>
+      
+
+   
+
+
+        <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
+          <label for="dashboardIds" class="col-form-label fw-bold fs-6">Summary Dashboard Id</label>
+          <ngx-select
+            id="dashboardIds"
+            [allowClear]="true"
+            formControlName="dashboardIds"
+            [items]="p1ValuesSummary"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Parameter"
+            style="width: 100%;">
+          </ngx-select>
+        </div>
+      
+     
+        <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
+          <label for="selectType" class="col-form-label fw-bold fs-6">Select Type</label>
+          <ngx-select
+            id="selectType"
+            [allowClear]="true"
+            formControlName="selectType"
+            [items]="SelectTypeSummary"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Parameter"
+            style="width: 100%;">
+          </ngx-select>
+        </div>
+       </div> -->
+    </div>
+
+  </div>
+
+  <div class="card shadow-none rounded-0 w-100" [formGroup]="createChart" *ngIf="createChart" style="margin-top: 10px;">
+  
+    <div class="card card-custom">
+  
+      <div class="modal-body">
+        <div class="card-body pt-0">
+          <!-- Tab Navigation -->
+          <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap"
+            id="myTab_settings" role="tablist">
+            <div class="col-6" role="Data">
+              <li class="nav-item">
+                <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab"
+                  aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Data</a>
+              </li>
+            </div>
+            <div class="col-6" role="Filter">
+              <li class="nav-item">
+                <a class="nav-link text-active-primary me-6" id="filter-tab" data-bs-toggle="tab" role="tab"
+                  aria-controls="filter-tab" aria-selected="false" (click)="selectedSettingsTab('filter-tab')">Filter</a>
+              </li>
+            </div>
+
+
+          </ul>
+  
+          <!-- Tab Content -->
+          <div class="tab-content mt-3" id="modalTabsContent">
+            <!-- General Tab Content -->
+            <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'dataTab'}" id="dataTab"
+              role="tabpanel" aria-labelledby="home-tab">
+              <div formArrayName="all_fields">
+                <div *ngFor="let field of all_fields.controls; let fieldIndex=index">
+                  <div [formGroupName]="fieldIndex"
+                    style="border: 2px solid rgb(201, 228, 239); padding: 10px; margin: 5px;border-radius: 5px;">
+  
+                    <div class="row g-3">
+                      <!-- Forms Field -->
+                      <div class="col-md-4">
+                        <label for="formlist" class="col-createChart-label fw-bold fs-6 required">Forms</label>
+                        <ngx-select
+                          id="formlist"
+                          [allowClear]="true"
+                          formControlName="formlist"
+                          [items]="listofDeviceIds"
+                          optionValueField="value"
+                          optionTextField="text"
+                          (selectionChanges)="selectFormParams($event, fieldIndex)"
+                          placeholder="Select Form">
+                        </ngx-select>
+                      </div>
+                    
+                      <!-- Form Fields Dropdown -->
+                      <div class="col-md-4">
+                        <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields</label>
+                        <ngx-select
+                          [allowClear]="true"
+                          formControlName="parameterName"
+                          [items]="getDynamicParamsFormFields(fieldIndex)"
+                          optionValueField="value"
+                          optionTextField="text"
+                          (selectionChanges)="dynamicparameterLabel($event, fieldIndex)"
+                          placeholder="Select Parameter">
+                        </ngx-select>
+                      </div>
+                    
+                      <!-- Marker Type Dropdown -->
+                      <div class="col-md-4">
+                        <label for="map_type" class="fw-bold fs-6 required">Marker Type</label>
+                        <select
+                          id="map_type"
+                          class="form-select form-select-solid form-select-lg fw-bold"
+                          formControlName="map_type"
+                          (change)="mapValueCheck($event, fieldIndex)"
+                          required>
+                          <option value="null" disabled selected>Select marker</option>
+                          <option *ngFor="let marker of markers" [value]="marker.value" [attr.data-label]="marker.label">
+                            {{ marker.label }}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                      
+                    
+          
+
+
+  
+                      <div class="col-lg-6 col-md-6 col-sm-6 mb-4 mt-4">
+                        <div class="form-group row align-items-center">
+                          <label 
+                            for="dateTypeSelect" 
+                            class="col-lg-4 col-md-4 col-sm-4 col-form-label text-lg-end text-md-start text-sm-start fw-bold required">
+                            Date Type
+                          </label>
+                          <div class="col-lg-8 col-md-12 col-sm-8">
+                            <select 
+                              formControlName="dateType" 
+                              id="dateTypeSelect" 
+                              class="form-select form-select-solid form-select-lg"
+                              aria-label="Select Date Type">
+                              <option [value]="null" [selected]="true" disabled>Select Date Type</option>
+                              <option value="is">is</option>
+                              <option value=">=">&gt;=</option>
+                              <option value="<=">&lt;=</option>
+                              <option value="between">between</option>
+                              <option value="between time">between time</option>
+                              <option value="less than days ago">less than days ago</option>
+                              <option value="more than days ago">more than days ago</option>
+                              <option value="in the past">in the past</option> 
+                              <option value="days ago">days ago</option>
+                              <option value="today">today</option>
+                              <option value="yesterday">yesterday</option>
+                              <option value="this week">this week</option>
+                              <option value="last week">last week</option>
+                              <option value="last 2 weeks">last 2 weeks</option>
+                              <option value="this month">this month</option>
+                              <option value="last month">last month</option>
+                              <option value="this year">this year</option>
+                              <option value="any">any</option>
+                              <option value="latest 10">latest 10</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div *ngIf="getDateType(fieldIndex)?.value === 'days ago' || 
+                      getDateType(fieldIndex)?.value === 'less than days ago' || 
+                      getDateType(fieldIndex)?.value === 'more than days ago' || 
+                      getDateType(fieldIndex)?.value === 'in the past'" 
+               class="mb-7">
+            <div class="form-group row ps-4 mb-2">
+              <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Number of Days</label>
+              <div class="col-3">
+                <input type="number" formControlName="daysAgo" class="form-control" placeholder="Enter number of days">
+              </div>
+            </div>
+          </div>
+          
+          
+<!-- For "between time" and "between" -->
+<!-- For "between time" and "between" -->
+<div *ngIf="getDateType(fieldIndex)?.value === 'between time' || 
+            getDateType(fieldIndex)?.value === 'between'" class="mb-7">
+  <div class="form-group row ps-4 mb-2">
+    <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Start Date</label>
+    <div class="col-3">
+      <input 
+        [type]="dateTypeConfig[getDateType(fieldIndex)?.value]?.isBetweenTime ? 'datetime-local' : 'date'" 
+        formControlName="startDate" 
+        class="form-control">
+    </div>
+  </div>
+  <br>
+  <div class="form-group row ps-4">
+    <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">End Date</label>
+    <div class="col-3">
+      <input 
+        [type]="dateTypeConfig[getDateType(fieldIndex)?.value]?.isBetweenTime ? 'datetime-local' : 'date'" 
+        formControlName="endDate" 
+        class="form-control">
+    </div>
+  </div>
+</div>
+
+<!-- For "is", ">=", "<=" -->
+<div *ngIf="getDateType(fieldIndex)?.value === '<=' || 
+            getDateType(fieldIndex)?.value === '>=' || 
+            getDateType(fieldIndex)?.value === 'is'" class="mb-7">
+  <div class="form-group row ps-4 mb-2">
+    <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Select Date</label>
+    <div class="col-3">
+      <input 
+        type="date" 
+        formControlName="singleDate" 
+        class="form-control">
+    </div>
+  </div>
+</div>
+<div class="col-md-4" *ngIf="isFieldVisible">
+  <label class="col-lg-12 col-form-label fw-bold fs-6"></label>
+  <input type="number" class="
+                    form-control form-control-lg form-control-solid
+                    mb-3 mb-lg-0" name="add_Markers" formControlName="add_Markers"
+    required>
+</div>
+
+
+
+  
+  
+                      <!-- <div class="col-md-4 mb-3">
+                        <label for="groupByFormat" class="col-form-label fw-bold fs-6 required">Group By Format</label>
+                        <input id="groupByFormat" type="text" class="form-control form-control-solid"
+                        placeholder="Select GroupByFormat" [formControlName]="'groupByFormat'"
+                        (click)="openModalCalender(fieldIndex)" readonly>
+                 
+                      </div> -->
+  
+
+  
+                      <!-- <div class="col-md-4 mb-3">
+                        <label for="rangeCalendarTimeRight" class="col-form-label fw-bold fs-6">Pre Defined Date
+                          Range</label>
+                        <input id="rangeCalendarCenter" type="text" class="form-control" readonly
+                          ngxDaterangepickerBootstrap [formControl]="datePickerControl" [drops]="dropsDown"
+                          [opens]="opensCenter" [locale]="locale" [ranges]="ranges" [showCustomRangeLabel]="true"
+                          (selectionChanges)="preDefinedRange($event)"
+                          (datesUpdated)="datesUpdatedRange($event,fieldIndex)">
+                      </div> -->
+  
+
+  
+
+  
+  
+  
+            
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Settings Tab Content -->
+
+  
+
+            <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'filter-tab'}" id="filter-tab"
+            role="tabpanel" aria-labelledby="filter-tabpane">
+            <form [formGroup]="createChart">
+              <div formArrayName="all_fields">
+                <div *ngFor="let field of all_fields.controls; let fieldIndex=index">
+                  <div [formGroupName]="fieldIndex"
+                    style="border: 2px solid rgb(201, 228, 239); padding: 10px; margin: 5px;border-radius: 5px;">
+            
+            <div class="row">
+     
+              
+              <div class="col-md-5 mb-3">
+                <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields</label>
+                <p-multiSelect
+                id="parameterName"
+            
+                formControlName="filterParameter"
+                [options]="getDynamicParams(fieldIndex)"
+                optionLabel="text"
+                placeholder="Select Parameter"
+                (onChange)="dynamicparameterValue($event,fieldIndex)"
+         
+              ></p-multiSelect>
+              
+              </div>
+
+          
+              <div class="col-md-2 mb-3 d-flex align-items-end">
+                <button type="button" class="btn btn-primary w-100" (click)="onAdd(fieldIndex)">Add</button>
+              </div>
+            </div>
+          
+            <div class="col-md-12 mb-3">
+              <label for="description" class="col-createChart-label fw-bold fs-6">Description</label>
+              <textarea
+              id="description"
+              formControlName="filterDescription"  
+              class="form-control"
+              rows="3"
+              placeholder="Enter description"
+            >{{ selectedParameterValue }}</textarea>
+            </div>
+  
+                  </div>
+                </div>
+              </div>
+            </form>
+            
+          </div>
+
+          
+          
+          
+          </div>
+        </div>
+  
+  
+        <div class="modal-footer" style="margin-top: 20px;">
+          <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+          <button type="button" class="btn btn-primary" *ngIf="!isEditMode"
+            (click)="addTile('Map');modal.dismiss()">Save</button>
+          <button type="button" class="btn btn-warning" (click)="updateTile('Map');modal.dismiss() " *ngIf="isEditMode"
+            [disabled]="createChart?.invalid">
+            Update
+          </button>
+        </div>
+      </div>
+  
+  
+    </div>
+  
+  </div>
+  
+  <ng-template #calendarModalChart let-modal>
+    <div class="modal-header">
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body right-side-modal">
+      <div class="card-body pt-0">
+        <div class="container1">
+          <div class="list-row">
+            <div class="list-column">
+              <div class="list-item active" (click)="selectValue('Last 24 Hours', modal)" (mouseenter)="showTooltip('Last 24 Hours')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Last 24 Hours</div>
+                <div class="example">E.g., Last 24 hours of data</div>
+              </div>
+              <div class="list-item" (click)="selectValue('Today', modal)" (mouseenter)="showTooltip('Today')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Today</div>
+                <div class="example">E.g., Data from 00:00 hrs to now</div>
+              </div>
+              <div class="list-item" (click)="selectValue('Yesterday', modal)" (mouseenter)="showTooltip('Yesterday')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Yesterday</div>
+                <div class="example">E.g., Data from previous day</div>
+              </div>
+              <div class="list-item" (click)="selectValue('Last 7 days', modal)" (mouseenter)="showTooltip('Last 7 days')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Last 7 days</div>
+                <div class="example">E.g., Data for past 7 days</div>
+              </div>
+              <div class="list-item" (click)="selectValue('Last 30 days', modal)" (mouseenter)="showTooltip('Last 30 days')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Last 30 days</div>
+                <div class="example">E.g., Data for the past 30 days</div>
+              </div>
+              <div class="list-item" (click)="selectValue('This Week', modal)" (mouseenter)="showTooltip('This Week')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">This Week</div>
+                <div class="example">E.g., Current week (Monday to Sunday)</div>
+              </div>
+              <div class="list-item" (click)="selectValue('Last 5 Weeks', modal)" (mouseenter)="showTooltip('Last 5 Weeks')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Last 5 Weeks</div>
+                <div class="example">E.g., Data for past 5 weeks</div>
+              </div>
+              <div class="list-item" (click)="selectValue('This Month', modal)" (mouseenter)="showTooltip('This Month')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">This Month</div>
+                <div class="example">E.g., Data for current month</div>
+              </div>
+            </div>
+          
+            <div class="list-column">
+              <div class="list-item" (click)="selectValue('Last Month', modal)" (mouseenter)="showTooltip('Last Month')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Last Month</div>
+                <div class="example">E.g., Data for previous month</div>
+              </div>
+              <div class="list-item" (click)="selectValue('This Quarter', modal)" (mouseenter)="showTooltip('This Quarter')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">This Quarter</div>
+                <div class="example">E.g., Current quarter (Q1/Q2/Q3/Q4)</div>
+              </div>
+              <div class="list-item" (click)="selectValue('Last Quarter', modal)" (mouseenter)="showTooltip('Last Quarter')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Last Quarter</div>
+                <div class="example">E.g., Data from the previous quarter</div>
+              </div>
+              <div class="list-item" (click)="selectValue('This BiAnnual', modal)" (mouseenter)="showTooltip('This BiAnnual')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">This BiAnnual</div>
+                <div class="example">E.g., Current half-year period</div>
+              </div>
+              <div class="list-item" (click)="selectValue('Last BiAnnual', modal)" (mouseenter)="showTooltip('Last BiAnnual')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Last BiAnnual</div>
+                <div class="example">E.g., Previous half-year period</div>
+              </div>
+              <div class="list-item" (click)="selectValue('This Year', modal)" (mouseenter)="showTooltip('This Year')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">This Year</div>
+                <div class="example">E.g., Data for the current year</div>
+              </div>
+              <div class="list-item" (click)="selectValue('Last Year', modal)" (mouseenter)="showTooltip('Last Year')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Last Year</div>
+                <div class="example">E.g., Data from the previous year</div>
+              </div>
+              <div class="list-item" (click)="selectValue('Last 5 Years', modal)" (mouseenter)="showTooltip('Last 5 Years')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Last 5 Years</div>
+                <div class="example">E.g., Data for the past 5 years</div>
+              </div>
+            </div>
+          </div>
+          
+          
+        </div>
+      </div>
+    </div>
+  </ng-template>

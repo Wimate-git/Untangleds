@@ -54,6 +54,9 @@ import { TableWidgetUiComponent } from './table-widget-ui/table-widget-ui.compon
 import { TableWidgetConfigComponent } from './table-widget-config/table-widget-config.component';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { AgGridAngular } from 'ag-grid-angular';
+import { MapConfigComponent } from './map-config/map-config.component';
+import { MapUiComponent } from './map-ui/map-ui.component';
+import { GoogleMapsModule } from '@angular/google-maps';
 
 
 
@@ -85,7 +88,9 @@ import { AgGridAngular } from 'ag-grid-angular';
     FilterTileUiComponent,
     FilterTileConfigComponent,
     TableWidgetUiComponent,
-    TableWidgetConfigComponent
+    TableWidgetConfigComponent,
+    MapConfigComponent,
+    MapUiComponent
 
 
 
@@ -118,6 +123,7 @@ import { AgGridAngular } from 'ag-grid-angular';
     MatTooltipModule,
     NgbTooltipModule,
     MultiSelectModule,
+    GoogleMapsModule 
   
   ],
   exports:[
@@ -154,7 +160,9 @@ import { AgGridAngular } from 'ag-grid-angular';
     FilterTileUiComponent,
     FilterTileConfigComponent,
     TableWidgetUiComponent,
-    TableWidgetConfigComponent
+    TableWidgetConfigComponent,
+    MapConfigComponent,
+    MapUiComponent
   
 
     

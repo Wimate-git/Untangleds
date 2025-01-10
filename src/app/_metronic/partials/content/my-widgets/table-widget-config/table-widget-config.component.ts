@@ -1,5 +1,5 @@
-import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, ViewChild } from '@angular/core';
+import { FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -15,7 +15,7 @@ import { ColDef } from 'ag-grid-community';
   templateUrl: './table-widget-config.component.html',
   styleUrl: './table-widget-config.component.scss'
 })
-export class TableWidgetConfigComponent implements OnInit{
+export class TableWidgetConfigComponent implements OnInit,AfterViewInit{
   table: { columnDefs: ColDef[]; rows: any[] } = {
     columnDefs: [], // Initialize with an empty column definition array
     rows: [] // Initialize with an empty rows array
@@ -46,6 +46,15 @@ export class TableWidgetConfigComponent implements OnInit{
   userIsChanging: boolean = false;
   tooltip: string | null = null;
   @ViewChild('calendarModal') calendarModal: any;
+  selectedTabset: string = 'dataTab';
+  dynamicParamMap = new Map<number, any[]>();
+  selectedParameterValue: string;
+  all_fields: any;
+  dynamicConditions: FormGroup[] = [];
+  showRemoveButton:boolean = false;
+  dynamicFields: any;
+  selectedParameterValueDupli: { value: any; text: any; };
+  selectedParameterValueDupl: string;
 
 
   ngOnInit(): void {
@@ -59,24 +68,80 @@ export class TableWidgetConfigComponent implements OnInit{
     console.log('this.SK_clientID check', this.SK_clientID)
 this.initializeTileFields()
     this.dynamicData()
+
     // this.dashboardIds(1)
   }
   constructor(private summaryConfiguration: SharedService, private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector,
     private spinner: NgxSpinnerService,private zone: NgZone
-  ){}
+  ){
+
+
+  }
+  ngAfterViewInit(): void {
+    this.addCondition();
+  }
 
   initializeTileFields(): void {
     // Initialize the form group
     this.createKPIWidget = this.fb.group({
+
+      // all_fields:new FormArray([]),
+      conditions: this.fb.array([]), 
       formlist: ['', Validators.required],
       form_data_selected: ['', Validators.required],
     
       custom_Label:['',Validators.required],
       groupByFormat: ['', Validators.required],
-      rowData:['']
+      rowData:[''],
+      filterParameter: [[]], // Initialize as an array to handle multiple or single values
+      filterDescription: [''],
+      filterParameter1:[''],
+      custom_Label1:[''],
+      filterDescription1:['']
     });
   }
+
+
+  // Handle dynamic parameter value changes
+  get conditions(): FormArray<FormGroup> {
+    return this.createKPIWidget.get('conditions') as FormArray<FormGroup>;
+  }
+  onAdd1(): void {
+    // Capture the selected parameters (which will be an array of objects with text and value)
+
+    const selectedParameters =  this.selectedParameterValueDupli;
+
+    console.log('selectedParameters checking', selectedParameters);
+  
+    if (Array.isArray(selectedParameters)) {
+      // Format the selected parameters to include both text and value
+      this.selectedParameterValueDupl = selectedParameters
+        .map(param => `${param.text}-\${${param.value}}`) // Include both text and value
+        .join(' '); // Join them with a comma and space
+    } else if (selectedParameters) {
+      // If only one parameter is selected, format it directly
+      this.selectedParameterValueDupl = `${selectedParameters.text}-\${${selectedParameters.value}}`;
+    } else {
+      console.warn('No parameters selected or invalid format:', selectedParameters);
+      this.selectedParameterValueDupl = ''; // Fallback in case of no selection
+    }
+  
+    console.log('this.selectedParameterValueDupli check', this.selectedParameterValueDupli);
+  
+    // Update the form control value for filterDescription with the formatted string
+    this.createKPIWidget.patchValue({
+      filterDescription1: `${this.selectedParameterValueDupl}`,
+    });
+  
+    // Manually trigger change detection to ensure the UI reflects the changes
+    this.cdr.detectChanges();
+  }
+
+
+
+
+
 
 
   selectValue(value: string, modal: any) {
@@ -99,60 +164,57 @@ this.initializeTileFields()
     return this.createKPIWidget.get('groupByFormat') as FormControl; // Cast to FormControl
   }
   addTile(key: any) {
-console.log('this.createKPIWidget.value.parameterName check',this.createKPIWidget.value.form_data_selected)
+    console.log('Selected Form Data:', this.createKPIWidget.value.form_data_selected);
   
-    if (key === 'TableWidget') {
-      // const uniqueId = this.generateUniqueId();
+    // Accessing FormArray values directly
+    const conditionsArray = this.conditions.controls.map(control => {
+      if (control instanceof FormGroup) {
+        return control.value; // Access the value of the FormGroup
+      }
+      return null; // Handle cases where the control is not a FormGroup (optional)
+    }).filter(value => value !== null); // Remove null values if necessary
+    console.log('conditionsArray check',conditionsArray)
   
-      const newTile = {
-        // id: uniqueId,
-        x: 0,
-        y: 0,
-        rows: 13,
-        cols: 25,
-        rowHeight: 100,
-        colWidth: 100,
-        fixedColWidth: true,
-        fixedRowHeight: true,
-        grid_type: 'TableWidget',
-        // rowData:[],
-   
-        formlist: this.createKPIWidget.value.formlist,
-        tableWidget_Config: this.createKPIWidget.value.form_data_selected,
-  
-    
-        custom_Label:this.createKPIWidget.value.custom_Label,
-        rowData:this.createKPIWidget.value.rowData,
-        groupByFormat: this.createKPIWidget.value.groupByFormat,
+    const newTile = {
+      x: 0,
+      y: 0,
+      rows: 13,
+      cols: 25,
+      rowHeight: 100,
+      colWidth: 100,
+      fixedColWidth: true,
+      fixedRowHeight: true,
+      grid_type: 'TableWidget',
+      formlist: this.createKPIWidget.value.formlist,
+      tableWidget_Config: this.createKPIWidget.value.form_data_selected,
+      custom_Label: this.createKPIWidget.value.custom_Label,
+      rowData: this.createKPIWidget.value.rowData,
+      groupByFormat: this.createKPIWidget.value.groupByFormat,
+      conditions: conditionsArray, // Use the updated conditions array
+      filterParameter1:this.createKPIWidget.value.filterParameter1,
+      custom_Label1:this.createKPIWidget.value.custom_Label1,
+      filterDescription1:this.createKPIWidget.value.filterDescription1
 
-      };
+    };
   
-      if (!this.dashboard) {
-        this.dashboard = [];
-      }
+    if (!this.dashboard) {
+      this.dashboard = [];
+    }
   
-      this.dashboard.push(newTile);
+    this.dashboard.push(newTile);
+    console.log('Updated Dashboard:', this.dashboard);
   
-      console.log('this.dashboard after adding new tile', this.dashboard);
+    this.grid_details = this.dashboard; // Update grid details
+    console.log('Grid Details:', this.grid_details);
   
-      this.grid_details = this.dashboard; // Update grid_details dynamically
-      console.log('this.grid_details checking', this.grid_details);
-  
-      this.dashboardChange.emit(this.grid_details); // Emit the updated dashboard to parent component or listeners
-  
-      if (this.grid_details) {
-        this.updateSummary('', 'add_tile');
-  
-        // Use ChangeDetectorRef to update the view dynamically
-        this.cdr.detectChanges(); // Ensure changes are reflected in the UI
-      }
-  
-      // Optionally reset the form if needed after adding the tile
-      // this.createKPIWidget.patchValue({
-      //   widgetid: uniqueId,
-      // });
+    this.dashboardChange.emit(this.grid_details); // Emit updated dashboard
+    if (this.grid_details) {
+      this.updateSummary('', 'add_tile');
+      this.cdr.detectChanges(); // Ensure UI updates
     }
   }
+  
+  
   updateSummary(data: any, arg2: any) {
     this.update_PowerBoard_config.emit({ data, arg2 });
   }
@@ -284,41 +346,77 @@ console.log('this.createKPIWidget.value.parameterName check',this.createKPIWidge
   }
   openTableModal(tile: any, index: number) {
     console.log('Index checking:', index); // Log the index
-  
+    
     if (tile) {
       this.selectedTile = tile;
-      this.editTileIndex = index !== undefined ? index : null; 
+      this.editTileIndex = index !== undefined ? index : null;
       console.log('this.editTileIndex checking from openkpi', this.editTileIndex); // Store the index, default to null if undefined
       console.log('Tile Object:', tile); // Log the tile object
   
-      // Parse multi_value if it is a string
-      let parsedMultiValue = [];
+      // Parse tableWidget_Config if it is a string
+      let parsedTableWidgetConfig = [];
       if (typeof tile.tableWidget_Config === 'string') {
         try {
-          parsedMultiValue = JSON.parse(tile.tableWidget_Config);
-          console.log('parsedMultiValue check',parsedMultiValue)
-          const textValues = parsedMultiValue.map((item: { text: any; }) => item.text);
-
-console.log('Extracted Text Values:', textValues);
-
-
+          parsedTableWidgetConfig = JSON.parse(tile.tableWidget_Config);
+          console.log('Parsed tableWidget_Config:', parsedTableWidgetConfig);
+          const textValues = parsedTableWidgetConfig.map((item: { text: any }) => item.text);
+          console.log('Extracted Text Values:', textValues);
           this.table.columnDefs = this.createColumnDefs(textValues);
-          console.log('Parsed multi_value:', parsedMultiValue); // Log parsed multi_value to verify structure
         } catch (error) {
-          console.error('Error parsing multi_value:', error);
+          console.error('Error parsing tableWidget_Config:', error);
         }
       } else {
-        parsedMultiValue = tile.tableWidget_Config;
+        parsedTableWidgetConfig = tile.tableWidget_Config;
       }
-
-
+  
+      // Parse conditions if it is a string
+      let parsedConditions = [];
+      if (typeof tile.conditions === 'string') {
+        try {
+          parsedConditions = JSON.parse(tile.conditions);
+          console.log('Parsed conditions:', parsedConditions);
+        } catch (error) {
+          console.error('Error parsing conditions:', error);
+        }
+      } else {
+        parsedConditions = tile.conditions;
+      }
+  
+      // Parse filterParameter1 if it is a string
+      let parsedFilterParameter1 = [];
+      if (typeof tile.filterParameter1 === 'string') {
+        try {
+          parsedFilterParameter1 = JSON.parse(tile.filterParameter1);
+          console.log('Parsed filterParameter1:', parsedFilterParameter1);
+        } catch (error) {
+          console.error('Error parsing filterParameter1:', error);
+        }
+      } else {
+        parsedFilterParameter1 = tile.filterParameter1;
+      }
+  
+      // Set parsedConditions into FormArray
+      const formArray = this.conditions;
+      formArray.clear(); // Clear existing FormArray controls
+      parsedConditions.forEach((condition: any, i: number) => {
+        formArray.push(this.fb.group({
+          columnLabel: [condition.columnLabel || ''],
+          filterParameter: [condition.filterParameter || []],
+          filterDescription: [condition.filterDescription || '']
+        }));
+      });
+  
+      console.log('FormArray after readback:', formArray.value);
+  
+      // Patch other form values
       this.createKPIWidget.patchValue({
         formlist: tile.formlist,
-        form_data_selected: parsedMultiValue,
+        form_data_selected: parsedTableWidgetConfig,
         groupByFormat: tile.groupByFormat,
-        
-          custom_Label:tile.custom_Label
-  
+        custom_Label: tile.custom_Label,
+        filterParameter1: parsedFilterParameter1, // Parsed array
+        filterDescription1: tile.filterDescription1,
+        custom_Label1: tile.custom_Label1,
       });
   
       this.isEditMode = true; // Set to edit mode
@@ -326,15 +424,16 @@ console.log('Extracted Text Values:', textValues);
       this.selectedTile = null; // No tile selected for adding
       this.isEditMode = false; // Set to add mode
       this.createKPIWidget.reset(); // Reset the form for new entry
+      this.conditions.clear(); // Clear the FormArray
     }
   
     // Clear the 'selected' state for all themes
-    this.themes.forEach((theme: { selected: boolean; }) => {
+    this.themes.forEach((theme: { selected: boolean }) => {
       theme.selected = false; // Deselect all themes
     });
   
     // Find the theme that matches the tile's themeColor
-    const matchingTheme = this.themes.find((theme: { color: any; }) => theme.color === tile?.themeColor);
+    const matchingTheme = this.themes.find((theme: { color: any }) => theme.color === tile?.themeColor);
   
     // If a matching theme is found, set it as selected
     if (matchingTheme) {
@@ -342,6 +441,9 @@ console.log('Extracted Text Values:', textValues);
       console.log('Matching theme found and selected:', matchingTheme);
     }
   }
+  
+  
+  
   showTooltip(item: string) {
     this.tooltip = item;
   }
@@ -358,20 +460,29 @@ console.log('Extracted Text Values:', textValues);
       console.log('this.editTileIndex check:', this.editTileIndex);
       console.log('Tile checking for update:', this.dashboard[this.editTileIndex]);
   
+      // Prepare the updated conditions array from FormArray
+      const updatedConditions = this.conditions.controls.map(control => {
+        const condition = control.value; // Access the value of each FormGroup in the FormArray
+        return {
+          columnLabel: condition.columnLabel,
+          filterParameter: condition.filterParameter,
+          filterDescription: condition.filterDescription,
+        };
+      });
   
-    
+      console.log('Updated conditions:', updatedConditions);
   
-      // Update multi_value array
-
       // Prepare the updated tile object
       const updatedTile = {
         ...this.dashboard[this.editTileIndex], // Keep existing properties
         formlist: this.createKPIWidget.value.formlist,
         tableWidget_Config: this.createKPIWidget.value.form_data_selected,
         groupByFormat: this.createKPIWidget.value.groupByFormat,
-
-  
-        custom_Label:this.createKPIWidget.value.custom_Label,
+        custom_Label: this.createKPIWidget.value.custom_Label,
+        conditions: updatedConditions, // Directly assign the array
+        filterParameter1: this.createKPIWidget.value.filterParameter1, // Parsed array
+        filterDescription1: this.createKPIWidget.value.filterDescription1,
+        custom_Label1: this.createKPIWidget.value.custom_Label1,
       };
   
       console.log('Updated tile:', updatedTile);
@@ -408,6 +519,7 @@ console.log('Extracted Text Values:', textValues);
       console.error('Edit index is null or invalid. Unable to update the tile.');
     }
   }
+  
   openModalCalender() {
     const modalRef = this.modalService.open(this.calendarModal);
     modalRef.result.then(
@@ -430,4 +542,191 @@ console.log('Extracted Text Values:', textValues);
     this.userIsChanging = true
     this.cdr.detectChanges()
   }
+
+  selectedSettingsTab(tab: string) {
+    this.selectedTabset = tab;
+    // console.log()
+  }
+
+  getDynamicParams(index: number): any[] {
+    return this.dynamicParamMap.get(index) || [];
+  }
+  dynamicparameterValue(event: any): void {
+    console.log('Event check for dynamic param:', event);
+    // this.selectedTexts = event.map((item: any) => {
+    //   if (item && item.data && item.data.text) {
+    //     return item.data.text; // Extract the `text` property
+    //   } else {
+    //     console.warn('Unexpected item structure:', item);
+    //     return ''; // Fallback for unexpected item structure
+    //   }
+    // }).filter((value: any) => value); // Remove empty or undefined values
+
+    // // Log the extracted texts
+    // console.log('Selected Text Values:', this.selectedTexts);
+  
+    if (event && Array.isArray(event)) {
+      if (event.length === 1) {
+        // Handle single selection
+        const singleItem = event[0];
+        if (singleItem && singleItem.data && singleItem.data.text) {
+          const formattedValue = singleItem.data.text; // Use only the text value
+          console.log('Single Selected Item:', formattedValue);
+  
+          // Update the form control with the single value
+          const filterParameter = this.createKPIWidget.get('filterParameter');
+          if (filterParameter) {
+            filterParameter.setValue(formattedValue);
+            this.cdr.detectChanges(); // Trigger change detection
+          }
+  
+          this.selectedParameterValue = formattedValue;
+        } else {
+          console.warn('Unexpected item structure for single selection:', singleItem);
+        }
+      } else {
+        // Handle multiple selections
+        const formattedValues = event.map((item: any) => {
+          if (item && item.data && item.data.text) {
+            return item.data.text; // Use only the text value
+          } else {
+            console.warn('Unexpected item structure:', item);
+            return ''; // Fallback for unexpected item structure
+          }
+        }).filter(value => value).join(', '); // Join values into a single string
+  
+        console.log('Formatted Multiple Items:', formattedValues);
+  
+        // Update the form control with the concatenated values
+        const filterParameter = this.createKPIWidget.get('filterParameter');
+        console.log('filterParameter check',filterParameter)
+        if (filterParameter) {
+          filterParameter.setValue(formattedValues);
+          this.cdr.detectChanges(); // Trigger change detection
+        }
+  
+        this.selectedParameterValue = formattedValues;
+      }
+    } else {
+      console.warn('Invalid event structure:', event);
+    }
+  }
+
+
+  filterParamevent(arg0: string, filterParamevent: any) {
+    throw new Error('Method not implemented.');
+  }
+  onAdd(index: number): void {
+    // Access the selected parameters for the specific condition
+    const selectedParameters = this.conditions.at(index).get('filterParameter')?.value;
+  
+    console.log('Selected parameters for condition', index, ':', selectedParameters);
+  
+    if (Array.isArray(selectedParameters)) {
+      // Format each parameter to include `text` and wrap `value` in `${}`
+      console.log('this.selectedParameterValue', selectedParameters);
+      this.selectedParameterValue = selectedParameters
+        .map(param => ` ${param.text}-\${${param.value}}`) // Format as "text-${value}"
+        .join(' '); // Join them with spaces
+    } else if (selectedParameters) {
+      // Handle single selection case (if applicable)
+      const param = selectedParameters;
+      this.selectedParameterValue = ` ${param.text}-\${${param.value}}`;
+    } else {
+      this.selectedParameterValue = '';
+    }
+  
+    console.log('Formatted selectedParameterValue for condition', index, ':', this.selectedParameterValue);
+  
+    // Update the specific form group's `filterDescription` with the formatted string
+    this.conditions.at(index).patchValue({
+      filterDescription: `${this.selectedParameterValue}`,
+    });
+  
+    // Manually trigger change detection to ensure the UI reflects the changes
+    this.cdr.detectChanges();
+  }
+  
+  addCondition(): void {
+    if (!this.createKPIWidget) {
+      console.error('createKPIWidget is not initialized!');
+      return;
+    }
+
+    const conditionGroup = this.fb.group({
+      columnLabel: ['', Validators.required],
+      filterParameter: [[], Validators.required],
+      filterDescription: ['', Validators.required],
+    });
+
+    this.conditions.push(conditionGroup); // Add the FormGroup to the FormArray
+  }
+
+  
+  
+
+  removeCondition(index: number): void {
+    this.conditions.removeAt(index);
+  }
+
+  dynamicparameterValue1(event: any): void {
+    console.log('Event check for dynamic param:', event);
+  
+    if (event && event.value && Array.isArray(event.value)) {
+      const valuesArray = event.value;
+  
+      if (valuesArray.length === 1) {
+        // Handle single selection
+        const singleItem = valuesArray[0];
+        const { value, text } = singleItem; // Destructure value and text
+        console.log('Single Selected Item:', { value, text });
+  
+        // Update the form control with the single value (object)
+        const filterParameter = this.createKPIWidget.get('filterParameter1');
+        if (filterParameter) {
+          filterParameter.setValue([{ value, text }]); // Store as an array of objects
+          this.cdr.detectChanges(); // Trigger change detection
+        }
+  
+        // Store the single selected parameter
+        this.selectedParameterValueDupli = { value, text };
+      } else {
+        // Handle multiple selections
+        const formattedValuesdupli = valuesArray.map((item: any) => {
+          const { value, text } = item; // Destructure value and text
+          return { value, text }; // Create an object with value and text
+        });
+  
+        console.log('Formatted Multiple Items:', formattedValuesdupli);
+  
+        // Update the form control with the concatenated values (array of objects)
+        const filterParameter = this.createKPIWidget.get('filterParameter1');
+        if (filterParameter) {
+          filterParameter.setValue(formattedValuesdupli);
+          this.cdr.detectChanges(); // Trigger change detection
+        }
+  
+        // Store the multiple selected parameters
+        this.selectedParameterValueDupli = formattedValuesdupli;
+      }
+    } else if (event && event.itemValue) {
+      // Handle the case where `itemValue` exists
+      const { value, text } = event.itemValue;
+      console.log('Single Selected Item from itemValue:', { value, text });
+  
+      // Update the form control with the single value (object)
+      const filterParameter = this.createKPIWidget.get('filterParameter1');
+      if (filterParameter) {
+        filterParameter.setValue([{ value, text }]); // Store as an array of objects
+        this.cdr.detectChanges(); // Trigger change detection
+      }
+  
+      // Store the single selected parameter
+      this.selectedParameterValueDupli = { value, text };
+    } else {
+      console.warn('Invalid event structure:', event);
+    }
+  }
+  
+  
 }

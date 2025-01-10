@@ -76,6 +76,7 @@ export class Chart1ConfigComponent implements OnInit {
   listofDynamicParamFilter: any;
   dashboardIdsList: any;
   p1ValuesSummary: any;
+  parsedParam: any;
 
 
  
@@ -170,13 +171,13 @@ export class Chart1ConfigComponent implements OnInit {
     
       // themeColor: ['#000000', Validators.required],
   
-      fontSize: [14, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
+      fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       // fontColor: ['#000000', Validators.required], // Default to black
    
       chart_title:[''],
       highchartsOptionsJson:[JSON.stringify(this.defaultHighchartsOptionsJson,null,4)],
       filterForm:[''],
-      filterParameter:[''],
+      filterParameter:[[]],
       filterDescription:[''],
       custom_Label:['',Validators.required],
    
@@ -428,6 +429,9 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     // fontColor: this.createChart.value.fontColor,
     chartConfig: this.createChart.value.all_fields,
     highchartsOptionsJson: this.chartFinalOptions,
+    filterParameter:this.createChart.value.filterParameter,
+    filterDescription:this.createChart.value.filterDescription,
+
     // filterForm:this.createChart.value.filterForm,
     // filterParameter:this.createChart.value.filterParameter,
     // filterDescription:this.createChart.value.filterDescription,
@@ -557,48 +561,41 @@ openChartModal1(tile: any, index: number) {
   console.log('Index checking:', index); // Log the index
 
   if (tile) {
-
     this.selectedTile = tile;
     this.editTileIndex = index !== undefined ? index : null;
     console.log('this.editTileIndex checking from openChartModal1', this.editTileIndex); // Store the index, default to null if undefined
     console.log('Tile Object:', tile);
-    console.log('tile.noOfParams checking ',tile.noOfParams)
-    this.paramCount =tile.noOfParams
-    this.highchartsOptionsJson=JSON.parse(tile.highchartsOptionsJson)
 
-    const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14;
-   
-    // Log the tile object
+    // Parse necessary fields
+    this.paramCount = tile.noOfParams;
+    this.highchartsOptionsJson = JSON.parse(tile.highchartsOptionsJson);
 
+    const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14; // Default to 14px if undefined
 
-    // Parse highchartsOptionsJson
+    // Parse filterParameter if it exists and is a string
+    let parsedFilterParameter = [];
+    if (tile.filterParameter) {
+      try {
+        parsedFilterParameter = JSON.parse(tile.filterParameter);
+      } catch (error) {
+        console.error('Error parsing filterParameter:', error);
+      }
+    }
 
- // Default to 14px if undefined
-    console.log('this.paramCount check',this.paramCount)
-    this.initializeTileFields();
+    console.log('Parsed FilterParameter:', parsedFilterParameter);
+
     // Initialize form fields and pre-select values
     this.createChart = this.fb.group({
-
-      add_fields:this.paramCount,
-      chart_title:tile.chart_title,
+      add_fields: this.paramCount,
+      chart_title: tile.chart_title,
       all_fields: this.repopulate_fields(tile),
-      highchartsOptionsJson:JSON.stringify(this.highchartsOptionsJson,null,4),
-      custom_Label:tile.custom_Label,
-      fontSize:fontSizeValue,
-      filterDescription:tile.filterDescription,
-      filterForm:tile.filterForm
-
-      // filterForm:tile.filterForm,
-      // filterParameter:tile.filterParameter,
-      // filterDescription:tile.filterDescription
-
-
-
-   
-
-    })
-
-
+      highchartsOptionsJson: JSON.stringify(this.highchartsOptionsJson, null, 4),
+      custom_Label: tile.custom_Label,
+      fontSize: fontSizeValue,
+      filterDescription: tile.filterDescription,
+      filterForm: tile.filterForm,
+      filterParameter: [parsedFilterParameter], // Patch the parsed value here
+    });
 
     console.log('Updated all_fields:', this.all_fields);
 
@@ -608,21 +605,8 @@ openChartModal1(tile: any, index: number) {
     this.isEditMode = false; // Set to add mode
     this.createChart.reset(); // Reset the form for new entry
   }
-
-  // Clear the 'selected' state for all themes
-  // this.themes.forEach((theme) => {
-  //   theme.selected = false; // Deselect all themes
-  // });
-
-  // // Find the theme that matches the tile's themeColor
-  // const matchingTheme = this.themes.find((theme) => theme.color === tile?.themeColor);
-
-  // If a matching theme is found, set it as selected
-  // if (matchingTheme) {
-  //   matchingTheme.selected = true;
-  //   console.log('Matching theme found and selected:', matchingTheme);
-  // }
 }
+
 
 preDefinedRange(preDefined:any){
   console.log('preDefined check',preDefined)
@@ -896,41 +880,74 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   ]
 
   dynamicparameterValue(event: any): void {
-    console.log('event check for dynamic param',event)
-    console.log('event[0].text check',event[0].text)
-    const filterParameter=this.createChart.get('filterParameter')
-    console.log('filterParameter check',filterParameter)
-    if (event && event[0] && event[0].text) {
-    if(filterParameter){
-
-      filterParameter.setValue(event[0].text)
-      this.cdr.detectChanges();   
-    }
-  }else{
-    console.log('failed to set value')
-  }
-   
-
-    if (event && event[0].value) {
-      // Format the value as ${field-key}
-      const formattedValue = "${"+event[0].value+"}"; 
-      console.log('formattedValue check',formattedValue) // You can customize the formatting as needed
-      this.selectedParameterValue = formattedValue;
-
+    console.log('Event check for dynamic param:', event);
   
-      console.log('Formatted Selected Item:', this.selectedParameterValue);
+    if (event && event.value && Array.isArray(event.value)) {
+      const valuesArray = event.value;
+  
+      if (valuesArray.length === 1) {
+        // Handle single selection
+        const singleItem = valuesArray[0];
+        const { value, text } = singleItem; // Destructure value and text
+        console.log('Single Selected Item:', { value, text });
+  
+        // Update the form control with the single value (object)
+        const filterParameter = this.createChart.get('filterParameter');
+        if (filterParameter) {
+          filterParameter.setValue([{ value, text }]); // Store as an array of objects
+          this.cdr.detectChanges(); // Trigger change detection
+        }
+  
+        // Store the single selected parameter
+        this.selectedParameterValue = { value, text };
+      } else {
+        // Handle multiple selections
+        const formattedValues = valuesArray.map((item: any) => {
+          const { value, text } = item; // Destructure value and text
+          return { value, text }; // Create an object with value and text
+        });
+  
+        console.log('Formatted Multiple Items:', formattedValues);
+  
+        // Update the form control with the concatenated values (array of objects)
+        const filterParameter = this.createChart.get('filterParameter');
+        if (filterParameter) {
+          filterParameter.setValue(formattedValues);
+          this.cdr.detectChanges(); // Trigger change detection
+        }
+  
+        // Store the multiple selected parameters
+        this.selectedParameterValue = formattedValues;
+      }
     } else {
-      console.log('Event structure is different:', event);
+      console.warn('Invalid event structure:', event);
     }
-
   }
+  
+  
+  
 
   onAdd(): void {
-    // Set the `selectedParameterValue` to the `name` of the selected parameter
-    this.selectedParameterValue = this.selectedParameterValue;
-    console.log('this.selectedParameterValue check',this.selectedParameterValue)
+    // Capture the selected parameters (which will be an array of objects with text and value)
+    const selectedParameters =  this.selectedParameterValue;
+    console.log('selectedParameters checking', selectedParameters);
   
-    // Update the form control value for filterDescription
+    if (Array.isArray(selectedParameters)) {
+      // Format the selected parameters to include both text and value
+      this.selectedParameterValue = selectedParameters
+        .map(param => `${param.text}-\${${param.value}}`) // Include both text and value
+        .join(' '); // Join them with a comma and space
+    } else if (selectedParameters) {
+      // If only one parameter is selected, format it directly
+      this.selectedParameterValue = `${selectedParameters.text}-\${${selectedParameters.value}}`;
+    } else {
+      console.warn('No parameters selected or invalid format:', selectedParameters);
+      this.selectedParameterValue = ''; // Fallback in case of no selection
+    }
+  
+    console.log('this.selectedParameterValue check', this.selectedParameterValue);
+  
+    // Update the form control value for filterDescription with the formatted string
     this.createChart.patchValue({
       filterDescription: `${this.selectedParameterValue}`,
     });

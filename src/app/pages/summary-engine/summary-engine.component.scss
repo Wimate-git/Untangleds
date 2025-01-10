@@ -653,6 +653,16 @@ input[type="color"]:focus {
   background-color: green;
   color: white;
 }
+google-map {
+  width: 400px !important;
+  height: 400px !important;
+  display: block;
+  border: none;
+  margin: 0;
+  padding: 0;
+  box-shadow: none; /* Ensure no shadow is applied */
+  outline: none;    /* Remove outline if any */
+}
 
 
 

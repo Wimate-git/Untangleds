@@ -1,0 +1,38 @@
+// google-map {
+//     border-radius: 8px;
+//   }
+  .map-container {
+    margin: 50px auto 50px auto; /* Top, horizontal, and bottom margins */
+    padding: 0; /* Ensure no padding affects alignment */
+    width: calc(100% - 40px); /* Subtract total side margins from the container width */
+    max-width: 400px; /* Optional: Limit the maximum width of the map */
+    display: flex; /* Use flexbox for centering */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    border-radius: 8px; /* Optional: Add rounded corners */
+  }
+  // .text_3d {
+  //   position: fixed;
+  //   top: 50%; 
+  //   right: 50%;
+  
+  //   transform: translate(50%, -50%);
+  // }
+  
+  .text_3d {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .processed-value-container {
+    font-weight: bold;
+    margin-bottom: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 18px;
+  }
+  
+  

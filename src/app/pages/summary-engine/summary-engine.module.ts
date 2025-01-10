@@ -33,6 +33,7 @@ import { CrudSummaryComponent } from './crud-summary/crud-summary.component';
 import { MyWidgetsModule } from 'src/app/_metronic/partials';
 import { HttpClientModule } from '@angular/common/http';
 import { AgGridAngular } from 'ag-grid-angular';
+import { GoogleMapsModule } from '@angular/google-maps';
 
 
  // Import Keen UI Module
@@ -76,6 +77,7 @@ import { AgGridAngular } from 'ag-grid-angular';
     MatTooltipModule,
     NgbTooltipModule,
     HttpClientModule,
+    GoogleMapsModule,
    
     
 

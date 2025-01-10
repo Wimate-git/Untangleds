@@ -13,12 +13,12 @@
       {{ item.custom_Label }}
     </div>
       <!-- Parameter Name -->
-      <div class="processed-value-container"
+      <!-- <div class="processed-value-container"
         [style.font-size]="item.fontSize" 
         [style.color]="item.fontColor"
         style="font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
         {{ item.parameterNameRead }}
-      </div>
+      </div> -->
       
       <!-- Processed Value -->
       <div class="processed-value-container" 
@@ -26,7 +26,7 @@
         [style.color]="item.fontColor" 
         tabindex="0" 
         style="font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-        {{ descriptionData || primaryValue}}:{{ item.multi_value[0]?.processed_value }}
+        {{ descriptionData || primaryValue}} {{ item.multi_value[0]?.processed_value }}
       </div>
     </div>
 

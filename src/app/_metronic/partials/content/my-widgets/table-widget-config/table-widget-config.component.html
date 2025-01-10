@@ -9,11 +9,35 @@
       <div class="card-body pt-0">
   
         <!-- Tab Navigation -->
+        <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap"
+        id="myTab_settings" role="tablist">
+        <div class="col-4" role="Data">
+          <li class="nav-item">
+            <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab"
+              aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Data</a>
+          </li>
+        </div>
+        <div class="col-4" role="Settings">
+          <li class="nav-item">
+            <a class="nav-link text-active-primary me-6" id="settings-tabpane" data-bs-toggle="tab" role="tab" aria-controls="settings-tab" aria-selected="false" (click)="selectedSettingsTab('settings-tab')">Filter</a>
+          </li>
+        </div>
+        <div class="col-4" role="Filter">
+          <li class="nav-item">
+            <a class="nav-link text-active-primary me-6" id="filter-tab" data-bs-toggle="tab" role="tab"
+              aria-controls="filter-tab" aria-selected="false" (click)="selectedSettingsTab('filter-tab')">Function</a>
+          </li>
+        </div>
 
+
+
+      </ul>
   
         <!-- Tab Content -->
         <div class="tab-content mt-3" id="modalTabsContent">
           <!-- General Tab Content -->
+          <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'dataTab'}" id="dataTab"
+          role="tabpanel" aria-labelledby="home-tab">
 
             <div class="row g-3">
               <!-- Form Fields -->
@@ -97,7 +121,135 @@
 
           
         </div>
+          </div>
+
+          <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab" role="tabpanel" aria-labelledby="settings-tabpane">
+          
+          <div class="row g-3 align-items-end mb-4">
+            <!-- Form Fields -->
+            <div class="col-md-4">
+              <label for="parameterName" class="fw-bold fs-6">Form Fields</label>
+              <p-multiSelect
+                id="parameterName"
+                formControlName="filterParameter1"
+                [options]="listofDynamicParam"
+                optionLabel="text"
+                placeholder="Select Parameter"
+                (onChange)="dynamicparameterValue1($event)"
+            
+              ></p-multiSelect>
+            </div>
+          
+            <!-- Add Button -->
+            <div class="col-md-3">
+              <button type="button" class="btn btn-primary w-100 mt-4" (click)="onAdd1()">Add</button>
+            </div>
+          
+            <!-- Custom Label -->
+            <div class="col-md-5">
+              <label for="custom_Label1" class="col-form-label fw-bold fs-6 required">Custom Label</label>
+              <input
+                type="text"
+                class="form-control form-control-solid"
+                id="custom_Label1"
+                name="custom_Label1"
+                formControlName="custom_Label1"
+              />
+            </div>
+          </div>
         
+          <div class="col-md-12 mb-3">
+            <label for="description" class="col-createChart-label fw-bold fs-6">Equation</label>
+            <textarea
+              id="description"
+              formControlName="filterDescription1"
+              class="form-control"
+              rows="3"
+              placeholder="Enter description"
+         
+            >
+              {{ selectedParameterValue }}
+            </textarea>
+          </div>
+        </div>
+          <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'filter-tab'}" id="filter-tab"
+          role="tabpanel" aria-labelledby="filter-tabpane">
+
+          <div
+          *ngFor="let condition of conditions.controls; let i = index"
+          [formGroup]="condition"
+          style="border: 2px solid rgb(21, 163, 219); padding: 10px; margin: 5px; border-radius: 5px;"
+        >
+          <div class="row g-3 align-items-end mb-4">
+            <div class="col-md-4">
+              <label for="constant-{{ i }}" class="col-form-label fw-bold fs-6 required">Column Label</label>
+              <input
+                id="constant-{{ i }}"
+                type="text"
+                class="form-control form-control-solid"
+                placeholder="Enter Label"
+                formControlName="columnLabel"
+              />
+            </div>
+        
+            <div class="col-md-5">
+              <label for="parameterName-{{ i }}" class="fw-bold fs-6 required">Form Fields</label>
+              <p-multiSelect
+                id="parameterName-{{ i }}"
+                formControlName="filterParameter"
+                [options]="listofDynamicParam"
+                optionLabel="text"
+                placeholder="Select Form Fields"
+              ></p-multiSelect>
+            </div>
+        
+            <div class="col-md-3">
+              <button
+                type="button"
+                class="btn btn-primary w-100"
+                (click)="onAdd(i)"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        
+          <div class="col-md-12 mb-3">
+            <label for="description-{{ i }}" class="col-createChart-label fw-bold fs-6 required">Equation</label>
+            <textarea
+              id="description-{{ i }}"
+              formControlName="filterDescription"
+              class="form-control"
+              rows="3"
+              placeholder="Enter Equation"
+            ></textarea>
+          </div>
+        
+          <div class="d-flex justify-content-start mt-3">
+            <button
+              type="button"
+              class="btn btn-danger btn-sm"
+              (click)="removeCondition(i)"
+            >
+              Remove Condition
+            </button>
+          </div>
+        </div>
+        
+        <!-- Add Condition Button -->
+        <div class="d-flex mt-3">
+          <button
+            type="button"
+            class="btn btn-primary btn-sm me-4"
+            (click)="addCondition()"
+          >
+            Add Condition
+          </button>
+        </div>
+        
+
+     
+          </div>
   
       </div>
   

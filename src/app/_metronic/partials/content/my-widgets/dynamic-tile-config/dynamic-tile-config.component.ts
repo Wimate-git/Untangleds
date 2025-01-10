@@ -575,10 +575,10 @@ openDynamicTileModal(tile: any, index: number) {
 
     const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14;
 
-    // // Set the selected theme based on tile.themeColor
-    // this.themes.forEach((theme) => {
-    //   theme.selected = theme.color === tile.themeColor;
-    // });
+    // Set the selected theme based on tile.themeColor
+    this.themes.forEach((theme) => {
+      theme.selected = theme.color === tile.themeColor;
+    });
 
     console.log('Themes after selection:', this.themes);
 
@@ -586,16 +586,15 @@ openDynamicTileModal(tile: any, index: number) {
       add_fields: this.paramCount,
       chart_title: tile.chart_title || '',
       themeColor: tile.themeColor || 'linear-gradient(to right, #ffffff, #000000)', // Fallback for themeColor
-   
-      dashboardIds:tile.dashboardIds,
+      dashboardIds: tile.dashboardIds,
       fontSize: fontSizeValue,
       selectType: tile.selectType,
       fontColor: tile.fontColor || '#000000',
-      toggleCheck:tile.toggleCheck,
-
+      toggleCheck: tile.toggleCheck,
       all_fields: this.repopulate_fields(tile),
     });
-console.log('this.isEditMode check',this.isEditMode)
+
+    console.log('this.isEditMode check', this.isEditMode);
     this.isEditMode = true;
   } else {
     this.selectedTile = null;
@@ -603,8 +602,14 @@ console.log('this.isEditMode check',this.isEditMode)
     if (this.createChart) {
       this.createChart.reset();
     }
+
+    // Reset theme selection if no tile is passed
+    this.themes.forEach((theme) => {
+      theme.selected = false;
+    });
   }
 }
+
 
 
 
@@ -638,10 +643,12 @@ repopulate_fields(getValues: any) {
       for (let i = 0; i < parsedtileConfig.length; i++) {
         console.log('parsedtileConfig checking', parsedtileConfig[i]);
 
-        // Ensure filterParameter exists and is being read correctly
-        const filterParameterValue = parsedtileConfig[i].filterParameter;
-        if (filterParameterValue === undefined || filterParameterValue === null) {
-          console.error(`filterParameter is missing or invalid at index ${i}`, parsedtileConfig[i]);
+        // Ensure filterParameter exists and is an array
+        const filterParameterValue = Array.isArray(parsedtileConfig[i].filterParameter)
+          ? parsedtileConfig[i].filterParameter
+          : [];
+        if (!filterParameterValue || filterParameterValue.length === 0) {
+          console.warn(`filterParameter is empty or invalid at index ${i}`, parsedtileConfig[i]);
         }
 
         // Add the fields to the form group
@@ -654,16 +661,13 @@ repopulate_fields(getValues: any) {
           selectedRangeType: parsedtileConfig[i].selectedRangeType || '',
           selectFromTime: parsedtileConfig[i].selectFromTime || '',
           selectToTime: parsedtileConfig[i].selectToTime || '',
-          // parameterValue: parsedtileConfig[i].parameterValue || '',
-          // dashboardIds: parsedtileConfig[i].dashboardIds || '',
-          // selectType: parsedtileConfig[i].selectType || '',
           filterDescription: parsedtileConfig[i].filterDescription || '',
           custom_Label: parsedtileConfig[i].custom_Label || '',
           fontSize: parsedtileConfig[i].fontSize || 14,
           filterForm: parsedtileConfig[i].filterForm || '',
-          filterParameter: filterParameterValue, // Directly assign the original value
+          filterParameter: this.fb.control(filterParameterValue), // Properly assign filterParameter as a form control
         }));
-console.log('this.all_fields checking',)
+
         // Log to confirm the field was added correctly
         console.log('Field added:', this.all_fields.at(this.all_fields.length - 1).value);
       }
@@ -681,6 +685,7 @@ console.log('this.all_fields checking',)
 
   return this.all_fields;
 }
+
 
 
 
@@ -858,7 +863,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   ]
   dynamicparameterValue(event: any, index: any): void {
     console.log('Event check for dynamic param:', event);
-    console.log('event[0].text check:', event[0]?.text);
+    console.log('Index check:', index);
   
     // Access the specific FormGroup from the FormArray
     const formDynamicParam = this.all_fields.at(index) as FormGroup;
@@ -872,32 +877,51 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     const filterParameter = formDynamicParam.get('filterParameter');
     console.log('filterParameter check:', filterParameter);
   
-    if (event && event[0] && event[0].text) {
-      this.filterParamevent = event[0].text;
-      console.log('this.filterParamevent check:', this.filterParamevent);
+    if (event && event.value && Array.isArray(event.value)) {
+      const valuesArray = event.value;
   
-      if (filterParameter) {
-        // Patch the value to the FormControl
-        filterParameter.patchValue(this.filterParamevent);
-        this.cdr.detectChanges();
+      if (valuesArray.length === 1) {
+        // Handle single selection
+        const singleItem = valuesArray[0];
+        const { value, text } = singleItem; // Destructure value and text
+        console.log('Single Selected Item:', { value, text });
+  
+        if (filterParameter) {
+          // Update the form control with the single value (object)
+          filterParameter.setValue([{ value, text }]); // Store as an array of objects
+          this.cdr.detectChanges(); // Trigger change detection
+        } else {
+          console.warn(`filterParameter control not found in FormGroup for index ${index}`);
+        }
+  
+        // Store the single selected parameter
+        this.selectedParameterValue = { value, text };
       } else {
-        console.warn(`filterParameter control not found in FormGroup for index ${index}`);
+        // Handle multiple selections
+        const formattedValues = valuesArray.map((item: any) => {
+          const { value, text } = item; // Destructure value and text
+          return { value, text }; // Create an object with value and text
+        });
+  
+        console.log('Formatted Multiple Items:', formattedValues);
+  
+        if (filterParameter) {
+          // Update the form control with the concatenated values (array of objects)
+          filterParameter.setValue(formattedValues);
+          this.cdr.detectChanges(); // Trigger change detection
+        } else {
+          console.warn(`filterParameter control not found in FormGroup for index ${index}`);
+        }
+  
+        // Store the multiple selected parameters
+        this.selectedParameterValue = formattedValues;
       }
     } else {
-      console.log('Failed to set value: event structure is invalid or missing text property.');
-    }
-  
-    // Format and set the selectedParameterValue
-    if (event && event[0] && event[0].value) {
-      const formattedValue = `\${${event[0].value}}`; // Custom formatting
-      console.log('formattedValue check:', formattedValue);
-      this.selectedParameterValue = formattedValue;
-  
-      console.log('Formatted Selected Item:', this.selectedParameterValue);
-    } else {
-      console.log('Event structure is different or missing value property:', event);
+      console.warn('Invalid event structure or missing value array:', event);
     }
   }
+  
+  
   
 
   dynamicparameterLabel(event: any, index: any) {
@@ -918,7 +942,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   
 
   onAdd(index: any): void {
-    console.log('index checking from onAdd', index);
+    console.log('Index checking from onAdd:', index);
   
     // Access the specific form group from the form array
     const formDescParam = this.all_fields.at(index) as FormGroup;
@@ -926,30 +950,44 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     // Retrieve the `filterDescription` control from the group
     const groupByFormatControl = formDescParam.get('filterDescription');
   
-    // Set the `selectedParameterValue` to the `name` of the selected parameter
-    console.log('this.selectedParameterValue check', this.selectedParameterValue);
+    // Capture the selected parameters (which will be an array of objects with text and value)
+    const selectedParameters = this.selectedParameterValue;
+    console.log('Selected parameters checking:', selectedParameters);
+  
+    let formattedDescription = '';
+  
+    if (Array.isArray(selectedParameters)) {
+      // Format the selected parameters to include both text and value
+      formattedDescription = selectedParameters
+        .map(param => `${param.text}-\${${param.value}}`) // Include both text and value
+        .join(' '); // Join them with a comma and space
+    } else if (selectedParameters) {
+      // If only one parameter is selected, format it directly
+      formattedDescription = `${selectedParameters.text}-\${${selectedParameters.value}}`;
+    } else {
+      console.warn('No parameters selected or invalid format:', selectedParameters);
+      formattedDescription = ''; // Fallback in case of no selection
+    }
+  
+    console.log('Formatted Description:', formattedDescription);
   
     // Update the specific form control value for `filterDescription`
     if (groupByFormatControl) {
-      groupByFormatControl.patchValue(`${this.selectedParameterValue}`);
-      console.log(
-        `Patched value for index ${index}:`,
-        `${this.selectedParameterValue}`
-      );
+      groupByFormatControl.patchValue(formattedDescription);
+      console.log(`Patched value for index ${index}:`, formattedDescription);
     } else {
-      console.warn(
-        `filterDescription control not found for index ${index}.`
-      );
+      console.warn(`filterDescription control not found for index ${index}.`);
     }
   
     // Optionally patch at the top-level form if needed
     this.createChart.patchValue({
-      filterDescription: `${this.selectedParameterValue}`,
+      filterDescription: formattedDescription,
     });
   
     // Manually trigger change detection to ensure the UI reflects the changes
     this.cdr.detectChanges();
   }
+  
   
   
 

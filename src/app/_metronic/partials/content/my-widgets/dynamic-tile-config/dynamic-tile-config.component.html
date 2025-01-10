@@ -327,20 +327,20 @@
      
               
               <div class="col-md-5 mb-3">
-                <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Parameter</label>
-                <ngx-select
+                <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields</label>
+                <p-multiSelect
                 id="parameterName"
-                [allowClear]="true"
+            
                 formControlName="filterParameter"
-                [items]="getDynamicParams(fieldIndex)"
-                optionValueField="value"
-                optionTextField="text"
+                [options]="getDynamicParams(fieldIndex)"
+                optionLabel="text"
                 placeholder="Select Parameter"
-                (selectionChanges)="dynamicparameterValue($event,fieldIndex)"
-                style="width: 100%;"
-              ></ngx-select>
+                (onChange)="dynamicparameterValue($event,fieldIndex)"
+         
+              ></p-multiSelect>
               
               </div>
+
           
               <div class="col-md-2 mb-3 d-flex align-items-end">
                 <button type="button" class="btn btn-primary w-100" (click)="onAdd(fieldIndex)">Add</button>

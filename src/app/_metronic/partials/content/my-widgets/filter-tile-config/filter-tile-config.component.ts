@@ -321,7 +321,7 @@ console.log('Cleaned-up formlist values:', this.formlistValues);
       all_fields:new FormArray([]),
   
       widgetid: [this.generateUniqueId()],
-      dateType:['', Validators.required],
+  
       themeColor: ['', Validators.required],
       fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['', Validators.required], 
@@ -329,7 +329,8 @@ console.log('Cleaned-up formlist values:', this.formlistValues);
       daysAgo:[''],
       startDate:[''],
       endDate:[''],
-      singleDate:['']
+      singleDate:[''],
+      dateType:['', Validators.required],
     
       // themeColor: ['#000000', Validators.required],
   
@@ -577,6 +578,7 @@ console.log('this.conditionsFilter',this.conditionsFilter);
       //   return { ...field, label }; // Add the label to the current field object
       // });
   
+      
       console.log('this.fields check after label update', this.fields);
   
       const newTile = {

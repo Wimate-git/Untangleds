@@ -260,33 +260,36 @@
             role="tabpanel" aria-labelledby="filter-tabpane">
         
             
-            <div class="row">
-     
+            <div class="row g-3 align-items-end mb-4">
+              <!-- Form Fields -->
+              <div class="col-md-4">
+                <label for="parameterName" class="fw-bold fs-6">Form Fields</label>
+                <p-multiSelect
+                  id="parameterName"
+                  formControlName="filterParameter"
+                  [options]="listofDynamicParam"
+                  optionLabel="text"
+                  placeholder="Select Parameter"
+                  (onChange)="dynamicparameterValue($event)"
               
-              <div class="col-md-5 mb-3">
-                <label for="parameterName" class="col-createChart-label fw-bold fs-6 ">Form Fields</label>
-                <ngx-select
-                id="parameterName"
-                [allowClear]="true"
-                formControlName="filterParameter"
-                [items]="listofDynamicParam"
-                optionValueField="value"
-                optionTextField="text"
-                placeholder="Select Parameter"
-                (selectionChanges)="dynamicparameterValue($event)"
-                style="width: 100%;"
-              ></ngx-select>
-              
+                ></p-multiSelect>
               </div>
-          
-              <div class="col-md-2 mb-3 d-flex align-items-end">
-                <button type="button" class="btn btn-primary w-100" (click)="onAdd()">Add</button>
+            
+              <!-- Add Button -->
+              <div class="col-md-3">
+                <button type="button" class="btn btn-primary w-100 mt-4" (click)="onAdd()">Add</button>
               </div>
-
-              <div class="col-md-5 mb-3">
-                <label for="custom_Label" class="col-form-label fw-bold fs-6  required">Custom Label</label>
-                <input type="text" class="form-control form-control-solid"  name="custom_Label"
-                  formControlName="custom_Label">
+            
+              <!-- Custom Label -->
+              <div class="col-md-5">
+                <label for="custom_Label" class="col-form-label fw-bold fs-6 required">Custom Label</label>
+                <input
+                  type="text"
+                  class="form-control form-control-solid"
+                  id="custom_Label"
+                  name="custom_Label"
+                  formControlName="custom_Label"
+                />
               </div>
             </div>
           

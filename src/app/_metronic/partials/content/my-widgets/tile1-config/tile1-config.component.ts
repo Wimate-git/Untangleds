@@ -63,7 +63,7 @@ export class Tile1ConfigComponent implements OnInit {
   idsDashboard: any;
   dashboardIdsList: any;
   p1ValuesSummary: any;
-  selectedParameterValue: string;
+  selectedParameterValue: any;
   parameterNameRead: any;
   multipleCheck: any;
   selectedTexts: any;
@@ -557,61 +557,44 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   //   }
 
   // }
-
   dynamicparameterValue(event: any): void {
     console.log('Event check for dynamic param:', event);
-    // this.selectedTexts = event.map((item: any) => {
-    //   if (item && item.data && item.data.text) {
-    //     return item.data.text; // Extract the `text` property
-    //   } else {
-    //     console.warn('Unexpected item structure:', item);
-    //     return ''; // Fallback for unexpected item structure
-    //   }
-    // }).filter((value: any) => value); // Remove empty or undefined values
-
-    // // Log the extracted texts
-    // console.log('Selected Text Values:', this.selectedTexts);
   
-    if (event && Array.isArray(event)) {
-      if (event.length === 1) {
+    if (event && event.value && Array.isArray(event.value)) {
+      const valuesArray = event.value;
+  
+      if (valuesArray.length === 1) {
         // Handle single selection
-        const singleItem = event[0];
-        if (singleItem && singleItem.data && singleItem.data.text) {
-          const formattedValue = singleItem.data.text; // Use only the text value
-          console.log('Single Selected Item:', formattedValue);
+        const singleItem = valuesArray[0];
+        const { value, text } = singleItem; // Destructure value and text
+        console.log('Single Selected Item:', { value, text });
   
-          // Update the form control with the single value
-          const filterParameter = this.createKPIWidget.get('filterParameter');
-          if (filterParameter) {
-            filterParameter.setValue(formattedValue);
-            this.cdr.detectChanges(); // Trigger change detection
-          }
-  
-          this.selectedParameterValue = formattedValue;
-        } else {
-          console.warn('Unexpected item structure for single selection:', singleItem);
+        // Update the form control with the single value (object)
+        const filterParameter = this.createKPIWidget.get('filterParameter');
+        if (filterParameter) {
+          filterParameter.setValue([{ value, text }]); // Store as an array of objects
+          this.cdr.detectChanges(); // Trigger change detection
         }
+  
+        // Store the single selected parameter
+        this.selectedParameterValue = { value, text };
       } else {
         // Handle multiple selections
-        const formattedValues = event.map((item: any) => {
-          if (item && item.data && item.data.text) {
-            return item.data.text; // Use only the text value
-          } else {
-            console.warn('Unexpected item structure:', item);
-            return ''; // Fallback for unexpected item structure
-          }
-        }).filter(value => value).join(', '); // Join values into a single string
+        const formattedValues = valuesArray.map((item: any) => {
+          const { value, text } = item; // Destructure value and text
+          return { value, text }; // Create an object with value and text
+        });
   
         console.log('Formatted Multiple Items:', formattedValues);
   
-        // Update the form control with the concatenated values
+        // Update the form control with the concatenated values (array of objects)
         const filterParameter = this.createKPIWidget.get('filterParameter');
-        console.log('filterParameter check',filterParameter)
         if (filterParameter) {
           filterParameter.setValue(formattedValues);
           this.cdr.detectChanges(); // Trigger change detection
         }
   
+        // Store the multiple selected parameters
         this.selectedParameterValue = formattedValues;
       }
     } else {
@@ -620,26 +603,27 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   }
   
   
+  
 
   onAdd(): void {
-    // Capture the selected parameters (which will be an array due to multi-selection)
-    const selectedParameters = this.createKPIWidget.value.filterParameter;
-    console.log('selectedParameters checking',selectedParameters)
-    
-    // If multiple parameters are selected, join them as a comma-separated string
+    // Capture the selected parameters (which will be an array of objects with text and value)
+    const selectedParameters =  this.selectedParameterValue;
+    console.log('selectedParameters checking', selectedParameters);
+  
     if (Array.isArray(selectedParameters)) {
-      // Join the selected parameters into a string with the same formatting as before
-      this.selectedParameterValue = selectedParameters.map(param => `${param}`).join(', ');
+      // Format the selected parameters to include both text and value
+      this.selectedParameterValue = selectedParameters
+        .map(param => `${param.text}-\${${param.value}}`) // Include both text and value
+        .join(' '); // Join them with a comma and space
+    } else if (selectedParameters) {
+      // If only one parameter is selected, format it directly
+      this.selectedParameterValue = `${selectedParameters.text}-\${${selectedParameters.value}}`;
     } else {
-      // If only one parameter is selected, use it directly
-      this.selectedParameterValue = selectedParameters;
+      console.warn('No parameters selected or invalid format:', selectedParameters);
+      this.selectedParameterValue = ''; // Fallback in case of no selection
     }
   
     console.log('this.selectedParameterValue check', this.selectedParameterValue);
-     this.selectedParameterValue = this.selectedParameterValue
-    .split(', ') // Split the string by comma and space
-    .map(value => `\${${value}}`) // Wrap each value in ${}
-    .join(''); // Join them back with ', '
   
     // Update the form control value for filterDescription with the formatted string
     this.createKPIWidget.patchValue({
@@ -649,6 +633,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     // Manually trigger change detection to ensure the UI reflects the changes
     this.cdr.detectChanges();
   }
+  
   
   selectedSettingsTab(tab: string) {
     this.selectedTabset = tab;
@@ -798,8 +783,9 @@ openKPIModal(tile: any, index: number) {
       selectType: tile.selectType,
       filterParameter: tile.filterParameter, // Always an array
       filterDescription: tile.filterDescription,
+      custom_Label:tile.custom_Label,
         formatType:tile.formatType,
-        custom_Label:tile.custom_Label
+    
 
     });
 

@@ -54,6 +54,7 @@ import { TableWidgetConfigComponent } from 'src/app/_metronic/partials/content/m
 
 import { AgGridAngular } from 'ag-grid-angular';
 import { GridApi ,Column} from 'ag-grid-community';
+import { MapConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/map-config/map-config.component';
 
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
@@ -143,6 +144,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   @ViewChild(CloneDashboardComponent, { static: false }) CloneDashboardComponent: CloneDashboardComponent;
   @ViewChild(FilterTileConfigComponent, { static: false }) FilterTileConfigComponent: FilterTileConfigComponent;
   @ViewChild(TableWidgetConfigComponent, { static: false }) TableWidgetConfigComponent: TableWidgetConfigComponent;
+  @ViewChild(MapConfigComponent, { static: false }) MapConfigComponent: MapConfigComponent;
   
  
   
@@ -176,7 +178,21 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   private gridColumnApi!: Column;
   columnApi: any;
   rowData: { location: string; 'text-1732683302774': string; '1732683476': string; }[];
+  extractUserName: any;
+  mapHeight: any[] = [];
+  mapWidth: any[] = [];
 
+  center: google.maps.LatLngLiteral = { lat: 20.5937, lng: 78.9629 };
+  zoom = 5; // Adjust the zoom level
+
+  // Marker positions
+  markers = [
+    { lat: 28.6139, lng: 77.209, label: 'Delhi' }, // Delhi
+    { lat: 19.076, lng: 72.8777, label: 'Mumbai' }, // Mumbai
+    { lat: 13.0827, lng: 80.2707, label: 'Chennai' }, // Chennai
+    { lat: 22.5726, lng: 88.3639, label: 'Kolkata' }, // Kolkata
+    { lat: 12.9716, lng: 77.5946, label: 'Bangalore' }, // Bangalore
+  ];
 
 
   createPieChart() {
@@ -766,6 +782,7 @@ if(!this.isFullScreen){
   showDynamicTileGrid:boolean
   showFilterGrid:boolean
   showTableGrid:boolean
+  showMapGrid:boolean
   showChartGrid:boolean;
   editTitleIndex: number | null;
   isDuplicateID: boolean = false;
@@ -809,6 +826,7 @@ if(!this.isFullScreen){
       },
       itemInitCallback: this.onItemInit.bind(this),
       itemResizeCallback: this.itemResize.bind(this),
+      // itemResizeCallbackMap: this.itemResizeMap.bind(this),
       itemChangeCallback: () => {
         console.log('Grid item changed');
         this.isGirdMoved = true; // Set flag to indicate grid item changed
@@ -933,32 +951,84 @@ if(!this.isFullScreen){
   }
 
   public itemResize(item: GridsterItem, itemComponent: GridsterItemComponentInterface): void {
-  
     if (!this.chartHeight || !this.chartWidth) {
+      // Initialize height and width arrays for all dashboard items
       this.chartHeight = new Array(this.dashboard.length).fill('');
       this.chartWidth = new Array(this.dashboard.length).fill('');
+    }
+    if (!this.mapHeight || !this.mapWidth) {
+      // Initialize height and width arrays for all dashboard items
+      this.mapHeight = new Array(this.dashboard.length).fill('');
+      this.mapWidth = new Array(this.dashboard.length).fill('');
     }
   
     // Get the index of the item in the dashboard array
     const index = this.dashboard.indexOf(item as GridsterItem);
-
-    // Make sure the index is valid
+  
     if (index !== -1) {
       const itemComponentWidth = itemComponent.width;
       const itemComponentHeight = itemComponent.height;
-
-
-     if (item.grid_type === 'chart') {
-        this.chartHeight[index] = (itemComponentHeight - 10) ;
-        this.chartWidth[index] = (itemComponentWidth - 30) ;
-    
+  
+      // Handle both charts and maps
+      if (item.grid_type === 'chart') {
+        // Adjust height and width for the current item
+        this.chartHeight[index] = itemComponentHeight - 10; // Subtract margin/padding
+        this.chartWidth[index] = itemComponentWidth - 30;  // Subtract margin/padding
+  
+        console.log(
+          `Resized ${item.grid_type} at index ${index}:`,
+          `Height: ${this.chartHeight[index]}, Width: ${this.chartWidth[index]}`
+        );
+  
+        // Optionally emit an event or force change detection
       }
+      else if (item.grid_type === 'Map') {
+        // const topMargin = 20; // Define the top margin value
+      
+        // Adjust height and width with the top margin
+        this.mapHeight[index] = itemComponentHeight - 10 ; // Subtract additional top margin
+        this.mapWidth[index] = itemComponentWidth - 10; // Subtract margin/padding for width
+      
+        console.log(
+          `Resized ${item.grid_type} at index ${index}:`,
+          `Height: ${this.mapHeight[index]}, Width: ${this.mapWidth[index]}, Top Margin: }`
+        );
+      }
+      
+    } else {
+      console.warn('Item not found in dashboard array');
+    }
+  }
+  
+
+
+  // public itemResizeMap(item: GridsterItem, itemComponentMap: GridsterItemComponentInterface): void {
+  
+  //   if (!this.mapHeight || !this.mapWidth) {
+  //     this.mapHeight = new Array(this.dashboard.length).fill('');
+  //     this.mapWidth = new Array(this.dashboard.length).fill('');
+  //   }
+  
+  //   // Get the index of the item in the dashboard array
+  //   const index = this.dashboard.indexOf(item as GridsterItem);
+
+  //   // Make sure the index is valid
+  //   if (index !== -1) {
+  //     const itemComponentMapWidth = itemComponentMap.width;
+  //     const itemComponentMapHeight = itemComponentMap.height;
+
+
+  //    if (item.grid_type === 'Map') {
+  //       this.mapHeight[index] = (itemComponentMapWidth - 10) ;
+  //       this.mapWidth[index] = (itemComponentMapHeight - 30) ;
+    
+  //     }
      
 
-      //console.log('AFTER this.isGirdMoved', this.isGirdMoved)
-    }
+  //     //console.log('AFTER this.isGirdMoved', this.isGirdMoved)
+  //   }
 
-  }
+  // }
   deleteTile(item: any, index: number, all_Packet_store: any): void {
     Swal.fire({
       title: 'Are you sure?',
@@ -1600,7 +1670,9 @@ processFetchedData(result: any): void {
     { value: 'Chart', label: 'Chart' },
     { value: 'DynamicTile', label: 'DynamicTile' },
     {value:'FilterTile',label:'FilterTile'},
-    {value:'TableTile',label:'TableTile'}
+    {value:'TableTile',label:'TableTile'},
+    {value:'MapWidget',label:'MapWidget'},
+    
 
     
 
@@ -1618,14 +1690,16 @@ processFetchedData(result: any): void {
 
 
       // Update visibility based on the selected tile
-      this.showGrid = this.selectedTile === 'Tiles' || this.selectedTile === 'Title' || this.selectedTile === 'Chart'|| this.selectedTile === 'DynamicTile' || this.selectedTile === 'FilterTile' || this.selectedTile === 'TableTile' ;
+      this.showGrid = this.selectedTile === 'Tiles' || this.selectedTile === 'Title' || this.selectedTile === 'Chart'|| this.selectedTile === 'DynamicTile' || this.selectedTile === 'FilterTile' || this.selectedTile === 'TableTile' || this.selectedTile === 'MapWidget' ;
 
-     
+      
       this.showTitleGrid = this.selectedTile === 'Title'; // Show specific grid for Title
       this.showChartGrid = this.selectedTile === 'Chart';
       this.showDynamicTileGrid =  this.selectedTile === 'DynamicTile'
             this.showFilterGrid =  this.selectedTile === 'FilterTile'
                this.showTableGrid =  this.selectedTile === 'TableTile'
+                    this.showMapGrid =  this.selectedTile === 'MapWidget'
+
 
             
 
@@ -1979,6 +2053,16 @@ setTimeout(() => {
         this.TableWidgetConfigComponent.openTableModal(event.arg1, event.arg2);
       }, 500);
     }
+    if(event.arg1.grid_type=='Map'){
+      this.modalService.open(KPIModal, { size: 'lg' });
+
+    
+      // Access the component instance and trigger `openKPIModal`
+      setTimeout(() => {
+       
+        this.MapConfigComponent.openMapModal(event.arg1, event.arg2);
+      }, 500);
+    }
 
 
     
@@ -2131,6 +2215,12 @@ setTimeout(() => {
   // this.updateSummary('','add_Tile')
     }
     else if(event.data.arg1.grid_type=='TableWidget'){
+      console.log('event check', event)
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push(event.data.arg1)
+      // this.updateSummary(event.all_Packet_store,'add_Tile')
+    }
+    else if(event.data.arg1.grid_type=='Map'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
@@ -3770,11 +3860,15 @@ setTimeout(() => {
   //   this.validateAndSubmit(tempObj, key);
   // }
   updateSummary(value: any, key: any) {
+    console.log('this.getLoggedUser check update', this.getLoggedUser);
+    this.extractUserName = this.getLoggedUser.username;
+  
     let tempClient = this.SK_clientID + "#summary" + "#lookup";
-    console.log('value checking from updatesummary',value)
+    console.log('value checking from updatesummary', value);
+  
     this.createSummaryField.get('summaryID')?.enable();
   
-    // Update allCompanyDetails if not already populated
+    // Ensure `allCompanyDetails` is populated with the existing data
     if (!this.allCompanyDetails) {
       this.allCompanyDetails = this.constructAllCompanyDetails();
     }
@@ -3785,39 +3879,48 @@ setTimeout(() => {
     this.formattedDashboard = this.formatDashboardTiles(this.dashboard);
     console.log('Formatted Dashboard:', this.formattedDashboard);
   
+    // Preserve the original createdDate and createdUser from `allCompanyDetails`
+    const originalCreatedDate = this.allCompanyDetails.crDate || Math.ceil((new Date()).getTime() / 1000);
+    const originalCreatedUser = this.allCompanyDetails.createdUser || this.getLoggedUser.username;
+  
+    // Set the updated date and updated user
+    const updatedDate = Math.ceil(new Date().getTime() / 1000);
+  
     // Construct tempObj
     let tempObj = {
       PK: `${this.SK_clientID}#${this.allCompanyDetails.summaryID}#summary#main`,
       SK: 1,
       metadata: JSON.stringify({
         ...this.allCompanyDetails,
-        grid_details: this.formattedDashboard
-      })
+      // Set updated user
+        grid_details: this.formattedDashboard,
+      }),
     };
   
     console.log('TempObj being validated and submitted:', tempObj);
   
     // Validate and submit the object
     this.validateAndSubmit(tempObj, key);
-    const createdDate = Math.ceil(new Date().getTime() / 1000); // Created date
-    const updatedDate = Math.ceil(new Date().getTime() / 1000); 
+  
     const items = {
       P1: this.allCompanyDetails.summaryID,
       P2: this.allCompanyDetails.summaryName,
       P3: this.allCompanyDetails.summaryDesc,
-      P4: createdDate,  // Updated date
-      P5: updatedDate,   // Created date
-      P6: this.allCompanyDetails.createdUser,  // Created by user
-      P7: this.getLoggedUser.username,          // Updated by user
+      P4: updatedDate, // Updated date
+      P5: originalCreatedDate, // Keep original created date
+      P6: originalCreatedUser, // Keep original created user
+      P7: this.extractUserName, // Updated user
       P8: JSON.stringify(this.previewObjDisplay),
-      P9: this.allCompanyDetails.iconSelect // Add selected icon
+      P9: this.allCompanyDetails.iconSelect, // Add selected icon
     };
-console.log('items checking from update Summary',items)
-  //  this.createLookUpSummary(items, 1, tempClient);
-  this.cd.detectChanges(); 
-   this.fetchTimeMachineById(1,items.P1,'update',items)
-   this.cd.detectChanges(); 
+  
+    console.log('items checking from update Summary', items);
+  
+    this.cd.detectChanges();
+    this.fetchTimeMachineById(1, items.P1, 'update', items);
+    this.cd.detectChanges();
   }
+  
   
   
   private validateAndSubmit(tempObj: any, actionKey: string) {
@@ -3904,12 +4007,42 @@ console.log('items checking from update Summary',items)
   
   private formatField(value: any): string {
     try {
+      let parsedValue;
+  
+      // Step 1: Parse if the value is a string
       if (typeof value === 'string') {
-        const parsed = JSON.parse(value);
-        return JSON.stringify(parsed);
+        parsedValue = JSON.parse(value);
+      } else {
+        // Assume it's already parsed, directly assign it
+        parsedValue = value;
       }
-      return JSON.stringify(value || []);
+  
+      // Step 2: Check if the parsed value is an array with `filterDescription`
+      if (Array.isArray(parsedValue)) {
+        const formattedArray = parsedValue.map((item) => {
+          if (item.filterDescription && item.filterParameter && item.filterParameter1 && item.filterDescription1) {
+            // Replace placeholders in filterDescription with corresponding text
+            let formattedDescription = item.filterDescription;
+            item.filterParameter.forEach((param: any) => {
+              const placeholder = `\${${param.value}}`;
+              formattedDescription = formattedDescription.replace(placeholder, param.text);
+            });
+  
+            return {
+              ...item,
+              formattedFilterDescription: formattedDescription,
+            };
+          }
+          return item;
+        });
+  
+        return JSON.stringify(formattedArray); // Convert back to a string
+      }
+  
+      // Step 3: For non-array objects, just stringify the value
+      return JSON.stringify(parsedValue || []);
     } catch (error) {
+      // Handle errors gracefully
       console.error('Error formatting field:', value, error);
       return '[]';
     }
@@ -3923,7 +4056,12 @@ console.log('items checking from update Summary',items)
       filterParameter: this.formatField(tile.filterParameter),
       tileConfig: this.formatField(tile.tileConfig),
       filterTileConfig:this.formatField(tile.filterTileConfig),
-      tableWidget_Config:this.formatField(tile.tableWidget_Config)
+      tableWidget_Config:this.formatField(tile.tableWidget_Config),
+      conditions:this.formatField(tile.conditions),
+      MapConfig:this.formatField(tile.MapConfig),
+      filterParameter1:this.formatField(tile.filterParameter1)
+
+      
 
     }));
   }
@@ -4138,39 +4276,42 @@ this.createSummaryField.patchValue({
 
 
 
-
   async fetchTimeMachineById(sk: any, id: any, type: any, item: any) {
     const tempClient = this.SK_clientID + '#summary' + '#lookup';
     console.log("Temp client is ", tempClient);
     console.log("Type of client", typeof tempClient);
-    console.log("item check from fetchtimemachine", item);
-
+    console.log("item check from fetchTimeMachine", item);
+  
     try {
       const response = await this.api.GetMaster(tempClient, sk);
-      console.log('response check from timemechin', response)
-
+      console.log('response check from timeMachine', response);
+  
       if (response && response.options) {
         let data: ListItem[] = await JSON.parse(response.options);
-
+  
         // Find the index of the item with the matching id
         let findIndex = data.findIndex((obj) => obj[Object.keys(obj)[0]].P1 === id);
-
+  
         if (findIndex !== -1) { // If item found
           if (type === 'update') {
+            // Preserve the original createdDate and createdUser in the data
+            const existingItem = data[findIndex][`L${findIndex + 1}`];
+            item.P5 = existingItem.P5 || item.P5; // Preserve createdDate
+            item.P6 = existingItem.P6 || item.P6; // Preserve createdUser
+  
             data[findIndex][`L${findIndex + 1}`] = item;
-
+  
             // Create a new array to store the re-arranged data without duplicates
             const newData = [];
-
-            // Loop through each object in the data array
+  
             for (let i = 0; i < data.length; i++) {
-              const originalKey = Object.keys(data[i])[0]; // Get the original key (e.g., L1, L2, ...)
-              const newKey = `L${i + 1}`; // Generate the new key based on the current index
-
+              const originalKey = Object.keys(data[i])[0];
+              const newKey = `L${i + 1}`;
+  
               if (originalKey) {
                 const newObj = { [newKey]: data[i][originalKey] };
                 const existingIndex = newData.findIndex(obj => Object.keys(obj)[0] === newKey);
-
+  
                 if (existingIndex !== -1) {
                   Object.assign(newData[existingIndex][newKey], data[i][originalKey]);
                 } else {
@@ -4180,37 +4321,29 @@ this.createSummaryField.patchValue({
                 console.error(`Original key not found for renaming in data[${i}].`);
               }
             }
-
-            // Replace the original data array with the newData array
+  
             data = newData;
-            // Update the local state or service with the new data
-            this.lookup_data_summary = data; // Assuming this is the variable bound to your UI
-            this.refreshFunction()
-            this.cd.detectChanges(); // Trigger change detection if needed
-       
-
+            this.lookup_data_summary = data;
+            this.refreshFunction();
+            this.cd.detectChanges();
           } else if (type === 'delete') {
             data.splice(findIndex, 1);
-            this.lookup_data_summary = data; // Update the UI data
-            this.cd.detectChanges(); // Trigger change detection if needed
+            this.lookup_data_summary = data;
+            this.cd.detectChanges();
           }
-
-          // Prepare the updated data for API update
+  
           let updateData = {
             PK: tempClient,
             SK: response.SK,
-            options: JSON.stringify(data)
+            options: JSON.stringify(data),
           };
-
-          // Update the data in the API
+  
           await this.api.UpdateMaster(updateData);
-
         } else { // If item not found
-          await new Promise(resolve => setTimeout(resolve, 500)); // Wait before retrying
-          await this.fetchTimeMachineById(sk + 1, id, type, item); // Retry with next SK
-
+          await new Promise(resolve => setTimeout(resolve, 500));
+          await this.fetchTimeMachineById(sk + 1, id, type, item);
         }
-      } else { // If response or listOfItems is null
+      } else {
         Swal.fire({
           position: "top-right",
           icon: "error",
@@ -4223,6 +4356,7 @@ this.createSummaryField.patchValue({
       console.error('Error:', error);
     }
   }
+  
 
 refreshFunction(){
   if (this.routeId) {
@@ -5213,6 +5347,11 @@ refreshFunction(){
   }
   openTableModal(tableModal:TemplateRef<any>,modal:any){
     this.modalService.open(tableModal, {size: 'lg' });
+    modal.dismiss();
+
+  }
+  openMapModal(MapModal:TemplateRef<any>,modal:any){
+    this.modalService.open(MapModal, {size: 'lg' });
     modal.dismiss();
 
   }

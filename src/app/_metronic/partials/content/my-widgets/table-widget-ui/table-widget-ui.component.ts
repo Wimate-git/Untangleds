@@ -58,6 +58,8 @@ export class TableWidgetUiComponent implements OnInit{
   private gridApi!: GridApi;
   private gridColumnApi!: Column;
   columnApi: any;
+  parsedColumns: any;
+  columnLabelsArray: any;
   ngOnInit(): void {
 
     
@@ -82,45 +84,72 @@ export class TableWidgetUiComponent implements OnInit{
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
-    console.log("tile data check from tile1 ",this.item)
-   
+    console.log("tile data check from table Widget",this.item)
+// Parse the conditions
+this.parsedColumns = JSON.parse(this.item.conditions);
+console.log('this.parsedColumns checking', this.parsedColumns);
+
+// Extract columnLabel values
+const columnLabels = this.parsedColumns.map((column: { columnLabel: string }) => column.columnLabel);
+
+// Log or store the extracted column labels
+console.log('Extracted column labels:', columnLabels);
+
+// Store in a variable
+this.columnLabelsArray = columnLabels; // Example variable to hold the column labels
+
+
+
+  
 
    
-    this.tabledata = this.item.tableWidget_Config; // This will contain your data
-    console.log('description check', this.tabledata);
 
-    // Parse tableWidget_Config
-    try {
-      this.parsedTableData = JSON.parse(this.tabledata);
-      console.log('this.parsedTableData checking', this.parsedTableData);
+   
+this.tabledata = this.item.tableWidget_Config; // This will contain your data
+console.log('description check', this.tabledata);
 
-      // Create ag-Grid column definitions
-      this.columnDefs = this.parsedTableData.map((column: { text: any; value: any; }) => ({
-        headerName: column.text, // Column header
-        field: column.value, // Field name
-        sortable: true,
-        filter: true,
-        resizable: true
-      }));
-      console.log("tile data check from tile1 ",this.item)
-      this.rowData = JSON.parse(this.item.rowData)
-      console.log('this.rowData',this.rowData)
-      // Example row data (Replace with your actual row data)
-      // this.rowData = [
-      //   {
-      //     'location': 'India',
-      //     'text-1732683302774': '+91',
-      //     '1732683476': '2023-12-31'
-      //   },
-      //   {
-      //     'location': 'USA',
-      //     'text-1732683302774': '+1',
-      //     '1732683476': '2023-12-30'
-      //   }
-      // ];
-    } catch (error) {
-      console.error('Error parsing table data:', error);
-    }
+try {
+  this.tabledata = this.item.tableWidget_Config; // Source data for columns
+  console.log('description check', this.tabledata);
+
+  // Parse tableWidget_Config
+  this.parsedTableData = JSON.parse(this.tabledata);
+  console.log('this.parsedTableData checking', this.parsedTableData);
+
+  // Generate column definitions from tableWidget_Config
+  const tableWidgetColumns = this.parsedTableData.map((column: { text: string; value: string }) => ({
+    headerName: column.text || 'Unnamed Column', // Use a default name if text is missing
+    field: column.value,
+    sortable: true,
+    filter: true,
+    resizable: true,
+  }));
+
+  console.log('tableWidget column definitions:', tableWidgetColumns);
+
+  // Include additional columns from columnLabelsArray
+  const additionalColumns = this.columnLabelsArray.map((label: string) => ({
+    headerName: label || 'Unnamed Column', // Use label as headerName
+    field: label, // Field must match rowData keys
+    sortable: true,
+    filter: true,
+    resizable: true,
+  }));
+
+  console.log('Additional columns from columnLabelsArray:', additionalColumns);
+
+  // Combine tableWidget columns and additional columns
+  this.columnDefs = [...tableWidgetColumns, ...additionalColumns];
+  console.log('Final column definitions:', this.columnDefs);
+
+  // Parse row data
+  this.rowData = JSON.parse(this.item.rowData);
+  console.log('this.rowData', this.rowData);
+} catch (error) {
+  console.error('Error parsing table data:', error);
+}
+
+
   
     
     // Split the description by '&&'
