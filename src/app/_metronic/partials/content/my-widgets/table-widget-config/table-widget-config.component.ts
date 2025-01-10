@@ -109,27 +109,26 @@ this.initializeTileFields()
   }
   onAdd1(): void {
     // Capture the selected parameters (which will be an array of objects with text and value)
-
-    const selectedParameters =  this.selectedParameterValueDupli;
-
+    const selectedParameters = this.selectedParameterValueDupli;
+  
     console.log('selectedParameters checking', selectedParameters);
   
     if (Array.isArray(selectedParameters)) {
-      // Format the selected parameters to include both text and value
+      // Format the selected parameters to include the updated structure
       this.selectedParameterValueDupl = selectedParameters
-        .map(param => `${param.text}-\${${param.value}}`) // Include both text and value
-        .join(' '); // Join them with a comma and space
+        .map(param => `\${${param.text}.${param.value}}`) // Format as "${Label.Value}"
+        .join(' '); // Join all parameters with a space
     } else if (selectedParameters) {
       // If only one parameter is selected, format it directly
-      this.selectedParameterValueDupl = `${selectedParameters.text}-\${${selectedParameters.value}}`;
+      this.selectedParameterValueDupl = `\${${selectedParameters.text}.${selectedParameters.value}}`; // Single parameter format
     } else {
       console.warn('No parameters selected or invalid format:', selectedParameters);
       this.selectedParameterValueDupl = ''; // Fallback in case of no selection
     }
   
-    console.log('this.selectedParameterValueDupli check', this.selectedParameterValueDupli);
+    console.log('this.selectedParameterValueDupl check', this.selectedParameterValueDupl);
   
-    // Update the form control value for filterDescription with the formatted string
+    // Update the form control value for filterDescription1 with the formatted string
     this.createKPIWidget.patchValue({
       filterDescription1: `${this.selectedParameterValueDupl}`,
     });
@@ -137,6 +136,7 @@ this.initializeTileFields()
     // Manually trigger change detection to ensure the UI reflects the changes
     this.cdr.detectChanges();
   }
+  
 
 
 
@@ -281,17 +281,18 @@ this.initializeTileFields()
           // Include created_time and updated_time
           if (parsedMetadata.created_time) {
             this.listofDynamicParam.push({
-              value: parsedMetadata.created_time.toString(),
+              value: `created_time`,
               text: 'Created Time' // You can customize the label here if needed
             });
           }
-
+          
           if (parsedMetadata.updated_time) {
             this.listofDynamicParam.push({
-              value: parsedMetadata.updated_time.toString(),
+              value: `updated_time`,
               text: 'Updated Time' // You can customize the label here if needed
             });
           }
+          
 
           console.log('Transformed dynamic parameters:', this.listofDynamicParam);
 
@@ -623,15 +624,14 @@ this.initializeTileFields()
     console.log('Selected parameters for condition', index, ':', selectedParameters);
   
     if (Array.isArray(selectedParameters)) {
-      // Format each parameter to include `text` and wrap `value` in `${}`
-      console.log('this.selectedParameterValue', selectedParameters);
+      // Initialize formatted parameter string
       this.selectedParameterValue = selectedParameters
-        .map(param => ` ${param.text}-\${${param.value}}`) // Format as "text-${value}"
-        .join(' '); // Join them with spaces
+        .map(param => `\${${param.text}.${param.value}}`) // Format all parameters as "${Label.Value}"
+        .join(' '); // Join all parameters with spaces
     } else if (selectedParameters) {
       // Handle single selection case (if applicable)
       const param = selectedParameters;
-      this.selectedParameterValue = ` ${param.text}-\${${param.value}}`;
+      this.selectedParameterValue = `\${${param.text}.${param.value}}`; // Format single parameter
     } else {
       this.selectedParameterValue = '';
     }
@@ -646,6 +646,8 @@ this.initializeTileFields()
     // Manually trigger change detection to ensure the UI reflects the changes
     this.cdr.detectChanges();
   }
+  
+  
   
   addCondition(): void {
     if (!this.createKPIWidget) {

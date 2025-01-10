@@ -180,6 +180,9 @@ makeTrueCheck:any = false
 
 
   }
+  ngAfterViewInit(): void {
+    this.checkData()
+  }
   get dateType() {
     return this.createChart.get('dateType');
   }
@@ -187,68 +190,76 @@ makeTrueCheck:any = false
     const initialDateType = this.createChart.get('dateType')?.value;
     this.showDaysAgoField = this.daysAgoOptions.includes(initialDateType);
   }
-  checkData(){
-    this.gridDetailExtract = this.all_Packet_store.grid_details
-    console.log('this.gridDetailExtract check',this.gridDetailExtract)
-// Initialize the formlist values array
-
-
-// Extract formlist from gridDetailExtract
-if (this.gridDetailExtract && Array.isArray(this.gridDetailExtract)) {
-    this.formlistValues = this.gridDetailExtract.map((packet: { formlist: any }) => packet.formlist);
-    console.log('this.formlistValues check',this.formlistValues)
-}
-
-// Initialize formlistValues as an empty array if not already initialized
-this.formlistValues = this.formlistValues || [];
-
-// Iterate through each packet in gridDetailExtract
-if (Array.isArray(this.gridDetailExtract)) {
-    this.gridDetailExtract.forEach((packet: any) => {
-        // Check if chartConfig exists in the current packet and is not empty
+  checkData() {
+    this.gridDetailExtract = this.all_Packet_store.grid_details;
+    console.log('this.gridDetailExtract check', this.gridDetailExtract);
+  
+    // Initialize the formlistValues array
+    this.formlistValues = [];
+  
+    // Extract formlist directly from gridDetailExtract
+    if (this.gridDetailExtract && Array.isArray(this.gridDetailExtract)) {
+      this.formlistValues = this.gridDetailExtract.map((packet: { formlist: any }) => packet.formlist);
+      console.log('this.formlistValues check', this.formlistValues);
+    }
+  
+    // Ensure formlistValues is an empty array if not initialized
+    this.formlistValues = this.formlistValues || [];
+  
+    // Iterate through each packet in gridDetailExtract
+    if (Array.isArray(this.gridDetailExtract)) {
+      this.gridDetailExtract.forEach((packet: any) => {
+        // Parse and extract from chartConfig if it exists
         if (packet.chartConfig && packet.chartConfig !== "[]") {
-            try {
-                // Parse the chartConfig JSON
-                const parsedChartConfig = JSON.parse(packet.chartConfig);
-
-                // Validate parsedChartConfig is an array
-                if (Array.isArray(parsedChartConfig)) {
-                    // Extract formlist values from parsedChartConfig
-                    const chartConfigFormlist = parsedChartConfig.map((config: { formlist: any }) => config.formlist);
-
-                    // Add the extracted values to formlistValues
-                    this.formlistValues = [...this.formlistValues, ...chartConfigFormlist];
-                    console.log('this.formlistValues check extract',this.formlistValues)
-                } else {
-                    console.warn('Parsed chartConfig is not an array:', parsedChartConfig);
-                }
-            } catch (error) {
-                console.error('Error parsing chartConfig:', error);
+          try {
+            const parsedChartConfig = JSON.parse(packet.chartConfig);
+            if (Array.isArray(parsedChartConfig)) {
+              const chartConfigFormlist = parsedChartConfig.map(
+                (config: { formlist: any }) => config.formlist
+              );
+              this.formlistValues = [...this.formlistValues, ...chartConfigFormlist];
+              console.log('this.formlistValues after chartConfig extract', this.formlistValues);
+            } else {
+              console.warn('Parsed chartConfig is not an array:', parsedChartConfig);
             }
+          } catch (error) {
+            console.error('Error parsing chartConfig:', error);
+          }
         }
-    });
-
-    // Remove duplicates from formlistValues if needed
-// Remove undefined values and duplicates from formlistValues
-this.formlistValues = [...new Set(this.formlistValues.filter(value => value !== undefined))];
-this.fetchDynamicFormDataForAll(this.formlistValues);
-
-
-// Log the cleaned-up formlistValues
-console.log('Cleaned-up formlist values:', this.formlistValues);
-
-
-
-} else {
-    console.warn('gridDetailExtract is not an array or is undefined.');
-}
-
-// Check and extract formlist from chartConfig
-// Initialize formlistValues as an empty array if not already done
-
-
-
+  
+        // Parse and extract from mapConfig if it exists
+        if (packet.mapConfig && packet.mapConfig !== "[]") {
+          try {
+            const parsedMapConfig = JSON.parse(packet.mapConfig);
+            if (Array.isArray(parsedMapConfig)) {
+              const mapConfigFormlist = parsedMapConfig.map(
+                (config: { formlist: any }) => config.formlist
+              );
+              this.formlistValues = [...this.formlistValues, ...mapConfigFormlist];
+              console.log('this.formlistValues after mapConfig extract', this.formlistValues);
+            } else {
+              console.warn('Parsed mapConfig is not an array:', parsedMapConfig);
+            }
+          } catch (error) {
+            console.error('Error parsing mapConfig:', error);
+          }
+        }
+      });
+  
+      // Remove duplicates and undefined values from formlistValues
+      this.formlistValues = [...new Set(this.formlistValues.filter(value => value !== undefined))];
+  
+      // Fetch dynamic form data for all extracted formlistValues
+      this.fetchDynamicFormDataForAll(this.formlistValues);
+  
+      // Log the cleaned-up formlistValues
+      console.log('Cleaned-up formlist values:', this.formlistValues);
+    } else {
+      console.warn('gridDetailExtract is not an array or is undefined.');
+    }
   }
+  
+  
 
   fetchDynamicFormDataForAll(values: string[]) {
     values.forEach((value, index) => {
@@ -257,7 +268,7 @@ console.log('Cleaned-up formlist values:', this.formlistValues);
   }
   fetchDynamicFormData(value: string, index: number) {
     console.log("Fetching data for:", value);
-  
+ 
     const apiUrl = `${this.SK_clientID}#dynamic_form#${value}#main`;
     this.api.GetMaster(apiUrl, 1)
       .then((result: any) => {
@@ -662,14 +673,18 @@ console.log('this.conditionsFilter',this.conditionsFilter);
   
       // Map `all_fields` to `filterTileConfig`
       const fields = this.createChart.value.all_fields || [];
-      const conditionsFilter = fields.map((field: { conditions: any[] }) =>
-        field.conditions.map((condition: any) => ({
-          formField: condition.formField || '',
-          operator: condition.operator || '',
-          filterValue: condition.filterValue || '',
-          operatorBetween: condition.operatorBetween || '',
-        }))
-      );
+      const conditionsFilter = fields.map((field: { conditions: any[]; parameterName: string }) => {
+        if (!field.conditions || !Array.isArray(field.conditions)) {
+          console.error('Invalid conditions in field:', field);
+          return [];
+        }
+  
+        // Add `parameterName` to each condition
+        return field.conditions.map((condition: any) => ({
+          ...condition, // Retain existing condition properties
+          parameterName: field.parameterName || '', // Ensure parameterName is preserved
+        }));
+      });
   
       console.log('Mapped conditionsFilter for update:', conditionsFilter);
   
@@ -677,19 +692,18 @@ console.log('this.conditionsFilter',this.conditionsFilter);
         ...this.dashboard[this.editTileIndex], // Retain existing properties
         fontSize: `${this.createChart.value.fontSize}px`,
         fontColor: this.createChart.value.fontColor,
-
+  
         // Update specific properties
-        custom_Label:this.createChart.value.custom_Label ,
-        daysAgo:this.createChart.value.daysAgo,
+        custom_Label: this.createChart.value.custom_Label,
+        daysAgo: this.createChart.value.daysAgo,
         dateType: this.createChart.value.dateType || '',
-        filterTileConfig: conditionsFilter, // Updated filter configuration
+        filterTileConfig: conditionsFilter, // Updated filter configuration with parameterName
         addFieldsEnabled: this.createChart.value.add_fields || false, // Add fields toggle state
         noOfParams: this.dashboard[this.editTileIndex].noOfParams, // Retain existing parameter count
-        themeColor:this.createChart.value.themeColor,
-        // daysAgo:this.createChart.value.daysAgo,
-        startDate:this.createChart.value.startDate,
-        endDate:this.createChart.value.endDate,
-        singleDate:this.createChart.value.singleDate,
+        themeColor: this.createChart.value.themeColor,
+        startDate: this.createChart.value.startDate,
+        endDate: this.createChart.value.endDate,
+        singleDate: this.createChart.value.singleDate,
       };
   
       console.log('updatedTile checking', updatedTile);
@@ -711,7 +725,7 @@ console.log('this.conditionsFilter',this.conditionsFilter);
       };
   
       console.log(
-        '  this.all_Packet_store.grid_details[this.editTileIndex]',
+        'this.all_Packet_store.grid_details[this.editTileIndex]',
         this.all_Packet_store.grid_details[this.editTileIndex]
       );
   
@@ -736,6 +750,8 @@ console.log('this.conditionsFilter',this.conditionsFilter);
       console.error('Edit index is null. Unable to update the tile.');
     }
   }
+  
+  
   
   toggleAddFields(event: any, tile: any) {
     tile.addFieldsEnabled = event.target.checked;

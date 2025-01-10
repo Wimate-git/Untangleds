@@ -36,12 +36,13 @@ export class MapUiComponent implements OnInit{
   tileTiltle: any;
 
   // center: google.maps.LatLngLiteral = { lat: 37.7749, lng: -122.4194 }; // Default location
-  markers = [
-    { position: { lat: 37.7749, lng: -122.4194 }, title: 'San Francisco', label: 'A' },
-    { position: { lat: 37.7849, lng: -122.4094 }, title: 'Nearby Location 1', label: 'B' },
-    { position: { lat: 37.7649, lng: -122.4294 }, title: 'Nearby Location 2', label: 'C' }
-  ];
+  // markers = [
+  //   { position: { lat: 37.7749, lng: -122.4194 }, title: 'San Francisco', label: 'A' },
+  //   { position: { lat: 37.7849, lng: -122.4094 }, title: 'Nearby Location 1', label: 'B' },
+  //   { position: { lat: 37.7649, lng: -122.4294 }, title: 'Nearby Location 2', label: 'C' }
+  // ];
   parsedData: any;
+  markers: any[];
 
   ngOnInit(): void {
 
@@ -53,8 +54,44 @@ export class MapUiComponent implements OnInit{
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
     console.log("tile data check from dynamic Title",this.item)
-    this.parsedData = JSON.parse(this.item.MapConfig);
-    console.log('this.parsedData check',this.parsedData)
+// Parse the MapConfig and log parsed data
+this.parsedData = JSON.parse(this.item.MapConfig);
+console.log('Parsed data check:', this.parsedData);
+
+// Ensure parsedData is an array
+if (Array.isArray(this.parsedData)) {
+  // Extract markers dynamically
+  this.markers = this.parsedData.map((packet: any) => {
+    if (Array.isArray(packet.add_Markers) && packet.add_Markers.length > 0) {
+      // Map each marker in add_Markers array
+      return packet.add_Markers.map((marker: any) => ({
+        position: {
+          lat: parseFloat(marker.position.lat), // Ensure latitude is a number
+          lng: parseFloat(marker.position.lng), // Ensure longitude is a number
+        },
+        title: marker.title || '', // Default to empty string if title is not available
+        label: marker.label || '', // Default to empty string if label is not available
+        mapType: packet.map_type || '', // Include map_type from the parent object
+      }));
+    }
+    return []; // Return empty array if add_Markers is not valid
+  }).flat(); // Flatten nested arrays into a single array
+
+  // Filter markers to include only those with valid mapType
+  this.markers = this.markers
+  .filter(marker => marker.mapType) // Filter markers with valid mapType
+  .map(marker => ({
+    ...marker, // Retain existing marker properties
+    mapType: {
+      url: marker.mapType, // Use the mapType as the icon URL
+      scaledSize: { width: 30, height: 30 } // Set the desired width and height
+    }
+  }));
+
+console.log('Formatted markers with map types and sizes:', this.markers);
+
+}
+
 
 
  

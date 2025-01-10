@@ -465,7 +465,7 @@ console.log('Cleaned-up formlist values:', this.formlistValues);
             filterParameter: [''],
             filterDescription: [''],
             custom_Label: ['', Validators.required],
-            add_Markers:['']
+            add_Markers:[[]]
             
           
           })
@@ -494,7 +494,9 @@ console.log('Cleaned-up formlist values:', this.formlistValues);
     this.widgetIdCounter++;
     return Date.now() + this.widgetIdCounter; // Use timestamp and counter for uniqueness
   }
-  
+  ngAfterViewInit(){
+    this.checkData()
+  }
 
   addTile(key: any) {
     console.log('this.noOfParams check', this.noOfParams);

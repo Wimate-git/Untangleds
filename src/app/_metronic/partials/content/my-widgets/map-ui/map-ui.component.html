@@ -1,31 +1,33 @@
-<div  class="map-container" *ngIf="item.grid_type === 'Map'" >
+<div class="map-container" *ngIf="item.grid_type === 'Map'">
   <!-- Google Map Wrapper -->
-  <div >
-
+  <div>
     <div class="row text_3d"
          style="display: flex; flex-direction: column; align-items: center; text-align: center;">
       <div class="processed-value-container"
-           style="font-weight: bold; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 20px;margin-top: -10px;">
+           style="font-weight: bold; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 20px; margin-top: -10px;">
         {{ item.chart_title }}
       </div>
     </div>
 
+    <!-- Google Map -->
     <google-map
-    [height]="mapHeight+'px'" 
-    [width]="mapWidth+'px'"
-
-
+      [height]="mapHeight + 'px'" 
+      [width]="mapWidth + 'px'"
       [zoom]="5"
     >
+      <!-- Dynamic Map Markers -->
       <map-marker
         *ngFor="let marker of markers"
         [position]="marker.position"
         [title]="marker.title"
-        [label]="marker.label">
+        [label]="marker.label"
+        [icon]="marker.mapType" 
+        
+      >
       </map-marker>
     </google-map>
   </div>
-      <!-- [center]="center" -->
+
   <!-- Action Menu -->
   <div class="action-menu-container d-flex align-items-center"
        style="position: absolute; top: 10px; right: 10px; gap: 10px;">
@@ -38,16 +40,6 @@
             style="background: none; border: none; cursor: pointer;">
       <i class="bi bi-pencil" style="color: black;"></i>
     </button>
-
-    <!-- Helper Button -->
-    <!-- <button *ngIf="!isEditModeView && !hideButton && shouldShowButton"
-            (click)="helperDashboard(item, index, modalContent, item.selectType)"
-            class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px"
-            aria-haspopup="menu"
-            aria-expanded="false"
-            style="background: none; border: none; cursor: pointer;">
-      <i class="bi bi-graph-up" style="color: black;"></i>
-    </button> -->
 
     <!-- Dropdown Menu -->
     <div class="dropdown">
@@ -69,6 +61,8 @@
     </div>
   </div>
 </div>
+
+
 
 
 
