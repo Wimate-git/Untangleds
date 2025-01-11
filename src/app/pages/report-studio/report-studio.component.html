@@ -1,418 +1,433 @@
 <ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true"><p style="color: white" >Loading… please enjoy this virtual cup of coffee! ☕ </p></ngx-spinner>
 
-<div class="card card-custom">
-    <div class="card-header border-0 pt-6" style="align-items: center;padding: 0 1.6rem">
+
+<div class="card" 
+     [ngClass]="{
+       'card-custom': !isFilterScreen, 
+       'full-screen-page': isFilterScreen
+     }">
+
+
+      <div class="card-header border-0 pt-6" style="align-items: center;padding: 0 1.6rem">
         <h2 class="p-0 m-0">Report Studio</h2>
     </div>
 
     <hr>
-    
+      <div style="width: fit-content;">
+            <button *ngIf="isFilterScreen" 
+              type="button" 
+              class="btn btn-info mb-3 custom-toggle-btn" 
+              (click)="toggleFormVisibility()">
+          <i class="fa" [ngClass]="isFormVisible ? 'fa-chevron-up' : 'fa-chevron-down'"></i> 
+          {{ isFormVisible ? 'Hide Filters' : 'Show Filters' }}
+          </button>
+      </div>
+          
 
 
-    <form [formGroup]="reportsFeilds" class="ps-2">
-            <div class="form-group row ps-4 mb-7 mt-5" >
-                <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold" >Form Name</label>
-                    <div class="col-3">
-                        <div class="custom-multiselect">
+      <form [formGroup]="reportsFeilds" class="ps-2" *ngIf="isFormVisible">
+        <div class="form-group row ps-4 mb-7 mt-5" >
+            <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold" >Form Name</label>
+                <div class="col-3">
+                    <div class="custom-multiselect">
 
-                            <p-multiSelect
-                            [options]="formList" 
-                            placeholder="Select Form"
-                            [(ngModel)]="selectedForms"
-                            value ="value"
-                            formControlName="form_permission"
-                            (onChange)="multiSelectChange()"
-                            required>
-                            </p-multiSelect>
-                        </div>
+                        <p-multiSelect
+                        [options]="formList" 
+                        placeholder="Select Form"
+                        [(ngModel)]="selectedForms"
+                        value ="value"
+                        formControlName="form_permission"
+                        (onChange)="multiSelectChange()"
+                        required>
+                        </p-multiSelect>
                     </div>
-            </div>
+                </div>
+        </div>
 
 
-           <!-- Date Type Field -->
-        <div class="form-group row ps-4 mb-7">
-            <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Date Type</label>
+      <!-- Date Type Field -->
+    <div class="form-group row ps-4 mb-7">
+        <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Date Type</label>
+        <div class="col-3">
+            <select formControlName="dateType" class="form-select form-select-solid form-select-lg">
+                <option [value]="null" [selected]="true" disabled>Select Date Type</option>
+                <option value="is">is</option>
+                <option value=">=">&gt;=</option>
+                <option value="<=">&lt;=</option>
+                <option value="between">between</option>
+                <option value="between time">between time</option>
+                <option value="less than days ago">less than days ago</option>
+                <option value="more than days ago">more than days ago</option>
+                <option value="in the past">in the past</option>
+                <option value="days ago">days ago</option>
+                <option value="today">today</option>
+                <option value="yesterday">yesterday</option>
+                <option value="this week">this week</option>
+                <option value="last week">last week</option>
+                <option value="last 2 weeks">last 2 weeks</option>
+                <option value="this month">this month</option>
+                <option value="last month">last month</option>
+                <option value="this year">this year</option>
+                <option value="any">any</option>
+                <option value="latest 10">latest 10</option>
+            </select>
+        </div>
+    </div>
+
+
+    <div *ngIf="dateTypeConfig[dateType?.value]?.showDate" class="mb-7">
+        <div class="form-group row ps-4 mb-2">
+            <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Select Date</label>
             <div class="col-3">
-                <select formControlName="dateType" class="form-select form-select-solid form-select-lg">
-                    <option [value]="null" [selected]="true" disabled>Select Date Type</option>
-                    <option value="is">is</option>
-                    <option value=">=">&gt;=</option>
-                    <option value="<=">&lt;=</option>
-                    <option value="between">between</option>
-                    <option value="between time">between time</option>
-                    <option value="less than days ago">less than days ago</option>
-                    <option value="more than days ago">more than days ago</option>
-                    <option value="in the past">in the past</option>
-                    <option value="days ago">days ago</option>
-                    <option value="today">today</option>
-                    <option value="yesterday">yesterday</option>
-                    <option value="this week">this week</option>
-                    <option value="last week">last week</option>
-                    <option value="last 2 weeks">last 2 weeks</option>
-                    <option value="this month">this month</option>
-                    <option value="last month">last month</option>
-                    <option value="this year">this year</option>
-                    <option value="any">any</option>
-                    <option value="latest 10">latest 10</option>
-                </select>
+                <input type="date" formControlName="singleDate" class="form-control">
             </div>
         </div>
+    </div>
 
-     
-        <div *ngIf="dateTypeConfig[dateType?.value]?.showDate" class="mb-7">
-            <div class="form-group row ps-4 mb-2">
-                <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Select Date</label>
-                <div class="col-3">
-                    <input type="date" formControlName="singleDate" class="form-control">
-                </div>
-            </div>
-        </div>
-
-        <div *ngIf="dateTypeConfig[dateType?.value]?.showStartDate" class="mb-7">
-          <div class="form-group row ps-4 mb-2">
-              <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Start Date</label>
-              <div class="col-3">
-                  <!-- Dynamically change the type based on dateType -->
-                  <input [type]="dateTypeConfig[dateType?.value]?.isBetweenTime ? 'datetime-local' : 'date'" formControlName="startDate" class="form-control">
-              </div>
-          </div>
-          <br>
-          <div class="form-group row ps-4">
-              <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">End Date</label>
-              <div class="col-3">
-                  <!-- Dynamically change the type based on dateType -->
-                  <input [type]="dateTypeConfig[dateType?.value]?.isBetweenTime ? 'datetime-local' : 'date'" formControlName="endDate" class="form-control">
-              </div>
+    <div *ngIf="dateTypeConfig[dateType?.value]?.showStartDate" class="mb-7">
+      <div class="form-group row ps-4 mb-2">
+          <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Start Date</label>
+          <div class="col-3">
+              <!-- Dynamically change the type based on dateType -->
+              <input [type]="dateTypeConfig[dateType?.value]?.isBetweenTime ? 'datetime-local' : 'date'" formControlName="startDate" class="form-control">
           </div>
       </div>
+      <br>
+      <div class="form-group row ps-4">
+          <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">End Date</label>
+          <div class="col-3">
+              <!-- Dynamically change the type based on dateType -->
+              <input [type]="dateTypeConfig[dateType?.value]?.isBetweenTime ? 'datetime-local' : 'date'" formControlName="endDate" class="form-control">
+          </div>
+      </div>
+    </div>
 
-   
-        <div  *ngIf="dateTypeConfig[dateType?.value]?.showDaysAgo" class="mb-7">
-            <div class="form-group row ps-4 mb-2">
-                <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Number of Days</label>
-                <div class="col-3">
-                    <input type="number" formControlName="daysAgo" class="form-control" placeholder="Enter number of days">
-                </div>
+
+    <div  *ngIf="dateTypeConfig[dateType?.value]?.showDaysAgo" class="mb-7">
+        <div class="form-group row ps-4 mb-2">
+            <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Number of Days</label>
+            <div class="col-3">
+                <input type="number" formControlName="daysAgo" class="form-control" placeholder="Enter number of days">
             </div>
         </div>
+    </div>
 
 
-         <!-- Filter Data Section with Radio Buttons -->
-<div class="form-group row ps-4 mb-7">
-  <label class="required col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Filter Data</label>
-  <div class="col-3 d-flex gap-7 align-items-center">
+    <!-- Filter Data Section with Radio Buttons -->
+    <div class="form-group row ps-4 mb-7">
+    <label class="required col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Filter Data</label>
+    <div class="col-3 d-flex gap-7 align-items-center">
     <div class="form-check">
-      <input class="form-check-input" type="radio" id="filterAll" formControlName="filterOption" value="all" (change)="onFilterChange($event,'html','create')">
-      <label class="form-check-label" for="filterAll">All</label>
+    <input class="form-check-input" type="radio" id="filterAll" formControlName="filterOption" value="all" (change)="onFilterChange($event,'html','create')">
+    <label class="form-check-label" for="filterAll">All</label>
     </div>
     <div class="form-check">
-      <input class="form-check-input" type="radio" id="filterOnCondition" formControlName="filterOption" value="onCondition" (change)="onFilterChange($event,'html','create')">
-      <label class="form-check-label" for="filterOnCondition">On Condition</label>
+    <input class="form-check-input" type="radio" id="filterOnCondition" formControlName="filterOption" value="onCondition" (change)="onFilterChange($event,'html','create')">
+    <label class="form-check-label" for="filterOnCondition">On Condition</label>
     </div>
-  </div>
-</div>
+    </div>
+    </div>
 
 
 
- <!-- Dynamic Form Fields Based on Selected Forms -->
-<form [formGroup]="formFieldsGroup" class="card card-custom p-2 mt-5" style="background-color: #F5F7F8;" *ngIf="conditionflag">
-  <div formArrayName="forms" style="display: flex; flex-wrap: wrap;">
-      <div *ngFor="let form of forms().controls; let formIndex=index" >
-        <div [formGroupName]="formIndex" class="form-group" style="border: 1px solid blue; padding: 10px; width: 600px; margin: 5px;">
-         
-          <h5>{{ getFormNameByIndex(formIndex) }}</h5>
-          
-     
-          <div formArrayName="conditions">
-            <div *ngFor="let conditionGroup of conditions(formIndex).controls; let condIndex=index" [formGroupName]="condIndex">
-
-
-              <div style="display: flex;flex-wrap: wrap;justify-content: space-between;">
-                <div class="mb-3" style="width: 30%;">
-                  <label class="required">Select Field</label>
-                  <select formControlName="condition" class="form-control">
-                    <option *ngFor="let field of getAvailableFields(formIndex)" [value]="field.name" >{{ field.label }}</option>
-                  </select>                  
-                </div>
+    <!-- Dynamic Form Fields Based on Selected Forms -->
+    <form [formGroup]="formFieldsGroup" class="card card-custom p-2 mt-5" style="background-color: #F5F7F8;" *ngIf="conditionflag">
+    <div formArrayName="forms" style="display: flex; flex-wrap: wrap;">
+    <div *ngFor="let form of forms().controls; let formIndex=index" >
+    <div [formGroupName]="formIndex" class="form-group" style="border: 1px solid blue; padding: 10px; width: 600px; margin: 5px;">
+    
+      <h5>{{ getFormNameByIndex(formIndex) }}</h5>
       
-                <div class="mb-3" style="width: 30%;">
-                  <label class="required">Operator</label>
-                  <select formControlName="operator" placeholder="Select operator" class="form-control">
-                    <option value="" disabled selected>Select operator</option>
-                    <option value="==">Equals</option>
-                    <option value=">">Not equals</option>
-                    <option value="includes">Contains</option>
-                    <option value="startsWith">Starts with</option>
-                    <option value="endsWith">Ends with</option>
-                    <option value=">">Greater than</option>
-                    <option value="<">Less than</option>
-                    <option value="<=">Less than equals to</option>
-                    <option value=">=">Greater than equals to</option>
-                  </select>
-                </div>
-      
-                <!-- <div class="mb-3" style="width: 30%;">
-                  <label class="required">Value</label>
-                  <input type="text" formControlName="value" placeholder="value"  class="form-control" />
-                </div> -->
+
+      <div formArrayName="conditions">
+        <div *ngFor="let conditionGroup of conditions(formIndex).controls; let condIndex=index" [formGroupName]="condIndex">
 
 
+          <div style="display: flex;flex-wrap: wrap;justify-content: space-between;">
+            <div class="mb-3" style="width: 30%;">
+              <label class="required">Select Field</label>
+              <select formControlName="condition" class="form-control">
+                <option *ngFor="let field of getAvailableFields(formIndex)" [value]="field.name" >{{ field.label }}</option>
+              </select>                  
+            </div>
 
-          <!-- Conditionally Render Value Field: Input or Dropdown -->
-          <!-- <div class="mb-3" style="width: 30%;">
-            <label class="required">Value</label>
-            
-  
-            <ng-container *ngIf="isDropdown(formIndex,condIndex)">
-              <select formControlName="value" class="form-control">
-                <option *ngFor="let option of getAvailableFieldOptions(formIndex,condIndex) | async" [value]="option">{{ option }}</option>
+            <div class="mb-3" style="width: 30%;">
+              <label class="required">Operator</label>
+              <select formControlName="operator" placeholder="Select operator" class="form-control">
+                <option value="" disabled selected>Select operator</option>
+                <option value="==">Equals</option>
+                <option value=">">Not equals</option>
+                <option value="includes">Contains</option>
+                <option value="startsWith">Starts with</option>
+                <option value="endsWith">Ends with</option>
+                <option value=">">Greater than</option>
+                <option value="<">Less than</option>
+                <option value="<=">Less than equals to</option>
+                <option value=">=">Greater than equals to</option>
               </select>
-            </ng-container>
-            
+            </div>
 
-            <ng-container *ngIf="!isDropdown(formIndex,condIndex)">
-              <input type="text" formControlName="value" placeholder="Enter value" class="form-control" />
-            </ng-container>
-          </div> -->
-
+            <!-- <div class="mb-3" style="width: 30%;">
+              <label class="required">Value</label>
+              <input type="text" formControlName="value" placeholder="value"  class="form-control" />
+            </div> -->
 
 
-          <div class="mb-3" style="width: 30%;">
-            <label class="required">Value</label>
-            
-            <ng-container *ngIf="isDropdown(formIndex,condIndex)">
-              <select 
-                formControlName="value" 
-                class="form-control"
-                (change)="onFieldChange(formIndex, condIndex)"
+
+      <!-- Conditionally Render Value Field: Input or Dropdown -->
+      <!-- <div class="mb-3" style="width: 30%;">
+        <label class="required">Value</label>
+        
+
+        <ng-container *ngIf="isDropdown(formIndex,condIndex)">
+          <select formControlName="value" class="form-control">
+            <option *ngFor="let option of getAvailableFieldOptions(formIndex,condIndex) | async" [value]="option">{{ option }}</option>
+          </select>
+        </ng-container>
+        
+
+        <ng-container *ngIf="!isDropdown(formIndex,condIndex)">
+          <input type="text" formControlName="value" placeholder="Enter value" class="form-control" />
+        </ng-container>
+      </div> -->
+
+
+
+      <div class="mb-3" style="width: 30%;">
+        <label class="required">Value</label>
+        
+        <ng-container *ngIf="isDropdown(formIndex,condIndex)">
+          <select 
+            formControlName="value" 
+            class="form-control"
+            (change)="onFieldChange(formIndex, condIndex)"
+          >
+            <option value="" disabled>Select an option</option>
+            <ng-container *ngIf="getAvailableFieldOptions(formIndex,condIndex) | async as options; else loading">
+              <option 
+                *ngFor="let option of options; trackBy: trackByOption" 
+                [value]="option"
               >
-                <option value="" disabled>Select an option</option>
-                <ng-container *ngIf="getAvailableFieldOptions(formIndex,condIndex) | async as options; else loading">
-                  <option 
-                    *ngFor="let option of options; trackBy: trackByOption" 
-                    [value]="option"
-                  >
-                    {{ option }}
-                  </option>
-                </ng-container>
-                <ng-template #loading>
-                  <option disabled>Loading...</option>
-                </ng-template>
-              </select>
+                {{ option }}
+              </option>
             </ng-container>
+            <ng-template #loading>
+              <option disabled>Loading...</option>
+            </ng-template>
+          </select>
+        </ng-container>
 
 
 
-            
-            <ng-container *ngIf="!isDropdown(formIndex,condIndex)">
-              <input 
-                type="text" 
-                formControlName="value" 
-                placeholder="Enter value" 
-                class="form-control" 
-              />
-            </ng-container>
-          </div>
-            
-
-
-
-              </div>
-
-
-            
-    
-         
-              <div *ngIf="condIndex < conditions(formIndex).length - 1" class="mb-3" style="width: 30%;">
-                <label class="required">Between Operator</label>
-                <select formControlName="operatorBetween" placeholder="Select operator" class="form-control">
-                  <option value="" disabled selected>Select operator</option>
-                  <option value="&&">AND</option>
-                  <option value="||">OR</option>
-                </select>
-              </div>
-    
-              <button *ngIf="condIndex != 0" type="button" class="btn btn-danger btn-sm mb-2" (click)="removeCondition(formIndex, condIndex)">Remove Condition</button>
-            </div>
-          </div>
-          <button type="button" class="btn btn-primary btn-sm" (click)="addCondition(formIndex)">Add Condition</button>
-          
-        </div>
+        
+        <ng-container *ngIf="!isDropdown(formIndex,condIndex)">
+          <input 
+            type="text" 
+            formControlName="value" 
+            placeholder="Enter value" 
+            class="form-control" 
+          />
+        </ng-container>
       </div>
-    </div>
- 
-</form>
+        
 
 
 
-<div class="form-group row ps-4 mb-7" *ngIf="selectedForms && selectedForms.length > 0">
-  <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Column Visibility</label>
-  <div class="col-3 d-flex gap-7 align-items-center">
-    <div class="form-check">
-      <input class="form-check-input" type="radio" id="columnVisible" formControlName="columnOption" value="all" (change)="onColumnChange($event,'html')">
-      <label class="form-check-label" for="columnVisible">All</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="radio" id="columnVisible" formControlName="columnOption" value="onCondition" (change)="onColumnChange($event,'html')">
-      <label class="form-check-label" for="columnVisible">Selected</label>
-    </div>
-  </div>
-</div>
+          </div>
 
 
-
-<div class="card card-custom p-2 mt-5" *ngIf="visibiltyflag">
-  <div class="row">
-    <div class="col-3" *ngFor="let item of populateFormData; let i = index">
-      <label class="required">{{ dropdownKeys[i] }}</label>
-      <div class="custom-multiselect">
-        <p-multiSelect
-          [options]="item[dropdownKeys[i]]"
-          [formControl]="getFormControl(i)"
-          placeholder="Select Columns"
-        >
-        </p-multiSelect>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-<div class="form-group row ps-4 mb-7" *ngIf="selectedForms && selectedForms.length > 0">
-  <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Add Custom Columns</label>
-  <div class="col-3 d-flex gap-7 align-items-center">
-    <div class="form-check">
-      <input class="form-check-input" type="radio" id="columnVisible" formControlName="addColumn" value="false" (change)="addColumns($event,'html')">
-      <label class="form-check-label" for="columnVisible">No</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="radio" id="columnVisible" formControlName="addColumn" value="true" (change)="addColumns($event,'html')">
-      <label class="form-check-label" for="columnVisible">Yes</label>
-    </div>
-  </div>
-</div>
-
-
-
-<form [formGroup]="customColumnsGroup" class="card card-custom p-2 mt-5" style="background-color: #F5F7F8;" *ngIf="customColumnsflag">
-  <div formArrayName="customForms" style="display: flex; flex-wrap: wrap;">
-      <div *ngFor="let form of customForms().controls; let formIndex=index">
-        <div [formGroupName]="formIndex" class="form-group" style="border: 1px solid blue; padding: 10px; width: 600px; margin: 5px;">
-         
-          <h5>{{ getCustomFormNameByIndex(formIndex) }}</h5>
-
-          <div formArrayName="conditions">
-            <div *ngFor="let conditionGroup of customConditions(formIndex).controls; let condIndex=index" [formGroupName]="condIndex">
-              <div style="display: flex;flex-wrap: wrap;justify-content: space-between;align-items:center;">
-                <div class="mb-3" style="width: 30%;">
-                  <label class="required">Column Name</label>
-                  <input type="text" formControlName="columnName" placeholder="Enter Column Name" class="form-control" />
-                </div>
-
-
-
-                      <div class="mb-3" style="width: 30%;">
-                        <label class="required">Field Selected</label>
-                        <select formControlName="fieldSelector" class="form-control">
-                          <option *ngFor="let field of getAvailablecustomFields(formIndex)" [value]="field.label+'.'+field.name" >{{ field.label }}</option>
-                        </select>                  
-                      </div>
-
-
-
-                      <div class="mb-3" style="width: 30%;">
-                        <label class="required">Predefined Scripts</label>
-                        <select formControlName="predefined" class="form-control"  [ngbTooltip]="'Select a predefined script to populate the equation field'" (change)="onPredefinedChange(formIndex, condIndex)">
-                          <option value="time_difference">Time Difference</option>
-                          <option value="days_difference">Days Difference</option>
-                          <option value="none">None</option>
-                        </select>                  
-                      </div>
-
-
-                        <!-- Button to Add Field to Equation -->
-                        <div style="margin-top: 10px;">
-                          <button type="button" class="btn btn-secondary btn-sm" (click)="insertFieldIntoEquation(formIndex, condIndex)">
-                            Insert Field into Equation
-                          </button>
-                        </div>
-
-                    <div class="mb-3" style="width: 100%;height: 40%;">
-                      <label class="required">Equation</label>
-                    <textarea  formControlName="equationText" class="form-control"></textarea>                
-                    </div>
-                </div>
-
-
-                <hr>
+        
 
     
-              <button *ngIf="condIndex != 0" type="button" class="btn btn-danger btn-sm mb-2" (click)="removeCustomCondition(formIndex, condIndex)">Remove Column</button>
-            </div>
+          <div *ngIf="condIndex < conditions(formIndex).length - 1" class="mb-3" style="width: 30%;">
+            <label class="required">Between Operator</label>
+            <select formControlName="operatorBetween" placeholder="Select operator" class="form-control">
+              <option value="" disabled selected>Select operator</option>
+              <option value="&&">AND</option>
+              <option value="||">OR</option>
+            </select>
           </div>
-          <button type="button" class="btn btn-primary btn-sm" (click)="addCustomCondition(formIndex)">Add Column</button>
-          
+
+          <button *ngIf="condIndex != 0" type="button" class="btn btn-danger btn-sm mb-2" (click)="removeCondition(formIndex, condIndex)">Remove Condition</button>
         </div>
       </div>
+      <button type="button" class="btn btn-primary btn-sm" (click)="addCondition(formIndex)">Add Condition</button>
+      
     </div>
- 
-</form>
+    </div>
+    </div>
 
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-        <div class="mb-7">
-            <div class="form-group row ps-4 mb-2">
-                <div class="col-3">
-
-                </div>
-                <div class="col-4">
-                    <button type="submit" [disabled]="reportsFeilds.invalid" class="btn fw-bold custom-success translatey me-5" (click)="onSubmit()">Apply</button>
-                    <button type="submit" class="btn fw-bold custom-primary" (click)="clearFeilds()">Clear</button>
-                    <button type="submit" *ngIf="onSubmitFlag" class="btn fw-bold btn-primary translatey ms-5" (click)="saveQuery(openModal1)">Save</button>
-                    <button type="submit" *ngIf="saveButton" class="btn fw-bold btn-primary translatey ms-5" (click)="editQuery(openModal1)">Edit</button>
-
-
-                     <!-- Main Button to trigger the dropdown -->
-                     <button mat-raised-button color="primary" [matMenuTriggerFor]="menu" class="export-button" *ngIf="showTable">
-                      Export
-                    </button>
-                  
-                    <!-- Menu containing the export options -->
-                    <mat-menu #menu="matMenu">
-                      <button mat-menu-item (click)="exportAllTablesAsCSV()">
-                        Export as CSV
-                      </button>
-                      <button mat-menu-item (click)="exportAllTablesAsExcel()">
-                        Export as Excel
-                      </button>
-                      <button mat-menu-item (click)="exportAllTablesAsPDF()">
-                        Export as PDF
-                      </button>
-                    </mat-menu>
-                </div>
-            </div>
-        </div>
     </form>
 
 
-</div>
+
+    <div class="form-group row ps-4 mb-7" *ngIf="selectedForms && selectedForms.length > 0">
+    <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Column Visibility</label>
+    <div class="col-3 d-flex gap-7 align-items-center">
+    <div class="form-check">
+    <input class="form-check-input" type="radio" id="columnVisible" formControlName="columnOption" value="all" (change)="onColumnChange($event,'html')">
+    <label class="form-check-label" for="columnVisible">All</label>
+    </div>
+    <div class="form-check">
+    <input class="form-check-input" type="radio" id="columnVisible" formControlName="columnOption" value="onCondition" (change)="onColumnChange($event,'html')">
+    <label class="form-check-label" for="columnVisible">Selected</label>
+    </div>
+    </div>
+    </div>
 
 
 
-<div *ngIf="showTable">
+    <div class="card card-custom p-2 mt-5" *ngIf="visibiltyflag">
+    <div class="row">
+    <div class="col-3" *ngFor="let item of populateFormData; let i = index">
+    <label class="required">{{ dropdownKeys[i] }}</label>
+    <div class="custom-multiselect">
+    <p-multiSelect
+      [options]="item[dropdownKeys[i]]"
+      [formControl]="getFormControl(i)"
+      placeholder="Select Columns"
+    >
+    </p-multiSelect>
+    </div>
+    </div>
+    </div>
+    </div>
+
+
+
+    <div class="form-group row ps-4 mb-7" *ngIf="selectedForms && selectedForms.length > 0">
+    <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Add Custom Columns</label>
+    <div class="col-3 d-flex gap-7 align-items-center">
+    <div class="form-check">
+    <input class="form-check-input" type="radio" id="columnVisible" formControlName="addColumn" value="false" (change)="addColumns($event,'html')">
+    <label class="form-check-label" for="columnVisible">No</label>
+    </div>
+    <div class="form-check">
+    <input class="form-check-input" type="radio" id="columnVisible" formControlName="addColumn" value="true" (change)="addColumns($event,'html')">
+    <label class="form-check-label" for="columnVisible">Yes</label>
+    </div>
+    </div>
+    </div>
+
+
+
+    <form [formGroup]="customColumnsGroup" class="card card-custom p-2 mt-5" style="background-color: #F5F7F8;" *ngIf="customColumnsflag">
+    <div formArrayName="customForms" style="display: flex; flex-wrap: wrap;">
+    <div *ngFor="let form of customForms().controls; let formIndex=index">
+    <div [formGroupName]="formIndex" class="form-group" style="border: 1px solid blue; padding: 10px; width: 600px; margin: 5px;">
+    
+      <h5>{{ getCustomFormNameByIndex(formIndex) }}</h5>
+
+      <div formArrayName="conditions">
+        <div *ngFor="let conditionGroup of customConditions(formIndex).controls; let condIndex=index" [formGroupName]="condIndex">
+          <div style="display: flex;flex-wrap: wrap;justify-content: space-between;align-items:center;">
+            <div class="mb-3" style="width: 30%;">
+              <label class="required">Column Name</label>
+              <input type="text" formControlName="columnName" placeholder="Enter Column Name" class="form-control" />
+            </div>
+
+
+
+                  <div class="mb-3" style="width: 30%;">
+                    <label class="required">Field Selected</label>
+                    <select formControlName="fieldSelector" class="form-control">
+                      <option *ngFor="let field of getAvailablecustomFields(formIndex)" [value]="field.label+'.'+field.name" >{{ field.label }}</option>
+                    </select>                  
+                  </div>
+
+
+
+                  <div class="mb-3" style="width: 30%;">
+                    <label class="required">Predefined Scripts</label>
+                    <select formControlName="predefined" class="form-control"  [ngbTooltip]="'Select a predefined script to populate the equation field'" (change)="onPredefinedChange(formIndex, condIndex)">
+                      <option value="time_difference">Time Difference</option>
+                      <option value="days_difference">Days Difference</option>
+                      <option value="none">None</option>
+                    </select>                  
+                  </div>
+
+
+                    <!-- Button to Add Field to Equation -->
+                    <div style="margin-top: 10px;">
+                      <button type="button" class="btn btn-secondary btn-sm" (click)="insertFieldIntoEquation(formIndex, condIndex)">
+                        Insert Field into Equation
+                      </button>
+                    </div>
+
+                <div class="mb-3" style="width: 100%;height: 40%;">
+                  <label class="required">Equation</label>
+                <textarea  formControlName="equationText" class="form-control"></textarea>                
+                </div>
+            </div>
+
+
+            <hr>
+
+
+          <button *ngIf="condIndex != 0" type="button" class="btn btn-danger btn-sm mb-2" (click)="removeCustomCondition(formIndex, condIndex)">Remove Column</button>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" (click)="addCustomCondition(formIndex)">Add Column</button>
+      
+    </div>
+    </div>
+    </div>
+
+    </form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class="mb-7">
+        <div class="form-group row ps-4 mb-2">
+            <div class="col-3">
+
+            </div>
+            <div class="col-5">
+                <button type="submit" [disabled]="reportsFeilds.invalid" class="btn fw-bold custom-success translatey me-5" (click)="onSubmit()">Apply</button>
+                <button type="submit" class="btn fw-bold custom-primary" (click)="clearFeilds()">Clear</button>
+                <button type="submit" *ngIf="onSubmitFlag" class="btn fw-bold btn-primary translatey ms-5" (click)="saveQuery(openModal1)">Save</button>
+                <button type="submit" *ngIf="saveButton" class="btn fw-bold btn-primary translatey ms-5" (click)="editQuery(openModal1)">Edit</button>
+                <button type="submit" *ngIf="trackLocationMapFlag" class="btn fw-bold btn-dark translatey ms-5" (click)="openTrackLocationModal(trackLocationArray)">Map</button>
+
+
+                <!-- Main Button to trigger the dropdown -->
+                <button mat-raised-button color="primary" [matMenuTriggerFor]="menu" class="export-button" *ngIf="showTable">
+                  Export
+                </button>
+              
+                <!-- Menu containing the export options -->
+                <mat-menu #menu="matMenu">
+                  <button mat-menu-item (click)="exportAllTablesAsCSV()">
+                    Export as CSV
+                  </button>
+                  <button mat-menu-item (click)="exportAllTablesAsExcel()">
+                    Export as Excel
+                  </button>
+                  <button mat-menu-item (click)="exportAllTablesAsPDF()">
+                    Export as PDF
+                  </button>
+                </mat-menu>
+            </div>
+        </div>
+    </div>
+    </form>
+
+
+
+
+<div *ngIf="showTable"  [ngClass]="{'full-screen-page': isFullScreen && !isFilterScreen}">
   <div *ngFor="let table of tableDataWithFormFilters">
     <div class="card card-custom p-2 mt-5">
         <h3 class="text-center text-primary">{{ table.formFilter }}</h3> 
@@ -434,7 +449,14 @@
       </ag-grid-angular>
     </div>
   </div>
+</div> 
 </div>
+
+
+
+
+
+
 
 
 
@@ -479,7 +501,7 @@
 
 <!-- hamburger menu is here -->
 <div style="top: 1%;
-  z-index: 100;
+  z-index: 1054;
   right:44px;
   flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20 gap-2">
 
@@ -497,6 +519,13 @@
   <a *ngIf="!showHeading" class="myMenu-item"  title="Search dashboard" (click)="openModal(SavedQuery)">
     <i style="color: white;" class="fa fa-search"></i>
   </a>
+
+
+
+    <!-- New Full View Icon -->
+    <a *ngIf="showTable" class="myMenu-item"   (click)="toggleFullScreenFullView()" style="cursor: pointer;" [attr.title]="isFullScreen ? 'Exit Full View' : 'Full View'">
+      <i style="color: white;" class="fa" [ngClass]="isFullScreen ? 'fa-compress' : 'fa-expand'"></i>
+    </a>
 
 
   <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="width:50px;height:50px">
@@ -570,6 +599,32 @@
 
 
 
+
+
+
+<!-- 
+<div *ngIf="showTable" [ngClass]="{'fullscreen-container': (fullscreenService.isFullscreen$ | async)}">
+  <div *ngFor="let table of tableDataWithFormFilters">
+    <div class="card card-custom p-2" [ngClass]="{'mt-5': !(fullscreenService.isFullscreen$ | async)}">
+      <h3 class="text-center text-primary">{{ table.formFilter }}</h3>
+      
+      <ag-grid-angular
+        [ngStyle]="(fullscreenService.isFullscreen$ | async) ? {'height': '100vh'} : {'height': '100%'}"
+        class="ag-theme-alpine"
+        [rowData]="table.rows"    
+        [columnDefs]="createColumnDefs(table.rows,table.formFilter)" 
+        [domLayout]="(fullscreenService.isFullscreen$ | async) ? 'normal' : 'autoHeight'"
+        [pagination]="true"
+        [paginationPageSize]="10"
+        [paginationPageSizeSelector]="pageSizeOptions"
+        [suppressHorizontalScroll]="false" 
+        (gridReady)="onGridReady($event,table.formFilter)" 
+        [gridOptions]="gridOptions"
+      > 
+      </ag-grid-angular>
+    </div>
+  </div>
+</div> -->
 
 
 

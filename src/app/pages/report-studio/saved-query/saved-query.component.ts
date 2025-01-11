@@ -46,6 +46,7 @@ export class SavedQueryComponent implements OnInit {
   username: any;
   errorForUniqueID: string = '';
   currentSelectedQuery: any = '';
+  allUsers: any;
 
   constructor(private moduleDisplayService: ModuleDisplayService,private fb:FormBuilder,private cd:ChangeDetectorRef,private notifyConfig:SharedService,
     private api:APIService
@@ -102,7 +103,7 @@ export class SavedQueryComponent implements OnInit {
     this.createSavedQuery = this.fb.group({
       queryName:{ value: values.queryName, disabled: this.editOperation },
       queryDesc:[values.queryDesc,Validators.required],
-      userIDs:[values.userIDs,Validators.required]
+      userIDs:[values.userIDs]
     })
   }
 
@@ -126,19 +127,19 @@ export class SavedQueryComponent implements OnInit {
     this.createSavedQuery = this.fb.group({
       queryName:['',Validators.required],
       queryDesc:['',Validators.required],
-      userIDs:['',Validators.required]
+      userIDs:['']
     })
   }
 
  
-  onSubmitModule(event:any): void {
+  async onSubmitModule(event:any) {
 
     if(event.type == 'submit' && this.editOperation == false){
       console.log("Module form submitted");
-      this.createNewSavedQuery()
+      await this.createNewSavedQuery()
     }
     else{
-      this.updateSavedQuery()
+      await this.updateSavedQuery()
       console.log("Module form is being updated");
     }
     console.log("Module form submitted");
@@ -147,7 +148,7 @@ export class SavedQueryComponent implements OnInit {
 
 
 
-  updateSavedQuery(){
+  async updateSavedQuery(){
     const successAlert: SweetAlertOptions = {
       icon: 'success',
       title: 'Success!',
@@ -184,14 +185,22 @@ export class SavedQueryComponent implements OnInit {
     }
 
 
-    this.api.UpdateMaster(tempObj).then(async (value: any)=>{  
+    await this.api.UpdateMaster(tempObj).then(async (value: any)=>{  
       if (value) {
 
-        var item={
+        const username = this.username;
+        this.allUsers = JSON.parse(JSON.stringify(this.createSavedQuery.value.userIDs.map((item:any)=>item.PK)))
+
+        console.log("All users are here ",this.allUsers);
+
+        const item={
           P1:savedQueryTemp.queryName,
-          P2:{username:this.username},
+          P2:JSON.stringify({username:username,userList:this.allUsers}),
           P3:Math.ceil(((new Date()).getTime())/1000)
       }
+
+      console.log("Item is here ",item);
+
         await this.fetchTimeMachineById(1,this.SK_clientID+"#savedquery"+"#lookup", 'update', item);
         this.showAlert(successAlert)
       }
@@ -251,10 +260,12 @@ export class SavedQueryComponent implements OnInit {
      
       this.api.CreateMaster(tempObj).then(async (value: any)=>{  
         if (value) {
+
+          const userList = this.createSavedQuery.value.userIDs.map((item:any)=>item.PK)
   
           var item={
             P1:savedQueryTemp.queryName,
-            P2:{username:this.username},
+            P2:JSON.stringify({username:this.username,userList:userList}),
             P3:Math.ceil(((new Date()).getTime())/1000)
         }
           await this.createLookUpRdt(item,1,this.SK_clientID+"#savedquery"+"#lookup")

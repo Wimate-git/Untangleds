@@ -326,3 +326,38 @@
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
 }
+
+
+
+.custom-toggle-btn {
+  background: linear-gradient(45deg, #6e7cfc, #4f5fcb);  /* Gradient background */
+  color: #fff;  /* Text color */
+  font-size: 16px;  /* Larger font size */
+  font-weight: 600;  /* Make the text bold */
+  border-radius: 30px;  /* Rounded corners */
+  padding: 12px 24px;  /* Adequate padding */
+  display: inline-flex; /* Flex layout for center alignment */
+  align-items: center; /* Vertically align the icon and text */
+  gap: 8px; /* Space between icon and text */
+  transition: all 0.3s ease-in-out;  /* Smooth transition */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.custom-toggle-btn:hover {
+  background: linear-gradient(45deg, #4f5fcb, #6e7cfc);  /* Reverse the gradient on hover */
+  transform: translateY(-2px);  /* Slightly move the button up on hover */
+}
+
+.custom-toggle-btn:active {
+  transform: translateY(0);  /* Reset the position on click */
+}
+
+.custom-toggle-btn i {
+  font-size: 18px;  /* Icon size */
+}
+
+
+

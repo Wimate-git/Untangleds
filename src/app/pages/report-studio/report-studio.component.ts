@@ -23,6 +23,7 @@ import { MapModalComponent } from './map-modal/map-modal.component';
 import XLSX from 'xlsx-js-style';  
 import { MiniTableComponent } from './mini-table/mini-table.component';
 import { DynamicModalComponent } from './dynamic-modal/dynamic-modal.component';
+import { FullscreenService } from './services/fullscreen.service';
 
 interface ListItem {
   [key: string]: {
@@ -115,6 +116,8 @@ columns: any;
   selectedItem: any = [];
   tempResHolder: any;
 
+  isFilterScreen:boolean = false
+
     // Ensure the listener is not added multiple times
     private isImageClickListenerAdded = false;
     private isLocationClickListenerAdded = false;
@@ -127,10 +130,16 @@ columns: any;
   tableState: any = [];
   editOperation: boolean = false;
   customColumnsflag: boolean = false;
+  urlQuery: any;
+  viewMode: any = 'default';
+  isFullScreen: boolean = false;
+  isFormVisible: boolean = true;
+  trackLocationMapFlag: boolean = false;
+  trackLocationArray: any = [];
 
    constructor(private fb:FormBuilder,private api:APIService,private configService:SharedService,private scheduleAPI:scheduleApiService,
     private toast:MatSnackBar,private spinner:NgxSpinnerService,private cd:ChangeDetectorRef,private modalService: NgbModal,private moduleDisplayService: ModuleDisplayService,
-    private route: ActivatedRoute,private router:Router
+    private route: ActivatedRoute,private router:Router,  public fullscreenService: FullscreenService
    ){
 
     this.gridOptions = <GridOptions>{
@@ -227,17 +236,32 @@ columns: any;
 
 
     this.checkPermissions()
+
+
     
     this.routeSub = this.route.queryParams.subscribe((params) => {
       this.savedQuery = params['savedQuery'];
+      this.urlQuery = params['metadata'];
+      this.viewMode = params['mode']
       // console.log("Received saved query:", this.savedQuery);
 
       if(this.savedQuery){
         this.spinner.show()
         this.selectedValues = []
-        this.editSavedQuery( this.savedQuery)
+        this.editSavedQuery( this.savedQuery,'saved')
+      }
+
+
+      if(this.urlQuery){
+        console.log("Url query is here ",this.viewMode);
+          this.spinner.show()
+          this.selectedValues = []
+          this.editUrlSavedQuery(JSON.parse(this.urlQuery),'url')
       }
     });
+
+
+    // this.getTestingParams()
 
 
 
@@ -974,6 +998,8 @@ async onFilterChange(event: any,getValue:any,key:any) {
 
    async onSubmit() {
 
+    this.trackLocationMapFlag = false
+
     let body: any;
     this.showTable = true
     this.tableData = []; 
@@ -1116,6 +1142,8 @@ async onFilterChange(event: any,getValue:any,key:any) {
   
     let index = 0;
 
+    this.trackLocationArray = []
+
     for (let formFilter in groupedData) {
 
 
@@ -1145,10 +1173,10 @@ async onFilterChange(event: any,getValue:any,key:any) {
         }
     
         return metadata;
-    });
+      });
 
 
-    console.log("After getting options ",tempMetaArray);
+      console.log("After getting options ",tempMetaArray);
 
 
 
@@ -1205,24 +1233,45 @@ async onFilterChange(event: any,getValue:any,key:any) {
       if (rows && Array.isArray(rows) && rows.length > 0 && this.visibiltyflag && formMap) {
         rows = rows.map(item => {
           let filteredItem: any = {}; // Initialize the filtered item
+          
           // Loop through the fields in formMap[`${formFilter}`]
           formMap[`${formFilter}`] && formMap[`${formFilter}`].forEach((key: string) => {
+            // If the key is "trackLocation" and the item has an "id", preserve it
+            if (key === "trackLocation") {
+              if (item.hasOwnProperty("id")) {
+                filteredItem["id"] = item["id"]; // Preserve "id"
+              }
+            }
+            if (key === "dynamic_table_values") {
+              if (item.hasOwnProperty("id")) {
+                filteredItem["id"] = item["id"]; // Preserve "id"
+              }
+            }
+            
             // Check if the row item has the field key and add it to filteredItem
             if (item.hasOwnProperty(key)) {
               filteredItem[key] = item[key];
             }
           });
+          
           return filteredItem;
         });
       }
+      
 
 
     
   
       responses[0].metadata = rows
 
+
      
       for(let i=0;i<rows.length;i++){
+
+        const tempHolder = Array.isArray(rows[i].trackLocation) 
+        ? rows[i].trackLocation.flat()  // Flatten the array
+        : [];
+        this.trackLocationArray.push(...tempHolder)
         rows[i].formFilter = formFilter
       }
 
@@ -1241,6 +1290,12 @@ async onFilterChange(event: any,getValue:any,key:any) {
 
     this.tableDataWithFormFilters = tableDataWithFormFilters;
     // console.log("Table rows are here ",this.tableDataWithFormFilters);
+
+
+    console.log("All the trackLocation array are here ",this.trackLocationArray);
+    if(this.trackLocationArray && Array.isArray(this.trackLocationArray) && this.trackLocationArray.length > 0){
+      this.trackLocationMapFlag = true
+    }
 
  
     this.spinner.hide()
@@ -1373,6 +1428,7 @@ isBase64(value: string): boolean {
           } else if (isLocation) {
             cellRenderer = this.locationCellRenderer;
           } else if (isTrackLocation) {
+         
             cellRenderer = this.trackLocationCellRenderer;
           }else if (isMiniTable) {
             cellRenderer = (params: any) => this.miniTableCellRenderer(params, formName);
@@ -1773,8 +1829,10 @@ locationCellRenderer(params: any) {
 
   clearFeilds() {
 
+    this.trackLocationMapFlag = false
     this.editOperation = false;
     this.tableState = {};
+    this.showTable = false
 
     this.forms().clear()
     this.customForms().clear()
@@ -1845,6 +1903,7 @@ locationCellRenderer(params: any) {
 
 
 async evaluateTemplate(template: string, metadata: any, getkey: any) {
+
   // Use regex to match variable-value pairs
   const matches = template.match(/\${(.*?)}/g);
 
@@ -1883,8 +1942,8 @@ async evaluateTemplate(template: string, metadata: any, getkey: any) {
 
       // Show an error message to the user
       Swal.fire({
-          title: "Incomplete Fields",
-          text: "Please fill in all the required conditional fields before proceeding.",
+          title: "Error while evaluating",
+          text: "Please check you conditions or script.",
           icon: "error",
           confirmButtonText: "Okay"
       });
@@ -2176,13 +2235,14 @@ mergeAndAddLocation(mappedResponse: any) {
 
 
   
-    async editSavedQuery(P1: any) {
+    async editSavedQuery(P1: any,key:any) {
 
       // console.log("Edit si being called");
 
       this.populateFormData= []     
       
       try{
+        
        this.api.GetMaster(`${this.SK_clientID}#savedquery#${P1}#main`,1).then(async (result)=>{
         if(result && result.metadata){
 
@@ -2430,7 +2490,7 @@ mergeAndAddLocation(mappedResponse: any) {
               reject(new Error('response.options is not a string.'));
             }
           } else {
-            // console.log("All the users are here", this.lookup_data_savedQuery);
+            console.log("All the users are here", JSON.parse(JSON.stringify(this.lookup_data_savedQuery)));
 
             this.original_lookup_data = this.lookup_data_savedQuery
 
@@ -2439,14 +2499,29 @@ mergeAndAddLocation(mappedResponse: any) {
             // console.log("All the unique IDs are here ",this.listofSavedIds);
 
             this.lookup_data_savedQuery = this.lookup_data_savedQuery.map((item: any) => {
-              if (item.P2 && item.P2.username === this.username) {
+              let tempHolder:any = {}
+              if(item.P2 && typeof item.P2 == 'string'){
+                tempHolder = JSON.parse(item.P2)
+              }
+              else{
+                tempHolder = item.P2
+              }
+              if (tempHolder && tempHolder.username === this.username) {
+                item.P2 = {}
                 item.P2.username = 'Me';
+                item.P2.userList = tempHolder && tempHolder.userList ? tempHolder.userList:[]
+              }
+              else{
+                item.P2 = {}
+                item.P2.username = tempHolder.username;
+                item.P2.userList = tempHolder && tempHolder.userList ? tempHolder.userList:[]
               }
               return item; 
             });
 
+
             if(!this.adminAccess){
-              this.lookup_data_savedQuery = this.lookup_data_savedQuery.filter((item:any)=>item.P2.username == "Me")
+              this.lookup_data_savedQuery = this.lookup_data_savedQuery.filter((item:any)=>(item.P2 && item.P2.username == "Me") || (item.P2.userList &&  item.P2.userList.includes(this.username)))
             }
            
             resolve(this.lookup_data_savedQuery); // Resolve with the current lookup data
@@ -2513,6 +2588,8 @@ mergeAndAddLocation(mappedResponse: any) {
       const ws = XLSX.utils.aoa_to_sheet(data);
 
        // Add the worksheet to the workbook with the name of the formFilter
+       let sheetName = this.tableDataWithFormFilters[index].formFilter;
+       sheetName = sheetName.length > 30 ? sheetName.slice(0, 30) : sheetName;
        XLSX.utils.book_append_sheet(wb, ws, this.tableDataWithFormFilters[index].formFilter);
 
 
@@ -2522,7 +2599,9 @@ mergeAndAddLocation(mappedResponse: any) {
         if (trackLocationColumnIndex !== -1) {
           const trackLocationData = this.extractTrackLocationData(data, trackLocationColumnIndex, index);
           const trackLocationSheet = XLSX.utils.aoa_to_sheet(trackLocationData);
-          XLSX.utils.book_append_sheet(wb, trackLocationSheet, `TrackLocation ${this.tableDataWithFormFilters[index].formFilter}`);
+          let sheetName1 = `TrackLocation ${this.tableDataWithFormFilters[index].formFilter}`;
+            sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
+          XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
         }
     
         const tableColumnIndex = this.tableDataWithFormFilters[index].rows[0].hasOwnProperty('dynamic_table_values');
@@ -2537,7 +2616,9 @@ mergeAndAddLocation(mappedResponse: any) {
             if (tableData.hasOwnProperty(tableKey)) {
               const miniTableData = tableData[tableKey];
               const miniTableSheet = XLSX.utils.aoa_to_sheet(miniTableData);
-              XLSX.utils.book_append_sheet(wb, miniTableSheet, `${filteredFormName[tableKey]} ${this.tableDataWithFormFilters[index].formFilter}`);
+              let sheetName1 = `${filteredFormName[tableKey]} ${this.tableDataWithFormFilters[index].formFilter}`;
+              sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
+              XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1);
             }
           }
         }
@@ -2587,14 +2668,35 @@ mergeAndAddLocation(mappedResponse: any) {
   // Method to extract mini table data
   async extractMiniTableData(data: any[], tableColumnIndex: number, index: number) {
     const tableData: any = {};
+
+    // console.log("table with filters are here ",this.tableDataWithFormFilters[index]["rows"]);
   
-    // Extract dynamic_table_values from the current record
-    let tempHolder = this.tableDataWithFormFilters[index]["rows"].map((item: any) => item?.dynamic_table_values || []);
+
+    let tempHolder = this.tableDataWithFormFilters[index]["rows"].map((item: any) => {
+
+      if (item?.dynamic_table_values) {
+    
+        Object.keys(item.dynamic_table_values).forEach((dynamicRow: any) => {
+          // Loop through each dynamic table row
+          item.dynamic_table_values[dynamicRow].forEach((ele: any,i: number) => {
+            // Add 'id' to each dynamic row element
+            
+            item.dynamic_table_values[dynamicRow][i] = Object.assign({ id: item.id }, ele);
+          });
+        });
+      }
+    
+      return item?.dynamic_table_values;
+    });
+
+    console.log("TempHolder is here ",tempHolder);
+
+    // console.log("Filter mini table values are here ",tempHolder);
   
     // console.log("tempHolder before filtering:", tempHolder);
   
-    // Remove any invalid data (e.g., empty arrays)
-    tempHolder = tempHolder.filter((ele: any) => !Array.isArray(ele));  // Fix filtering logic
+    tempHolder = tempHolder.filter((item: any) => item != undefined);
+
   
     // console.log("tempHolder after filtering:", tempHolder);
   
@@ -2627,6 +2729,7 @@ mergeAndAddLocation(mappedResponse: any) {
         });
       }
     });
+
   
     // console.log('Iterated Table data is here ', tableData);
   
@@ -3025,7 +3128,12 @@ splitCsv(csv: string): string[] {
         this.customColumnsflag = false
         return
       }
-    
+      
+
+      console.log("this.selectedForms ",this.selectedForms);
+
+      console.log("Selected value is here ",selectedValue);
+
     
       if (Array.isArray(this.selectedForms) == false || (this.selectedForms.length == 0 && selectedValue == "true")) {
         Swal.fire({
@@ -3201,7 +3309,7 @@ splitCsv(csv: string): string[] {
   
     generateDaysDifferenceScript(dateStr: string): string {
         const dateFormat = this.getDateFormat(dateStr);
-        let script = `Math.floor((new Date() - new Date("\${${dateStr}}")) / (1000 * 3600 * 24))`;
+        let script = `Math.floor((new Date() - new Date(\${${dateStr}})) / (1000 * 3600 * 24))`;
         script = script + "+ ' days'"
         return script;
     }
@@ -3213,7 +3321,7 @@ splitCsv(csv: string): string[] {
 
         function generateTimeDifferenceScript(){
            const now = new Date();
-          const selectedDate = new Date("\${${dateStr}}"); 
+          const selectedDate = new Date(\${${dateStr}}); 
           const diffInMs = now - selectedDate;
       
           const diffInSecs = Math.floor(diffInMs / 1000);
@@ -3287,6 +3395,264 @@ splitCsv(csv: string): string[] {
     });
   }
     
+
+
+
+
+
+  getTestingParams() {
+    const params:any = {
+      metadata: {
+        columnVisibility: "[[{\"name\":\"approval_history\",\"label\":\"approval_history\",\"formName\":\"Work Order\"},{\"name\":\"track-3274927276\",\"label\":\"trackLocation\",\"formName\":\"Work Order\"},{\"name\":\"text-1732769530080\",\"label\":\"Work Order ID\",\"formName\":\"Work Order\"},{\"name\":\"single-select-1732769559973\",\"label\":\"Status\",\"formName\":\"Work Order\"},{\"name\":\"date-1732769545031\",\"label\":\"Date Issued\",\"formName\":\"Work Order\"},{\"name\":\"single-select-1732858580037\",\"label\":\"Part required\",\"formName\":\"Work Order\"},{\"name\":\"table-1732775270521\",\"label\":\"dynamic_table_values\",\"formName\":\"Work Order\"}]]",
+        conditionMetadata: "{\"forms\":[{\"conditions\":[{\"condition\":\"single-select-1732858580037\",\"operator\":\"==\",\"value\":\"Yes\",\"operatorBetween\":\"\"}]}]}",
+        customColumnMetadata: "{\"customForms\":[{\"conditions\":[{\"columnName\":\"Aging\",\"fieldSelector\":\"Date Issued.date-1732769545031\",\"equationText\":\" Math.floor((new Date() - new Date(\\\"${Date Issued.date-1732769545031}\\\")) / (1000 * 3600 * 24))+ ' days'\",\"predefined\":\"days_difference\"}]}]}",
+        queryDesc: "test1",
+        queryName: "test1",
+        reportMetadata: "{\"dateType\":\"this year\",\"singleDate\":\"\",\"startDate\":\"\",\"endDate\":\"\",\"daysAgo\":\"\",\"form_permission\":[\"Work Order\"],\"form_data_selected\":[[{\"name\":\"approval_history\",\"label\":\"approval_history\",\"formName\":\"Work Order\"},{\"name\":\"track-3274927276\",\"label\":\"trackLocation\",\"formName\":\"Work Order\"},{\"name\":\"text-1732769530080\",\"label\":\"Work Order ID\",\"formName\":\"Work Order\"},{\"name\":\"single-select-1732769559973\",\"label\":\"Status\",\"formName\":\"Work Order\"},{\"name\":\"date-1732769545031\",\"label\":\"Date Issued\",\"formName\":\"Work Order\"},{\"name\":\"single-select-1732858580037\",\"label\":\"Part required\",\"formName\":\"Work Order\"},{\"name\":\"table-1732775270521\",\"label\":\"dynamic_table_values\",\"formName\":\"Work Order\"}]],\"filterOption\":\"onCondition\",\"columnOption\":\"onCondition\",\"addColumn\":\"true\"}",
+        tableState: "{\"Work Order\":[{\"colId\":\"formFilter\",\"width\":200,\"hide\":true,\"pinned\":null,\"sort\":null,\"sortIndex\":null,\"aggFunc\":null,\"rowGroup\":false,\"rowGroupIndex\":null,\"pivot\":false,\"pivotIndex\":null,\"flex\":1},{\"colId\":\"Work Order ID\",\"width\":158,\"hide\":false,\"pinned\":null,\"sort\":null,\"sortIndex\":null,\"aggFunc\":null,\"rowGroup\":false,\"rowGroupIndex\":null,\"pivot\":false,\"pivotIndex\":null,\"flex\":1},{\"colId\":\"Status\",\"width\":158,\"hide\":false,\"pinned\":null,\"sort\":null,\"sortIndex\":null,\"aggFunc\":null,\"rowGroup\":false,\"rowGroupIndex\":null,\"pivot\":false,\"pivotIndex\":null,\"flex\":1},{\"colId\":\"approval_history\",\"width\":158,\"hide\":false,\"pinned\":null,\"sort\":null,\"sortIndex\":null,\"aggFunc\":null,\"rowGroup\":false,\"rowGroupIndex\":null,\"pivot\":false,\"pivotIndex\":null,\"flex\":1},{\"colId\":\"trackLocation\",\"width\":158,\"hide\":false,\"pinned\":null,\"sort\":null,\"sortIndex\":null,\"aggFunc\":null,\"rowGroup\":false,\"rowGroupIndex\":null,\"pivot\":false,\"pivotIndex\":null,\"flex\":1},{\"colId\":\"Date Issued\",\"width\":158,\"hide\":false,\"pinned\":null,\"sort\":null,\"sortIndex\":null,\"aggFunc\":null,\"rowGroup\":false,\"rowGroupIndex\":null,\"pivot\":false,\"pivotIndex\":null,\"flex\":1},{\"colId\":\"Part required\",\"width\":158,\"hide\":false,\"pinned\":null,\"sort\":null,\"sortIndex\":null,\"aggFunc\":null,\"rowGroup\":false,\"rowGroupIndex\":null,\"pivot\":false,\"pivotIndex\":null,\"flex\":1},{\"colId\":\"dynamic_table_values\",\"width\":158,\"hide\":false,\"pinned\":null,\"sort\":null,\"sortIndex\":null,\"aggFunc\":null,\"rowGroup\":false,\"rowGroupIndex\":null,\"pivot\":false,\"pivotIndex\":null,\"flex\":1},{\"colId\":\"Aging\",\"width\":162,\"hide\":false,\"pinned\":null,\"sort\":null,\"sortIndex\":null,\"aggFunc\":null,\"rowGroup\":false,\"rowGroupIndex\":null,\"pivot\":false,\"pivotIndex\":null,\"flex\":1}]}",
+        userIDs: [
+          {
+            PK: "swapnil"
+          }
+        ]
+      }
+    };
+
+    params.mode = "filterView"; 
+  
+    // Serialize and encode each parameter
+    const encodeParams = (obj: any) => {
+      return Object.keys(obj)
+        .map(key => {
+          const value = obj[key];
+          // If the value is an object or array, we need to serialize it into a JSON string first
+          return `${encodeURIComponent(key)}=${encodeURIComponent(JSON.stringify(value))}`;
+        })
+        .join('&');
+    };
+  
+    // Construct the query string
+    const queryString = encodeParams(params);
+  
+    // Construct the full URL (replace `baseUrl` with your actual endpoint)
+    const baseUrl = "http://localhost:4200/reportStudio"; // Change this to your actual URL
+    const fullUrl = `${baseUrl}?${queryString}`;
+
+
+    console.log("URL is here ",fullUrl);
+  
+    return fullUrl;
+  }
+  
+
+  
+
+
+
+
+
+  async editUrlSavedQuery(result: any,key:any) {
+
+    this.populateFormData= []     
+
+    console.log("Edit url is called", result);
+    
+    try{
+      
+     if(result){
+      if(result){
+
+
+        this.tempResHolder = result
+
+        console.log("Result is here ",this.tempResHolder);
+
+        this.tempResHolder.reportMetadata = JSON.parse(this.tempResHolder.reportMetadata)
+        this.tempResHolder.conditionMetadata = JSON.parse(this.tempResHolder.conditionMetadata).forms
+        this.tempResHolder.customColumnMetadata = JSON.parse(this.tempResHolder.customColumnMetadata).customForms
+        this.tempResHolder.columnVisibility = this.tempResHolder && this.tempResHolder.columnVisibility && JSON.parse(this.tempResHolder.columnVisibility)
+        this.tempResHolder.tableState = this.tempResHolder && this.tempResHolder.tableState && JSON.parse(this.tempResHolder.tableState)
+         this.editSavedDataArray = this.tempResHolder
+
+         console.log("Result for the edit is here ",this.tempResHolder);
+         const reportMetadata = this.tempResHolder.reportMetadata
+         const conditionMetadata = this.tempResHolder.conditionMetadata
+         const columnVisibility = this.tempResHolder.columnVisibility
+         const customColumnMetadata = this.tempResHolder && this.tempResHolder.customColumnMetadata
+
+         //Get the table State
+         this.tableState = this.tempResHolder.tableState && JSON.parse(JSON.stringify(this.tempResHolder.tableState))
+
+         console.log("conditionMetadata is here ",conditionMetadata);
+
+         this.reportsFeilds.patchValue({
+           dateType: reportMetadata.dateType,
+           singleDate: reportMetadata.singleDate,
+           startDate: reportMetadata.startDate,
+           endDate:reportMetadata.endDate ,
+           daysAgo:reportMetadata.daysAgo ,
+           form_permission:reportMetadata.form_permission , 
+           filterOption:reportMetadata.filterOption ,
+           columnOption:reportMetadata.columnOption,
+           addColumn:reportMetadata.addColumn
+         })       
+         
+         this.selectedForms = reportMetadata.form_permission
+         
+         this.selectedItem = []
+
+          if(columnVisibility){
+            this.selectedValues = JSON.parse(JSON.stringify(columnVisibility))
+          }
+        
+         
+          
+
+          console.log("Star selected ",this.selectedValues);
+           
+         if(reportMetadata.columnOption != 'all' && Array.isArray(this.selectedValues) && this.selectedValues.length > 0){
+           this.visibiltyflag = true
+         }
+
+         this.saveButton = true
+
+
+         if(reportMetadata.addColumn != 'false'){
+
+          console.log("Add column is executed ");
+
+          this.customForms().clear()
+
+
+
+          await this.addColumns("true",'')
+
+
+          customColumnMetadata.forEach((formData: any) => {
+            this.populateCustomForm(formData);
+          });
+
+          
+         }
+         else{
+          this.customForms().clear();
+
+          this.selectedForms.forEach((formData: any) => {
+            this.addCustomForm(); 
+          });
+
+            this.customColumnsflag = false
+         }
+
+
+
+
+         
+         if(reportMetadata.filterOption != 'all'){
+
+          this.forms().clear();
+
+           await this.onFilterChange('onCondition','','edit')
+
+           
+
+          //  console.log("conditionMetadata - - - - -- - -- - ",conditionMetadata);
+            
+          conditionMetadata.forEach((formData: any) => {
+               this.populateForm(formData);
+             });
+
+             
+         }
+         else{
+
+          this.forms().clear();
+
+          this.selectedForms.forEach((formData: any) => {
+            this.addForm(); 
+          });
+
+    
+
+
+            this.conditionflag = false
+         }
+         if(this.selectedValues != undefined && Array.isArray(this.selectedValues) && this.selectedValues.length > 0 && reportMetadata.columnOption != 'all'){
+
+          this.reportsFeilds.get('form_data_selected')?.patchValue([])
+
+          // console.log("Column Option is false");
+
+          await this.onColumnChange('onCondition','savedQuery')
+         }
+         else{
+          this.visibiltyflag = false
+         }
+
+         this.onSubmitFlag = false
+          this.onSubmit()
+
+          if (JSON.parse(this.viewMode) === "fullView") {
+
+            console.log("View mode is jere ",this.viewMode);
+
+            this.isFullScreen = true;
+            this.showHeading = true
+          }
+          else if(JSON.parse(this.viewMode) === "filterView"){
+            this.isFullScreen = false;
+            this.isFilterScreen = true
+            this.showHeading = true
+            this.isFormVisible = false
+          }
+          else{
+            this.isFullScreen = false;
+            this.isFilterScreen = false
+            this.showHeading = false
+          }
+
+       
+         this.onSubmitFlag = false
+
+     
+         this.dismissModal1(this.modalRef);
+
+       
+       }
+     }
+
+     this.cd.detectChanges()
+     this.spinner.hide()
+
+   
+    }
+    catch(error){
+      this.spinner.hide()
+      console.log("Error fetching reports table ",error);
+    }
+  }
+
+
+  toggleFullScreenFullView(){
+    if(this.isFilterScreen){
+      this.isFilterScreen = false
+      this.isFullScreen = false;
+      this.showHeading = !this.showHeading
+   
+    }else{
+      this.isFullScreen = !this.isFullScreen;
+      this.showHeading = !this.showHeading
+    } 
+ 
+    this.isFormVisible = true
+  }
+
+
+  toggleFormVisibility() {
+    this.isFormVisible = !this.isFormVisible;
+  }
+
+
 } 
 
 
