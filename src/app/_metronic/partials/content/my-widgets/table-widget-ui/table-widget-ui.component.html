@@ -11,18 +11,19 @@
     </div>
     
   
-         <div class="ag-theme-alpine gridster-item-content" style="width: 100%; height: auto;">
-          <ag-grid-angular
-            [rowData]="rowData"
-            [columnDefs]="columnDefs"
-            [domLayout]="'autoHeight'"
-            [pagination]="true"
-            [paginationPageSize]="10"
-            [defaultColDef]="defaultColDef"
-            (gridReady)="onGridReady($event)"
-            style="width: 100%;"
-          ></ag-grid-angular>
-        </div>
+    <div class="ag-theme-alpine gridster-item-content" style="width: 100%; height: 400px; overflow: hidden;">
+      <ag-grid-angular
+        [rowData]="rowData"
+        [columnDefs]="columnDefs"
+        [domLayout]="'normal'" 
+        [pagination]="true"
+        [paginationPageSize]="10"
+        [defaultColDef]="defaultColDef"
+        (gridReady)="onGridReady($event)"
+        style="width: 100%; height: 100%;"
+      ></ag-grid-angular>
+    </div>
+    
         
         
         
