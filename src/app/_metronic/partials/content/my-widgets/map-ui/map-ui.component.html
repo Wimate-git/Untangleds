@@ -1,16 +1,5 @@
 <div class="map-container" *ngIf="item.grid_type === 'Map'">
-  <!-- Google Map Wrapper -->
-  <div>
-    <div class="row text_3d"
-         style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-      <div class="processed-value-container"
-           style="font-weight: bold; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 20px; margin-top: -10px;">
-        {{ item.chart_title }}
-      </div>
-    </div>
-
-    <!-- Google Map -->
-    <google-map
+      <google-map
     [height]="mapHeight + 'px'"
     [width]="mapWidth + 'px'"
     [zoom]="5"
@@ -47,6 +36,26 @@
     
   </google-map>
   
+  <!-- Google Map Wrapper -->
+  <div>
+    <!-- <div class="row processed-value-container"
+         style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+        
+      <div class="processed-value-container"
+      style="
+      font-weight: bold;
+      margin-bottom: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+    ">
+     
+      </div>
+    </div> -->
+
+    <!-- Google Map -->
+
   </div>
 
   <!-- Action Menu -->
