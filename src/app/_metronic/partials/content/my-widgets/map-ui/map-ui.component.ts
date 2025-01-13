@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { GoogleMap, MapInfoWindow } from '@angular/google-maps';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -34,6 +35,9 @@ export class MapUiComponent implements OnInit{
   parsedTileConfig: any;
   tileConfig: any;
   tileTiltle: any;
+  selectedMarker: any;
+  @ViewChild(MapInfoWindow) infoWindow!: MapInfoWindow; // Reference the InfoWindow
+  @ViewChild(GoogleMap) map!: GoogleMap;
 
   // center: google.maps.LatLngLiteral = { lat: 37.7749, lng: -122.4194 }; // Default location
   // markers = [
@@ -61,36 +65,49 @@ console.log('Parsed data check:', this.parsedData);
 // Ensure parsedData is an array
 if (Array.isArray(this.parsedData)) {
   // Extract markers dynamically
-  this.markers = this.parsedData.map((packet: any) => {
-    if (Array.isArray(packet.add_Markers) && packet.add_Markers.length > 0) {
-      // Map each marker in add_Markers array
-      return packet.add_Markers.map((marker: any) => ({
-        position: {
-          lat: parseFloat(marker.position.lat), // Ensure latitude is a number
-          lng: parseFloat(marker.position.lng), // Ensure longitude is a number
-        },
-        title: marker.title || '', // Default to empty string if title is not available
-        label: marker.label || '', // Default to empty string if label is not available
-        mapType: packet.map_type || '', // Include map_type from the parent object
-      }));
-    }
-    return []; // Return empty array if add_Markers is not valid
-  }).flat(); // Flatten nested arrays into a single array
+  this.markers = this.parsedData
+    .filter((packet: any) => packet.label === "Track Location" || packet.label === "Graphic Location") // Filter by label
+    .map((packet: any) => {
+      if (Array.isArray(packet.add_Markers) && packet.add_Markers.length > 0) {
+        // Map each marker in add_Markers array
+        return packet.add_Markers.map((marker: any) => {
+          const baseMarker = {
+            position: {
+              lat: parseFloat(marker.position.lat), // Ensure latitude is a number
+              lng: parseFloat(marker.position.lng), // Ensure longitude is a number
+            },
+            title: marker.title || '', // Default to empty string if title is not available
+            label: marker.label || '', // Default to empty string if label is not available
+            mapType: packet.map_type || '', // Include map_type from the parent object
+          };
 
-  // Filter markers to include only those with valid mapType
+          // Add marker_info only for "Track Location"
+          if (packet.label === "Track Location") {
+            return { ...baseMarker, marker_info: marker.marker_info || {} };
+          }
+
+          // For "Graphic Location", return base marker
+          return baseMarker;
+        });
+      }
+      return []; // Return empty array if add_Markers is not valid
+    })
+    .flat(); // Flatten nested arrays into a single array
+
+  // Process markers to include mapType and scaled size
   this.markers = this.markers
-  .filter(marker => marker.mapType) // Filter markers with valid mapType
-  .map(marker => ({
-    ...marker, // Retain existing marker properties
-    mapType: {
-      url: marker.mapType, // Use the mapType as the icon URL
-      scaledSize: { width: 30, height: 30 } // Set the desired width and height
-    }
-  }));
+    .filter(marker => marker.mapType) // Filter markers with valid mapType
+    .map(marker => ({
+      ...marker, // Retain existing marker properties
+      mapType: {
+        url: marker.mapType, // Use the mapType as the icon URL
+        scaledSize: { width: 30, height: 30 } // Set the desired width and height
+      }
+    }));
 
-console.log('Formatted markers with map types and sizes:', this.markers);
-
+  console.log('Formatted markers with map types and sizes:', this.markers);
 }
+
 
 
 
@@ -99,6 +116,15 @@ console.log('Formatted markers with map types and sizes:', this.markers);
   
 }
 
+  openInfoWindow(markerinfo: any,templateRef:any): void {
+    console.log('marker checking', markerinfo); // Debugging marker data
+    this.selectedMarker = markerinfo; // Set selected marker details
+    if (this.infoWindow) {
+      this.infoWindow.open(templateRef); // Open the InfoWindow if it exists
+    } else {
+      console.error('InfoWindow is not initialized.');
+    }
+  }
 ngAfterViewInit(): void {
   // this.initializeMapData();
 }

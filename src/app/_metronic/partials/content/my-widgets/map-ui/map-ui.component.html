@@ -11,21 +11,42 @@
 
     <!-- Google Map -->
     <google-map
-      [height]="mapHeight + 'px'" 
-      [width]="mapWidth + 'px'"
-      [zoom]="5"
+    [height]="mapHeight + 'px'"
+    [width]="mapWidth + 'px'"
+    [zoom]="5"
+    [center]="markers[0]?.position"
+  >
+    <!-- Dynamic Markers -->
+    <map-marker
+      *ngFor="let marker of markers"
+      [position]="marker.position"
+      #marker1="mapMarker"
+      [title]="marker.title"
+      [label]="marker.label"
+      [icon]="marker.mapType"
+      (mapClick)="openInfoWindow( marker,marker1)" 
     >
-      <!-- Dynamic Map Markers -->
-      <map-marker
-        *ngFor="let marker of markers"
-        [position]="marker.position"
-        [title]="marker.title"
-        [label]="marker.label"
-        [icon]="marker.mapType" 
-        
-      >
-      </map-marker>
-    </google-map>
+    </map-marker>
+  
+    <!-- Info Window -->
+    <map-info-window #infoWindow>
+      <div style="width: 500px; overflow: auto;"> <!-- Apply width here as well -->
+        <!-- <h6>{{ selectedMarker?.title || 'No Title Available' }}</h6> -->
+        <p *ngIf="selectedMarker?.marker_info">
+          <strong>Type:</strong> {{ selectedMarker?.marker_info?.type }}<br />
+          <strong>Name:</strong> {{ selectedMarker?.marker_info?.name }}<br />
+          <strong>Date & Time:</strong> {{ selectedMarker?.marker_info?.Date_and_time }}<br />
+          <strong>Id:</strong> {{ selectedMarker?.marker_info?.label_id }}<br />
+          <strong>Status:</strong> {{ selectedMarker?.marker_info?.label_name }}<br />
+        </p>
+        <p *ngIf="!selectedMarker?.marker_info">
+          No Info available.
+        </p>
+      </div>
+    </map-info-window>
+    
+  </google-map>
+  
   </div>
 
   <!-- Action Menu -->
@@ -61,6 +82,7 @@
     </div>
   </div>
 </div>
+
 
 
 

@@ -35,4 +35,9 @@
     font-size: 18px;
   }
   
+  ::ng-deep .gm-style-iw {
+    width: 300px !important; /* Force the width */
+    max-width: 300px !important; /* Ensure the width doesn't shrink */
+    overflow: auto !important; /* Handle overflow */
+  }
   

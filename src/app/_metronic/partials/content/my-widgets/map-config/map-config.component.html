@@ -187,11 +187,11 @@
 
   
                       <div class="col-lg-6 col-md-6 col-sm-6 mb-4 mt-4">
-                        <div class="form-group row align-items-center">
+                        <div class="form-group row align-items-center" *ngIf="getDateType(fieldIndex)?.value">
                           <label 
                             for="dateTypeSelect" 
                             class="col-lg-4 col-md-4 col-sm-4 col-form-label text-lg-end text-md-start text-sm-start fw-bold required">
-                            Date Type
+                            Date Type 
                           </label>
                           <div class="col-lg-8 col-md-12 col-sm-8">
                             <select 
@@ -199,7 +199,7 @@
                               id="dateTypeSelect" 
                               class="form-select form-select-solid form-select-lg"
                               aria-label="Select Date Type">
-                              <option [value]="null" [selected]="true" disabled>Select Date Type</option>
+                              <!-- <option [value]="null" [selected]="true" disabled>Select Date Type</option> -->
                               <option value="is">is</option>
                               <option value=">=">&gt;=</option>
                               <option value="<=">&lt;=</option>
