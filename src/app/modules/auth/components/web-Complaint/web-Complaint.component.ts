@@ -31,6 +31,10 @@ export class WebComplaintsComponent
   withoutlogin: { formName: string; title: string; searchButton: string; searchbutton_name: string; addButton: string; addButton_name: string; scanButton: string; scanButton_name: string; };
   firstWord: any;
   loginDetail_: any;
+  recordId: {
+    type: string; // "view", "create"
+    fields: { "Service Type.prefix-text-1735110082653": string; "Service Type.single-select-1735110320882": string; "Customer Name.single-select-1735110727686": string; "Name.single-select-1735110877149": string; "Logo.single-select-1735111013692": string; "third Party.single-select-1735111127955": string; }; mainTableKey: string; // web_1736503505722
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -132,6 +136,20 @@ delete this.loginDetail_.profile_picture;
 
 console.log("AFTER REMOVE OF pic:",this.loginDetail_)
 
+this.recordId = {
+  "type": "view",  // "view", "create"
+  "fields": {
+      "Service Type.prefix-text-1735110082653": "Web_Complaint_1",
+      "Service Type.single-select-1735110320882": "divya",
+      "Customer Name.single-select-1735110727686": "Samsung",
+      "Name.single-select-1735110877149": "South Korea",
+      "Logo.single-select-1735111013692": "130",
+      "third Party.single-select-1735111127955": "Sprinkler"
+  },
+
+  "mainTableKey": "1736503505722" // web_1736503505722
+};
+
 
     
 
@@ -168,7 +186,7 @@ console.log("AFTER REMOVE OF pic:",this.loginDetail_)
         // console.log(this.url_result,)
         // const timestamp = new Date().getTime();
         // this.url=`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/public/WIMATE_ADMIN/Without+Login/src/index.html?loginDetail="{\"username\":\"Wimate_Test\",\"clientID\":\"Climaveneta\",\"username_\":\"12345678\",\"name\":\"Wimate_Admin\",\"user_type\":\"Admin\",\"password\":\"DUMMY\",\"role\":\"Admin\",\"token\":\"admin-token\",\"permission_ID\":\"Dreamboard Module\"}"&withoutlogin="{\"formName\":\"Testing Web Complaint\",\"title\":\"How Can we help you\",\"searchButton\":\"yes\",\"searchbutton_name\":\"Search\",\"addButton\":\"yes\",\"addButton_name\":\"Create Ticket\",\"scanButton\":\"yes\",\"scanButton_name\":\"Scan QR Code\"}"`
-        this.url = `https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/public/WIMATE_ADMIN/Without%20Login/src/index.html?`+`&loginDetail=${JSON.stringify(JSON.stringify(this.loginDetail_))}`+`&withoutlogin=${JSON.stringify(JSON.stringify(this.withoutlogin))}`
+        this.url = `https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/public/WIMATE_ADMIN/Without%20Login/src/index.html?`+`&loginDetail=${JSON.stringify(JSON.stringify(this.loginDetail_))}`+`&withoutlogin=${JSON.stringify(JSON.stringify(this.withoutlogin))}`+`&recordId=${JSON.stringify(JSON.stringify(this.recordId))}`
         // this.url =`https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/public/WIMATE_ADMIN/Without Login/src/index.html?loginDetail="{\"username\":\"Wimate_Test\",\"clientID\":\"Climaveneta\",\"username_\":\"12345678\",\"name\":\"Wimate_Admin\",\"user_type\":\"Admin\",\"password\":\"DUMMY\",\"role\":\"Admin\",\"token\":\"admin-token\",\"permission_ID\":\"Dreamboard Module\"}"&withoutlogin="{\"formName\":\"Testing Web Complaint\",\"title\":\"How Can we help you\",\"searchButton\":\"yes\",\"searchbutton_name\":\"Search\",\"addButton\":\"yes\",\"addButton_name\":\"Create Ticket\",\"scanButton\":\"yes\",\"scanButton_name\":\"Scan QR Code\"}"`
         this.send_data = this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
         console.log(this.send_data)
