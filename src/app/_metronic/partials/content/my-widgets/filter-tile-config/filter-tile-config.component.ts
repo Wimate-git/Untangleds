@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AgGridAngular } from 'ag-grid-angular';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { catchError, from, map, Observable, of, shareReplay, Subject, take, takeUntil } from 'rxjs';
 import { APIService } from 'src/app/API.service';
 import { LocationPermissionService } from 'src/app/location-permission.service';
 import { SharedService } from 'src/app/pages/shared.service';
@@ -82,6 +83,10 @@ makeTrueCheck:any = false
   conditionsFilter: any;
   parsedfilterTileConfig: any;
   showDaysAgoField: boolean;
+  populateFormBuilder: any = [];
+
+  private optionsCache = new Map<string, Observable<any[]>>();
+  private destroy$ = new Subject<void>();
 
   private readonly daysAgoOptions = [
     'less than days ago',
@@ -90,6 +95,11 @@ makeTrueCheck:any = false
     'days ago'
   ];
   formValueSave: any;
+  lookup_data_savedQuery: any;
+  original_lookup_data: any;
+  listofSavedIds: any;
+  username: any;
+  adminAccess: boolean = false;
 
 
  
@@ -97,6 +107,7 @@ makeTrueCheck:any = false
 
     this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
     this.SK_clientID = this.getLoggedUser.clientID;
+    this.username = this.getLoggedUser.username;
     console.log('this.SK_clientID check', this.SK_clientID)
     console.log('this.getLoggedUser check', this.getLoggedUser)
     // console.log('dashboardChange ngOnInit',this.all_Packet_store)
@@ -129,6 +140,7 @@ makeTrueCheck:any = false
     this.createChart.get('dateType')?.valueChanges.subscribe(value => {
       this.onDateTypeChange(value);
     });
+    this.getAvailableFieldOptions(1,1)
 
 
   }
@@ -182,6 +194,7 @@ makeTrueCheck:any = false
   }
   ngAfterViewInit(): void {
     this.checkData()
+    this.getAvailableFieldOptions(1,1)
   }
   get dateType() {
     return this.createChart.get('dateType');
@@ -642,7 +655,7 @@ console.log('this.conditionsFilter',this.conditionsFilter);
       this.dashboardChange.emit(this.grid_details);
   
       if (this.grid_details) {
-        this.updateSummary('', 'add_tile');
+        this.updateSummary('', 'filter_add');
       }
   
       this.createChart.patchValue({
@@ -656,6 +669,9 @@ console.log('this.conditionsFilter',this.conditionsFilter);
   betweenoperator(event:any){
     console.log('event checking ',event)
 
+  }
+  trackByOption(index: number, option: any): any {
+    return option;
   }
   
   
@@ -738,7 +754,7 @@ console.log('this.conditionsFilter',this.conditionsFilter);
   
       // Trigger update summary if grid details exist
       if (this.grid_details) {
-        this.updateSummary(this.all_Packet_store, 'update_tile');
+        this.updateSummary(this.all_Packet_store, 'update_Dashboard');
       }
   
       console.log('this.dashboard check from updateTile', this.dashboard);
@@ -1487,6 +1503,216 @@ toggleCheckbox1(theme: any) {
 
   // Method to initialize the chart using the form's JSON value
 
+  getAvailableFieldOptions(formIndex: number, condIndex: any): Observable<any[]> {
+    const selectedField = this.all_fields.at(formIndex).get('conditions')?.value[condIndex]?.condition;
+    const formName = this.all_fields.get('parameterName')?.value;
+    console.log('formName',formName)
+    
+    // Create a unique cache key
+    const cacheKey = `${formName}-${selectedField}`;
+  
+    // Return cached value if exists
+    if (this.optionsCache.has(cacheKey)) {
+      return this.optionsCache.get(cacheKey)!;
+    }
+  
+    // Get field configuration
+    const formFields = this.populateFormBuilder.find(
+      (form: { [key: string]: any }) => form[formName]
+    );
+    console.log('formFields check',formFields)
+    const field = formFields[formName].find(
+      (f: { name: string }) => f.name === selectedField
+    );
+  
+    // Create the observable
+    const options$ = new Observable<any[]>(observer => {
+      if (!field) {
+        observer.next([]);
+        observer.complete();
+        return;
+      }
+  
+      if (field.validation && field.validation?.user === true) {
+        const lookupKey = `${this.SK_clientID}#user#lookup`;
+  
+        // console.log("User list dropdown is here ");
+  
+        // Make API call and transform result
+        from(this.fetchUserLookupdata(1, lookupKey)).pipe(
+          map((result: any) => {
+            if (result) {
+              // console.log("Users List is ", result);
+              return Array.from(new Set(result.map((item: any) => item.P1)));
+            }
+            return [];
+          }),
+          catchError(error => {
+            console.error('Error fetching users:', error);
+            return of([]);
+          }),
+          take(1) // Ensure the observable completes after first emission
+        ).subscribe({
+          next: (value) => {
+            observer.next(value);
+            observer.complete();
+          },
+          error: (error) => {
+            observer.error(error);
+          }
+        });
+      }
+  
+      else if (field.validation?.lookup === true && field.validation?.form) {
+        const lookupKey = `${this.SK_clientID}#${field.validation.form}#lookup`;
+  
+        // Make API call and transform result
+        from(this.api.GetMaster(lookupKey, 1)).pipe(
+          map(result => {
+            if (result?.options) {
+              const options = JSON.parse(result.options);
+              return this.extractSpecificSingleSelectValue(options, field.validation.field).sort();
+            }
+            return [];
+          }),
+          catchError(error => {
+            console.error('Error fetching options:', error);
+            return of([]);
+          }),
+          take(1) // Ensure the observable completes after first emission
+        ).subscribe({
+          next: (value) => {
+            observer.next(value);
+            observer.complete();
+          },
+          error: (error) => {
+            observer.error(error);
+          }
+        });
+      } else {
+        // Return static options if not a lookup field
+        observer.next(field.options || []);
+        observer.complete();
+      }
+    }).pipe(
+      shareReplay(1), // Cache the last emitted value and share it among all subscribers
+      takeUntil(this.destroy$) // Make sure to unsubscribe on destroy
+    );
+  
+    // Store in cache
+    this.optionsCache.set(cacheKey, options$);
+    
+    return options$;
+  }
+  // getFormNameByIndexCustom(index: number): string {
+  //   const selectedFormValue = this.selectedForms[index];
+  //   return selectedFormValue
+  // }
+
+  // getFormNameByIndex(index: number): string {
+  //   const selectedFormValue = this.selectedForms[index];
+  //   return selectedFormValue
+  // }
+  fetchUserLookupdata(sk:any,pkValue:any):any {
+    
+    return new Promise((resolve, reject) => {
+      this.api.GetMaster(pkValue, sk)
+        .then(response => {
+          if (response && response.options) {
+            // Check if response.options is a string
+            if (typeof response.options === 'string') {
+              let data = JSON.parse(response.options);
+              
+              if (Array.isArray(data)) {
+                const promises:any = []; // Array to hold promises for recursive calls
+  
+                for (let index = 0; index < data.length; index++) {
+                  const element = data[index];
+  
+                  if (element !== null && element !== undefined) {
+                    // Extract values from each element and push them to lookup_data_user
+                    const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
+                    const { P1, P2, P3 } = element[key]; // Extract values from the nested object
+                    this.lookup_data_savedQuery.push({ P1, P2, P3 }); // Push an array containing P1, P2, P3, P4, P5, P6
+                  } else {
+                    break;
+                  }
+                }
+  
+                // Sort the lookup_data_user array based on P5 values in descending order
+                this.lookup_data_savedQuery.sort((a: { P3: number; }, b: { P3: number; }) => b.P3 - a.P3);
+  
+                // Continue fetching recursively
+                promises.push(this.fetchUserLookupdata(sk + 1,pkValue)); // Store the promise for the recursive call
+                
+                // Wait for all promises to resolve
+                Promise.all(promises)
+                  .then(() => resolve(this.lookup_data_savedQuery)) // Resolve with the final lookup data
+                  .catch(reject); // Handle any errors from the recursive calls
+              } else {
+                console.error('Invalid data format - not an array.');
+                reject(new Error('Invalid data format - not an array.'));
+              }
+            } else {
+              console.error('response.options is not a string.');
+              reject(new Error('response.options is not a string.'));
+            }
+          } else {
+            console.log("All the users are here", JSON.parse(JSON.stringify(this.lookup_data_savedQuery)));
+
+            this.original_lookup_data = this.lookup_data_savedQuery
+
+            this.listofSavedIds = this.lookup_data_savedQuery.map((item:any)=>item.P1)
+
+            // console.log("All the unique IDs are here ",this.listofSavedIds);
+
+            this.lookup_data_savedQuery = this.lookup_data_savedQuery.map((item: any) => {
+              let tempHolder:any = {}
+              if(item.P2 && typeof item.P2 == 'string'){
+                tempHolder = JSON.parse(item.P2)
+              }
+              else{
+                tempHolder = item.P2
+              }
+              if (tempHolder && tempHolder.username === this.username) {
+                item.P2 = {}
+                item.P2.username = 'Me';
+                item.P2.userList = tempHolder && tempHolder.userList ? tempHolder.userList:[]
+              }
+              else{
+                item.P2 = {}
+                item.P2.username = tempHolder.username;
+                item.P2.userList = tempHolder && tempHolder.userList ? tempHolder.userList:[]
+              }
+              return item; 
+            });
 
 
+            if(!this.adminAccess){
+              this.lookup_data_savedQuery = this.lookup_data_savedQuery.filter((item:any)=>(item.P2 && item.P2.username == "Me") || (item.P2.userList &&  item.P2.userList.includes(this.username)))
+            }
+           
+            resolve(this.lookup_data_savedQuery); // Resolve with the current lookup data
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          reject(error); // Reject the promise on error
+        });
+    });
+  }
+
+  extractSpecificSingleSelectValue = (options: string[][],valueFilter:any): string[] => {
+    const specificSingleSelectArray: string[] = [];
+    
+    options.forEach(optionGroup => {
+      optionGroup.forEach(option => {
+        if (option.includes(valueFilter) && option.includes('#')) {  // Checking for exact match
+          specificSingleSelectArray.push(option.split('#')[1]);
+        }
+      });
+    });
+  
+    return specificSingleSelectArray;
+  };
 }

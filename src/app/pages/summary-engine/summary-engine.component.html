@@ -46,7 +46,8 @@
               <gridster style="background: var(--bs-app-bg-color)!important;border-radius: 5px;padding: 0px; "
                 [options]="options"     >
   
-                <gridster-item *ngFor="let item of dashboard; let i = index;" [item]="item" [style.background]="item.themeColor"  class="rounded">
+                <gridster-item *ngFor="let item of dashboard; let i = index;" [item]="item" [style.background]="item.themeColor"  class="rounded"   (click)="item.grid_type === 'filterTile' ? helperFilter(item,i, FilterModal) : null"
+                >
                  
          
                   <div *ngIf="item.grid_type === 'tile'">
@@ -444,6 +445,18 @@
   [fullScreen]="true">
   <p style="color: white">Loading Data, please wait...</p>
   </ngx-spinner>
+  <ngx-spinner 
+  *ngIf="isLoading" 
+  bdColor="rgba(0, 0, 0, 0.8)" 
+  size="medium" 
+  color="#fff" 
+
+  name="dataProcess"
+  type="square-jelly-box" 
+  [fullScreen]="true">
+  <p style="color: white">Data Processing, Please Wait....</p>
+  </ngx-spinner>
+
   <div style="top: 1%;
   z-index: 100;
   right:44px;

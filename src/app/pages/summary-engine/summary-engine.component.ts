@@ -665,7 +665,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     this.isLoading = true; // Set loading state to true
     console.log('this.routeId check', this.routeId);
     console.log('client id check', this.SK_clientID);
-  
+  this.spinner.show('dataProcess')
     // Define the API Gateway URL
     const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
   
@@ -677,12 +677,20 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
       }),
     };
   
-    console.log('requestBody checking',requestBody)
+    console.log('requestBody checking', requestBody);
   
     // Send a POST request to the Lambda function with the body
     this.http.post(apiUrl, requestBody).subscribe(
       (response) => {
         console.log('Lambda function triggered successfully:', response);
+        this.spinner.hide('dataProcess')
+        // Display SweetAlert success message
+        // Swal.fire({
+        //   title: 'Success!',
+        //   text: 'Lambda function triggered successfully.',
+        //   icon: 'success',
+        //   confirmButtonText: 'OK'
+        // });
   
         // Proceed with route parameter handling
         this.route.paramMap.subscribe(params => {
@@ -697,10 +705,20 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
       },
       (error) => {
         console.error('Error triggering Lambda function:', error);
+  
+        // Display SweetAlert error message
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to trigger the Lambda function. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+  
         this.isLoading = false; // Reset loading state
       }
     );
   }
+  
   setFullscreen(): void {
     localStorage.setItem('fullscreen', 'true');
 
@@ -1054,7 +1072,7 @@ if(!this.isFullScreen){
           console.log('Updated all_Packet_store.grid_details:', all_Packet_store.grid_details);
           console.log('all_Packet_store test from deleteTile',all_Packet_store)
   
-          // Step 3: Call updateSummary to save changes
+    
           this.updateSummary(all_Packet_store, 'delete_tile');
   
           // Step 4: Trigger change detection to update the UI
@@ -2029,7 +2047,17 @@ setTimeout(() => {
       });
   }
 
+  helperFilter(data:any,index:any, KPIModal: TemplateRef<any>){
+    if(data.grid_type=='filterTile'){
+    this.modalService.open(KPIModal, { size: 'lg' });
 
+    // Access the component instance and trigger `openKPIModal`
+    setTimeout(() => {
+     
+      this.FilterTileConfigComponent.openFilterModal(data, index);
+    }, 500);
+  }
+  }
 
   helperTile(event: any, KPIModal: TemplateRef<any>) {
     console.log('KPIModal check',KPIModal)
@@ -2212,100 +2240,95 @@ setTimeout(() => {
       this.isGirdMoved = false; 
   this.dashboard.push(arg1)
  
-  // this.updateSummary('','add_Tile')
+
     }
     else if(event.data.arg1.grid_type=='TableWidget'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      // this.updateSummary(event.all_Packet_store,'add_Tile')
+ 
     }
     else if(event.data.arg1.grid_type=='Map'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      // this.updateSummary(event.all_Packet_store,'add_Tile')
+     
     }
     else if(event.data.arg1.grid_type=='tile2'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      // this.updateSummary(event.all_Packet_store,'add_Tile')
+
     }
     else if(event.data.arg1.grid_type=='filterTile'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      // this.updateSummary(event.all_Packet_store,'add_Tile')
+   
     }
     else if(event.data.arg1.grid_type=='tile3'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      // this.updateSummary(event.all_Packet_store,'add_Tile')
+
     }
     else if(event.data.arg1.grid_type=='tile4'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      // this.updateSummary(event.all_Packet_store,'add_Tile')
+
 
     }
     else if(event.data.arg1.grid_type=='tile5'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      // this.updateSummary(event.all_Packet_store,'add_Tile')
+    
 
     }
     else if(event.data.arg1.grid_type=='tile6'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      // this.updateSummary(event.all_Packet_store,'add_Tile')
+
 
     }
     else if(event.data.arg1.grid_type=='chart'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      // this.updateSummary(event.all_Packet_store,'add_Tile')
+  
 
     }
     else if(event.data.arg1.grid_type=='Linechart'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      // this.updateSummary(event.all_Packet_store,'add_Tile')
+    
 
     }
         else if(event.data.arg1.grid_type=='Columnchart'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      // this.updateSummary(event.all_Packet_store,'add_Tile')
+
 
     }
         else if(event.data.arg1.grid_type=='Areachart'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      // this.updateSummary(event.all_Packet_store,'add_Tile')
+
 
     }
     else if(event.data.arg1.grid_type=='Barchart'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
-      // this.updateSummary(event.all_Packet_store,'add_Tile')
+
 
     }
-  //   else if(event.arg1.grid_type=='Areachart'){
-  //     console.log('event check', event)
-  //     this.dashboard.push(event.arg1)
-  // this.updateSummary('','update_tile')
 
-  //   }
 
     else if(event.data.arg1.grid_type=='dynamicTile'){
       console.log('event check from dynamic', event.data.arg1)
@@ -2313,7 +2336,6 @@ setTimeout(() => {
       this.dashboard.push(event.data.arg1)
       console.log('this.dashboard from dynamic',event.all_Packet_store)
 
-  // this.updateSummary(event.all_Packet_store,'add_Tile')
 
     }
     else if(event.data.arg1.grid_type=='title'){
@@ -2322,10 +2344,10 @@ setTimeout(() => {
       this.dashboard.push(event.data.arg1)
       console.log('this.dashboard from dynamic',event.all_Packet_store)
 
-  // this.updateSummary(event.all_Packet_store,'add_Tile')
+
 
     }
-    // this.updateSummary(event.data, event.arg2);
+
 
   }
 
@@ -3949,7 +3971,9 @@ setTimeout(() => {
           update_tile:'Widget Updated',
           delete_tile: 'Tile deleted',
           deleteTile: 'Tile deleted',
-          update: 'Summary updated'
+          update: 'Summary updated',
+          update_Dashboard:'Dashboard Filteration is updated',
+          filter_add:'Dashboard Filteration is added'
         }[actionKey] || 'Dashboard changes saved ';
   
         console.log('Action key condition check:', actionKey);
@@ -4492,6 +4516,7 @@ refreshFunction(){
       const result: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#lookup", 1);
       if (result) {
         const helpherObj = JSON.parse(result.options);
+        console.log('helpherObj checking',helpherObj)
         this.formList = helpherObj.map((item: [string]) => item[0]); // Explicitly define the type
         this.listofDeviceIds = this.formList.map((form: string) => ({ text: form, value: form })); // Explicitly define the type here too
         console.log('this.formList check from location', this.formList);

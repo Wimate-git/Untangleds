@@ -800,9 +800,11 @@ async onFilterChange(event: any,getValue:any,key:any) {
       const formFields = this.populateFormBuilder.find(
         (form: { [key: string]: any }) => form[formName]
       );
+      console.log('formFields checking',formFields)
       const field = formFields[formName].find(
         (f: { name: string }) => f.name === selectedField
       );
+      console.log('field checking',field)
     
       // Create the observable
       const options$ = new Observable<any[]>(observer => {
@@ -3234,7 +3236,6 @@ splitCsv(csv: string): string[] {
       const selectedFormValue = this.selectedForms[index];
       return selectedFormValue
     }
-
 
 
 

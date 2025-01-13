@@ -64,49 +64,44 @@ console.log('Parsed data check:', this.parsedData);
 
 // Ensure parsedData is an array
 if (Array.isArray(this.parsedData)) {
+  console.log('Parsed data check:', this.parsedData);
+
   // Extract markers dynamically
   this.markers = this.parsedData
-    .filter((packet: any) => packet.label === "Track Location" || packet.label === "Graphic Location") // Filter by label
-    .map((packet: any) => {
-      if (Array.isArray(packet.add_Markers) && packet.add_Markers.length > 0) {
-        // Map each marker in add_Markers array
-        return packet.add_Markers.map((marker: any) => {
-          const baseMarker = {
-            position: {
-              lat: parseFloat(marker.position.lat), // Ensure latitude is a number
-              lng: parseFloat(marker.position.lng), // Ensure longitude is a number
-            },
-            title: marker.title || '', // Default to empty string if title is not available
-            label: marker.label || '', // Default to empty string if label is not available
-            mapType: packet.map_type || '', // Include map_type from the parent object
-          };
+    .filter((packet: any) => packet.add_Markers && Array.isArray(packet.add_Markers)) // Ensure add_Markers exists
+    .flatMap((packet: any) => {
+      return packet.add_Markers.map((marker: any) => {
+        const baseMarker = {
+          position: {
+            lat: parseFloat(marker.position.lat), // Convert latitude to number
+            lng: parseFloat(marker.position.lng), // Convert longitude to number
+          },
+          title: marker.title || '', // Default to empty string if title is missing
+          label: marker.label || '', // Default to empty string if label is missing
+          mapType: packet.map_type || '', // Include map_type from parent packet
+        };
 
-          // Add marker_info only for "Track Location"
-          if (packet.label === "Track Location") {
-            return { ...baseMarker, marker_info: marker.marker_info || {} };
-          }
+        // Include marker_info only if packet label is "Track Location"
+        if (packet.parameterName === "TrackLocation") {
+          return { ...baseMarker, marker_info: marker.marker_info || {} };
+        }
 
-          // For "Graphic Location", return base marker
-          return baseMarker;
-        });
-      }
-      return []; // Return empty array if add_Markers is not valid
-    })
-    .flat(); // Flatten nested arrays into a single array
+        return baseMarker;
+      });
+    });
 
   // Process markers to include mapType and scaled size
-  this.markers = this.markers
-    .filter(marker => marker.mapType) // Filter markers with valid mapType
-    .map(marker => ({
-      ...marker, // Retain existing marker properties
+  this.markers = this.markers.map(marker => ({
+      ...marker,
       mapType: {
-        url: marker.mapType, // Use the mapType as the icon URL
-        scaledSize: { width: 30, height: 30 } // Set the desired width and height
-      }
+        url: marker.mapType, // Use mapType as icon URL
+        scaledSize: { width: 30, height: 30 }, // Set custom dimensions
+      },
     }));
 
   console.log('Formatted markers with map types and sizes:', this.markers);
 }
+
 
 
 
