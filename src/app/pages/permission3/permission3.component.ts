@@ -2,7 +2,7 @@ import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, O
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { Observable } from 'rxjs';
 import { DataTablesResponse, IUserModel, UserService } from 'src/app/_fake/services/user-service';
-import Swal,{ SweetAlertOptions } from 'sweetalert2';
+import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { Config } from 'datatables.net';
 import {
   Validators,
@@ -14,8 +14,7 @@ import {
 } from "@angular/forms";
 import { APIService } from 'src/app/API.service';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
-import { SharedService } from '../shared.service';
-import { permission } from 'process';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 type Tabs = 'Sidebar' | 'Header' | 'Toolbar' | 'User';
 interface ListItem {
@@ -125,13 +124,29 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   dynamic_field: any;
   cloneUserOperation: boolean = false;
   editOperation: boolean;
-  userList: any[]=[];
+  userList: any[] = [];
+  populateFormBuilder: any;
+  conditionflag: boolean;
+  selectedFilterOption: string = ''; // Default value
+  formName: any;
+  formfieldData_: any;
+  dropdown: boolean;
+  Items: any;
+  allOptions: any[] = [];
+  // extractedValues: any[];
+  extractedValues: any[] = [];
+  fieldUserList: any[];
+  fieldList: any[];
+
+  addItem: boolean = false
+  loading: boolean = false;
+  formSelect: any;
 
   constructor(
     private cdr: ChangeDetectorRef,
     private fb: FormBuilder,
     private api: APIService,
-    private getDiagnostics: SharedService,
+    private spinner: NgxSpinnerService
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -180,18 +195,18 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
             const searchValue = dataTablesParameters.search.value.toLowerCase();
             const filteredData = Array.from(new Set(
-             responseData
-               .filter((item: { P1: string }) => item.P1.toLowerCase().includes(searchValue.toLowerCase()))
-               .map((item: any) => JSON.stringify(item)) // Stringify the object to make it unique
-           )).map((item: any) => JSON.parse(item)); // Parse back to object
+              responseData
+                .filter((item: { P1: string }) => item.P1.toLowerCase().includes(searchValue.toLowerCase()))
+                .map((item: any) => JSON.stringify(item)) // Stringify the object to make it unique
+            )).map((item: any) => JSON.parse(item)); // Parse back to object
 
             callback({
-                draw: dataTablesParameters.draw,
-                recordsTotal: responseData.length,
-                recordsFiltered: filteredData.length,
-                data: filteredData // Return filtered data
+              draw: dataTablesParameters.draw,
+              recordsTotal: responseData.length,
+              recordsFiltered: filteredData.length,
+              data: filteredData // Return filtered data
             });
-        
+
             console.log("Response is in this form ", responseData);
           })
           .catch((error: any) => {
@@ -273,13 +288,15 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   }
 
 
-  dynamicFormSelect(selectForm:any):void{
+  async dynamicFormSelect(selectForm: any): Promise<void> {
 
     this.formfieldData = []
     // this.permissionForm.get('fieldValue')?.reset();
-    console.log("SELECTION OF FORMS:",selectForm)
+    console.log("SELECTION OF FORMS:", selectForm)
 
-    this.api.GetMaster(this.client+'#dynamic_form#'+selectForm+'#main',1).then((formres:any)=>{
+    this.formName = selectForm
+
+    this.api.GetMaster(this.client + '#dynamic_form#' + selectForm + '#main', 1).then((formres: any) => {
 
       // console.log("FORMS MAIN TABLE:",(formres.metadata))
 
@@ -287,7 +304,11 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
       this.formfieldData = this.formData.formFields
 
+      this.formfieldData_ = this.formData.formFields
+
       this.formfieldData = this.formfieldData.filter((field: any) => field.validation.lookup_table === true);
+
+      // this.formfieldData_ = this.formfieldData.filter((field: any) => field.validation.lookup === true);
 
       this.formfieldData.unshift({
         "name": "",
@@ -297,33 +318,36 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
         "placeholder": "Enter System Username",  // Example placeholder
         "type": "text",  // Assuming it's a text input
         "validation": {
-            "lookup": false,
-            "formName_table": null,
-            "font_size": null,
-            "minLength": null,
-            "font_style": null,
-            "required": false,
-            "alignment_heading": null,
-            "hide": false,
-            "field": null,
-            "form": null,
-            "lookup_table": false,
-            "unique": false,
-            "disabled": false,
-            "user": false,
-            "maxLength": null
+          "lookup": false,
+          "formName_table": null,
+          "font_size": null,
+          "minLength": null,
+          "font_style": null,
+          "required": false,
+          "alignment_heading": null,
+          "hide": false,
+          "field": null,
+          "form": null,
+          "lookup_table": false,
+          "unique": false,
+          "disabled": false,
+          "user": false,
+          "maxLength": null
         }
-    });
+      });
 
-      console.log("Filtered Form Fields:", this.formfieldData);
+      console.log("Filtered Form Fields Advance:", this.formfieldData);
 
-      // this.formfieldData = this.formData.formFields.filter((field: any) => field.label !== "Empty Placeholder");
+      console.log("Filtered Form Fields Default:", this.formfieldData_);
+
+      this.formfieldData_ = this.formData.formFields.filter((field: any) => field.label !== "Empty Placeholder");
+      this.formfieldData_ = this.formData.formFields.filter((field: any) => field.type !== "heading");
 
       // console.log("FORMS AFTER STRINGIFY:", this.formfieldData);
 
-    }).catch((error)=>{
-     
-      console.log("ERRROR:",error)
+    }).catch((error) => {
+
+      console.log("ERRROR:", error)
     })
 
   }
@@ -342,42 +366,42 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
       const currentValue = this.permissionForm.get('fieldValue')?.value || '';
 
-  //   if (currentValue.includes(`\${${selectedField}}`)) {
-  //     // this.permissionError = 'This field is already added.';
-  //     this.showAlert(errorAlertform)
-  // } else {
+      //   if (currentValue.includes(`\${${selectedField}}`)) {
+      //     // this.permissionError = 'This field is already added.';
+      //     this.showAlert(errorAlertform)
+      // } else {
       // Append the new field value with a space separator
-      const updatedValue = currentValue 
-          ? `${currentValue} \${${selectedField}}` 
-          : `\${${selectedField}}`;
+      const updatedValue = currentValue
+        ? `${currentValue} \${${selectedField}}`
+        : `\${${selectedField}}`;
 
       // Set the formatted value in the Filter Equation field
       this.permissionForm.patchValue({
-          fieldValue: updatedValue
+        fieldValue: updatedValue
       });
-  // }
+      // }
     } else {
-        // Optionally, show an error or notification if no field is selected
-        // this.permissionError = 'Please select a Field Label first.';
+      // Optionally, show an error or notification if no field is selected
+      // this.permissionError = 'Please select a Field Label first.';
     }
     this.permissionForm.patchValue({
       field: '',
     });
-}
+  }
 
 
 
   onSelectAllChanged(event: Event): void {
     const target = event.target as HTMLInputElement;
     const isChecked = target.checked;
-  
+
     this.permissionsArray.controls.forEach(control => {
       // Set both 'view' and 'update' checkboxes to match the "Select All" checkbox
       control.get('view')?.setValue(isChecked);
       control.get('update')?.setValue(isChecked);
     });
   }
-  
+
 
 
   onFormGroupSelect(selectedItem: any): void {
@@ -387,16 +411,16 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
     console.log("Current Selected Form Groups:", this.selectedFormGroups);
 
-    if(selectedItem == 'All'){
-     this.DynamicFormlist()
+    if (selectedItem == 'All') {
+      this.DynamicFormlist()
     }
-    else{
+    else {
 
-    this.handleFormGroupSelection(selectedItem);
+      this.handleFormGroupSelection(selectedItem);
     }
   }
 
-  async onFormGroupDeSelect(deselectedItem: any){
+  async onFormGroupDeSelect(deselectedItem: any) {
     console.log("Deselected Form Group:", deselectedItem);
 
     // Remove deselected item from the array
@@ -407,7 +431,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
     // this.handleFormGroupsLength(this.selectedFormGroups);
 
-    this.formList=[]
+    this.formList = []
 
     this.selectedFormGroups.forEach((item: any) => this.handleFormGroupSelection(item));
 
@@ -419,7 +443,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   onSelectAll(selectedItems: any): void {
     console.log("All selected Form Groups:", selectedItems);
 
-    if(selectedItems == 'All'){
+    if (selectedItems == 'All') {
       this.addFromService()
     }
     // Handle logic for when all items are selected
@@ -428,17 +452,17 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     // this.handleFormOnSelectAll(selectedItems)
   }
 
-  handleFormGroupsLength(value:any) {
-    if(value.inculdes("All")){
+  handleFormGroupsLength(value: any) {
+    if (value.inculdes("All")) {
 
       this.addFromService()
     }
-    else{
+    else {
       value.length
 
-      console.log("VALUE LENGTH:",value.length)
+      console.log("VALUE LENGTH:", value.length)
     }
-}
+  }
 
   onDeSelectAll(deselectedItems: any): void {
     console.log("All deselected Form Groups:", deselectedItems);
@@ -469,30 +493,32 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   async handleFormGroupSelection(value: any): Promise<void> {
     console.log("Handling selection for value:", value);
 
-      const dymanic_form_result = await this.api.GetMaster(this.client + '#formgroup#' + value + '#main', 1)
+    this.formSelect = value.split('-')
 
-      console.log("DYNMAIC FORM:", JSON.parse(JSON.stringify(dymanic_form_result)))
+    const dymanic_form_result = await this.api.GetMaster(this.client + '#formgroup#' + this.formSelect[0]+ '#main', 1)
 
-      this.dynamicform = JSON.parse(JSON.parse(JSON.stringify(dymanic_form_result.metadata)))
+    console.log("DYNMAIC FORM:", JSON.parse(JSON.stringify(dymanic_form_result)))
 
-      console.log("DYMAINC FORM :", this.dynamicform.formList)
+    this.dynamicform = JSON.parse(JSON.parse(JSON.stringify(dymanic_form_result.metadata)))
 
-      for (const form of this.dynamicform.formList) {
-        // Assuming form has a property 'value' that you want to push
-        if (form && !this.formList.includes(form)) {
-          this.formList.push(form);
-        }
+    console.log("DYMAINC FORM :", this.dynamicform.formList)
+
+    for (const form of this.dynamicform.formList) {
+      // Assuming form has a property 'value' that you want to push
+      if (form && !this.formList.includes(form)) {
+        this.formList.push(form);
       }
-
-      this.formList.unshift("All");
-
-      this.formList = Array.from(new Set(this.formList));
-
-      console.log("Unique Form List:", this.formList);
-
-
-      console.log("Updated Form List:", this.formList);
     }
+
+    this.formList.unshift("All");
+
+    this.formList = Array.from(new Set(this.formList));
+
+    console.log("Unique Form List:", this.formList);
+
+
+    console.log("Updated Form List:", this.formList);
+  }
 
   async handleFormOnSelectAll(value: any): Promise<void> {
 
@@ -524,23 +550,27 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       label: ["", Validators.required],
       description: ["", Validators.required],
       time: ["",],
+      filterOption: [''],
       no_of_request: ["",],
       no_of_records: ["",],
-      size: ["", ],
-      setting: ["", ],
+      size: ["",],
+      setting: ["",],
       user_grade: ["",],
-      api_enable: [false, ],
+      api_enable: [false,],
       formgroup: [[]],
       dreamBoardIDs: [[], Validators.required],
       advance_report: [[]],
       powerboardId: [[]],
       magicboardId: [[]],
-      userList:[[]],
-      permissionsList: this.fb.array([],Validators.required),
+      userList: [[]],
+      permissionsList: this.fb.array([], Validators.required),
       dynamicEntries: this.fb.array([]),
+      conditions: this.fb.array([]),
       dynamicForm: [[]],
-      field:[],
-      fieldValue:[],
+      field: [],
+      fieldValue: [],
+      operator: [],
+      value: [],
       permission: [[]],
       createdTime: [Math.ceil(((new Date()).getTime()) / 1000)],
       updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
@@ -548,14 +578,174 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
 
     this.addPermissions();
+    this.addCondition();
+  }
+
+  get conditions(): FormArray {
+    return this.permissionForm.get('conditions') as FormArray;
+  }
+
+  addCondition() {
+
+
+    if (this.addItem == false) {
+
+
+      // const conditionGroup = this.fb.group({
+      //   field: [''],
+      //   operator: [''],
+      //   value: [''],
+      //   operatorBetween: [''],
+      //   dropdown: [false],
+      // });
+
+      const conditionGroup = this.fb.group({
+        field: ['', Validators.required],
+        operator: ['', Validators.required],
+        value: ['', Validators.required],
+        operatorBetween: [''],
+        dropdown: [false],
+      });
+
+      this.conditions.push(conditionGroup);
+    }
+
+    console.log("ADD CONDITION:", this.conditions)
+
+    this.updateFieldValue();
+  }
+
+  get isConditionsValid(): boolean {
+    return this.conditions.valid;
+  }
+
+  updateFieldValue() {
+    // Build the string from the conditions array
+    const conditionStrings = this.conditions.controls.map((condition: any, index: number) => {
+      const { field, operator, value, operatorBetween } = condition.value;
+
+      if (!field || !operator || !value) {
+        return '';
+      }
+
+      // Format current condition
+      const conditionStr = `\${${field}} ${operator} "${value}"`;
+
+      // Append operatorBetween only if not the last condition
+      return index < this.conditions.length - 1 ? `${conditionStr} ${operatorBetween}` : conditionStr;
+    });
+
+    // Join all condition strings
+    const finalFieldValue = conditionStrings.join(' ');
+
+    console.log("Value", finalFieldValue)
+
+    // Update the `fieldValue` form field
+    this.permissionForm.patchValue({ fieldValue: finalFieldValue });
+  }
+
+  removeCondition(condIndex: number) {
+    if (this.conditions.length > 0) {
+      this.conditions.removeAt(condIndex);
+    } else {
+      alert('At least one condition must be present.');
+    }
+  }
+
+  async onFormSelection(event: any, index: number) {
+
+    console.log("EVENT:", event.target.value)
+
+    const field = (event.target.value).split('.')
+
+
+    console.log("FIELD:", field)
+
+    console.log("SELECT OF FORM FIELD:", this.formfieldData_)
+
+    const matchedField = this.formfieldData_.find((item: { label: any; }) => item.label === field[0]);
+
+    const condition = this.conditions.at(index);
+
+
+    console.log("MATCH FIELD:", matchedField)
+
+    if (matchedField.validation.lookup === true && matchedField.type == 'select') {
+      //  this.dropdown = true
+      condition.get('dropdown')?.setValue(true);
+      //  const fieldData = await this.api.GetMaster(this.client+'#'+matchedField.validation.form+'#lookup',1)
+
+      this.fieldList = await this.fieldlookup(1, matchedField.validation.form)
+
+      console.log("FIELD LIST:", this.fieldList)
+
+
+      this.extractedValues[index] = this.fieldList
+        .map((record) => {
+          const match = record.find((item: string) => item.startsWith(matchedField.validation.field));
+          return match ? match.split('#')[1] : null;
+        })
+        .filter((value) => value !== null);
+
+      console.log("FIELD EXTRACT VALUE:", this.extractedValues[index]);
+    }
+    else if (matchedField.validation.user === true && matchedField.type == 'select') {
+
+      condition.get('dropdown')?.setValue(true);
+
+      this.fieldList = this.fieldUserList
+
+      this.extractedValues[index] = this.fieldList
+
+    }
+    else if (matchedField.type == 'select' && matchedField.options.length > 0) {
+
+      condition.get('dropdown')?.setValue(true);
+
+      this.fieldList = matchedField.options
+
+      this.extractedValues[index] = this.fieldList
+
+
+    }
+    else {
+      this.dropdown = false
+      this.fieldList = []
+
+      condition.get('dropdown')?.setValue(false);
+    }
+
   }
 
 
-  async onCloneUser(){
+  async fieldlookup(sk: number, fieldform: string) {
+
+    const response = await this.api.GetMaster(this.client + '#' + fieldform + "#lookup", sk);
+    console.log("RESPONSE:", (JSON.parse(JSON.parse(JSON.stringify(response.options)))))
+
+    this.Items = (JSON.parse(JSON.parse(JSON.stringify(response.options))))
+
+    if (this.Items && this.Items.length > 0) {
+
+      this.allOptions.push(...this.Items);
+
+
+      if (this.Items.length === 500) {
+        // Call the function recursively if 500 items are fetched
+        await this.fieldlookup(sk + 1, fieldform);
+      }
+
+    }
+
+    return this.allOptions
+
+  }
+
+  async onCloneUser() {
     this.cloneUserOperation = true
 
     this.permissionForm.get('permissionID')?.reset()
-    
+
     this.update = false
 
 
@@ -568,14 +758,25 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       timer: 2000,
       timerProgressBar: true
     });
-    
-}
+
+  }
 
   addDynamicData() {
 
+    this.formName =''
+
+
     this.permissionForm.markAsDirty();
+
+    if (this.selectedFilterOption == 'default') {
+
+      this.addItem = true
+      this.addCondition()
+    }
     // this.addbutton = false
     // Get the values from the form
+
+    this.addItem = false
     const dynamicForm = this.permissionForm.get('dynamicForm')?.value;
     const permission = this.permissionForm.get('permission')?.value;
     const fieldValue = this.permissionForm.get('fieldValue')?.value;
@@ -593,6 +794,8 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     };
     if (dynamicForm?.length > 0 && permission?.length > 0) {
 
+
+
       // Check for duplicate entries
       const isDuplicate = this.dynamicEntries.controls.some((entry: any) => {
         const existingDynamicForm = entry.get('dynamicForm')?.value;
@@ -609,7 +812,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
         this.dynamicEntries.push(this.fb.group({
           dynamicForm: [dynamicForm, Validators.required],
           permission: [permission, Validators.required],
-          fieldValue: [fieldValue]
+          fieldValue: [fieldValue],
         }));
 
         console.log("ADD DYNAMIC DATA:", this.dynamicEntries);
@@ -620,14 +823,20 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       this.permissionForm.get('dynamicForm')?.reset();
       this.permissionForm.get('permission')?.reset();
       this.permissionForm.get('fieldValue')?.reset();
-      this.formfieldData=[]
+
+
+      if (this.selectedFilterOption == 'default') {
+        while (this.conditions.length > 0) {
+          this.conditions.removeAt(0);
+        }
+      }
+
+
+      this.formfieldData = []
     }
     else {
-     
-      // this.permissionForm.get('dynamicForm')?.reset();
-      // this.permissionForm.get('permission')?.reset();
-      // this.permissionForm.get('fieldValue')?.reset();
-      this.formfieldData=[]
+
+      this.formfieldData = []
       this.showAlert(errorAlert_1)
     }
   }
@@ -637,23 +846,103 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     this.permissionForm.markAsDirty();
   }
 
-  editEntry(index: number) {
-    const entry = this.dynamicEntries.at(index) as FormGroup;
-    this.permissionForm.markAsDirty();
-    // Set the values back into the form for editing
-    if (entry) {
-      console.log("ON CLICK ON EDIT:", entry)
-      const dynamicFormValue = entry.get('dynamicForm')?.value;
-      this.permissionForm.get('dynamicForm')?.setValue(entry.get('dynamicForm')?.value);
-      this.permissionForm.get('permission')?.setValue(entry.get('permission')?.value);
-      this.permissionForm.get('fieldValue')?.setValue(entry.get('fieldValue')?.value); // Set fieldValue
+  async editEntry(index: number) {
+
+    if (this.selectedFilterOption !== '') {
+      const entry = this.dynamicEntries.at(index) as FormGroup;
+      this.permissionForm.markAsDirty();
+      // Set the values back into the form for editing
+      if (entry) {
+        console.log("ON CLICK ON EDIT:", entry)
+        const dynamicFormValue = entry.get('dynamicForm')?.value;
+        this.permissionForm.get('dynamicForm')?.setValue(entry.get('dynamicForm')?.value);
+        this.permissionForm.get('permission')?.setValue(entry.get('permission')?.value);
+        this.permissionForm.get('fieldValue')?.setValue(entry.get('fieldValue')?.value); // Set fieldValue
+    
+       await this.dynamicFormSelect(dynamicFormValue)
 
 
-      this.dynamicFormSelect(dynamicFormValue)
+     if(this.selectedFilterOption == 'default'){
 
+      this.spinner.show()
+
+       setTimeout(async () => {
+        console.log('This message is delayed by 2 seconds');
+    
+        while (this.conditions.length > 0) {
+          this.conditions.removeAt(0);
+        }
+      const fieldValue = entry.get('fieldValue')?.value;
+      if (fieldValue) {
+        const conditionRegex = /\${(.*?)}\s*(==|!=|<=|>=|<|>)\s*"(.*?)"/g;
+        let match;
+
+        while ((match = conditionRegex.exec(fieldValue)) !== null) {
+          const [_, field, operator, value] = match;
+          const conditionGroup = this.fb.group({
+            field: [field.trim(), Validators.required],
+            operator: [operator.trim(), Validators.required],
+            value: [value.trim(), Validators.required],
+            operatorBetween: [''], // We'll handle AND/OR separately below
+            dropdown: [field.includes("single-select")], // Determine dropdown based on field format
+          });
+          this.conditions.push(conditionGroup);
+
+
+          const fieldEvent = { target: { value: field.trim() } }; // Mock the field selection event
+          await this.onFormSelection(fieldEvent, this.conditions.length - 1);
+        }
+
+        // Handle AND/OR operators between conditions
+        const operatorBetweenRegex = /(&&|\|\|)/g;
+        const operators = fieldValue.match(operatorBetweenRegex);
+        if (operators) {
+          this.conditions.controls.forEach((condition, index) => {
+            if (index < operators.length) {
+              condition.get('operatorBetween')?.setValue(operators[index]);
+            }
+          });
+        }
+      }
+    }, 2000);
+    this.spinner.hide();
+  }
     }
-    // Optionally, you can remove the entry after loading it for editing
-    this.dynamicEntries.removeAt(index);
+    
+      // Optionally, you can remove the entry after loading it for editing
+      this.dynamicEntries.removeAt(index);
+     
+    }
+    else {
+      const errorAlert_1: SweetAlertOptions = {
+        icon: 'error',
+        title: 'Error!',
+        text: 'Please Select filter option.',
+      };
+      this.showAlert(errorAlert_1)
+
+    
+    }
+  }
+
+  parseConditions(fieldValue: string): any[] {
+    const conditions: any[] = [];
+    const conditionStrings = fieldValue.split('&&').map((str) => str.trim());
+
+    conditionStrings.forEach((condition) => {
+      const match = condition.match(/\${(.*?)}\s*(==|!=|>|<|>=|<=)\s*"(.*?)"/);
+      if (match) {
+        conditions.push({
+          field: match[1],
+          operator: match[2],
+          value: match[3],
+          dropdown: false, // Default value; adjust as needed
+          operatorBetween: match[4], // Optional
+        });
+      }
+    });
+
+    return conditions;
   }
 
   addPermissions() {
@@ -691,7 +980,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       dynamicEntriesArray.push(this.fb.group({
         dynamicForm: [entry.dynamicForm, Validators.required],
         permission: [entry.permission, Validators.required],
-        fieldValue:[entry.fieldValue]
+        fieldValue: [entry.fieldValue],
       }));
     });
   }
@@ -726,9 +1015,16 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
   edit(P1: any) {
 
+    this.initForm()
+    this.formName = ''
     this.update = true
+    this.selectedFilterOption = ''
     console.log("EDIT ID:", P1)
     this.data_temp = []
+    this.fieldList =[]
+    this.addItem = false
+
+    // this.addCondition()
 
     this.api.GetMaster(this.client + '#permission#' + P1 + '#main', 1).then((res: any) => {
 
@@ -751,6 +1047,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
             no_of_records: [this.data_temp[0].no_of_request],
             size: [this.data_temp[0].size],
             setting: [this.data_temp[0].setting],
+            filterOption: [],
             user_grade: [this.data_temp[0].user_grade],
             api_enable: [this.data_temp[0].api_enable],
             formgroup: [this.data_temp[0].formgroup],
@@ -762,9 +1059,10 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
             permission: [this.data_temp[0].permission],
             permissionsList: this.fb.array([]),
             dynamicEntries: this.fb.array([]),
+            conditions: this.fb.array([]),
             field: this.data_temp[0].field,
-            userList:[this.data_temp[0].userList],
-            fieldValue:this.data_temp[0].fieldValue,
+            userList: [this.data_temp[0].userList],
+            fieldValue: this.data_temp[0].fieldValue,
             createdTime: [this.data_temp[0].createdTime],
             updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
           });
@@ -786,9 +1084,11 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
   create() {         // click on create new 
     this.update = false
-    this.error = '';    
-    this.formList=[]   // Model heading and button text change flag
-    this.formfieldData =[]
+    this.selectedFilterOption = ''
+    this.error = '';
+    this.formList = []   // Model heading and button text change flag
+    this.formfieldData = []
+    this.formName = ''
     this.initForm()
   }
 
@@ -882,6 +1182,25 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
     const updateFn = () => {
 
+      const errorAlert_1: SweetAlertOptions = {
+        icon: 'error',
+        title: 'Error!',
+        text: 'Please Click on Add button',
+      };
+
+
+      const dynamicForm = this.permissionForm.get('dynamicForm')?.value;
+      const permission = this.permissionForm.get('permission')?.value;
+      const fieldValue = this.permissionForm.get('fieldValue')?.value;
+
+      if (dynamicForm?.length > 0 || permission?.length > 0 || fieldValue?.length > 0) {
+
+        this.showAlert(errorAlert_1)
+
+        return;
+
+      }
+
       const formValue = this.permissionForm.value
 
       const dynamicEntries = formValue.dynamicEntries
@@ -936,6 +1255,13 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       createFn();
     }
 
+  }
+
+  onFilterChange(event: Event, type: string): void {
+
+
+    const target = event.target as HTMLInputElement;
+    this.selectedFilterOption = target.value;
   }
 
 
@@ -1097,7 +1423,12 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       } else {
 
 
-        this.formgroupIDs = this.formgroupIDs.map((item: any) => item.P1)
+        // this.formgroupIDs = this.formgroupIDs.map((item: any) => item.P1)
+
+        this.formgroupIDs = this.formgroupIDs.map((item: any) => {
+            // Check if item[1] is not empty and concatenate with item[0]
+            return `${item.P1}-${item.P2}`
+          });
 
         this.formgroupIDs.unshift("All");
 
@@ -1151,13 +1482,19 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
         this.userList = this.userList.map((item: any) => item.P1)
 
+        this.fieldUserList = this.userList
+
+        const element_remove = ['Logged-in User', 'All', 'None']
+
+        this.fieldUserList = this.fieldUserList.filter(item => !element_remove.includes(item));
+
         this.userList.unshift("Logged-in User")
 
 
         this.userList.unshift("All");
 
         this.userList.unshift("None");
-       
+
         console.log("All the formgroup Id are here ", this.userList);
 
       }
@@ -1261,7 +1598,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
         this.magicboardId = this.magicboardId.map((item: any) => item.P1)
 
         this.magicboardId.unshift("All");
-        
+
 
         console.log("All the magicboard id are here ", this.magicboardId);
 
@@ -1489,7 +1826,6 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
         });
     });
   }
-
 
 
 }

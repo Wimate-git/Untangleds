@@ -1,3 +1,4 @@
+<ngx-spinner *ngIf="loading" bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true"><p style="color: white" > Loading data, please wait... </p></ngx-spinner>
 <div class="card">
     <div class="card-header border-0 pt-6">
         <h2>Permission Configuration</h2>
@@ -47,8 +48,10 @@
         <div class="modal-header">
             <h4 *ngIf="!update" class="modal-title" id="modal-basic-title">Add Permission Configuration</h4>
             <h4 *ngIf="update" class="modal-title" id="modal-basic-title">Edit Permission Configuration</h4>
-            <button *ngIf="update" [disabled]="cloneUserOperation" type="button" placement="bottom" class="btn btn-sm btn-warning copy-btn ms-1" (click)="onCloneUser()">
-                <span class="copy-icon"><i class="fa-regular fa-copy fs-6 text-white pt-1"></i></span> <!-- Copy icon (clipboard) -->
+            <button *ngIf="update" [disabled]="cloneUserOperation" type="button" placement="bottom"
+                class="btn btn-sm btn-warning copy-btn ms-1" (click)="onCloneUser()">
+                <span class="copy-icon"><i class="fa-regular fa-copy fs-6 text-white pt-1"></i></span>
+                <!-- Copy icon (clipboard) -->
                 <span class="copy-text"> Clone Permission</span> <!-- Text that appears on hover -->
             </button>
             <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
@@ -70,7 +73,7 @@
                             <input *ngIf="update" type="text" class="form-control form-control-solid mb-3 mb-lg-0"
                                 name="permissionID" placeholder="Enter permission Id" formControlName="permissionID"
                                 readonly required />
-                                <span style="color: #fc1900;">{{error}}</span>
+                            <span style="color: #fc1900;">{{error}}</span>
                             <div *ngIf="permissionForm.controls['permissionID'].invalid && permissionForm.controls['permissionID'].touched"
                                 class="invalid-feedback">
                                 Permission Id is required.
@@ -202,7 +205,7 @@
                                 </ng-multiselect-dropdown>
                             </div>
                         </div>
-                        <div class="col-md-4 mb-6">
+                        <!-- <div class="col-md-4 mb-6">
                             <label class="fw-semibold fs-6 mb-2">Advance Report Permission</label>
                             <div class="custom-multiselect">
                                 <ng-multiselect-dropdown style="
@@ -224,7 +227,7 @@
                                     [formControl]="$any(permissionForm.controls['advance_report'])">
                                 </ng-multiselect-dropdown>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="col-md-4 mb-6">
                             <label class="fw-semibold fs-6 mb-2">User Restriction</label>
                             <div class="custom-multiselect">
@@ -242,9 +245,8 @@
                                           border-radius: 4px;
                                           
                                           " class="form-select form-select-solid form-select"
-                                    [placeholder]="'Select user'" [settings]="dropdownSettings"
-                                    [data]="userList" name="userList"
-                                    [formControl]="$any(permissionForm.controls['userList'])">
+                                    [placeholder]="'Select user'" [settings]="dropdownSettings" [data]="userList"
+                                    name="userList" [formControl]="$any(permissionForm.controls['userList'])">
                                 </ng-multiselect-dropdown>
                             </div>
                         </div>
@@ -318,7 +320,7 @@
                                     Dynamic Form
                                 </a>
                             </li>
-                           
+
                         </ul>
                     </div>
                     <div class="card-body">
@@ -336,16 +338,14 @@
                                         <tr *ngIf="permissionsArray.controls.length">
                                             <td>Select All</td>
                                             <td colspan="2">
-                                              <label class="form-check form-check-custom form-check-solid align-items-start">
-                                                <input
-                                                  class="form-check-input me-3"
-                                                  type="checkbox"
-                                                  (change)="onSelectAllChanged($event)"
-                                                />
-                                                Select All
-                                              </label>
+                                                <label
+                                                    class="form-check form-check-custom form-check-solid align-items-start">
+                                                    <input class="form-check-input me-3" type="checkbox"
+                                                        (change)="onSelectAllChanged($event)" />
+                                                    Select All
+                                                </label>
                                             </td>
-                                          </tr>
+                                        </tr>
                                         <tr *ngFor="let permission of permissionsArray.controls; let i = index"
                                             [formGroupName]="i">
                                             <td>{{ permission.get('name')?.value }}</td>
@@ -385,13 +385,12 @@
                                                       background-image: none;
                                                       border-radius: 4px;
                                                       " class="form-select form-select-solid form-select"
-                                                      (onSelect)="dynamicFormSelect($event)"
-                                            [placeholder]="'dynamic form'" [settings]="dropdownSettings_"
-                                            [data]="formList" name="dynamicForm"
+                                            (onSelect)="dynamicFormSelect($event)" [placeholder]="'dynamic form'"
+                                            [settings]="dropdownSettings_" [data]="formList" name="dynamicForm"
                                             [formControl]="$any(permissionForm.controls['dynamicForm'])">
                                         </ng-multiselect-dropdown>
                                     </div>
-                                    
+
                                     <span style="color: #fc1900;">{{dynamicFormError}}</span>
                                 </div>
                                 <div class="col-md-5 mb-4">
@@ -419,41 +418,159 @@
                                     </div>
                                     <span style="color: #fc1900;">{{permissionError}}</span>
                                 </div>
-                                
-                                <div class="col-md-3 mb-4">
-                                    <label class="fw-semibold fs-6 mb-2">Field Label</label>
-                                    <!-- <input type="text" class="form-control form-control-solid" name="newInput1"
-                                        placeholder="Enter value for New Input 1" formControlName="newInput1" /> -->
-                                        <select
-                                        class="form-select form-select-solid form-select"
-                                        name="field"
-                                        placeholder="Select field"
-                                        formControlName="field"
-                                    >
-                                        <option value="" disabled [selected]="true">Select field</option>
-                                        <option *ngFor="let item of formfieldData" [value]="item.label + '.' + item.name">
-                                            {{ item.label }}
-                                        </option>
+
+                                <div class="form-group row ps-4 mb-7">
+                                    <label
+                                        class="required col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Filter
+                                        Data</label>
+                                    <div class="col-3 d-flex gap-7 align-items-center">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" id="filterAll"
+                                                formControlName="filterOption" value="default"
+                                                (change)="onFilterChange($event, 'html')">
+                                            <label class="form-check-label" for="filterAll">Default</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" id="filterOnCondition"
+                                                formControlName="filterOption" value="advance"
+                                                (change)="onFilterChange($event, 'html')">
+                                            <label class="form-check-label" for="filterOnCondition">Advance</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="selectedFilterOption === 'advance'" class="row">
+                                    
+                                    <div class="col-md-3 mb-4">
+                                        <label class="fw-semibold fs-6 mb-2">Field Label</label>
+                                        <select class="form-select form-select-solid form-select" name="field"
+                                            placeholder="Select field" formControlName="field">
+                                            <option value="" disabled [selected]="true">Select field</option>
+                                            <option *ngFor="let item of formfieldData"
+                                                [value]="item.label + '.' + item.name">
+                                                {{ item.label }}
+                                            </option>
                                         </select>
+                                    </div>
+                                    <div class="col-md-2 mb-19 d-flex align-items-end">
+                                        <button type="button"
+                                            class="btn btn-light-primary w-30 d-flex align-items-center justify-content-center"
+                                            (click)="populateFilterEquation()">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                    </div>
+                                    <div class="col-md-5 mb-4 filter-equation">
+                                        <label class="fw-semibold fs-6 mb-2">Filter equation</label>
+                                        <textarea type="text" class="form-control form-control-solid" name="fieldValue"
+                                            rows="3" placeholder="value" formControlName="fieldValue"></textarea>
+                                    </div>
+
+
+                                    <div class="col-md-2 mb-16 d-flex align-items-end">
+                                        <button type="button" class="btn btn-primary w-60"
+                                            (click)="addDynamicData()">Add</button>
+                                    </div>
                                 </div>
-                                <div class="col-md-2 mb-19 d-flex align-items-end">
-                                    <button type="button" class="btn btn-light-primary w-30 d-flex align-items-center justify-content-center" (click)="populateFilterEquation()">
-                                        <i class="bi bi-plus"></i>
-                                    </button>
+
+                                <div *ngIf="selectedFilterOption === 'default'" class="row">
+                                    <!-- <div formArrayName="conditions">
+                                        <div *ngFor="let condition of conditions.controls; let i = index" [formGroupName]="i" style="display: flex; flex-wrap: wrap; justify-content: space-between;"> -->
+                                    <div class="form-group"
+                                        style="border: 1px solid blue; padding: 10px; width: 900px; margin: 5px;">
+                                        <h5>{{ formName }}</h5>
+                                        <div formArrayName="conditions">
+                                            <div *ngFor="let condition of conditions.controls; let condIndex = index"
+                                                [formGroupName]="condIndex"
+                                                style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;">
+                                                <div
+                                                    style="display: flex;flex-wrap: wrap;justify-content: space-between;">
+                                                    <div class="mb-3" style="width: 30%;">
+                                                        <label class="required">Field Label</label>
+                                                        <select formControlName="field" class="form-control"
+                                                            (change)="onFormSelection($event,condIndex)">
+                                                            <option value="" disabled [selected]="true">Select field
+                                                            </option>
+                                                            <option *ngFor="let item of formfieldData_"
+                                                                [value]="item.label + '.' + item.name">
+                                                                {{ item.label }}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="mb-3" style="width: 30%;">
+                                                        <label class="required">Operator</label>
+                                                        <select formControlName="operator" placeholder="Select operator"
+                                                            class="form-control">
+                                                            <option value="" disabled selected>Select operator</option>
+                                                            <option value="==">Equals</option>
+                                                            <option value=">">Not equals</option>
+                                                            <option value=">">Greater than</option>
+                                                            <option value="<">Less than</option>
+                                                            <option value="<=">Less than equals to</option>
+                                                            <option value=">=">Greater than equals to</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div nclass="mb-3" style="width: 30%;" *ngIf="dropdown">
+                                                        <label class="required">Value</label>
+                                                        <!-- <input type="text" formControlName="value" placeholder="value"  class="form-control" /> -->
+                                                        <select formControlName="value" placeholder="Select value"
+                                                            class="form-control">
+                                                            <option value="" disabled selected>Select operator</option>
+                                                            <option *ngFor="let item of extractedValues" [value]="item">
+                                                                {{ item }}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div nclass="mb-3" style="width: 30%;"
+                                                        *ngIf="condition.get('dropdown')?.value">
+                                                        <label class="required">Value</label>
+                                                        <select formControlName="value" placeholder="Select value"
+                                                            class="form-control">
+                                                            <option value="" disabled selected>Select value</option>
+                                                            <option *ngFor="let item of extractedValues[condIndex]"
+                                                                [value]="item">
+                                                                {{ item }}
+                                                            </option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="mb-3" style="width: 30%;"
+                                                        *ngIf="!condition.get('dropdown')?.value">
+                                                        <label class="required">Value</label>
+                                                        <input type="text" formControlName="value" placeholder="value"
+                                                            class="form-control" />
+                                                    </div>
+
+                                                    <div *ngIf="condIndex < conditions.length - 1" class="mb-3"
+                                                        style="width: 30%;">
+                                                        <label class="required">Between Operator</label>
+                                                        <select formControlName="operatorBetween"
+                                                            placeholder="Select operator" class="form-control">
+                                                            <option value="&&">AND</option>
+                                                            <option value="||">OR</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div style="width: 100%; display: flex; justify-content: flex-start;">
+                                                        <button *ngIf="condIndex != 0" type="button" class="btn btn-danger btn-sm mt-2 mb-2" (click)="removeCondition(condIndex)">
+                                                            Remove Condition
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-primary btn-sm mt-2" [disabled]="!isConditionsValid"
+                                            (click)="addCondition()">Add Condition</button>
+                                    </div>
+                                    <div class="col-md-2 mb-16 d-flex align-items-end">
+                                        <button type="button" class="btn btn-primary w-60"
+                                            (click)="addDynamicData()">Add</button>
+                                    </div>
                                 </div>
-                                <div class="col-md-5 mb-4 filter-equation">
-                                    <label class="fw-semibold fs-6 mb-2">Filter equation</label>
-                                    <!--<input type="text" class="form-control form-control-solid" name="fieldValue"
-                                        placeholder="value" formControlName="fieldValue" />-->
-                                        <textarea type="text" class="form-control form-control-solid" name="fieldValue" rows="3"
-                                        placeholder="value" formControlName="fieldValue"></textarea>
-                                </div>
-                               
-                        
-                                <div class="col-md-2 mb-16 d-flex align-items-end">
-                                    <button type="button" class="btn btn-primary w-60"
-                                        (click)="addDynamicData()">Add</button>
-                                </div>
+                                
+
+
                             </div>
                             <div class="table-responsive mt-4">
                                 <table class="table align-middle table-row-dashed">
@@ -467,12 +584,16 @@
                                     </thead>
                                     <tbody>
                                         <tr *ngFor="let entry of dynamicEntries.controls; let i = index">
-                                            <td>{{ entry.get('dynamicForm')?.value }}</td>
-                                            <td class="text-truncate filter-equation-cell" title="{{ entry.get('permission')?.value }}">
+                                            <td class="text-truncate filter-equation-cell"
+                                                title="{{ entry.get('dynamicForm')?.value }}">
+                                                {{ entry.get('dynamicForm')?.value }}</td>
+                                            <td class="text-truncate filter-equation-cell"
+                                                title="{{ entry.get('permission')?.value }}">
                                                 {{ entry.get('permission')?.value }}</td>
-                                            <td class="text-truncate filter-equation-cell" title="{{ entry.get('fieldValue')?.value }}">
+                                            <td class="text-truncate filter-equation-cell"
+                                                title="{{ entry.get('fieldValue')?.value }}">
                                                 {{ entry.get('fieldValue')?.value }}
-                                              </td>
+                                            </td>
                                             <td>
                                                 <button type="button" class="btn btn-sm btn-warning me-2"
                                                     (click)="editEntry(i)">
@@ -481,7 +602,7 @@
 
                                                 <!-- Delete Button with Icon -->
                                                 <button type="button" class="btn btn-sm btn-danger"
-                                                    (click)="removeDynamicData(i)" >
+                                                    (click)="removeDynamicData(i)">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </button>
                                             </td>
@@ -516,8 +637,7 @@
                                             [formControl]="$any(permissionForm.controls['formgroup'])"
                                             (onSelect)="onFormGroupSelect($event)"
                                             (onDeSelect)="onFormGroupDeSelect($event)"
-                                            (onSelectAll)="onSelectAll($event)"
-                                            (onDeSelectAll)="onDeSelectAll($event)">
+                                            (onSelectAll)="onSelectAll($event)" (onDeSelectAll)="onDeSelectAll($event)">
                                         </ng-multiselect-dropdown>
                                     </div>
                                     <!-- <span style="color: #fc1900;">{{dynamicFormError}}</span> -->
@@ -534,8 +654,9 @@
                 (click)="modal.dismiss('cancel')">
                 Discard
             </button>
-            <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary" 
-            [disabled]="permissionForm.invalid || permissionForm.pristine" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+            <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary"
+                [disabled]="permissionForm.invalid || permissionForm.pristine"
+                [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
                 <span *ngIf="!update" class="indicator-label">Submit</span>
                 <span *ngIf="update" class="indicator-label">Update</span>
                 <span class="indicator-progress">

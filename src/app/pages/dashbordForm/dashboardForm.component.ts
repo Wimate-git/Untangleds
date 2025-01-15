@@ -223,6 +223,14 @@ export class DashboardFormComponent implements OnInit {
         this.cdr.detectChanges();
     }
 
+    searchQuery = '';
+  get filteredCards() {
+    return this.cards.filter(card =>
+      card.name?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+      card.job?.toLowerCase().includes(this.searchQuery.toLowerCase())
+    );
+  }
+
 
     showAlert(swalOptions: SweetAlertOptions) {
         let style = swalOptions.icon?.toString() || 'success';

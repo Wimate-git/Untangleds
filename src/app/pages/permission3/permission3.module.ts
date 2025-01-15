@@ -11,6 +11,7 @@ import { Permission3Component } from "./permission3.component";
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatCardModule} from '@angular/material/card';
+// import { Crud2Module } from "src/app/modules/crud2/crud.module";
 
 
 @NgModule({
@@ -36,6 +37,7 @@ import {MatCardModule} from '@angular/material/card';
     NgxSpinnerModule,
     MatTabsModule,
     MatCardModule,
+    // Crud2Module ,
     SweetAlert2Module
     
 ]
