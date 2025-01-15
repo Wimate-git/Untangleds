@@ -183,6 +183,29 @@
                             </div>
                         </div>
                         <div class="col-md-4 mb-6">
+                            <label class="fw-semibold fs-6 mb-2">Summary Dashboard</label>
+                            <div class="custom-multiselect">
+                                <ng-multiselect-dropdown style="
+                                          display: inline-block; 
+                                          width: 100%;
+                                          padding: 0px ;
+                                          margin-bottom: 0;
+                                          font-weight: 0px;
+                                          line-height: 1.52857143;
+                                          text-align: left;
+                                          vertical-align: middle;
+                                          cursor: pointer;
+                                          background-image: none;
+                                          border-radius: 4px;
+                                          
+                                          " class="form-select form-select-solid form-select"
+                                    [placeholder]="'Select summary permission'" [settings]="dropdownSettings"
+                                    [data]="summaryList" name="summaryList"
+                                    [formControl]="$any(permissionForm.controls['summaryList'])">
+                                </ng-multiselect-dropdown>
+                            </div>
+                        </div> 
+                        <div class="col-md-4 mb-6">
                             <label class="fw-semibold fs-6 mb-2">Advance Report Permission</label>
                             <div class="custom-multiselect">
                                 <ng-multiselect-dropdown style="

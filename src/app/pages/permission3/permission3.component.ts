@@ -141,6 +141,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   addItem: boolean = false
   loading: boolean = false;
   formSelect: any;
+  summaryList: any[]=[];
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -284,6 +285,8 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     await this.fetchFormgrouplookup(1)
 
     await this.fetchUserList(1)
+
+    await this.fetchSummaryList(1)
 
   }
 
@@ -563,6 +566,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       powerboardId: [[]],
       magicboardId: [[]],
       userList: [[]],
+      summaryList:[[]],
       permissionsList: this.fb.array([], Validators.required),
       dynamicEntries: this.fb.array([]),
       conditions: this.fb.array([]),
@@ -1024,7 +1028,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     this.fieldList =[]
     this.addItem = false
 
-    // this.addCondition()
+    this.addCondition()
 
     this.api.GetMaster(this.client + '#permission#' + P1 + '#main', 1).then((res: any) => {
 
@@ -1062,6 +1066,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
             conditions: this.fb.array([]),
             field: this.data_temp[0].field,
             userList: [this.data_temp[0].userList],
+            summaryList:[this.data_temp[0].summaryList],
             fieldValue: this.data_temp[0].fieldValue,
             createdTime: [this.data_temp[0].createdTime],
             updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
@@ -1496,6 +1501,69 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
         this.userList.unshift("None");
 
         console.log("All the formgroup Id are here ", this.userList);
+
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle the error as needed
+    }
+  }
+
+  async fetchSummaryList(sk: any) {
+    try {
+      const response = await this.api.GetMaster(this.client + "#summary#lookup", sk);
+
+      if (response && response.options) {
+        // Check if response.listOfItems is a string
+        if (typeof response.options === 'string') {
+          let data = JSON.parse(response.options);
+          console.log("d1 =", data)
+          if (Array.isArray(data)) {
+            for (let index = 0; index < data.length; index++) {
+              const element = data[index];
+
+              if (element !== null && element !== undefined) {
+                // Extract values from each element and push them to lookup_data_temp1
+                const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
+                const { P1, P2, P3, P4, P5, P6, P7 } = element[key]; // Extract values from the nested object
+                this.summaryList.push({ P1, P2, P3, P4, P5, P6, P7 }); // Push an array containing P1, P2, and P3 values
+                console.log("d2 =", this.summaryList)
+              } else {
+                break;
+              }
+            }
+            //this.lookup_data_temp1.sort((a, b) => b.P5 - a.P5);
+            this.summaryList.sort((a: any, b: any) => {
+              return b.P5 - a.P5; // Compare P5 values in descending order
+            });
+            console.log("Lookup sorting", this.summaryList);
+            // Continue fetching recursively
+            await this.fetchSummaryList(sk + 1);
+          } else {
+            console.error('Invalid data format - not an array.');
+          }
+        } else {
+          console.error('response.listOfItems is not a string.');
+        }
+      } else {
+
+
+        this.summaryList = this.summaryList.map((item: any) => item.P1)
+
+        // this.fieldUserList = this.userList
+
+        // const element_remove = ['Logged-in User', 'All', 'None']
+
+        // this.fieldUserList = this.fieldUserList.filter(item => !element_remove.includes(item));
+
+        // this.userList.unshift("Logged-in User")
+
+
+        this.summaryList.unshift("All");
+
+        this.summaryList.unshift("None");
+
+        console.log("All the formgroup Id are here ", this.summaryList);
 
       }
     } catch (error) {
