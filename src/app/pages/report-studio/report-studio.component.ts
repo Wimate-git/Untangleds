@@ -673,7 +673,6 @@ initializeFormControls(): void {
       formArray.removeAt(0);
     }
 
-    // console.log("Create the form here ",this.selectedValues);
 
     // Loop over the new data and add FormControls
     this.selectedValues.forEach((dropdownData: any[], i: any) => {
@@ -1404,73 +1403,6 @@ isBase64(value: string): boolean {
 }
  
 
-
-  // createColumnDefs(rowData: any[]): ColDef[] {
-  //   const columns: any = [];
-    
-  //   if (rowData.length > 0) {
-  //     const sampleRow = rowData[0];
-    
-  //     // Add 'formFilter' column manually
-  //     columns.push({
-  //       headerName: 'Form Filter',
-  //       field: 'formFilter',
-  //       flex: 1,
-  //       filter: true,
-  //       minWidth: 150,  // Add a minimum width for the formFilter column
-  //       hide: true
-  //     });
-
-    
-  //     // Iterate through metadata keys to create dynamic columns
-  //     for (let key in sampleRow) {
-
-  //       if (key !== 'formFilter' && key !== 'PK' && key !== 'SK' && key != 'Updated Date') {
-  //         // Check if the value in the row is Base64 (image data)
-  //         const isBase64Image = this.isBase64(sampleRow[key]);
-  //         const isLocation = this.isLocation(key,sampleRow[key]);
-
-
-  //         // Choose renderer based on condition
-  //           let cellRenderer = null;
-  //           if (isBase64Image) {
-  //             cellRenderer = this.imageCellRenderer;
-  //           } else if (isLocation) {
-  //             cellRenderer = this.locationCellRenderer;
-  //           }
-  
-  //         columns.push({
-  //           headerName: this.formatHeaderName(key), // Format the header name
-  //           field: key,
-  //           flex: 1,            // Allow the column to flex (resize relative to others)
-  //           minWidth: 150,   
-  //           filter: true,       // Enable filtering for this column
-  //           sortable: true,     // Enable sorting for this column
-  //           cellRenderer: cellRenderer, // Apply custom cellRenderer for Base64 images
-  //           cellRendererParams: {
-  //             context: this  // Pass the component context to the cell renderer
-  //           }
-  //         });
-  //       }
-  //     }
-  
-  //     // Check if 'updatedDate' field exists and sort it
-  //     if (sampleRow.hasOwnProperty('Updated Date')) {
-  //       columns.push({
-  //         headerName: 'Updated Date',
-  //         field: 'Updated Date',
-  //         flex: 1,
-  //         filter: 'agDateColumnFilter',  // Use date filter
-  //         sortable: true,
-  //         minWidth: 200,  // Customize width
-  //         sort: 'desc',   // Set default sort order to descending (latest first)
-  //       });
-  //     }
-
-  //   }
-  
-  //   return columns;
-  // }
 
   createColumnDefs(rowData: any[],formName:any): ColDef[] {
     const columns: any = [];
