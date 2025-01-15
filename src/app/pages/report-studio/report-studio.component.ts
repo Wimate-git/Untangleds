@@ -314,7 +314,7 @@ columns: any;
         ajax: (dataTablesParameters:any, callback) => {
           this.datatableConfig = {}
           this.lookup_data_savedQuery = []
-          this.fetchUserLookupdata(1,this.SK_clientID + "#savedquery" + "#lookup")
+          this.fetchUserLookupdata(1,this.SK_clientID + "#savedquery" + "#lookup",'table')
             .then((resp:any) => {
               var responseData = resp || []; // Default to an empty array if resp is null
               responseData = Array.from(new Set(responseData))
@@ -576,18 +576,35 @@ async onColumnChange(event: any, getValue: string): Promise<void> {
 
             if((field.name.startsWith("map-") || field.type == 'map') && geoFlag == false){
               geoFlag = true
-              return { name: field.name, label: "Geographic Location", formName: formName };
+              return { name: field.name, label: "Geographic Location", formName: formName, type: field.type};
             }
             else if((field.name.startsWith("dynamic_table_values") || field.type == 'table') && table == false){
               table = true
-              return { name: field.name, label: "dynamic_table_values", formName: formName };
+              return { name: field.name, label: "dynamic_table_values", formName: formName,type: field.type };
             }
             else if(field && field.name && field.validation && field.validation.isTrackHistory && trackFlag == false){
               trackFlag = true
             }
-            return { name: field.name, label: field.label, formName: formName };
+            return { name: field.name, label: field.label, formName: formName,type: field.type };
           });
 
+          //Filter all the headings and empty place holders
+          // tempMetadata[item] = tempMetadata[item].filter((field:any)=>field && field.name && field.type != 'heading' && field && field.name && (!field.name.startsWith("Empty-Placeholder-")))
+
+          tempMetadata[item] = tempMetadata[item]
+          .filter((field: any) => 
+            field && 
+            field.name && 
+            field.type !== 'heading' && 
+            !field.name.startsWith("Empty-Placeholder-")
+          )
+          .map((field: any) => {
+            // After filtering, delete the 'type' property from each object
+            delete field.type;
+            return field; // Return the modified field object
+          });
+
+          
 
           tempMetadata[item].push({ name: "approval_history", label: "approval_history", formName: formName })
 
@@ -733,6 +750,8 @@ async onFilterChange(event: any,getValue:any,key:any) {
           tempMetadata[item] = tempResult.map((item: any) => {
             return { name: item.name, label: item.label,  formName:formName ,options:item.options , type:item.type , validation:item.validation};  
           });
+
+          tempMetadata[item] = tempMetadata[item].filter((field:any)=>field && field.name && field.type != 'heading' && field && field.name && (!field.name.startsWith("Empty-Placeholder-")))
         }
         this.populateFormBuilder.push(tempMetadata)
       }
@@ -820,11 +839,11 @@ async onFilterChange(event: any,getValue:any,key:any) {
           // console.log("User list dropdown is here ");
     
           // Make API call and transform result
-          from(this.fetchUserLookupdata(1, lookupKey)).pipe(
+          from(this.fetchUserLookupdata(1, lookupKey,'')).pipe(
             map((result: any) => {
               if (result) {
                 // console.log("Users List is ", result);
-                return Array.from(new Set(result.map((item: any) => item.P1)));
+                return Array.from(new Set(result.map((item: any) => item.P1))).sort();
               }
               return [];
             }),
@@ -843,8 +862,43 @@ async onFilterChange(event: any,getValue:any,key:any) {
             }
           });
         }
+
+        else if (field.validation?.isDerivedUser === true && field.validation?.form) {
+
+          console.log("Derived user is satisfied ");
+
+          const lookupKey = `${this.SK_clientID}#${field.validation.form}#lookup`;
+    
+          // Make API call and transform result
+          from(this.api.GetMaster(lookupKey, 1)).pipe(
+            map(result => {
+              if (result?.options) {
+                const options = JSON.parse(result.options);
+                return this.extractDerivedUsersList(options, field.validation.field).sort()
+                // return this.extractSpecificSingleSelectValue(options, field.validation.field).sort();
+              }
+              return [];
+            }),
+            catchError(error => {
+              console.error('Error fetching options:', error);
+              return of([]);
+            }),
+            take(1) // Ensure the observable completes after first emission
+          ).subscribe({
+            next: (value) => {
+              observer.next(value);
+              observer.complete();
+            },
+            error: (error) => {
+              observer.error(error);
+            }
+          });
+        } 
     
         else if (field.validation?.lookup === true && field.validation?.form) {
+
+          console.log("Lookup data is satisfied");
+
           const lookupKey = `${this.SK_clientID}#${field.validation.form}#lookup`;
     
           // Make API call and transform result
@@ -870,7 +924,9 @@ async onFilterChange(event: any,getValue:any,key:any) {
               observer.error(error);
             }
           });
-        } else {
+        }
+       
+         else {
           // Return static options if not a lookup field
           observer.next(field.options || []);
           observer.complete();
@@ -901,6 +957,25 @@ async onFilterChange(event: any,getValue:any,key:any) {
     
   
 
+    extractDerivedUsersList= (options: string[][],valueFilter:any): string[] => {
+      const specificSingleSelectArray: string[] = [];
+      
+      options.forEach(optionGroup => {
+        optionGroup.forEach(option => {
+          if (option.includes(valueFilter) && option.includes('#')) {  
+            const tempUser = option.split('#')[1]
+            if(tempUser.includes(',')){
+              specificSingleSelectArray.push(...tempUser.split(','));
+            }
+            else{
+              specificSingleSelectArray.push(tempUser);
+            }         
+          }
+        });
+      });
+    
+      return Array.from(new Set(specificSingleSelectArray));
+    };
 
 
     extractSpecificSingleSelectValue = (options: string[][],valueFilter:any): string[] => {
@@ -1291,7 +1366,7 @@ async onFilterChange(event: any,getValue:any,key:any) {
   
 
     this.tableDataWithFormFilters = tableDataWithFormFilters;
-    // console.log("Table rows are here ",this.tableDataWithFormFilters);
+    console.log("Table rows are here ",this.tableDataWithFormFilters);
 
 
     console.log("All the trackLocation array are here ",this.trackLocationArray);
@@ -1572,6 +1647,10 @@ isBase64(value: string): boolean {
 
         if (params && params.value) {
             const coordinates = params.value;
+
+            if(coordinates && Array.isArray(coordinates) && coordinates.filter((item:any)=>item.longitude != null && item.latitude != null).length <= 0){
+              return null
+            }
     
             // Create a container for the icon
             const container = document.createElement('div');
@@ -1611,6 +1690,10 @@ isBase64(value: string): boolean {
     dynamicModalRenderer(params: any){
       if (params && params.value) {
         const coordinates = params.value;
+
+        if(coordinates && Array.isArray(coordinates) && coordinates.length <= 0){
+          return null
+        }
 
         // Create a container for the icon
         const container = document.createElement('div');
@@ -1972,6 +2055,7 @@ async evaluateTemplate(template: string, metadata: any, getkey: any) {
       metadata.forEach((field: any) => {
         const fieldName = field.name;   
         const label = field.label;
+        const type = field.type
         
         
         //Merge Both Latitude and longitude
@@ -1989,15 +2073,15 @@ async evaluateTemplate(template: string, metadata: any, getkey: any) {
           delete mappedResponse[fieldName];
         } 
         else {
-          mappedResponse[label] = 'N/A';
+          if(type == 'heading'){
+            delete mappedResponse[fieldName];
+          }
+          else{
+            mappedResponse[label] = 'N/A';
+          }
         }
       });
     
-
-      // if(mappedResponse.hasOwnProperty('id')){
-      //   console.log("Field ID is here ",mappedResponse[uniqueIDKey.name]);
-      //   mappedResponse['id'] = mappedResponse[uniqueIDKey.name]
-      // } 
 
       if(mappedResponse.hasOwnProperty('id') && uniqueIDKey){
         mappedResponse['id'] = mappedResponse[uniqueIDKey.label]
@@ -2087,7 +2171,13 @@ mergeAndAddLocation(mappedResponse: any) {
 
      // Dismiss the modal programmatically
   dismissModal1(modal: any) {
-    modal.dismiss('Cross click');
+    try{
+      modal.dismiss('Cross click');
+    }
+    catch(error){
+      
+    } 
+
   }
 
 
@@ -2447,7 +2537,7 @@ mergeAndAddLocation(mappedResponse: any) {
     }
 
 
-  fetchUserLookupdata(sk:any,pkValue:any):any {
+  fetchUserLookupdata(sk:any,pkValue:any,key:any):any {
     
     return new Promise((resolve, reject) => {
       this.api.GetMaster(pkValue, sk)
@@ -2477,7 +2567,7 @@ mergeAndAddLocation(mappedResponse: any) {
                 this.lookup_data_savedQuery.sort((a: { P3: number; }, b: { P3: number; }) => b.P3 - a.P3);
   
                 // Continue fetching recursively
-                promises.push(this.fetchUserLookupdata(sk + 1,pkValue)); // Store the promise for the recursive call
+                promises.push(this.fetchUserLookupdata(sk + 1,pkValue,key)); // Store the promise for the recursive call
                 
                 // Wait for all promises to resolve
                 Promise.all(promises)
@@ -2498,33 +2588,44 @@ mergeAndAddLocation(mappedResponse: any) {
 
             this.listofSavedIds = this.lookup_data_savedQuery.map((item:any)=>item.P1)
 
-            // console.log("All the unique IDs are here ",this.listofSavedIds);
 
-            this.lookup_data_savedQuery = this.lookup_data_savedQuery.map((item: any) => {
-              let tempHolder:any = {}
-              if(item.P2 && typeof item.P2 == 'string'){
-                tempHolder = JSON.parse(item.P2)
+            if(key == 'table'){
+              try{
+                this.lookup_data_savedQuery = this.lookup_data_savedQuery.map((item: any) => {
+                  let tempHolder:any = {}
+                  if(item.P2 && typeof item.P2 == 'string'){
+                    tempHolder = JSON.parse(item.P2)
+                  }
+                  else{
+                    tempHolder = item.P2
+                  }
+                  if (tempHolder && tempHolder.username === this.username) {
+                    item.P2 = {}
+                    item.P2.username = 'Me';
+                    item.P2.userList = tempHolder && tempHolder.userList ? tempHolder.userList:[]
+                  }
+                  else{
+                    item.P2 = {}
+                    item.P2.username = tempHolder.username;
+                    item.P2.userList = tempHolder && tempHolder.userList ? tempHolder.userList:[]
+                  }
+                  return item; 
+                });
               }
-              else{
-                tempHolder = item.P2
+              catch(error){
+                console.log("Not a valid JSON");
               }
-              if (tempHolder && tempHolder.username === this.username) {
-                item.P2 = {}
-                item.P2.username = 'Me';
-                item.P2.userList = tempHolder && tempHolder.userList ? tempHolder.userList:[]
+            
+  
+  
+              if(!this.adminAccess){
+                this.lookup_data_savedQuery = this.lookup_data_savedQuery.filter((item:any)=>(item.P2 && item.P2.username == "Me") || (item.P2.userList &&  item.P2.userList.includes(this.username)))
               }
-              else{
-                item.P2 = {}
-                item.P2.username = tempHolder.username;
-                item.P2.userList = tempHolder && tempHolder.userList ? tempHolder.userList:[]
-              }
-              return item; 
-            });
-
-
-            if(!this.adminAccess){
-              this.lookup_data_savedQuery = this.lookup_data_savedQuery.filter((item:any)=>(item.P2 && item.P2.username == "Me") || (item.P2.userList &&  item.P2.userList.includes(this.username)))
             }
+           
+           
+
+            // console.log("All the unique IDs are here ",this.listofSavedIds);
            
             resolve(this.lookup_data_savedQuery); // Resolve with the current lookup data
           }
@@ -2579,15 +2680,26 @@ mergeAndAddLocation(mappedResponse: any) {
       const gridApi = gridInstance.api;
       const csvData = gridApi.getDataAsCsv();
       // console.log("CSV data is here ",csvData);
-      const data = this.csvToArray(csvData || '');
+      let data = this.csvToArray(csvData || '');
 
       // console.log("Data is here ",data);
   
-      const headers = data[0].map((header: string) => header.replace(/[\r\n]+/g, '').replace(/^"|"$/g, '').trim());
+      let headers = data[0].map((header: string) => header.replace(/[\r\n]+/g, '').replace(/^"|"$/g, '').trim());
 
-      // console.log("Headers are here ",headers);
+      console.log("Headers are here ",headers);
+
+      const headersToRemove = ['Dynamic Table Values', 'TrackLocation'];
+      const removeIndices = headers
+        .map((header: string, index: any) => headersToRemove.includes(header) || header.includes('Signature') ? index : -1)
+        .filter((index: number) => index !== -1);
+      
   
-      const ws = XLSX.utils.aoa_to_sheet(data);
+      const xlsxheaders = headers.filter((header: any, index: any) => !removeIndices.includes(index));
+      
+      let xlsxdata = data.map(row => row.filter((_: any, index: any) => !removeIndices.includes(index)));
+
+  
+      const ws = XLSX.utils.aoa_to_sheet(xlsxdata);
 
        // Add the worksheet to the workbook with the name of the formFilter
        let sheetName = this.tableDataWithFormFilters[index].formFilter;
@@ -2605,9 +2717,9 @@ mergeAndAddLocation(mappedResponse: any) {
             sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
           XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
         }
-    
-        const tableColumnIndex = this.tableDataWithFormFilters[index].rows[0].hasOwnProperty('dynamic_table_values');
-        // console.log("Table column Index is here ",tableColumnIndex);
+       
+        const tableColumnIndex = headers.indexOf('dynamic_table_values');
+        console.log("Table column Index is here ",tableColumnIndex);
         if (tableColumnIndex) {
           const tableData: any = await this.extractMiniTableData(data, tableColumnIndex, index);
 
@@ -2671,7 +2783,7 @@ mergeAndAddLocation(mappedResponse: any) {
   async extractMiniTableData(data: any[], tableColumnIndex: number, index: number) {
     const tableData: any = {};
 
-    // console.log("table with filters are here ",this.tableDataWithFormFilters[index]["rows"]);
+    console.log("table with filters are here ",this.tableDataWithFormFilters[index]["rows"]);
   
 
     let tempHolder = this.tableDataWithFormFilters[index]["rows"].map((item: any) => {
@@ -3652,6 +3764,27 @@ splitCsv(csv: string): string[] {
   toggleFormVisibility() {
     this.isFormVisible = !this.isFormVisible;
   }
+
+
+  columnValidation(getValue: any, index: any, condIndex: any) {
+    const condition = this.customForms().at(index).get('conditions')?.value;
+    console.log("Condition is here ", condition);
+  
+
+    const numberOfEnteredColumns = condition.filter((item: any) => item.columnName == getValue.target.value);
+    
+    console.log("numberOfEnteredColumns",numberOfEnteredColumns);
+
+    if (numberOfEnteredColumns.length > 1) {
+      Swal.fire({
+        title: "Duplicate custom columns found",
+        text: `There are ${numberOfEnteredColumns.length} columns with the name "${getValue.target.value}". Please resolve the duplication.`,
+        icon: 'warning', 
+        confirmButtonText: 'OK'
+      });
+    }
+  }
+  
 
 
 } 

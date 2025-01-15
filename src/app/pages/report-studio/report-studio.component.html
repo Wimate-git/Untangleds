@@ -167,30 +167,7 @@
               </select>
             </div>
 
-            <!-- <div class="mb-3" style="width: 30%;">
-              <label class="required">Value</label>
-              <input type="text" formControlName="value" placeholder="value"  class="form-control" />
-            </div> -->
-
-
-
-      <!-- Conditionally Render Value Field: Input or Dropdown -->
-      <!-- <div class="mb-3" style="width: 30%;">
-        <label class="required">Value</label>
-        
-
-        <ng-container *ngIf="isDropdown(formIndex,condIndex)">
-          <select formControlName="value" class="form-control">
-            <option *ngFor="let option of getAvailableFieldOptions(formIndex,condIndex) | async" [value]="option">{{ option }}</option>
-          </select>
-        </ng-container>
-        
-
-        <ng-container *ngIf="!isDropdown(formIndex,condIndex)">
-          <input type="text" formControlName="value" placeholder="Enter value" class="form-control" />
-        </ng-container>
-      </div> -->
-
+       
 
 
       <div class="mb-3" style="width: 30%;">
@@ -323,7 +300,7 @@
           <div style="display: flex;flex-wrap: wrap;justify-content: space-between;align-items:center;">
             <div class="mb-3" style="width: 30%;">
               <label class="required">Column Name</label>
-              <input type="text" formControlName="columnName" placeholder="Enter Column Name" class="form-control" />
+              <input type="text" (keyup)="columnValidation($event,formIndex,condIndex)" formControlName="columnName" placeholder="Enter Column Name" class="form-control" />
             </div>
 
 
