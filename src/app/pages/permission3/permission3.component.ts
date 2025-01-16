@@ -171,6 +171,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     ];
 
     this.form_permission = [
+      'All',
       'Create',
       'Read',
       'Update',
@@ -180,7 +181,9 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       'Xlsx template download',
       'Xlsx data upload',
       'Xlsx data download',
-      'None'
+      'Choose',
+      'None',
+
     ]
 
     this.datatableConfig = {}
