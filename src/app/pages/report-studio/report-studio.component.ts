@@ -202,7 +202,7 @@ columns: any;
     this.username = this.getLoggedUser.username;
     this.permissionID = this.getLoggedUser.permission_ID
 
-    // this.addFromService()
+    this.addFromService()
 
 
 
@@ -284,14 +284,30 @@ columns: any;
     try {
       await this.api.GetMaster(`${this.SK_clientID}#permission#${this.permissionID}#main`, 1).then((result: any) => {
         if (result) {
+
+          console.log("Result is here ",result);
+
           const helpherObj = JSON.parse(result.metadata).advance_report;
           this.adminAccess = helpherObj.includes('All Report ID Access') == true
 
           const tempholder = JSON.parse(JSON.parse(result.metadata).dynamicEntries)
 
+         const permissionChecker = tempholder.filter((item:any)=>item.dynamicForm.includes('All'))
+
+         console.log("Permission checker is here ",permissionChecker);
+
+         if(permissionChecker && Array.isArray(permissionChecker) && permissionChecker.length > 0){
+
+         }
+         else{
           this.validForms = tempholder.filter((item:any)=>item.permission.includes('Read') == true)
 
           this.formList = this.validForms.map((item:any)=>item.dynamicForm[0])
+         }
+
+        
+
+         this.cd.detectChanges()
 
         }
       });
@@ -1829,6 +1845,8 @@ locationCellRenderer(params: any) {
     
           // Corrected the map function
           this.formList = helpherObj.map((item: any) => (item[0]));
+
+          console.log("Form list is here ",this.formList);
         }
       });
     } catch (err) {
@@ -2459,7 +2477,20 @@ mergeAndAddLocation(mappedResponse: any) {
       // Perform any cleanup here
       // e.g., unsubscribe from observables or clear any data
       // window.removeEventListener('location-click', this.handleLocationClick);
-      window.removeEventListener('location-click', (event: Event) => this.handleLocationClick(event as CustomEvent));
+      // window.removeEventListener('location-click', (event: Event) => this.handleLocationClick(event as CustomEvent));
+
+      if (this.isLocationClickListenerAdded) {
+        window.removeEventListener('location-click', (event: Event) => this.handleLocationClick(event as CustomEvent));
+      }
+      if (this.isminiTableClickListenerAdded) {
+          window.removeEventListener('miniTable-click', (event: Event) => this.handleLocationClick(event as CustomEvent));
+      }
+      if (this.isMarkerClickListenerAdded) {
+          window.removeEventListener('marker-click', (event: Event) => this.handleLocationClick(event as CustomEvent));
+      }
+      if (this.isapprovalClickListenerAdded) {
+          window.removeEventListener('approve-click', (event: Event) => this.handleLocationClick(event as CustomEvent));
+      }
 
       this.destroy$.next();
       this.destroy$.complete();

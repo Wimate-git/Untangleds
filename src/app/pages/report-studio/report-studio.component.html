@@ -574,30 +574,6 @@
 
 
 
-<!-- 
-<div *ngIf="showTable" [ngClass]="{'fullscreen-container': (fullscreenService.isFullscreen$ | async)}">
-  <div *ngFor="let table of tableDataWithFormFilters">
-    <div class="card card-custom p-2" [ngClass]="{'mt-5': !(fullscreenService.isFullscreen$ | async)}">
-      <h3 class="text-center text-primary">{{ table.formFilter }}</h3>
-      
-      <ag-grid-angular
-        [ngStyle]="(fullscreenService.isFullscreen$ | async) ? {'height': '100vh'} : {'height': '100%'}"
-        class="ag-theme-alpine"
-        [rowData]="table.rows"    
-        [columnDefs]="createColumnDefs(table.rows,table.formFilter)" 
-        [domLayout]="(fullscreenService.isFullscreen$ | async) ? 'normal' : 'autoHeight'"
-        [pagination]="true"
-        [paginationPageSize]="10"
-        [paginationPageSizeSelector]="pageSizeOptions"
-        [suppressHorizontalScroll]="false" 
-        (gridReady)="onGridReady($event,table.formFilter)" 
-        [gridOptions]="gridOptions"
-      > 
-      </ag-grid-angular>
-    </div>
-  </div>
-</div> -->
-
 
 
 
