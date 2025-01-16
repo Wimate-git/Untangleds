@@ -161,7 +161,13 @@ export class Tile1ConfigComponent implements OnInit {
     { value: 'Last Month', text: 'Last Month' },
     { value: 'This Year', text: 'This Year' },
     { value: 'Last Year', text: 'Last Year' },
-    
+    { value: 'Last 60 Days', text: 'Last 60 Days' },
+    { value: 'Last 90 Days', text: 'Last 90 Days' },
+    { value: 'Last 180 Days', text: 'Last 180 Days' },
+    { value: 'Last 2 Years', text: 'Last 2 Year' },
+ 
+ 
+ 
   ]
   initializeTileFields(): void {
     // Initialize the form group
@@ -924,7 +930,7 @@ openKPIModal(tile: any, index: number) {
     // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
     // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
     { value: 'Constant', text: 'Constant' },
-    { value: 'Live', text: 'Live' },
+   
     { value: 'Count', text: 'Count' },
 
   ]

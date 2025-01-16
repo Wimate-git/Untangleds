@@ -934,7 +934,7 @@ repopulate_fields(getValues: any) {
     { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
     { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
     { value: 'Constant', text: 'Constant' },
-    { value: 'Live', text: 'Live' },
+
     { value: 'Count', text: 'Count' },
     { value: 'Count_Multiple', text: 'Count Multiple' },
 
@@ -952,7 +952,7 @@ repopulate_fields(getValues: any) {
 
 
   showCustomValues = [
-    { value: 'Live', text: 'Live' },
+
     { value: 'Hourly', text: 'Hourly' },
     { value: 'Daily', text: 'Daily' },
     { value: 'Hour of the Day', text: 'Hour of the Day' },

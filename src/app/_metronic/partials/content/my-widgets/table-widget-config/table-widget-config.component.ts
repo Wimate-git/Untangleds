@@ -97,7 +97,7 @@ this.initializeTileFields()
       filterParameter: [[]], // Initialize as an array to handle multiple or single values
       filterDescription: [''],
       filterParameter1:[''],
-      custom_Label1:[''],
+      // custom_Label1:[''],
       filterDescription1:['']
     });
   }
@@ -192,7 +192,7 @@ this.initializeTileFields()
       groupByFormat: this.createKPIWidget.value.groupByFormat,
       conditions: conditionsArray, // Use the updated conditions array
       filterParameter1:this.createKPIWidget.value.filterParameter1,
-      custom_Label1:this.createKPIWidget.value.custom_Label1,
+      // custom_Label1:this.createKPIWidget.value.custom_Label1,
       filterDescription1:this.createKPIWidget.value.filterDescription1
 
     };
@@ -417,7 +417,7 @@ this.initializeTileFields()
         custom_Label: tile.custom_Label,
         filterParameter1: parsedFilterParameter1, // Parsed array
         filterDescription1: tile.filterDescription1,
-        custom_Label1: tile.custom_Label1,
+        // custom_Label1: tile.custom_Label1,
       });
   
       this.isEditMode = true; // Set to edit mode
@@ -483,7 +483,7 @@ this.initializeTileFields()
         conditions: updatedConditions, // Directly assign the array
         filterParameter1: this.createKPIWidget.value.filterParameter1, // Parsed array
         filterDescription1: this.createKPIWidget.value.filterDescription1,
-        custom_Label1: this.createKPIWidget.value.custom_Label1,
+        // custom_Label1: this.createKPIWidget.value.custom_Label1,
       };
   
       console.log('Updated tile:', updatedTile);
@@ -656,9 +656,9 @@ this.initializeTileFields()
     }
 
     const conditionGroup = this.fb.group({
-      columnLabel: ['', Validators.required],
-      filterParameter: [[], Validators.required],
-      filterDescription: ['', Validators.required],
+      columnLabel: [''],
+      filterParameter: [[]],
+      filterDescription: [''],
     });
 
     this.conditions.push(conditionGroup); // Add the FormGroup to the FormArray

@@ -83,3 +83,7 @@
   flex-direction: column; /* Stack content vertically */
   justify-content: flex-start; /* Align content at the top */
 }
+.cdk-global-overlay-wrapper,
+.cdk-overlay-container {
+  z-index: 99999 !important;
+}

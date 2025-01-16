@@ -194,6 +194,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     { lat: 12.9716, lng: 77.5946, label: 'Bangalore' }, // Bangalore
   ];
   summaryPermission: any;
+  dashboardData: any;
 
 
   createPieChart() {
@@ -1565,46 +1566,75 @@ async fetchPermissionIdMain(clientID: number, p1Value: string) {
   console.log('this.SK_clientID checking from permission', this.SK_clientID);
 
   try {
-      // Construct the primary key (PK) for the main table
-      const pk = `${this.SK_clientID}#permission#${p1Value}#main`;
-      console.log(`Fetching main table data for PK: ${pk}`);
+    // Construct the primary key (PK) for the main table
+    const pk = `${this.SK_clientID}#permission#${p1Value}#main`;
+    console.log(`Fetching main table data for PK: ${pk}`);
 
-      // Fetch data from the main table (API call or service call)
-      const result: any = await this.api.GetMaster(pk, clientID);
-      console.log('Result fetched for the permission:', result);
+    // Fetch data from the main table (API call or service call)
+    const result: any = await this.api.GetMaster(pk, clientID);
+    console.log('Result fetched for the permission:', result);
 
-      // Parse and process the metadata
-      if (result && result.metadata) {
-          this.parsedPermission = JSON.parse(result.metadata);
-          console.log('Parsed permission metadata:', this.parsedPermission);
+    // Parse and process the metadata
+    if (result && result.metadata) {
+      this.parsedPermission = JSON.parse(result.metadata);
+      console.log('Parsed permission metadata:', this.parsedPermission);
 
-this.summaryPermission = this.parsedPermission.summaryList;
-console.log('this.summaryPermission check',this.summaryPermission)
-          this.permissionIdsListList = this.parsedPermission.permissionsList;
-          console.log('Parsed permission list:', this.permissionIdsListList);
+      this.summaryPermission = this.parsedPermission.summaryList;
+      console.log('this.summaryPermission check', this.summaryPermission);
 
-          // Find specific permission
-          const summaryDashboardItem = this.permissionIdsListList.find(
-              (item: { name: string; update: boolean; view: boolean }) => item.name === 'Summary Dashboard'
-          );
-          console.log('Summary Dashboard Item:', summaryDashboardItem);
-
-          if (summaryDashboardItem) {
-              this.summaryDashboardUpdate = summaryDashboardItem.update;
-              // Set default mode based on `update` permission
-              this.isEditModeView = this.summaryDashboardUpdate; // Default to view mode if update is false
-              this.updateOptions(); // Ensure options reflect the correct mode
-          }
-
-          this.processFetchedData(result);
+      // Determine if "All" permission is included
+      if (this.summaryPermission.includes("All")) {
+        // If "All", fetch and display all dashboard data
+        console.log("Permission is 'All'. Fetching all dashboards...");
+        this.fetchCompanyLookupdata(0).then((allData: any) => {
+          console.log('All Dashboards Data:', allData);
+          this.dashboardData = allData; // Store all dashboard data
+        });
       } else {
-          console.warn('Result metadata is null or undefined.');
+        // If not "All", fetch specific dashboard data
+        console.log("Permission is restricted. Fetching specific dashboards...");
+        this.fetchCompanyLookupdata(0).then((allData: any[]) => {
+          console.log('All Dashboards Data:', allData);
+          this.dashboardData = allData.filter((dashboard: any) =>
+  
+       
+            this.summaryPermission.includes(dashboard.P1)
+            
+
+          ); // Filter dashboards based on summaryPermission
+          console.log('Filtered Dashboards Data:', this.dashboardData);
+          console.log('this.summaryPermission',this.summaryPermission)
+        });
       }
+
+      // Handle specific permissions
+      this.permissionIdsListList = this.parsedPermission.permissionsList;
+      console.log('Parsed permission list:', this.permissionIdsListList);
+
+      // Find specific permission
+      const summaryDashboardItem = this.permissionIdsListList.find(
+        (item: { name: string; update: boolean; view: boolean }) =>
+          item.name === 'Summary Dashboard'
+      );
+      console.log('Summary Dashboard Item:', summaryDashboardItem);
+
+      if (summaryDashboardItem) {
+        this.summaryDashboardUpdate = summaryDashboardItem.update;
+        // Set default mode based on `update` permission
+        this.isEditModeView = this.summaryDashboardUpdate; // Default to view mode if update is false
+        this.updateOptions(); // Ensure options reflect the correct mode
+      }
+
+      this.processFetchedData(result);
+    } else {
+      console.warn('Result metadata is null or undefined.');
+    }
   } catch (error) {
-      // Handle any errors during the fetch
-      console.error(`Error fetching data for PK (${p1Value}):`, error);
+    // Handle any errors during the fetch
+    console.error(`Error fetching data for PK (${p1Value}):`, error);
   }
 }
+
 
 fetchCompanyLookupdata(sk:any):any {
   console.log("I am called Bro");
@@ -3398,44 +3428,64 @@ setTimeout(() => {
   loadData() {
     this.lookup_data_summary1 = [];
     this.lookup_data_summaryCopy = [];
-
-    this.fetchCompanyLookupdataOnit(1).then((data: any) => {
-      this.lookup_data_summaryCopy = data; // Assign data to the component property
-
-      // Sort the records based on P4 (or another timestamp field) in descending order
-      this.lookup_data_summaryCopy.sort((a, b) => b.P4 - a.P4);
-
-      console.log('Sorted Data:', this.lookup_data_summaryCopy); // Log sorted data
-
-      this.lookup_data_summaryCopy.forEach(item => {
-        if (item.P8) {
-          try {
-            // Parse the P8 property
-            const parsedIcon = JSON.parse(item.P8);
-            console.log('Parsed Icon Object:', parsedIcon);
-
-            // Store the parsed icon back into the object
-            item.parsedIcon = parsedIcon;
-
-            // Access the properties if needed
-            console.log('Icon Value:', parsedIcon.value);
-            console.log('Icon Label:', parsedIcon.label);
-          } catch (error) {
-            console.error('Error parsing P8:', error);
-          }
+  
+    // Fetch company lookup data
+    this.fetchCompanyLookupdataOnit(1)
+      .then((data: any) => {
+        this.lookup_data_summaryCopy = data; // Assign fetched data to the component property
+        console.log('this.lookup_data_summaryCopy check', this.lookup_data_summaryCopy);
+  
+        // Sort the records based on P4 (or another timestamp field) in descending order
+        this.lookup_data_summaryCopy.sort((a, b) => b.P4 - a.P4);
+        console.log('Sorted Data:', this.lookup_data_summaryCopy);
+  
+        // Filter data based on permissions
+        if (this.summaryPermission.includes('None')) {
+          console.log("Permission includes 'None'. No dashboards will be displayed.");
+          this.lookup_data_summaryCopy = []; // Set the data to an empty array
+        } else if (this.summaryPermission.includes('All')) {
+          console.log("Permission is 'All'. Displaying all dashboards...");
+          // No filtering needed, show all data
         } else {
-          console.warn('P8 not found for item:', item);
+          console.log("Restricted permissions. Filtering dashboards...");
+          this.lookup_data_summaryCopy = this.lookup_data_summaryCopy.filter((item: any) =>
+            this.summaryPermission.includes(item.P1)
+          );
         }
+  
+        // Process each item in the data for parsed icons
+        this.lookup_data_summaryCopy.forEach(item => {
+          if (item.P8) {
+            try {
+              // Parse the P8 property
+              const parsedIcon = JSON.parse(item.P8);
+              console.log('Parsed Icon Object:', parsedIcon);
+  
+              // Store the parsed icon back into the object
+              item.parsedIcon = parsedIcon;
+  
+              // Access the properties if needed
+              console.log('Icon Value:', parsedIcon.value);
+              console.log('Icon Label:', parsedIcon.label);
+            } catch (error) {
+              console.error('Error parsing P8:', error);
+            }
+          } else {
+            console.warn('P8 not found for item:', item);
+          }
+        });
+  
+        console.log('Final parsed and filtered data:', this.lookup_data_summaryCopy);
+  
+        this.cdr.detectChanges(); // Ensure UI updates
+      })
+      .catch((error: any) => {
+        console.error('Failed to load company lookup data:', error);
+        this.cdr.detectChanges(); // Ensure UI updates
       });
-
-      console.log('Final parsed and sorted data:', this.lookup_data_summaryCopy);
-
-      this.cdr.detectChanges(); // Ensure UI updates
-    }).catch((error: any) => {
-      console.error('Failed to load company lookup data:', error);
-      this.cdr.detectChanges(); // Ensure UI updates
-    });
   }
+  
+  
 
 
   checkUniqueIdentifier(enteredID: string): void {
@@ -3664,7 +3714,6 @@ setTimeout(() => {
   //     },
   //   };
   // }
-  
   async showTable() {
     console.log("Show DataTable is called BTW");
   
@@ -3680,8 +3729,22 @@ setTimeout(() => {
         this.fetchCompanyLookupdata(1)
           .then((resp: any) => {
             console.log("resp check", resp);
-            const responseData = resp || []; // Default to an empty array if resp is null
+            let responseData = resp || []; // Default to an empty array if resp is null
             console.log("responseData", responseData);
+  
+            // Permission-based filtering
+            if (this.summaryPermission.includes('None')) {
+              console.log("Permission includes 'None'. No data will be displayed.");
+              responseData = []; // Set responseData to an empty array
+            } else if (this.summaryPermission.includes('All')) {
+              console.log("Permission is 'All'. Displaying all data.");
+              // No filtering needed
+            } else {
+              console.log("Restricted permissions. Filtering data...");
+              responseData = responseData.filter((item: any) =>
+                this.summaryPermission.includes(item.P1)
+              );
+            }
   
             // Example filtering for search
             const searchValue = dataTablesParameters.search.value.toLowerCase();
@@ -3693,8 +3756,7 @@ setTimeout(() => {
               )
             ).map((item: any) => JSON.parse(item)); // Parse back to object
   
-            console.log("responseData checking", responseData);
-            console.log("filteredData check", filteredData);
+            console.log("Filtered Data after permissions and search:", filteredData);
   
             // Implement pagination by slicing the filtered data
             const paginatedData = filteredData.slice(start, start + length);
@@ -3727,13 +3789,13 @@ setTimeout(() => {
             const colorClasses = ['success', 'info', 'warning', 'danger'];
             const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
             const initials = data[0].toUpperCase();
-        
+  
             const symbolLabel = `
               <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
                 ${initials}
               </div>
             `;
-        
+  
             return `
               <div class="d-flex align-items-center">
                 <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
@@ -3748,11 +3810,6 @@ setTimeout(() => {
             `;
           },
         },
-        
-        // {
-        //   title: '<span style="color: black;">Client ID</span>',
-        //   data: 'P2',
-        // },
         {
           title: '<span style="color: black;">Name</span>',
           data: 'P2',
@@ -3812,6 +3869,8 @@ setTimeout(() => {
       pageLength: 10, // Set default page size to 10
     };
   }
+  
+  
   
 
 

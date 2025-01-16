@@ -181,7 +181,7 @@ export class Tile5ConfigComponent implements OnInit {
     // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
     // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
     { value: 'Constant', text: 'Constant' },
-    { value: 'Live', text: 'Live' },
+
     { value: 'Count', text: 'Count' },
   
   ]

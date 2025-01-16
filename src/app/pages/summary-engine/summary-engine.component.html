@@ -481,7 +481,7 @@
   right:44px;
   flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20 gap-2">
   
-  <nav class="myMenu" #tooltipContainer *ngIf="!disableMenuQP">
+  <nav class="myMenu" #tooltipContainer *ngIf="!disableMenuQP && summaryPermission?.includes('None') === false">
     <input type="checkbox" href="#" class="myMenu-open" name="myMenu-open" id="myMenu-open" />
     <label class="myMenu-open-button" for="myMenu-open">
       <span class="hamburger hamburger-1"></span>

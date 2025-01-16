@@ -110,6 +110,7 @@ makeTrueCheck:any = false
   username: any;
   adminAccess: boolean = false;
   resultCheck: any;
+  fetchedValues: any;
 
 
  
@@ -150,7 +151,7 @@ makeTrueCheck:any = false
     this.createChart.get('dateType')?.valueChanges.subscribe(value => {
       this.onDateTypeChange(value);
     });
-    this.getAvailableFieldOptions(1,1)
+
 
 this.fetchDynamic(this.formValueSave)
   }
@@ -199,15 +200,15 @@ this.fetchDynamic(this.formValueSave)
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange ngonchanges',this.all_Packet_store)
     this.checkData()
-    this.fetchDynamic(this.formValueSave)
+    // this.fetchDynamic(this.formValueSave)
 
 
   }
   ngAfterViewInit(): void {
     this.checkData()
-    this.getAvailableFieldOptions(1,1)
 
-    this.fetchDynamic(this.formValueSave)
+
+    // this.fetchDynamic(this.formValueSave)
   }
   get dateType() {
     return this.createChart.get('dateType');
@@ -472,12 +473,26 @@ this.fetchDynamic(this.formValueSave)
   //   // Update noOfParams for use in addTile
   //   this.noOfParams = noOfParams;
   // }
-  addControls(event: any, _type: string, count: number, formValue: any) {
+  async addControls(event: any, _type: string, count: number, formValue: any): Promise<void> {
     console.log('formValue checking', formValue);
   
     this.formValueSave = formValue;
-    console.log('this.formValueSave add',this.formValueSave)
-    this.fetchDynamic(this.formValueSave)
+    console.log('this.formValueSave add', this.formValueSave);
+  
+    try {
+      // Call fetchDynamic and handle the Promise
+      this.fetchDynamic(this.formValueSave)
+        .then((values) => {
+          this.fetchedValues = values; // Assign the resolved values
+          console.log('Fetched Values:', this.fetchedValues);
+        })
+        .catch((error) => {
+          console.error('Error fetching values:', error);
+        });
+    } catch (error) {
+      console.error('Unexpected error:', error);
+    }
+    
   
     // Determine checkbox state
     this.makeTrueCheck = event.target.checked;
@@ -525,6 +540,7 @@ this.fetchDynamic(this.formValueSave)
   
     console.log('Updated all_fields:', allFieldsArray.controls);
   }
+  
   
   
   
@@ -601,33 +617,30 @@ this.fetchDynamic(this.formValueSave)
   
 
   addTile(key: any) {
- 
-  console.log('this.createChart.value.all_fields',this.createChart.value.all_fields)
+    console.log('this.createChart.value.all_fields', this.createChart.value.all_fields);
+  
     if (key === 'filterTile') {
       const uniqueId = this.generateUniqueId();
       console.log('this.createChart.value:', this.createChart.value); // Log form values for debugging
       this.fields = this.createChart.value.all_fields;
-      this.conditionsFilter = this.fields.map((field: { conditions: any[] }) => {
-        return field.conditions.map(condition => ({
-          ...condition,
-          operatorBetween: condition.operatorBetween , // Preserve value or set default
-        }));
+  
+      // Map through fields and conditions
+      this.conditionsFilter = this.fields.map((field: { conditions: any[] }, fieldIndex: number) => {
+        return field.conditions.map((condition) => {
+          const fieldData = this.getOptionsForField(fieldIndex, condition.formField);
+          return {
+            ...condition,
+            operatorBetween: condition.operatorBetween, // Preserve value or set default
+            type: fieldData?.type || 'text', // Include the type for each condition
+          };
+        });
       });
-console.log('this.conditionsFilter',this.conditionsFilter);
+  
+      console.log('this.conditionsFilter', this.conditionsFilter);
       console.log('this.fields check before label update', this.fields);
-  
-      // Map through fields to include corresponding labels from dynamicparameterLabMap
-      // this.fields = this.fields.map((field:any, index:any) => {
-      //   const label = this.dynamicparameterLabMap[index] || ''; // Get the label for the current index
-      //   return { ...field, label }; // Add the label to the current field object
-      // });
-  
-      
-      console.log('this.fields check after label update', this.fields);
   
       const newTile = {
         id: uniqueId,
-     
         x: 0,
         y: 0,
         rows: 13, // The number of rows in the grid
@@ -638,26 +651,16 @@ console.log('this.conditionsFilter',this.conditionsFilter);
         fixedRowHeight: true,
         grid_type: 'filterTile',
         dateType: this.createChart.value.dateType || '', // Ensure this value exists
-        filterTileConfig:this.conditionsFilter ,   
+        filterTileConfig: this.conditionsFilter, // Include conditions with type
         addFieldsEnabled: this.createChart.value.add_fields,
         themeColor: this.createChart.value.themeColor,
         fontSize: `${this.createChart.value.fontSize}px`, // Added fontSize
         fontColor: this.createChart.value.fontColor,
-        custom_Label:this.createChart.value.custom_Label,
-        daysAgo:this.createChart.value.daysAgo,
-        startDate:this.createChart.value.startDate,
-        endDate:this.createChart.value.endDate,
-        singleDate:this.createChart.value.singleDate,
-
-        // // startDate:[''],
-        // endDate:[''],
-        // singleDate:['']
-        
-  
-        // filterTile: this.fields || [], // Updated fields with labels
-
-       
-     
+        custom_Label: this.createChart.value.custom_Label,
+        daysAgo: this.createChart.value.daysAgo,
+        startDate: this.createChart.value.startDate,
+        endDate: this.createChart.value.endDate,
+        singleDate: this.createChart.value.singleDate,
         noOfParams: this.noOfParams || 0, // Ensure noOfParams has a valid value
       };
   
@@ -680,11 +683,10 @@ console.log('this.conditionsFilter',this.conditionsFilter);
   
       this.createChart.patchValue({
         widgetid: uniqueId,
-      // Reset chart title field (or leave it if needed)
- // Reset chart options (or leave it if needed)
       });
     }
   }
+  
 
   betweenoperator(event:any){
     console.log('event checking ',event)
@@ -876,6 +878,9 @@ themes = [
 
 openFilterModal(tile: any, index: number) {
   console.log('Tile checking data from openFilterModal', tile);
+
+  console.log('this.formlistValues check',this.formlistValues)
+  this.fetchDynamic(this.formlistValues)
   const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14;
 
   if (tile) {
@@ -884,11 +889,9 @@ openFilterModal(tile: any, index: number) {
 
     this.paramCount = tile.noOfParams || 1;
 
-    // Parse the filterTileConfig
     this.parsedfilterTileConfig = JSON.parse(tile.filterTileConfig);
     console.log('this.parsedfilterTileConfig check', this.parsedfilterTileConfig);
 
-    // Initialize form with dynamic bindings
     this.createChart = this.fb.group({
       fontSize: fontSizeValue,
       selectType: tile.selectType,
@@ -898,9 +901,9 @@ openFilterModal(tile: any, index: number) {
       noOfParams: [{ value: tile.noOfParams, disabled: !tile.addFieldsEnabled }],
       dateType: [tile.dateType],
       toggleCheck: [tile.toggleCheck],
-      all_fields: this.fb.array([]), // Initialize empty array
+      all_fields: this.fb.array([]),
       custom_Label: tile.custom_Label,
-      themeColor: [tile.themeColor || ''], // Bind themeColor
+      themeColor: [tile.themeColor || ''],
       startDate: tile.startDate,
       endDate: tile.endDate,
       singleDate: tile.singleDate,
@@ -908,66 +911,85 @@ openFilterModal(tile: any, index: number) {
 
     const allFieldsArray = this.createChart.get('all_fields') as FormArray;
 
-    // Populate all_fields from parsedfilterTileConfig index-wise
     this.parsedfilterTileConfig.forEach((packet: any[], fieldIndex: number) => {
       const conditionsArray = this.fb.array(
         packet.map((condition: any) =>
           this.fb.group({
-            formField: [condition.formField || '', Validators.required],
+            formField: [condition.formField || '', Validators.required], // Ensure formField is bound correctly
             operator: [condition.operator || '', Validators.required],
-            filterValue: [condition.filterValue || '', Validators.required], // Ensure filterValue is initialized
+            filterValue: [condition.filterValue || '', Validators.required], // Ensure filterValue is bound correctly
             operatorBetween: [condition.operatorBetween || '', Validators.required],
+            type: [condition.type || 'text'], // Dynamically set type with a fallback
           })
         )
       );
-
+    
       const fieldGroup = this.fb.group({
-        parameterName: [this.formlistValues[fieldIndex] || `Parameter ${fieldIndex + 1}`, Validators.required],
+        parameterName: [packet[0]?.parameterName || `Parameter ${fieldIndex + 1}`, Validators.required], // Read parameterName dynamically
         conditions: conditionsArray,
       });
-
+    
       allFieldsArray.push(fieldGroup);
-
-      // Add a listener to reset `filterValue` when `formField` changes
+    
       const conditions = (fieldGroup.get('conditions') as FormArray).controls;
-
+    
       conditions.forEach((conditionGroup) => {
         const formFieldControl = conditionGroup.get('formField');
         const filterValueControl = conditionGroup.get('filterValue');
-
+    
+        // Check if the filterValue is already set
+        const currentFilterValue = filterValueControl?.value;
+    
         formFieldControl?.valueChanges.subscribe((newFormFieldValue) => {
-          // Reset `filterValue` when `formField` changes
+          // Prevent unnecessary resets for the initial value
+          if (currentFilterValue && newFormFieldValue === conditionGroup.get('formField')?.value) {
+            return;
+          }
+    
+          // Reset filterValue when formField changes
           filterValueControl?.reset();
+    console.log('fieldIndex',fieldIndex)
 
-          // Dynamically adjust `filterValue` type and options
           const options = this.getOptionsForField(fieldIndex, newFormFieldValue);
+          console.log('Dynamic options for fieldIndex:', options);
+    
           if (options?.type === 'select') {
-            filterValueControl?.setValue(options.options?.[0] || ''); // Set default value if available
+            // Set default value for select, ensuring the value is retained if it's valid
+            const validValue =
+              currentFilterValue && options.options?.includes(currentFilterValue)
+                ? currentFilterValue
+                : options.options?.[0] || '';
+    
+            filterValueControl?.setValue(validValue);
           }
         });
+    
+        // Log current values for debugging
+        console.log('formFieldControl initial value:', formFieldControl?.value);
+        console.log('filterValueControl initial value:', filterValueControl?.value);
       });
-
+    
       console.log(`Populated field at index ${fieldIndex}:`, fieldGroup.value);
     });
+    
+    
 
-    // Update the themes array based on tile.themeColor
     this.themes.forEach(theme => {
       theme.selected = theme.color === tile.themeColor;
     });
 
     console.log('Updated themes:', this.themes);
 
-    // Listen for changes in add_fields and update form dynamically
     this.createChart.get('add_fields')?.valueChanges.subscribe((isEnabled) => {
       const noOfParamsControl = this.createChart.get('noOfParams');
       if (isEnabled) {
-        noOfParamsControl?.enable(); // Enable noOfParams
+        noOfParamsControl?.enable();
       } else {
-        noOfParamsControl?.disable(); // Disable noOfParams
+        noOfParamsControl?.disable();
       }
     });
 
-    this.isEditMode = true; // Set to edit mode
+    this.isEditMode = true;
   } else {
     this.selectedTile = null;
     this.isEditMode = false;
@@ -976,6 +998,7 @@ openFilterModal(tile: any, index: number) {
     }
   }
 }
+
 
 
 
@@ -1543,107 +1566,7 @@ toggleCheckbox1(theme: any) {
 
   // Method to initialize the chart using the form's JSON value
 
-  getAvailableFieldOptions(formIndex: number, condIndex: any): Observable<any[]> {
-    const selectedField = this.all_fields.at(formIndex).get('conditions')?.value[condIndex]?.condition;
-    const formName = this.all_fields.get('parameterName')?.value;
-    console.log('formName',formName)
-    
-    // Create a unique cache key
-    const cacheKey = `${formName}-${selectedField}`;
-  
-    // Return cached value if exists
-    if (this.optionsCache.has(cacheKey)) {
-      return this.optionsCache.get(cacheKey)!;
-    }
-  
-    // Get field configuration
-    const formFields = this.populateFormBuilder.find(
-      (form: { [key: string]: any }) => form[formName]
-    );
-    console.log('formFields check',formFields)
-    const field = formFields[formName].find(
-      (f: { name: string }) => f.name === selectedField
-    );
-  
-    // Create the observable
-    const options$ = new Observable<any[]>(observer => {
-      if (!field) {
-        observer.next([]);
-        observer.complete();
-        return;
-      }
-  
-      if (field.validation && field.validation?.user === true) {
-        const lookupKey = `${this.SK_clientID}#user#lookup`;
-  
-        // console.log("User list dropdown is here ");
-  
-        // Make API call and transform result
-        from(this.fetchUserLookupdata(1, lookupKey)).pipe(
-          map((result: any) => {
-            if (result) {
-              // console.log("Users List is ", result);
-              return Array.from(new Set(result.map((item: any) => item.P1)));
-            }
-            return [];
-          }),
-          catchError(error => {
-            console.error('Error fetching users:', error);
-            return of([]);
-          }),
-          take(1) // Ensure the observable completes after first emission
-        ).subscribe({
-          next: (value) => {
-            observer.next(value);
-            observer.complete();
-          },
-          error: (error) => {
-            observer.error(error);
-          }
-        });
-      }
-  
-      else if (field.validation?.lookup === true && field.validation?.form) {
-        const lookupKey = `${this.SK_clientID}#${field.validation.form}#lookup`;
-  
-        // Make API call and transform result
-        from(this.api.GetMaster(lookupKey, 1)).pipe(
-          map(result => {
-            if (result?.options) {
-              const options = JSON.parse(result.options);
-              return this.extractSpecificSingleSelectValue(options, field.validation.field).sort();
-            }
-            return [];
-          }),
-          catchError(error => {
-            console.error('Error fetching options:', error);
-            return of([]);
-          }),
-          take(1) // Ensure the observable completes after first emission
-        ).subscribe({
-          next: (value) => {
-            observer.next(value);
-            observer.complete();
-          },
-          error: (error) => {
-            observer.error(error);
-          }
-        });
-      } else {
-        // Return static options if not a lookup field
-        observer.next(field.options || []);
-        observer.complete();
-      }
-    }).pipe(
-      shareReplay(1), // Cache the last emitted value and share it among all subscribers
-      takeUntil(this.destroy$) // Make sure to unsubscribe on destroy
-    );
-  
-    // Store in cache
-    this.optionsCache.set(cacheKey, options$);
-    
-    return options$;
-  }
+
   // getFormNameByIndexCustom(index: number): string {
   //   const selectedFormValue = this.selectedForms[index];
   //   return selectedFormValue
@@ -1756,17 +1679,16 @@ toggleCheckbox1(theme: any) {
     return specificSingleSelectArray;
   };
 
-  async fetchDynamic(formValueSave: string[]): Promise<void> {
+  async fetchDynamic(formValueSave: string[]): Promise<any[]> {
     console.log('formValueSave check', formValueSave);
+    const fetchedData = []; // Initialize an array to store the fetched values
   
     try {
       this.populateFormBuilder = []; // Initialize to ensure a clean state
   
-      // Iterate through each form in formValueSave
       for (const [index, formName] of formValueSave.entries()) {
         console.log(`Processing form at index ${index}:`, formName);
   
-        // Fetch the result for the current form
         const result = await this.api.GetMaster(
           `${this.SK_clientID}#dynamic_form#${formName}#main`,
           1
@@ -1778,7 +1700,6 @@ toggleCheckbox1(theme: any) {
           const tempResult = JSON.parse(result.metadata || '{}').formFields;
           console.log('Parsed form fields:', tempResult);
   
-          // Map form fields and store them under the respective form name
           const tempMetadata = {
             [formName]: tempResult.map((field: any) => ({
               name: field.name,
@@ -1790,50 +1711,73 @@ toggleCheckbox1(theme: any) {
             })),
           };
   
-          // Store in the populateFormBuilder with the index
           this.populateFormBuilder[index] = tempMetadata;
+          fetchedData.push(tempMetadata); // Push to the fetched data array
         }
       }
   
       console.log('Final populateFormBuilder:', this.populateFormBuilder);
+      return fetchedData; // Return the fetched data
     } catch (error) {
       this.spinner.hide();
       console.error('Error in fetching form Builder data:', error);
+      return []; // Return an empty array in case of an error
     }
   }
   
+  
+  
   getOptionsForField(fieldIndex: number, formFieldValue: string): { type: string; options: string[] | null } | null {
-    console.log('Checking parameterName:', this.all_fields.controls[fieldIndex].get('parameterName')?.value);
-    console.log('Checking formFieldValue:', formFieldValue);
+    // console.log('Checking parameterName:', this.all_fields.controls[fieldIndex].get('parameterName')?.value);
+    // console.log('Checking formFieldValue:', formFieldValue);
   
     if (!formFieldValue) {
+      console.warn('formFieldValue is empty or invalid');
       return { type: 'text', options: null }; // Default to text if no formField is selected
     }
   
-    // Ensure index-specific access to populateFormBuilder
+    // Get the form name from the current field
     const formName = this.all_fields.controls[fieldIndex].get('parameterName')?.value;
-  
-    // Find the matching metadata for the given index and form name
-    const matchingMetadata = this.populateFormBuilder[fieldIndex]?.[formName];
-  
-    if (!matchingMetadata) {
-      console.warn(`No metadata found for index ${fieldIndex} and formName ${formName}`);
-      return { type: 'text', options: null }; // Default to text if metadata is missing
+    if (!formName) {
+      console.warn(`Parameter name is missing for fieldIndex ${fieldIndex}`);
+      return { type: 'text', options: null };
     }
   
-    // Find the field that matches the formFieldValue by 'name'
-    const foundField = matchingMetadata.find(
-      (field: Field) => field.name === formFieldValue
-    );
+    // Access the metadata for the given index and form name
+    const metadataAtFieldIndex = this.populateFormBuilder[fieldIndex];
+    if (!metadataAtFieldIndex) {
+      // console.error(`No metadata found for fieldIndex ${fieldIndex} in populateFormBuilder`);
+      return { type: 'text', options: null };
+    }
   
+    const matchingMetadata = metadataAtFieldIndex[formName];
+    if (!matchingMetadata) {
+      console.error(`No metadata found for formName ${formName} at fieldIndex ${fieldIndex}`);
+      return { type: 'text', options: null };
+    }
+  
+    console.log('Matching metadata:', matchingMetadata);
+  
+    // Find the field with the given formFieldValue
+    const foundField = matchingMetadata.find((field: Field) => field.name === formFieldValue);
     if (foundField) {
       console.log(`Found field for ${formFieldValue}:`, foundField);
+  
+      // Check if type is select and options array is empty or contains only empty values
+      if (foundField.type === 'select' && (!foundField.options || foundField.options.every((option: any) => !option))) {
+        console.warn(`Field ${formFieldValue} has type 'select' but options are empty. Defaulting to type 'text'.`);
+        return { type: 'text', options: null };
+      }
+  
       return { type: foundField.type, options: foundField.options || null };
     } else {
       console.warn(`Field with name ${formFieldValue} not found in metadata for index ${fieldIndex}`);
+      console.log('Available field names:', matchingMetadata.map((field: Field) => field.name));
       return { type: 'text', options: null }; // Default to text if no matching field is found
     }
   }
+  
+  
   
   
   
