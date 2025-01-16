@@ -2604,6 +2604,9 @@ mergeAndAddLocation(mappedResponse: any) {
   }
 
 
+
+
+
   async exportAllTablesAsExcel() {
     const wb = XLSX.utils.book_new(); 
   
@@ -2620,7 +2623,7 @@ mergeAndAddLocation(mappedResponse: any) {
 
       console.log("Headers are here ",headers);
 
-      const headersToRemove = ['Dynamic Table Values', 'TrackLocation'];
+      const headersToRemove = ['Dynamic Table Values', 'TrackLocation','Approval History'];
       const removeIndices = headers
         .map((header: string, index: any) => headersToRemove.includes(header) || header.includes('Signature') ? index : -1)
         .filter((index: number) => index !== -1);
@@ -2646,6 +2649,16 @@ mergeAndAddLocation(mappedResponse: any) {
           const trackLocationData = this.extractTrackLocationData(data, trackLocationColumnIndex, index);
           const trackLocationSheet = XLSX.utils.aoa_to_sheet(trackLocationData);
           let sheetName1 = `TrackLocation ${this.tableDataWithFormFilters[index].formFilter}`;
+            sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
+          XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
+        }
+
+        const approvalColumnIndex = headers.indexOf('Approval History');
+        // console.log('Index is here ',trackLocationColumnIndex);
+        if (approvalColumnIndex !== -1) {
+          const trackLocationData = this.extractApprovalData(data, approvalColumnIndex,index);
+          const trackLocationSheet = XLSX.utils.aoa_to_sheet(trackLocationData);
+          let sheetName1 = `Approval History ${this.tableDataWithFormFilters[index].formFilter}`;
             sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
           XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
         }
@@ -2675,28 +2688,33 @@ mergeAndAddLocation(mappedResponse: any) {
   
    
   
-      // Style the header row
-      for (let i = 0; i < headers.length; i++) {
-        const cellAddress = { r: 0, c: i };  // Row 0 (header row)
-        const cellRef = XLSX.utils.encode_cell(cellAddress);
-  
-        if (!ws[cellRef]) ws[cellRef] = {};  // Ensure the cell exists
-  
-        // Apply styles to header cells
-        ws[cellRef].s = {
-          fill: {
-            fgColor: { rgb: 'FFA500' }  // Orange background
-          },
-          font: {
-            color: { rgb: 'FFFFFF' },   // White font color
-            bold: true                  // Bold text
-          },
-          alignment: {
-            horizontal: 'center',      // Center header text
-            vertical: 'center'
+      // Now that all sheets are added, we can loop through the sheets and apply the header styles
+        wb.SheetNames.forEach(sheetName => {
+          const ws = wb.Sheets[sheetName];
+          
+          // Apply styles to the header row (Row 0) for the current sheet
+          for (let i = 0; i < xlsxheaders.length; i++) {
+              const cellAddress = { r: 0, c: i };  // Row 0 (header row)
+              const cellRef = XLSX.utils.encode_cell(cellAddress);
+
+              if (!ws[cellRef]) ws[cellRef] = {};  // Ensure the cell exists
+
+              // Apply styles to header cells
+              ws[cellRef].s = {
+                  fill: {
+                      fgColor: { rgb: 'FFA500' }  // Orange background
+                  },
+                  font: {
+                      color: { rgb: 'FFFFFF' },   // White font color
+                      bold: true                  // Bold text
+                  },
+                  alignment: {
+                      horizontal: 'center',      // Center header text
+                      vertical: 'center'
+                  }
+              };
           }
-        };
-      }
+      });
   
     }));
   
@@ -2808,6 +2826,68 @@ mergeAndAddLocation(mappedResponse: any) {
     return tableData;
   }
   
+
+  extractApprovalData = (data: any, trackLocationColumnIndex: any,index:any)=> {
+
+    console.log("Approval rows are here ", this.tableDataWithFormFilters);
+
+    let tempHolder =  this.tableDataWithFormFilters[index]["rows"].map((item: { approval_history: any[]; id: any; }) => {
+        if (item?.approval_history && Array.isArray(item?.approval_history) && item?.approval_history.length > 0) {
+            item?.approval_history.forEach((dynamicRow: any[]) => {
+                dynamicRow.unshift(item.id)
+          });
+        }
+        return item?.approval_history;
+      });
+
+    tempHolder = tempHolder.filter((item: string | any[])=>item && Array.isArray(item) && item.length > 0)
+
+     console.log("Approval History is here ",tempHolder);
+
+    const trackLocationRows = [];
+
+    const headers = [
+        "id", "Status", "Comments", "Date and Time"
+    ];
+
+    // Check if the first entry in tempHolder has the data we need (ensure it's an array and not empty)
+    const trackLocationArray = Array.isArray(tempHolder) && tempHolder.length > 0 ? tempHolder : [];
+
+    if (Array.isArray(trackLocationArray) && trackLocationArray.length > 0) {
+        // Add headers as the first row
+        trackLocationRows.push(headers);
+
+        // Iterate over each row in tempHolder and extract "TrackLocation" data
+        tempHolder.forEach(function(row: any) {
+            // If the trackLocation is a valid array
+            const trackLocationObjects = row;
+
+            if (Array.isArray(trackLocationObjects) && trackLocationObjects.length > 0) {
+                // For each object in the trackLocation array, extract the relevant fields
+                
+                trackLocationObjects.forEach((ele)=>{
+                    const rowValues = [
+                        ele[0] || '',              
+                        ele[1].split('-')[0] || ele[1] ||'',   
+                        ele[1].split('-')[1] || '',        
+                        new Date(Number(ele[2]*1000)).toLocaleString() || ''
+                    ]
+
+                    // Push the extracted values to the rows
+                    trackLocationRows.push(rowValues);
+                })
+                   
+            }
+        });
+    }
+
+    console.log("Track Location rows extracted: ", trackLocationRows);
+
+    // Return the rows to be used in the new sheet
+    return trackLocationRows;
+}
+
+
 
 extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: any) {
 
@@ -2921,148 +3001,260 @@ splitCsv(csv: string): string[] {
  
 
 
-  exportAllTablesAsPDF() {
-    const tableDataWithFormFilters = this.tableDataWithFormFilters; // Assuming this is your table data
+  // exportAllTablesAsPDF() {
+  //   const tableDataWithFormFilters = this.tableDataWithFormFilters; // Assuming this is your table data
   
+  //   const docDefinition: any = {
+  //     content: [],
+  //     defaultStyle: {
+  //       fontSize: 10,
+  //     },
+  //     styles: {
+  //       tableHeader: {
+  //         bold: true,
+  //         fontSize: 14,
+  //         margin: [0, 5],
+  //         alignment: 'center',
+  //         fillColor: '#4CAF50',  // Green background for header
+  //         color: '#fff',         // White text for header
+  //         padding: [5, 10],      // Add padding to header cells
+  //         border: [true, true, true, true],  // Border around header cells
+  //       },
+  //       tableBody: {
+  //         fontSize: 10,
+  //         margin: [0, 5],
+  //         padding: [5, 10],        // Add padding to body cells
+  //         alignment: 'center',     // Center align text for better readability
+  //       },
+  //       tableRow: {
+  //         fontSize: 10,
+  //         margin: [0, 5],
+  //         border: [true, true, true, true],  // Border for body cells
+  //         padding: [5, 10],  // Padding inside table cells
+  //       },
+  //       alternatingRow: {
+  //         fontSize: 10,
+  //         margin: [0, 5],
+  //         fillColor: '#f9f9f9',  // Light gray background for alternating rows
+  //         border: [true, true, true, true],
+  //         padding: [5, 10],  // Padding inside alternating row cells
+  //       },
+  //       footer: {
+  //         fontSize: 10,
+  //         alignment: 'center',
+  //         margin: [0, 10],
+  //       },
+  //       title: {
+  //         fontSize: 18,
+  //         bold: true,
+  //         alignment: 'center',
+  //         margin: [0, 10],
+  //         color: '#333',  // Darker color for the title
+  //       }
+  //     },
+  //     footer: function(currentPage: number, pageCount: number) {
+  //       return [
+  //         {
+  //           text: `Untangled Pro Page ${currentPage} of ${pageCount}`, // Page number
+  //           alignment: 'center', // Center the page number
+  //           margin: [0, 10],
+  //         }
+  //       ];
+  //     },
+  //   };
+  
+  //   tableDataWithFormFilters.forEach((tableData: { rows: any[]; formFilter: any; }, index: number) => {
+  //     const columns = this.createColumnDefsPDF(tableData.rows);
+  
+  //     // Adjust the page size based on the number of columns
+  //     const columnCount = columns.length;
+  //     if (columnCount <= 6) {
+  //       docDefinition.pageSize = 'A4'; // Set page size to A4 if columns are less than or equal to 6
+  //     } else if (columnCount <= 10) {
+  //       docDefinition.pageSize = 'A3'; // Set page size to A3 if columns are between 7 and 10
+  //     } else if (columnCount <= 15) {
+  //       docDefinition.pageSize = 'A2'; // Set page size to A2 if columns are between 11 and 15
+  //     } else {
+  //       docDefinition.pageSize = 'A1'; // Set page size to A1 if columns are greater than 15
+  //     }
+  
+  //     // Add title (formFilter as table title)
+  //     const title = `${tableData.formFilter}`;
+  //     docDefinition.content.push({
+  //       text: title,
+  //       style: 'tableHeader',
+  //       margin: [0, 10],
+  //     });
+  
+  
+  //     // Prepare the table body
+  //     const tableBody = [];
+  
+  //     // Add header row
+  //     tableBody.push(columns.map((col: any) => ({
+  //       text: col.toString(),
+  //       style: 'tableHeader',
+  //     })));
+  
+  //     // Add data rows
+  //     tableData.rows.forEach((row: any) => {
+  //       const rowData = columns.map((col: any) => {
+  //         let cellData: any = row[col];
+  
+  //         if (typeof cellData === 'object' && cellData !== null) {
+  //           return ''; // Treat object as empty string
+  //         }
+  
+  //         // Check if cellData contains a base64 image string
+  //         else if (cellData && typeof cellData === 'string' && cellData.includes('data:image')) {
+  //           return {
+  //             image: cellData,   // Use the Base64 image data
+  //             width: 50,         // Set image width (adjust as needed)
+  //             height: 50,        // Set image height (adjust as needed)
+  //           };
+  //         }
+  
+  //         // Return empty string for null or undefined
+  //         return cellData ?? '';
+  //       });
+  //       tableBody.push(rowData);
+  //     });
+  
+  //     // Add the table to the content
+  //     docDefinition.content.push({
+  //       table: {
+  //         body: tableBody,
+  //         headerRows: 1, // First row is header
+  //         widths: Array(columns.length).fill('auto'), // Dynamically set column widths based on content
+  //       },
+  //       layout: 'lightHorizontalLines', // Layout style
+  //       margin: [0, 10],
+  //     });
+  
+  //     // Add page break between tables if not the last table
+  //     if (index < tableDataWithFormFilters.length - 1) {
+  //       docDefinition.content.push({
+  //         text: '', pageBreak: 'before',
+  //       });
+  //     }
+  //   });
+  
+  //   // Generate the PDF using pdfMake
+  //   pdfMake.createPdf(docDefinition).download('combined-tables.pdf');
+  // }
+
+ 
+  exportAllTablesAsPDF(): void {
     const docDefinition: any = {
       content: [],
-      defaultStyle: {
-        fontSize: 10,
-      },
+      pageOrientation: 'landscape',
+      pageSize: { width: 2000, height: 1000 },
+      pageMargins: [10, 10, 10, 10],
       styles: {
-        tableHeader: {
+        header: {
+          fontSize: 8,
           bold: true,
-          fontSize: 14,
-          margin: [0, 5],
+          fillColor: '#4CAF50',
+          color: 'white',
           alignment: 'center',
-          fillColor: '#4CAF50',  // Green background for header
-          color: '#fff',         // White text for header
-          padding: [5, 10],      // Add padding to header cells
-          border: [true, true, true, true],  // Border around header cells
+          margin: [2, 2, 2, 2]
         },
-        tableBody: {
-          fontSize: 10,
-          margin: [0, 5],
-          padding: [5, 10],        // Add padding to body cells
-          alignment: 'center',     // Center align text for better readability
-        },
-        tableRow: {
-          fontSize: 10,
-          margin: [0, 5],
-          border: [true, true, true, true],  // Border for body cells
-          padding: [5, 10],  // Padding inside table cells
-        },
-        alternatingRow: {
-          fontSize: 10,
-          margin: [0, 5],
-          fillColor: '#f9f9f9',  // Light gray background for alternating rows
-          border: [true, true, true, true],
-          padding: [5, 10],  // Padding inside alternating row cells
-        },
-        footer: {
-          fontSize: 10,
+        cell: {
+          fontSize: 7,
           alignment: 'center',
-          margin: [0, 10],
+          margin: [2, 2, 2, 2]
         },
         title: {
-          fontSize: 18,
+          fontSize: 12,
           bold: true,
           alignment: 'center',
-          margin: [0, 10],
-          color: '#333',  // Darker color for the title
+          margin: [0, 0, 0, 10]
         }
-      },
-      footer: function(currentPage: number, pageCount: number) {
-        return [
-          {
-            text: `Untangled Pro Page ${currentPage} of ${pageCount}`, // Page number
-            alignment: 'center', // Center the page number
-            margin: [0, 10],
-          }
-        ];
-      },
+      }
     };
   
-    tableDataWithFormFilters.forEach((tableData: { rows: any[]; formFilter: any; }, index: number) => {
+    this.tableDataWithFormFilters.forEach((tableData: any) => {
       const columns = this.createColumnDefsPDF(tableData.rows);
-  
-      // Adjust the page size based on the number of columns
-      const columnCount = columns.length;
-      if (columnCount <= 6) {
-        docDefinition.pageSize = 'A4'; // Set page size to A4 if columns are less than or equal to 6
-      } else if (columnCount <= 10) {
-        docDefinition.pageSize = 'A3'; // Set page size to A3 if columns are between 7 and 10
-      } else if (columnCount <= 15) {
-        docDefinition.pageSize = 'A2'; // Set page size to A2 if columns are between 11 and 15
-      } else {
-        docDefinition.pageSize = 'A1'; // Set page size to A1 if columns are greater than 15
-      }
-  
-      // Add title (formFilter as table title)
-      const title = `${tableData.formFilter}`;
+      
+      // Add table title
       docDefinition.content.push({
-        text: title,
-        style: 'tableHeader',
-        margin: [0, 10],
+        text: tableData.formFilter,
+        style: 'title'
       });
   
+      // Split columns into chunks that fit on a page
+      const columnChunks:any = this.chunkColumns(columns, 10); // Adjust 10 to the max columns per page
   
-      // Prepare the table body
-      const tableBody = [];
+      columnChunks.forEach((columnChunk: any[], chunkIndex: number) => {
+        // Create table body starting with headers for each chunk
+        const tableBody = [
+          columnChunk.map((col: { toString: () => any; }) => ({
+            text: col.toString(),
+            style: 'header'
+          }))
+        ];
   
-      // Add header row
-      tableBody.push(columns.map((col: any) => ({
-        text: col.toString(),
-        style: 'tableHeader',
-      })));
-  
-      // Add data rows
-      tableData.rows.forEach((row: any) => {
-        const rowData = columns.map((col: any) => {
-          let cellData: any = row[col];
-  
-          if (typeof cellData === 'object' && cellData !== null) {
-            return ''; // Treat object as empty string
-          }
-  
-          // Check if cellData contains a base64 image string
-          else if (cellData && typeof cellData === 'string' && cellData.includes('data:image')) {
+        // Add data rows
+        tableData.rows.forEach((row: any) => {
+          const rowData:any = columnChunk.map((col: string | number) => {
+            let cellData = row[col];
+            if (typeof cellData === 'object' && cellData !== null) {
+              return { text: '', style: 'cell' };
+            } else if (cellData && typeof cellData === 'string' && cellData.includes('data:image')) {
+              return {
+                image: cellData,
+                width: 20,
+                height: 20,
+                alignment: 'center'
+              };
+            }
             return {
-              image: cellData,   // Use the Base64 image data
-              width: 50,         // Set image width (adjust as needed)
-              height: 50,        // Set image height (adjust as needed)
+              text: cellData?.toString() ?? '',
+              style: 'cell'
             };
-          }
-  
-          // Return empty string for null or undefined
-          return cellData ?? '';
+          });
+          tableBody.push(rowData);
         });
-        tableBody.push(rowData);
-      });
   
-      // Add the table to the content
-      docDefinition.content.push({
-        table: {
-          body: tableBody,
-          headerRows: 1, // First row is header
-          widths: Array(columns.length).fill('auto'), // Dynamically set column widths based on content
-        },
-        layout: 'lightHorizontalLines', // Layout style
-        margin: [0, 10],
-      });
-  
-      // Add page break between tables if not the last table
-      if (index < tableDataWithFormFilters.length - 1) {
+        // Add table to document
         docDefinition.content.push({
-          text: '', pageBreak: 'before',
+          table: {
+            headerRows: 1,
+            widths: Array(columnChunk.length).fill('*'),
+            body: tableBody,
+          },
+          layout: {
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => '#ddd',
+            vLineColor: () => '#ddd',
+            paddingLeft: () => 2,
+            paddingRight: () => 2,
+            paddingTop: () => 2,
+            paddingBottom: () => 2
+          }
         });
-      }
+  
+        // Add page break if there are more chunks
+        if (chunkIndex < columnChunks.length - 1) {
+          docDefinition.content.push({ text: '', pageBreak: 'after' });
+        }
+      });
     });
   
-    // Generate the PDF using pdfMake
-    pdfMake.createPdf(docDefinition).download('combined-tables.pdf');
+    // Create PDF and download
+    pdfMake.createPdf(docDefinition).download('wide-tables.pdf');
   }
-
+  
+  // Utility function to chunk columns into smaller groups
+  chunkColumns(columns: string | any[], chunkSize: number) {
+    const chunks = [];
+    for (let i = 0; i < columns.length; i += chunkSize) {
+      chunks.push(columns.slice(i, i + chunkSize));
+    }
+    return chunks;
+  }
+  
 
 
 
