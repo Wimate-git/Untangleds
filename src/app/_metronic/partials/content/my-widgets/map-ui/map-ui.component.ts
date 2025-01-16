@@ -83,7 +83,8 @@ if (Array.isArray(this.parsedData)) {
 
         // Include marker_info only if packet label is "Track Location"
         if (packet.parameterName === "TrackLocation") {
-          return { ...baseMarker, marker_info: marker.marker_info || {} };
+          const { label_id, label_name, ...cleanedMarkerInfo } = marker.marker_info || {};
+          return { ...baseMarker, marker_info: cleanedMarkerInfo };
         }
 
         return baseMarker;
@@ -92,15 +93,16 @@ if (Array.isArray(this.parsedData)) {
 
   // Process markers to include mapType and scaled size
   this.markers = this.markers.map(marker => ({
-      ...marker,
-      mapType: {
-        url: marker.mapType, // Use mapType as icon URL
-        scaledSize: { width: 30, height: 30 }, // Set custom dimensions
-      },
-    }));
+    ...marker,
+    mapType: {
+      url: marker.mapType, // Use mapType as icon URL
+      scaledSize: { width: 30, height: 30 }, // Set custom dimensions
+    },
+  }));
 
   console.log('Formatted markers with map types and sizes:', this.markers);
 }
+
 
 
 

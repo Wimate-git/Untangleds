@@ -160,73 +160,119 @@
               <!-- General Tab Content -->
               <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'dataTab'}" id="dataTab"
                 role="tabpanel" aria-labelledby="home-tab">
-            <div formArrayName="all_fields">
-                <div *ngFor="let field of all_fields.controls; let fieldIndex = index" [formGroupName]="fieldIndex" 
-                     style="border: 2px solid rgb(21, 163, 219); padding: 10px; margin: 5px; border-radius: 5px;">
-                  <h5 class="fw-bold mb-3">{{ field.get('parameterName')?.value || 'No Heading' }}</h5>
-              
-                  <!-- Render the conditions -->
-                  <div formArrayName="conditions">
-                    <div *ngFor="let condition of getFormArrayControls(field); let conditionIndex = index">
-                      <!-- Render the condition row -->
-                       <div [formGroupName]="conditionIndex">
-                      <div  class="row g-3" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
-                        <div class="mb-3" style="width: 30%;">
-                          <label class="col-form-label fw-bold fs-6 required">Select Field</label>
-                          <select formControlName="formField" class="form-control">
-                            <option value="" disabled selected>Select Field</option>
-                            <ng-container *ngFor="let option of dynamicParamMap.get(fieldIndex) || []">
-                              <option [value]="option.value">{{ option.text }}</option>
-                            </ng-container>
-                          </select>
+                <div formArrayName="all_fields">
+                  <div
+                    *ngFor="let field of all_fields.controls; let fieldIndex = index"
+                    [formGroupName]="fieldIndex"
+                    style="border: 2px solid rgb(21, 163, 219); padding: 10px; margin: 5px; border-radius: 5px;"
+                  >
+                    <h5 class="fw-bold mb-3">{{ field.get('parameterName')?.value || 'No Heading' }}</h5>
+                
+                    <!-- Render the conditions -->
+                    <div formArrayName="conditions">
+                      <div *ngFor="let condition of getFormArrayControls(field); let conditionIndex = index">
+                        <!-- Render the condition row -->
+                        <div [formGroupName]="conditionIndex">
+                          <div
+                            class="row g-3"
+                            style="display: flex; flex-wrap: wrap; justify-content: space-between;"
+                          >
+                            <div class="mb-3" style="width: 30%;">
+                              <label class="col-form-label fw-bold fs-6 required">Select Field</label>
+                              <select formControlName="formField" class="form-control">
+                                <option value="" disabled selected>Select Field</option>
+                                <ng-container *ngFor="let option of dynamicParamMap.get(fieldIndex) || []">
+                                  <option [value]="option.value">{{ option.text }}</option>
+                                </ng-container>
+                              </select>
+                            </div>
+                
+                            <div class="mb-3" style="width: 30%;">
+                              <label class="col-form-label fw-bold fs-6 required">Operator</label>
+                              <select formControlName="operator" placeholder="Select operator" class="form-control">
+                                <option value="" disabled selected>Select operator</option>
+                                <option value="==">Equals</option>
+                                <option value="!=">Not equals</option>
+                                <option value=">">Greater than</option>
+                                <option value="<">Less than</option>
+                                <option value="<=">Less than equals to</option>
+                                <option value=">=">Greater than equals to</option>
+                              </select>
+                            </div>
+                
+                            <!-- Dynamic Value Field -->
+                            <div class="mb-3" style="width: 30%;">
+                              <label class="col-form-label fw-bold fs-6 required">Value</label>
+                              <!-- Always display the filterValue field -->
+                              <ng-container *ngIf="getOptionsForField(fieldIndex, condition.get('formField')?.value) as fieldData">
+                                <ng-container *ngIf="fieldData.type === 'select'; else textInput">
+                                  <!-- Render as a select dropdown if type is 'select' -->
+                                  <select formControlName="filterValue" class="form-control">
+                                    <option value="" disabled>Select Value</option>
+                                    <ng-container *ngFor="let option of fieldData.options">
+                                      <option [value]="option">{{ option }}</option>
+                                    </ng-container>
+                                  </select>
+                                </ng-container>
+                              </ng-container>
+                              <ng-template #textInput>
+                                <!-- Render as a text input if type is not 'select' -->
+                                <input type="text" formControlName="filterValue" placeholder="Enter value" class="form-control" />
+                              </ng-template>
+                            </div>
+                            
+                            
+                            
+                            
+                            
+                          </div>
+                
+                          <!-- Remove Condition Button (for all conditions except the first) -->
+                          <div *ngIf="conditionIndex > 0" class="d-flex mt-2">
+                            <button
+                              type="button"
+                              class="btn btn-danger btn-sm"
+                              (click)="removeCondition(fieldIndex, conditionIndex)"
+                            >
+                              Remove Condition
+                            </button>
+                          </div>
+                
+                          <!-- Render the Between Operator after the first condition -->
+                          <div
+                            *ngIf="conditionIndex < getFormArrayControls(field).length - 1"
+                            class="mb-3"
+                            style="width: 30%;"
+                          >
+                            <label class="col-form-label fw-bold fs-6 required">Between Operator</label>
+                            <select
+                              formControlName="operatorBetween"
+                              (change)="betweenoperator($event)"
+                              placeholder="Select Operator"
+                              class="form-control"
+                            >
+                              <option value="&&">AND</option>
+                              <option value="||">OR</option>
+                            </select>
+                          </div>
                         </div>
-              
-                        <div class="mb-3" style="width: 30%;">
-                          <label class="col-form-label fw-bold fs-6 required">Operator</label>
-                          <select formControlName="operator" placeholder="Select operator" class="form-control">
-                            <option value="" disabled selected>Select operator</option>
-                            <option value="==">Equals</option>
-                            <option value="!=">Not equals</option>
-                            <option value=">">Greater than</option>
-                            <option value="<">Less than</option>
-                            <option value="<=">Less than equals to</option>
-                            <option value=">=">Greater than equals to</option>
-                          </select>
-                        </div>
-              
-                        <div class="mb-3" style="width: 30%;">
-                          <label class="col-form-label fw-bold fs-6 required">Value</label>
-                          <input type="text" formControlName="filterValue" placeholder="value" class="form-control" />
-                        </div>
-                      </div>
-              
-                      <!-- Remove Condition Button (for all conditions except the first) -->
-                      <div *ngIf="conditionIndex > 0" class="d-flex mt-2">
-                        <button type="button" class="btn btn-danger btn-sm" (click)="removeCondition(fieldIndex, conditionIndex)">
-                          Remove Condition
-                        </button>
-                      </div>
-              
-                      <!-- Render the Between Operator after the first condition -->
-                      <div *ngIf="conditionIndex < getFormArrayControls(field).length - 1" class="mb-3" style="width: 30%; ">
-                        <label class="col-form-label fw-bold fs-6 required">Between Operator</label>
-                        <select formControlName="operatorBetween" (change)="betweenoperator($event)" placeholder="Select Operator" class="form-control">
-                          <option value="&&">AND</option>
-                          <option value="||">OR</option>
-                        </select>
                       </div>
                     </div>
+                
+                    <!-- Add Condition Button -->
+                    <div class="d-flex mt-3">
+                      <button
+                        type="button"
+                        class="btn btn-primary btn-sm me-4"
+                        (click)="addCondition(fieldIndex)"
+                      >
+                        Add Condition
+                      </button>
                     </div>
-                  </div>
-              
-                  <!-- Add Condition Button -->
-                  <div class="d-flex mt-3">
-                    <button type="button" class="btn btn-primary btn-sm me-4" (click)="addCondition(fieldIndex)">
-                      Add Condition
-                    </button>
                   </div>
                 </div>
-              </div>
+                
+                
               </div>
 
               <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'theme-tab'}" id="theme-tab" role="tabpanel" aria-labelledby="theme-tabpane">

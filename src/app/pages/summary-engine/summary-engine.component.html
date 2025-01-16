@@ -54,18 +54,26 @@
                     <app-tile-ui1 
                       [item]="item" 
                       [index]="i" 
-                      [isFullscreen]="isFullscreen" 
+                    
                       [isEditModeView]="isEditModeView" 
                       [hideButton]="hideButton" 
                       [all_Packet_store]="all_Packet_store" 
-                      [summaryDashboardUpdate]="summaryDashboardUpdate" 
-                      [hidingLink]="hidingLink"
+                   
+            
                       (customEvent)="helperTile($event, KPIModal)" 
                       (customEvent1)="emitDuplicate($event)" 
                       (customEvent2)="emitDelete6($event)">
                     </app-tile-ui1>
                   </div>
 
+                  <!-- [isEditModeView]="isEditModeView" 
+                  [hideButton]="hideButton" 
+                  [all_Packet_store]="all_Packet_store" 
+       
+           
+                  (customEvent)="helperTile($event, MapModal)" 
+                  (customEvent1)="emitDuplicate($event)" 
+                  (customEvent2)="emitDelete6($event)" -->
 
                   <div *ngIf="item.grid_type === 'TableWidget'" >
                     <app-table-widget-ui [item]="item" [index]="i" (customEvent)="helperTile($event,tableModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"   [summaryDashboardUpdate]="summaryDashboardUpdate" 
@@ -455,6 +463,17 @@
   type="square-jelly-box" 
   [fullScreen]="true">
   <p style="color: white">Data Processing, Please Wait....</p>
+  </ngx-spinner>
+  <ngx-spinner 
+  *ngIf="isLoading" 
+  bdColor="rgba(0, 0, 0, 0.8)" 
+  size="medium" 
+  color="#fff" 
+
+  name=""
+  type="square-jelly-box" 
+  [fullScreen]="true">
+  <p style="color: white">Redirecting to Dashboard, Please Wait....</p>
   </ngx-spinner>
 
   <div style="top: 1%;

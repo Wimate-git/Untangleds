@@ -15,7 +15,7 @@ export class TileUi1Component implements OnInit{
   @Input() isEditModeView:any;
   @Input() summaryDashboardUpdate:any;
   @Input() hidingLink:any;
-  @Input() isFullscreen: boolean = false; 
+  @Input() isFullscreen:  any; 
   
   
   @Output() customEvent = new EventEmitter<{ arg1: any; arg2: number }>();

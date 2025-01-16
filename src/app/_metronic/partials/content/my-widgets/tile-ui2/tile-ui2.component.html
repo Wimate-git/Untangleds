@@ -43,7 +43,7 @@
         
         <!-- Edit Icon Button -->
         <button 
-        *ngIf="isEditModeView && !hideButton && summaryDashboardUpdate && hidingLink"
+        *ngIf="isEditModeView && !hideButton"
         (click)="edit_each_tileUI(item,index)"
           class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
           aria-haspopup="menu" 
@@ -53,7 +53,7 @@
         </button>
 
         <button 
-        *ngIf="!isEditModeView  && !hideButton && shouldShowButton && summaryDashboardUpdate"
+        *ngIf="!isEditModeView  && hideButton "
   
         (click)="helperDashboard(item, index,modalContent,item.selectType)"
         class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
@@ -70,7 +70,7 @@
           class="dropdown" 
           style="position: relative;">
           <button
-          *ngIf="isEditModeView && summaryDashboardUpdate && hidingLink"
+          *ngIf="isEditModeView && !hideButton"
           [matMenuTriggerFor]="menu"
           class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" >
           <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>

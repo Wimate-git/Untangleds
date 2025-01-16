@@ -193,6 +193,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     { lat: 22.5726, lng: 88.3639, label: 'Kolkata' }, // Kolkata
     { lat: 12.9716, lng: 77.5946, label: 'Bangalore' }, // Bangalore
   ];
+  summaryPermission: any;
 
 
   createPieChart() {
@@ -721,44 +722,54 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   
   setFullscreen(): void {
     localStorage.setItem('fullscreen', 'true');
+    console.log('Fullscreen enabled');
+}
 
-  }
-
-  checkAndSetFullscreen(): void {
+checkAndSetFullscreen(): void {
     const isFullscreen = localStorage.getItem('fullscreen') === 'true';
-    console.log('isFullscreen check',isFullscreen)
- 
-    this.hidingLink = true
+    console.log('isFullscreen check:', isFullscreen);
+
+    // Update the fullscreen state and related flags
     this.isFullscreen = isFullscreen;
-    //     this.isEditModeView = this.summaryDashboardUpdate; // Default to view mode if update is false
-    // this.updateOptions();
+    this.hidingLink = isFullscreen;
 
     if (isFullscreen) {
-      this.toggleFullScreenFullView();
+        this.toggleFullScreenFullView(true); // Enter fullscreen directly
+    } else {
+        this.toggleFullScreenFullView(false); // Exit fullscreen
     }
-    else{
-      this.hidingLink = false
-    }
-  }
-  exitFullScreen(){
-    localStorage.removeItem('fullscreen');
-  }
-  toggleFullScreenFullView() {
-
-    this.isFullScreen = !this.isFullScreen;
-    this.hidingLink = !this.hidingLink
-
-this.updateOptions()
-
-
-if(!this.isFullScreen){
-
-
-}else{
- 
 }
-// this.initializeModal()
-  }
+
+exitFullScreen(): void {
+    localStorage.removeItem('fullscreen');
+    this.isFullscreen = false;
+    this.hidingLink = false;
+    console.log('Exited fullscreen mode');
+    this.updateOptions();
+}
+
+toggleFullScreenFullView(enterFullscreen?: boolean): void {
+    // Allow direct control of fullscreen state or toggle if no parameter is provided
+    if (enterFullscreen !== undefined) {
+        this.isFullScreen = enterFullscreen;
+    } else {
+        this.isFullScreen = !this.isFullScreen; // Toggle fullscreen
+    }
+
+    this.hidingLink = this.isFullScreen; // Update hidingLink state
+
+    console.log('Fullscreen state updated:', this.isFullScreen);
+    this.updateOptions(); // Update any dependent options
+
+    if (this.isFullScreen) {
+        console.log('Entered fullscreen mode');
+        // Additional logic for entering fullscreen
+    } else {
+        console.log('Exited fullscreen mode');
+        // Additional logic for exiting fullscreen
+    }
+}
+
 
   // toggleFullView() {
   //   this.isFullScreen = !this.isFullScreen;  // Toggle the full-screen state
@@ -1431,6 +1442,7 @@ if(!this.isFullScreen){
     this.fetchLiveContractlookup(1)
     this.fetchContractOrderMasterlookup(1)
     this.permissionIds(1)
+    this.fetchCompanyLookupdata(1)
          this.rowData = [
         {
           'location': 'India',
@@ -1566,6 +1578,8 @@ async fetchPermissionIdMain(clientID: number, p1Value: string) {
           this.parsedPermission = JSON.parse(result.metadata);
           console.log('Parsed permission metadata:', this.parsedPermission);
 
+this.summaryPermission = this.parsedPermission.summaryList;
+console.log('this.summaryPermission check',this.summaryPermission)
           this.permissionIdsListList = this.parsedPermission.permissionsList;
           console.log('Parsed permission list:', this.permissionIdsListList);
 
@@ -1590,6 +1604,70 @@ async fetchPermissionIdMain(clientID: number, p1Value: string) {
       // Handle any errors during the fetch
       console.error(`Error fetching data for PK (${p1Value}):`, error);
   }
+}
+
+fetchCompanyLookupdata(sk:any):any {
+  console.log("I am called Bro");
+  
+  return new Promise((resolve, reject) => {
+    this.api.GetMaster(this.SK_clientID + "#summary" + "#lookup", sk)
+      .then(response => {
+        if (response && response.options) {
+          // Check if response.options is a string
+          if (typeof response.options === 'string') {
+            let data = JSON.parse(response.options);
+            console.log("d1 =", data);
+            
+            if (Array.isArray(data)) {
+              const promises = []; // Array to hold promises for recursive calls
+
+              for (let index = 0; index < data.length; index++) {
+                const element = data[index];
+
+                if (element !== null && element !== undefined) {
+                  // Extract values from each element and push them to lookup_data_user
+                  const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
+                  const { P1, P2, P3, P4, P5, P6,P7 ,P8} = element[key]; // Extract values from the nested object
+                 this.lookup_data_summary.push({ P1, P2, P3, P4, P5, P6,P7,P8 }); // Push an array containing P1, P2, P3, P4, P5, P6
+                  console.log("d2 =", this.lookup_data_summary);
+                } else {
+                  break;
+                }
+              }
+
+              // Sort the lookup_data_user array based on P5 values in descending order
+              console.log("Summary LookupData", this.lookup_data_summary);
+              this.lookup_data_summary.sort((a: { P5: number; }, b: { P5: number; }) => b.P5 - a.P5);
+              console.log("Lookup sorting", this.lookup_data_summary);
+
+              // Continue fetching recursively
+              promises.push(this.fetchCompanyLookupdata(sk + 1)); // Store the promise for the recursive call
+              
+              // Wait for all promises to resolve
+              Promise.all(promises)
+                .then(() => resolve(this.lookup_data_summary)) // Resolve with the final lookup data
+                .catch(reject); // Handle any errors from the recursive calls
+            } else {
+              console.error('Invalid data format - not an array.');
+              reject(new Error('Invalid data format - not an array.'));
+            }
+          } else {
+            console.error('response.options is not a string.');
+            reject(new Error('response.options is not a string.'));
+          }
+        } else {
+          console.log("All the users are here", this.lookup_data_summary);
+
+          this.listofSK = this.lookup_data_summary.map((item:any)=>item.P1)
+
+          resolve(this.lookup_data_summary); // Resolve with the current lookup data
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        reject(error); // Reject the promise on error
+      });
+  });
 }
 
 
@@ -1856,14 +1934,17 @@ setTimeout(() => {
 
   
   redirectDashboard(id: string): void {
+    this.isLoading = true;
+  
     // Dismiss all modals
     this.modalService.dismissAll(); // Remove the modal-open class
-    
-    // Navigate to the desired route
-    this.router.navigate([`/summary-engine/${id}`]);
   
-    // Set the state to Edit Mode (if applicable)
+    // Navigate to the desired route
+    this.router.navigate([`/summary-engine/${id}`]).then(() => {
+      window.location.reload(); // Reload the window after navigation
+    });
   }
+  
   
   
 
@@ -3311,131 +3392,8 @@ setTimeout(() => {
     return '200px';  // Default height
   }
 
-  // fetchCompanyLookupdata(page: number, pageSize: number): Promise<any> {
-  //   console.log("Fetching paginated data for page:", page, "pageSize:", pageSize);
-  
-  //   return new Promise((resolve, reject) => {
-  //     this.api.GetMaster(this.SK_clientID + "#summary" + "#lookup", page)
-  //       .then(response => {
-  //         if (response && response.options) {
-  //           if (typeof response.options === 'string') {
-  //             let data = JSON.parse(response.options);
-  //             console.log("Fetched data:", data);
-  
-  //             if (Array.isArray(data)) {
-  //               for (let index = 0; index < data.length; index++) {
-  //                 const element = data[index];
-  //                 if (element) {
-  //                   const key = Object.keys(element)[0];
-  //                   const { P1, P2, P3, P4, P5, P6, P7, P8 } = element[key];
-  //                   this.lookup_data_summary.push({ P1, P2, P3, P4, P5, P6, P7, P8 });
-  //                 }
-  //               }
-  
-  //               console.log("Aggregated lookup data:", this.lookup_data_summary);
-  
-  //               // Sort the data by P5 in descending order (optional)
-  //               this.lookup_data_summary.sort((a:any, b:any) => b.P5 - a.P5);
-  
-  //               // Slice the data for pagination
-  //               const totalRecords = this.lookup_data_summary.length;
-  //               const start = (page - 1) * pageSize;
-  //               const paginatedData = this.lookup_data_summary.slice(start, start + pageSize);
-  
-  //               resolve({
-  //                 data: paginatedData,
-  //                 totalRecords: totalRecords
-  //               });
-  //             } else {
-  //               console.error('Invalid data format - not an array.');
-  //               reject(new Error('Invalid data format - not an array.'));
-  //             }
-  //           } else {
-  //             console.error('response.options is not a string.');
-  //             reject(new Error('response.options is not a string.'));
-  //           }
-  //         } else {
-  //           console.log("All data fetched:", this.lookup_data_summary);
-  
-  //           // Return paginated results
-  //           const totalRecords = this.lookup_data_summary.length;
-  //           const start = (page - 1) * pageSize;
-  //           const paginatedData = this.lookup_data_summary.slice(start, start + pageSize);
-  
-  //           resolve({
-  //             data: paginatedData,
-  //             totalRecords: totalRecords
-  //           });
-  //         }
-  //       })
-  //       .catch(error => {
-  //         console.error('Error fetching data:', error);
-  //         reject(error);
-  //       });
-  //   });
-  // }
-  fetchCompanyLookupdata(sk:any):any {
-    console.log("I am called Bro");
-    
-    return new Promise((resolve, reject) => {
-      this.api.GetMaster(this.SK_clientID + "#summary" + "#lookup", sk)
-        .then(response => {
-          if (response && response.options) {
-            // Check if response.options is a string
-            if (typeof response.options === 'string') {
-              let data = JSON.parse(response.options);
-              console.log("d1 =", data);
-              
-              if (Array.isArray(data)) {
-                const promises = []; // Array to hold promises for recursive calls
-  
-                for (let index = 0; index < data.length; index++) {
-                  const element = data[index];
-  
-                  if (element !== null && element !== undefined) {
-                    // Extract values from each element and push them to lookup_data_user
-                    const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
-                    const { P1, P2, P3, P4, P5, P6,P7 ,P8} = element[key]; // Extract values from the nested object
-                   this.lookup_data_summary.push({ P1, P2, P3, P4, P5, P6,P7,P8 }); // Push an array containing P1, P2, P3, P4, P5, P6
-                    console.log("d2 =", this.lookup_data_summary);
-                  } else {
-                    break;
-                  }
-                }
-  
-                // Sort the lookup_data_user array based on P5 values in descending order
-                this.lookup_data_summary.sort((a: { P5: number; }, b: { P5: number; }) => b.P5 - a.P5);
-                console.log("Lookup sorting", this.lookup_data_summary);
-  
-                // Continue fetching recursively
-                promises.push(this.fetchCompanyLookupdata(sk + 1)); // Store the promise for the recursive call
-                
-                // Wait for all promises to resolve
-                Promise.all(promises)
-                  .then(() => resolve(this.lookup_data_summary)) // Resolve with the final lookup data
-                  .catch(reject); // Handle any errors from the recursive calls
-              } else {
-                console.error('Invalid data format - not an array.');
-                reject(new Error('Invalid data format - not an array.'));
-              }
-            } else {
-              console.error('response.options is not a string.');
-              reject(new Error('response.options is not a string.'));
-            }
-          } else {
-            console.log("All the users are here", this.lookup_data_summary);
 
-            this.listofSK = this.lookup_data_summary.map((item:any)=>item.P1)
 
-            resolve(this.lookup_data_summary); // Resolve with the current lookup data
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          reject(error); // Reject the promise on error
-        });
-    });
-  }
   
   loadData() {
     this.lookup_data_summary1 = [];

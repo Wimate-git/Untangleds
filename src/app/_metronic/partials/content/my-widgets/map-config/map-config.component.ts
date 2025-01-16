@@ -91,6 +91,7 @@ export class MapConfigComponent {
   ];
   parsedData: any;
   updateddateType: any;
+  selectedParameterValueGraphic: any;
 
 
  
@@ -465,7 +466,10 @@ console.log('Cleaned-up formlist values:', this.formlistValues);
             filterParameter: [''],
             filterDescription: [''],
             custom_Label: ['', Validators.required],
-            add_Markers:[[]]
+            add_Markers:[[]],
+            filterParameter1:[''],
+            filterDescription1:['']
+
             
           
           })
@@ -786,36 +790,33 @@ repopulate_fields(getValues: any): FormArray {
   if (parsedtileConfig && parsedtileConfig.length > 0) {
     parsedtileConfig.forEach((configItem, index) => {
       console.log(`Processing index ${index} - Full Object:`, configItem);
-      console.log(`Index ${index} - dateType:`, configItem?.dateType || 'Not Found');
-
-      // Handle parameterName
-      const parameterNameValue = Array.isArray(configItem.parameterName)
-        ? configItem.parameterName // Extract 'text' from each object
-        : [];
 
       // Handle filterParameter
       const filterParameterValue = Array.isArray(configItem.filterParameter)
         ? configItem.filterParameter
         : [];
 
-        console.log('configItem?.dateType check',configItem.dateType )
-        this.updateddateType = configItem.dateType
- 
+      // Handle filterParameter1
+      const filterParameter1Value = Array.isArray(configItem.filterParameter1)
+        ? configItem.filterParameter1
+        : [];
+
       // Create and push FormGroup
       this.all_fields.push(
         this.fb.group({
           formlist: configItem.formlist || '',
-          parameterName: configItem.parameterName,
-          dateType: configItem.dateType ,// Provide fallback
+          parameterName: configItem.parameterName || '',
+          dateType: configItem.dateType || '', // Provide fallback
           singleDate: configItem.singleDate || '',
           daysAgo: configItem.daysAgo || '',
           startDate: configItem.startDate || '',
           endDate: configItem.endDate || '',
-          map_type:configItem.map_type,
-       
+          map_type: configItem.map_type || '',
           filterDescription: configItem.filterDescription || '',
+          filterDescription1: configItem.filterDescription1 || '',
           filterForm: configItem.filterForm || '',
           filterParameter: this.fb.control(filterParameterValue),
+          filterParameter1: this.fb.control(filterParameter1Value),
         })
       );
 
@@ -830,6 +831,8 @@ repopulate_fields(getValues: any): FormArray {
 
   return this.all_fields;
 }
+
+
 
 
 mapValueCheck(event: Event, fieldIndex: number): void {
@@ -1084,25 +1087,91 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
       console.warn('Invalid event structure or missing value array:', event);
     }
   }
-  
-  
-  
 
-  dynamicparameterLabel(event: any, index: any) {
-    console.log('event checking dynamicparameterLabel', event);
-    console.log('index checking dynamicparameterLabel', index);
+  dynamicparameterValue1(event: any, index: any): void {
+    console.log('Event check for dynamic param:', event);
+    console.log('Index check:', index);
   
-    // Ensure the variable is initialized as an array or object
-    if (!this.dynamicparameterLabMap) {
-      this.dynamicparameterLabMap = {}; // Initialize as an object if not already
+    // Access the specific FormGroup from the FormArray
+    const formDynamicParamGraphic = this.all_fields.at(index) as FormGroup;
+  
+    if (!formDynamicParamGraphic) {
+      console.warn(`FormGroup not found for index ${index}`);
+      return;
     }
   
+    // Access the filterParameter FormControl
+    const filterParameterGraphic = formDynamicParamGraphic.get('filterParameter1');
+    console.log('filterParameter check:', filterParameterGraphic);
+  
+    if (event && event.value && Array.isArray(event.value)) {
+      const valuesArray = event.value;
+  
+      if (valuesArray.length === 1) {
+        // Handle single selection
+        const singleItem = valuesArray[0];
+        const { value, text } = singleItem; // Destructure value and text
+        console.log('Single Selected Item:', { value, text });
+  
+        if (filterParameterGraphic) {
+          // Update the form control with the single value (object)
+          filterParameterGraphic.setValue([{ value, text }]); // Store as an array of objects
+          this.cdr.detectChanges(); // Trigger change detection
+        } else {
+          console.warn(`filterParameter control not found in FormGroup for index ${index}`);
+        }
+  
+        // Store the single selected parameter
+        this.selectedParameterValueGraphic = { value, text };
+      } else {
+        // Handle multiple selections
+        const formattedValuesGraphic = valuesArray.map((item: any) => {
+          const { value, text } = item; // Destructure value and text
+          return { value, text }; // Create an object with value and text
+        });
+  
+        console.log('Formatted Multiple Items:', formattedValuesGraphic);
+  
+        if (filterParameterGraphic) {
+          // Update the form control with the concatenated values (array of objects)
+          filterParameterGraphic.setValue(formattedValuesGraphic);
+          this.cdr.detectChanges(); // Trigger change detection
+        } else {
+          console.warn(`filterParameter control not found in FormGroup for index ${index}`);
+        }
+  
+        // Store the multiple selected parameters
+        this.selectedParameterValueGraphic = formattedValuesGraphic;
+      }
+    } else {
+      console.warn('Invalid event structure or missing value array:', event);
+    }
+  }
+  
+  
+  
+dynamicparameterLabel(event: any, index: any) {
+  console.log('event checking dynamicparameterLabel', event);
+  console.log('index checking dynamicparameterLabel', index);
+
+  // Ensure the variable is initialized as an object
+  if (!this.dynamicparameterLabMap) {
+    this.dynamicparameterLabMap = {}; // Initialize if not already
+  }
+
+  // Check if event is valid and has at least one item
+  if (Array.isArray(event) && event.length > 0) {
     // Store the value for the specific index
     this.dynamicparameterLabMap[index] = event[0]?.text || '';
-    console.log('dynamicparameterLabMap after update:', this.dynamicparameterLabMap[index]);
-  
-    console.log('dynamicparameterLabMap after update:', this.dynamicparameterLabMap);
+  } else {
+    // Handle cases where event is undefined or empty
+    this.dynamicparameterLabMap[index] = '';
   }
+
+  console.log('dynamicparameterLabMap after update:', this.dynamicparameterLabMap[index]);
+  console.log('dynamicparameterLabMap after update:', this.dynamicparameterLabMap);
+}
+
   
 
   onAdd(index: any): void {
@@ -1130,6 +1199,55 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
       formattedDescription = `${selectedParameters.text}-\${${selectedParameters.value}}`;
     } else {
       console.warn('No parameters selected or invalid format:', selectedParameters);
+      formattedDescription = ''; // Fallback in case of no selection
+    }
+  
+    console.log('Formatted Description:', formattedDescription);
+  
+    // Update the specific form control value for `filterDescription`
+    if (groupByFormatControl) {
+      groupByFormatControl.patchValue(formattedDescription);
+      console.log(`Patched value for index ${index}:`, formattedDescription);
+    } else {
+      console.warn(`filterDescription control not found for index ${index}.`);
+    }
+  
+    // Optionally patch at the top-level form if needed
+    this.createChart.patchValue({
+      filterDescription: formattedDescription,
+    });
+  
+    // Manually trigger change detection to ensure the UI reflects the changes
+    this.cdr.detectChanges();
+  }
+
+
+
+  onAdd1(index: any): void {
+    console.log('Index checking from onAdd:', index);
+  
+    // Access the specific form group from the form array
+    const formDescParamGraphic = this.all_fields.at(index) as FormGroup;
+  
+    // Retrieve the `filterDescription` control from the group
+    const groupByFormatControl = formDescParamGraphic.get('filterDescription1');
+  
+    // Capture the selected parameters (which will be an array of objects with text and value)
+    const selectedParametersGraphic = this.selectedParameterValueGraphic;
+    console.log('Selected parameters checking:', selectedParametersGraphic);
+  
+    let formattedDescription = '';
+  
+    if (Array.isArray(selectedParametersGraphic)) {
+      // Format the selected parameters to include both text and value
+      formattedDescription = selectedParametersGraphic
+        .map(param => `${param.text}-\${${param.value}}`) // Include both text and value
+        .join(' '); // Join them with a comma and space
+    } else if (selectedParametersGraphic) {
+      // If only one parameter is selected, format it directly
+      formattedDescription = `${selectedParametersGraphic.text}-\${${selectedParametersGraphic.value}}`;
+    } else {
+      console.warn('No parameters selected or invalid format:', selectedParametersGraphic);
       formattedDescription = ''; // Fallback in case of no selection
     }
   
@@ -1190,6 +1308,9 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   }
   
   getDynamicParams(index: number): any[] {
+    return this.dynamicParamMap.get(index) || [];
+  }
+  getDynamicParams1(index: number): any[] {
     return this.dynamicParamMap.get(index) || [];
   }
   getDynamicParamsFormFields(index: number): any[] {

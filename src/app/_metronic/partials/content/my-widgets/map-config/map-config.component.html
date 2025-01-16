@@ -162,6 +162,7 @@
                           placeholder="Select Parameter">
                         </ngx-select>
                       </div>
+                      
                     
                       <!-- Marker Type Dropdown -->
                       <div class="col-md-4">
@@ -284,6 +285,35 @@
                     mb-3 mb-lg-0" name="add_Markers" formControlName="add_Markers"
     required>
 </div>
+
+<div *ngIf="dynamicparameterLabMap?.[fieldIndex] === 'Graphic Location'" class="col-md-5 mb-3">
+  <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields</label>
+  <p-multiSelect
+    id="parameterName"
+    formControlName="filterParameter1"
+    [options]="getDynamicParams1(fieldIndex)"
+    optionLabel="text"
+    placeholder="Select Parameter"
+    (onChange)="dynamicparameterValue1($event, fieldIndex)">
+  </p-multiSelect>
+</div>
+
+<div *ngIf="dynamicparameterLabMap?.[fieldIndex] === 'Graphic Location'" class="col-md-2 mb-3 d-flex align-items-end">
+  <button type="button" class="btn btn-primary w-100" (click)="onAdd1(fieldIndex)">Add</button>
+</div>
+
+<div *ngIf="dynamicparameterLabMap?.[fieldIndex] === 'Graphic Location'" class="col-md-12 mb-3">
+  <label for="description" class="col-createChart-label fw-bold fs-6">Description</label>
+  <textarea
+    id="description"
+    formControlName="filterDescription1"
+    class="form-control"
+    rows="3"
+    placeholder="Enter description">
+    {{ selectedParameterValue }}
+  </textarea>
+</div>
+
 
 
 

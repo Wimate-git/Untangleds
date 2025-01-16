@@ -937,6 +937,7 @@ repopulate_fields(getValues: any) {
     { value: 'Constant', text: 'Constant' },
     { value: 'Live', text: 'Live' },
     { value: 'Count', text: 'Count' },
+    { value: 'Count_Multiple', text: 'Count Multiple' },
 
 
   ]
