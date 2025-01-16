@@ -179,9 +179,9 @@
                           >
                             <div class="mb-3" style="width: 30%;">
                               <label class="col-form-label fw-bold fs-6 required">Select Field</label>
-                              <select formControlName="formField" class="form-control">
+                              <select formControlName="formField" class="form-control" (change)="getOptionsForField(fieldIndex,conditionIndex, condition.get('formField')?.value);condition.get('filterValue')?.setValue('');">
                                 <option value="" disabled selected>Select Field</option>
-                                <ng-container *ngFor="let option of dynamicParamMap.get(fieldIndex) || []">
+                                <ng-container *ngFor="let option of dynamicParamMap.get(fieldIndex) || []" >
                                   <option [value]="option.value">{{ option.text }}</option>
                                 </ng-container>
                               </select>
@@ -203,14 +203,14 @@
                             <!-- Dynamic Value Field -->
                             <div class="mb-3" style="width: 30%;">
                               <label class="col-form-label fw-bold fs-6 required">Value</label>
-                              <ng-container *ngIf="condition.get('type')?.value as fieldType">
+                              <ng-container *ngIf="condition.get('type')?.value as fieldType; ">
                                 <ng-container *ngIf="fieldType === 'select'; else textInput">
-                                  <ng-container *ngIf="getOptionsForField(fieldIndex, condition.get('formField')?.value) as fieldData">
-                                    <ng-container *ngIf="fieldData.options && fieldData.options.length > 0; else noOptions">
+                                  <ng-container *ngIf="globalFieldData[conditionIndex]">
+                                    <ng-container *ngIf="globalFieldData[conditionIndex].options && globalFieldData[conditionIndex].options.length > 0 && globalFieldData[conditionIndex].options[0]!==' '; else noOptions">
                                       <!-- Render as a select dropdown if type is 'select' and options are valid -->
                                       <select formControlName="filterValue" class="form-control">
                                         <option value="" disabled>Select Value</option>
-                                        <ng-container *ngFor="let option of fieldData.options">
+                                        <ng-container *ngFor="let option of globalFieldData[conditionIndex].options">
                                           <ng-container *ngIf="option && option.trim()">
                                             <option [value]="option">{{ option }}</option>
                                           </ng-container>
@@ -282,6 +282,13 @@
                       >
                         Add Condition
                       </button>
+                      <button
+                      type="button"
+                      class="btn btn-danger btn-sm me-4"
+                      (click)="remove(fieldIndex)"
+                    >
+                    Remove
+                    </button>
                     </div>
                   </div>
                 </div>

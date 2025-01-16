@@ -5398,6 +5398,11 @@ refreshFunction(){
 
   }
 
-  
+  refreshHelper(data:any){
+    if(data){
+      this.reloadPage()
+    }
+
+  }
 
 }
