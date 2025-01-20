@@ -84,6 +84,10 @@ export class DashboardComponent implements OnInit {
 
         console.log("Permission Table Formgroup Selected:", this.permissionFormgroup)
 
+        var result = this.permissionFormgroup.map((item: string) => item.split('-')[0]);
+
+          console.log(result);
+
 
         await this.api.GetMaster(this.client + "#formgroup#lookup", 1).then((result: any) => {
           if (result) {
@@ -165,7 +169,7 @@ export class DashboardComponent implements OnInit {
             const key = Object.keys(data)[0];
             const item = data[key];
             // Check if the P1 value exists in the permissionFormgroup array
-            return this.permissionFormgroup.includes(item.P1);
+            return result.includes(item.P1);
           });
 
           console.log("Filtered Data:", filteredData)
@@ -282,15 +286,15 @@ export class DashboardComponent implements OnInit {
 
       if (this.cards_2.length === 0) {
 
-        // Swal.fire({
-        //   toast: true,
-        //   position: 'bottom',
-        //   icon: 'success', // or another icon like 'info', 'error', etc.
-        //   title: 'No Form Group data available',
-        //   showConfirmButton: false,
-        //   timer: 2000,
-        //   timerProgressBar: true
-        // });
+        Swal.fire({
+          toast: true,
+          position: 'bottom',
+          icon: 'success', // or another icon like 'info', 'error', etc.
+          title: 'No Form Group data available',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true
+        });
 
         const errorAlert_icon: SweetAlertOptions = {
           icon: 'error',
