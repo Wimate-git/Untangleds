@@ -155,7 +155,7 @@ export class DashboardComponent implements OnInit {
                   year: 'numeric'
                 }),  // Convert timestamp to a readable date format
                 totalEarnings: item.P1 || '',  // Fallback in case P5 is empty
-                online: '', // Placeholder for 'online' status
+                online: item.P8, // Placeholder for 'online' status
 
               };
             })
@@ -225,7 +225,7 @@ export class DashboardComponent implements OnInit {
                   year: 'numeric'
                 }),  // Convert timestamp to a readable date format
                 totalEarnings: item.P1 || '',  // Fallback in case P5 is empty
-                online: '', // Placeholder for 'online' status
+                online: item.P8, // Placeholder for 'online' status
               };
             })
           );
@@ -271,7 +271,7 @@ export class DashboardComponent implements OnInit {
                 year: 'numeric'
               }),  // Convert timestamp to a readable date format
               totalEarnings: item.P1 || '',  // Fallback in case P5 is empty
-              online: '', // Placeholder for 'online' status
+              online: item.P8, // Placeholder for 'online' status
 
             };
           })

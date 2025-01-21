@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, input, Input, OnInit } from '@angular/core';
 import { IconUserModel } from '../icon-user.model';
 import { Router } from '@angular/router';
 
@@ -17,9 +17,11 @@ export class Card2Component implements OnInit{
   @Input() date: string = '';
   @Input() budget: string = '';
   @Input() progress: number = 50;
+  @Input() online: string;
   @Input() formgroup: string = '';
   @Input() users: Array<IconUserModel> = [];
   @Input() icon_: { value: string; label: string; class1: string; class2: string };
+ 
 
   id: string;
 
@@ -33,23 +35,37 @@ export class Card2Component implements OnInit{
 
   }
 
-  onStatusClick(title: any) {
+  onStatusClick(data: { title: string; id: string }): void {
+
+    console.log("ID:", data.id)
+
+    if(data.id == 'Calendar'){
+      this.id = 'Calendar'
+    }
+    else{
 
     this.id = 'Forms'
+    }
+
+    // this.id = 'Calendar'
+
+    console.log("ID:",this.id)
 
 
     if(this.componentSource == 'dashboard'){
 
       
-       this.router.navigate([`dashboard/dashboardFrom/${title.title}`]);
+       this.router.navigate([`dashboard/dashboardFrom/${this.id}/${data.title}`]);
 
     }
     else if(this.componentSource == 'dashboardForm'){
 
-      this.router.navigate([`view-dreamboard/${this.id}/${title.title}`]);
+      
+
+      this.router.navigate([`view-dreamboard/${this.id}/${data.title}`]);
      
 
-      console.log('NAVIGATE:',title)
+      // console.log('NAVIGATE:',title)
     }
 
   }

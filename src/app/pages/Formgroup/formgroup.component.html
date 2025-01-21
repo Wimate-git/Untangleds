@@ -103,7 +103,25 @@
                         </div>
                         <!--end::Input-->
                     </div>
-                    <div class="fv-row mb-7">
+
+                    <div class="form-group row ps-4 mb-7">
+                        <label
+                            class="required col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Type</label>
+                        <div class="col-3 d-flex gap-7 align-items-center">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="filterAll"
+                                    formControlName="filterOption" value="form" (change)="onTypeChange($event)">
+                                <label class="form-check-label" for="filterAll">Form</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="filterOnCondition"
+                                    formControlName="filterOption" value="Calendar" (change)="onTypeChange($event)">
+                                <label class="form-check-label" for="filterOnCondition">Calendar</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="selectedType === 'form'" class="fv-row mb-7">
                         <label class="required fw-semibold fs-6 mb-2">Form ID</label>
                         <div class="custom-multiselect">
                             <ng-multiselect-dropdown style="
@@ -125,29 +143,30 @@
                             </ng-multiselect-dropdown>
                         </div>
                     </div>
-                    <!-- <div class="image-upload-container" style="align-items: center;"> -->
-                        <!-- Left side text -->
-                        <!-- <div class="upload-text" style="flex: 1;">
-                          <label class="fw-semibold fs-6 mb-2" for="profile_avatar">Upload Icon</label>
-                        </div> -->
-                      
-                        <!-- Right side image preview and input -->
-                        <!-- <div class="image-input image-input-outline" [ngClass]="{'image-input-changed': selectedImage}" id="kt_image_1">
-                            <div 
-                              class="image-input-wrapper" 
-                              [ngStyle]="{ 'background-image': selectedImage ? 'url(' + selectedImage + ')' : 'url(assets/media/avatars/blank.png)'}">
-                            </div>
-                          
-                            <label class="btn btn-xs btn-icon btn-circle btn-red btn-hover-text-primary btn-shadow" title="Change avatar">
-                              <i class="fa fa-pen icon-sm text-muted"></i>
-                              <input type="file" (change)="onFileChange($event)" accept=".png, .jpg, .jpeg" style="display:none;"/>
-                            </label>
-                          
-                            <span class="btn btn-xs btn-icon btn-circle btn-white btn-hover-text-primary btn-shadow" (click)="cancelImage()" title="Cancel avatar">
-                              <i class="ki ki-bold-close icon-xs text-muted"></i>
-                            </span>
-                          </div> -->
 
+                    <div *ngIf="selectedType === 'Calendar'" class="fv-row mb-7">
+                        <label class="required fw-semibold fs-6 mb-2">Calendar</label>
+                        <div class="custom-multiselect">
+                            <ng-multiselect-dropdown style="
+                                      display: inline-block; 
+                                      width: 100%;
+                                      padding: 0px ;
+                                      margin-bottom: 0;
+                                      font-weight: 0px;
+                                      line-height: 1.52857143;
+                                      text-align: left;
+                                      vertical-align: middle;
+                                      cursor: pointer;
+                                      background-image: none;
+                                      border-radius: 4px;
+                                      
+                                      " class="form-select form-select-solid form-select"
+                                [placeholder]="'Select form Id'" [settings]="dropdownSettings" [data]="formList"
+                                name="formList" [formControl]="$any(formgroupForm.controls['formList'])">
+                            </ng-multiselect-dropdown>
+                        </div>
+                    </div>
+                   
                           <div class="row mb-3">
                             <div class="col-md-4">
                               <label class="fw-semibold fs-6 mb-2 required" for="icon-select">Select an Icon:</label>

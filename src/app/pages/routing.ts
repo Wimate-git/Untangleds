@@ -23,7 +23,7 @@ const Routing: Routes = [
     loadChildren: () => import('./project-template-dashboard/project-template-dashboard.module').then((m) => m.ProjectTemplateDashboardModule),
   },
   {
-    path: 'dashboard/dashboardFrom/:formgroup',
+    path: 'dashboard/dashboardFrom/:id/:formgroup',
     loadChildren: () => import('./dashbordForm/dashboardForm.module').then((m) =>m.DashboardFormModule),
   },
   {

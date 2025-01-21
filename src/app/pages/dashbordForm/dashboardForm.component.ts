@@ -39,6 +39,7 @@ export class DashboardFormComponent implements OnInit {
     group: any[] = [];
     resultArray:any[] =[];
     loading = true;
+    id: string | null;
   
 
 
@@ -57,6 +58,7 @@ export class DashboardFormComponent implements OnInit {
         this.route.paramMap.subscribe(params => {
             console.log(this.route)
             this.form_group = params.get('formgroup');
+            this.id = params.get('id')
 
             console.log("ROUTE FORMGROUP:", this.form_group)
         });
@@ -95,6 +97,8 @@ export class DashboardFormComponent implements OnInit {
 
             this.groupForm = this.groupFormResponse.formList
 
+            console.log("GROUP LIST:",this.groupForm)
+
 
         }).catch((error) => {
             console.log("FormGroup Error:", error)
@@ -105,6 +109,21 @@ export class DashboardFormComponent implements OnInit {
         }, []);
 
         console.log("ALLOW FORMS:", allowedForms)
+
+        if(this.id == 'Calendar'){
+            await this.api.GetMaster(this.client + "#systemCalendarQuery#lookup", 1).then((result: any) => {
+                if (result) {
+                    this.helpherObj = JSON.parse(result.options)
+    
+                    this.formList = this.helpherObj.map((item: any) => item)
+    
+                    console.log("DYNAMIC FORMLIST:", this.formList)
+                }
+            }).catch((error) => {
+                console.log("Error:", error)
+            })
+        }
+        else{
 
 
         await this.api.GetMaster(this.client + "#dynamic_form#lookup", 1).then((result: any) => {
@@ -118,6 +137,37 @@ export class DashboardFormComponent implements OnInit {
         }).catch((error) => {
             console.log("Error:", error)
         })
+    }
+    
+
+        // await Promise.all([
+        //     this.api.GetMaster(this.client + "#dynamic_form#lookup", 1),
+        //     this.api.GetMaster(this.client + "#systemCalendarQuery#lookup", 1)
+        // ])
+        //     .then((results: any[]) => {
+        //         const [dynamicFormResult, systemCalendarResult] = results;
+        
+        //         // Parse the first result and add to the formList
+        //         if (dynamicFormResult) {
+        //             const dynamicFormOptions = JSON.parse(dynamicFormResult.options);
+        //             this.formList = dynamicFormOptions.map((item: any) => item);
+        //         }
+        
+        //         // Parse the second result and combine with the formList
+        //         if (systemCalendarResult) {
+        //             const systemCalendarOptions = JSON.parse(systemCalendarResult.options);
+        //             const calendarFormList = systemCalendarOptions.map((item: any) => item);
+        
+        //             // Combine the lists
+        //             this.formList = [...this.formList, ...calendarFormList];
+        //         }
+        
+        //         console.log("COMBINED FORMLIST:", this.formList);
+        //     })
+        //     .catch((error) => {
+        //         console.log("Error:", error);
+        //     });
+        
 
         let matchingItems = []
         if(allowedForms.includes('All') ){
@@ -153,7 +203,7 @@ export class DashboardFormComponent implements OnInit {
                     year: 'numeric'
                 }) : '',  // Handle cases where values may be empty
                 totalEarnings: data[0] || '',  // Fallback if index 5 is empty
-                online: ''  // Placeholder for online status
+                online: this.id  // Placeholder for online status
             }));
 
         }

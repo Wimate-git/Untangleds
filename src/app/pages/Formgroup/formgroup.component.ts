@@ -86,6 +86,7 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
   url: any;
   uploadnew: boolean=false;
   previewObjDisplay:any=null;
+  selectedType: string;
 
   constructor(
     // private apiService: UserService, 
@@ -279,6 +280,7 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
       formList: [[], Validators.required],
       createdUser: [' '],
       updatedUser: [' '],
+      filterOption: [''],
       selectedImage: [''],
       iconSelect:['',Validators.required],
       iconObject:[''],
@@ -419,7 +421,9 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log("DATATABLE:", this.datatableConfig)
     //   this.roles$ = this.roleService.getRoles();
 
-    await this.addFromService()
+    // await this.addFromService()
+
+    // await this.addCalenderService()
   }
 
   delete(P1: any) {
@@ -500,42 +504,6 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
 
         if (this.data_temp) {
 
-          // if (this.data_temp[0].selectedImage) {
-
-          //   var request_data = {
-          //     bucket_name: "dreamboard-dynamic",
-          //     operation_type: "generate",
-          //     //key: 'public/' + clientid_ + '/fileuploads/Quote_Template/' + input_ID.value + '/' + visitType + '/',
-          //     "key": 'public/' + this.client + '/fileuploads/formgroup/' + P1 + '/',
-          //   }
-          //   //showLoadingSpinnerm();
-          //   // Call your API endpoint that triggers the Lambda function
-          //   fetch('https://3luwbeeuk0.execute-api.ap-south-1.amazonaws.com/s1/s3Bucket', {
-          //     method: 'POST',
-          //     body: JSON.stringify(request_data)
-          //   })
-          //     .then(response => response.json())
-          //     .then(data => {
-
-          //       console.log(data);
-
-          //       var data_ = JSON.parse(data.body)
-
-          //       var data_1 = JSON.parse(data_.data)
-          //       console.log('data_1 :', data_1);
-
-          //       this.url = data_1[0].url
-          //       this.selectedImage = this.url
-          //       console.log("URL:", this.url)
-          //     }).catch((error) => {
-
-          //       console.log("FETCH DATA FROM and BUCKET:", error)
-          //     })
-          // }
-          // else {
-          //   this.selectedImage = this.data_temp[0].selectedImage
-          // }
-
           this.previewObjDisplay = this.data_temp[0].iconObject
 
           this.formgroupForm = this.fb.group({
@@ -549,8 +517,11 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
             createdUser: [this.data_temp[0].createdUser],
             updatedUser: [this.data_temp[0].updatedUser],
             createdTime: [this.data_temp[0].createdTime],
+            filterOption:[this.data_temp[0].filterOption],
             updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
           });
+
+          this.onTypeChange(this.data_temp[0].filterOption)
         }
 
       }
@@ -567,7 +538,8 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
     this.update = false
     this.error=''
     this.selectedImage = null;  
-    this.previewObjDisplay = '';       // Model heading and button text change flag
+    this.previewObjDisplay = '';  
+    this.selectedType =''     // Model heading and button text change flag
     this.initForm()
   }
 
@@ -649,6 +621,7 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
           P5: this.formgroupForm.value.createdUser,
           P6: this.formgroupForm.value.updatedUser,
           P7: this.formgroupForm.value.updatedTime,
+          P8: this.selectedType
         };
 
         console.log("LOOK UP DREAMBOARD DATA:", this.formgroupItem);
@@ -706,7 +679,8 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
           P5: this.updateResponse.createdUser,
           P6: this.updateResponse.updatedUser,
           // P7: this.updateResponse.updatedTime,
-          P7: Math.ceil(((new Date()).getTime()) / 1000)
+          P7: Math.ceil(((new Date()).getTime()) / 1000),
+          P8: this.selectedType
 
         };
 
@@ -802,8 +776,8 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
                   if (element !== null && element !== undefined) {
                     // Extract values from each element and push them to lookup_data_user
                     const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
-                    const { P1, P2, P3, P4, P5, P6, P7 } = element[key]; // Extract values from the nested object
-                    this.lookup_data_user.push({ P1, P2, P3, P4, P5, P6, P7 }); // Push an array containing P1, P2, P3, P4, P5, P6
+                    const { P1, P2, P3, P4, P5, P6, P7 ,P8} = element[key]; // Extract values from the nested object
+                    this.lookup_data_user.push({ P1, P2, P3, P4, P5, P6, P7,P8 }); // Push an array containing P1, P2, P3, P4, P5, P6
                     console.log("d2 =", this.lookup_data_user);
                   } else {
                     break;
@@ -940,7 +914,16 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
         if (result) {
           const helpherObj = JSON.parse(result.options)
 
+
+          console.log("HELPER OBJECT:", helpherObj)
+
           this.formList = helpherObj.map((item: any) => item[0])
+
+          // this.formList = helpherObj.map((item: any) => {
+          //   // Check if item[1] is not empty and concatenate with item[0]
+          //   return item[1] ? `${item[0]}-${item[1]}` : item[0];
+          // });
+
 
           console.log("FORMGORUP COMPONENT FETCH FORM LIST:", this.formList)
         }
@@ -951,6 +934,73 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
   }
+  async addCalendarService() {
+    try {
+      await this.api.GetMaster(this.client + "#systemCalendarQuery#lookup", 1).then((result: any) => {
+        if (result) {
+          const helpherObj = JSON.parse(result.options)
+
+
+          console.log("HELPER OBJECT:", helpherObj)
+
+          this.formList = helpherObj.map((item: any) => item[0])
+
+          // this.formList = helpherObj.map((item: any) => {
+          //   // Check if item[1] is not empty and concatenate with item[0]
+          //   return item[1] ? `${item[0]}-${item[1]}` : item[0];
+          // });
+
+
+          console.log("FORMGORUP COMPONENT FETCH FORM LIST:", this.formList)
+        }
+      })
+    }
+    catch (err) {
+      console.log("Error fetching the dynamic form data ", err);
+    }
+
+  }
+
+  // async onTypeChange(event: Event): Promise<void> {
+  //   const target = event.target as HTMLInputElement;
+  //   this.selectedType = target.value; // Update the selected type
+
+  //   if(this.selectedType == 'form'){
+  //     this.formList =[]
+  //     await this.addFromService()
+  //   }
+  //   if(this.selectedType == 'Calendar'){
+  //     this.formList =[]
+  //     await this.addCalendarService()
+  //   }
+  // }
+
+  async onTypeChange(eventOrType: Event | string): Promise<void> {
+    let selectedType: string;
+  
+    if (typeof eventOrType === 'string') {
+      // If the input is a string, use it directly
+      selectedType = eventOrType;
+    } else {
+      // Otherwise, extract the value from the event
+      const target = eventOrType.target as HTMLInputElement;
+      selectedType = target.value;
+    }
+  
+    this.selectedType = selectedType; // Update the selected type
+  
+    if (this.selectedType === 'form') {
+      this.formList = [];
+      await this.addFromService();
+    }
+  
+    if (this.selectedType === 'Calendar') {
+      this.formList = [];
+      await this.addCalendarService();
+    }
+  }
+  
+
 
   async createLookupdreamboard(item: any, pageNumber: number, dreamboardIdPk: any) {
     try {
