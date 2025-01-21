@@ -234,6 +234,15 @@
                             
                             
                           </div>
+                          <div class="col-md-4 mb-3" *ngIf = enableParameterName>
+                            <label for="parameterName" class="col-form-label fw-bold fs-6 "></label>
+                            <input
+                              id="parameterName"
+                              type="number"
+                              class="form-control form-control-solid"
+                              placeholder="Select constant"
+                              formControlName="parameterName">
+                          </div>
                 
                           <!-- Remove Condition Button (for all conditions except the first) -->
                           <div *ngIf="conditionIndex > 0" class="d-flex mt-2">
@@ -325,6 +334,8 @@
                         Font size must be between 8 and 72.
                       </div>
                   </div>
+
+
               
                   <!-- Font Color Input -->
                   <div class="col-md-6 mb-3">
