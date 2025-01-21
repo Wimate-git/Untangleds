@@ -94,6 +94,7 @@ export class MapConfigComponent {
   selectedParameterValueGraphic: any;
 
 
+
  
   ngOnInit() {
 
@@ -468,7 +469,8 @@ console.log('Cleaned-up formlist values:', this.formlistValues);
             custom_Label: ['', Validators.required],
             add_Markers:[[]],
             filterParameter1:[''],
-            filterDescription1:['']
+            filterDescription1:[''],
+            graphicInfo:['']
 
             
           

@@ -55,6 +55,7 @@ import { TableWidgetConfigComponent } from 'src/app/_metronic/partials/content/m
 import { AgGridAngular } from 'ag-grid-angular';
 import { GridApi ,Column} from 'ag-grid-community';
 import { MapConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/map-config/map-config.component';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
@@ -195,6 +196,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   ];
   summaryPermission: any;
   dashboardData: any;
+  currentModalIndex: number;
+  currentiframeUrl: any;
 
 
   createPieChart() {
@@ -662,6 +665,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   isFullView = false;   // Track if the icon is in full view mode
 
   isLoading = false; // Add loading state
+  @ViewChild('modalContent') modalContent!: TemplateRef<any>;
+  iframeUrl!: SafeResourceUrl;
 
   reloadPage() {
     this.isLoading = true; // Set loading state to true
@@ -740,6 +745,70 @@ checkAndSetFullscreen(): void {
         this.toggleFullScreenFullView(false); // Exit fullscreen
     }
 }
+invokeHelperDashboard(item: any, index: number, template: any): void {
+
+  this.currentModalIndex = index;
+
+    this.currentItem = item
+
+
+    this.setModuleID(item, index)
+
+    const viewModeQP = true;
+    const disableMenuQP = true;
+
+
+    localStorage.setItem('viewMode', viewModeQP.toString());
+    localStorage.setItem('disableMenu', disableMenuQP.toString());
+    this.cdr.detectChanges()
+    this.modalService.open(template, {
+      size: 'xl',
+      backdrop: 'static',
+      keyboard: false
+    });
+
+}
+setModuleID(packet: any, selectedMarkerIndex: any): void {
+  console.log('packet checking:', packet);
+
+  // Dynamically determine viewMode and disableMenu
+  const viewMode = true;
+  const disableMenu = true;
+
+  const modulePath = packet.dashboardIds;
+  console.log('modulePath checking:', modulePath);
+
+  localStorage.setItem('isFullScreen', JSON.stringify(true));
+  const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}`;
+
+  // Update currentItem and currentModalIndex for passing to child
+  this.currentItem = packet; // Store the packet for passing to the child component
+  this.currentModalIndex = selectedMarkerIndex;
+
+  if (packet.selectType === 'NewTab') {
+    const safeUrl = `${window.location.origin}/summary-engine/${modulePath}`;
+    console.log('Opening new tab with URL:', safeUrl);
+    window.open(safeUrl, '_blank'); // Open the URL in a new tab
+  } else if (packet.selectType === 'Modal') {
+    if (this.modalContent) {
+      this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+        `${window.location.origin}/summary-engine/${modulePath}${queryParams}`
+      );
+      console.log('Opening modal with iframe URL:', this.currentiframeUrl);
+      this.modalService.open(this.modalContent, { size: 'xl' });
+    } else {
+      console.error('Modal content is undefined');
+    }
+  } else if (packet.selectType === 'Same page Redirect') {
+    const navigationPath = `/summary-engine/${modulePath}`;
+    console.log('Redirecting to:', navigationPath);
+    this.modalService.dismissAll();
+    this.router.navigate([navigationPath]).then(() => {
+      window.location.reload();
+    }).catch(err => console.error('Navigation error:', err));
+  }
+}
+
 
 exitFullScreen(): void {
     localStorage.removeItem('fullscreen');
@@ -747,6 +816,10 @@ exitFullScreen(): void {
     this.hidingLink = false;
     console.log('Exited fullscreen mode');
     this.updateOptions();
+}
+
+closeModal1() {
+  this.modalService.dismissAll(); // Close the modal programmatically
 }
 
 toggleFullScreenFullView(enterFullscreen?: boolean): void {
@@ -841,14 +914,14 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
   private updateOptions(): void {
     this.options = {
       draggable: {
-        enabled: this.isEditModeView, // Draggable only in edit mode
+        enabled: !this.isEditModeView, // Draggable only in edit mode
         stop: () => {
           console.log('Grid moved');
           this.isGirdMoved = true; // Set flag to indicate grid was moved
         },
       },
       resizable: {
-        enabled: this.isEditModeView, // Resizable only in edit mode
+        enabled: !this.isEditModeView, // Resizable only in edit mode
         stop: () => {
           console.log('Grid resized');
           this.isGirdMoved = true; // Set flag to indicate grid was resized
@@ -1000,18 +1073,19 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
       const itemComponentHeight = itemComponent.height;
   
       // Handle both charts and maps
-      if (item.grid_type === 'chart') {
-        // Adjust height and width for the current item
-        this.chartHeight[index] = itemComponentHeight - 10; // Subtract margin/padding
-        this.chartWidth[index] = itemComponentWidth - 30;  // Subtract margin/padding
+      if (item.grid_type === 'Linechart') {
+        const baseHeight = 400; // Base height for the chart
+        const extraHeight = 40; // Additional height for labels, etc.
+  
+        this.chartHeight[index] = Math.max(0, itemComponentHeight + extraHeight); // Adjust height
+        this.chartWidth[index] = Math.max(0, itemComponentWidth);
   
         console.log(
-          `Resized ${item.grid_type} at index ${index}:`,
-          `Height: ${this.chartHeight[index]}, Width: ${this.chartWidth[index]}`
+          `Updated chart dimensions at index ${index}:`,
+          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
         );
-  
-        // Optionally emit an event or force change detection
       }
+      
       else if (item.grid_type === 'Map') {
         // const topMargin = 20; // Define the top margin value
       
@@ -1027,6 +1101,19 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
       
     } else {
       console.warn('Item not found in dashboard array');
+    }
+  }
+  private redrawChart(index: number): void {
+    const chartId = `lineChart${index + 1}`; // Assuming your chart container ID follows this pattern
+    const chartElement = document.getElementById(chartId);
+  
+    if (chartElement) {
+      // Trigger chart resize/update logic depending on the library you're using
+      console.log(`Redrawing chart for index ${index}`);
+      // Example for Highcharts:
+      Highcharts.charts[index]?.reflow(); // Adjust this for your specific charting library
+    } else {
+      console.warn(`Chart container not found for index ${index}`);
     }
   }
   
@@ -1153,7 +1240,8 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
 
   constructor(private summaryConfiguration: SharedService, private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector,
-    private spinner: NgxSpinnerService, private zone: NgZone,private http: HttpClient
+    private spinner: NgxSpinnerService, private zone: NgZone,private http: HttpClient,  private sanitizer: DomSanitizer, // Inject DomSanitizer
+
   ) {
     this.resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
@@ -1431,9 +1519,8 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     this.showTable()
     this.addFromService()
     const savedMode = localStorage.getItem('editModeState');
-    if (savedMode !== null) {
-      this.isEditModeView = savedMode === 'true'; // Convert string to boolean
-    }
+    this.isEditModeView = savedMode ? JSON.parse(savedMode) : false;
+
 
     // Update options based on the retrieved mode
     this.updateOptions();
@@ -2167,6 +2254,16 @@ setTimeout(() => {
      
       this.FilterTileConfigComponent.openFilterModal(data, index);
     }, 500);
+  }
+  else if(data.grid_type=='tile'){
+    this.modalService.open(KPIModal, { size: 'lg' });
+
+    // Access the component instance and trigger `openKPIModal`
+    setTimeout(() => {
+     
+      this.tileConfig1Component.openKPIModal(data, index);
+    }, 500);
+
   }
   }
 
@@ -4010,7 +4107,7 @@ setTimeout(() => {
                 this.routeId = params.get('id');
                 if (this.routeId) {
                   this.openModalHelpher(this.routeId);
-                  this.editButtonCheck = true;
+                  this.editButtonCheck = false;
                   console.log('Route ID found, opening modal:', this.routeId);
                 }
               });
@@ -5280,28 +5377,27 @@ refreshFunction(){
       console.log("Error fetching the dynamic form data", err);
     }
   }
-
   toggleMode(): void {
     console.log('Current Mode (Before Toggle):', this.isEditModeView ? 'Edit Mode' : 'View Mode');
-    this.spinner.show()
+    this.spinner.show();
     setTimeout(() => {
-      this.spinner.hide()
+      this.spinner.hide();
     }, 1000);
-    // Check if update permission is allowed
+
     if (!this.summaryDashboardUpdate) {
-        console.warn('Update permission is false. Staying in view mode.');
-        this.isEditModeView = false; // Ensure grid stays in view mode
-        this.updateOptions(); // Reflect the correct mode in options
-        return; // Exit function early
+      console.warn('Update permission is false. Staying in View Mode.');
+      this.isEditModeView = false; // Ensure grid stays in View Mode
+      this.updateOptions(); // Reflect the correct mode in options
+      return;
     }
 
-    // Toggle between edit and view modes
+    // Toggle between Edit and View modes
     this.isEditModeView = !this.isEditModeView;
     this.updateOptions(); // Update grid options
     console.log('Current Mode (After Toggle):', this.isEditModeView ? 'Edit Mode' : 'View Mode');
     localStorage.setItem('editModeState', this.isEditModeView.toString()); // Save state
- 
-}
+  }
+
 
   // gridTitle: { cols: number; rows: number; y: number; x: number; themeColor: string }[] = [
   //   { cols: 2, rows: 1, y: 0, x: 0, themeColor: '#3498db' },

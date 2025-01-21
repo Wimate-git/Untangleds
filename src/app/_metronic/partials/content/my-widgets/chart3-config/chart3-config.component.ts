@@ -786,6 +786,8 @@ repopulate_fields(getValues: any) {
       });
   }
 
+
+
   fetchDynamicFormDataFilter(value: any) {
     console.log("Data from lookup:", value);
 
@@ -833,51 +835,7 @@ repopulate_fields(getValues: any) {
       });
   }
 
-  dynamicparameterValue(event: any): void {
-    console.log('Event check for dynamic param:', event);
-  
-    if (event && event.value && Array.isArray(event.value)) {
-      const valuesArray = event.value;
-  
-      if (valuesArray.length === 1) {
-        // Handle single selection
-        const singleItem = valuesArray[0];
-        const { value, text } = singleItem; // Destructure value and text
-        console.log('Single Selected Item:', { value, text });
-  
-        // Update the form control with the single value (object)
-        const filterParameter = this.createChart.get('filterParameter');
-        if (filterParameter) {
-          filterParameter.setValue([{ value, text }]); // Store as an array of objects
-          this.cdr.detectChanges(); // Trigger change detection
-        }
-  
-        // Store the single selected parameter
-        this.selectedParameterValue = { value, text };
-      } else {
-        // Handle multiple selections
-        const formattedValues = valuesArray.map((item: any) => {
-          const { value, text } = item; // Destructure value and text
-          return { value, text }; // Create an object with value and text
-        });
-  
-        console.log('Formatted Multiple Items:', formattedValues);
-  
-        // Update the form control with the concatenated values (array of objects)
-        const filterParameter = this.createChart.get('filterParameter');
-        if (filterParameter) {
-          filterParameter.setValue(formattedValues);
-          this.cdr.detectChanges(); // Trigger change detection
-        }
-  
-        // Store the multiple selected parameters
-        this.selectedParameterValue = formattedValues;
-      }
-    } else {
-      console.warn('Invalid event structure:', event);
-    }
-  }
-  
+
   
   
 
@@ -945,7 +903,8 @@ repopulate_fields(getValues: any) {
   }
 
   selectFormParamsFilter(event: any) {
-    if (event && event[0] && event[0].data) {
+    console.log('event.value check',event.value)
+    if (event && event.value) {
       const selectedFilterText = event[0].data.text;  // Adjust based on the actual structure
       console.log('Selected Form Text:', selectedFilterText);
 
@@ -954,6 +913,51 @@ repopulate_fields(getValues: any) {
       }
     } else {
       console.error('Event data is not in the expected format:', event);
+    }
+  }
+
+  dynamicparameterValue(event: any): void {
+    console.log('Event check for dynamic param:', event);
+  
+    if (event && event.value && Array.isArray(event.value)) {
+      const valuesArray = event.value;
+  
+      if (valuesArray.length === 1) {
+        // Handle single selection
+        const singleItem = valuesArray[0];
+        const { value, text } = singleItem; // Destructure value and text
+        console.log('Single Selected Item:', { value, text });
+  
+        // Update the form control with the single value (object)
+        const filterParameter = this.createChart.get('filterParameter');
+        if (filterParameter) {
+          filterParameter.setValue([{ value, text }]); // Store as an array of objects
+          this.cdr.detectChanges(); // Trigger change detection
+        }
+  
+        // Store the single selected parameter
+        this.selectedParameterValue = { value, text };
+      } else {
+        // Handle multiple selections
+        const formattedValues = valuesArray.map((item: any) => {
+          const { value, text } = item; // Destructure value and text
+          return { value, text }; // Create an object with value and text
+        });
+  
+        console.log('Formatted Multiple Items:', formattedValues);
+  
+        // Update the form control with the concatenated values (array of objects)
+        const filterParameter = this.createChart.get('filterParameter');
+        if (filterParameter) {
+          filterParameter.setValue(formattedValues);
+          this.cdr.detectChanges(); // Trigger change detection
+        }
+  
+        // Store the multiple selected parameters
+        this.selectedParameterValue = formattedValues;
+      }
+    } else {
+      console.warn('Invalid event structure:', event);
     }
   }
 

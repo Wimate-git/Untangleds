@@ -945,6 +945,8 @@ openKPIModal(tile: any, index: number) {
   SelectTypeSummary =[
     { value: 'NewTab', text: 'New Tab' },
     { value: 'Modal', text: 'Modal' },
+    { value: 'Same page Redirect', text: 'Same page Redirect' },
+
   ]
   onValueChange(selectedValue: any): void {
     // Handle any logic here if needed when the value changes

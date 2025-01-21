@@ -313,6 +313,15 @@
     {{ selectedParameterValue }}
   </textarea>
 </div>
+<div class="col-md-4 mb-3" *ngIf="showIdField">
+  <label for="id" class="col-form-label fw-bold fs-6 "></label>
+  <input
+    id="id"
+    type="number"
+    class="form-control form-control-solid"
+    placeholder="Enter ID"
+    formControlName="graphicInfo">
+</div>
 
 
 
@@ -367,7 +376,7 @@
      
               
               <div class="col-md-5 mb-3">
-                <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields</label>
+                <label for="parameterName" class="col-createChart-label fw-bold fs-6 ">Form Fields</label>
                 <p-multiSelect
                 id="parameterName"
             

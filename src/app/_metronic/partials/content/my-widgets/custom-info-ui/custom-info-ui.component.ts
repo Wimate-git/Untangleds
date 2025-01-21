@@ -18,7 +18,7 @@ export class CustomInfoUiComponent implements OnInit{
   ngOnChanges(changes: SimpleChanges): void {
  
     console.log("custom info check ",this.item)
-    console.log('tile1Config check',this.tile1Config)
+    // console.log('tile1Config check',this.tile1Config)
  
 }
 ngOnInit(): void {

@@ -55,7 +55,7 @@
          style="position: absolute; top: 10px; right: 10px; gap: 10px;">
       <!-- Dropdown Menu -->
       <div class="dropdown">
-        <button *ngIf="isEditModeView && summaryDashboardUpdate && hidingLink"
+        <button *ngIf="!isEditModeView && summaryDashboardUpdate && hidingLink"
                 [matMenuTriggerFor]="menu"
                 class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" (click)="$event.stopPropagation()">
           <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>

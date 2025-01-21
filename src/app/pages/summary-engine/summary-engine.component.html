@@ -45,9 +45,19 @@
           
               <gridster style="background: var(--bs-app-bg-color)!important;border-radius: 5px;padding: 0px; "
                 [options]="options"     >
-  
-                <gridster-item *ngFor="let item of dashboard; let i = index;" [item]="item" [style.background]="item.themeColor"  class="rounded"   (click)="item.grid_type === 'filterTile' ? helperFilter(item,i, FilterModal) : null"
-                >
+                <gridster-item
+                *ngFor="let item of dashboard; let i = index;"
+                [item]="item"
+                [style.background]="item.themeColor"
+                class="rounded"
+                [style.height.px]="item.grid_type === 'chart' ? 300 : null" 
+                [style.width.px]="item.grid_type === 'chart' ? 400 : null" 
+                (click)="
+                  item.grid_type === 'filterTile' ? helperFilter(item, i, FilterModal) :
+                  item.grid_type === 'tile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent) : null) :
+                  null
+                "
+              >
                  
          
                   <div *ngIf="item.grid_type === 'tile'">
@@ -506,9 +516,12 @@
     class="myMenu-item" 
     (click)="toggleMode()" 
     style="cursor: pointer;" 
-    [attr.title]="isEditModeView ? 'View Mode' : 'Edit Mode'">
-   <i style="color: white;" class="fa" [ngClass]="isEditModeView ? 'fa-eye' : 'fa-pencil-alt'"></i>
+    [attr.title]="isEditModeView ? 'Edit Mode' : 'View Mode'">
+    <i style="color: white;" class="fa" [ngClass]="isEditModeView ? 'fa-pencil-alt' : 'fa-eye'"></i>
  </a>
+ 
+ 
+ 
     
     <!-- New Full View Icon -->
     <a class="myMenu-item" *ngIf="!isSummaryEngine()"   (click)="toggleFullScreenFullView()" style="cursor: pointer;" [attr.title]="isFullView ? 'Exit Full View' : 'Full View'">
@@ -1765,8 +1778,27 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   
   </ng-template>
   </div>
+<!--   
+  <ng-template #modalContent>
+    <app-custom-info-ui
+      [iframeUrl]="iframeUrl"
+      [selectedMarkerIndex]="selectedMarkerIndex"
+      (closeModalEvent)="closeModal()"
+      [tile1Config]="tile1Config">
+    </app-custom-info-ui>
+  </ng-template> -->
   
+  <ng-template #modalContent>
+    <app-custom-info-ui
+      [iframeUrl]="currentiframeUrl"
+      [item]="currentItem"
+      [selectedMarkerIndex]="currentModalIndex"
+      (closeModalEvent)="closeModal1()">
+    </app-custom-info-ui>
+  </ng-template>
   
+  <!-- (closeModalEvent)="closeModal()" -->
+
   
   
   

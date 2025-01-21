@@ -97,6 +97,7 @@ console.log('Extracted column labels:', columnLabels);
 
 // Store in a variable
 this.columnLabelsArray = columnLabels; // Example variable to hold the column labels
+console.log('this.columnLabelsArray checking',this.columnLabelsArray)
 
 
 
@@ -118,7 +119,7 @@ try {
 
   // Generate column definitions from tableWidget_Config
   const tableWidgetColumns = this.parsedTableData.map((column: { text: string; value: string }) => ({
-    headerName: column.text || 'Unnamed Column', // Use a default name if text is missing
+    headerName: column.text || 'Default Header', // Use a default name if text is missing
     field: column.value,
     sortable: true,
     filter: true,
@@ -128,15 +129,17 @@ try {
   console.log('tableWidget column definitions:', tableWidgetColumns);
 
   // Include additional columns from columnLabelsArray
-  const additionalColumns = this.columnLabelsArray.map((label: string) => ({
-    headerName: label || 'Unnamed Column', // Use label as headerName
-    field: label, // Field must match rowData keys
-    sortable: true,
-    filter: true,
-    resizable: true,
-  }));
+  const additionalColumns = this.columnLabelsArray
+    .filter((label: string) => label && label.trim() !== '') // Filter out empty labels
+    .map((label: string) => ({
+      headerName: label,
+      field: label,
+      sortable: true,
+      filter: true,
+      resizable: true,
+    }));
 
-  console.log('Additional columns from columnLabelsArray:', additionalColumns);
+  console.log('Filtered additional columns from columnLabelsArray:', additionalColumns);
 
   // Combine tableWidget columns and additional columns
   this.columnDefs = [...tableWidgetColumns, ...additionalColumns];
@@ -148,6 +151,7 @@ try {
 } catch (error) {
   console.error('Error parsing table data:', error);
 }
+
 
 
   
