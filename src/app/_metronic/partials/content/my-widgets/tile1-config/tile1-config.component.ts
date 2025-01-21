@@ -165,6 +165,7 @@ export class Tile1ConfigComponent implements OnInit {
     { value: 'Last 90 Days', text: 'Last 90 Days' },
     { value: 'Last 180 Days', text: 'Last 180 Days' },
     { value: 'Last 2 Years', text: 'Last 2 Year' },
+    { value: 'any', text: 'any' },
  
  
  
