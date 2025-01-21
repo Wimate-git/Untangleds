@@ -209,7 +209,7 @@
                                     <select formControlName="filterValue" class="form-control">
                                       <option value="" disabled>Select Value</option>
                                       <ng-container *ngFor="let option of globalFieldData[conditionIndex].options">
-                                        <option [value]="option">{{ option }}</option>
+                                        <option [ngValue]="option">{{ option }}</option>
                                       </ng-container>
                                     </select>
                                   </ng-container>

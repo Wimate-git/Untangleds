@@ -1808,6 +1808,19 @@ toggleCheckbox1(theme: any) {
       const foundField = matchingMetadata.find((field: Field) => field.name === formFieldValue);
       if (foundField) {
         console.log(`Found field for ${formFieldValue}:`, foundField);
+  
+        // Handle case where type is 'select' but options are empty or invalid
+        if (
+          foundField.type === 'select' &&
+          (!foundField.options || foundField.options.length === 0 || foundField.options.every((option: string) => !option.trim()))
+        ) {
+          console.warn(`Field ${formFieldValue} has type 'select' but options are empty. Defaulting to type 'text'.`);
+          conditions.controls[conditionIndex].get('type')?.setValue('text');
+          this.globalFieldData[conditionIndex] = { type: 'text', options: null };
+          return;
+        }
+  
+        // Set the type and options in the global variable
         conditions.controls[conditionIndex].get('type')?.setValue(foundField.type || 'text');
         this.globalFieldData[conditionIndex] = { type: foundField.type, options: foundField.options || null };
       } else {
@@ -1820,6 +1833,8 @@ toggleCheckbox1(theme: any) {
       console.error('Error in getOptionsForField:', error);
     }
   }
+  
+  
   
   
   

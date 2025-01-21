@@ -140,12 +140,20 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
           case 'create':
             this.createEvent.emit(true);
-            this.modalRef = this.modalService.open(this.modal, this.modalConfig);
+            // this.modalRef = this.modalService.open(this.modal, this.modalConfig);
+            this.modalRef = this.modalService.open(this.modal, {
+              ...this.modalConfig, // Keep existing modal configuration if any
+              backdrop: 'static'
+          });
             break;
 
           case 'edit':
             this.editEvent.emit(this.idInAction);
-            this.modalRef = this.modalService.open(this.modal, this.modalConfig);
+            // this.modalRef = this.modalService.open(this.modal, this.modalConfig);
+            this.modalRef = this.modalService.open(this.modal, {
+              ...this.modalConfig, // Keep existing modal configuration if any
+              backdrop: 'static'
+          });
             break;
 
           case 'delete':
