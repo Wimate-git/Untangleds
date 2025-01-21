@@ -47,6 +47,7 @@ export class MapUiComponent implements OnInit{
   // ];
   parsedData: any;
   markers: any[];
+  defaultCenter: { lat: number; lng: number; };
 
   ngOnInit(): void {
 
@@ -70,25 +71,27 @@ if (Array.isArray(this.parsedData)) {
   this.markers = this.parsedData
     .filter((packet: any) => packet.add_Markers && Array.isArray(packet.add_Markers)) // Ensure add_Markers exists
     .flatMap((packet: any) => {
-      return packet.add_Markers.map((marker: any) => {
-        const baseMarker = {
-          position: {
-            lat: parseFloat(marker.position.lat), // Convert latitude to number
-            lng: parseFloat(marker.position.lng), // Convert longitude to number
-          },
-          title: marker.title || '', // Default to empty string if title is missing
-          label: marker.label || '', // Default to empty string if label is missing
-          mapType: packet.map_type || '', // Include map_type from parent packet
-        };
+      return packet.add_Markers
+        .filter((marker: any) => marker.position && marker.position.lat && marker.position.lng) // Validate lat/lng
+        .map((marker: any) => {
+          const baseMarker = {
+            position: {
+              lat: parseFloat(marker.position.lat), // Convert latitude to number
+              lng: parseFloat(marker.position.lng), // Convert longitude to number
+            },
+            title: marker.title || '', // Default to empty string if title is missing
+            label: marker.label || '', // Default to empty string if label is missing
+            mapType: packet.map_type || '', // Include map_type from parent packet
+          };
 
-        // Include marker_info only if packet label is "Track Location"
-        if (packet.parameterName === "TrackLocation") {
-          const { label_id, label_name, ...cleanedMarkerInfo } = marker.marker_info || {};
-          return { ...baseMarker, marker_info: cleanedMarkerInfo };
-        }
+          // Include marker_info only if packet label is "Track Location"
+          if (packet.parameterName === "TrackLocation") {
+            const { label_id, label_name, ...cleanedMarkerInfo } = marker.marker_info || {};
+            return { ...baseMarker, marker_info: cleanedMarkerInfo };
+          }
 
-        return baseMarker;
-      });
+          return baseMarker;
+        });
     });
 
   // Process markers to include mapType and scaled size
@@ -101,8 +104,18 @@ if (Array.isArray(this.parsedData)) {
   }));
 
   console.log('Formatted markers with map types and sizes:', this.markers);
+
+  // Handle the case when markers array is empty
+  if (this.markers.length === 0) {
+    console.warn('No valid markers found. Displaying empty map.');
+  }
+} else {
+  console.error('Parsed data is not an array.');
 }
 
+// Add a fallback for map center
+// this.defaultCenter = { lat: 0, lng: 0 };
+this.defaultCenter = { lat: 0, lng: 0 };
 
 
 

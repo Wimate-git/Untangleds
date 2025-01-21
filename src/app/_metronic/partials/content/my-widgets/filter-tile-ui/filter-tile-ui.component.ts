@@ -44,6 +44,7 @@ export class FilterTileUiComponent implements OnInit{
  
     console.log("tile data check from dynamic Title",this.item)
     this.filterTileConfig = this.item
+    console.log('this.filterTileConfig check',this.filterTileConfig)
   
   
 

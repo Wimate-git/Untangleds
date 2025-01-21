@@ -3,7 +3,7 @@
     [height]="mapHeight + 'px'"
     [width]="mapWidth + 'px'"
     [zoom]="5"
-    [center]="markers[0]?.position"
+    [center]="markers[0]?.position || defaultCenter"
   >
     <!-- Dynamic Markers -->
     <map-marker

@@ -166,7 +166,7 @@
                     [formGroupName]="fieldIndex"
                     style="border: 2px solid rgb(21, 163, 219); padding: 10px; margin: 5px; border-radius: 5px;"
                   >
-                    <h5 class="fw-bold mb-3">{{ field.get('parameterName')?.value || 'No Heading' }}</h5>
+                  <h5 class="fw-bold mb-3">{{ formlistValues[fieldIndex] || 'No Heading' }}</h5>
                 
                     <!-- Render the conditions -->
                     <div formArrayName="conditions">
@@ -203,32 +203,26 @@
                             <!-- Dynamic Value Field -->
                             <div class="mb-3" style="width: 30%;">
                               <label class="col-form-label fw-bold fs-6 required">Value</label>
-                              <ng-container *ngIf="condition.get('type')?.value as fieldType; ">
+                              <ng-container *ngIf="condition.get('type')?.value as fieldType;">
                                 <ng-container *ngIf="fieldType === 'select'; else textInput">
-                                  <ng-container *ngIf="globalFieldData[conditionIndex]">
-                                    <ng-container *ngIf="globalFieldData[conditionIndex].options && globalFieldData[conditionIndex].options.length > 0 && globalFieldData[conditionIndex].options[0]!==' '; else noOptions">
-                                      <!-- Render as a select dropdown if type is 'select' and options are valid -->
-                                      <select formControlName="filterValue" class="form-control">
-                                        <option value="" disabled>Select Value</option>
-                                        <ng-container *ngFor="let option of globalFieldData[conditionIndex].options">
-                                          <ng-container *ngIf="option && option.trim()">
-                                            <option [value]="option">{{ option }}</option>
-                                          </ng-container>
-                                        </ng-container>
-                                      </select>
-                                    </ng-container>
-                                    <ng-template #noOptions>
-                                      <!-- Render a text input if options are not valid -->
-                                      <input type="text" formControlName="filterValue" placeholder="Enter value" class="form-control" />
-                                    </ng-template>
+                                  <ng-container *ngIf="globalFieldData[conditionIndex]?.options?.length > 0; else noOptions">
+                                    <select formControlName="filterValue" class="form-control">
+                                      <option value="" disabled>Select Value</option>
+                                      <ng-container *ngFor="let option of globalFieldData[conditionIndex].options">
+                                        <option [value]="option">{{ option }}</option>
+                                      </ng-container>
+                                    </select>
                                   </ng-container>
+                                  <ng-template #noOptions>
+                                    <input type="text" formControlName="filterValue" placeholder="Enter value" class="form-control" />
+                                  </ng-template>
                                 </ng-container>
                               </ng-container>
                               <ng-template #textInput>
-                                <!-- Render as a text input if type is not 'select' -->
                                 <input type="text" formControlName="filterValue" placeholder="Enter value" class="form-control" />
                               </ng-template>
                             </div>
+                            
                             
                             
                             

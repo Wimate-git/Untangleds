@@ -554,8 +554,10 @@ console.log('Cleaned-up formlist values:', this.formlistValues);
       this.dashboardChange.emit(this.grid_details);
   
       if (this.grid_details) {
-        this.updateSummary('', 'add_tile');
+        this.updateSummary('', 'add_map');
       }
+      // add_map:'Map Added',
+      // update_map:'Map Updated',
   
       this.createChart.patchValue({
         widgetid: uniqueId,
@@ -624,7 +626,7 @@ console.log('Cleaned-up formlist values:', this.formlistValues);
   
       // Call updateSummary if grid_details exist
       if (this.grid_details) {
-        this.updateSummary(this.all_Packet_store, 'update_tile');
+        this.updateSummary(this.all_Packet_store, 'update_map');
       }
   
       // Reset editTileIndex after the update
@@ -682,7 +684,7 @@ alert('cloned tile')
     if(this.grid_details)
       {
         alert('grid details is there')
-        this.updateSummary('','add_tile')
+        this.updateSummary('','add_map')
       }
 
     // Trigger change detection to ensure the UI updates

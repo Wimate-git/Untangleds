@@ -129,33 +129,33 @@ get shouldShowButton(): boolean {
   this.customEvent2.emit(payloadDelete); // Emitting an event with two arguments
 
   }
-  helperDashboard(item: any, index: any, modalContent: any, selectType: any): void {
-    const viewMode = true;
-    const disableMenu = true;
+  // helperDashboard(item: any, index: any, modalContent: any, selectType: any): void {
+  //   const viewMode = true;
+  //   const disableMenu = true;
 
-    localStorage.setItem('isFullScreen', JSON.stringify(true));
-    const modulePath = item.dashboardIds; // Adjust with your module route
-    const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}`;
+  //   localStorage.setItem('isFullScreen', JSON.stringify(true));
+  //   const modulePath = item.dashboardIds; // Adjust with your module route
+  //   const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}`;
 
-    this.dashboardAction.emit({ item, index, modalContent, selectType });
+  //   this.dashboardAction.emit({ item, index, modalContent, selectType });
 
-    if (selectType === 'NewTab') {
-      this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        `${window.location.origin}/summary-engine/${modulePath}`
-      );
-      window.open(this.iframeUrl.changingThisBreaksApplicationSecurity, '_blank');
-    } else if (selectType === 'Modal') {
-      this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        `${window.location.origin}/summary-engine/${modulePath}${queryParams}`
-      );
-      this.modalService.open(modalContent, { size: 'xl' });
-    } else if (selectType === 'Same page Redirect') {
-      this.modalService.dismissAll();
-      this.router.navigate([`/summary-engine/${modulePath}`]).then(() => {
-        window.location.reload();
-      });
-    }
-  }
+  //   if (selectType === 'NewTab') {
+  //     this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+  //       `${window.location.origin}/summary-engine/${modulePath}`
+  //     );
+  //     window.open(this.iframeUrl.changingThisBreaksApplicationSecurity, '_blank');
+  //   } else if (selectType === 'Modal') {
+  //     this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+  //       `${window.location.origin}/summary-engine/${modulePath}${queryParams}`
+  //     );
+  //     this.modalService.open(modalContent, { size: 'xl' });
+  //   } else if (selectType === 'Same page Redirect') {
+  //     this.modalService.dismissAll();
+  //     this.router.navigate([`/summary-engine/${modulePath}`]).then(() => {
+  //       window.location.reload();
+  //     });
+  //   }
+  // }
 
   closeModal() {
     this.modalService.dismissAll(); // Close the modal programmatically

@@ -751,6 +751,7 @@ invokeHelperDashboard(item: any, index: number, template: any): void {
 
     this.currentItem = item
 
+    console.log('item checking',item)
 
     this.setModuleID(item, index)
 
@@ -761,11 +762,11 @@ invokeHelperDashboard(item: any, index: number, template: any): void {
     localStorage.setItem('viewMode', viewModeQP.toString());
     localStorage.setItem('disableMenu', disableMenuQP.toString());
     this.cdr.detectChanges()
-    this.modalService.open(template, {
-      size: 'xl',
-      backdrop: 'static',
-      keyboard: false
-    });
+    // this.modalService.open(template, {
+    //   size: 'xl',
+    //   backdrop: 'static',
+    //   keyboard: false
+    // });
 
 }
 setModuleID(packet: any, selectedMarkerIndex: any): void {
@@ -4077,49 +4078,43 @@ setTimeout(() => {
     this.api.UpdateMaster(tempObj).then(response => {
       console.log('API Response:', response);
       if (response && response.metadata) {
-        // Refined success title logic
         const successTitle = {
           create: 'Summary created',
           saveDashboard: 'Dashboard saved',
-          add_tile: 'Widget Added ',
-          update_tile:'Widget Updated',
+          add_tile: 'Widget Added',
+          update_tile: 'Widget Updated',
           delete_tile: 'Tile deleted',
+          add_map:'Map Added',
+          update_map:'Map Updated',
           deleteTile: 'Tile deleted',
           update: 'Summary updated',
-          update_Dashboard:'Dashboard Filteration is updated',
-          filter_add:'Dashboard Filteration is added'
-        }[actionKey] || 'Dashboard changes saved ';
+          update_Dashboard: 'Dashboard Filteration is updated',
+          filter_add: 'Dashboard Filteration is added'
+        }[actionKey] || 'Dashboard changes saved';
   
         console.log('Action key condition check:', actionKey);
   
+        // Show alert and then reload the window if required
+        Swal.fire({
+          position: 'center',
+          icon: 'success',
+          title: `${successTitle} successfully`,
+          showConfirmButton: true
+        }).then((result) => {
+          if (result.isConfirmed && (actionKey === 'add_map' || actionKey === 'update_map')) {
+            window.location.reload(); // Reloads the current window after the alert
+          }
+        });
+  
+        // Additional logic for 'update'
         if (actionKey === 'update') {
-          // For "Summary updated successfully", reload window after confirmation
-          Swal.fire({
-            position: 'center',
-            icon: 'success',
-            title: `${successTitle} successfully`,
-            showConfirmButton: true
-          }).then((result) => {
-            console.log('Swal confirmation result:', result); // Debugging
-            if (result.isConfirmed) {
-              // Route param subscription to handle the modal logic
-              this.route.paramMap.subscribe(params => {
-                this.routeId = params.get('id');
-                if (this.routeId) {
-                  this.openModalHelpher(this.routeId);
-                  this.editButtonCheck = false;
-                  console.log('Route ID found, opening modal:', this.routeId);
-                }
-              });
+          this.route.paramMap.subscribe(params => {
+            this.routeId = params.get('id');
+            if (this.routeId) {
+              this.openModalHelpher(this.routeId);
+              this.editButtonCheck = false;
+              console.log('Route ID found, opening modal:', this.routeId);
             }
-          });
-        } else {
-          // Show success message for other actions without reloading
-          Swal.fire({
-            position: 'center',
-            icon: 'success',
-            title: `${successTitle} successfully`,
-            showConfirmButton: true
           });
         }
   
@@ -4140,6 +4135,7 @@ setTimeout(() => {
       });
     });
   }
+  
   
   
   

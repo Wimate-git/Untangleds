@@ -367,7 +367,7 @@ makeTrueCheck:any = false
       widgetid: [this.generateUniqueId()],
   
       themeColor: ['', Validators.required],
-      fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
+      fontSize: [, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['', Validators.required], 
       custom_Label:['', Validators.required],
       daysAgo:[''],
@@ -550,24 +550,30 @@ makeTrueCheck:any = false
   
   
   
-  addCondition(fieldIndex: number) {
-    console.log('fieldIndex check',fieldIndex)
-    const parentGroup = this.all_fields.at(fieldIndex) as FormGroup;
+  addCondition(fieldIndex: number): void {
+    // Access the specific field group
+    const parentGroup = this.all_fields.controls[fieldIndex] as FormGroup;
     const conditions = parentGroup.get('conditions') as FormArray;
   
-    // Add a new condition
-    conditions.push(
-      this.fb.group({
-        formField: ['', Validators.required],
-        operator: ['', Validators.required],
-        filterValue: ['', Validators.required],
-        operatorBetween: ['',Validators.required],
-        type:['text']
-      })
-    );
+    // Add a new condition with default values
+    const newCondition = this.fb.group({
+      formField: ['', Validators.required],
+      operator: ['', Validators.required],
+      filterValue: ['', Validators.required],
+      operatorBetween: ['', Validators.required],
+      type: ['text'], // Default type as 'text'
+    });
   
-    console.log(`Condition added at index ${fieldIndex}`);
+    // Push the new condition into the conditions array
+    conditions.push(newCondition);
+  
+    // Update globalFieldData for the new condition
+    const conditionIndex = conditions.length - 1;
+    this.globalFieldData[conditionIndex] = { type: 'text', options: null };
+  
+    console.log(`Condition added at fieldIndex ${fieldIndex}, conditionIndex ${conditionIndex}`);
   }
+  
   
   removeCondition(fieldIndex: number, conditionIndex: number) {
     const parentGroup = this.all_fields.at(fieldIndex) as FormGroup;
@@ -720,6 +726,7 @@ makeTrueCheck:any = false
           return [];
         }
   
+        
         // Ensure `parameterName` and all condition fields (including filterValue) are preserved
         return field.conditions.map((condition: any) => ({
           formField: condition.formField || '',
@@ -878,12 +885,12 @@ themes = [
   { color: "linear-gradient(to right, #fc5c7d, #6a82fb)", selected: false }  // Pink to Blue
 ];
 
-
 openFilterModal(tile: any, index: number) {
   console.log('Tile checking data from openFilterModal', tile);
 
-  console.log('this.formlistValues check',this.formlistValues)
-  this.fetchDynamic(this.formlistValues)
+  console.log('this.formlistValues check', this.formlistValues);
+  this.fetchDynamic(this.formlistValues); // Ensure this fetches required data for dynamic fields
+
   const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14;
 
   if (tile) {
@@ -892,9 +899,10 @@ openFilterModal(tile: any, index: number) {
 
     this.paramCount = tile.noOfParams || 1;
 
-    this.parsedfilterTileConfig = JSON.parse(tile.filterTileConfig);
+    this.parsedfilterTileConfig = JSON.parse(tile.filterTileConfig || '[]');
     console.log('this.parsedfilterTileConfig check', this.parsedfilterTileConfig);
 
+    // Initialize the form
     this.createChart = this.fb.group({
       fontSize: fontSizeValue,
       selectType: tile.selectType,
@@ -914,78 +922,61 @@ openFilterModal(tile: any, index: number) {
 
     const allFieldsArray = this.createChart.get('all_fields') as FormArray;
 
+    // Populate fields and conditions from the parsed configuration
     this.parsedfilterTileConfig.forEach((packet: any[], fieldIndex: number) => {
+      if (!packet || !Array.isArray(packet)) {
+        console.warn(`Invalid packet structure at fieldIndex ${fieldIndex}:`, packet);
+        return;
+      }
+
+      // Map conditions within the field
       const conditionsArray = this.fb.array(
-        packet.map((condition: any) =>
-          this.fb.group({
-            formField: [condition.formField || '', Validators.required], // Ensure formField is bound correctly
+        packet.map((condition: any, conditionIndex: number) => {
+          if (!condition) {
+            console.warn(`Invalid condition at fieldIndex ${fieldIndex}, conditionIndex ${conditionIndex}:`, condition);
+            return this.fb.group({
+              formField: ['', Validators.required],
+              operator: ['', Validators.required],
+              filterValue: ['', Validators.required],
+              operatorBetween: ['', Validators.required],
+              type: ['text'], // Default to text type
+            });
+          }
+
+          const formFieldControl = condition.formField || '';
+          const newCondition = this.fb.group({
+            formField: [formFieldControl, Validators.required],
             operator: [condition.operator || '', Validators.required],
-            filterValue: [condition.filterValue || '', Validators.required], // Ensure filterValue is bound correctly
+            filterValue: [condition.filterValue || '', Validators.required],
             operatorBetween: [condition.operatorBetween || '', Validators.required],
-            type: [condition.type || 'select'], // Dynamically set type with a fallback
-          })
-        )
+            type: [condition.type || 'text'], // Dynamically set type with a fallback
+          });
+
+          // Dynamically fetch options and set globalFieldData
+          this.getOptionsForField(fieldIndex, conditionIndex, formFieldControl);
+
+          return newCondition;
+        })
       );
-    
+
+      // Create a field group with conditions
       const fieldGroup = this.fb.group({
-        parameterName: [packet[0]?.parameterName || `Parameter ${fieldIndex + 1}`, Validators.required], // Read parameterName dynamically
+        parameterName: [packet[0]?.parameterName || `Parameter ${fieldIndex + 1}`, Validators.required],
         conditions: conditionsArray,
       });
-    
+
+      // Add the field group to all_fields
       allFieldsArray.push(fieldGroup);
-    
-      const conditions = (fieldGroup.get('conditions') as FormArray).controls;
-    
-      conditions.forEach((conditionGroup:any,conditionIndex:number) => {
-        const formFieldControl = conditionGroup.get('formField');
-        const filterValueControl = conditionGroup.get('filterValue');
-        // setTimeout(() => {
-          this.getOptionsForField(fieldIndex,conditionIndex, conditionGroup.get('formField')?.value);
-        // }, 3000);
-      
-        // Check if the filterValue is already set
-        // const currentFilterValue = filterValueControl?.value;
-    
-    //     formFieldControl?.valueChanges.subscribe((newFormFieldValue: any) => {
-    //       // Prevent unnecessary resets for the initial value
-    //       if (currentFilterValue && newFormFieldValue === conditionGroup.get('formField')?.value) {
-    //         return;
-    //       }
-    
-    //       // Reset filterValue when formField changes
-    // //       filterValueControl?.reset();
-    // // console.log('fieldIndex',fieldIndex)
-
-    // //       const options = this.getOptionsForField(fieldIndex,conditionIndex, newFormFieldValue);
-    // //       console.log('Dynamic options for fieldIndex:', options);
-    
-    // //       if (options?.type === 'select') {
-    // //         // Set default value for select, ensuring the value is retained if it's valid
-    // //         const validValue =
-    // //           currentFilterValue && options.options?.includes(currentFilterValue)
-    // //             ? currentFilterValue
-    // //             : options.options?.[0] || '';
-    
-    // //         filterValueControl?.setValue(validValue);
-    // //       }
-    //     });
-    
-        // Log current values for debugging
-        console.log('formFieldControl initial value:', formFieldControl?.value);
-        console.log('filterValueControl initial value:', filterValueControl?.value);
-      });
-    
-      console.log(`Populated field at index ${fieldIndex}:`, fieldGroup.value);
     });
-    
-    
 
-    this.themes.forEach(theme => {
+    // Update themes based on tile configuration
+    this.themes.forEach((theme) => {
       theme.selected = theme.color === tile.themeColor;
     });
 
     console.log('Updated themes:', this.themes);
 
+    // Enable/disable parameter count based on add_fields toggle
     this.createChart.get('add_fields')?.valueChanges.subscribe((isEnabled) => {
       const noOfParamsControl = this.createChart.get('noOfParams');
       if (isEnabled) {
@@ -995,8 +986,10 @@ openFilterModal(tile: any, index: number) {
       }
     });
 
+    // Mark edit mode as true
     this.isEditMode = true;
   } else {
+    // If no tile is selected, reset the form
     this.selectedTile = null;
     this.isEditMode = false;
     if (this.createChart) {
@@ -1004,6 +997,8 @@ openFilterModal(tile: any, index: number) {
     }
   }
 }
+
+
 
 
 
@@ -1738,66 +1733,75 @@ toggleCheckbox1(theme: any) {
     conditionIndex: number,
     formFieldValue: string
   ): void {
-    // Access the conditions form array
-    const conditions = this.all_fields.controls[fieldIndex].get('conditions') as FormArray;
-    // conditions.controls[conditionIndex].get('filterValue')?.setValue('');
-    // If formFieldValue is empty or invalid, default to text type
-    if (!formFieldValue) {
-      console.warn('formFieldValue is empty or invalid');
-      conditions.controls[conditionIndex].get('type')?.setValue('text');
-      this.globalFieldData[conditionIndex] = { type: 'text', options: null };
-      return;
-    }
+    try {
+      // Access the field group at the given index
+      const fieldGroup = this.all_fields.at(fieldIndex) as FormGroup;
+      if (!fieldGroup) {
+        console.warn(`Field group is undefined for fieldIndex ${fieldIndex}`);
+        return;
+      }
   
-    // Get the form name for the current field
-    const formName = this.all_fields.controls[fieldIndex].get('parameterName')?.value;
-    if (!formName) {
-      console.warn(`Parameter name is missing for fieldIndex ${fieldIndex}`);
-      conditions.controls[conditionIndex].get('type')?.setValue('text');
-      this.globalFieldData[conditionIndex] = { type: 'text', options: null };
-      return;
-    }
+      // Access the conditions form array
+      const conditions = fieldGroup.get('conditions') as FormArray;
+      if (!conditions || !conditions.controls[conditionIndex]) {
+        console.warn(`Conditions array or condition at index ${conditionIndex} is not defined for fieldIndex ${fieldIndex}`);
+        return;
+      }
   
-    // Retrieve metadata for the given index and form name
-    const metadataAtFieldIndex = this.populateFormBuilder[fieldIndex];
-    if (!metadataAtFieldIndex) {
-      conditions.controls[conditionIndex].get('type')?.setValue('text');
-      this.globalFieldData[conditionIndex] = { type: 'text', options: null };
-      return;
-    }
-  
-    const matchingMetadata = metadataAtFieldIndex[formName];
-    if (!matchingMetadata) {
-      console.error(`No metadata found for formName ${formName} at fieldIndex ${fieldIndex}`);
-      conditions.controls[conditionIndex].get('type')?.setValue('text');
-      this.globalFieldData[conditionIndex] = { type: 'text', options: null };
-      return;
-    }
-  
-    // Find the field that matches the formFieldValue
-    const foundField = matchingMetadata.find((field: Field) => field.name === formFieldValue);
-    if (foundField) {
-      console.log(`Found field for ${formFieldValue}:`, foundField);
-  
-      // Default to text if type is select but options are empty or invalid
-      if (foundField.type === 'select' && (!foundField.options || foundField.options.every((option: any) => !option))) {
-        console.warn(`Field ${formFieldValue} has type 'select' but options are empty. Defaulting to type 'text'.`);
+      // Default to 'text' type if formFieldValue is invalid or empty
+      if (!formFieldValue) {
+        console.warn('formFieldValue is empty or invalid');
         conditions.controls[conditionIndex].get('type')?.setValue('text');
         this.globalFieldData[conditionIndex] = { type: 'text', options: null };
         return;
       }
   
-      // Set the type and options in the global variable
-      conditions.controls[conditionIndex].get('type')?.setValue('select');
-      this.globalFieldData[conditionIndex] = { type: foundField.type, options: foundField.options || null };
-    } else {
-      console.warn(`Field with name ${formFieldValue} not found in metadata for index ${fieldIndex}`);
-      console.log('Available field names:', matchingMetadata.map((field: Field) => field.name));
-      conditions.controls[conditionIndex].get('type')?.setValue('text');
-      this.globalFieldData[conditionIndex] = { type: 'text', options: null };
+      // Get the form name for the current field
+      const formName = fieldGroup.get('parameterName')?.value;
+      if (!formName) {
+        console.warn(`Parameter name is missing for fieldIndex ${fieldIndex}`);
+        conditions.controls[conditionIndex].get('type')?.setValue('text');
+        this.globalFieldData[conditionIndex] = { type: 'text', options: null };
+        return;
+      }
+  
+      // Retrieve metadata for the given index and form name
+      const metadataAtFieldIndex = this.populateFormBuilder[fieldIndex];
+      if (!metadataAtFieldIndex) {
+        console.warn(`Metadata is undefined for fieldIndex ${fieldIndex}`);
+        conditions.controls[conditionIndex].get('type')?.setValue('text');
+        this.globalFieldData[conditionIndex] = { type: 'text', options: null };
+        return;
+      }
+  
+      const matchingMetadata = metadataAtFieldIndex[formName];
+      if (!matchingMetadata) {
+        console.error(`No metadata found for formName ${formName} at fieldIndex ${fieldIndex}`);
+        conditions.controls[conditionIndex].get('type')?.setValue('text');
+        this.globalFieldData[conditionIndex] = { type: 'text', options: null };
+        return;
+      }
+  
+      // Find the field that matches the formFieldValue
+      const foundField = matchingMetadata.find((field: Field) => field.name === formFieldValue);
+      if (foundField) {
+        console.log(`Found field for ${formFieldValue}:`, foundField);
+  
+        // Set the type and options in the global variable
+        conditions.controls[conditionIndex].get('type')?.setValue(foundField.type || 'text');
+        this.globalFieldData[conditionIndex] = { type: foundField.type, options: foundField.options || null };
+      } else {
+        console.warn(`Field with name ${formFieldValue} not found in metadata for index ${fieldIndex}`);
+        console.log('Available field names:', matchingMetadata.map((field: Field) => field.name));
+        conditions.controls[conditionIndex].get('type')?.setValue('text');
+        this.globalFieldData[conditionIndex] = { type: 'text', options: null };
+      }
+    } catch (error) {
+      console.error('Error in getOptionsForField:', error);
     }
-
   }
+  
+  
   
   
   
@@ -1807,13 +1811,23 @@ toggleCheckbox1(theme: any) {
   
   
   remove(fieldIndex: number): void {
-    const parentGroup = this.all_fields.at(fieldIndex) as FormGroup; // Access the specific field group
-    const conditions = parentGroup.get('conditions') as FormArray; // Access the conditions FormArray
-    
-   
-      conditions.removeAt(fieldIndex); // Remove the specific condition group at the given index
-
+    // Access the specific field group
+    const parentGroup = this.all_fields.at(fieldIndex) as FormGroup;
+  
+    // Access the conditions FormArray within the field group
+    const conditions = parentGroup.get('conditions') as FormArray;
+  
+    // Check if there are any conditions to remove
+    if (conditions && conditions.length > 0) {
+      // Remove the last condition in the array
+      conditions.removeAt(conditions.length - 1);
+    } else {
+      console.warn(`No conditions available to remove for field index ${fieldIndex}`);
+    }
   }
+  
+  
+  
   
   
   
