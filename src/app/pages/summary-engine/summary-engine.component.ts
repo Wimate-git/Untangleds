@@ -75,6 +75,16 @@ interface ListItem {
     P9: any;
   };
 }
+interface RowData {
+  P1: string;
+  P2: string;
+  P3: string;
+  P4: number;
+  P5: number;
+  P6?: string; // Optional fields
+  P7?: string;
+  P8?: string;
+}
 interface UpdateMasterInput {
   PK: string;
   SK: number;
@@ -2008,6 +2018,20 @@ setTimeout(() => {
     // Set the state to Edit Mode
     this.showModal = true; // Open modal in edit mode
   }
+  dashboardRedirect(id: string): void {
+    // Toggle the full-screen state
+    this.setFullscreen();
+  
+    // Navigate to the desired route
+    this.router.navigate([`/summary-engine/${id}`]).then(() => {
+      // Reload the window after navigation
+      window.location.reload();
+    });
+  
+    // Set the state to Edit Mode
+    this.showModal = true; // Open modal in edit mode
+  }
+  
 
   
   dashboardOpen(id: string): void {
@@ -3961,9 +3985,19 @@ setTimeout(() => {
           data: 'P7',
         },
       ],
-      createdRow: (row, data, dataIndex) => {
-        $('td:eq(0)', row).addClass('');
+      createdRow: (row: Node, data: any, dataIndex: number) => {
+        console.log('data from columns', data);
+      
+        // Assert that `data` is of type `RowData`
+        const rowData = data as RowData;
+      
+        $(row).on('click', 'td', (event) => {
+          event.preventDefault(); // Prevent default action
+          this.dashboardRedirect(rowData.P1); // TypeScript now knows P1 exists
+        });
       },
+      
+      
       pageLength: 10, // Set default page size to 10
     };
   }
