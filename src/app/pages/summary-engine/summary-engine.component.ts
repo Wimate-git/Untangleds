@@ -4084,8 +4084,8 @@ setTimeout(() => {
           add_tile: 'Widget Added',
           update_tile: 'Widget Updated',
           delete_tile: 'Tile deleted',
-          add_map:'Map Added',
-          update_map:'Map Updated',
+          add_map: 'Map Added',
+          update_map: 'Map Updated',
           deleteTile: 'Tile deleted',
           update: 'Summary updated',
           update_Dashboard: 'Dashboard Filteration is updated',
@@ -4094,15 +4094,20 @@ setTimeout(() => {
   
         console.log('Action key condition check:', actionKey);
   
-        // Show alert and then reload the window if required
+        // Show alert
         Swal.fire({
           position: 'center',
           icon: 'success',
           title: `${successTitle} successfully`,
           showConfirmButton: true
         }).then((result) => {
-          if (result.isConfirmed && (actionKey === 'add_map' || actionKey === 'update_map')) {
-            window.location.reload(); // Reloads the current window after the alert
+          if (result.isConfirmed) {
+            // Reload the page for specific action keys
+            if (actionKey === 'add_map' || actionKey === 'update_map') {
+              window.location.reload(); // Reloads the current window
+            } else if (actionKey === 'update_Dashboard' || actionKey === 'filter_add') {
+              this.reloadPage(); // Call the reloadPage function
+            }
           }
         });
   
@@ -4135,6 +4140,7 @@ setTimeout(() => {
       });
     });
   }
+  
   
   
   
@@ -5492,7 +5498,11 @@ refreshFunction(){
 
   refreshHelper(data:any){
     if(data){
-      this.reloadPage()
+      // setTimeout(() => {
+        
+      // this.reloadPage()
+      // }, 1000);
+
     }
 
   }
