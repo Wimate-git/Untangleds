@@ -84,8 +84,11 @@ if (Array.isArray(this.parsedData)) {
             mapType: packet.map_type || '', // Include map_type from parent packet
           };
 
-          // Include marker_info only if packet label is "Track Location"
-          if (packet.parameterName === "TrackLocation") {
+          // Include marker_info for "Track Location" and "Graphic Location"
+          if (
+            packet.label === "Track Location" ||
+            packet.label === "Graphic Location"
+          ) {
             const { label_id, label_name, ...cleanedMarkerInfo } = marker.marker_info || {};
             return { ...baseMarker, marker_info: cleanedMarkerInfo };
           }
@@ -112,6 +115,8 @@ if (Array.isArray(this.parsedData)) {
 } else {
   console.error('Parsed data is not an array.');
 }
+
+
 
 // Add a fallback for map center
 // this.defaultCenter = { lat: 0, lng: 0 };
@@ -249,6 +254,17 @@ get shouldShowButton(): boolean {
   closeModal() {
     this.modalService.dismissAll(); // Close the modal programmatically
   }
+  // formatGraphicInfo(infoString: string): string {
+  //   if (!infoString) {
+  //     return 'No details available';
+  //   }
+
+  //   // Format the concatenated string by splitting on hyphens or spaces
+  //   return infoString
+  //     .split('-') // Split by hyphens
+  //     .map((part) => part.trim()) // Trim any extra spaces
+  //     .join('<br />'); // Join with line breaks
+  // }
   
 
 }

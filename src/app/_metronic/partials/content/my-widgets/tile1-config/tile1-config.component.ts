@@ -70,6 +70,10 @@ export class Tile1ConfigComponent implements OnInit {
   @Input()isGirdMoved: any;
   permissionIdsList: any;
   p1ValuesSummaryPemission: any;
+  selectedEquationParameterValue: any;
+  listofFormValues: any;
+  listofEquationParam: any;
+  operationValue: any;
 
 
  
@@ -86,6 +90,7 @@ export class Tile1ConfigComponent implements OnInit {
     this.initializeTileFields()
     this.setupRanges();
     this.dynamicData()
+    this.dynamicDataEquation()
     this.dashboardIds(1)
     // this.permissionIds(1)
   }
@@ -193,7 +198,12 @@ export class Tile1ConfigComponent implements OnInit {
       filterParameter: [[]], // Initialize as an array to handle multiple or single values
       filterDescription: [''],
       formatType:[''],
-      custom_Label:['',Validators.required]
+      custom_Label:['',Validators.required],
+      EquationFormList:[''],
+      EquationParam:[[]],
+      EquationOperation:[''],
+      EquationDesc:['']
+
     });
   }
   
@@ -215,6 +225,22 @@ export class Tile1ConfigComponent implements OnInit {
     }
   }
 
+  async dynamicDataEquation(){
+    try {
+      const result: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#lookup", 1);
+      if (result) {
+        console.log('forms chaecking',result)
+        const helpherObj = JSON.parse(result.options);
+        console.log('helpherObj checking',helpherObj)
+        this.formList = helpherObj.map((item: [string]) => item[0]); // Explicitly define the type
+        this.listofFormValues = this.formList.map((form: string) => ({ text: form, value: form })); // Explicitly define the type here too
+        console.log('listofFormValues',this.listofFormValues)
+        console.log('this.formList check from location', this.formList);
+      }
+    } catch (err) {
+      console.log("Error fetching the dynamic form data", err);
+    }
+  }
 
   async dashboardIds(sk: any) {
     console.log("Iam called Bro");
@@ -401,6 +427,15 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         fontColor: this.createKPIWidget.value.fontColor,
         formatType: this.createKPIWidget.value.formatType,
         custom_Label:this.createKPIWidget.value.custom_Label,
+        EquationFormList:this.createKPIWidget.value.EquationFormList,
+        EquationParam:this.createKPIWidget.value.EquationParam,
+        EquationOperation:this.createKPIWidget.value.EquationOperation,
+        EquationDesc:this.createKPIWidget.value.EquationDesc,
+
+
+
+
+
         multi_value: [
           {
             value: this.createKPIWidget.value.primaryValue,
@@ -453,34 +488,41 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
       console.log('Tile checking for update:', this.dashboard[this.editTileIndex]);
   
       const multiValue = this.dashboard[this.editTileIndex]?.multi_value || [];
-      const primaryValue = this.createKPIWidget.value.primaryValue || multiValue[0]?.value || ''; // Get primaryValue from form or multi_value[0]
+      const primaryValue = this.createKPIWidget.value.primaryValue || multiValue[0]?.value || '';
       const constantValue = multiValue[0]?.constantValue || 0;
-      const processedValue = this.createKPIWidget.value.processed_value || ''; // Form value
-      const updatedConstantValue = this.createKPIWidget.value.constantValue || constantValue; // Form value
+      const processedValue = this.createKPIWidget.value.processed_value || '';
+      const updatedConstantValue = this.createKPIWidget.value.constantValue || constantValue;
   
       console.log('Extracted primaryValue:', primaryValue);
       console.log('Form Value for processed_value:', processedValue);
       console.log('Form Value for constantValue:', updatedConstantValue);
   
-      // Update multi_value array
       if (multiValue.length > 1) {
         multiValue[1].processed_value = processedValue;
         multiValue[0].constantValue = updatedConstantValue;
-        multiValue[0].value = primaryValue; // Sync primaryValue to multi_value[0]
+        multiValue[0].value = primaryValue;
       } else {
         multiValue.push({ processed_value: processedValue, constantValue: updatedConstantValue, value: primaryValue });
       }
   
-      // Prepare the updated tile object
+      // Recalculate EquationDesc
+      const updatedEquationDesc = this.generateEquationDesc(
+        this.createKPIWidget.value.EquationOperation,
+        this.createKPIWidget.value.EquationFormList,
+        this.createKPIWidget.value.EquationParam
+      );
+  
+      console.log('Updated EquationDesc:', updatedEquationDesc);
+  
       const updatedTile = {
-        ...this.dashboard[this.editTileIndex], // Keep existing properties
+        ...this.dashboard[this.editTileIndex],
         formlist: this.createKPIWidget.value.formlist,
         parameterName: this.createKPIWidget.value.parameterName,
-        primaryValue: primaryValue, // Updated primaryValue from form or multi_value
+        primaryValue: primaryValue,
         groupByFormat: this.createKPIWidget.value.groupByFormat,
-        constantValue: updatedConstantValue, // Use the updated constantValue
-        processed_value: processedValue, // Use the updated processed_value
-        multi_value: multiValue, // Update the multi_value array with the modified data
+        constantValue: updatedConstantValue,
+        processed_value: processedValue,
+        multi_value: multiValue,
         selectedRangeType: this.createKPIWidget.value.selectedRangeType,
         startDate: this.createKPIWidget.value.startDate,
         endDate: this.createKPIWidget.value.endDate,
@@ -495,12 +537,15 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         filterDescription: this.createKPIWidget.value.filterDescription,
         parameterNameRead: this.parameterNameRead,
         formatType: this.createKPIWidget.value.formatType,
-        custom_Label:this.createKPIWidget.value.custom_Label,
+        custom_Label: this.createKPIWidget.value.custom_Label,
+        EquationFormList: this.createKPIWidget.value.EquationFormList,
+        EquationParam: this.createKPIWidget.value.EquationParam,
+        EquationOperation: this.createKPIWidget.value.EquationOperation,
+        EquationDesc: updatedEquationDesc, // Update with recalculated value
       };
   
       console.log('Updated tile:', updatedTile);
   
-      // Update the dashboard array with the updated tile
       this.dashboard = [
         ...this.dashboard.slice(0, this.editTileIndex),
         updatedTile,
@@ -509,7 +554,6 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   
       console.log('Updated dashboard:', this.dashboard);
   
-      // Update grid_details and emit the event
       if (this.all_Packet_store?.grid_details) {
         this.all_Packet_store.grid_details[this.editTileIndex] = {
           ...this.all_Packet_store.grid_details[this.editTileIndex],
@@ -526,12 +570,24 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         this.updateSummary(this.all_Packet_store, 'update_tile');
       }
   
-      // Reset editTileIndex after the update
       this.editTileIndex = null;
     } else {
       console.error('Edit index is null or invalid. Unable to update the tile.');
     }
   }
+
+  generateEquationDesc(operation: string, formList: string, params: any[]): string {
+    if (!operation || !formList || !params || params.length === 0) {
+      return '';
+    }
+  
+    const paramStrings = params.map(
+      (param: any) => `\${${formList}.${param.text}.${param.value}}`
+    );
+    return `${operation}(${paramStrings.join(', ')})`;
+  }
+  
+  
   
 
 
@@ -608,6 +664,44 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
       console.warn('Invalid event structure:', event);
     }
   }
+
+  EquationparameterValue(event: any): void {
+    console.log('Event check for dynamic param:', event);
+  
+    if (event && event.value && Array.isArray(event.value)) {
+      const valuesArray = event.value;
+  
+      // Format selected values
+      const formattedValues = valuesArray.map((item: any) => {
+        const { value, text } = item; // Destructure value and text
+        return { value, text }; // Create an object with value and text
+      });
+  
+      console.log('Formatted Selected Items:', formattedValues);
+  
+      // Update the form control with the selected values
+      const EquationParameter = this.createKPIWidget.get('EquationParam');
+      if (EquationParameter) {
+        EquationParameter.setValue(formattedValues); // Update as an array of objects
+        this.cdr.detectChanges(); // Trigger change detection
+      }
+  
+      // Store the selected parameters
+      this.selectedEquationParameterValue = formattedValues.length === 1 
+        ? formattedValues[0] // Single selection
+        : formattedValues;   // Multiple selections
+    } else {
+      console.warn('Invalid event structure:', event);
+  
+      // Reset the form control and selected value in case of invalid input
+      const EquationParameter = this.createKPIWidget.get('EquationParam');
+      if (EquationParameter) {
+        EquationParameter.setValue([]); // Reset to an empty array
+      }
+      this.selectedEquationParameterValue = [];
+    }
+  }
+  
   
   
   
@@ -640,6 +734,47 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     // Manually trigger change detection to ensure the UI reflects the changes
     this.cdr.detectChanges();
   }
+  
+
+  addEquation(): void {
+    // Get the operation value from the form control
+    const operationValue = this.createKPIWidget.get('EquationOperation')?.value;
+    console.log('Operation Value:', operationValue);
+  
+    // Capture the selected parameters
+    const selectedParameters = this.selectedEquationParameterValue;
+    console.log('Selected Parameters:', selectedParameters);
+  
+    if (Array.isArray(selectedParameters) && selectedParameters.length > 0) {
+      // Format the parameters with form name, text, and value
+      const formattedParameters = selectedParameters
+        .map(param => `\${${this.formName}.${param.text}.${param.value}}`)
+        .join(', ');
+  
+      // Construct the full equation
+      const formattedEquation = `${operationValue}(${formattedParameters})`;
+  
+      // Patch the form control with the formatted equation
+      this.createKPIWidget.patchValue({
+        EquationDesc: formattedEquation,
+      });
+  
+      console.log('Formatted Equation:', formattedEquation);
+    } else {
+      console.warn('No parameters selected or invalid format:', selectedParameters);
+  
+      // Reset the equation description if no parameters are selected
+      this.createKPIWidget.patchValue({
+        EquationDesc: '',
+      });
+    }
+  
+    // Manually trigger change detection to ensure the UI reflects the changes
+    this.cdr.detectChanges();
+  }
+  
+  
+  
   
   
   selectedSettingsTab(tab: string) {
@@ -722,19 +857,16 @@ themes = [
 
 openKPIModal(tile: any, index: number) {
   console.log('Index checking:', index); // Log the index
-
   if (tile) {
     this.selectedTile = tile;
-    this.editTileIndex = index !== undefined ? index : null; 
-    console.log('this.editTileIndex checking from openkpi', this.editTileIndex); // Store the index, default to null if undefined
-    console.log('Tile Object:', tile); // Log the tile object
+    this.editTileIndex = index !== undefined ? index : null;
+    console.log('Tile object from readback:', tile);
 
     // Parse multi_value if it is a string
     let parsedMultiValue = [];
     if (typeof tile.multi_value === 'string') {
       try {
         parsedMultiValue = JSON.parse(tile.multi_value);
-        console.log('Parsed multi_value:', parsedMultiValue); // Log parsed multi_value to verify structure
       } catch (error) {
         console.error('Error parsing multi_value:', error);
       }
@@ -742,59 +874,59 @@ openKPIModal(tile: any, index: number) {
       parsedMultiValue = tile.multi_value;
     }
 
-    // Extract value and constantValue from parsed multi_value
-    const value = parsedMultiValue.length > 0 ? parsedMultiValue[0]?.value || '' : '';
-    const constantValue = parsedMultiValue[0]?.constantValue !== undefined ? parsedMultiValue[0].constantValue : 0;
-    const parsedValue = parsedMultiValue[0]?.processed_value !== undefined ? parsedMultiValue[0].processed_value : 0;
-
-    // Preprocess fontSize to remove "px" and convert to number
-    const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14; // Default to 14px if undefined
-
-    // Helper function to check if a string is valid JSON
-    const isValidJson = (str: string): boolean => {
+    // Parse EquationParam if it is a string
+    let parsedEquationParam = [];
+    if (typeof tile.EquationParam === 'string') {
       try {
-        JSON.parse(str);
-        return true;
-      } catch {
-        return false;
+        parsedEquationParam = JSON.parse(tile.EquationParam);
+      } catch (error) {
+        console.error('Error parsing EquationParam:', error);
       }
-    };
-
-    let parsedParameterValue: any = [];
-    if (typeof tile.filterParameter === 'string' && isValidJson(tile.filterParameter)) {
-      parsedParameterValue = JSON.parse(tile.filterParameter);
-    } else if (typeof tile.filterParameter === 'string') {
-      console.warn('Invalid JSON for filterParameter, using as raw string:', tile.filterParameter);
-      parsedParameterValue = [tile.filterParameter];
-    } else {
-      parsedParameterValue = Array.isArray(tile.filterParameter) ? tile.filterParameter : [tile.filterParameter];
+    } else if (Array.isArray(tile.EquationParam)) {
+      parsedEquationParam = tile.EquationParam;
     }
-    console.log('parsedParameterValue checking', parsedParameterValue);
-    tile.filterParameter = parsedParameterValue;
+    let parsedFilterParam = [];
+    if (typeof tile.filterParameter === 'string') {
+      try {
+        parsedFilterParam = JSON.parse(tile.filterParameter);
+      } catch (error) {
+        console.error('Error parsing EquationParam:', error);
+      }
+    } else if (Array.isArray(tile.filterParameter)) {
+      parsedFilterParam = tile.filterParameter;
+    }
 
+    console.log('Parsed EquationParam:', parsedEquationParam);
+
+    // Populate the form control and selected parameters
     this.createKPIWidget.patchValue({
       formlist: tile.formlist,
       parameterName: tile.parameterName,
-      primaryValue: value,
+      primaryValue: parsedMultiValue.length > 0 ? parsedMultiValue[0]?.value || '' : '',
       groupByFormat: tile.groupByFormat,
-      constantValue: constantValue,
-      processed_value: parsedValue,
+      constantValue: parsedMultiValue[0]?.constantValue !== undefined ? parsedMultiValue[0].constantValue : 0,
+      processed_value: parsedMultiValue[0]?.processed_value !== undefined ? parsedMultiValue[0].processed_value : 0,
       selectedRangeCalendarTimeRight: tile.selectedRangeCalendarTimeRight,
       selectedRangeType: tile.selectedRangeType,
       themeColor: tile.themeColor,
-      fontSize: fontSizeValue,
+      fontSize: tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14,
       fontColor: tile.fontColor,
       selectFromTime: tile.selectFromTime,
       selectToTime: tile.selectToTime,
       dashboardIds: tile.dashboardIds,
       selectType: tile.selectType,
-      filterParameter: tile.filterParameter, // Always an array
+      filterParameter: parsedFilterParam,
       filterDescription: tile.filterDescription,
-      custom_Label:tile.custom_Label,
-        formatType:tile.formatType,
-    
-
+      custom_Label: tile.custom_Label,
+      formatType: tile.formatType,
+      EquationFormList: tile.EquationFormList,
+      EquationParam: parsedEquationParam, // Set parsed EquationParam
+      EquationOperation: tile.EquationOperation,
+      EquationDesc: tile.EquationDesc,
     });
+
+    // Set selected parameters
+    this.selectedEquationParameterValue = parsedEquationParam;
 
     this.isEditMode = true; // Set to edit mode
   } else {
@@ -817,6 +949,7 @@ openKPIModal(tile: any, index: number) {
     console.log('Matching theme found and selected:', matchingTheme);
   }
 }
+
 
 
 
@@ -889,6 +1022,52 @@ openKPIModal(tile: any, index: number) {
       });
   }
 
+  fetchDynamicFormDataEquation(value: any) {
+    console.log("Data from lookup:", value);
+
+    this.api
+      .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
+      .then((result: any) => {
+        if (result && result.metadata) {
+          const parsedMetadata = JSON.parse(result.metadata);
+          const EquaformFields = parsedMetadata.formFields;
+          console.log('formFields check',EquaformFields)
+
+          // Initialize the list with formFields labels
+          this.listofEquationParam = EquaformFields.map((field: any) => {
+            console.log('field check',field)
+            return {
+              value: field.name,
+              text: field.label
+            };
+          });
+
+          // Include created_time and updated_time
+          if (parsedMetadata.created_time) {
+            this.listofEquationParam.push({
+              value: parsedMetadata.created_time.toString(),
+              text: 'Created Time' // You can customize the label here if needed
+            });
+          }
+
+          if (parsedMetadata.updated_time) {
+            this.listofEquationParam.push({
+              value: parsedMetadata.updated_time.toString(),
+              text: 'Updated Time' // You can customize the label here if needed
+            });
+          }
+
+          console.log('Transformed dynamic parameters:', this.listofEquationParam);
+
+          // Trigger change detection to update the view
+          this.cdr.detectChanges();
+        }
+      })
+      .catch((err) => {
+        console.log("Can't fetch", err);
+      });
+  }
+
 
   parameterValue(event:any){
     console.log('event for parameter check',event)
@@ -907,6 +1086,25 @@ openKPIModal(tile: any, index: number) {
       console.error('Event data is not in the expected format:', event);
     }
   }
+
+  formName: string = ''; // Add a property to store the form name
+
+  selectFormParams1(event: any): void {
+    console.log('Event checking from equa', event);
+  
+    if (event && event[0] && event[0].data) {
+      const selectedTexteqa = event[0].data.text; // Extract the form name (e.g., "Work Order")
+      console.log('Selected Form Text from Equation', selectedTexteqa);
+  
+      if (selectedTexteqa) {
+        this.formName = selectedTexteqa; // Store the form name for use in addEquation
+        this.fetchDynamicFormDataEquation(selectedTexteqa);
+      }
+    } else {
+      console.error('Event data is not in the expected format:', event);
+    }
+  }
+  
 
   groupByOptions = [
     { value: 'none', text: 'None' },
@@ -933,6 +1131,7 @@ openKPIModal(tile: any, index: number) {
     { value: 'Constant', text: 'Constant' },
    
     { value: 'Count', text: 'Count' },
+    { value: 'Count Dynamic', text: 'Count Dynamic' },
 
   ]
 
@@ -953,6 +1152,20 @@ openKPIModal(tile: any, index: number) {
     // Handle any logic here if needed when the value changes
     console.log('selectedValue check',selectedValue); // Optional: log the selected value
   }
+  selectedOperation(selectedOperation: any): void {
+    if (selectedOperation && selectedOperation[0]) {
+      this.operationValue = selectedOperation[0].value;
+      console.log('this.operationValue:', this.operationValue);
+  
+      // Synchronize with the form control
+      this.createKPIWidget.patchValue({
+        EquationOperation: this.operationValue,
+      });
+    } else {
+      console.warn('Invalid operation selected:', selectedOperation);
+    }
+  }
+  
   get primaryValue() {
     return this.createKPIWidget.get('primaryValue');
   }

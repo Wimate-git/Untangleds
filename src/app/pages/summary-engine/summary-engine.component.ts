@@ -4233,7 +4233,11 @@ setTimeout(() => {
       tableWidget_Config:this.formatField(tile.tableWidget_Config),
       conditions:this.formatField(tile.conditions),
       MapConfig:this.formatField(tile.MapConfig),
-      filterParameter1:this.formatField(tile.filterParameter1)
+      filterParameter1:this.formatField(tile.filterParameter1),
+      EquationParam:this.formatField(tile.EquationParam)
+
+
+
 
       
 

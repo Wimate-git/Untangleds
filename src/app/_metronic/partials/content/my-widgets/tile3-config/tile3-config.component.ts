@@ -409,6 +409,7 @@ if (key === 'tile3') {
     { value: 'Constant', text: 'Constant' },
  
     { value: 'Count', text: 'Count' },
+    { value: 'Count Dynamic', text: 'Count Dynamic' },
 
   ]
 

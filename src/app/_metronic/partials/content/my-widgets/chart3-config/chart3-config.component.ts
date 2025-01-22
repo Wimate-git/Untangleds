@@ -987,6 +987,7 @@ repopulate_fields(getValues: any) {
     // { value: 'Live', text: 'Live' },
     { value: 'Count', text: 'Count' },
     { value: 'Count_Multiple', text: 'Count Multiple' },
+    { value: 'Count Dynamic', text: 'Count Dynamic' },
 
 
   ]
