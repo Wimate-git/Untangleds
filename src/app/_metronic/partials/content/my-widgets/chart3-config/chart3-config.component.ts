@@ -165,7 +165,7 @@ export class Chart3ConfigComponent implements OnInit{
     
       // themeColor: ['#000000', Validators.required],
   
-      fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
+      // fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       // fontColor: ['#000000', Validators.required], // Default to black
    
       chart_title:[''],
@@ -173,7 +173,7 @@ export class Chart3ConfigComponent implements OnInit{
       filterForm:[''],
       filterParameter:[''],
       filterDescription:[''],
-      custom_Label:['',Validators.required]
+  
 
     });
 

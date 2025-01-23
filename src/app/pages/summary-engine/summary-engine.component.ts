@@ -53,9 +53,10 @@ import { FilterTileConfigComponent } from 'src/app/_metronic/partials/content/my
 import { TableWidgetConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/table-widget-config/table-widget-config.component';
 
 import { AgGridAngular } from 'ag-grid-angular';
-import { GridApi ,Column} from 'ag-grid-community';
+import { GridApi ,Column, ColDef} from 'ag-grid-community';
 import { MapConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/map-config/map-config.component';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { MultiTableConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/multi-table-config/multi-table-config.component';
 
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
@@ -156,12 +157,26 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   @ViewChild(FilterTileConfigComponent, { static: false }) FilterTileConfigComponent: FilterTileConfigComponent;
   @ViewChild(TableWidgetConfigComponent, { static: false }) TableWidgetConfigComponent: TableWidgetConfigComponent;
   @ViewChild(MapConfigComponent, { static: false }) MapConfigComponent: MapConfigComponent;
+  @ViewChild(MultiTableConfigComponent, { static: false }) MultiTableConfigComponent: MultiTableConfigComponent;
+  
   
  
   
 
 
   @ViewChild('tileModal', { static: true }) tileModal!: ElementRef<HTMLDivElement>;
+  modalData: any[] = [
+    { id: 1, name: 'John Doe', age: 25, profession: 'Engineer' },
+    { id: 2, name: 'Jane Smith', age: 30, profession: 'Designer' },
+  ];
+
+  nestedColumnDefs: ColDef[] = [
+    { field: 'id', headerName: 'ID', sortable: true, filter: true },
+    { field: 'name', headerName: 'Name', sortable: true, filter: true },
+    { field: 'age', headerName: 'Age', sortable: true, filter: true },
+    { field: 'profession', headerName: 'Profession', sortable: true, filter: true },
+  ];
+
   chartIdsFromChild1: any;
   chartHeight: any[]=[];
   chartWidth: any[]=[];
@@ -897,6 +912,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
   showFilterGrid:boolean
   showTableGrid:boolean
   showMapGrid:boolean
+  showMultiTableGrid:boolean
   showChartGrid:boolean;
   editTitleIndex: number | null;
   isDuplicateID: boolean = false;
@@ -1085,6 +1101,55 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
   
       // Handle both charts and maps
       if (item.grid_type === 'Linechart') {
+        const baseHeight = 400; // Base height for the chart
+        const extraHeight = 40; // Additional height for labels, etc.
+  
+        this.chartHeight[index] = Math.max(0, itemComponentHeight + extraHeight); // Adjust height
+        this.chartWidth[index] = Math.max(0, itemComponentWidth);
+  
+        console.log(
+          `Updated chart dimensions at index ${index}:`,
+          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        );
+      }
+      else if (item.grid_type === 'chart') {
+        const baseHeight = 400; // Base height for the chart
+        const extraHeight = 40; // Additional height for labels, etc.
+  
+        this.chartHeight[index] = Math.max(0, itemComponentHeight + extraHeight); // Adjust height
+        this.chartWidth[index] = Math.max(0, itemComponentWidth);
+  
+        console.log(
+          `Updated chart dimensions at index ${index}:`,
+          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        );
+      }
+      else if (item.grid_type === 'Columnchart') {
+        const baseHeight = 400; // Base height for the chart
+        const extraHeight = 40; // Additional height for labels, etc.
+  
+        this.chartHeight[index] = Math.max(0, itemComponentHeight + extraHeight); // Adjust height
+        this.chartWidth[index] = Math.max(0, itemComponentWidth);
+  
+        console.log(
+          `Updated chart dimensions at index ${index}:`,
+          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        );
+      }
+
+      else if (item.grid_type === 'Areachart') {
+        const baseHeight = 400; // Base height for the chart
+        const extraHeight = 40; // Additional height for labels, etc.
+  
+        this.chartHeight[index] = Math.max(0, itemComponentHeight + extraHeight); // Adjust height
+        this.chartWidth[index] = Math.max(0, itemComponentWidth);
+  
+        console.log(
+          `Updated chart dimensions at index ${index}:`,
+          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        );
+      }
+      else if (item.grid_type === 'Barchart') {
         const baseHeight = 400; // Base height for the chart
         const extraHeight = 40; // Additional height for labels, etc.
   
@@ -1896,6 +1961,8 @@ processFetchedData(result: any): void {
     {value:'FilterTile',label:'FilterTile'},
     {value:'TableTile',label:'TableTile'},
     {value:'MapWidget',label:'MapWidget'},
+    {value:'MultiTableWidget',label:'MultiTableWidget'},
+    
     
 
     
@@ -1914,7 +1981,7 @@ processFetchedData(result: any): void {
 
 
       // Update visibility based on the selected tile
-      this.showGrid = this.selectedTile === 'Tiles' || this.selectedTile === 'Title' || this.selectedTile === 'Chart'|| this.selectedTile === 'DynamicTile' || this.selectedTile === 'FilterTile' || this.selectedTile === 'TableTile' || this.selectedTile === 'MapWidget' ;
+      this.showGrid = this.selectedTile === 'Tiles' || this.selectedTile === 'Title' || this.selectedTile === 'Chart'|| this.selectedTile === 'DynamicTile' || this.selectedTile === 'FilterTile' || this.selectedTile === 'TableTile' || this.selectedTile === 'MapWidget' || this.selectedTile === 'MultiTableWidget';
 
       
       this.showTitleGrid = this.selectedTile === 'Title'; // Show specific grid for Title
@@ -1923,6 +1990,8 @@ processFetchedData(result: any): void {
             this.showFilterGrid =  this.selectedTile === 'FilterTile'
                this.showTableGrid =  this.selectedTile === 'TableTile'
                     this.showMapGrid =  this.selectedTile === 'MapWidget'
+                              this.showMapGrid =  this.selectedTile === 'MapWidget'
+                              this.showMultiTableGrid = this.selectedTile === 'MultiTableWidget'
 
 
             
@@ -2304,6 +2373,16 @@ setTimeout(() => {
         this.tileConfig1Component.openKPIModal(event.arg1, event.arg2);
       }, 500);
     }
+    if(event.arg1.grid_type=='MultiTableWidget'){
+      this.modalService.open(KPIModal, { size: 'lg' });
+
+    
+      // Access the component instance and trigger `openKPIModal`
+      setTimeout(() => {
+       
+        this.MultiTableConfigComponent.openMultiTableModal(event.arg1, event.arg2);
+      }, 500);
+    }
     if(event.arg1.grid_type=='TableWidget'){
       this.modalService.open(KPIModal, { size: 'lg' });
 
@@ -2476,6 +2555,12 @@ setTimeout(() => {
 
     }
     else if(event.data.arg1.grid_type=='TableWidget'){
+      console.log('event check', event)
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push(event.data.arg1)
+ 
+    }
+    else if(event.data.arg1.grid_type=='MultiTableWidget'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
@@ -4123,7 +4208,12 @@ setTimeout(() => {
           deleteTile: 'Tile deleted',
           update: 'Summary updated',
           update_Dashboard: 'Dashboard Filteration is updated',
-          filter_add: 'Dashboard Filteration is added'
+          filter_add: 'Dashboard Filteration is added',
+
+          add_table:'Table Widget Added',
+          update_table:'Table Widget Updated',
+          add_multiTable:'Table Widget Added',
+          update_multiTable:'Table Widget Updated',
         }[actionKey] || 'Dashboard changes saved';
   
         console.log('Action key condition check:', actionKey);
@@ -4141,6 +4231,13 @@ setTimeout(() => {
               window.location.reload(); // Reloads the current window
             } else if (actionKey === 'update_Dashboard' || actionKey === 'filter_add') {
               this.reloadPage(); // Call the reloadPage function
+            }
+            else if (actionKey === 'add_table' || actionKey === 'update_table'){
+              this.reloadPage(); 
+            }
+            else if(actionKey === 'add_multiTable' || actionKey === 'update_multiTable'){
+              this.reloadPage(); 
+
             }
           }
         });
@@ -4234,7 +4331,8 @@ setTimeout(() => {
       conditions:this.formatField(tile.conditions),
       MapConfig:this.formatField(tile.MapConfig),
       filterParameter1:this.formatField(tile.filterParameter1),
-      EquationParam:this.formatField(tile.EquationParam)
+      EquationParam:this.formatField(tile.EquationParam),
+      multiTableWidget_Config:this.formatField(tile.multiTableWidget_Config)
 
 
 
@@ -5533,6 +5631,11 @@ refreshFunction(){
     modal.dismiss();
 
   }
+  openMultiTableModal(MultiTableModal:TemplateRef<any>,modal:any){
+    this.modalService.open(MultiTableModal, {size: 'lg' });
+    modal.dismiss();
+
+  }
 
   refreshHelper(data:any){
     if(data){
@@ -5544,5 +5647,14 @@ refreshFunction(){
     }
 
   }
+  helperInfo(event:any,templateref:any){
+    console.log('event checking',event)
+    this.modalService.open(templateref, { size: 'lg' });
+    
+
+
+  }
+
+
 
 }

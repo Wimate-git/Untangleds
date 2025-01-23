@@ -179,7 +179,7 @@
                           >
                             <div class="mb-3" style="width: 30%;">
                               <label class="col-form-label fw-bold fs-6 required">Select Field</label>
-                              <select formControlName="formField" class="form-control" (change)="getOptionsForField(fieldIndex,conditionIndex, condition.get('formField')?.value);condition.get('filterValue')?.setValue('');">
+                              <select formControlName="formField" class="form-control" (change)="fetchDynamic(formlistValues,fieldIndex,conditionIndex, condition.get('formField')?.value);condition.get('filterValue')?.setValue('');">
                                 <option value="" disabled selected>Select Field</option>
                                 <ng-container *ngFor="let option of dynamicParamMap.get(fieldIndex) || []" >
                                   <option [value]="option.value">{{ option.text }}</option>
@@ -281,7 +281,7 @@
                       <button
                         type="button"
                         class="btn btn-primary btn-sm me-4"
-                        (click)="addCondition(fieldIndex)"
+                        (click)="addCondition(fieldIndex, '', '')"
                       >
                         Add Condition
                       </button>

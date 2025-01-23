@@ -1,6 +1,6 @@
 
 <div class="modal-header">
-    <h4 class="modal-title">Column Chart</h4>
+    <h4 class="modal-title">Area Chart</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
   </div>
   <div class="container" *ngIf="createChart">
@@ -42,26 +42,26 @@
           <!-- Tab Navigation -->
           <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap"
             id="myTab_settings" role="tablist">
-            <div class="col-3" role="Data">
+            <div class="col-4" role="Data">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab"
                   aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Data</a>
               </li>
             </div>
-            <div class="col-3" role="Filter">
+            <div class="col-4" role="Filter">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="filter-tab" data-bs-toggle="tab" role="tab"
                   aria-controls="filter-tab" aria-selected="false" (click)="selectedSettingsTab('filter-tab')">Filter</a>
               </li>
             </div>
-            <div class="col-3" role="Settings">
+            <!-- <div class="col-3" role="Settings">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="settings-tabpane" data-bs-toggle="tab" role="tab"
                   aria-controls="settings-tab" aria-selected="false"
                   (click)="selectedSettingsTab('settings-tab')">Settings</a>
               </li>
-            </div>
-            <div class="col-3" role="Advanced">
+            </div> -->
+            <div class="col-4" role="Advanced">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="advanced-tabpane" data-bs-toggle="tab" role="tab"
                   aria-controls="advanced-tab" aria-selected="false"
@@ -296,7 +296,7 @@
               </div> -->
               
               <div class="col-md-5 mb-3">
-                <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Parameter</label>
+                <label for="parameterName" class="col-createChart-label fw-bold fs-6 ">Parameter</label>
                 <ngx-select
                 id="parameterName"
                 [allowClear]="true"
@@ -403,6 +403,11 @@
                 <div class="title">This Month</div>
                 <div class="example">E.g., Data for current month</div>
               </div>
+              <div class="list-item" (click)="selectValue('any', modal)" (mouseenter)="showTooltip('any')"
+              (mouseleave)="hideTooltip()">
+              <div class="title">Any</div>
+              <div class="example">E.g., Any</div>
+            </div>
             </div>
           
             <div class="list-column">

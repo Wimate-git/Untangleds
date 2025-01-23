@@ -166,7 +166,7 @@ export class Chart2ConfigComponent implements OnInit{
     
       // themeColor: ['#000000', Validators.required],
   
-      fontSize: [14, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
+      // fontSize: [14, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       // fontColor: ['#000000', Validators.required], // Default to black
    
       chart_title:[''],
@@ -174,7 +174,7 @@ export class Chart2ConfigComponent implements OnInit{
       filterForm:[''],
       filterParameter:[''],
       filterDescription:[''],
-      custom_Label:['',Validators.required]
+      // custom_Label:['',Validators.required]
 
     });
 
@@ -323,13 +323,13 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         grid_type: 'Linechart',
   
         chart_title: this.createChart.value.chart_title || '',  // Ensure this value exists
-        fontSize: `${this.createChart.value.fontSize || 16}px`,  // Provide a fallback font size
+        // fontSize: `${this.createChart.value.fontSize || 16}px`,  // Provide a fallback font size
         themeColor: 'var(--bs-body-bg)',  // Default theme color
         chartConfig: this.createChart.value.all_fields || [],  // Default to empty array if missing
         filterForm: this.createChart.value.filterForm || {},
         filterParameter: this.createChart.value.filterParameter || {},
         filterDescription: this.createChart.value.filterDescription || '',
-        custom_Label: this.createChart.value.custom_Label || '',
+        // custom_Label: this.createChart.value.custom_Label || '',
   
         highchartsOptionsJson: this.chartFinalOptions,
         noOfParams: this.noOfParams || 0,  // Ensure noOfParams has a valid value

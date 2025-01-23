@@ -1,0 +1,68 @@
+
+<div *ngIf="item.grid_type === 'MultiTableWidget'">
+  <div 
+    tabindex="0"
+    style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out; width: 100%; height: 100%;">
+
+    <!-- Grid Title -->
+    <div class="processed-value-container fw-4"
+         style="font-weight: bold; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 18px;">
+      {{ item.custom_Label }}
+    </div>
+
+    <!-- AG Grid Table -->
+    <div class="ag-theme-alpine gridster-item-content" style="width: 100%; height: 400px; overflow: hidden;">
+      <ag-grid-angular
+        [rowData]="rowData"
+        [columnDefs]="columnDefs"
+        [domLayout]="'normal'"
+        [pagination]="true"
+        [paginationPageSize]="10"
+        [defaultColDef]="defaultColDef"
+        (gridReady)="onGridReady($event)"
+        (rowClicked)="onRowClick($event)"
+        (cellClicked)="onCellClick($event)"
+        style="width: 100%; height: 100%;"
+      ></ag-grid-angular>
+    </div>
+
+    <!-- Action Menu -->
+    <div class="action-menu-container d-flex align-items-center"
+         style="position: absolute; top: 3px; right: 10px; gap: 10px;">
+      <button *ngIf="!isEditModeView && !hideButton"
+              class="btn btn-icon btn-custom"
+              (click)="edit_each_tileUI(item, index)"
+              style="background: none; border: none;">
+        <i class="bi bi-pencil" style="color: black;"></i>
+      </button>
+
+      <div class="dropdown">
+        <button *ngIf="!isEditModeView && !hideButton"
+                [matMenuTriggerFor]="menu"
+                class="btn btn-icon btn-custom">
+          <i class="bi bi-three-dots-vertical"></i>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="edit_each_duplicate(item, index)">Duplicate</button>
+          <button mat-menu-item (click)="deleteTile(item, index)">Delete</button>
+          <button mat-menu-item (click)="exportToCSV()">Export to CSV</button>
+          <button mat-menu-item (click)="exportAllTablesAsExcel()">Export to Excel</button>
+          <button mat-menu-item (click)="exportAllTablesAsPDF()">Export to PDF</button>
+        </mat-menu>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  
+  
+  <ng-template #modalContent>
+    <app-custom-info-ui
+  
+      [iframeUrl]="iframeUrl"
+      [selectedMarkerIndex]="selectedMarkerIndex"
+      (closeModalEvent)="closeModal()" [tile1Config]="tile1Config">
+    </app-custom-info-ui>
+  </ng-template>
+

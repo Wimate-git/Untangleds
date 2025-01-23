@@ -57,6 +57,9 @@ import { AgGridAngular } from 'ag-grid-angular';
 import { MapConfigComponent } from './map-config/map-config.component';
 import { MapUiComponent } from './map-ui/map-ui.component';
 import { GoogleMapsModule } from '@angular/google-maps';
+import { MultiTableConfigComponent } from './multi-table-config/multi-table-config.component';
+import { MultiTableUiComponent } from './multi-table-ui/multi-table-ui.component';
+import { NestedTableComponent } from './nested-table/nested-table.component';
 
 
 
@@ -90,7 +93,10 @@ import { GoogleMapsModule } from '@angular/google-maps';
     TableWidgetUiComponent,
     TableWidgetConfigComponent,
     MapConfigComponent,
-    MapUiComponent
+    MapUiComponent,
+    MultiTableConfigComponent,
+    MultiTableUiComponent,
+    NestedTableComponent
 
 
 
@@ -162,7 +168,10 @@ import { GoogleMapsModule } from '@angular/google-maps';
     TableWidgetUiComponent,
     TableWidgetConfigComponent,
     MapConfigComponent,
-    MapUiComponent
+    MapUiComponent,
+    MultiTableConfigComponent,
+    MultiTableUiComponent,
+    NestedTableComponent
   
 
     

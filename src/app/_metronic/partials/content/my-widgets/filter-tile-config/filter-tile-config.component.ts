@@ -482,19 +482,19 @@ makeTrueCheck:any = false
     this.formValueSave = formValue;
     console.log('this.formValueSave add', this.formValueSave);
   
-    try {
-      // Call fetchDynamic and handle the Promise
-      this.fetchDynamic(this.formValueSave)
-        .then((values) => {
-          this.fetchedValues = values; // Assign the resolved values
-          console.log('Fetched Values:', this.fetchedValues);
-        })
-        .catch((error) => {
-          console.error('Error fetching values:', error);
-        });
-    } catch (error) {
-      console.error('Unexpected error:', error);
-    }
+    // try {
+    //   // Call fetchDynamic and handle the Promise
+    //   this.fetchDynamic(this.formValueSave)
+    //     .then((values) => {
+    //       this.fetchedValues = values; // Assign the resolved values
+    //       console.log('Fetched Values:', this.fetchedValues);
+    //     })
+    //     .catch((error) => {
+    //       console.error('Error fetching values:', error);
+    //     });
+    // } catch (error) {
+    //   console.error('Unexpected error:', error);
+    // }
     
   
     // Determine checkbox state
@@ -552,8 +552,8 @@ makeTrueCheck:any = false
   
   
   
-  addCondition(fieldIndex: number): void {
-    this.fetchDynamic(this.formlistValues);
+  addCondition(fieldIndex: number, condition:any, formFieldControl:any): void {
+    this.fetchDynamic(this.formlistValues,fieldIndex, condition, formFieldControl);
     console.log('Final populateFormBuilder:', this.populateFormBuilder);
   
     const parentGroup = this.all_fields.controls[fieldIndex] as FormGroup;
@@ -655,16 +655,19 @@ makeTrueCheck:any = false
   
       // Map through fields and conditions
       this.conditionsFilter = this.fields.map((field: { conditions: any[] }, fieldIndex: number) => {
-        return field.conditions.map((condition,Index) => {
-          const fieldData = this.globalFieldData
+        return field.conditions.map((condition, index) => {
+          // Access the correct fieldData based on the fieldIndex
+          const fieldData = this.globalFieldData[fieldIndex];
+          console.log('fieldData checking', fieldData);
+      
           return {
             ...condition,
             operatorBetween: condition.operatorBetween, // Preserve value or set default
-            type: fieldData?.type || 'text', // Include the type for each condition
+            type: fieldData?.type || null // Include the type for each condition or set to null if not found
           };
         });
       });
-  
+      
       console.log('this.conditionsFilter', this.conditionsFilter);
       console.log('this.fields check before label update', this.fields);
   
@@ -909,11 +912,13 @@ openFilterModal(tile: any, index: number) {
   console.log('Tile checking data from openFilterModal', tile);
 
   console.log('this.formlistValues check', this.formlistValues);
-  this.fetchDynamic(this.formlistValues); // Ensure this fetches required data for dynamic fields
+// Ensure this fetches required data for dynamic fields
+
 
   const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14;
 
   if (tile) {
+    console.log('tile object checking',tile)
     this.selectedTile = tile;
     this.editTileIndex = index !== undefined ? index : null;
 
@@ -943,12 +948,15 @@ openFilterModal(tile: any, index: number) {
     const allFieldsArray = this.createChart.get('all_fields') as FormArray;
 
     // Populate fields and conditions from the parsed configuration
+    this.parsedfilterTileConfig = JSON.parse(tile.filterTileConfig || '[]');
+    console.log('this.parsedfilterTileConfig check', this.parsedfilterTileConfig);
+    
     this.parsedfilterTileConfig.forEach((packet: any[], fieldIndex: number) => {
       if (!packet || !Array.isArray(packet)) {
         console.warn(`Invalid packet structure at fieldIndex ${fieldIndex}:`, packet);
         return;
       }
-
+    
       // Map conditions within the field
       const conditionsArray = this.fb.array(
         packet.map((condition: any, conditionIndex: number) => {
@@ -959,38 +967,42 @@ openFilterModal(tile: any, index: number) {
               operator: ['', Validators.required],
               filterValue: ['', Validators.required],
               operatorBetween: ['', Validators.required],
-              type: ['text'], // Default to text type
+              type: [''], // Default to text type
             });
           }
+    
+          // Safely access and dynamically assign type
+          const conditionType = condition.type ; // Default to 'text' if type is not defined
+          console.log('conditionType select',conditionType)
           const formName = this.formlistValues[fieldIndex];
-     
           const formFieldControl = condition.formField || '';
+    
           const newCondition = this.fb.group({
             formField: [formFieldControl, Validators.required],
             operator: [condition.operator || '', Validators.required],
             filterValue: [condition.filterValue || '', Validators.required],
             operatorBetween: [condition.operatorBetween || '', Validators.required],
-            type: [condition.type || 'text'], // Dynamically set type with a fallback
+            type: [conditionType], // Dynamically set type
             parameterName: [formName, Validators.required],
-
           });
-
+          this.fetchDynamic(this.formlistValues,fieldIndex, conditionIndex, formFieldControl); 
           // Dynamically fetch options and set globalFieldData
-          this.getOptionsForField(fieldIndex, conditionIndex, formFieldControl);
-
+       
+    
           return newCondition;
         })
       );
-
+    
       // Create a field group with conditions
       const fieldGroup = this.fb.group({
         parameterName: [packet[0]?.parameterName || `Parameter ${fieldIndex + 1}`, Validators.required],
         conditions: conditionsArray,
       });
-
+    
       // Add the field group to all_fields
       allFieldsArray.push(fieldGroup);
     });
+    
 
     // Update themes based on tile configuration
     this.themes.forEach((theme) => {
@@ -1704,7 +1716,7 @@ toggleCheckbox1(theme: any) {
     return specificSingleSelectArray;
   };
 
-  async fetchDynamic(formValueSave: string[]): Promise<any[]> {
+  async fetchDynamic(formValueSave: string[],fieldIndex:any, conditionIndex:any, formFieldControl:any): Promise<any[]> {
     console.log('formValueSave check', formValueSave);
     const fetchedData = []; // Initialize an array to store the fetched values
   
@@ -1740,7 +1752,8 @@ toggleCheckbox1(theme: any) {
           fetchedData.push(tempMetadata); // Push to the fetched data array
         }
       }
-  
+     // Dynamically fetch options and set globalFieldData
+     this.getOptionsForField(fieldIndex, conditionIndex, formFieldControl);
       console.log('Final populateFormBuilder:', this.populateFormBuilder);
       return fetchedData; // Return the fetched data
     } catch (error) {
@@ -1761,6 +1774,7 @@ toggleCheckbox1(theme: any) {
     console.log('conditionIndex check:', conditionIndex);
     console.log('formFieldValue check:', formFieldValue);
     console.log('Final populateFormBuilder dynamic:', this.populateFormBuilder);
+    
   
     try {
       const fieldGroup = this.all_fields.at(fieldIndex) as FormGroup;

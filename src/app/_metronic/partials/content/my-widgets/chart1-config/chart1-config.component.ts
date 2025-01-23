@@ -171,7 +171,7 @@ export class Chart1ConfigComponent implements OnInit {
     
       // themeColor: ['#000000', Validators.required],
   
-      fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
+      // fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       // fontColor: ['#000000', Validators.required], // Default to black
    
       chart_title:[''],
@@ -179,7 +179,7 @@ export class Chart1ConfigComponent implements OnInit {
       filterForm:[''],
       filterParameter:[[]],
       filterDescription:[''],
-      custom_Label:['',Validators.required],
+      // custom_Label:['',Validators.required],
    
   
 
@@ -1249,28 +1249,28 @@ toggleCheckbox(theme: any): void {
     },
     title: {
       style: {
-        color: 'var(--bs-body-color)'
+        color: 'var(--bs-body-color)',
       },
-      text: ''
+      text: '',
     },
     tooltip: {
       // valueSuffix: '%'
     },
     exporting: {
-      enabled: false
+      enabled: false,
     },
     credits: {
-      enabled: false
+      enabled: false,
     },
     plotOptions: {
       series: {
         innerSize: '40%',
         allowPointSelect: true,
         cursor: 'pointer',
-        showInLegend: true,
+        showInLegend: false, // Set to false to disable legends
         dataLabels: [{
           enabled: true,
-          distance: 20
+          distance: 20,
         }, {
           enabled: true,
           distance: -40,
@@ -1278,43 +1278,39 @@ toggleCheckbox(theme: any): void {
           style: {
             fontSize: '1.2em',
             textOutline: 'none',
-            opacity: 0.7
+            opacity: 0.7,
           },
           filter: {
             operator: '>',
             property: 'count',
-            value: 10
-          }
-        }]
-      }
+            value: 10,
+          },
+        }],
+      },
+    },
+    legend: {
+      enabled: false, // Disable legends
     },
     responsive: {
       rules: [{
         condition: {
-          maxWidth: 10000
+          maxWidth: 10000,
         },
         chartOptions: {
-          legend: {
-            itemStyle: {
-              color: 'var(--bs-body-color)'
-            },
-            layout: 'horizontal',
-            align: 'center',
-            verticalAlign: 'bottom'
-          }
-        }
-      }]
+  
+        },
+      }],
     },
     series: [{
       itemStyle: {
-        color: 'var(--bs-body-color)'
+        color: 'var(--bs-body-color)',
       },
       name: 'Count',
       colorByPoint: true,
-      data: []
-    }]
+      data: [],
+    }],
   };
-
+  
 
 
 

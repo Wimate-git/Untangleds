@@ -75,6 +75,22 @@
                       (customEvent2)="emitDelete6($event)">
                     </app-tile-ui1>
                   </div>
+                  <div *ngIf="item.grid_type === 'MultiTableWidget'">
+                    <app-multi-table-ui 
+                      [item]="item" 
+                      [index]="i" 
+                    
+                      [isEditModeView]="isEditModeView" 
+                      [hideButton]="hideButton" 
+                      [all_Packet_store]="all_Packet_store" 
+                      (sendCellInfo) = "helperInfo($event,nestedTable)"
+                   
+            
+                      (customEvent)="helperTile($event, MultiTableModal)" 
+                      (customEvent1)="emitDuplicate($event)" 
+                      (customEvent2)="emitDelete6($event)">
+                    </app-multi-table-ui>
+                  </div>
 
                   <!-- [isEditModeView]="isEditModeView" 
                   [hideButton]="hideButton" 
@@ -910,7 +926,7 @@
       </div>
       <!-- <button (click)="createChartGauge()">click me</button> -->
   
-      <div *ngIf="showGrid && selectedTile !== 'Title' &&  selectedTile !== 'Chart' &&  selectedTile !== 'DynamicTile' && selectedTile !== 'FilterTile' && selectedTile !== 'TableTile' && selectedTile !== 'MapWidget' " class="grid-container">
+      <div *ngIf="showGrid && selectedTile !== 'Title' &&  selectedTile !== 'Chart' &&  selectedTile !== 'DynamicTile' && selectedTile !== 'FilterTile' && selectedTile !== 'TableTile' && selectedTile !== 'MapWidget'&& selectedTile !== 'MultiTableWidget' " class="grid-container">
         <div class="grid-item highlight" tabindex="0" (click)="openKPIModal(KPIModal,modal);modal.dismiss"  style="background: linear-gradient(to right, #ff7e5f, #feb47b); padding: 20px; border-radius: 8px; color: white;">
           <div>Label</div>
           <div class="value" tabindex="0">Value</div>
@@ -1198,6 +1214,36 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
           </google-map>
             
             </div>
+         
+            
+              </button>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+
+      <div *ngIf="showGrid" class="container" style="margin-top: 10px;">
+        <div class="row" style="display: flex; justify-content: center; align-items: center;">
+          <!-- Grid item spanning full width -->
+          <div class="col-md-12 d-flex justify-content-center align-items-center">
+            <div *ngIf="showMultiTableGrid">
+              <button
+                class="grid-item col bg-light-primary px-6 py-8 rounded-2 mb-7"
+                style="width: 600px; height: 300px; display: flex; justify-content: center; align-items: center; border: 0;"
+              >
+  
+              <div   (click)="openMultiTableModal(MultiTableModal, modal)" class="ag-theme-alpine" style="width: 100%; height: 100%;">
+                <ag-grid-angular
+                  [rowData]="rowData"
+                  [columnDefs]="columnDefs"
+                  [domLayout]="'autoHeight'"
+                  [pagination]="true"
+                  [paginationPageSize]="10"
+                  [defaultColDef]="defaultColDef"
+                  (gridReady)="onGridReady($event)"
+                ></ag-grid-angular>
+              </div>
          
             
               </button>
@@ -1776,6 +1822,18 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   
     <app-map-config  [dashboard]="dashboard" (dashboardChange)="getGridDetails2($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver2($event)"  ></app-map-config>
   
+  </ng-template>
+  <ng-template #MultiTableModal let-modal >
+  
+    <app-multi-table-config [modal]="modal" [dashboard]="dashboard" (dashboardChange)="getGridDetails2($event)" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver2($event)"></app-multi-table-config>
+  
+  </ng-template>
+
+  <ng-template #nestedTable let-modal>
+    <app-nested-table
+      [modalData]="modalData"
+      [columnDefs]="nestedColumnDefs"
+    ></app-nested-table>
   </ng-template>
   </div>
 <!--   

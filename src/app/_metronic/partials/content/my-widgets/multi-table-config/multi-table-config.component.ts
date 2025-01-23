@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, Output, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -10,12 +10,12 @@ import { SharedService } from 'src/app/pages/shared.service';
 import { ColDef } from 'ag-grid-community';
 
 @Component({
-  selector: 'app-table-widget-config',
+  selector: 'app-multi-table-config',
 
-  templateUrl: './table-widget-config.component.html',
-  styleUrl: './table-widget-config.component.scss'
+  templateUrl: './multi-table-config.component.html',
+  styleUrl: './multi-table-config.component.scss'
 })
-export class TableWidgetConfigComponent implements OnInit,AfterViewInit{
+export class MultiTableConfigComponent {
   table: { columnDefs: ColDef[]; rows: any[] } = {
     columnDefs: [], // Initialize with an empty column definition array
     rows: [] // Initialize with an empty rows array
@@ -184,9 +184,9 @@ this.initializeTileFields()
       colWidth: 100,
       fixedColWidth: true,
       fixedRowHeight: true,
-      grid_type: 'TableWidget',
+      grid_type: 'MultiTableWidget',
       formlist: this.createKPIWidget.value.formlist,
-      tableWidget_Config: this.createKPIWidget.value.form_data_selected,
+      multiTableWidget_Config: this.createKPIWidget.value.form_data_selected,
       custom_Label: this.createKPIWidget.value.custom_Label,
       rowData: this.createKPIWidget.value.rowData,
       groupByFormat: this.createKPIWidget.value.groupByFormat,
@@ -209,7 +209,7 @@ this.initializeTileFields()
   
     this.dashboardChange.emit(this.grid_details); // Emit updated dashboard
     if (this.grid_details) {
-      this.updateSummary('', 'add_table');
+      this.updateSummary('', 'add_multiTable');
       this.cdr.detectChanges(); // Ensure UI updates
     }
   }
@@ -238,7 +238,42 @@ this.initializeTileFields()
       console.log("Error fetching the dynamic form data", err);
     }
   }
+
+
+  async fetchMiniTableData(item:any){
+    
+    try {
+      const resultMain: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#"+item+"#main", 1);
+      if (resultMain) {
+        console.log('forms chaecking',resultMain)
+        const helpherObjmain = JSON.parse(resultMain.metadata);
+        console.log('helpherObjmain checking',helpherObjmain)
+        const filteredResults: { name: any; type: any; }[] = [];
+
+        helpherObjmain.forEach((record: { name: any; type: any; }) => {
+            if (record.name.startsWith("dynamic_table_values") || record.type === 'table') {
+                // Push the name and type into the results array
+                filteredResults.push({
+                    name: record.name,
+                    type: record.type
+                });
+            }
+        });
+        
+        // Log the filtered results
+        console.log('Filtered Results:', filteredResults);
+        
+      
+    
+      }
+    } catch (err) {
+      console.log("Error fetching the dynamic form data", err);
+    }
+  }
   selectFormParams(event: any) {
+    console.log('event check from selectFormParams',event[0].value)
+    const dynamicFormMain = event[0].value
+     this.fetchMiniTableData(dynamicFormMain)
     if (event && event[0] && event[0].data) {
       const selectedText = event[0].data.text; 
       if(this.userIsChanging){
@@ -266,6 +301,7 @@ this.initializeTileFields()
       .then((result: any) => {
         if (result && result.metadata) {
           const parsedMetadata = JSON.parse(result.metadata);
+          console.log('parsedMetadata check',parsedMetadata)
           const formFields = parsedMetadata.formFields;
           console.log('formFields check',formFields)
 
@@ -291,6 +327,14 @@ this.initializeTileFields()
               value: `updated_time`,
               text: 'Updated Time' // You can customize the label here if needed
             });
+            
+          }
+          if (parsedMetadata.updated_time) {
+            this.listofDynamicParam.push({
+              value: `dynamic_table_values`,
+              text: 'Dynamic Table Values' // You can customize the label here if needed
+            });
+            
           }
           
 
@@ -313,6 +357,7 @@ this.initializeTileFields()
   
     // Dynamically create column definitions for ag-grid
     this.table.columnDefs = this.createColumnDefs(selectedTexts);
+    console.log('this.table.columnDefs checking',this.table.columnDefs)
   }
   
 
@@ -345,7 +390,7 @@ this.initializeTileFields()
   
     return columns;
   }
-  openTableModal(tile: any, index: number) {
+  openMultiTableModal(tile: any, index: number) {
     console.log('Index checking:', index); // Log the index
     
     if (tile) {
@@ -356,9 +401,10 @@ this.initializeTileFields()
   
       // Parse tableWidget_Config if it is a string
       let parsedTableWidgetConfig = [];
-      if (typeof tile.tableWidget_Config === 'string') {
+      if (typeof tile.multiTableWidget_Config === 'string') {
         try {
-          parsedTableWidgetConfig = JSON.parse(tile.tableWidget_Config);
+          parsedTableWidgetConfig = JSON.parse(tile.multiTableWidget_Config
+          );
           console.log('Parsed tableWidget_Config:', parsedTableWidgetConfig);
           const textValues = parsedTableWidgetConfig.map((item: { text: any }) => item.text);
           console.log('Extracted Text Values:', textValues);
@@ -367,7 +413,7 @@ this.initializeTileFields()
           console.error('Error parsing tableWidget_Config:', error);
         }
       } else {
-        parsedTableWidgetConfig = tile.tableWidget_Config;
+        parsedTableWidgetConfig = tile.multiTableWidget_Config;
       }
   
       // Parse conditions if it is a string
@@ -477,7 +523,7 @@ this.initializeTileFields()
       const updatedTile = {
         ...this.dashboard[this.editTileIndex], // Keep existing properties
         formlist: this.createKPIWidget.value.formlist,
-        tableWidget_Config: this.createKPIWidget.value.form_data_selected,
+        multiTableWidget_Config: this.createKPIWidget.value.form_data_selected,
         groupByFormat: this.createKPIWidget.value.groupByFormat,
         custom_Label: this.createKPIWidget.value.custom_Label,
         conditions: updatedConditions, // Directly assign the array
@@ -511,7 +557,7 @@ this.initializeTileFields()
       this.dashboardChange.emit(this.grid_details);
   
       if (this.grid_details) {
-        this.updateSummary(this.all_Packet_store, 'update_table');
+        this.updateSummary(this.all_Packet_store, 'update_multiTable');
       }
   
       // Reset editTileIndex after the update
@@ -730,5 +776,5 @@ this.initializeTileFields()
     }
   }
   
-  
+
 }
