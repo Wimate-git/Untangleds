@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { scheduleApiService } from '../schedule-api.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { catchError, firstValueFrom, from, map, Observable, of, shareReplay, Subject, Subscription, take, takeUntil, timeout } from 'rxjs';
+import { catchError, defer, firstValueFrom, from, map, Observable, of, shareReplay, Subject, Subscription, take, takeUntil, timeout } from 'rxjs';
 import { PrimeNGConfig } from 'primeng/api';
 import Swal from 'sweetalert2';
 import { ImageModalComponent } from './image-modal/image-modal.component';
@@ -61,6 +61,7 @@ export class ReportStudioComponent implements AfterViewInit,OnDestroy{
    tableData: any = [];
    selectedPermissions: string[] = [];
    showHeading :boolean = false;
+   userList:any;
 
   //WorkAround is being added this should be resolved
   modalName = 'Reports'
@@ -94,6 +95,7 @@ export class ReportStudioComponent implements AfterViewInit,OnDestroy{
   tableDataWithFormFilters: any = [];
 
   conditionflag: boolean = false;
+  advancedFlag:boolean = false
   populateFormBuilder: any = [];
   isCollapsed1 = false;
   savedModulePacket: any[];
@@ -136,6 +138,7 @@ columns: any;
   isFormVisible: boolean = true;
   trackLocationMapFlag: boolean = false;
   trackLocationArray: any = [];
+  addExcellOptions: boolean = false;
 
    constructor(private fb:FormBuilder,private api:APIService,private configService:SharedService,private scheduleAPI:scheduleApiService,
     private toast:MatSnackBar,private spinner:NgxSpinnerService,private cd:ChangeDetectorRef,private modalService: NgbModal,private moduleDisplayService: ModuleDisplayService,
@@ -195,6 +198,15 @@ columns: any;
    ngOnInit() {
 
 
+    // this.mainFormGroup = this.fb.group({
+    //   dynamicConditions: this.fb.array([this.createConditionGroup()])  // Initial condition group
+    // });
+
+
+    this.mainFormGroup = this.fb.group({
+      dynamicConditions: this.fb.array([this.createConditionGroup()])  // Initial condition group
+    });
+
     this.editOperation = false
 
     this.getLoggedUser = this.configService.getLoggedUserDetails()
@@ -215,6 +227,9 @@ columns: any;
       customForms: this.fb.array([]) 
     });
 
+    this.customLocationGroup = this.fb.group({
+      customForms: this.fb.array([this.createCustomForm1()])
+    });
 
     this.reportsFeilds = this.fb.group({
       dateType: ['', Validators.required],
@@ -225,6 +240,8 @@ columns: any;
       form_permission: [[], Validators.required], 
       form_data_selected: this.fb.array([]), // Create FormArray
       filterOption: ['all'],
+      advanceOption:['all'],
+      addExcellOption:['all'],
       columnOption: ['all'],
       addColumn:['false']
     });
@@ -525,12 +542,13 @@ multiSelectChange(): void {
 
   this.selectedForms.forEach(() => {
     this.addForm(); 
-  });
-
-
-  this.selectedForms.forEach(() => {
     this.addCustomForm(); 
+    this.createCustomForm1()
+    this.customForms1()
   });
+
+
+
 }
 
 
@@ -1009,7 +1027,9 @@ async onFilterChange(event: any,getValue:any,key:any) {
 
 
   formFieldsGroup: FormGroup;
+  formAdvancedGroup:FormGroup;
   customColumnsGroup:FormGroup;
+  customLocationGroup:FormGroup
 
   
 
@@ -1852,6 +1872,21 @@ locationCellRenderer(params: any) {
     } catch (err) {
       console.log("Error fetching the dynamic form data ", err);
     }
+
+
+
+
+
+    try{
+      const result = await this.fetchUserLookupdata(1,`${this.SK_clientID}#user#lookup`,'')
+
+      console.log("Result USer ",result);
+
+      this.userList = result.map((item:any)=>item.P1)
+    }
+    catch(error){
+      console.log("Error fetching user list ",);
+    }
   }
 
 
@@ -1864,6 +1899,8 @@ locationCellRenderer(params: any) {
 
   clearFeilds() {
 
+    this.isFormAdvancedVisible = false
+    this.addExcellOptions = false
     this.trackLocationMapFlag = false
     this.editOperation = false;
     this.tableState = {};
@@ -1871,6 +1908,9 @@ locationCellRenderer(params: any) {
 
     this.forms().clear()
     this.customForms().clear()
+    this.customForms1().clear()
+    this.getConditions().clear()
+    
 
     this.customColumnsflag = false
     this.populateCustomFormBuilder = []
@@ -1970,7 +2010,8 @@ async evaluateTemplate(template: string, metadata: any, getkey: any) {
   try {
       // Make sure to evaluate only the final expression and handle potential errors in evaluation
       const result = eval(template);  // Using `Function` instead of `eval`
-
+      console.log("Template is here ",template);
+      console.log("Result is here ",result);
       return result;
   } catch (error) {
       console.error("Error evaluating template:", error);
@@ -2078,12 +2119,7 @@ mergeAndAddLocation(mappedResponse: any) {
 
     this.editOperation = true
 
-    // console.log("Selected column visibility ",this.selectedItem);
-
-    // console.log("Table temp State is here ",this.tableTempState);
-
-    //Creating packet for reports module to pass
-    this.savedModulePacket = [this.reportsFeilds.value,this.formFieldsGroup.value,this.selectedValues, this.tableTempState,this.customColumnsGroup.value]
+    this.savedModulePacket = [this.reportsFeilds.value,this.formFieldsGroup.value,this.selectedValues, this.tableTempState,this.customColumnsGroup.value,this.customLocationGroup.value,this.mainFormGroup.value]
     this.modalService.open(content,{
       backdrop: 'static',
   });
@@ -2297,6 +2333,9 @@ mergeAndAddLocation(mappedResponse: any) {
           this.tempResHolder.customColumnMetadata = JSON.parse(this.tempResHolder.customColumnMetadata).customForms
           this.tempResHolder.columnVisibility = this.tempResHolder && this.tempResHolder.columnVisibility && JSON.parse(this.tempResHolder.columnVisibility)
           this.tempResHolder.tableState = this.tempResHolder && this.tempResHolder.tableState && JSON.parse(this.tempResHolder.tableState)
+          this.tempResHolder.advancedCustomColumnMetadata = this.tempResHolder.advancedCustomColumnMetadata && JSON.parse(this.tempResHolder.advancedCustomColumnMetadata)
+          this.tempResHolder.advancedFilterColumnMetadata = this.tempResHolder.advancedFilterColumnMetadata && JSON.parse(this.tempResHolder.advancedFilterColumnMetadata)
+          
            this.editSavedDataArray = this.tempResHolder
  
           //  console.log("Result for the edit is here ",this.tempResHolder);
@@ -2304,6 +2343,8 @@ mergeAndAddLocation(mappedResponse: any) {
            const conditionMetadata = this.tempResHolder.conditionMetadata
            const columnVisibility = this.tempResHolder.columnVisibility
            const customColumnMetadata = this.tempResHolder && this.tempResHolder.customColumnMetadata
+           const advancedFilterColumnMetadata = this.tempResHolder && this.tempResHolder.advancedFilterColumnMetadata
+           const advancedCustomColumnMetadata = this.tempResHolder && this.tempResHolder.advancedCustomColumnMetadata
 
            //Get the table State
            this.tableState = this.tempResHolder.tableState && JSON.parse(JSON.stringify(this.tempResHolder.tableState))
@@ -2319,19 +2360,18 @@ mergeAndAddLocation(mappedResponse: any) {
              form_permission:reportMetadata.form_permission , 
              filterOption:reportMetadata.filterOption ,
              columnOption:reportMetadata.columnOption,
-             addColumn:reportMetadata.addColumn
+             addColumn:reportMetadata.addColumn,
+             addExcellOption:reportMetadata.addExcellOption,
+             advanceOption:reportMetadata.advanceOption
            })        
            
            this.selectedItem = []
 
             if(columnVisibility){
               this.selectedValues = JSON.parse(JSON.stringify(columnVisibility))
-            }
-          
-           
-            
+            } 
 
-            // console.log("Star selected ",this.selectedValues);
+            console.log("Selected Values are here  ",this.mainFormGroup.value);
              
            if(reportMetadata.columnOption != 'all' && Array.isArray(this.selectedValues) && this.selectedValues.length > 0){
              this.visibiltyflag = true
@@ -2409,6 +2449,33 @@ mergeAndAddLocation(mappedResponse: any) {
            else{
             this.visibiltyflag = false
            }
+
+
+           if (reportMetadata.advanceOption !== 'all') {
+      
+
+            const dynamicConditionsArray = this.mainFormGroup.get('dynamicConditions')! as FormArray;
+            dynamicConditionsArray.clear(); 
+
+         
+              this.populateAdvanceFilterForm(advancedFilterColumnMetadata);
+            
+            this.isFormAdvancedVisible = true;
+          } else {
+            this.isFormAdvancedVisible = false;
+          }
+
+             //Advance Custom Columns is here
+             if(reportMetadata.addExcellOption != 'all'){
+              this.customForms1().clear()
+              console.log("advancedCustomColumnMetadata",advancedCustomColumnMetadata);
+              this.repopulateForm(advancedCustomColumnMetadata);
+              this.addExcellOptions = true
+             }
+             else{
+                this.addExcellOptions = false
+             }
+
 
            this.onSubmit()
            this.onSubmitFlag = false
@@ -2634,131 +2701,263 @@ mergeAndAddLocation(mappedResponse: any) {
     link.click();
   }
 
-
-
-
-
   async exportAllTablesAsExcel() {
-    const wb = XLSX.utils.book_new(); 
+
+    this.spinner.show()
+
+    try{
+      const wb = XLSX.utils.book_new(); 
+
+      // Use `map` instead of `forEach` to handle async operations properly
+      const tableExports = await Promise.all(this.agGrids.toArray().map(async (gridInstance, index) => {
+        const gridApi = gridInstance.api;
+        const csvData = gridApi.getDataAsCsv();
+        let data = this.csvToArray(csvData || '');
+    
+        let headers = data[0].map((header: string) => header.replace(/[\r\n]+/g, '').replace(/^"|"$/g, '').trim());
+    
+        const headersToRemove = ['Dynamic Table Values', 'TrackLocation', 'Approval History'];
+        const removeIndices = headers
+          .map((header: string, index: any) => headersToRemove.includes(header) || header.includes('Signature') ? index : -1)
+          .filter((index: number) => index !== -1);
+    
+        const xlsxheaders = headers.filter((header: any, index: any) => !removeIndices.includes(index));
+    
+        let xlsxdata = data.map(row => row.filter((_: any, index: any) => !removeIndices.includes(index)));
+    
+        const ws = XLSX.utils.aoa_to_sheet(xlsxdata);
+    
+        // Add the worksheet to the workbook with the name of the formFilter
+        let sheetName = this.tableDataWithFormFilters[index].formFilter;
+        sheetName = sheetName.length > 30 ? sheetName.slice(0, 30) : sheetName;
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    
+        try {
+          const trackLocationColumnIndex = headers.indexOf('TrackLocation');
+          if (trackLocationColumnIndex !== -1) {
+            // Await the trackLocation data
+           
+            const trackLocationData: any = await this.extractTrackLocationData(data, trackLocationColumnIndex, index);
+            console.log("Track location data is here 99999",trackLocationData);
   
-    // Use `map` instead of `forEach` to handle async operations properly
-    const tableExports = await Promise.all(this.agGrids.toArray().map(async (gridInstance, index) => {
-      const gridApi = gridInstance.api;
-      const csvData = gridApi.getDataAsCsv();
-      // console.log("CSV data is here ",csvData);
-      let data = this.csvToArray(csvData || '');
-
-      // console.log("Data is here ",data);
-  
-      let headers = data[0].map((header: string) => header.replace(/[\r\n]+/g, '').replace(/^"|"$/g, '').trim());
-
-      console.log("Headers are here ",headers);
-
-      const headersToRemove = ['Dynamic Table Values', 'TrackLocation','Approval History'];
-      const removeIndices = headers
-        .map((header: string, index: any) => headersToRemove.includes(header) || header.includes('Signature') ? index : -1)
-        .filter((index: number) => index !== -1);
-      
-  
-      const xlsxheaders = headers.filter((header: any, index: any) => !removeIndices.includes(index));
-      
-      let xlsxdata = data.map(row => row.filter((_: any, index: any) => !removeIndices.includes(index)));
-
-  
-      const ws = XLSX.utils.aoa_to_sheet(xlsxdata);
-
-       // Add the worksheet to the workbook with the name of the formFilter
-       let sheetName = this.tableDataWithFormFilters[index].formFilter;
-       sheetName = sheetName.length > 30 ? sheetName.slice(0, 30) : sheetName;
-       XLSX.utils.book_append_sheet(wb, ws, this.tableDataWithFormFilters[index].formFilter);
-
-
-      try{
-        const trackLocationColumnIndex = headers.indexOf('TrackLocation');
-        // console.log('Index is here ',trackLocationColumnIndex);
-        if (trackLocationColumnIndex !== -1) {
-          const trackLocationData = this.extractTrackLocationData(data, trackLocationColumnIndex, index);
-          const trackLocationSheet = XLSX.utils.aoa_to_sheet(trackLocationData);
-          let sheetName1 = `TrackLocation ${this.tableDataWithFormFilters[index].formFilter}`;
+            const trackLocationSheet = XLSX.utils.aoa_to_sheet(trackLocationData);
+            let sheetName1 = `TrackLocation ${this.tableDataWithFormFilters[index].formFilter}`;
             sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
-          XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
-        }
-
-        const approvalColumnIndex = headers.indexOf('Approval History');
-        // console.log('Index is here ',trackLocationColumnIndex);
-        if (approvalColumnIndex !== -1) {
-          const trackLocationData = this.extractApprovalData(data, approvalColumnIndex,index);
-          const trackLocationSheet = XLSX.utils.aoa_to_sheet(trackLocationData);
-          let sheetName1 = `Approval History ${this.tableDataWithFormFilters[index].formFilter}`;
+            XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
+          }
+    
+          const approvalColumnIndex = headers.indexOf('Approval History');
+          if (approvalColumnIndex !== -1) {
+            const approvalData = this.extractApprovalData(data, approvalColumnIndex, index);
+            const approvalSheet = XLSX.utils.aoa_to_sheet(approvalData);
+            let sheetName1 = `Approval History ${this.tableDataWithFormFilters[index].formFilter}`;
             sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
-          XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
-        }
-       
-        const tableColumnIndex = headers.indexOf('dynamic_table_values');
-        console.log("Table column Index is here ",tableColumnIndex);
-        if (tableColumnIndex) {
-          const tableData: any = await this.extractMiniTableData(data, tableColumnIndex, index);
-
-          for (const tableKey in tableData) {
-            const filteredFormName = this.tableFormName.find((item:any)=>Object.keys(item)[0] == tableKey)
-            // console.log("Filtered FormName ",filteredFormName);
-
-            if (tableData.hasOwnProperty(tableKey)) {
-              const miniTableData = tableData[tableKey];
-              const miniTableSheet = XLSX.utils.aoa_to_sheet(miniTableData);
-              let sheetName1 = `${filteredFormName[tableKey]} ${this.tableDataWithFormFilters[index].formFilter}`;
-              sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
-              XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1);
+            XLSX.utils.book_append_sheet(wb, approvalSheet, sheetName1);
+          }
+  
+          console.log("HEaders are here ",headers);
+    
+          const tableColumnIndex = headers.indexOf('Dynamic Table Values');
+          console.log("Table column index is here ",tableColumnIndex);
+          if (tableColumnIndex !== -1) {
+            const tableData: any = await this.extractMiniTableData(data, tableColumnIndex, index);
+            console.log("Mini Table data is ",tableData);
+    
+            for (const tableKey in tableData) {
+              const filteredFormName = this.tableFormName.find((item: any) => Object.keys(item)[0] === tableKey);
+    
+              if (tableData.hasOwnProperty(tableKey)) {
+                const miniTableData = tableData[tableKey];
+                const miniTableSheet = XLSX.utils.aoa_to_sheet(miniTableData);
+                let sheetName1:any
+                if(filteredFormName[tableKey]){
+                  sheetName1 = `${filteredFormName[tableKey]} ${this.tableDataWithFormFilters[index].formFilter}`;
+                }
+                sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
+                XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1);
+              }
             }
           }
+        } catch (error) {
+          console.log("Error in processing mini table and track Location ", error);
         }
-      }
-      catch(error){
-        console.log("Error in processing mini table and track Location ",error);
-      }
+    
+        // Now that all sheets are added, we can loop through the sheets and apply the header styles
+        wb.SheetNames.forEach(sheetName => {
+          const ws = wb.Sheets[sheetName];
+    
+          // Apply styles to the header row (Row 0) for the current sheet
+          for (let i = 0; i < xlsxheaders.length; i++) {
+            const cellAddress = { r: 0, c: i };  // Row 0 (header row)
+            const cellRef = XLSX.utils.encode_cell(cellAddress);
+    
+            if (!ws[cellRef]) ws[cellRef] = {};  // Ensure the cell exists
+    
+            // Apply styles to header cells
+            ws[cellRef].s = {
+              fill: {
+                fgColor: { rgb: 'FFA500' }  // Orange background
+              },
+              font: {
+                color: { rgb: 'FFFFFF' },   // White font color
+                bold: true                  // Bold text
+              },
+              alignment: {
+                horizontal: 'center',      // Center header text
+                vertical: 'center'
+              }
+            };
+          }
+        });
+    
+      }));
+    
+      // Generate the Excel file
+      const excelFile = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    
+      // Create a Blob and trigger the download
+      const blob = new Blob([excelFile], { type: 'application/octet-stream' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${this.selectedForms[0]}${this.selectedForms.length > 1 ? `(${this.selectedForms.length})...` : ''}.xlsx`;
+      link.click();
+    }
+
+    catch(err){
+      console.log("Error creating excell file ",err);
+      this.spinner.hide()
+    }
+
+
+    this.spinner.hide()
+  }
+  
+
+
+
+  // async exportAllTablesAsExcel() {
+  //   const wb = XLSX.utils.book_new(); 
+  
+  //   // Use `map` instead of `forEach` to handle async operations properly
+  //   const tableExports = await Promise.all(this.agGrids.toArray().map(async (gridInstance, index) => {
+  //     const gridApi = gridInstance.api;
+  //     const csvData = gridApi.getDataAsCsv();
+  //     // console.log("CSV data is here ",csvData);
+  //     let data = this.csvToArray(csvData || '');
+
+  //     // console.log("Data is here ",data);
+  
+  //     let headers = data[0].map((header: string) => header.replace(/[\r\n]+/g, '').replace(/^"|"$/g, '').trim());
+
+  //     console.log("Headers are here ",headers);
+
+  //     const headersToRemove = ['Dynamic Table Values', 'TrackLocation','Approval History'];
+  //     const removeIndices = headers
+  //       .map((header: string, index: any) => headersToRemove.includes(header) || header.includes('Signature') ? index : -1)
+  //       .filter((index: number) => index !== -1);
+      
+  
+  //     const xlsxheaders = headers.filter((header: any, index: any) => !removeIndices.includes(index));
+      
+  //     let xlsxdata = data.map(row => row.filter((_: any, index: any) => !removeIndices.includes(index)));
+
+  
+  //     const ws = XLSX.utils.aoa_to_sheet(xlsxdata);
+
+  //      // Add the worksheet to the workbook with the name of the formFilter
+  //      let sheetName = this.tableDataWithFormFilters[index].formFilter;
+  //      sheetName = sheetName.length > 30 ? sheetName.slice(0, 30) : sheetName;
+  //      XLSX.utils.book_append_sheet(wb, ws, this.tableDataWithFormFilters[index].formFilter);
+
+
+  //     try{
+  //       const trackLocationColumnIndex = headers.indexOf('TrackLocation');
+  //       // console.log('Index is here ',trackLocationColumnIndex);
+  //       if (trackLocationColumnIndex !== -1) {
+  //         const trackLocationData:any = await this.extractTrackLocationData(data, trackLocationColumnIndex, index);
+  //         console.log("TrackLocation excell data is here ",trackLocationData);
+
+  //         const trackLocationSheet = XLSX.utils.aoa_to_sheet(trackLocationData);
+  //         let sheetName1 = `TrackLocation ${this.tableDataWithFormFilters[index].formFilter}`;
+  //           sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
+  //         XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
+  //       }
+
+  //       const approvalColumnIndex = headers.indexOf('Approval History');
+  //       // console.log('Index is here ',trackLocationColumnIndex);
+  //       if (approvalColumnIndex !== -1) {
+  //         const trackLocationData = this.extractApprovalData(data, approvalColumnIndex,index);
+  //         const trackLocationSheet = XLSX.utils.aoa_to_sheet(trackLocationData);
+  //         let sheetName1 = `Approval History ${this.tableDataWithFormFilters[index].formFilter}`;
+  //           sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
+  //         XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
+  //       }
+       
+  //       const tableColumnIndex = headers.indexOf('dynamic_table_values');
+  //       console.log("Table column Index is here ",tableColumnIndex);
+  //       if (tableColumnIndex) {
+  //         const tableData: any = await this.extractMiniTableData(data, tableColumnIndex, index);
+
+  //         for (const tableKey in tableData) {
+  //           const filteredFormName = this.tableFormName.find((item:any)=>Object.keys(item)[0] == tableKey)
+  //           // console.log("Filtered FormName ",filteredFormName);
+
+  //           if (tableData.hasOwnProperty(tableKey)) {
+  //             const miniTableData = tableData[tableKey];
+  //             const miniTableSheet = XLSX.utils.aoa_to_sheet(miniTableData);
+  //             let sheetName1 = `${filteredFormName[tableKey]} ${this.tableDataWithFormFilters[index].formFilter}`;
+  //             sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
+  //             XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1);
+  //           }
+  //         }
+  //       }
+  //     }
+  //     catch(error){
+  //       console.log("Error in processing mini table and track Location ",error);
+  //     }
   
    
   
-      // Now that all sheets are added, we can loop through the sheets and apply the header styles
-        wb.SheetNames.forEach(sheetName => {
-          const ws = wb.Sheets[sheetName];
+  //     // Now that all sheets are added, we can loop through the sheets and apply the header styles
+  //       wb.SheetNames.forEach(sheetName => {
+  //         const ws = wb.Sheets[sheetName];
           
-          // Apply styles to the header row (Row 0) for the current sheet
-          for (let i = 0; i < xlsxheaders.length; i++) {
-              const cellAddress = { r: 0, c: i };  // Row 0 (header row)
-              const cellRef = XLSX.utils.encode_cell(cellAddress);
+  //         // Apply styles to the header row (Row 0) for the current sheet
+  //         for (let i = 0; i < xlsxheaders.length; i++) {
+  //             const cellAddress = { r: 0, c: i };  // Row 0 (header row)
+  //             const cellRef = XLSX.utils.encode_cell(cellAddress);
 
-              if (!ws[cellRef]) ws[cellRef] = {};  // Ensure the cell exists
+  //             if (!ws[cellRef]) ws[cellRef] = {};  // Ensure the cell exists
 
-              // Apply styles to header cells
-              ws[cellRef].s = {
-                  fill: {
-                      fgColor: { rgb: 'FFA500' }  // Orange background
-                  },
-                  font: {
-                      color: { rgb: 'FFFFFF' },   // White font color
-                      bold: true                  // Bold text
-                  },
-                  alignment: {
-                      horizontal: 'center',      // Center header text
-                      vertical: 'center'
-                  }
-              };
-          }
-      });
+  //             // Apply styles to header cells
+  //             ws[cellRef].s = {
+  //                 fill: {
+  //                     fgColor: { rgb: 'FFA500' }  // Orange background
+  //                 },
+  //                 font: {
+  //                     color: { rgb: 'FFFFFF' },   // White font color
+  //                     bold: true                  // Bold text
+  //                 },
+  //                 alignment: {
+  //                     horizontal: 'center',      // Center header text
+  //                     vertical: 'center'
+  //                 }
+  //             };
+  //         }
+  //     });
   
-    }));
+  //   }));
   
-    // Generate the Excel file
-    const excelFile = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  //   // Generate the Excel file
+  //   const excelFile = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
   
-    // Create a Blob and trigger the download
-    const blob = new Blob([excelFile], { type: 'application/octet-stream' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `${this.selectedForms[0]}${this.selectedForms.length > 1 ? `(${this.selectedForms.length})...` : ''}.xlsx`;
-    link.click();
-  }
+  //   // Create a Blob and trigger the download
+  //   const blob = new Blob([excelFile], { type: 'application/octet-stream' });
+  //   const link = document.createElement('a');
+  //   link.href = URL.createObjectURL(blob);
+  //   link.download = `${this.selectedForms[0]}${this.selectedForms.length > 1 ? `(${this.selectedForms.length})...` : ''}.xlsx`;
+  //   link.click();
+  // }
   
   // Method to extract mini table data
   async extractMiniTableData(data: any[], tableColumnIndex: number, index: number) {
@@ -2773,8 +2972,9 @@ mergeAndAddLocation(mappedResponse: any) {
     
         Object.keys(item.dynamic_table_values).forEach((dynamicRow: any) => {
           // Loop through each dynamic table row
-          item.dynamic_table_values[dynamicRow].forEach((ele: any,i: number) => {
-            // Add 'id' to each dynamic row element
+
+          Array.isArray(item.dynamic_table_values[dynamicRow]) && item.dynamic_table_values[dynamicRow].forEach((ele: any,i: number) => {
+            // Add 'id' to each dynamic row element 
             
             item.dynamic_table_values[dynamicRow][i] = Object.assign({ id: item.id }, ele);
           });
@@ -2919,43 +3119,244 @@ mergeAndAddLocation(mappedResponse: any) {
 }
 
 
+// async extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: any) {
+//   let tempHolder = this.tableDataWithFormFilters[index]["rows"].map((item: any) => ({
+//     trackLocation: item.trackLocation,
+//     id: item.id
+//   }));
 
-extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: any) {
+//   const customColumnForm = this.customLocationGroup.value.customForms[0].conditions;
 
-  // console.log("Multiple rows are here ",this.tableDataWithFormFilters[index]["rows"]);
+//   // Filter once at the start to avoid redundant checks
+//   tempHolder = tempHolder.filter((item: any) => Array.isArray(item.trackLocation) && item.trackLocation.length > 0);
 
-  let tempHolder = this.tableDataWithFormFilters[index]["rows"].map((item: any) =>{
-    return {trackLocation:item.trackLocation, id:item.id}
+//   const trackLocationRows: any[] = [];
+//   let headers = [
+//     "ID", "Date and Time", "Label ID", "Label Name", "Latitude", "Longitude", "Name", "Type"
+//   ];
+
+//   let conditionalString: any = '';
+//   if (this.isFormAdvancedVisible) {
+//     conditionalString = await this.buildConditionLocationString(this.mainFormGroup.value.dynamicConditions);
+//   }
+
+//   if (this.addExcellOptions) {
+//     console.log("Custom Columns are here ", customColumnForm);
+
+//     for (let custom of customColumnForm) {
+//       headers.push(custom.columnName); // Add custom column headers
+//       if (custom.aggregate) {
+//         custom["values"] = [];  // Initialize values array for aggregation
+//       }
+//     }
+//   }
+
+//   // Use a map to store aggregated values instead of recalculating multiple times
+//   const aggregateValues: any[] = new Array(headers.length).fill(null);
+
+//   if (Array.isArray(tempHolder) && tempHolder.length > 0) {
+//     trackLocationRows.push(headers); // Push headers
+
+//     for (const row of tempHolder) {
+//       let trackLocationObjects = row.trackLocation;
+
+//       if (Array.isArray(trackLocationObjects) && trackLocationObjects.length > 0) {
+//         let filteredTrackLocationObjects = trackLocationObjects;
+
+//         // Apply conditional filtering upfront
+//         if (this.isFormAdvancedVisible) {
+//           filteredTrackLocationObjects = await Promise.all(
+//             trackLocationObjects.map(async (data: any) => {
+//               return await this.evaluateTemplate(conditionalString, data, 'None') ? data : null;
+//             })
+//           );
+//           filteredTrackLocationObjects = filteredTrackLocationObjects.filter(Boolean);
+//         }
+
+//         console.log("Filtered rows are here: ", filteredTrackLocationObjects);
+
+//         // Process each trackLocationObject
+//         for (const obj of filteredTrackLocationObjects) {
+//           const rowValues = [
+//             row.id || '',               // ID
+//             obj.Date_and_time || '',    // Date and Time
+//             obj.label_id || '',         // Label ID
+//             obj.label_name || '',       // Label Name
+//             obj.latitude || '',         // Latitude
+//             obj.longitude || '',        // Longitude
+//             obj.name || '',             // Name
+//             obj.type || ''              // Type
+//           ];
+
+//           // Loop through the custom columns and apply logic for each
+//           for (let custom of customColumnForm) {
+//             if (custom.predefined === "km Difference") {
+//               // Fetch start and end positions once per row
+//               const startPostion = trackLocationObjects.find((item: any) =>
+//                 item?.latitude != null && item?.longitude != null && item.type === 'Accept to Start Travel'
+//               );
+//               const endPosition = trackLocationObjects.find((item: any) =>
+//                 item?.latitude != null && item?.longitude != null && item.type === 'Arrived At Site to In-Progress'
+//               );
+
+//               if (startPostion && endPosition) {
+//                 const distance = await this.calculateDistanceUsingGoogleAPI(
+//                   startPostion.latitude, startPostion.longitude,
+//                   endPosition.latitude, endPosition.longitude
+//                 );
+
+//                 rowValues.push(`${(await distance).toFixed(2)} km`);
+
+//                 // Store value for aggregation (SUM, AVG, etc.)
+//                 if (custom.aggregate) {
+//                   custom["values"].push(await distance);
+//                 }
+//               } else {
+//                 rowValues.push(''); // Add empty value if positions are not valid
+//               }
+//             }
+//             else if (custom.predefined === "time_taken_distance") {
+//               const startPostion1 = trackLocationObjects.find((item: any) => item.type === 'Accept to Start Travel');
+//               const endPosition1 = trackLocationObjects.find((item: any) => item.type === 'Arrived At Site to In-Progress');
+
+//               if (startPostion1 && endPosition1) {
+//                 const startDate = new Date(startPostion1.Date_and_time);
+//                 const endDate = new Date(endPosition1.Date_and_time);
+//                 const diffInMs = endDate.getTime() - startDate.getTime();
+
+//                 // Calculate time difference in ms
+//                 const diffInSecs = Math.floor(diffInMs / 1000);
+//                 const diffInMins = Math.floor(diffInSecs / 60);
+//                 const diffInHours = Math.floor(diffInMins / 60);
+//                 const diffInDays = Math.floor(diffInMs / (1000 * 3600 * 24));
+//                 const diffInMonths = Math.floor(diffInDays / 30); // Approximate months
+//                 const diffInYears = Math.floor(diffInDays / 365); // Approximate years
+
+//                 let timeDiffFormatted = '';
+
+//                 if (diffInSecs < 60) {
+//                   timeDiffFormatted = `${diffInSecs} seconds`;
+//                 } else if (diffInMins < 60) {
+//                   timeDiffFormatted = `${diffInMins} minutes`;
+//                 } else if (diffInHours < 24) {
+//                   timeDiffFormatted = `${diffInHours} hours`;
+//                 } else if (diffInDays < 30) {
+//                   timeDiffFormatted = `${diffInDays} days`;
+//                 } else if (diffInMonths < 12) {
+//                   timeDiffFormatted = `${diffInMonths} months`;
+//                 } else {
+//                   timeDiffFormatted = `${diffInYears} years`;
+//                 }
+
+//                 rowValues.push(timeDiffFormatted);
+
+//                 // Store value for aggregation (SUM, AVG, etc.)
+//                 if (custom.aggregate) {
+//                   custom["values"].push(diffInMs);  // Store time diff in ms for aggregation
+//                 }
+//               } else {
+//                 rowValues.push(''); // Add empty value if positions are not valid
+//               }
+//             } else {
+//               // Evaluate equation for other columns
+//               const res = await this.evaluateTemplate(custom.equationText, obj, 'None');
+//               rowValues.push(res || "");
+//             }
+//           }
+
+//           trackLocationRows.push(rowValues);
+//         }
+//       }
+//     }
+
+//     // Calculate aggregates only once
+//     const aggregateRow = new Array(headers.length).fill(''); // Create an empty row for aggregate values
+
+//     for (let custom of customColumnForm) {
+//       if (custom.aggregate && custom.values.length > 0) {
+//         let aggregateValue: any = null;
+
+//         if (custom.aggregate === 'SUM') {
+//           aggregateValue = custom.values.reduce((acc: any, val: any) => acc + val, 0);
+//         } else if (custom.aggregate === 'AVG') {
+//           aggregateValue = custom.values.reduce((acc: any, val: any) => acc + val, 0) / custom.values.length;
+//         } else if (custom.aggregate === 'MIN') {
+//           aggregateValue = Math.min(...custom.values);
+//         } else if (custom.aggregate === 'MAX') {
+//           aggregateValue = Math.max(...custom.values);
+//         }
+
+//         // Place the aggregate value in the corresponding column
+//         aggregateRow[headers.length - customColumnForm.length + customColumnForm.indexOf(custom)] = `${aggregateValue.toFixed(2)}`;
+//       }
+//     }
+
+//     // Add the aggregate row at the end of the trackLocationRows
+//     trackLocationRows.push(aggregateRow);
+//   }
+
+//   return trackLocationRows;
+// }
+
+
+async extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: any) {
+  let tempHolder = this.tableDataWithFormFilters[index]["rows"].map((item: any) => {
+    return { trackLocation: item.trackLocation, id: item.id };
   });
 
-  tempHolder = tempHolder.filter((item:any)=>Array.isArray(item.trackLocation) && item.trackLocation.length > 0)
-  // console.log("Temp holder is here ", tempHolder);
+  const customColumnForm = this.customLocationGroup.value.customForms[0].conditions;
+
+  tempHolder = tempHolder.filter((item: any) => Array.isArray(item.trackLocation) && item.trackLocation.length > 0);
 
   const trackLocationRows: any[] = [];
 
-  // Define headers for the "TrackLocation" sheet
-  const headers = [
-    "ID","Date and Time", "Label ID", "Label Name", "Latitude", "Longitude", "Name", "Type"
+  let headers = [
+    "ID", "Date and Time", "Label ID", "Label Name", "Latitude", "Longitude", "Name", "Type"
   ];
 
+  let conditionalString: any = '';
+  if (this.isFormAdvancedVisible) {
+    conditionalString = await this.buildConditionLocationString(this.mainFormGroup.value.dynamicConditions);
+  }
 
-  // Check if the first entry in tempHolder has the data we need (ensure it's an array and not empty)
-  const trackLocationArray = Array.isArray(tempHolder) && tempHolder.length > 0 ? tempHolder[0].trackLocation:[];
+  if (this.addExcellOptions) {
+    console.log("Custom Columns are here ", customColumnForm);
 
-  if (Array.isArray(trackLocationArray) && trackLocationArray.length > 0) {
-    // Add headers as the first row
-    trackLocationRows.push(headers);
+    for (let custom of customColumnForm) {
+      headers.push(custom.columnName); // Add custom column headers
+      if (custom.aggregate) {
+        custom["values"] = [];  // Initialize values array for aggregation
+      }
+    }
+  }
 
-    // Iterate over each row in tempHolder and extract "TrackLocation" data
-    tempHolder.forEach((row: any) => {
-      // If the trackLocation is a valid array
-      const trackLocationObjects = row.trackLocation;
+  let tempArray: any[] = [];
+
+  if (Array.isArray(tempHolder) && tempHolder.length > 0) {
+    trackLocationRows.push(headers); // Push headers
+
+    for (const row of tempHolder) {
+      let trackLocationObjects = row.trackLocation;
 
       if (Array.isArray(trackLocationObjects) && trackLocationObjects.length > 0) {
-        // For each object in the trackLocation array, extract the relevant fields
-        trackLocationObjects.forEach((obj: any) => {
+
+        // Apply conditional filtering if needed
+        if (this.isFormAdvancedVisible) {
+          tempArray = [];
+          for (const data of trackLocationObjects) {
+            if (await this.evaluateTemplate(conditionalString, data, 'None') === true) {
+              tempArray.push(data);
+            }
+          }
+          trackLocationObjects = tempArray;
+        }
+
+        console.log("Filtered rows are here: ", trackLocationObjects);
+
+        for (const obj of trackLocationObjects) {
+          // Default row values for each object
           const rowValues = [
-            row.id || '',               //ID
+            row.id || '',               // ID
             obj.Date_and_time || '',    // Date and Time
             obj.label_id || '',         // Label ID
             obj.label_name || '',       // Label Name
@@ -2965,23 +3366,160 @@ extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: any) {
             obj.type || ''              // Type
           ];
 
-          // Push the extracted values to the rows
+          if (this.addExcellOptions) {
+            console.log("Custom Columns Forms are ", customColumnForm);
+
+            for (let custom of customColumnForm) {
+
+              if (custom.predefined === "km Difference") {
+                console.log("Lat long will be calculated ");
+                let startPostion: any;
+                let endPosition: any;
+
+                // Get the start and end positions
+                startPostion = trackLocationObjects.find((item: any) =>
+                  item?.latitude != null && item?.longitude != null && item.type === 'Accept to Start Travel'
+                );
+
+                endPosition = trackLocationObjects.find((item: any) =>
+                  item?.latitude != null && item?.longitude != null && item.type === 'Arrived At Site to In-Progress'
+                );
+
+                console.log("Start and end Position are here ", startPostion, endPosition);
+
+                if (startPostion && endPosition) {
+                  const distance = await this.calculateDistanceUsingGoogleAPI(
+                    startPostion.latitude, startPostion.longitude,
+                    endPosition.latitude, endPosition.longitude
+                  );
+
+                  // Only add km difference if type matches
+                  if (rowValues[7] !== 'Arrived At Site to In-Progress') {
+                    rowValues.push('');
+                  } else {
+                    rowValues.push(`${(await distance).toFixed(2)} km`);
+
+                    // Store value for aggregation (SUM, AVG, etc.)
+                    if (custom.aggregate) {
+                      custom["values"].push(await distance);  // Add distance to the values array
+                    }
+                  }
+                } else {
+                  rowValues.push(''); // Add empty value if positions are not valid
+                }
+              }
+              else if (custom.predefined === "time_taken_distance") {
+                const startPostion1 = trackLocationObjects.find((item: any) =>
+                  item.type === 'Accept to Start Travel'
+                );
+
+                const endPosition1 = trackLocationObjects.find((item: any) =>
+                  item.type === 'Arrived At Site to In-Progress'
+                );
+
+                if (startPostion1 && endPosition1) {
+                  // Parse the Date strings using the custom parseDateTime function
+                  const startDate = this.parseDateTime(startPostion1.Date_and_time);
+                  const endDate = this.parseDateTime(endPosition1.Date_and_time);
+              
+                  // Check if both dates are valid
+                  if (startDate && endDate) {
+                      const diffInMs = endDate.getTime() - startDate.getTime();
+              
+                      // Calculate differences in various units
+                      const diffInSecs = Math.floor(diffInMs / 1000);
+                      const diffInMins = Math.floor(diffInSecs / 60);
+                      const diffInHours = Math.floor(diffInMins / 60);
+                      const diffInDays = Math.floor(diffInMs / (1000 * 3600 * 24));
+                      const diffInMonths = Math.floor(diffInDays / 30); // Approximate months
+                      const diffInYears = Math.floor(diffInDays / 365); // Approximate years
+              
+                      let timeDiffFormatted = '';
+              
+                      if (diffInSecs < 60) {
+                          timeDiffFormatted = `${diffInSecs} seconds`;
+                      } else if (diffInMins < 60) {
+                          timeDiffFormatted = `${diffInMins} minutes`;
+                      } else if (diffInHours < 24) {
+                          timeDiffFormatted = `${diffInHours} hours`;
+                      } else if (diffInDays < 30) {
+                          timeDiffFormatted = `${diffInDays} days`;
+                      } else if (diffInMonths < 12) {
+                          timeDiffFormatted = `${diffInMonths} months`;
+                      } else {
+                          timeDiffFormatted = `${diffInYears} years`;
+                      }
+              
+                      // Only add time taken if type matches
+                      if (rowValues[7] !== 'Arrived At Site to In-Progress') {
+                          rowValues.push('');
+                      } else {
+                          rowValues.push(timeDiffFormatted);
+              
+                          // Store value for aggregation (SUM, AVG, etc.)
+                          if (custom.aggregate) {
+                              custom["values"].push(Math.floor(diffInMins / 60));  // Add time diff in ms for aggregation
+                          }
+                      }
+                  } else {
+                      rowValues.push(''); // Add empty value if dates are invalid
+                  }
+              } else {
+                  rowValues.push(''); // Add empty value if positions are not valid
+              }
+              }
+              else {
+                // Evaluate equation for other columns
+                const res = await this.evaluateTemplate(custom.equationText, obj, 'None');
+                if (res) {
+                  rowValues.push(res);
+                } else {
+                  rowValues.push("");
+                }
+              }
+            }
+          }
+
           trackLocationRows.push(rowValues);
-        });
+        }
       }
-    });
+    }
+
+ 
+    console.log("Custom Columns are here ", customColumnForm);
+
+    const aggregateRow = new Array(headers.length).fill('');
+
+    for (let custom of customColumnForm) {
+      if (custom.aggregate && custom.values.length > 0) {
+        let aggregateValue: any = null;
+
+        if (custom.aggregate === 'SUM') {
+          aggregateValue = custom.values.reduce((acc: any, val: any) => acc + val, 0);
+        } else if (custom.aggregate === 'AVG') {
+          aggregateValue = custom.values.reduce((acc: any, val: any) => acc + val, 0) / custom.values.length;
+        } else if (custom.aggregate === 'MIN') {
+          aggregateValue = Math.min(...custom.values);
+        } else if (custom.aggregate === 'MAX') {
+          aggregateValue = Math.max(...custom.values);
+        }
+
+        aggregateRow[headers.length - customColumnForm.length + customColumnForm.indexOf(custom)] = `${aggregateValue.toFixed(2)}`;
+      }
+    }
+
+
+    trackLocationRows.push(aggregateRow);
   }
 
-  // console.log("Track Location rows extracted: ", trackLocationRows);
-
-  // Return the rows to be used in the new sheet
   return trackLocationRows;
 }
 
 
+
   
 
-// Helper function to convert CSV string to 2D array (needed by SheetJS)
+
 csvToArray(csv: string): any[] {
   // Split the CSV string by newlines (\r?\n) and map each row using splitCsv
   const rows = csv
@@ -3901,6 +4439,48 @@ splitCsv(csv: string): string[] {
   }
 
 
+
+   parseDateTime(dateString: string): Date | null {
+    // Attempt to parse the date using JavaScript's Date object
+    let date = new Date(dateString);
+
+    // If JavaScript Date object fails (NaN), try custom format: "24/1/2025 12:28:42 pm"
+    if (isNaN(date.getTime())) {
+        // Regex pattern for dates in the format of dd/mm/yyyy hh:mm:ss AM/PM
+        const customDatePattern = /^(\d{1,2})\/(\d{1,2})\/(\d{4})\s(\d{1,2}):(\d{2}):(\d{2})\s(AM|PM)$/;
+
+        const match = customDatePattern.exec(dateString);
+        if (match) {
+            // Extract date parts
+            const day = parseInt(match[1], 10);
+            const month = parseInt(match[2], 10) - 1; // months are 0-based in JavaScript Date
+            const year = parseInt(match[3], 10);
+            let hours = parseInt(match[4], 10);
+            const minutes = parseInt(match[5], 10);
+            const seconds = parseInt(match[6], 10);
+            const period = match[7];
+
+            // Adjust hours for AM/PM
+            if (period === 'PM' && hours < 12) {
+                hours += 12;
+            }
+            if (period === 'AM' && hours === 12) {
+                hours = 0;
+            }
+
+            // Create and return the Date object
+            date = new Date(year, month, day, hours, minutes, seconds);
+        } else {
+            // Return null if the format is unsupported
+            return null;
+        }
+    }
+
+    // Return the valid date or null if it could not be parsed
+    return isNaN(date.getTime()) ? null : date;
+}
+
+
   toggleFullScreenFullView(){
     if(this.isFilterScreen){
       this.isFilterScreen = false
@@ -3939,10 +4519,568 @@ splitCsv(csv: string): string[] {
       });
     }
   }
+
+
+
+
+async onAdvancedOptions(event: any,getValue:any,key:any) {
+
+
+  let selectedValue
+  if(getValue == 'html'){
+    selectedValue = (event.target as HTMLInputElement).value;
+  }
+  else{
+    selectedValue = event;
+  }
+
+  if(selectedValue == "all"){
+    this.reportsFeilds.get('advanceOption')?.patchValue('all')
+    this.isFormAdvancedVisible = false
+    return
+  }
+
+
+  if (Array.isArray(this.selectedForms) == false || (this.selectedForms.length == 0 && selectedValue == "onCondition")) {
+    Swal.fire({
+        title: "Oops!",
+        text: "You need to select at least one form before to add conditions. Please select the forms to continue.",
+        icon: "warning",
+        confirmButtonText: "Got it"
+    });
+
+    this.reportsFeilds.get('advanceOption')?.patchValue('all')
+   
+
+    return;
+  }
+
+  
+  this.reportsFeilds.get('advanceOption')?.patchValue('onCondition')
+
+  this.isFormAdvancedVisible = true
+
+  // if(selectedValue == 'onCondition'){
+  //   this.spinner.show()
+
+  //   // console.log("Selected form data is here ",this.selectedForms);
+
+  //   try{
+  //     this.populateFormBuilder = []
+
+  //     let tempMetadata:any = []
+  //     for(let item of this.selectedForms){
+  //       const formName = item
+  //       const result = await this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${item}#main`,1)
+
+  //       if(result){
+  //         let tempResult = JSON.parse(result.metadata || '').formFields
+  //         // console.log("tempResult is ",tempResult);
+
+  //         tempMetadata = {}
+  //         tempMetadata[item] = tempResult.map((item: any) => {
+  //           return { name: item.name, label: item.label,  formName:formName ,options:item.options , type:item.type , validation:item.validation};  
+  //         });
+
+  //         tempMetadata[item] = tempMetadata[item].filter((field:any)=>field && field.name && field.type != 'heading' && field && field.name && (!field.name.startsWith("Empty-Placeholder-")))
+  //       }
+  //       this.populateFormBuilder.push(tempMetadata)
+  //     }
+      
+  //     // console.log("Data to be added in dropdowns ",this.populateFormBuilder);
+  //   }
+  //   catch(error){
+  //     this.spinner.hide()
+  //     console.log("Error in fetching form Builder data ",error);
+  //   }
+
+  //   this.spinner.hide()
+  //   console.log("Condition flag is true");
+  //   this.conditionflag = true
+  // }
+  // else{
+  //   this.conditionflag = false
+  // }
+
+ this.cd.detectChanges()
+}
+
+
+  
+mainFormGroup: FormGroup;
+isFormAdvancedVisible = false;  // Toggle visibility of the form
+
+
+// Get the 'dynamicConditions' FormArray
+getConditions() {
+  return this.mainFormGroup.get('dynamicConditions') as FormArray;
+}
+
+
+// Checking if a dropdown is required based on the selected field
+isDropdownName(formIndex: number): boolean {
+  try {
+    const selectedField = this.getConditions().at(formIndex).value.field;
+    return selectedField === 'name'; // Only 'name' will use a dropdown
+  } catch (error) {
+    console.error('Error in dynamic dropdown:', error);
+    return false;
+  }
+}
+
+
+getDropdownOptions(formIndex: number): Observable<any[]> {
+  const selectedField = this.getConditions().at(formIndex).value.field;
+  console.log("Selected Field:", selectedField);  // Debugging
+
+  // If no field is selected, return an empty array
+  if (!selectedField) {
+    return of([]); // Return empty array observable
+  }
+
+  // Use the cache key to avoid redundant API calls
+  const cacheKey = `dropdown-options-${selectedField}`;
+  if (this.optionsCache.has(cacheKey)) {
+    return this.optionsCache.get(cacheKey)!;
+  }
+
+  // Lazily create observable for the dropdown options
+  const options$ = defer(() => {
+    if (selectedField === 'name') {
+      const lookupKey = `${this.SK_clientID}#user#lookup`;
+
+      // Fetch user lookup data
+      return from(this.fetchUserLookupdata(1, lookupKey, '')).pipe(
+        map((result: any) => {
+          if (result) {
+            // Format and return options
+            const options = Array.from(new Set(result.map((item: any) => item.P1))).sort();
+            console.log("Formatted options:", options); // Debugging
+            return options;
+          }
+          return [];
+        }),
+        catchError(error => {
+          console.error('Error fetching users:', error);
+          return of([]); // Return empty array in case of error
+        }),
+        take(1) // Only take the first emission
+      );
+    }
+
+    // Return empty array if no condition is met
+    return of([]);
+  }).pipe(
+    shareReplay(1), // Cache the last emitted value for multiple subscribers
+    takeUntil(this.destroy$) // Ensure the observable is unsubscribed on component destroy
+  );
+
+  // Cache the observable for subsequent calls
+  this.optionsCache.set(cacheKey, options$);
+
+  return options$;
+}
+
+
+
+
+
+
+// populateAdvanceFilterForm(formData: any): void {
+ 
+//   const formGroup = this.fb.group({
+//     dynamicConditions: this.fb.array([]) 
+//   });
+
+//   console.log("formData", formData);
+//   formData.dynamicConditions.forEach((conditionData: any) => {
+
+//     console.log("Index ",1);
+//     (formGroup.get('dynamicConditions') as FormArray).push(this.populateAdvanceFilterCondition(conditionData));
+//   });
+
+//   this.mainFormGroup = formGroup;
+
+// }
+
+
+populateAdvanceFilterForm(formData: any): void {
+  // Access the dynamicConditions form array
+  const dynamicConditionsArray = this.mainFormGroup.get('dynamicConditions') as FormArray;
+
+  // Clear the existing conditions if necessary (before adding new ones)
+  dynamicConditionsArray.clear();
+
+  // Loop through the new data and populate the form array
+  formData.dynamicConditions.forEach((conditionData: any) => {
+    dynamicConditionsArray.push(this.populateAdvanceFilterCondition(conditionData));
+  });
+
+  // Optionally trigger manual change detection if needed to update the view
+  this.cd.detectChanges();
+}
+
+
+getSelectedFieldName(conditionIndex: number): string {
+  const selectedField = this.getConditions().at(conditionIndex).value.field;
+  return selectedField
+}
+
+
+ // Create a new condition form group
+ populateAdvanceFilterCondition(conditionData: any): FormGroup {
+return this.fb.group({
+  field: [conditionData.field, Validators.required],
+  operator: [conditionData.operator, Validators.required],
+  value: [conditionData.value, Validators.required],
+  logicalOperator: [conditionData.logicalOperator, Validators.required]
+});
+}
+
+
+
+
+addCustomForm1(): void {
+  this.fb.group({
+     dynamicConditions: this.fb.array([this.createConditionGroup()])  // Initial condition group
+    })
+}
+
+
+// this.fb.group({
+//   //   dynamicConditions: this.fb.array([this.createConditionGroup()])  // Initial condition group
+//   // })
+
+// Create a new condition FormGroup
+createConditionGroup(): FormGroup {
+  return this.fb.group({
+    field: ['', Validators.required],        // Field to compare
+    operator: ['', Validators.required],     // Operator (e.g., ==, >)
+    value: ['', Validators.required],        // Value to compare against
+    logicalOperator: ['']                    // Optional AND/OR for multiple conditions
+  });
+}
+
+// Add a new condition group
+async addNewCondition() {
+
+  console.log("mainFormGroup ",this.mainFormGroup.value.dynamicConditions);
+
+  if(this.isFormAdvancedVisible){
+    let tempArray:any = []
+    const conditionalString =  await this.buildConditionLocationString(this.mainFormGroup.value.dynamicConditions)
+    console.log("Conditon is here ",conditionalString);
+  }
+
+  this.getConditions().push(this.createConditionGroup());
+}
+
+// Remove a condition group
+removeConditionItem(index: number) {
+  this.getConditions().removeAt(index);
+}
+
+// Get the form title (You can adapt this to fetch a dynamic title if needed)
+getFormTitle() {
+  return "Track Location";
+}
+
+
+
+
+// Handle changes in the field (e.g., selection changes)
+onValueChange(index: number) {
+  // Handle the value change logic here, if needed
+}
+
+
+
+async buildConditionLocationString(conditions:any) {
+  let conditionString = '';
+
+  conditions.forEach((condition: any, index: number) => {
+    const operator = condition.operator;
+
+
+    let formattedCondition = ''
+    if(condition.operator == 'includes'){
+      formattedCondition = `\${${condition.field}}.${operator}('${condition.value}')`;
+    }
+    else if(condition.operator == 'startsWith'){
+      formattedCondition = `\${${condition.field}}.${operator}('${condition.value}')`;
+    }
+    else if(condition.operator == 'endsWith'){
+      formattedCondition = `\${${condition.field}}.${operator}('${condition.value}')`;
+    }
+    else{
+      formattedCondition = `\${${condition.field}} ${operator} '${condition.value}'`;
+    }
+
+
+   
+
+ 
+    conditionString += formattedCondition;
+
+    if (index !== conditions.length - 1) {
+      const logicalOperator = condition.logicalOperator ? condition.logicalOperator : '';
+      conditionString += ` ${logicalOperator} `;
+    }
+  });
+
+  return conditionString;
+}
+
+onCustomColumns(event:any,getValue:any,temp:any){
+  let selectedValue
+  if(getValue == 'html'){
+    selectedValue = (event.target as HTMLInputElement).value;
+  }
+  else{
+    selectedValue = event;
+  }
+
+  console.log("Selected value is ",selectedValue);
+
+  if(selectedValue == "all"){
+    this.reportsFeilds.get('addExcellOption')?.patchValue('all')
+    this.addExcellOptions = false
+    return
+  }
+
+
+  if (Array.isArray(this.selectedForms) == false || (this.selectedForms.length == 0 && selectedValue == "onCondition")) {
+    Swal.fire({
+        title: "Oops!",
+        text: "You need to select at least one form before to add conditions. Please select the forms to continue.",
+        icon: "warning",
+        confirmButtonText: "Got it"
+    });
+
+    this.reportsFeilds.get('addExcellOption')?.patchValue('all')
+   
+
+    return;
+  }
+
+  
+  this.reportsFeilds.get('addExcellOption')?.patchValue('onCondition')
+
+  this.addExcellOptions = true
+
+  // if(selectedValue == 'onCondition'){
+  //   this.spinner.show()
+
+  //   // console.log("Selected form data is here ",this.selectedForms);
+
+  //   try{
+  //     this.populateFormBuilder = []
+
+  //     let tempMetadata:any = []
+  //     for(let item of this.selectedForms){
+  //       const formName = item
+  //       const result = await this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${item}#main`,1)
+
+  //       if(result){
+  //         let tempResult = JSON.parse(result.metadata || '').formFields
+  //         // console.log("tempResult is ",tempResult);
+
+  //         tempMetadata = {}
+  //         tempMetadata[item] = tempResult.map((item: any) => {
+  //           return { name: item.name, label: item.label,  formName:formName ,options:item.options , type:item.type , validation:item.validation};  
+  //         });
+
+  //         tempMetadata[item] = tempMetadata[item].filter((field:any)=>field && field.name && field.type != 'heading' && field && field.name && (!field.name.startsWith("Empty-Placeholder-")))
+  //       }
+  //       this.populateFormBuilder.push(tempMetadata)
+  //     }
+      
+  //     // console.log("Data to be added in dropdowns ",this.populateFormBuilder);
+  //   }
+  //   catch(error){
+  //     this.spinner.hide()
+  //     console.log("Error in fetching form Builder data ",error);
+  //   }
+
+  //   this.spinner.hide()
+  //   console.log("Condition flag is true");
+  //   this.conditionflag = true
+  // }
+  // else{
+  //   this.conditionflag = false
+  // }
+
+ this.cd.detectChanges()
+}
+
+
+
+
+//Custom is added here
+
+
+customForms1(): FormArray {
+  return this.customLocationGroup.get('customForms') as FormArray;
+}
+
+
+
+repopulateForm(data: any): void {
+
+  const customFormsArray = this.customForms1();
+  customFormsArray.clear();
+
+  data.customForms.forEach((customFormData: any) => {
+    const formGroup = this.createCustomForm1Empty();
+    const conditionsArray = formGroup.get('conditions') as FormArray;
+
+    customFormData.conditions.forEach((conditionData: any) => {
+      const conditionGroup = this.createCustomCondition1();
+      conditionGroup.patchValue(conditionData);
+
+      conditionsArray.push(conditionGroup); 
+    });
+
+    customFormsArray.push(formGroup);
+  });
+}
+
+
+
+
+
+
+createCustomForm1Empty(): FormGroup {
+  return this.fb.group({
+    conditions: this.fb.array([])
+  });
+}
+
+
+
+createCustomForm1(): FormGroup {
+  return this.fb.group({
+    conditions: this.fb.array([this.createCustomCondition1()])
+  });
+}
+
+createCustomCondition1(): FormGroup {
+  return this.fb.group({
+    columnName: ['', Validators.required],
+    field: ['', Validators.required],
+    equationText: ['', Validators.required],
+    predefined:['none'],
+    aggregate:['']
+  });
+}
+
+getCustomFormName1(): string {
+  return 'Track Location'; // Static name as per your example
+}
+
+customConditions1(): any {
+  return (this.customForms1().at(0).get('conditions') as FormArray);
+}
+
+// Insert selected field into the equation
+insertFieldIntoEquation1(index:any) {
+
+  console.log(this.customConditions1());
+
+  const condition = this.customConditions1().at(index);
+  const fieldSelector = condition.get('field')?.value;
+
+  console.log("Field selected is ",fieldSelector);
+  const equationText = condition.get('equationText')?.value;
+
+  if (fieldSelector) {
+    const updatedEquation = `${equationText} \${${fieldSelector}}`; // Enclose the fieldSelector in ${}
+    condition.get('equationText')?.setValue(updatedEquation);
+  }
+}
+
+addCustomCondition1(): void {
+  const conditions = this.customConditions1();
+  conditions.push(this.createCustomCondition1());
+}
+
+// columnValidation1(event: any) {
+//   const condition = this.customConditions1().at(0).get('columnName')?.value;
+//   const numberOfEnteredColumns = this.customConditions1().filter((item: any) => item.get('columnName')?.value === condition);
+  
+//   if (numberOfEnteredColumns.length > 1) {
+//     Swal.fire({
+//       title: "Duplicate custom columns found",
+//       text: `There are ${numberOfEnteredColumns.length} columns with the name "${condition}". Please resolve the duplication.`,
+//       icon: 'warning', 
+//       confirmButtonText: 'OK'
+//     });
+//   }
+// }
+
+
+
+
+calculateDistanceUsingGoogleAPI(startLat: number, startLon: number, endLat: number, endLon: number): Promise<number> {
+  const service = new google.maps.DistanceMatrixService();
+
+  const origin = new google.maps.LatLng(startLat, startLon);
+  const destination = new google.maps.LatLng(endLat, endLon);
+
+  return new Promise((resolve, reject) => {
+    // Make a request to the Google Maps Distance Matrix API
+    service.getDistanceMatrix(
+      {
+        origins: [origin],
+        destinations: [destination],
+        travelMode: google.maps.TravelMode.DRIVING, // You can change this to WALKING or BICYCLING if needed
+      },
+      (response, status) => {
+        if (status === google.maps.DistanceMatrixStatus.OK) {
+          const results = response?.rows[0].elements[0];
+          if (results?.status === 'OK') {
+            const distance = results.distance.value / 1000; // Convert from meters to kilometers
+            resolve(distance); // Resolve with the distance in kilometers
+          } else {
+            reject('Distance calculation failed: ' + results?.status);
+          }
+        } else {
+          reject('Distance Matrix request failed due to: ' + status);
+        }
+      }
+    );
+  });
+}
+
+
+
+
+
+
   
 
+}
 
-} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
 
 
 

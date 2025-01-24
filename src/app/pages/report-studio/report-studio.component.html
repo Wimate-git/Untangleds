@@ -130,6 +130,19 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     <!-- Dynamic Form Fields Based on Selected Forms -->
     <form [formGroup]="formFieldsGroup" class="card card-custom p-2 mt-5" style="background-color: #F5F7F8;" *ngIf="conditionflag">
     <div formArrayName="forms" style="display: flex; flex-wrap: wrap;">
@@ -238,15 +251,159 @@
 
 
 
+      <!-- Filter Data Section with Radio Buttons -->
+      <div class="form-group row ps-4 mb-7">
+        <label class="required col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Advanced Filter</label>
+          <div class="col-3 d-flex gap-7 align-items-center">
+          <div class="form-check">
+          <input class="form-check-input" type="radio" id="advanceAllOption" formControlName="advanceOption" value="all" (change)="onAdvancedOptions($event,'html','create')">
+          <label class="form-check-label" for="filterAll">All</label>
+          </div>
+          <div class="form-check">
+          <input class="form-check-input" type="radio" id="advanceConditionOption" formControlName="advanceOption" value="onCondition" (change)="onAdvancedOptions($event,'html','create')">
+          <label class="form-check-label" for="filterOnCondition">On Condition</label>
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+      <form [formGroup]="mainFormGroup" class="card card-custom p-2 mt-5" style="background-color: #F5F7F8;" *ngIf="isFormAdvancedVisible">
+  
+        <!-- Single Form with Dynamic Conditions -->
+        <div class="form-group" style="border: 1px solid green; padding: 10px; width: 600px; margin: 5px;">
+      
+          <h5>{{ getFormTitle() }}</h5>
+      
+          <div formArrayName="dynamicConditions">
+            <div *ngFor="let conditionItem of getConditions().controls; let conditionIndex=index" [formGroupName]="conditionIndex">
+      
+              <div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+                
+                <!-- Field Selection -->
+                <div class="mb-3" style="width: 30%;">
+                  <label class="required">Choose Field</label>
+                  <select formControlName="field" class="form-control">
+                    <option value="" disabled selected>Choose Field</option>
+                    <option value="Date_and_time">Date and Type</option>
+                    <option value="label_id">Label</option>
+                    <option value="label_name">Label Name</option>
+                    <option value="latitude">Latitude</option>
+                    <option value="longitude">Longitude</option>
+                    <option value="name">Name</option>
+                    <option value="type">Type</option>
+                  </select>                  
+                </div>
+      
+                <!-- Operator Selection -->
+                <div class="mb-3" style="width: 30%;">
+                  <label class="required">Select Operator</label>
+                  <select formControlName="operator" class="form-control">
+                    <option value="" disabled selected>Choose operator</option>
+                    <option value="==">Equals</option>
+                    <option value=">">Not equals</option>
+                    <option value="includes">Contains</option>
+                    <option value="startsWith">Starts with</option>
+                    <option value="endsWith">Ends with</option>
+                    <option value=">">Greater than</option>
+                    <option value="<">Less than</option>
+                    <option value="<=">Less than or equal to</option>
+                    <option value=">=">Greater than or equal to</option>
+                  </select>
+                </div>
+      
+                <!-- Value Input -->
+                <div class="mb-3" style="width: 30%;">
+                  <label class="required">Input Value</label>
+                  
+                  <select *ngIf="isDropdownName(conditionIndex); else textInput" 
+                  formControlName="value" 
+                  class="form-control">
+            <option value="" disabled>Choose an option</option>
+            
+                      <!-- Check if the field is "Name", if yes, display userList -->
+                      <ng-container *ngIf="getSelectedFieldName(conditionIndex) === 'name'">
+                        <ng-container *ngIf="userList && userList.length > 0; else loading">
+                          <option *ngFor="let user of userList" [value]="user">{{ user }}</option>
+                        </ng-container>
+                        <ng-template #loading>
+                          <option disabled>Loading user list...</option>
+                        </ng-template>
+                      </ng-container>
+                      
+                    </select>
+                  <ng-template #textInput>
+                    <input type="text" 
+                          formControlName="value" 
+                          placeholder="Enter a value" 
+                          class="form-control" />
+                  </ng-template>
+          
+                </div>
+      
+              </div>
+      
+              <!-- Between Operator (Optional) -->
+              <div *ngIf="conditionIndex < getConditions().length - 1" class="mb-3" style="width: 30%;">
+                <label class="required">Between Operator</label>
+                <select formControlName="logicalOperator" class="form-control">
+                  <option value="" disabled selected>Choose operator</option>
+                  <option value="&&">AND</option>
+                  <option value="||">OR</option>
+                </select>
+              </div>
+      
+              <!-- Remove Condition Button -->
+              <button *ngIf="conditionIndex != 0" type="button" class="btn btn-danger btn-sm mb-2" (click)="removeConditionItem(conditionIndex)">Remove Condition</button>
+            </div>
+          </div>
+      
+          <!-- Add Condition Button -->
+          <button type="button" class="btn btn-primary btn-sm" (click)="addNewCondition()">Add Condition</button>
+      
+        </div>
+      
+      </form>
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <div class="form-group row ps-4 mb-7" *ngIf="selectedForms && selectedForms.length > 0">
     <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Column Visibility</label>
     <div class="col-3 d-flex gap-7 align-items-center">
     <div class="form-check">
-    <input class="form-check-input" type="radio" id="columnVisible" formControlName="columnOption" value="all" (change)="onColumnChange($event,'html')">
+    <input class="form-check-input" type="radio" id="columnAllVisible" formControlName="columnOption" value="all" (change)="onColumnChange($event,'html')">
     <label class="form-check-label" for="columnVisible">All</label>
     </div>
     <div class="form-check">
-    <input class="form-check-input" type="radio" id="columnVisible" formControlName="columnOption" value="onCondition" (change)="onColumnChange($event,'html')">
+    <input class="form-check-input" type="radio" id="columnConditionVisible" formControlName="columnOption" value="onCondition" (change)="onColumnChange($event,'html')">
     <label class="form-check-label" for="columnVisible">Selected</label>
     </div>
     </div>
@@ -269,6 +426,126 @@
     </div>
     </div>
     </div>
+
+
+
+         <!-- Filter Data Section with Radio Buttons -->
+         <div class="form-group row ps-4 mb-7" *ngIf="selectedForms && selectedForms.length > 0">
+         <div class="form-group row ps-4 mb-7">
+          <label class="required col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Add Excel Columns</label>
+            <div class="col-3 d-flex gap-7 align-items-center">
+            <div class="form-check">
+            <input class="form-check-input" type="radio" id="addExcellAllOption" formControlName="addExcellOption" value="all" (change)="onCustomColumns($event,'html','create')">
+            <label class="form-check-label" for="filterAll">All</label>
+            </div>
+            <div class="form-check">
+            <input class="form-check-input" type="radio" id="addExcellConditionOption" formControlName="addExcellOption" value="onCondition" (change)="onCustomColumns($event,'html','create')">
+            <label class="form-check-label" for="filterOnCondition">Selected</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+
+      <form [formGroup]="customLocationGroup" class="card card-custom p-2 mt-5" style="background-color: #F5F7F8;" *ngIf="addExcellOptions">
+        <div formArrayName="customForms" style="display: flex; flex-wrap: wrap;">
+            <div *ngFor="let form of customForms1().controls; let formIndex=index">
+                <div [formGroupName]="formIndex" class="form-group" style="border: 1px solid blue; padding: 10px; width: 600px; margin: 5px;">
+                    <h5>{{ getCustomFormName1() }}</h5>
+    
+                    <div formArrayName="conditions">
+                        <div *ngFor="let conditionGroup of customConditions1().controls; let condIndex=index" [formGroupName]="condIndex">
+                            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;">
+                                <div class="mb-3" style="width: 30%;">
+                                    <label class="required">Column Name</label>
+                                    <input type="text" formControlName="columnName" placeholder="Enter Column Name" class="form-control" />
+                                </div>
+    
+                                <div class="mb-3" style="width: 30%;">
+                                    <label class="required">Field Selected</label>
+                                    <select formControlName="field" class="form-control">
+                                        <option value="" disabled selected>Choose Field</option>
+                                        <option value="Date_and_time">Date and Time</option>
+                                        <option value="label_id">Label</option>
+                                        <option value="label_name">Label Name</option>
+                                        <option value="latitude">Latitude</option>
+                                        <option value="longitude">Longitude</option>
+                                        <option value="name">Name</option>
+                                        <option value="type">Type</option>
+                                    </select>
+                                </div>
+
+
+                                <div class="mb-3" style="width: 30%;">
+                                  <label class="required">Predefined Scripts</label>
+                                  <select formControlName="predefined" class="form-control"  [ngbTooltip]="'Select a predefined script to populate the equation field'">
+                                    <option value="km Difference">Distance Travelled</option>
+                                    <option value="time_taken_distance">Time Taken</option>
+                                    <!-- <option value="days_difference">Days Difference</option> -->
+                                    <option value="none">None</option>
+                                  </select>                  
+                                </div>
+
+
+
+
+    
+                                <!-- Button to Add Field to Equation -->
+                                <div style="margin-top: 10px;">
+                                    <button type="button" class="btn btn-secondary btn-sm" (click)="insertFieldIntoEquation1(condIndex)">
+                                        Insert Field into Equation
+                                    </button>
+                                </div>
+
+
+                                <div class="mb-3" style="width: 30%;">
+                                  <label class="required">Aggregate Functions</label>
+                                  <select formControlName="aggregate" class="form-control"  [ngbTooltip]="'Select an aggregate function which will apply for specific column'" >
+                                    <option value="" disabled selected>Select Aggregate</option>
+                                    <option value="SUM">SUM</option>
+                                    <option value="AVG">Average</option>
+                                
+                                    <option value="MIN">Minimum</option>
+                                    <option value="MAX">Maximum</option>
+                                  </select>                  
+                                </div>
+              
+
+
+    
+                                <div class="mb-3" style="width: 100%; height: 40%;">
+                                    <label class="required">Equation</label>
+                                    <textarea formControlName="equationText" class="form-control"></textarea>
+                                </div>
+                            </div>
+                            <hr>
+                        </div>
+                    </div>
+    
+                    <button type="button" class="btn btn-primary btn-sm" (click)="addCustomCondition1()">Add Column</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    
+    
+  
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -320,7 +597,7 @@
 
                   <div class="mb-3" style="width: 30%;">
                     <label class="required">Predefined Scripts</label>
-                    <select formControlName="predefined" class="form-control"  [ngbTooltip]="'Select a predefined script to populate the equation field'" (change)="onPredefinedChange(formIndex, condIndex)">
+                    <select formControlName="predefined" class="form-control"  [ngbTooltip]="'Select a predefined script to polpulate in equation field'" (change)="onPredefinedChange(formIndex, condIndex)">
                       <option value="time_difference">Time Difference</option>
                       <option value="days_difference">Days Difference</option>
                       <option value="none">None</option>
@@ -334,6 +611,11 @@
                         Insert Field into Equation
                       </button>
                     </div>
+
+
+            
+
+
 
                 <div class="mb-3" style="width: 100%;height: 40%;">
                   <label class="required">Equation</label>

@@ -114,12 +114,16 @@ export class SavedQueryComponent implements OnInit {
     this.errorForUniqueID = '';
     console.log("All the List of savedIDs ",this.listofSavedIds);
 
+    if(this.listofSavedIds){
+
     for (let uniqueID = 0; uniqueID < this.listofSavedIds.length; uniqueID++) {
       if (tempUser.toLowerCase() == this.listofSavedIds[uniqueID].toLowerCase()) {
         this.createSavedQuery.setErrors({ invalidForm: true });
         this.errorForUniqueID = "Saved Query already exist"
     }
     }
+    }
+
   }
 
 
@@ -243,7 +247,9 @@ export class SavedQueryComponent implements OnInit {
         conditionMetadata:JSON.stringify(this.savedModulePacket[1]),
         columnVisibility:JSON.stringify(this.savedModulePacket[2]),
         tableState:JSON.stringify(JSON.parse(JSON.stringify(this.tableState))),
-        customColumnMetadata:JSON.stringify(this.savedModulePacket[4])
+        customColumnMetadata:JSON.stringify(this.savedModulePacket[4]),
+        advancedCustomColumnMetadata:JSON.stringify(this.savedModulePacket[5]),
+        advancedFilterColumnMetadata:JSON.stringify(this.savedModulePacket[6])
       }
 
 
