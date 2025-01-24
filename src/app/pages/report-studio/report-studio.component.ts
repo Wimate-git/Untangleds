@@ -1910,6 +1910,11 @@ locationCellRenderer(params: any) {
     this.customForms().clear()
     this.customForms1().clear()
     this.getConditions().clear()
+
+
+    this.customLocationGroup = this.fb.group({
+      customForms: this.fb.array([this.createCustomForm1()])
+    });
     
 
     this.customColumnsflag = false
@@ -3458,7 +3463,7 @@ async extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: 
               
                           // Store value for aggregation (SUM, AVG, etc.)
                           if (custom.aggregate) {
-                              custom["values"].push(Math.floor(diffInMins / 60));  // Add time diff in ms for aggregation
+                              custom["values"].push(Math.ceil(diffInMins / 60));
                           }
                       }
                   } else {
@@ -3504,7 +3509,18 @@ async extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: 
           aggregateValue = Math.max(...custom.values);
         }
 
-        aggregateRow[headers.length - customColumnForm.length + customColumnForm.indexOf(custom)] = `${aggregateValue.toFixed(2)}`;
+
+         // Check if custom.type is 'km' and append " kms" to the aggregate value
+          let formattedValue = `${aggregateValue.toFixed(2)}`;
+          if (custom.predefined === 'km Difference') {
+            formattedValue += ' kms';
+          }
+          else if(custom.predefined === 'time_taken_distance'){
+            formattedValue += ' hours';
+          }
+
+
+        aggregateRow[headers.length - customColumnForm.length + customColumnForm.indexOf(custom)] = `${formattedValue}`;
       }
     }
 
