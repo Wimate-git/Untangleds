@@ -21,7 +21,7 @@
     <map-info-window #infoWindow>
       <div style="width: 500px; overflow: auto;"> <!-- Apply width here as well -->
         <!-- Display title if available -->
-        <h6 *ngIf="selectedMarker?.title">{{ selectedMarker.title || 'No Title Available' }}</h6>
+        <h6 *ngIf="selectedMarker?.title">{{ selectedMarker.title || 'No Title Available' }} </h6>
         
         <!-- For Track Location -->
         <p *ngIf="selectedMarker?.marker_info && selectedMarker?.marker_info?.type">
@@ -32,7 +32,7 @@
     
         <!-- For Graphic Location -->
         <p *ngIf="selectedMarker?.marker_info?.Info">
-          <strong>Details:</strong> {{ selectedMarker.marker_info.Info }}
+          <strong>Equipment Info:</strong> {{ selectedMarker.marker_info.Info }}
         </p>
     
         <!-- Fallback if no info is available -->

@@ -82,8 +82,10 @@ if (Array.isArray(this.parsedData)) {
             title: marker.title || '', // Default to empty string if title is missing
             label: marker.label || '', // Default to empty string if label is missing
             mapType: packet.map_type || '', // Include map_type from parent packet
+            marker_info:marker.marker_info
           };
 
+          console.log('baseMarker checking',baseMarker)
           // Include marker_info for "Track Location" and "Graphic Location"
           if (
             packet.label === "Track Location" ||

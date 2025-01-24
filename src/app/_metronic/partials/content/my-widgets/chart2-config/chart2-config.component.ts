@@ -544,6 +544,9 @@ themes = [
 
 openChartModal2(tile: any, index: number) {
   console.log('Index checking:', index); // Log the index
+  const getFormName = this.createChart.get('formlist');
+  console.log('getFormName checking',getFormName)
+
 
   if (tile) {
 
@@ -556,6 +559,7 @@ openChartModal2(tile: any, index: number) {
     this.highchartsOptionsJson=JSON.parse(tile.highchartsOptionsJson)
 
     const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14;
+  
    
     // Log the tile object
 

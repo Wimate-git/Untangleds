@@ -60,6 +60,8 @@ export class TableWidgetUiComponent implements OnInit{
   columnApi: any;
   parsedColumns: any;
   columnLabelsArray: any;
+  finalColumns: any;
+  customLabel: any;
   ngOnInit(): void {
 
     
@@ -85,6 +87,8 @@ export class TableWidgetUiComponent implements OnInit{
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
     console.log("tile data check from table Widget",this.item)
+    this.customLabel = this.item.custom_Label
+    console.log('this.customLabel checcking',this.customLabel)
 // Parse the conditions
 this.parsedColumns = JSON.parse(this.item.conditions);
 console.log('this.parsedColumns checking', this.parsedColumns);
@@ -144,6 +148,7 @@ try {
   // Combine tableWidget columns and additional columns
   this.columnDefs = [...tableWidgetColumns, ...additionalColumns];
   console.log('Final column definitions:', this.columnDefs);
+  this.finalColumns = this.columnDefs
 
   // Parse row data
   this.rowData = JSON.parse(this.item.rowData);
@@ -319,11 +324,18 @@ get shouldShowButton(): boolean {
       alert('No data available for export.');
       return; // Exit if there's no data to export
     }
+    console.log('this.rowData checking',this.rowData)
   
     const wb = XLSX.utils.book_new(); // Create a new workbook
+    
+
   
-    // Extract column headers dynamically from the first object
-    const columnHeaders = Object.keys(this.rowData[0]);
+    // Extract column headers and fields dynamically from finalColumns
+    const columnHeaders = this.finalColumns.map((column: any) => column.headerName);
+    const columnFields = this.finalColumns.map((column: any) => column.field);
+    console.log('Extracted Column Headers:', columnHeaders);
+    console.log('Extracted Column Fields:', columnFields);
+  
     if (columnHeaders.length === 0) {
       console.error('No columns available for export.');
       alert('No columns available for export.');
@@ -334,11 +346,12 @@ get shouldShowButton(): boolean {
     const excelData = [
       columnHeaders, // Add headers as the first row
       ...this.rowData.map((row: Record<string, any>) =>
-        columnHeaders.map((col) =>
-          row[col] !== null && row[col] !== undefined ? row[col].toString() : '' // Handle null/undefined
+        columnFields.map((field: string | number) =>
+          row[field] !== null && row[field] !== undefined ? row[field].toString() : '' // Handle null/undefined
         )
       ),
     ];
+    console.log('Excel Data Check:', excelData);
   
     // Convert data to a worksheet
     const ws = XLSX.utils.aoa_to_sheet(excelData);
@@ -413,14 +426,19 @@ get shouldShowButton(): boolean {
     };
   
     // Dynamically extract column headers from rowData
-    const columns = Object.keys(this.rowData[0] || {});
-    if (columns.length === 0) {
+    const columnHeaders = this.finalColumns.map((column: any) => column.headerName);
+    const columnFields = this.finalColumns.map((column: any) => column.field);
+    console.log('columnFields checking',columnFields)
+    // const columns = Object.keys(this.rowData[0] || {});
+    // console.log('columns checking',columns)
+
+    if (columnHeaders.length === 0) {
       console.error('No columns available for export.');
       return;
     }
   
     // Adjust page size dynamically
-    const columnCount = columns.length;
+    const columnCount = columnFields.length;
     docDefinition.pageSize =
       columnCount <= 6
         ? 'A4'
@@ -442,7 +460,7 @@ get shouldShowButton(): boolean {
   
     // Add header row
     tableBody.push(
-      columns.map((col) => ({
+      columnFields.map((col: any) => ({
         text: col,
         style: 'tableHeader',
       }))
@@ -450,8 +468,9 @@ get shouldShowButton(): boolean {
   
     // Add data rows
     this.rowData.forEach((row: Record<string, any>, index: number) => {
-      const rowData = columns.map((col) => {
+      const rowData = columnFields.map((col: string | number) => {
         const cellData = row[col];
+        console.log('cellData checking',cellData)
   
         if (cellData === null || cellData === undefined) {
           return ''; // Treat null/undefined as empty string
@@ -481,7 +500,7 @@ get shouldShowButton(): boolean {
       table: {
         body: tableBody,
         headerRows: 1,
-        widths: Array(columns.length).fill('auto'),
+        widths: Array(columnFields.length).fill('auto'),
       },
       layout: {
         fillColor: (rowIndex: number) => {
