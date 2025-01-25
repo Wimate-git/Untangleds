@@ -1911,10 +1911,6 @@ locationCellRenderer(params: any) {
     this.customForms1().clear()
     this.getConditions().clear()
 
-
-    this.customLocationGroup = this.fb.group({
-      customForms: this.fb.array([this.createCustomForm1()])
-    });
     
 
     this.customColumnsflag = false
@@ -4883,6 +4879,12 @@ onCustomColumns(event:any,getValue:any,temp:any){
   this.reportsFeilds.get('addExcellOption')?.patchValue('onCondition')
 
   this.addExcellOptions = true
+
+
+
+  this.customLocationGroup = this.fb.group({
+    customForms: this.fb.array([this.createCustomForm1()])
+  });
 
   // if(selectedValue == 'onCondition'){
   //   this.spinner.show()
