@@ -16,6 +16,7 @@ export class TileUi1Component implements OnInit{
   @Input() summaryDashboardUpdate:any;
   @Input() hidingLink:any;
   @Input() isFullscreen:  any; 
+  @Output() sendCellInfo = new EventEmitter<any>();
   @Output() dashboardAction = new EventEmitter<{
     item: any;
     index: any;

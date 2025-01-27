@@ -54,7 +54,7 @@
                 [style.width.px]="item.grid_type === 'chart' ? 400 : null" 
                 (click)="
                   item.grid_type === 'filterTile' ? helperFilter(item, i, FilterModal) :
-                  item.grid_type === 'tile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent) : null) :
+                  item.grid_type === 'tile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,dataTableModalTile1) : null) :
                   null
                 "
               >
@@ -72,7 +72,8 @@
             
                       (customEvent)="helperTile($event, KPIModal)" 
                       (customEvent1)="emitDuplicate($event)" 
-                      (customEvent2)="emitDelete6($event)">
+                      (customEvent2)="emitDelete6($event)"
+                   >
                     </app-tile-ui1>
                   </div>
                   <div *ngIf="item.grid_type === 'MultiTableWidget'">
@@ -127,14 +128,14 @@
                     </div>
                               <div *ngIf="item.grid_type === 'chart'"  >
                       <app-chart-ui1 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal1)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate" 
-                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"></app-chart-ui1>
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalChart1)" [routeId]="routeId" [SK_clientID]="SK_clientID"></app-chart-ui1>
                     </div>
                     <div *ngIf="item.grid_type === 'Linechart'"  >
-                      <app-chart-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal2)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store"></app-chart-ui2>
+                      <app-chart-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal2)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" (sendCellInfo) = "helperChartClickChart2($event,dataTableModalChart2)"></app-chart-ui2>
                     </div>
                     <div *ngIf="item.grid_type === 'Columnchart'"  >
                       <app-chart-ui3 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal3)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton" [summaryDashboardUpdate]="summaryDashboardUpdate" 
-                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"></app-chart-ui3>
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  (sendCellInfo) = "helperChartClick($event,dataTableModal)"></app-chart-ui3>
                     </div>
                     
                     <div *ngIf="item.grid_type === 'Areachart'"  >
@@ -1834,6 +1835,31 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
       [modalData]="modalData"
       [columnDefs]="nestedColumnDefs"
     ></app-nested-table>
+  </ng-template>
+
+  <ng-template #dataTableModal let-modal>
+    <app-data-table-show
+      [modalData]="modalData"
+      [columnDefs]="nestedColumnDefs"
+    ></app-data-table-show>
+  </ng-template>
+  <ng-template #dataTableModalChart1 let-modal>
+    <app-data-table-chart1
+      [modalData]="modalData"
+      [columnDefs]="nestedColumnDefs"
+    ></app-data-table-chart1>
+  </ng-template>
+  <ng-template #dataTableModalChart2 let-modal>
+    <app-data-table-chart2
+      [modalData]="modalData"
+      [columnDefs]="nestedColumnDefs"
+    ></app-data-table-chart2>
+  </ng-template>
+  <ng-template #dataTableModalTile1 let-modal>
+    <app-data-table-tile1
+      [modalData]="modalData"
+      [columnDefs]="nestedColumnDefs"
+    ></app-data-table-tile1>
   </ng-template>
   </div>
 <!--   

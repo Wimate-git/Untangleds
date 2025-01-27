@@ -3,6 +3,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Highcharts from 'highcharts';
+import Swal from 'sweetalert2';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-chart-ui1',
@@ -19,11 +21,18 @@ export class ChartUi1Component implements OnChanges {
   selectedMarkerIndex: any;
   iframeUrl: any;
   @Input () hideButton:any
+  @Output() sendCellInfo = new EventEmitter<any>();
+  @Input() routeId:any
+  @Input() SK_clientID:any
+  
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
-      console.log("Dynamic",this.item)
+      console.log("Dynamic data check",this.item)
       this.tile1Config = this.item
+      console.log('routeId checking from ui',this.routeId)
+      console.log('SK_clientID checking',this.SK_clientID)
+
 
       if (typeof this.item.highchartsOptionsJson === 'string') {
         try {
@@ -44,11 +53,76 @@ export class ChartUi1Component implements OnChanges {
       } else {
         this.gridOptions = this.item.chartConfig; // Already an object
       }
-      
+      console.log('this.chartOptions check', this.chartOptions);
       console.log('this.gridOptions check', this.gridOptions);
+
+      
      
 
     
+  }
+  onBarClick(event: Highcharts.PointClickEventObject): void {
+    console.log('event checking from ui',event)
+    console.log('Pie clicked:', {
+      name: event.point.name, // Use `name` for pie chart labels
+      value: event.point.y,   // Use `y` for the data value
+    });
+    const pointData = {
+      name: event.point.name,  // Pie chart label
+      value: event.point.y     // Data value
+    };
+
+
+      // Define the API Gateway URL
+      const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+    
+      // Prepare the request body
+      const requestBody = {
+        body: JSON.stringify({
+          clientId: this.SK_clientID,
+          routeId: this.routeId,
+          widgetId:this.item.id,
+          chartData:pointData,
+          MsgType:'DrillDown'
+        }),
+      };
+    
+      console.log('requestBody checking', requestBody);
+    
+      // Send a POST request to the Lambda function with the body
+      this.http.post(apiUrl, requestBody).subscribe(
+        (response: any) => {
+          console.log('Lambda function triggered successfully:', response);
+      
+          // Display SweetAlert success message
+          // Swal.fire({
+          //   title: 'Success!',
+          //   text: 'Lambda function triggered successfully.',
+          //   icon: 'success',
+          //   confirmButtonText: 'OK'
+          // });
+    
+          // Proceed with route parameter handling
+
+    
+   // Reset loading state
+        },
+        (error: any) => {
+          console.error('Error triggering Lambda function:', error);
+    
+          // Display SweetAlert error message
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to trigger the Lambda function. Please try again.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+   // Reset loading state
+        }
+      );
+
+    // Emit the cell info if needed
+    this.sendCellInfo.emit(event);
   }
   ngAfterViewInit(){
     setTimeout(() => {
@@ -106,16 +180,33 @@ export class ChartUi1Component implements OnChanges {
   }
 
   createPieChart() {
-
+    console.log('this.chartOptions in initialization', this.chartOptions);
   
-    Highcharts.chart(`pieChart${this.index+1}`, this.chartOptions);
+    // Fix the series data structure
+    this.chartOptions.series = this.chartOptions.series.map((series: any) => {
+      return {
+        ...series,
+        data: series.data.map((point: any, index: number) => ({
+          name: point[0], // First element as name
+          y: point[1],    // Second element as value
+          customIndex: index,
+          events: {
+            click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event),
+          },
+        })),
+      };
+    });
+  
+    // Initialize the Highcharts pie chart
+    Highcharts.chart(`pieChart${this.index + 1}`, this.chartOptions);
   }
+  
   get shouldShowButton(): boolean {
     return this.item.dashboardIds !== "";
   }
   
     constructor(
-     private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer
+     private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient
      
     ){}
 

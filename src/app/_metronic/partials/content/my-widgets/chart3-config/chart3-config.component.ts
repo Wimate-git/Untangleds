@@ -74,10 +74,16 @@ export class Chart3ConfigComponent implements OnInit{
   highchartsOptionsJson: string;
   chartFinalOptions: any;
   listofDynamicParamFilter: any;
+  selectedText: any;
+  columnVisisbilityFields: any;
+  shoRowData:boolean=false
+  
 
 
  
   ngOnInit() {
+    (window as any).handleSeriesClick = this.handleSeriesClick.bind(this);
+    console.log('(window as any).handleSeriesClick',(window as any).handleSeriesClick)
 
     this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
     console.log('this.getLoggedUser check', this.getLoggedUser)
@@ -90,10 +96,16 @@ export class Chart3ConfigComponent implements OnInit{
     this.initializeTileFields()
     this.setupRanges();
     this.dynamicData()
+   
 
 
 
   }
+
+  handleSeriesClick(seriesName: string): void {
+    console.log('Series clicked:', seriesName);
+    // Perform the desired action
+  } 
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange',this.all_Packet_store)
   }
@@ -250,7 +262,9 @@ export class Chart3ConfigComponent implements OnInit{
             selectedRangeType: [''],
             selectFromTime: [''],
             selectToTime: [''],
-            parameterValue:['']
+            parameterValue:[''],
+            columnVisibility:[[]],
+            rowData:['']
           })
         );
         console.log('this.all_fields check', this.all_fields);
@@ -571,7 +585,8 @@ openChartModal3(tile: any, index: number) {
    } catch (error) {
      console.error('Error parsing filterParameter:', error);
    }
- }
+ } 
+ this.cdr.detectChanges()
 
  console.log('Parsed FilterParameter:', parsedFilterParameter);
     console.log('this.paramCount check',this.paramCount)
@@ -629,91 +644,77 @@ preDefinedRange(preDefined:any){
 
 }
 
-repopulate_fields(getValues: any) {
-  let noOfParams: any = '';
-  
-  if (getValues && getValues !== null) {
-    noOfParams = getValues.noOfParams;
+repopulate_fields(getValues: any): FormArray {
+  if (!getValues || getValues === null) {
+    console.warn('No data to repopulate');
+    return this.all_fields;
+  }
 
-    this.all_fields.clear();
+  const noOfParams = getValues.noOfParams || '';
+  this.all_fields.clear(); // Clear existing fields in the FormArray
 
-    // Parse chartConfig
-    let parsedChartConfig = [];
-    try {
-      // Check if chartConfig is a string before parsing
-      if (typeof getValues.chartConfig === 'string') {
-        parsedChartConfig = JSON.parse(getValues.chartConfig || '[]');
-      } else {
-        // If it's already an object, just assign it to parsedChartConfig
-        parsedChartConfig = Array.isArray(getValues.chartConfig) ? getValues.chartConfig : [];
-      }
-      console.log('Parsed chartConfig:', parsedChartConfig);
-    } catch (error) {
-      console.error('Error parsing chartConfig:', error);
+  // Parse `chartConfig` safely
+  let parsedChartConfig: any[] = [];
+  try {
+    if (typeof getValues.chartConfig === 'string') {
+      parsedChartConfig = JSON.parse(getValues.chartConfig || '[]');
+    } else if (Array.isArray(getValues.chartConfig)) {
+      parsedChartConfig = getValues.chartConfig;
     }
-    console.log('selected params devices', getValues.device);
+  } catch (error) {
+    console.error('Error parsing chartConfig:', error);
+    parsedChartConfig = [];
+  }
 
-    if (parsedChartConfig.length > 0) {
-      for (let i = 0; i < parsedChartConfig.length; i++) {
-        console.log('parsedChartConfig checking', parsedChartConfig[i]);
+  console.log('Parsed chartConfig:', parsedChartConfig);
 
-        // Create predefinedRange object with both startDate and endDate as ISO strings
-        let predefinedRange: {
-          startDate: string | null;
-          endDate: string | null;
-        } = {
-          startDate: null,
-          endDate: null,
-        };
+  if (parsedChartConfig.length > 0) {
+    parsedChartConfig.forEach((configItem, index) => {
+      console.log(`Processing index ${index} - Full Object:`, configItem);
 
-        // Check and parse startDate and endDate
-        // if (parsedChartConfig[i].predefinedSelectRange) {
-        //   if (parsedChartConfig[i].predefinedSelectRange.startDate) {
-        //     predefinedRange.startDate = new Date(parsedChartConfig[i].predefinedSelectRange.startDate).toISOString();
-        //     // Validate the parsed startDate
-        //     if (isNaN(new Date(predefinedRange.startDate).getTime())) {
-        //       predefinedRange.startDate = null;
-        //     }
-        //   }
+      // Handle `columnVisibility` dynamically
+      const columnVisibility = Array.isArray(configItem.columnVisibility)
+        ? configItem.columnVisibility.map((item: { text: any; value: any; }) => ({
+            text: item.text || '',
+            value: item.value || '',
+          }))
+        : [];
 
-        //   if (parsedChartConfig[i].predefinedSelectRange.endDate) {
-        //     predefinedRange.endDate = new Date(parsedChartConfig[i].predefinedSelectRange.endDate).toISOString();
-        //     // Validate the parsed endDate
-        //     if (isNaN(new Date(predefinedRange.endDate).getTime())) {
-        //       predefinedRange.endDate = null;
-        //     }
-        //   }
-        // }
+      // Push FormGroup into FormArray
+      this.all_fields.push(
+        this.fb.group({
+          formlist: configItem.formlist || '',
+          parameterName: configItem.parameterName || '',
+          groupBy: configItem.groupBy || '',
+          primaryValue: configItem.primaryValue || '',
+          groupByFormat: configItem.groupByFormat || '',
+          constantValue: configItem.constantValue || '',
+          selectedRangeType: configItem.selectedRangeType || '',
+          selectFromTime: configItem.selectFromTime || '',
+          selectToTime: configItem.selectToTime || '',
+          parameterValue: configItem.parameterValue || '',
+          columnVisibility: this.fb.control(columnVisibility), // Use control to handle as an array
+        })
+      );
 
-        // Add the fields to the form group with predefinedRange
-        this.all_fields.push(this.fb.group({
-          formlist: parsedChartConfig[i].formlist,
-          parameterName: parsedChartConfig[i].parameterName,
-          groupBy: parsedChartConfig[i].groupBy,
-          primaryValue: parsedChartConfig[i].primaryValue,
-          groupByFormat: parsedChartConfig[i].groupByFormat,
-          constantValue: parsedChartConfig[i].constantValue,
-          // predefinedSelectRange: predefinedRange, // Use the predefinedRange object here
-          selectedRangeType: parsedChartConfig[i].selectedRangeType,
-          selectFromTime: parsedChartConfig[i].selectFromTime,
-          selectToTime: parsedChartConfig[i].selectToTime,
-          parameterValue:parsedChartConfig[i].parameterValue
-
-        }));
-      }
-    } else {
-      if (noOfParams !== "" && noOfParams !== undefined && noOfParams !== null) {
-        for (let i = this.all_fields.length; i >= noOfParams; i--) {
-          this.all_fields.removeAt(i);
-        }
+      console.log(`FormGroup at index ${index}:`, this.all_fields.at(index).value);
+    });
+  } else {
+    console.warn('No parsed data to populate fields');
+    if (noOfParams !== '' && noOfParams !== undefined && noOfParams !== null) {
+      // Adjust FormArray length based on noOfParams
+      for (let i = this.all_fields.length; i >= noOfParams; i--) {
+        this.all_fields.removeAt(i);
       }
     }
   }
 
-  console.log('after fields values assigned', this.all_fields);
+  console.log('Final FormArray Values:', this.all_fields.value);
 
   return this.all_fields;
 }
+
+
 
 
 
@@ -891,15 +892,68 @@ repopulate_fields(getValues: any) {
   }
   selectFormParams(event: any) {
     if (event && event[0] && event[0].data) {
-      const selectedText = event[0].data.text;  // Adjust based on the actual structure
-      console.log('Selected Form Text:', selectedText);
+      this.selectedText = event[0].data.text;  // Adjust based on the actual structure
+      console.log('Selected Form Text:', this.selectedText);
+      this.getFormControlValue(this.selectedText); 
 
-      if (selectedText) {
-        this.fetchDynamicFormData(selectedText);
+      if (this.selectedText) {
+        this.fetchDynamicFormData(this.selectedText);
       }
     } else {
       console.error('Event data is not in the expected format:', event);
     }
+  }
+  getFormControlValue(selectedTextConfi:any): void {
+    // const formlistControl = this.createChart.get('formlist');
+    console.log('Formlist Control Value:', selectedTextConfi);
+    this.fetchDynamicFormDataConfig(selectedTextConfi);
+  }
+
+  fetchDynamicFormDataConfig(value: any) {
+    console.log("Data from lookup:", value);
+
+    this.api
+      .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
+      .then((result: any) => {
+        if (result && result.metadata) {
+          const parsedMetadata = JSON.parse(result.metadata);
+          console.log('parsedMetadata check dynamic',parsedMetadata)
+          const formFields = parsedMetadata.formFields;
+          console.log('formFields check',formFields)
+
+          // Initialize the list with formFields labels
+          this.columnVisisbilityFields = formFields.map((field: any) => {
+            console.log('field check',field)
+            return {
+              value: field.name,
+              text: field.label
+            };
+          });
+
+          // Include created_time and updated_time
+          if (parsedMetadata.created_time) {
+            this.columnVisisbilityFields.push({
+              value: parsedMetadata.created_time.toString(),
+              text: 'Created Time' // You can customize the label here if needed
+            });
+          }
+
+          if (parsedMetadata.updated_time) {
+            this.columnVisisbilityFields.push({
+              value: parsedMetadata.updated_time.toString(),
+              text: 'Updated Time' // You can customize the label here if needed
+            });
+          }
+
+          console.log('Transformed dynamic parameters config', this.columnVisisbilityFields);
+
+          // Trigger change detection to update the view
+          this.cdr.detectChanges();
+        }
+      })
+      .catch((err) => {
+        console.log("Can't fetch", err);
+      });
   }
 
   selectFormParamsFilter(event: any) {
@@ -1205,162 +1259,158 @@ toggleCheckbox(theme: any): void {
 
 
   defaultHighchartsOptionsJson = {
-   
-
-      chart: {
-        backgroundColor: 'var(--bs-body-bg)',
-        renderTo: 'scatter',
-        type: 'column',
-        //zoomType: 'xy',
+    chart: {
+      backgroundColor: 'var(--bs-body-bg)',
+      renderTo: 'scatter',
+      type: 'column',
+    },
+    exporting: {
+      enabled: false,
+    },
+    title: {
+      text: '',
+      style: {
+        color: 'var(--bs-body-color)',
       },
-      exporting: {
-        enabled: false
+    },
+    subTitle: {
+      text: '',
+    },
+    xAxis: {
+      type: 'datetime',
+      labels: {
+        style: {
+          color: 'var(--bs-body-color)',
+        },
       },
       title: {
+        text: null,
         style: {
-          color: 'var(--bs-body-color)'
-         },
-        text: ''
-      },
-      subTitle: {
-        text: ''
-      },
-      xAxis: {
-        // categories: graph_data1, 
-        labels:{
-          style: {
-            color: 'var(--bs-body-color)'
-           }
+          color: 'var(--bs-body-color)',
         },
-        type: 'datetime',
-        title: {
-          style: {
-            color: 'var(--bs-body-color)'
-           },
-          text: null
-        }
       },
-      yAxis: {
-        labels:{
-          style: {
-            color: 'var(--bs-body-color)'
-           }
-        },
-        title: {
-          style: {
-            color: 'var(--bs-body-color)'
-           },
-          text: null
-        }
-      },
- 
-      tooltip: {
-        shared: true, // Ensure this is true for multiple points
-        useHTML: true,
-        backgroundColor: 'rgba(255, 255, 255, 0.85)',
-        borderColor: '#2c3e50',
-        borderRadius: 10,
-        borderWidth: 2,
-        shadow: true,
-        style: {
-            color: '#333',
-            fontSize: '14px',
-            fontFamily: 'Arial, sans-serif'
-        },
-        headerFormat: `
-            <div style="padding: 5px 10px; text-align: center;">
-                <span style="font-size: 16px; font-weight: bold; color: #2c3e50;">
-                    {point.key}
-                </span>
-            </div>
-            <hr style="margin: 5px 0; border-color: #2c3e50;">
-        `,
-        pointFormat: `
-            <div style="padding: 5px 10px;">
-                <span style="color:{series.color}; font-weight: bold;">
-                    ● {series.name}:
-                </span>
-                <span style="font-weight: bold;">
-                    {point.y}
-                </span>
-            </div>
-        `,
-        formatter: function (this: Highcharts.TooltipFormatterContextObject) {
-            if (this.points) { // For shared tooltips
-                let total = 0;
-                const pointsHtml = this.points.reduce((s, point) => {
-                    const yValue = point.y !== null && point.y !== undefined ? point.y : 0;
-                    total += yValue;
-                    return s + '<div style="color:' + point.series.color + '">● ' + 
-                               point.series.name + ': <strong>' + yValue + '</strong></div>';
-                }, '<div style="text-align: center; font-weight: bold; color: #2c3e50;">' + this.x + '</div>');
-                return pointsHtml + 
-                       '<hr style="margin: 5px 0; border-color: #2c3e50;">' + 
-                       '<div style="text-align: right; color: #888;">Total: <strong>' + total + '</strong></div>';
-            } else { // For single series tooltips
-                const yValue = this.y !== null && this.y !== undefined ? this.y : 'N/A';
-                return '<div style="text-align: center; font-weight: bold; color: #2c3e50;">' + this.x + '</div>' +
-                       '<div style="color:' + this.series.color + '">● ' + 
-                       this.series.name + ': <strong>' + yValue + '</strong></div>';
-            }
-        }
     },
-
-      plotOptions: {
-        series: {
-          turboThreshold: 0, // Comment out this code to display error
-          marker: {
-            enabled: true,
-            radius: 7
-          }
+    yAxis: {
+      labels: {
+        style: {
+          color: 'var(--bs-body-color)',
+        },
+      },
+      title: {
+        text: null,
+        style: {
+          color: 'var(--bs-body-color)',
+        },
+      },
+    },
+    tooltip: {
+      shared: true,
+      useHTML: true,
+      backgroundColor: 'rgba(255, 255, 255, 0.85)',
+      borderColor: '#2c3e50',
+      borderRadius: 10,
+      borderWidth: 2,
+      shadow: true,
+      style: {
+        color: '#333',
+        fontSize: '14px',
+        fontFamily: 'Arial, sans-serif',
+      },
+      headerFormat: `
+        <div style="padding: 5px 10px; text-align: center;">
+          <span style="font-size: 16px; font-weight: bold; color: #2c3e50;">{point.key}</span>
+        </div>
+        <hr style="margin: 5px 0; border-color: #2c3e50;">
+      `,
+      pointFormat: `
+        <div style="padding: 5px 10px;">
+          <span style="color:{series.color}; font-weight: bold;">● {series.name}:</span>
+          <span style="font-weight: bold;">{point.y}</span>
+        </div>
+      `,
+      formatter: function (this: Highcharts.TooltipFormatterContextObject) {
+        if (this.points) {
+          let total = 0;
+          const pointsHtml = this.points.reduce((s, point) => {
+            const yValue = point.y !== null && point.y !== undefined ? point.y : 0;
+            total += yValue;
+            return (
+              s +
+              `<div style="color:${point.series.color}">● 
+                 <span onclick="handleSeriesClick('${point.series.name}')"
+                       style="cursor: pointer; text-decoration: underline;">
+                   ${point.series.name}
+                 </span>: <strong>${yValue}</strong>
+               </div>`
+            );
+          }, `<div style="text-align: center; font-weight: bold; color: #2c3e50;">${this.x}</div>`);
+          return (
+            pointsHtml +
+            `<hr style="margin: 5px 0; border-color: #2c3e50;">
+             <div style="text-align: right; color: #888;">Total: <strong>${total}</strong></div>`
+          );
+        } else {
+          const yValue = this.y !== null && this.y !== undefined ? this.y : 'N/A';
+          return `
+            <div style="text-align: center; font-weight: bold; color: #2c3e50;">${this.x}</div>
+            <div style="color:${this.series.color}">● 
+              <span onclick="handleSeriesClick('${this.series.name}')"
+                    style="cursor: pointer; text-decoration: underline;">
+                ${this.series.name}
+              </span>: <strong>${yValue}</strong>
+            </div>`;
         }
-      },
-      // colors: [   '#6993FF', '#1BC5BD', '#8950FC', '#FFA800', '#F64E60', '#212121', '#F3F6F9',
-      //   '#3A3B3C', '#D4E157', '#FF7043', '#AB47BC', '#29B6F6', '#66BB6A', '#EF5350',
-      //   '#8D6E63', '#FFCA28', '#8E44AD', '#3498DB', '#2ECC71', '#E74C3C', '#F39C12',
-      //   '#D35400', '#2C3E50', '#16A085', '#27AE60', '#2980B9', '#8E44AD', '#2C3E50',
-      //   '#E67E22', '#ECF0F1', '#95A5A6', '#34495E', '#F1C40F', '#E74C3C', '#9B59B6',
-      //   '#1ABC9C', '#2ECC71'],
-      series: [
-      //   {
-      //     name: 'Sales',
-      //     data: [150, 200, 180, 220, 300, 350, 280, 400, 500, 450, 300, 600]
-      // }
+      }
       
-      ],
-      lineWidth:  2,
-
- 
-      credits: {
-        enabled: false
+    },
+    plotOptions: {
+      series: {
+        turboThreshold: 0,
+        marker: {
+          enabled: true,
+          radius: 7,
+        },
       },
-      responsive: {
-        rules: [{
+    },
+    series: [
+      // Example series can be added here
+      // {
+      //   name: 'Example',
+      //   data: [100, 200, 300],
+      // },
+    ],
+    lineWidth: 2,
+    credits: {
+      enabled: false,
+    },
+    responsive: {
+      rules: [
+        {
           condition: {
-            maxWidth: 10000//maxWidth: 800
+            maxWidth: 10000,
           },
           chartOptions: {
             legend: {
-
-              itemStyle: {
-                color: 'var(--bs-body-color)'
-               },
-            
               layout: 'horizontal',
               align: 'center',
-              verticalAlign: 'bottom'
-            }
-          }
-        }]
-      }
-
-
-
-   
-    
-
-
-  }
+              verticalAlign: 'bottom',
+              itemStyle: {
+                color: 'var(--bs-body-color)',
+              },
+            },
+          },
+        },
+      ],
+    },
+  };
+  
+  // Add the global function for handling clicks
+  window: any['handleSeriesClick'] = function (seriesName: any) {
+    console.log('Clicked on series:', seriesName);
+    // Add your custom logic here, e.g., navigation or additional details
+  };
+  
+  
 
   // Method to initialize the chart using the form's JSON value
 initializeChart(): void {
@@ -1385,6 +1435,8 @@ initializeChart(): void {
     console.error('Highcharts options are empty or undefined');
   }
 }
+
+
   
 
 }

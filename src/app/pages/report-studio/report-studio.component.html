@@ -485,6 +485,7 @@
                                   <select formControlName="predefined" class="form-control"  [ngbTooltip]="'Select a predefined script to populate the equation field'">
                                     <option value="km Difference">Distance Travelled</option>
                                     <option value="time_taken_distance">Time Taken</option>
+    
                                     <!-- <option value="days_difference">Days Difference</option> -->
                                     <option value="none">None</option>
                                   </select>                  
@@ -523,7 +524,9 @@
                                 </div>
                             </div>
                             <hr>
+                            <button *ngIf="condIndex != 0" type="button" class="btn btn-danger btn-sm mb-2" (click)="removeCustomCondition1(formIndex, condIndex)">Remove Column</button>
                         </div>
+                 
                     </div>
     
                     <button type="button" class="btn btn-primary btn-sm" (click)="addCustomCondition1()">Add Column</button>

@@ -60,6 +60,11 @@ import { GoogleMapsModule } from '@angular/google-maps';
 import { MultiTableConfigComponent } from './multi-table-config/multi-table-config.component';
 import { MultiTableUiComponent } from './multi-table-ui/multi-table-ui.component';
 import { NestedTableComponent } from './nested-table/nested-table.component';
+import { DataTableShowComponent } from './data-table-show/data-table-show.component';
+import { DataTableChart1Component } from './data-table-chart1/data-table-chart1.component';
+import { DataTableChart2Component } from './data-table-chart2/data-table-chart2.component';
+import { DataTableTile1Component } from './data-table-tile1/data-table-tile1.component';
+import { HttpClientModule } from '@angular/common/http';
 
 
 
@@ -96,7 +101,11 @@ import { NestedTableComponent } from './nested-table/nested-table.component';
     MapUiComponent,
     MultiTableConfigComponent,
     MultiTableUiComponent,
-    NestedTableComponent
+    NestedTableComponent,
+    DataTableShowComponent,
+    DataTableChart1Component,
+    DataTableChart2Component,
+    DataTableTile1Component
 
 
 
@@ -129,7 +138,8 @@ import { NestedTableComponent } from './nested-table/nested-table.component';
     MatTooltipModule,
     NgbTooltipModule,
     MultiSelectModule,
-    GoogleMapsModule 
+    GoogleMapsModule ,
+    HttpClientModule,
   
   ],
   exports:[
@@ -171,7 +181,11 @@ import { NestedTableComponent } from './nested-table/nested-table.component';
     MapUiComponent,
     MultiTableConfigComponent,
     MultiTableUiComponent,
-    NestedTableComponent
+    NestedTableComponent,
+    DataTableShowComponent,
+    DataTableChart1Component,
+    DataTableChart2Component,
+    DataTableTile1Component
   
 
     

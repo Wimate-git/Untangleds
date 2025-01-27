@@ -74,6 +74,9 @@ export class Chart2ConfigComponent implements OnInit{
   highchartsOptionsJson: string;
   chartFinalOptions: any;
   listofDynamicParamFilter: any;
+  columnVisisbilityFields: any;
+  selectedText: any;
+  shoRowData:boolean = false
 
 
  
@@ -251,7 +254,9 @@ export class Chart2ConfigComponent implements OnInit{
             selectedRangeType: [''],
             selectFromTime: [''],
             selectToTime: [''],
-            parameterValue:['']
+            parameterValue:[''],
+            columnVisibility:[[]],
+            rowData:['']
           })
         );
         console.log('this.all_fields check', this.all_fields);
@@ -275,7 +280,58 @@ export class Chart2ConfigComponent implements OnInit{
     this.widgetIdCounter++;
     return Date.now() + this.widgetIdCounter; // Use timestamp and counter for uniqueness
   }
-  
+  getFormControlValue(selectedTextConfi:any): void {
+    // const formlistControl = this.createChart.get('formlist');
+    console.log('Formlist Control Value:', selectedTextConfi);
+    this.fetchDynamicFormDataConfig(selectedTextConfi);
+  }
+
+  fetchDynamicFormDataConfig(value: any) {
+    console.log("Data from lookup:", value);
+
+    this.api
+      .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
+      .then((result: any) => {
+        if (result && result.metadata) {
+          const parsedMetadata = JSON.parse(result.metadata);
+          console.log('parsedMetadata check dynamic',parsedMetadata)
+          const formFields = parsedMetadata.formFields;
+          console.log('formFields check',formFields)
+
+          // Initialize the list with formFields labels
+          this.columnVisisbilityFields = formFields.map((field: any) => {
+            console.log('field check',field)
+            return {
+              value: field.name,
+              text: field.label
+            };
+          });
+
+          // Include created_time and updated_time
+          if (parsedMetadata.created_time) {
+            this.columnVisisbilityFields.push({
+              value: parsedMetadata.created_time.toString(),
+              text: 'Created Time' // You can customize the label here if needed
+            });
+          }
+
+          if (parsedMetadata.updated_time) {
+            this.columnVisisbilityFields.push({
+              value: parsedMetadata.updated_time.toString(),
+              text: 'Updated Time' // You can customize the label here if needed
+            });
+          }
+
+          console.log('Transformed dynamic parameters config', this.columnVisisbilityFields);
+
+          // Trigger change detection to update the view
+          this.cdr.detectChanges();
+        }
+      })
+      .catch((err) => {
+        console.log("Can't fetch", err);
+      });
+  }
 
   addTile(key: any) {
     console.log('this.noOfParams check', this.noOfParams);
@@ -632,91 +688,75 @@ preDefinedRange(preDefined:any){
 
 }
 
-repopulate_fields(getValues: any) {
-  let noOfParams: any = '';
-  
-  if (getValues && getValues !== null) {
-    noOfParams = getValues.noOfParams;
+repopulate_fields(getValues: any): FormArray {
+  if (!getValues || getValues === null) {
+    console.warn('No data to repopulate');
+    return this.all_fields;
+  }
 
-    this.all_fields.clear();
+  const noOfParams = getValues.noOfParams || '';
+  this.all_fields.clear(); // Clear existing fields in the FormArray
 
-    // Parse chartConfig
-    let parsedChartConfig = [];
-    try {
-      // Check if chartConfig is a string before parsing
-      if (typeof getValues.chartConfig === 'string') {
-        parsedChartConfig = JSON.parse(getValues.chartConfig || '[]');
-      } else {
-        // If it's already an object, just assign it to parsedChartConfig
-        parsedChartConfig = Array.isArray(getValues.chartConfig) ? getValues.chartConfig : [];
-      }
-      console.log('Parsed chartConfig:', parsedChartConfig);
-    } catch (error) {
-      console.error('Error parsing chartConfig:', error);
+  // Parse `chartConfig` safely
+  let parsedChartConfig: any[] = [];
+  try {
+    if (typeof getValues.chartConfig === 'string') {
+      parsedChartConfig = JSON.parse(getValues.chartConfig || '[]');
+    } else if (Array.isArray(getValues.chartConfig)) {
+      parsedChartConfig = getValues.chartConfig;
     }
-    console.log('selected params devices', getValues.device);
+  } catch (error) {
+    console.error('Error parsing chartConfig:', error);
+    parsedChartConfig = [];
+  }
 
-    if (parsedChartConfig.length > 0) {
-      for (let i = 0; i < parsedChartConfig.length; i++) {
-        console.log('parsedChartConfig checking', parsedChartConfig[i]);
+  console.log('Parsed chartConfig:', parsedChartConfig);
 
-        // Create predefinedRange object with both startDate and endDate as ISO strings
-        let predefinedRange: {
-          startDate: string | null;
-          endDate: string | null;
-        } = {
-          startDate: null,
-          endDate: null,
-        };
+  if (parsedChartConfig.length > 0) {
+    parsedChartConfig.forEach((configItem, index) => {
+      console.log(`Processing index ${index} - Full Object:`, configItem);
 
-        // Check and parse startDate and endDate
-        // if (parsedChartConfig[i].predefinedSelectRange) {
-        //   if (parsedChartConfig[i].predefinedSelectRange.startDate) {
-        //     predefinedRange.startDate = new Date(parsedChartConfig[i].predefinedSelectRange.startDate).toISOString();
-        //     // Validate the parsed startDate
-        //     if (isNaN(new Date(predefinedRange.startDate).getTime())) {
-        //       predefinedRange.startDate = null;
-        //     }
-        //   }
+      // Handle `columnVisibility` as a simple array initialization
+      const columnVisibility = Array.isArray(configItem.columnVisibility)
+        ? configItem.columnVisibility.map((item: { text: any; value: any; }) => ({
+            text: item.text || '',
+            value: item.value || '',
+          }))
+        : [];
 
-        //   if (parsedChartConfig[i].predefinedSelectRange.endDate) {
-        //     predefinedRange.endDate = new Date(parsedChartConfig[i].predefinedSelectRange.endDate).toISOString();
-        //     // Validate the parsed endDate
-        //     if (isNaN(new Date(predefinedRange.endDate).getTime())) {
-        //       predefinedRange.endDate = null;
-        //     }
-        //   }
-        // }
+      // Push FormGroup into FormArray
+      this.all_fields.push(
+        this.fb.group({
+          formlist: configItem.formlist || '',
+          parameterName: configItem.parameterName || '',
+          primaryValue: configItem.primaryValue || '',
+          groupByFormat: configItem.groupByFormat || '',
+          constantValue: configItem.constantValue || '',
+          selectedRangeType: configItem.selectedRangeType || '',
+          selectFromTime: configItem.selectFromTime || '',
+          selectToTime: configItem.selectToTime || '',
+          parameterValue: configItem.parameterValue || '',
+          columnVisibility: this.fb.control(columnVisibility), // Initialize columnVisibility as a control
+        })
+      );
 
-        // Add the fields to the form group with predefinedRange
-        this.all_fields.push(this.fb.group({
-          formlist: parsedChartConfig[i].formlist,
-          parameterName: parsedChartConfig[i].parameterName,
-          // groupBy: parsedChartConfig[i].groupBy,
-          primaryValue: parsedChartConfig[i].primaryValue,
-          groupByFormat: parsedChartConfig[i].groupByFormat,
-          constantValue: parsedChartConfig[i].constantValue,
-          // predefinedSelectRange: predefinedRange, // Use the predefinedRange object here
-          selectedRangeType: parsedChartConfig[i].selectedRangeType,
-          selectFromTime: parsedChartConfig[i].selectFromTime,
-          selectToTime: parsedChartConfig[i].selectToTime,
-          parameterValue:parsedChartConfig[i].parameterValue
-
-        }));
-      }
-    } else {
-      if (noOfParams !== "" && noOfParams !== undefined && noOfParams !== null) {
-        for (let i = this.all_fields.length; i >= noOfParams; i--) {
-          this.all_fields.removeAt(i);
-        }
+      console.log(`FormGroup at index ${index}:`, this.all_fields.at(index).value);
+    });
+  } else {
+    console.warn('No parsed data to populate fields');
+    if (noOfParams !== '' && noOfParams !== undefined && noOfParams !== null) {
+      // Adjust FormArray length based on noOfParams
+      for (let i = this.all_fields.length; i >= noOfParams; i--) {
+        this.all_fields.removeAt(i);
       }
     }
   }
 
-  console.log('after fields values assigned', this.all_fields);
+  console.log('Final FormArray Values:', this.all_fields.value);
 
   return this.all_fields;
 }
+
 
 
 
@@ -936,11 +976,12 @@ repopulate_fields(getValues: any) {
   }
   selectFormParams(event: any) {
     if (event && event[0] && event[0].data) {
-      const selectedText = event[0].data.text;  // Adjust based on the actual structure
-      console.log('Selected Form Text:', selectedText);
+      this.selectedText = event[0].data.text;  // Adjust based on the actual structure
+      console.log('Selected Form Text:', this.selectedText);
+      this.getFormControlValue(this.selectedText); 
 
-      if (selectedText) {
-        this.fetchDynamicFormData(selectedText);
+      if (this.selectedText) {
+        this.fetchDynamicFormData(this.selectedText);
       }
     } else {
       console.error('Event data is not in the expected format:', event);

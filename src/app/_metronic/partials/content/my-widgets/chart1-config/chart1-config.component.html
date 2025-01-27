@@ -53,13 +53,7 @@
                 aria-controls="filter-tab" aria-selected="false" (click)="selectedSettingsTab('filter-tab')">Filter</a>
             </li>
           </div>
-          <!-- <div class="col-3" role="Settings">
-            <li class="nav-item">
-              <a class="nav-link text-active-primary me-6" id="settings-tabpane" data-bs-toggle="tab" role="tab"
-                aria-controls="settings-tab" aria-selected="false"
-                (click)="selectedSettingsTab('settings-tab')">Settings</a>
-            </li>
-          </div> -->
+
           <div class="col-4" role="Advanced">
             <li class="nav-item">
               <a class="nav-link text-active-primary me-6" id="advanced-tabpane" data-bs-toggle="tab" role="tab"
@@ -92,18 +86,12 @@
 
                     <div class="col-md-4 mb-3">
                       <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields</label>
-                      <ngx-select id="parameterName" [allowClear]="true" formControlName="parameterName"
-                        [items]="listofDynamicParam" optionValueField="value" optionTextField="text"
-                        placeholder="Select Parameter" (selectionChanges)="parameterValueCheck($event,fieldIndex)" style="width: 100%;">
-                      </ngx-select>
+                      <p-multiSelect id="parameterName" formControlName="parameterName"
+                        [options]="listofDynamicParam"       optionLabel="text"
+                        placeholder="Select Parameter" (onChange)="parameterValueCheck($event,fieldIndex)" >
+                      </p-multiSelect>
                     </div>
 
-                    <!-- <div class="col-md-4 mb-3">
-                      <label for="groupBy" class="col-createChart-label fw-bold fs-6 required">Group By</label>
-                      <ngx-select id="groupBy" [allowClear]="true" formControlName="groupBy" [items]="groupByOptions"
-                        optionValueField="value" optionTextField="text" placeholder="Select Group" class="w-100">
-                      </ngx-select>
-                    </div> -->
 
                     <div class="col-md-4 mb-3">
                       <label for="primaryValue" class="col-form-label fw-bold fs-6 required">
@@ -181,36 +169,26 @@
                       <input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"
                         formControlName="selectToTime">
                     </div>
-
-                    <div class="col-md-4 mb-3">
-                      <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Summary Dashboard Id</label>
-                      <ngx-select
-                        id="parameterName"
-                        [allowClear]="true"
-                        formControlName="dashboardIds"
-                        [items]="p1ValuesSummary"
-                        optionValueField="value"
-                        optionTextField="text"
+                    <div class="col-md-4">
+                      <label for="columnVisibility" class="fw-bold fs-6 ">column Visibility</label>
+                      <p-multiSelect
+                        id="columnVisibility"
+                        formControlName="columnVisibility"
+                        [options]="columnVisisbilityFields"
+                        optionLabel="text"
                         placeholder="Select Parameter"
                       
-                        style="width: 100%;">
-                      </ngx-select>
+                    
+                      ></p-multiSelect>
+                    </div>
+                    <div class="col-md-4 mb-3" *ngIf = "shoRowData" >
+                      <label for="constant" class="col-form-label fw-bold fs-6 required"></label>
+                      <input id="constant" type="number" class="form-control form-control-solid"
+                        placeholder="Select constant" formControlName="rowData"
+                       />
                     </div>
 
-                    <div class="col-md-4 mb-3">
-                      <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Select Type</label>
-                      <ngx-select
-                        id="selectType"
-                        [allowClear]="true"
-                        formControlName="selectType"
-                        [items]="SelectTypeSummary"
-                        optionValueField="value"
-                        optionTextField="text"
-                        placeholder="Select Parameter"
-                       
-                        style="width: 100%;">
-                      </ngx-select>
-                    </div>
+
 
 
 

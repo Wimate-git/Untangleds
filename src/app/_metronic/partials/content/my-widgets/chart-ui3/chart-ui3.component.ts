@@ -12,10 +12,19 @@ export class ChartUi3Component implements OnInit{
   gridOptions: any;
   @Input() chartWidth:any
   @Input() chartHeight:any
+  parseChartOptions: any;
+  extractSeries: any;
+  @Output() sendCellInfo = new EventEmitter<any>();
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
       console.log("DynamicLine chart",this.item)
+      this.parseChartOptions = this.item.highchartsOptionsJson;
+      console.log('this.parseChartOptions checking',this.parseChartOptions)
+      const check = JSON.parse(this.parseChartOptions);
+      console.log('check parsed data',check)
+      this.extractSeries = check.series[0].name
+      console.log('this.extractSeries',this.extractSeries)
 
       if (typeof this.item.highchartsOptionsJson === 'string') {
         try {
@@ -39,9 +48,33 @@ export class ChartUi3Component implements OnInit{
       
       console.log('this.gridOptions check', this.gridOptions);
      
+      this.chartOptions.series = this.chartOptions.series.map((series: any) => {
+        return {
+          ...series,
+          data: series.data.map((value: any, index: number) => ({
+            y: value, // Data value
+            name: series.name, // Series name (optional)
+            customIndex: index, // Custom property to track index
+            events: {
+              click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event),
+            },
+          })),
+        };
+      });
+     
 
     
   }
+
+  onBarClick(event: Highcharts.PointClickEventObject): void {
+    console.log('Bar clicked:', {
+      category: event.point.category,
+      value: event.point.y,
+     
+    });
+    this.sendCellInfo.emit(event)
+  }
+  
   ngAfterViewInit(){
     setTimeout(() => {
       this.createBarChart()
@@ -101,9 +134,12 @@ export class ChartUi3Component implements OnInit{
   }
 
   createBarChart() {
+
     console.log('culomnchart dynamic data check', this.chartOptions);
   
     Highcharts.chart(`Columnchart${this.index+1}`, this.chartOptions);
+    // console.log()
+
   }
   
 

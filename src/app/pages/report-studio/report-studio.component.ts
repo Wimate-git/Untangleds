@@ -1908,9 +1908,12 @@ locationCellRenderer(params: any) {
 
     this.forms().clear()
     this.customForms().clear()
-    this.customForms1().clear()
+    // this.customForms1().clear()
     this.getConditions().clear()
 
+    this.customLocationGroup.reset()
+    
+    console.log("this.customLocationGroup ",this.customLocationGroup)
     
 
     this.customColumnsflag = false
@@ -1932,6 +1935,7 @@ locationCellRenderer(params: any) {
     if (this.modalName == 'Reports') {
       this.router.navigate(['/reportStudio']);
     }
+
   
     this.cd.detectChanges();
   }
@@ -2138,6 +2142,9 @@ mergeAndAddLocation(mappedResponse: any) {
     this.editSavedDataArray.conditionMetadata = this.formFieldsGroup.value
     this.editSavedDataArray.tableState = JSON.parse(JSON.stringify(this.tableState))
     this.editSavedDataArray.customColumnMetadata = this.customColumnsGroup.value
+    this.editSavedDataArray.advancedCustomColumnMetadata = this.customLocationGroup.value
+    this.editSavedDataArray.advancedFilterColumnMetadata = this.mainFormGroup.value
+
     this.savedModulePacket = this.editSavedDataArray
     this.modalService.open(content,{
       backdrop:'static'
@@ -3299,235 +3306,471 @@ mergeAndAddLocation(mappedResponse: any) {
 //   return trackLocationRows;
 // }
 
-
 async extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: any) {
-  let tempHolder = this.tableDataWithFormFilters[index]["rows"].map((item: any) => {
-    return { trackLocation: item.trackLocation, id: item.id };
-  });
-
+  const trackLocationRows: any[] = [];
   const customColumnForm = this.customLocationGroup.value.customForms[0].conditions;
 
-  tempHolder = tempHolder.filter((item: any) => Array.isArray(item.trackLocation) && item.trackLocation.length > 0);
 
-  const trackLocationRows: any[] = [];
+  
 
-  let headers = [
+  // Prepare headers
+  const headers = [
     "ID", "Date and Time", "Label ID", "Label Name", "Latitude", "Longitude", "Name", "Type"
   ];
 
-  let conditionalString: any = '';
+  let conditionalString = '';
   if (this.isFormAdvancedVisible) {
     conditionalString = await this.buildConditionLocationString(this.mainFormGroup.value.dynamicConditions);
   }
 
-  if (this.addExcellOptions) {
-    console.log("Custom Columns are here ", customColumnForm);
+  customColumnForm.forEach((custom: { columnName: string; }) => headers.push(custom.columnName));
+  trackLocationRows.push(headers);
 
-    for (let custom of customColumnForm) {
-      headers.push(custom.columnName); // Add custom column headers
-      if (custom.aggregate) {
-        custom["values"] = [];  // Initialize values array for aggregation
+
+  customColumnForm.forEach((custom:any) => {
+    custom.values = []
+  });
+
+  for (const row of this.tableDataWithFormFilters[index]["rows"]) {
+    let trackLocationObjects = row.trackLocation || [];
+    let filteredTrackLocationObjects: any[] = [];
+
+    if (this.isFormAdvancedVisible) {
+      const promises = trackLocationObjects.map(async (data: any) => {
+        if (await this.evaluateTemplate(conditionalString, data, 'None')) {
+          return data;
+        }
+      });
+      filteredTrackLocationObjects = await Promise.all(promises);
+    }
+    else{
+      filteredTrackLocationObjects = trackLocationObjects
+    }
+
+    trackLocationObjects = filteredTrackLocationObjects.filter((item) => item);  // Remove undefined/null values
+
+    console.log("Filtered after condition is here trackLocationObjects ", filteredTrackLocationObjects);
+     
+    // Process each location object
+    for (const obj of trackLocationObjects) {
+      console.log("Obj is here ", obj);
+
+      const rowValues = [
+        row.id || '',
+        obj.Date_and_time || '',
+        obj.label_id || '',
+        obj.label_name || '',
+        obj.latitude || '',
+        obj.longitude || '',
+        obj.name || '',
+        obj.type || ''
+      ];
+
+      // Process custom columns
+      for (const custom of customColumnForm) {
+        if (custom.predefined === "km Difference") {
+          rowValues.push(await this.calculateKmDifference(trackLocationObjects, obj.type,custom));
+        } else if (custom.predefined === "time_taken_distance") {
+          rowValues.push(await this.calculateTimeTaken(trackLocationObjects, obj.type,custom));
+        } else {
+          const res = await this.evaluateTemplate(custom.equationText, obj, 'None');
+          custom.values.push(res)
+          rowValues.push(res || "");
+        }
       }
+
+      trackLocationRows.push(rowValues);
     }
   }
 
-  let tempArray: any[] = [];
+    console.log("Custom Rows before adding values are here ",customColumnForm);
 
-  if (Array.isArray(tempHolder) && tempHolder.length > 0) {
-    trackLocationRows.push(headers); // Push headers
+    trackLocationRows.push(this.calculateAggregateRow(headers, customColumnForm));
+  
 
-    for (const row of tempHolder) {
-      let trackLocationObjects = row.trackLocation;
-
-      if (Array.isArray(trackLocationObjects) && trackLocationObjects.length > 0) {
-
-        // Apply conditional filtering if needed
-        if (this.isFormAdvancedVisible) {
-          tempArray = [];
-          for (const data of trackLocationObjects) {
-            if (await this.evaluateTemplate(conditionalString, data, 'None') === true) {
-              tempArray.push(data);
-            }
-          }
-          trackLocationObjects = tempArray;
-        }
-
-        console.log("Filtered rows are here: ", trackLocationObjects);
-
-        for (const obj of trackLocationObjects) {
-          // Default row values for each object
-          const rowValues = [
-            row.id || '',               // ID
-            obj.Date_and_time || '',    // Date and Time
-            obj.label_id || '',         // Label ID
-            obj.label_name || '',       // Label Name
-            obj.latitude || '',         // Latitude
-            obj.longitude || '',        // Longitude
-            obj.name || '',             // Name
-            obj.type || ''              // Type
-          ];
-
-          if (this.addExcellOptions) {
-            console.log("Custom Columns Forms are ", customColumnForm);
-
-            for (let custom of customColumnForm) {
-
-              if (custom.predefined === "km Difference") {
-                console.log("Lat long will be calculated ");
-                let startPostion: any;
-                let endPosition: any;
-
-                // Get the start and end positions
-                startPostion = trackLocationObjects.find((item: any) =>
-                  item?.latitude != null && item?.longitude != null && item.type === 'Accept to Start Travel'
-                );
-
-                endPosition = trackLocationObjects.find((item: any) =>
-                  item?.latitude != null && item?.longitude != null && item.type === 'Arrived At Site to In-Progress'
-                );
-
-                console.log("Start and end Position are here ", startPostion, endPosition);
-
-                if (startPostion && endPosition) {
-                  const distance = await this.calculateDistanceUsingGoogleAPI(
-                    startPostion.latitude, startPostion.longitude,
-                    endPosition.latitude, endPosition.longitude
-                  );
-
-                  // Only add km difference if type matches
-                  if (rowValues[7] !== 'Arrived At Site to In-Progress') {
-                    rowValues.push('');
-                  } else {
-                    rowValues.push(`${(await distance).toFixed(2)} km`);
-
-                    // Store value for aggregation (SUM, AVG, etc.)
-                    if (custom.aggregate) {
-                      custom["values"].push(await distance);  // Add distance to the values array
-                    }
-                  }
-                } else {
-                  rowValues.push(''); // Add empty value if positions are not valid
-                }
-              }
-              else if (custom.predefined === "time_taken_distance") {
-                const startPostion1 = trackLocationObjects.find((item: any) =>
-                  item.type === 'Accept to Start Travel'
-                );
-
-                const endPosition1 = trackLocationObjects.find((item: any) =>
-                  item.type === 'Arrived At Site to In-Progress'
-                );
-
-                if (startPostion1 && endPosition1) {
-                  // Parse the Date strings using the custom parseDateTime function
-                  const startDate = this.parseDateTime(startPostion1.Date_and_time);
-                  const endDate = this.parseDateTime(endPosition1.Date_and_time);
-              
-                  // Check if both dates are valid
-                  if (startDate && endDate) {
-                      const diffInMs = endDate.getTime() - startDate.getTime();
-              
-                      // Calculate differences in various units
-                      const diffInSecs = Math.floor(diffInMs / 1000);
-                      const diffInMins = Math.floor(diffInSecs / 60);
-                      const diffInHours = Math.floor(diffInMins / 60);
-                      const diffInDays = Math.floor(diffInMs / (1000 * 3600 * 24));
-                      const diffInMonths = Math.floor(diffInDays / 30); // Approximate months
-                      const diffInYears = Math.floor(diffInDays / 365); // Approximate years
-              
-                      let timeDiffFormatted = '';
-              
-                      if (diffInSecs < 60) {
-                          timeDiffFormatted = `${diffInSecs} seconds`;
-                      } else if (diffInMins < 60) {
-                          timeDiffFormatted = `${diffInMins} minutes`;
-                      } else if (diffInHours < 24) {
-                          timeDiffFormatted = `${diffInHours} hours`;
-                      } else if (diffInDays < 30) {
-                          timeDiffFormatted = `${diffInDays} days`;
-                      } else if (diffInMonths < 12) {
-                          timeDiffFormatted = `${diffInMonths} months`;
-                      } else {
-                          timeDiffFormatted = `${diffInYears} years`;
-                      }
-              
-                      // Only add time taken if type matches
-                      if (rowValues[7] !== 'Arrived At Site to In-Progress') {
-                          rowValues.push('');
-                      } else {
-                          rowValues.push(timeDiffFormatted);
-              
-                          // Store value for aggregation (SUM, AVG, etc.)
-                          if (custom.aggregate) {
-                              custom["values"].push(Math.ceil(diffInMins / 60));
-                          }
-                      }
-                  } else {
-                      rowValues.push(''); // Add empty value if dates are invalid
-                  }
-              } else {
-                  rowValues.push(''); // Add empty value if positions are not valid
-              }
-              }
-              else {
-                // Evaluate equation for other columns
-                const res = await this.evaluateTemplate(custom.equationText, obj, 'None');
-                if (res) {
-                  rowValues.push(res);
-                } else {
-                  rowValues.push("");
-                }
-              }
-            }
-          }
-
-          trackLocationRows.push(rowValues);
-        }
-      }
-    }
-
- 
-    console.log("Custom Columns are here ", customColumnForm);
-
-    const aggregateRow = new Array(headers.length).fill('');
-
-    for (let custom of customColumnForm) {
-      if (custom.aggregate && custom.values.length > 0) {
-        let aggregateValue: any = null;
-
-        if (custom.aggregate === 'SUM') {
-          aggregateValue = custom.values.reduce((acc: any, val: any) => acc + val, 0);
-        } else if (custom.aggregate === 'AVG') {
-          aggregateValue = custom.values.reduce((acc: any, val: any) => acc + val, 0) / custom.values.length;
-        } else if (custom.aggregate === 'MIN') {
-          aggregateValue = Math.min(...custom.values);
-        } else if (custom.aggregate === 'MAX') {
-          aggregateValue = Math.max(...custom.values);
-        }
-
-
-         // Check if custom.type is 'km' and append " kms" to the aggregate value
-          let formattedValue = `${aggregateValue.toFixed(2)}`;
-          if (custom.predefined === 'km Difference') {
-            formattedValue += ' kms';
-          }
-          else if(custom.predefined === 'time_taken_distance'){
-            formattedValue += ' hours';
-          }
-
-
-        aggregateRow[headers.length - customColumnForm.length + customColumnForm.indexOf(custom)] = `${formattedValue}`;
-      }
-    }
-
-
-    trackLocationRows.push(aggregateRow);
-  }
 
   return trackLocationRows;
 }
 
 
+// Helper method for km difference calculation
+async calculateKmDifference(trackLocationObjects: any[], currentType: string,custom:any): Promise<string> {
+
+  let kmCalculations = [
+    {
+      start: ['Accept to Start Travel','Open to Accept'],
+      end: ['Arrived At Site to In-Progress'],
+      matchType: 'Arrived At Site to In-Progress'
+    },
+    {
+      start: ['In-Progress to Leaving Site'],
+      end: ['Leaving Site to End Travel'],
+      matchType: 'Leaving Site to End Travel'
+    }
+  ];
+
+  if(custom && custom.equationText && custom.equationText != ''){
+    kmCalculations = JSON.parse(custom.equationText)
+  }
+
+
+  console.log("Text is here ",kmCalculations);
+
+
+
+  for (const calc of kmCalculations) {
+
+    console.log("Calc is ",calc);
+
+    if (currentType === calc.matchType) {
+
+      console.log("Match type is here ",currentType , calc.matchType);
+
+      const startPosition = trackLocationObjects.find((item: any) => 
+        item?.latitude != null && item?.longitude != null && calc.start.includes(item.type)
+      );
+      const endPosition = trackLocationObjects.find((item: any) => 
+        item?.latitude != null && item?.longitude != null && calc.end.includes(item.type)
+      );
+
+      if (startPosition && endPosition) {
+        const distance = await this.calculateDistanceUsingGoogleAPI(
+          startPosition.latitude, 
+          startPosition.longitude,
+          endPosition.latitude, 
+          endPosition.longitude
+        );
+        custom.values.push(distance)
+        return `${distance.toFixed(2)} km`;
+      }
+    }
+  }
+  return '';
+}
+
+// Helper method for time taken calculation
+async calculateTimeTaken(trackLocationObjects: any[], currentType: string,custom:any): Promise<string> {
+  let timeCalculations = [
+    {
+      start: ['Accept to Start Travel','Open to Accept'],
+      end: ['Arrived At Site to In-Progress'],
+      matchType: 'Arrived At Site to In-Progress'
+    },
+    {
+      start:['In-Progress to Leaving Site'] ,
+      end: ['Leaving Site to End Travel'],
+      matchType: 'Leaving Site to End Travel'
+    }
+  ];
+
+
+  if(custom && custom.equationText  && custom.equationText != ''){
+    timeCalculations = JSON.parse(custom.equationText)
+  }
+
+  for (const calc of timeCalculations) {
+    if (currentType === calc.matchType) {
+      const startPosition = trackLocationObjects.find((item: any) => 
+        calc.start.includes(item.type)
+      );
+      const endPosition = trackLocationObjects.find((item: any) => 
+        calc.end.includes(item.type)
+      );
+      console.log("Time should be taken in obj ", trackLocationObjects);
+      console.log("Start Position ", startPosition, "End Position ", endPosition);
+  
+      if (startPosition && endPosition) {
+        const startDate = this.parseDateTime(startPosition.Date_and_time);
+        const endDate = this.parseDateTime(endPosition.Date_and_time);
+  
+        console.log("Start Date ", startDate, "End Date ", endDate);
+  
+        if (startDate && endDate) {
+          console.log("Time will be calculated for ", trackLocationObjects);
+  
+          // Get the difference in milliseconds
+          const diffInMs = endDate.getTime() - startDate.getTime();
+  
+          // Calculate different time units
+          const diffInSeconds = Math.floor(diffInMs / 1000);
+          const diffInMinutes = Math.floor(diffInMs / 1000 / 60);
+          const diffInHours = Math.floor(diffInMs / 1000 / 60 / 60);
+          const diffInDays = Math.floor(diffInMs / 1000 / 60 / 60 / 24);
+          const diffInMonths = Math.floor(diffInDays / 30); // Approximate months
+          const diffInYears = Math.floor(diffInDays / 365); // Approximate years
+  
+          // Format the result based on the time difference
+          let result = '';
+  
+          if (diffInSeconds < 60) {
+            result = `${diffInSeconds} seconds`;
+          } else if (diffInMinutes < 60) {
+            result = `${diffInMinutes} minutes`;
+          } else if (diffInHours < 24) {
+            result = `${diffInHours} hours`;
+          } else if (diffInDays < 30) {
+            result = `${diffInDays} days`;
+          } else if (diffInMonths < 12) {
+            result = `${diffInMonths} months`;
+          } else {
+            result = `${diffInYears} years`;
+          }
+  
+          console.log("Time Difference:", result);
+
+          custom.values.push(diffInHours)
+  
+          // Return the formatted string
+          return result;
+        }
+      }
+    }
+  }
+  
+  return '';
+  
+  
+}
+
+// Helper method for aggregate calculations
+calculateAggregateRow(headers: string[], customColumnForm: any[]): any[] {
+  const aggregateRow = new Array(headers.length).fill('');
+  
+  for (const custom of customColumnForm) {
+    if (custom.aggregate && custom.values?.length > 0) {
+      let aggregateValue = null;
+      
+      switch (custom.aggregate) {
+        case 'SUM': 
+          aggregateValue = custom.values.reduce((acc: any, val: any) => acc + val, 0);
+          break;
+        case 'AVG': 
+          aggregateValue = custom.values.reduce((acc: any, val: any) => acc + val, 0) / custom.values.length;
+          break;
+        case 'MIN': 
+          aggregateValue = Math.min(...custom.values);
+          break;
+        case 'MAX': 
+          aggregateValue = Math.max(...custom.values);
+          break;
+      }
+
+      let formattedValue = `${parseInt(aggregateValue).toFixed(2)}`;
+      formattedValue += custom.predefined === 'km Difference' ? ' kms' : 
+                        custom.predefined === 'time_taken_distance' ? ' hours' : '';
+
+      aggregateRow[headers.length - customColumnForm.length + customColumnForm.indexOf(custom)] = formattedValue;
+    }
+  }
+
+  return aggregateRow;
+}
+
+
+// async extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: any) {
+//   let tempHolder = this.tableDataWithFormFilters[index]["rows"].map((item: any) => {
+//     return { trackLocation: item.trackLocation, id: item.id };
+//   });
+
+//   const customColumnForm = this.customLocationGroup.value.customForms[0].conditions;
+
+//   tempHolder = tempHolder.filter((item: any) => Array.isArray(item.trackLocation) && item.trackLocation.length > 0);
+
+//   const trackLocationRows: any[] = [];
+
+//   let headers = [
+//     "ID", "Date and Time", "Label ID", "Label Name", "Latitude", "Longitude", "Name", "Type"
+//   ];
+
+//   let conditionalString: any = '';
+//   if (this.isFormAdvancedVisible) {
+//     conditionalString = await this.buildConditionLocationString(this.mainFormGroup.value.dynamicConditions);
+//   }
+
+//   if (this.addExcellOptions) {
+//     for (let custom of customColumnForm) {
+//       headers.push(custom.columnName);
+//     }
+//   }
+
+//   let tempArray: any[] = [];
+
+//   if (Array.isArray(tempHolder) && tempHolder.length > 0) {
+//     trackLocationRows.push(headers); // Push headers
+
+//     for (const row of tempHolder) {
+//       let trackLocationObjects = row.trackLocation;
+
+//       if (Array.isArray(trackLocationObjects) && trackLocationObjects.length > 0) {
+//         // Apply conditional filtering if needed
+//         if (this.isFormAdvancedVisible) {
+//           tempArray = [];
+//           for (const data of trackLocationObjects) {
+//             if (await this.evaluateTemplate(conditionalString, data, 'None') === true) {
+//               tempArray.push(data);
+//             }
+//           }
+//           trackLocationObjects = tempArray;
+//         }
+
+//         for (const obj of trackLocationObjects) {
+//           // Default row values for each object
+//           const rowValues = [
+//             row.id || '',               // ID
+//             obj.Date_and_time || '',    // Date and Time
+//             obj.label_id || '',         // Label ID
+//             obj.label_name || '',       // Label Name
+//             obj.latitude || '',         // Latitude
+//             obj.longitude || '',        // Longitude
+//             obj.name || '',             // Name
+//             obj.type || ''              // Type
+//           ];
+
+//           if (this.addExcellOptions) {
+//             for (let custom of customColumnForm) {
+//               if (custom.predefined === "km Difference") {
+//                 let distance = null;
+//                 let startPosition1: any;
+//                 let endPosition1: any;
+//                 let startPosition2: any;
+//                 let endPosition2: any;
+
+//                 // First distance calculation (Accept to Start Travel to Arrived At Site)
+//                 startPosition1 = trackLocationObjects.find((item: any) =>
+//                   item?.latitude != null && item?.longitude != null && item.type === 'Accept to Start Travel'
+//                 );
+//                 endPosition1 = trackLocationObjects.find((item: any) =>
+//                   item?.latitude != null && item?.longitude != null && item.type === 'Arrived At Site to In-Progress'
+//                 );
+
+//                 // Second distance calculation (Leaving Site to End Travel)
+//                 startPosition2 = trackLocationObjects.find((item: any) =>
+//                   item?.latitude != null && item?.longitude != null && item.type === 'Leaving Site to End Travel'
+//                 );
+//                 endPosition2 = trackLocationObjects.find((item: any) =>
+//                   item?.latitude != null && item?.longitude != null && (item.type === 'In-Progress to Leaving Site' || item.type === 'Resolved to Leaving Site')
+//                 );
+
+//                 // Calculate first distance
+//                 if (startPosition1 && endPosition1 && obj.type === 'Arrived At Site to In-Progress') {
+//                   distance = await this.calculateDistanceUsingGoogleAPI(
+//                     startPosition1.latitude, startPosition1.longitude,
+//                     endPosition1.latitude, endPosition1.longitude
+//                   );
+//                   rowValues.push(`${(await distance).toFixed(2)} km`);
+//                 } 
+//                 // Calculate second distance
+//                 else if (startPosition2 && endPosition2 && obj.type === 'Leaving Site to End Travel') {
+//                   distance = await this.calculateDistanceUsingGoogleAPI(
+//                     startPosition2.latitude, startPosition2.longitude,
+//                     endPosition2.latitude, endPosition2.longitude
+//                   );
+//                   rowValues.push(`${(await distance).toFixed(2)} km`);
+//                 } 
+//                 else {
+//                   rowValues.push('');
+//                 }
+//               }
+//               else if (custom.predefined === "time_taken_distance") {
+//                 let startPosition1: any;
+//                 let endPosition1: any;
+//                 let startPosition2: any;
+//                 let endPosition2: any;
+
+//                 // First time calculation (Accept to Start Travel to Arrived At Site)
+//                 startPosition1 = trackLocationObjects.find((item: any) =>
+//                   item.type === 'Accept to Start Travel'
+//                 );
+//                 endPosition1 = trackLocationObjects.find((item: any) =>
+//                   item.type === 'Arrived At Site to In-Progress'
+//                 );
+
+//                 // Second time calculation (Leaving Site to End Travel)
+//                 startPosition2 = trackLocationObjects.find((item: any) =>
+//                   item.type === 'Leaving Site to End Travel'
+//                 );
+//                 endPosition2 = trackLocationObjects.find((item: any) =>
+//                   item.type === 'In-Progress to Leaving Site' || item.type === 'Resolved to Leaving Site'
+//                 );
+
+//                 // Calculate first time difference
+//                 if (startPosition1 && endPosition1 && obj.type === 'Arrived At Site to In-Progress') {
+//                   const startDate = this.parseDateTime(startPosition1.Date_and_time);
+//                   const endDate = this.parseDateTime(endPosition1.Date_and_time);
+
+//                   if (startDate && endDate) {
+//                     const diffInMs = endDate.getTime() - startDate.getTime();
+//                     const diffInMins = Math.floor(diffInMs / 1000 / 60);
+//                     const diffInHours = Math.ceil(diffInMins / 60);
+//                     rowValues.push(`${diffInHours} hours`);
+//                   } else {
+//                     rowValues.push('');
+//                   }
+//                 } 
+//                 // Calculate second time difference
+//                 else if (startPosition2 && endPosition2 && obj.type === 'Leaving Site to End Travel') {
+//                   const startDate = this.parseDateTime(startPosition2.Date_and_time);
+//                   const endDate = this.parseDateTime(endPosition2.Date_and_time);
+
+//                   if (startDate && endDate) {
+//                     const diffInMs = endDate.getTime() - startDate.getTime();
+//                     const diffInMins = Math.floor(diffInMs / 1000 / 60);
+//                     const diffInHours = Math.ceil(diffInMins / 60);
+//                     rowValues.push(`${diffInHours} hours`);
+//                   } else {
+//                     rowValues.push('');
+//                   }
+//                 } 
+//                 else {
+//                   rowValues.push('');
+//                 }
+//               }
+//               else {
+//                 // Evaluate equation for other columns
+//                 const res = await this.evaluateTemplate(custom.equationText, obj, 'None');
+//                 rowValues.push(res || "");
+//               }
+//             }
+//           }
+
+//           trackLocationRows.push(rowValues);
+//         }
+//       }
+//     }
+
+//     // Aggregate calculations remain the same
+//     const aggregateRow = new Array(headers.length).fill('');
+//     for (let custom of customColumnForm) {
+//       if (custom.aggregate && custom.values && custom.values.length > 0) {
+//         let aggregateValue: any = null;
+
+//         if (custom.aggregate === 'SUM') {
+//           aggregateValue = custom.values.reduce((acc: any, val: any) => acc + val, 0);
+//         } else if (custom.aggregate === 'AVG') {
+//           aggregateValue = custom.values.reduce((acc: any, val: any) => acc + val, 0) / custom.values.length;
+//         } else if (custom.aggregate === 'MIN') {
+//           aggregateValue = Math.min(...custom.values);
+//         } else if (custom.aggregate === 'MAX') {
+//           aggregateValue = Math.max(...custom.values);
+//         }
+
+//         // Format the aggregated value
+//         let formattedValue = `${aggregateValue.toFixed(2)}`;
+//         if (custom.predefined === 'km Difference') {
+//           formattedValue += ' kms';
+//         } else if (custom.predefined === 'time_taken_distance') {
+//           formattedValue += ' hours';
+//         }
+
+//         aggregateRow[headers.length - customColumnForm.length + customColumnForm.indexOf(custom)] = `${formattedValue}`;
+//       }
+//     }
+
+//     trackLocationRows.push(aggregateRow);
+//   }
+
+//   return trackLocationRows;
+// }
 
   
 
@@ -4452,45 +4695,181 @@ splitCsv(csv: string): string[] {
 
 
 
-   parseDateTime(dateString: string): Date | null {
-    // Attempt to parse the date using JavaScript's Date object
-    let date = new Date(dateString);
+//   parseDateTime(dateString: string): Date | null  {
+//   // Try to parse the date normally first
+//   let date = new Date(dateString);
 
-    // If JavaScript Date object fails (NaN), try custom format: "24/1/2025 12:28:42 pm"
-    if (isNaN(date.getTime())) {
-        // Regex pattern for dates in the format of dd/mm/yyyy hh:mm:ss AM/PM
-        const customDatePattern = /^(\d{1,2})\/(\d{1,2})\/(\d{4})\s(\d{1,2}):(\d{2}):(\d{2})\s(AM|PM)$/;
+//   // If the date is invalid, try to process it manually
+//   if (isNaN(date.getTime())) {
+      
+//       // Regex pattern for dates in the format of dd/mm/yyyy hh:mm:ss AM/PM
+//       const customDatePattern = /^(\d{1,2})\/(\d{1,2})\/(\d{4})\s(\d{1,2}):(\d{2}):(\d{2})\s(AM|PM)$/i;
 
-        const match = customDatePattern.exec(dateString);
-        if (match) {
-            // Extract date parts
-            const day = parseInt(match[1], 10);
-            const month = parseInt(match[2], 10) - 1; // months are 0-based in JavaScript Date
-            const year = parseInt(match[3], 10);
-            let hours = parseInt(match[4], 10);
-            const minutes = parseInt(match[5], 10);
-            const seconds = parseInt(match[6], 10);
-            const period = match[7];
+//       const match = customDatePattern.exec(dateString);
+//       if (match) {
+//           // Extract date parts
+//           const day = parseInt(match[1], 10);
+//           const month = parseInt(match[2], 10) - 1; // months are 0-based in JavaScript Date
+//           const year = parseInt(match[3], 10);
+//           let hours = parseInt(match[4], 10);
+//           const minutes = parseInt(match[5], 10);
+//           const seconds = parseInt(match[6], 10);
+//           const period = match[7];
 
-            // Adjust hours for AM/PM
-            if (period === 'PM' && hours < 12) {
-                hours += 12;
-            }
-            if (period === 'AM' && hours === 12) {
-                hours = 0;
-            }
+//           // Adjust hours for AM/PM
+//           if (period === 'PM' && hours < 12) {
+//               hours += 12;
+//           }
+//           if (period === 'AM' && hours === 12) {
+//               hours = 0;
+//           }
 
-            // Create and return the Date object
-            date = new Date(year, month, day, hours, minutes, seconds);
-        } else {
-            // Return null if the format is unsupported
-            return null;
+//           // Create and return the Date object
+//           date = new Date(year, month, day, hours, minutes, seconds);
+//       } else {
+//           // If no valid format, return null
+//             const dateStr = dateString;
+//           const [day, month, year] = dateStr.split(' ')[0].split('/');
+//           const time = dateStr.split(' ')[1];
+//           dateString = `${year}-${month}-${day}T${time}`;
+          
+//           return new Date(dateString);
+//       }
+//   }
+
+//   // Ensure that the date is valid before returning
+//   return isNaN(date.getTime()) ? null : date;
+// }
+
+
+
+  // parseDateTime(dateString: string): Date | null  {
+      
+  //       let date:any = dateString
+          
+  //       // Regex pattern for dates in the format of dd/mm/yyyy hh:mm:ss AM/PM
+  //       const customDatePattern = /^(\d{1,2})\/(\d{1,2})\/(\d{4})\s(\d{1,2}):(\d{2}):(\d{2})\s(AM|PM)$/i;
+        
+      
+
+  //       const match = customDatePattern.exec(dateString);
+        
+  //         console.log("customDatePattern ",match);
+  //       if (match) {
+  //           // Extract date parts
+  //           const day = parseInt(match[2], 10);
+  //           const month = parseInt(match[1], 10) - 1; // months are 0-based in JavaScript Date
+  //           const year = parseInt(match[3], 10);
+  //           let hours = parseInt(match[4], 10);
+  //           const minutes = parseInt(match[5], 10);
+  //           const seconds = parseInt(match[6], 10);
+  //           const period = match[7];
+
+  //           // Adjust hours for AM/PM
+  //           if (period === 'PM' && hours < 12) {
+  //               hours += 12;
+  //           }
+  //           if (period === 'AM' && hours === 12) {
+  //               hours = 0;
+  //           }
+
+  //           // Create and return the Date object
+  //           date = new Date(year, month, day, hours, minutes, seconds);
+  //       } else {
+  //           // If no valid format, return null
+  //             const dateStr = dateString;
+  //           const [day, month, year] = dateStr.split(' ')[0].split('/');
+  //           const time = dateStr.split(' ')[1];
+  //           dateString = `${year}-${month}-${day}T${time}`;
+            
+  //           return new Date(dateString);
+  //       }
+
+
+  //   // Ensure that the date is valid before returning
+  //   return isNaN(date.getTime()) ? null : date;
+  // }
+
+
+
+  parseDateTime(dateString:any) {
+    let date:any = dateString;
+
+    // Updated regex pattern to allow single-digit day and month (e.g., 1/27/2025 instead of 01/27/2025)
+    const customDatePattern = /^(\d{2})\/(\d{2})\/(\d{4})\s(\d{1,2}):(\d{2}):(\d{2})\s(AM|PM)$/i;
+    
+    const customDatePattern1 = /^(\d{1})\/(\d{1,2})\/(\d{4})\s(\d{1,2}):(\d{2}):(\d{2})\s(AM|PM)$/i;
+
+    const match = customDatePattern.exec(dateString);
+    const match1 = customDatePattern1.exec(dateString);
+    
+    console.log("match", match);
+    
+    console.log("match1 ",match1);
+
+    if (match) {
+        // Extract date parts
+        const day = parseInt(match[1], 10);
+        const month = parseInt(match[2], 10) - 1; // months are 0-based in JavaScript Date
+        const year = parseInt(match[3], 10);
+        let hours = parseInt(match[4], 10);
+        const minutes = parseInt(match[5], 10);
+        const seconds = parseInt(match[6], 10);
+        const period = match[7];
+
+        // Adjust hours for AM/PM
+        if (period === 'PM' && hours < 12) {
+            hours += 12;
         }
+        if (period === 'AM' && hours === 12) {
+            hours = 0;
+        }
+
+        // Create Date object in local time (no UTC conversion)
+        date = new Date(year, month, day, hours, minutes, seconds);
+
+    }
+    else if(match1){
+        console.log("Second amc");
+         // Extract date parts
+        const day = parseInt(match1[2], 10);
+        const month = parseInt(match1[1], 10) - 1; // months are 0-based in JavaScript Date
+        const year = parseInt(match1[3], 10);
+        let hours = parseInt(match1[4], 10);
+        const minutes = parseInt(match1[5], 10);
+        const seconds = parseInt(match1[6], 10);
+        const period = match1[7];
+
+        // Adjust hours for AM/PM
+        if (period === 'PM' && hours < 12) {
+            hours += 12;
+        }
+        if (period === 'AM' && hours === 12) {
+            hours = 0;
+        }
+
+        // Create Date object in local time (no UTC conversion)
+        date = new Date(year, month, day, hours, minutes, seconds);
+    }
+        else {
+        // Handle cases without AM/PM
+        const dateParts = dateString.split(' ')[0].split('/');
+        const time = dateString.split(' ')[1] || "00:00:00"; // Default time to 00:00:00 if not provided
+        const [hour, minute, second] = time.split(':').map((x: string) => parseInt(x, 10));
+
+        const year = parseInt(dateParts[2], 10);
+        const month = parseInt(dateParts[1], 10) - 1; // months are 0-based in JavaScript Date
+        const day = parseInt(dateParts[0], 10);
+
+        // Use local time by creating a Date object
+        date = new Date(year, month, day, hour, minute, second);
     }
 
-    // Return the valid date or null if it could not be parsed
+    // Ensure that the date is valid before returning
     return isNaN(date.getTime()) ? null : date;
 }
+
+
 
 
   toggleFullScreenFullView(){
@@ -4881,10 +5260,12 @@ onCustomColumns(event:any,getValue:any,temp:any){
   this.addExcellOptions = true
 
 
+  if(temp != 'create'){
+          this.customLocationGroup = this.fb.group({
+        customForms: this.fb.array([this.createCustomForm1()])
+      });
+  }
 
-  this.customLocationGroup = this.fb.group({
-    customForms: this.fb.array([this.createCustomForm1()])
-  });
 
   // if(selectedValue == 'onCondition'){
   //   this.spinner.show()
@@ -5021,6 +5402,14 @@ addCustomCondition1(): void {
   const conditions = this.customConditions1();
   conditions.push(this.createCustomCondition1());
 }
+
+removeCustomCondition1(formIndex: number, condIndex: number): void {
+  const conditions = this.customForms1().at(formIndex).get('conditions') as FormArray;
+  console.log("Conditions are here ",conditions);
+  conditions.removeAt(condIndex);
+}
+
+
 
 // columnValidation1(event: any) {
 //   const condition = this.customConditions1().at(0).get('columnName')?.value;

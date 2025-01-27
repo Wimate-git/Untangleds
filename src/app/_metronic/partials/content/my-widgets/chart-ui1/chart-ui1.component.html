@@ -42,7 +42,8 @@ style="background: none; border: none; cursor: pointer;">
 </div>
 </div>
 
-<div *ngIf="item.grid_type === 'chart'" id="pieChart{{index + 1}}"  [style.width.px]="chartWidth" [style.height.px]="chartHeight">
+<div *ngIf="item.grid_type === 'chart'" id="pieChart{{index + 1}}" [style.width.px]="chartWidth" [style.height.px]="chartHeight"></div>
+
 
   <!-- <div class="custom-label" *ngIf="item.custom_Label">
     {{ item.custom_Label }}
@@ -50,7 +51,7 @@ style="background: none; border: none; cursor: pointer;">
 
 
 
-</div>
+
 <ng-template #modalContent>
   <app-custom-info-ui
 

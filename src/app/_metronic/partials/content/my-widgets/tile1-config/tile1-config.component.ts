@@ -74,6 +74,9 @@ export class Tile1ConfigComponent implements OnInit {
   listofFormValues: any;
   listofEquationParam: any;
   operationValue: any;
+  columnVisisbilityFields: any;
+  selectedText: any;
+  shoRowData:boolean = false
 
 
  
@@ -202,7 +205,10 @@ export class Tile1ConfigComponent implements OnInit {
       EquationFormList:[''],
       EquationParam:[[]],
       EquationOperation:[''],
-      EquationDesc:['']
+      EquationDesc:[''],
+      columnVisibility:[[]],
+      rowData:[]
+
 
     });
   }
@@ -431,6 +437,8 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         EquationParam:this.createKPIWidget.value.EquationParam,
         EquationOperation:this.createKPIWidget.value.EquationOperation,
         EquationDesc:this.createKPIWidget.value.EquationDesc,
+        columnVisibility:this.createKPIWidget.value.columnVisibility,
+        rowData:this.createKPIWidget.value.rowData || '',
 
 
 
@@ -542,6 +550,9 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         EquationParam: this.createKPIWidget.value.EquationParam,
         EquationOperation: this.createKPIWidget.value.EquationOperation,
         EquationDesc: updatedEquationDesc, // Update with recalculated value
+        columnVisibility:this.createKPIWidget.value.columnVisibility
+
+
       };
   
       console.log('Updated tile:', updatedTile);
@@ -742,24 +753,34 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     console.log('Operation Value:', operationValue);
   
     // Capture the selected parameters
-    const selectedParameters = this.selectedEquationParameterValue;
+    let selectedParameters: any = this.selectedEquationParameterValue;
     console.log('Selected Parameters:', selectedParameters);
   
-    if (Array.isArray(selectedParameters) && selectedParameters.length > 0) {
+    // Ensure selectedParameters is always an array
+    selectedParameters = Array.isArray(selectedParameters)
+      ? selectedParameters
+      : [selectedParameters]; // Wrap in an array if not already
+  
+    // Check if selectedParameters has valid data
+    if (selectedParameters && selectedParameters.length > 0) {
       // Format the parameters with form name, text, and value
       const formattedParameters = selectedParameters
-        .map(param => `\${${this.formName}.${param.text}.${param.value}}`)
+        .map(
+          (param: { text: any; value: any }) =>
+            `\${${this.formName}.${param.text}.${param.value}}`
+        )
         .join(', ');
   
       // Construct the full equation
       const formattedEquation = `${operationValue}(${formattedParameters})`;
+      console.log('Formatted Equation:', formattedEquation);
   
       // Patch the form control with the formatted equation
       this.createKPIWidget.patchValue({
         EquationDesc: formattedEquation,
       });
   
-      console.log('Formatted Equation:', formattedEquation);
+      console.log('Formatted Equation Updated:', formattedEquation);
     } else {
       console.warn('No parameters selected or invalid format:', selectedParameters);
   
@@ -772,6 +793,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     // Manually trigger change detection to ensure the UI reflects the changes
     this.cdr.detectChanges();
   }
+  
   
   
   
@@ -885,18 +907,32 @@ openKPIModal(tile: any, index: number) {
     } else if (Array.isArray(tile.EquationParam)) {
       parsedEquationParam = tile.EquationParam;
     }
+
+    // Parse filterParameter if it is a string
     let parsedFilterParam = [];
     if (typeof tile.filterParameter === 'string') {
       try {
         parsedFilterParam = JSON.parse(tile.filterParameter);
       } catch (error) {
-        console.error('Error parsing EquationParam:', error);
+        console.error('Error parsing filterParameter:', error);
       }
     } else if (Array.isArray(tile.filterParameter)) {
       parsedFilterParam = tile.filterParameter;
     }
 
-    console.log('Parsed EquationParam:', parsedEquationParam);
+    // Parse columnVisibility if it is a string
+    let parsedColumnVisibility = [];
+    if (typeof tile.columnVisibility === 'string') {
+      try {
+        parsedColumnVisibility = JSON.parse(tile.columnVisibility);
+      } catch (error) {
+        console.error('Error parsing columnVisibility:', error);
+      }
+    } else if (Array.isArray(tile.columnVisibility)) {
+      parsedColumnVisibility = tile.columnVisibility;
+    }
+
+    console.log('Parsed columnVisibility:', parsedColumnVisibility);
 
     // Populate the form control and selected parameters
     this.createKPIWidget.patchValue({
@@ -923,6 +959,7 @@ openKPIModal(tile: any, index: number) {
       EquationParam: parsedEquationParam, // Set parsed EquationParam
       EquationOperation: tile.EquationOperation,
       EquationDesc: tile.EquationDesc,
+      columnVisibility: parsedColumnVisibility, // Set parsed columnVisibility
     });
 
     // Set selected parameters
@@ -948,6 +985,61 @@ openKPIModal(tile: any, index: number) {
     matchingTheme.selected = true;
     console.log('Matching theme found and selected:', matchingTheme);
   }
+}
+
+
+
+getFormControlValue(selectedTextConfi:any): void {
+  // const formlistControl = this.createChart.get('formlist');
+  console.log('Formlist Control Value:', selectedTextConfi);
+  this.fetchDynamicFormDataConfig(selectedTextConfi);
+}
+
+fetchDynamicFormDataConfig(value: any) {
+  console.log("Data from lookup:", value);
+
+  this.api
+    .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
+    .then((result: any) => {
+      if (result && result.metadata) {
+        const parsedMetadata = JSON.parse(result.metadata);
+        console.log('parsedMetadata check dynamic',parsedMetadata)
+        const formFields = parsedMetadata.formFields;
+        console.log('formFields check',formFields)
+
+        // Initialize the list with formFields labels
+        this.columnVisisbilityFields = formFields.map((field: any) => {
+          console.log('field check',field)
+          return {
+            value: field.name,
+            text: field.label
+          };
+        });
+
+        // Include created_time and updated_time
+        if (parsedMetadata.created_time) {
+          this.columnVisisbilityFields.push({
+            value: parsedMetadata.created_time.toString(),
+            text: 'Created Time' // You can customize the label here if needed
+          });
+        }
+
+        if (parsedMetadata.updated_time) {
+          this.columnVisisbilityFields.push({
+            value: parsedMetadata.updated_time.toString(),
+            text: 'Updated Time' // You can customize the label here if needed
+          });
+        }
+
+        console.log('Transformed dynamic parameters config', this.columnVisisbilityFields);
+
+        // Trigger change detection to update the view
+        this.cdr.detectChanges();
+      }
+    })
+    .catch((err) => {
+      console.log("Can't fetch", err);
+    });
 }
 
 
@@ -1076,11 +1168,12 @@ openKPIModal(tile: any, index: number) {
   }
   selectFormParams(event: any) {
     if (event && event[0] && event[0].data) {
-      const selectedText = event[0].data.text;  // Adjust based on the actual structure
-      console.log('Selected Form Text:', selectedText);
+      this.selectedText = event[0].data.text;  // Adjust based on the actual structure
+      console.log('Selected Form Text:', this.selectedText);
+      this.getFormControlValue(this.selectedText); 
 
-      if (selectedText) {
-        this.fetchDynamicFormData(selectedText);
+      if (this.selectedText) {
+        this.fetchDynamicFormData(this.selectedText);
       }
     } else {
       console.error('Event data is not in the expected format:', event);
@@ -1132,6 +1225,7 @@ openKPIModal(tile: any, index: number) {
    
     { value: 'Count', text: 'Count' },
     { value: 'Count Dynamic', text: 'Count Dynamic' },
+    { value: 'Equation', text: 'Equation' },
 
   ]
 
@@ -1147,6 +1241,7 @@ openKPIModal(tile: any, index: number) {
     { value: 'Modal', text: 'Modal' },
     { value: 'Same page Redirect', text: 'Same page Redirect' },
 
+    { value: 'drill down', text: 'drill down' },
   ]
   onValueChange(selectedValue: any): void {
     // Handle any logic here if needed when the value changes

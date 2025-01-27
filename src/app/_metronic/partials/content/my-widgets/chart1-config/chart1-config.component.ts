@@ -77,6 +77,9 @@ export class Chart1ConfigComponent implements OnInit {
   dashboardIdsList: any;
   p1ValuesSummary: any;
   parsedParam: any;
+  shoRowData:boolean=false
+  columnVisisbilityFields: any;
+  selectedText: any;
 
 
  
@@ -188,6 +191,58 @@ export class Chart1ConfigComponent implements OnInit {
 
   
   }
+  getFormControlValue(selectedTextConfi:any): void {
+    // const formlistControl = this.createChart.get('formlist');
+    console.log('Formlist Control Value:', selectedTextConfi);
+    this.fetchDynamicFormDataConfig(selectedTextConfi);
+  }
+
+  fetchDynamicFormDataConfig(value: any) {
+    console.log("Data from lookup:", value);
+
+    this.api
+      .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
+      .then((result: any) => {
+        if (result && result.metadata) {
+          const parsedMetadata = JSON.parse(result.metadata);
+          console.log('parsedMetadata check dynamic',parsedMetadata)
+          const formFields = parsedMetadata.formFields;
+          console.log('formFields check',formFields)
+
+          // Initialize the list with formFields labels
+          this.columnVisisbilityFields = formFields.map((field: any) => {
+            console.log('field check',field)
+            return {
+              value: field.name,
+              text: field.label
+            };
+          });
+
+          // Include created_time and updated_time
+          if (parsedMetadata.created_time) {
+            this.columnVisisbilityFields.push({
+              value: parsedMetadata.created_time.toString(),
+              text: 'Created Time' // You can customize the label here if needed
+            });
+          }
+
+          if (parsedMetadata.updated_time) {
+            this.columnVisisbilityFields.push({
+              value: parsedMetadata.updated_time.toString(),
+              text: 'Updated Time' // You can customize the label here if needed
+            });
+          }
+
+          console.log('Transformed dynamic parameters config', this.columnVisisbilityFields);
+
+          // Trigger change detection to update the view
+          this.cdr.detectChanges();
+        }
+      })
+      .catch((err) => {
+        console.log("Can't fetch", err);
+      });
+  }
 
   get constants() {
     return (this.createChart.get('constants') as FormArray);
@@ -248,7 +303,7 @@ export class Chart1ConfigComponent implements OnInit {
         this.all_fields.push(
           this.fb.group({
             formlist: ['', Validators.required],
-            parameterName: ['', Validators.required],
+            parameterName: [[], Validators.required],
             // groupBy: ['', Validators.required],
             primaryValue: ['', Validators.required],
             groupByFormat: ['', Validators.required],
@@ -260,8 +315,9 @@ export class Chart1ConfigComponent implements OnInit {
             selectFromTime: [''],
             selectToTime: [''],
             parameterValue:[''],
-            dashboardIds:[''],
-            selectType:['']
+            columnVisibility:[[]],
+            rowData:['']
+       
 
           })
         );
@@ -613,95 +669,87 @@ preDefinedRange(preDefined:any){
 
 }
 
-repopulate_fields(getValues: any) {
-  let noOfParams: any = '';
-  
-  if (getValues && getValues !== null) {
-    noOfParams = getValues.noOfParams;
-
-    this.all_fields.clear();
-
-    // Parse chartConfig
-    let parsedChartConfig = [];
-    try {
-      // Check if chartConfig is a string before parsing
-      if (typeof getValues.chartConfig === 'string') {
-        parsedChartConfig = JSON.parse(getValues.chartConfig || '[]');
-      } else {
-        // If it's already an object, just assign it to parsedChartConfig
-        parsedChartConfig = Array.isArray(getValues.chartConfig) ? getValues.chartConfig : [];
-      }
-      console.log('Parsed chartConfig:', parsedChartConfig);
-    } catch (error) {
-      console.error('Error parsing chartConfig:', error);
-    }
-    console.log('selected params devices', getValues.device);
-
-    if (parsedChartConfig.length > 0) {
-      for (let i = 0; i < parsedChartConfig.length; i++) {
-        console.log('parsedChartConfig checking', parsedChartConfig[i]);
-
-        // Create predefinedRange object with both startDate and endDate as ISO strings
-        let predefinedRange: {
-          startDate: string | null;
-          endDate: string | null;
-        } = {
-          startDate: null,
-          endDate: null,
-        };
-
-        // Check and parse startDate and endDate
-        // if (parsedChartConfig[i].predefinedSelectRange) {
-        //   if (parsedChartConfig[i].predefinedSelectRange.startDate) {
-        //     predefinedRange.startDate = new Date(parsedChartConfig[i].predefinedSelectRange.startDate).toISOString();
-        //     // Validate the parsed startDate
-        //     if (isNaN(new Date(predefinedRange.startDate).getTime())) {
-        //       predefinedRange.startDate = null;
-        //     }
-        //   }
-
-        //   if (parsedChartConfig[i].predefinedSelectRange.endDate) {
-        //     predefinedRange.endDate = new Date(parsedChartConfig[i].predefinedSelectRange.endDate).toISOString();
-        //     // Validate the parsed endDate
-        //     if (isNaN(new Date(predefinedRange.endDate).getTime())) {
-        //       predefinedRange.endDate = null;
-        //     }
-        //   }
-        // }
-
-        // Add the fields to the form group with predefinedRange
-        this.all_fields.push(this.fb.group({
-          formlist: parsedChartConfig[i].formlist,
-          parameterName: parsedChartConfig[i].parameterName,
-          // groupBy: parsedChartConfig[i].groupBy,
-          primaryValue: parsedChartConfig[i].primaryValue,
-          groupByFormat: parsedChartConfig[i].groupByFormat,
-          constantValue: parsedChartConfig[i].constantValue,
-          // predefinedSelectRange: predefinedRange, // Use the predefinedRange object here
-          selectedRangeType: parsedChartConfig[i].selectedRangeType,
-          selectFromTime: parsedChartConfig[i].selectFromTime,
-          selectToTime: parsedChartConfig[i].selectToTime,
-          parameterValue:parsedChartConfig[i].parameterValue,
-          dashboardIds:parsedChartConfig[i].dashboardIds,
-          selectType:parsedChartConfig[i].selectType
-
-
-
-        }));
-      }
-    } else {
-      if (noOfParams !== "" && noOfParams !== undefined && noOfParams !== null) {
-        for (let i = this.all_fields.length; i >= noOfParams; i--) {
-          this.all_fields.removeAt(i);
-        }
-      }
-    }
+repopulate_fields(getValues: any): FormArray {
+  if (!getValues || getValues === null) {
+    console.warn('No data to repopulate');
+    return this.all_fields;
   }
 
-  console.log('after fields values assigned', this.all_fields);
+  // Clear existing fields in the FormArray
+  this.all_fields.clear();
+
+  // Parse `chartConfig` safely
+  let parsedChartConfig: any[] = [];
+  try {
+    if (typeof getValues.chartConfig === 'string') {
+      parsedChartConfig = JSON.parse(getValues.chartConfig || '[]');
+    } else if (Array.isArray(getValues.chartConfig)) {
+      parsedChartConfig = getValues.chartConfig;
+    }
+  } catch (error) {
+    console.error('Error parsing chartConfig:', error);
+    parsedChartConfig = [];
+  }
+
+  console.log('Parsed chartConfig:', parsedChartConfig);
+
+  // Populate FormArray based on parsedChartConfig
+  if (parsedChartConfig.length > 0) {
+    parsedChartConfig.forEach((configItem, index) => {
+      console.log(`Processing index ${index} - Full Object:`, configItem);
+
+      // Handle columnVisibility as a simple array initialization
+      const columnVisibility = Array.isArray(configItem.columnVisibility)
+        ? configItem.columnVisibility.map((item: { text: any; value: any; }) => ({
+            text: item.text || '',
+            value: item.value || '',
+          }))
+        : [];
+
+      // Handle filterParameter dynamically
+      const filterParameterValue = Array.isArray(configItem.filterParameter)
+        ? configItem.filterParameter
+        : [];
+
+      // Handle filterParameter1 dynamically
+      const filterParameter1Value = Array.isArray(configItem.filterParameter1)
+        ? configItem.filterParameter1
+        : [];
+
+        const arrayParameter = Array.isArray(configItem.parameterName)
+        ? configItem.parameterName
+        : [];
+
+      // Create and push FormGroup into FormArray
+      this.all_fields.push(
+        this.fb.group({
+          formlist: configItem.formlist || '',
+          parameterName: this.fb.control(arrayParameter),
+          primaryValue: configItem.primaryValue || '',
+          groupByFormat: configItem.groupByFormat || '',
+          constantValue: configItem.constantValue || '',
+          selectedRangeType: configItem.selectedRangeType || '',
+          selectFromTime: configItem.selectFromTime || '',
+          selectToTime: configItem.selectToTime || '',
+          parameterValue: configItem.parameterValue || '',
+          columnVisibility: this.fb.control(columnVisibility), // Use control to handle as an array
+          filterParameter: this.fb.control(filterParameterValue), // Use control for dynamic handling
+          filterParameter1: this.fb.control(filterParameter1Value), // Same for filterParameter1
+        })
+      );
+
+      // Log the added FormGroup for debugging
+      console.log(`FormGroup at index ${index}:`, this.all_fields.at(index).value);
+    });
+  } else {
+    console.warn('No parsed data to populate fields');
+  }
+
+  console.log('Final FormArray Values:', this.all_fields.value);
 
   return this.all_fields;
 }
+
 
 
 
@@ -979,11 +1027,12 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   }
   selectFormParams(event: any) {
     if (event && event[0] && event[0].data) {
-      const selectedText = event[0].data.text;  // Adjust based on the actual structure
-      console.log('Selected Form Text:', selectedText);
+      this.selectedText = event[0].data.text;  // Adjust based on the actual structure
+      console.log('Selected Form Text:', this.selectedText);
+      this.getFormControlValue(this.selectedText); 
 
-      if (selectedText) {
-        this.fetchDynamicFormData(selectedText);
+      if (this.selectedText) {
+        this.fetchDynamicFormData(this.selectedText);
       }
     } else {
       console.error('Event data is not in the expected format:', event);
@@ -1030,6 +1079,8 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     { value: 'Count', text: 'Count' },
     { value: 'Count_Multiple', text: 'Count Multiple' },
     { value: 'Count Dynamic', text: 'Count Dynamic' },
+    { value: 'Count MultiplePram', text: 'Count MultiplePram' },
+
 
 
   ]

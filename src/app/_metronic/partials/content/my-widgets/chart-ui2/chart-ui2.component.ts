@@ -12,6 +12,7 @@ export class ChartUi2Component implements OnInit{
   gridOptions: any;
   @Input() chartWidth:any
   @Input() chartHeight:any
+  @Output() sendCellInfo = new EventEmitter<any>();
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
@@ -93,10 +94,34 @@ export class ChartUi2Component implements OnInit{
   ngOnInit(){
     console.log('item chacke',this.item.grid_details)
   }
+  onBarClick(event: Highcharts.PointClickEventObject): void {
+    console.log('Pie clicked:', {
+      value: event.point.y,
+  
+    });
+  
+    // Emit the cell info if needed
+    this.sendCellInfo.emit(event);
+  }
 
   createLineChart() {
+    console.log('this.chartOptions from line chart function',this.chartOptions)
 
-  console.log('this.chartOptions from function',this.chartOptions)
+    this.chartOptions.series = this.chartOptions.series.map((series: any) => {
+      return {
+        ...series,
+        data: series.data.map((value: number, index: number) => ({
+          y: value,
+          customIndex: index,
+          events: {
+            click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event),
+          },
+        })),
+      };
+    });
+
+
+ 
     Highcharts.chart(`lineChart${this.index+1}`, this.chartOptions);
   }
   

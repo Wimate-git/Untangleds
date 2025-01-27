@@ -174,7 +174,9 @@ export class SavedQueryComponent implements OnInit {
       conditionMetadata:JSON.stringify(this.savedModulePacket.conditionMetadata) || JSON.stringify([]),
       columnVisibility:JSON.stringify(this.savedModulePacket.columnVisibility),
       tableState:JSON.stringify(JSON.parse(JSON.stringify(this.tableState))),
-      customColumnMetadata:JSON.stringify(this.savedModulePacket.customColumnMetadata)
+      customColumnMetadata:JSON.stringify(this.savedModulePacket.customColumnMetadata),
+      advancedCustomColumnMetadata:JSON.stringify(this.savedModulePacket.advancedCustomColumnMetadata),
+      advancedFilterColumnMetadata:JSON.stringify(this.savedModulePacket.advancedFilterColumnMetadata)
     }
 
     console.log("Table state is here ",JSON.parse(JSON.stringify(this.tableState)));
