@@ -228,6 +228,10 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   isFilterdetail: boolean;
   storeFilterDetail: any[];
   updatedQueryPramas: any;
+  sendRowDynamic: any;
+  storeDrillDown: any;
+  responseBody: any;
+  responseRowData: any;
 
 
   createPieChart() {
@@ -777,6 +781,9 @@ checkAndSetFullscreen(): void {
 }
 invokeHelperDashboard(item: any, index: number, template: any,modaref:any): void {
 
+
+this.showDrillDownData(item)
+
   this.currentModalIndex = index;
 
     this.currentItem = item
@@ -799,6 +806,67 @@ invokeHelperDashboard(item: any, index: number, template: any,modaref:any): void
     // });
 
 }
+showDrillDownData(dynamicDrill:any){
+  console.log('dynamicDrill checking',dynamicDrill)
+  this.storeDrillDown = dynamicDrill
+  console.log('this.storeDrillDown',this.storeDrillDown.id)
+        // Define the API Gateway URL
+        const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+    
+        // Prepare the request body
+        const requestBody = {
+          body: JSON.stringify({
+            clientId: this.SK_clientID,
+            routeId: this.routeId,
+            widgetId:this.storeDrillDown.id,
+            TileData:'',
+            MsgType:'DrillDown'
+          }),
+        };
+      
+        console.log('requestBody Tile', requestBody);
+      
+        // Send a POST request to the Lambda function with the body
+        this.http.post(apiUrl, requestBody).subscribe(
+          (response: any) => {
+            console.log('Lambda function triggered successfully:', response);
+            this.responseBody = JSON.parse(response.body)
+            console.log('this.responseBody checking',this.responseBody )
+            this.responseRowData = JSON.parse(this.responseBody.rowdata)
+            console.log('this.responseRowData checking',this.responseRowData)
+        
+            
+            
+        
+            // Display SweetAlert success message
+            // Swal.fire({
+            //   title: 'Success!',
+            //   text: 'Lambda function triggered successfully.',
+            //   icon: 'success',
+            //   confirmButtonText: 'OK'
+            // });
+      
+            // Proceed with route parameter handling
+  
+      
+     // Reset loading state
+          },
+          (error: any) => {
+            console.error('Error triggering Lambda function:', error);
+      
+            // Display SweetAlert error message
+            Swal.fire({
+              title: 'Error!',
+              text: 'Failed to trigger the Lambda function. Please try again.',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
+     // Reset loading state
+          }
+        );
+
+}
+
 helperTileClick(event:any,modalChart:any){
   console.log('event checking',event)
   this.modalService.open(modalChart, { size: 'lg' });
@@ -959,14 +1027,19 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
     this.router.navigate([navigationPath]).then(() => {
       window.location.reload();
     }).catch(err => console.error('Navigation error:', err));
-  } else if (packet.selectType === 'drill down') {
+  }else if (packet.selectType === 'drill down') {
     if (modaref && modaref instanceof TemplateRef) {
       console.log('Opening modal with modaref:', modaref);
-      this.modalService.open(modaref, { size: 'lg', backdrop: 'static', centered: true });
+      this.modalService.open(modaref, {
+        size: 'lg',
+        backdrop: true, // Allows closing by clicking outside of the modal
+        centered: true
+      });
     } else {
       console.error('Invalid TemplateRef passed for modal:', modaref);
     }
   }
+  
 }
 
 
@@ -5895,6 +5968,12 @@ refreshFunction(){
   helperChartClickChart2(event:any,modalChart:any){
     console.log('event checking',event)
     this.modalService.open(modalChart, { size: 'lg' });
+  }
+  helperRow(rowDynamic:any){
+    console.log('rowDynamic checking',rowDynamic)
+    this.sendRowDynamic = rowDynamic
+    console.log('this.sendRowDynamic',this.sendRowDynamic)
+
   }
 
 

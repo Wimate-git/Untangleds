@@ -6,11 +6,11 @@
       <div class="container1">
         <div class="ag-theme-alpine" style="width: 100%; height: 400px;">
           <ag-grid-angular
-            [rowData]="modalData"
+            [rowData]="responseRowData"
             [columnDefs]="columnDefs"
             [defaultColDef]="defaultColDef"
             [pagination]="true"
-            [paginationPageSize]="5"
+            [paginationPageSize]="10"
             style="width: 100%; height: 100%;"
           ></ag-grid-angular>
         </div>

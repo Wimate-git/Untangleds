@@ -24,6 +24,10 @@ export class ChartUi1Component implements OnChanges {
   @Output() sendCellInfo = new EventEmitter<any>();
   @Input() routeId:any
   @Input() SK_clientID:any
+  checkResBody: any;
+  parsedResBody: any;
+  processedData: any;
+  @Output() paresdDataEmit = new EventEmitter<any>();
   
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
@@ -93,6 +97,15 @@ export class ChartUi1Component implements OnChanges {
       this.http.post(apiUrl, requestBody).subscribe(
         (response: any) => {
           console.log('Lambda function triggered successfully:', response);
+          this.checkResBody = response.body
+          console.log('this.checkResBody',this.checkResBody)
+          this.parsedResBody = JSON.parse(this.checkResBody)
+          console.log('this.parsedResBody checking',this.parsedResBody)
+          this.processedData = JSON.parse(this.parsedResBody.rowdata)
+          console.log('this.processedData check',this.processedData)
+          this.paresdDataEmit.emit(this.processedData); 
+          
+          
       
           // Display SweetAlert success message
           // Swal.fire({

@@ -1,0 +1,71 @@
+// .grid-item-content {
+//     width: 100%;
+//     height: 100%;
+//     display: flex;
+//     flex-direction: column;
+//   }
+  
+//   .widget-title {
+//     font-weight: bold;
+//     margin-bottom: 10px;
+//     text-align: center;
+//   }
+  
+//   .ag-theme-alpine {
+//     width: 100%;
+//     height: 100%;
+//   }
+.text_3d {
+    position: fixed;
+    top: 50%; 
+    right: 50%;
+  
+    transform: translate(50%, -50%);
+  }
+  .processed-value-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Ensure it takes up full width of its parent */
+    height: auto; /* Remove 100% height to make it responsive */
+  }
+  .grid-item-content {
+    background-color: gray;
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: calc(1.2rem + 1vw); /* Responsive font size based on viewport width */
+    height: 100%;
+    border-radius: 5px;
+    text-align: center;
+  }
+  
+  .grid-item-content h3 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  
+  .grid-item-content p {
+    font-size: 1rem;
+  }
+  .grid-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .custom-label {
+    font-weight: bold;
+    margin-bottom: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 18px; /* Adjust size as needed */
+  }
+  
+  
