@@ -1,5 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import Highcharts from 'highcharts';
+import { HttpClient } from '@angular/common/http';
+import Swal from 'sweetalert2';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Router } from '@angular/router';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-chart-ui3',
@@ -15,6 +20,13 @@ export class ChartUi3Component implements OnInit{
   parseChartOptions: any;
   extractSeries: any;
   @Output() sendCellInfo = new EventEmitter<any>();
+  @Input() routeId:any
+  @Input() SK_clientID:any
+  checkResBody: any;
+  parsedResBody: any;
+  processedData: any;
+  @Output() paresdDataEmit = new EventEmitter<any>();
+  
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
@@ -65,6 +77,10 @@ export class ChartUi3Component implements OnInit{
 
     
   }
+  constructor(
+    private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient
+    
+   ){}
 
   onBarClick(event: Highcharts.PointClickEventObject): void {
     console.log('Bar clicked:', {
@@ -72,7 +88,74 @@ export class ChartUi3Component implements OnInit{
       value: event.point.y,
      
     });
-    this.sendCellInfo.emit(event)
+
+    const pointData = {
+      name: event.point.name,  // Pie chart label
+      value: event.point.y     // Data value
+    };
+    console.log('pointData checking',pointData)
+
+
+      // Define the API Gateway URL
+      const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+    
+      // Prepare the request body
+      const requestBody = {
+        body: JSON.stringify({
+          clientId: this.SK_clientID,
+          routeId: this.routeId,
+          widgetId:this.item.id,
+          chartData:pointData,
+          MsgType:'DrillDown'
+        }),
+      };
+    
+      console.log('requestBody checking', requestBody);
+    
+      // Send a POST request to the Lambda function with the body
+      this.http.post(apiUrl, requestBody).subscribe(
+        (response: any) => {
+          console.log('Lambda function triggered successfully:', response);
+          this.checkResBody = response.body
+          console.log('this.checkResBody',this.checkResBody)
+          this.parsedResBody = JSON.parse(this.checkResBody)
+          console.log('this.parsedResBody checking',this.parsedResBody)
+          this.processedData = JSON.parse(this.parsedResBody.rowdata)
+          console.log('this.processedData check',this.processedData)
+          this.paresdDataEmit.emit(this.processedData); 
+          
+          
+      
+          // Display SweetAlert success message
+          // Swal.fire({
+          //   title: 'Success!',
+          //   text: 'Lambda function triggered successfully.',
+          //   icon: 'success',
+          //   confirmButtonText: 'OK'
+          // });
+    
+          // Proceed with route parameter handling
+
+    
+   // Reset loading state
+        },
+        (error: any) => {
+          console.error('Error triggering Lambda function:', error);
+    
+          // Display SweetAlert error message
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to trigger the Lambda function. Please try again.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+   // Reset loading state
+        }
+      );
+
+    // Emit the cell info if needed
+    this.sendCellInfo.emit(event);
+
   }
   
   ngAfterViewInit(){
