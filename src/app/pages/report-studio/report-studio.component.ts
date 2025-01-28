@@ -243,7 +243,8 @@ columns: any;
       advanceOption:['all'],
       addExcellOption:['all'],
       columnOption: ['all'],
-      addColumn:['false']
+      addColumn:['false'],
+      excelSheets:[[]]
     });
 
 
@@ -1108,7 +1109,16 @@ async onFilterChange(event: any,getValue:any,key:any) {
   }
 
 
+
+
+  
+
    async onSubmit() {
+
+    console.log("reportMetadata.excelSheets ",this.reportsFeilds.value.excelSheets);
+
+
+    this.buildConditionLocationString(this.mainFormGroup.value.dynamicConditions)
 
     this.trackLocationMapFlag = false
 
@@ -2034,6 +2044,60 @@ async evaluateTemplate(template: string, metadata: any, getkey: any) {
 
 
 
+async evaluateRowsTemplate(template:any, row:any, headers:any) {
+
+  const matches = template.match(/\${(.*?)}/g);
+
+
+  if (!matches) {
+    return template;
+  }
+
+
+  matches.forEach((match:any) => {
+    const variableName = match.replace(/\${|}/g, '').trim(); // 
+
+    console.log("variableName:", variableName);
+
+
+    const metadataKey = headers.indexOf(variableName);
+
+    console.log("metadataKey:", metadataKey);
+
+   
+    const substitutedValue = metadataKey !== -1 ? row[metadataKey] : match;
+
+    console.log("substitutedValue:", substitutedValue);
+
+ 
+    const formattedValue = typeof substitutedValue === 'string' ? `'${substitutedValue}'` : substitutedValue;
+
+
+    template = template.replace(match, formattedValue);
+  });
+
+  try {
+  
+    const result = eval(template); 
+    console.log("Template after substitution:", template);
+    console.log("Result:", result);
+    return result;
+  } catch (error) {
+    console.error("Error evaluating template:", error);
+
+    // Show an error message to the user
+    Swal.fire({
+      title: "Error while evaluating",
+      text: "Please check your conditions or script.",
+      icon: "error",
+      confirmButtonText: "Okay"
+    });
+    return null;
+  }
+}
+
+
+
 
 
 
@@ -2370,7 +2434,8 @@ mergeAndAddLocation(mappedResponse: any) {
              columnOption:reportMetadata.columnOption,
              addColumn:reportMetadata.addColumn,
              addExcellOption:reportMetadata.addExcellOption,
-             advanceOption:reportMetadata.advanceOption
+             advanceOption:reportMetadata.advanceOption,
+             excelSheets:reportMetadata && reportMetadata.excelSheets?reportMetadata.excelSheets:[]
            })        
            
            this.selectedItem = []
@@ -2711,6 +2776,8 @@ mergeAndAddLocation(mappedResponse: any) {
 
   async exportAllTablesAsExcel() {
 
+    const excelSheets = this.reportsFeilds.value.excelSheets
+
     this.spinner.show()
 
     try{
@@ -2738,7 +2805,17 @@ mergeAndAddLocation(mappedResponse: any) {
         // Add the worksheet to the workbook with the name of the formFilter
         let sheetName = this.tableDataWithFormFilters[index].formFilter;
         sheetName = sheetName.length > 30 ? sheetName.slice(0, 30) : sheetName;
-        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+
+        if(excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0){
+          if(excelSheets.includes('mainForm')){
+            XLSX.utils.book_append_sheet(wb, ws, sheetName);
+          }
+        }
+        else{
+          XLSX.utils.book_append_sheet(wb, ws, sheetName);
+        }
+
+ 
     
         try {
           const trackLocationColumnIndex = headers.indexOf('TrackLocation');
@@ -2751,7 +2828,19 @@ mergeAndAddLocation(mappedResponse: any) {
             const trackLocationSheet = XLSX.utils.aoa_to_sheet(trackLocationData);
             let sheetName1 = `TrackLocation ${this.tableDataWithFormFilters[index].formFilter}`;
             sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
-            XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
+
+
+            if(excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0 ){
+              if(excelSheets.includes('trackLocation')){
+                XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
+              }
+            }
+            else{
+              XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
+            }
+
+
+           
           }
     
           const approvalColumnIndex = headers.indexOf('Approval History');
@@ -2760,7 +2849,20 @@ mergeAndAddLocation(mappedResponse: any) {
             const approvalSheet = XLSX.utils.aoa_to_sheet(approvalData);
             let sheetName1 = `Approval History ${this.tableDataWithFormFilters[index].formFilter}`;
             sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
-            XLSX.utils.book_append_sheet(wb, approvalSheet, sheetName1);
+
+
+            if(excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0 ){
+              if(excelSheets.includes('approvalHistory')){
+                XLSX.utils.book_append_sheet(wb, approvalSheet, sheetName1);
+              }
+             
+            }
+            else{
+              XLSX.utils.book_append_sheet(wb, approvalSheet, sheetName1);
+            }
+
+
+          
           }
   
           console.log("HEaders are here ",headers);
@@ -2782,7 +2884,18 @@ mergeAndAddLocation(mappedResponse: any) {
                   sheetName1 = `${filteredFormName[tableKey]} ${this.tableDataWithFormFilters[index].formFilter}`;
                 }
                 sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
-                XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1);
+
+
+
+                if(excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0){
+                  if(excelSheets.includes('miniTable')){
+                    XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1);
+                  }
+              
+                }
+                else{
+                  XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1);
+                }
               }
             }
           }
@@ -3307,7 +3420,7 @@ mergeAndAddLocation(mappedResponse: any) {
 // }
 
 async extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: any) {
-  const trackLocationRows: any[] = [];
+  let trackLocationRows: any[] = [];
   const customColumnForm = this.customLocationGroup.value.customForms[0].conditions;
 
 
@@ -3317,6 +3430,8 @@ async extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: 
   const headers = [
     "ID", "Date and Time", "Label ID", "Label Name", "Latitude", "Longitude", "Name", "Type"
   ];
+
+  const tempHeaders = ['id','Date_and_time','label_id','label_name','latitude','longitude','name','type']
 
   let conditionalString = '';
   if (this.isFormAdvancedVisible) {
@@ -3333,23 +3448,23 @@ async extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: 
 
   for (const row of this.tableDataWithFormFilters[index]["rows"]) {
     let trackLocationObjects = row.trackLocation || [];
-    let filteredTrackLocationObjects: any[] = [];
+    // let filteredTrackLocationObjects: any[] = [];
 
-    if (this.isFormAdvancedVisible) {
-      const promises = trackLocationObjects.map(async (data: any) => {
-        if (await this.evaluateTemplate(conditionalString, data, 'None')) {
-          return data;
-        }
-      });
-      filteredTrackLocationObjects = await Promise.all(promises);
-    }
-    else{
-      filteredTrackLocationObjects = trackLocationObjects
-    }
+    // if (this.isFormAdvancedVisible) {
+    //   const promises = trackLocationObjects.map(async (data: any) => {
+    //     if (await this.evaluateTemplate(conditionalString, data, 'None')) {
+    //       return data;
+    //     }
+    //   });
+    //   filteredTrackLocationObjects = await Promise.all(promises);
+    // }
+    // else{
+    //   filteredTrackLocationObjects = trackLocationObjects
+    // }
 
-    trackLocationObjects = filteredTrackLocationObjects.filter((item) => item);  // Remove undefined/null values
+    // trackLocationObjects = filteredTrackLocationObjects.filter((item) => item);  // Remove undefined/null values
 
-    console.log("Filtered after condition is here trackLocationObjects ", filteredTrackLocationObjects);
+    // console.log("Filtered after condition is here trackLocationObjects ", filteredTrackLocationObjects);
      
     // Process each location object
     for (const obj of trackLocationObjects) {
@@ -3379,16 +3494,25 @@ async extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: 
         }
       }
 
-      trackLocationRows.push(rowValues);
+
+      if (this.isFormAdvancedVisible && obj) {
+          const isValid = await this.evaluateRowsTemplate(conditionalString, rowValues, tempHeaders);
+          if(isValid){
+          trackLocationRows.push(rowValues);
+          }
+      }
+      else{
+        trackLocationRows.push(rowValues);
+      }
+
     }
   }
 
     console.log("Custom Rows before adding values are here ",customColumnForm);
 
     trackLocationRows.push(this.calculateAggregateRow(headers, customColumnForm));
+
   
-
-
   return trackLocationRows;
 }
 
@@ -3398,12 +3522,12 @@ async calculateKmDifference(trackLocationObjects: any[], currentType: string,cus
 
   let kmCalculations = [
     {
-      start: ['Accept to Start Travel','Open to Accept'],
-      end: ['Arrived At Site to In-Progress'],
-      matchType: 'Arrived At Site to In-Progress'
+      start: ['Accept to Start Travel'],
+      end: ['Start Travel to Arrived At Site'],
+      matchType: 'Start Travel to Arrived At Site'
     },
     {
-      start: ['In-Progress to Leaving Site'],
+      start: ['In-Progress to Leaving Site','In-Progress to Resolved'],
       end: ['Leaving Site to End Travel'],
       matchType: 'Leaving Site to End Travel'
     }
@@ -3453,11 +3577,11 @@ async calculateTimeTaken(trackLocationObjects: any[], currentType: string,custom
   let timeCalculations = [
     {
       start: ['Accept to Start Travel','Open to Accept'],
-      end: ['Arrived At Site to In-Progress'],
-      matchType: 'Arrived At Site to In-Progress'
+      end: ['Start Travel to Arrived At Site'],
+      matchType: 'Start Travel to Arrived At Site'
     },
     {
-      start:['In-Progress to Leaving Site'] ,
+      start:['In-Progress to Leaving Site','In-Progress to Resolved'] ,
       end: ['Leaving Site to End Travel'],
       matchType: 'Leaving Site to End Travel'
     }
@@ -4555,7 +4679,8 @@ splitCsv(csv: string): string[] {
            form_permission:reportMetadata.form_permission , 
            filterOption:reportMetadata.filterOption ,
            columnOption:reportMetadata.columnOption,
-           addColumn:reportMetadata.addColumn
+           addColumn:reportMetadata.addColumn,
+           excelSheets:reportMetadata.excelSheets
          })       
          
          this.selectedForms = reportMetadata.form_permission
@@ -5124,7 +5249,8 @@ return this.fb.group({
   field: [conditionData.field, Validators.required],
   operator: [conditionData.operator, Validators.required],
   value: [conditionData.value, Validators.required],
-  logicalOperator: [conditionData.logicalOperator, Validators.required]
+  logicalOperator: [conditionData.logicalOperator, Validators.required],
+  bracket:[conditionData && conditionData.bracket ? conditionData.bracket : '', Validators.required]
 });
 }
 
@@ -5148,7 +5274,8 @@ createConditionGroup(): FormGroup {
     field: ['', Validators.required],        // Field to compare
     operator: ['', Validators.required],     // Operator (e.g., ==, >)
     value: ['', Validators.required],        // Value to compare against
-    logicalOperator: ['']                    // Optional AND/OR for multiple conditions
+    logicalOperator: [''],                    // Optional AND/OR for multiple conditions
+    bracket:['']
   });
 }
 
@@ -5185,13 +5312,12 @@ onValueChange(index: number) {
 }
 
 
-
 async buildConditionLocationString(conditions:any) {
   let conditionString = '';
 
-  conditions.forEach((condition: any, index: number) => {
+  conditions.forEach((condition: { operator: string; bracket: any; field: any; value: any; logicalOperator: any; }, index: number) => {
     const operator = condition.operator;
-
+    const bracket = condition.bracket
 
     let formattedCondition = ''
     if(condition.operator == 'includes'){
@@ -5201,7 +5327,13 @@ async buildConditionLocationString(conditions:any) {
       formattedCondition = `\${${condition.field}}.${operator}('${condition.value}')`;
     }
     else if(condition.operator == 'endsWith'){
-      formattedCondition = `\${${condition.field}}.${operator}('${condition.value}')`;
+      formattedCondition = `\${${condition.field}}.${operator}('${condition.value}')`;;
+    }
+    else if(bracket == "("){
+      formattedCondition = `${bracket}\${${condition.field}} ${operator} '${condition.value}'`;
+    }
+     else if(bracket == ")"){
+      formattedCondition = `\${${condition.field}} ${operator} '${condition.value}'`+ bracket;
     }
     else{
       formattedCondition = `\${${condition.field}} ${operator} '${condition.value}'`;
@@ -5219,8 +5351,11 @@ async buildConditionLocationString(conditions:any) {
     }
   });
 
+  console.log("conditionString ",conditionString);
+
   return conditionString;
 }
+
 
 onCustomColumns(event:any,getValue:any,temp:any){
   let selectedValue
