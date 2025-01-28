@@ -18,10 +18,11 @@
       <!-- Parameter Name and Processed Value -->
       <div *ngFor="let config of parsedTileConfig" class="parameter-container" style="margin-bottom: 5px;">
         <div 
+         [style.font-size]="item.fontSize" 
           class="parameter-name" 
           [style.color]="item.fontColor" 
           style="font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-          {{ config.label }}
+          {{ config.custom_Label }}
         </div>
         <div 
           class="processed-value" 
@@ -37,7 +38,7 @@
       style="position: absolute; top: 10px; right: 10px; gap: 10px;">
       <!-- Edit Button -->
       <button
-        *ngIf="isEditModeView && !hideButton"
+        *ngIf="!isEditModeView && !hideButton"
         class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px"
         (click)="edit_each_tileUI(item, index)"
         aria-haspopup="menu"
@@ -46,7 +47,7 @@
         <i class="bi bi-pencil" style="color: black;"></i>
       </button>
       <button
-        *ngIf="!isEditModeView && shouldShowButton && !hideButton"
+        *ngIf="isEditModeView  && hideButton"
         (click)="helperDashboard(item, index, modalContent, item.selectType)"
         class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px"
         aria-haspopup="menu"
@@ -57,7 +58,7 @@
 
       <!-- Dropdown Menu -->
       <div class="dropdown">
-        <button *ngIf="isEditModeView"
+        <button *ngIf="!isEditModeView && !hideButton"
                 [matMenuTriggerFor]="menu"
                 class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px">
           <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>

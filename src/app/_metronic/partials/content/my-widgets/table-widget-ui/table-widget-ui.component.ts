@@ -71,6 +71,7 @@ export class TableWidgetUiComponent implements OnInit{
     resizable: true, // Allow columns to be resized
     sortable: true, // Enable sorting
     filter: true, // Enable filtering
+    enableColMove: true
   };
   autoSizeAllColumns() {
     const allColumnIds: string[] = [];

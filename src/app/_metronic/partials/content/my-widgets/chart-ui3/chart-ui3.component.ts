@@ -83,6 +83,7 @@ export class ChartUi3Component implements OnInit{
    ){}
 
   onBarClick(event: Highcharts.PointClickEventObject): void {
+    console.log('event check for column chart',event)
     console.log('Bar clicked:', {
       category: event.point.category,
       value: event.point.y,
@@ -90,10 +91,10 @@ export class ChartUi3Component implements OnInit{
     });
 
     const pointData = {
-      name: event.point.name,  // Pie chart label
+      name: event.point.category,  // Pie chart label
       value: event.point.y     // Data value
     };
-    console.log('pointData checking',pointData)
+    console.log('pointData checking column chart',pointData)
 
 
       // Define the API Gateway URL

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { GridApi ,Column} from 'ag-grid-community';
+import pdfMake from 'pdfmake/build/pdfmake';
 import * as XLSX from 'xlsx';  
 
 @Component({
@@ -43,6 +44,7 @@ export class DataTableChart1Component {
     sortable: true,
     filter: true,
     resizable: true,
+    enableColMove: true
   };
 
 
@@ -104,6 +106,15 @@ this.parseChartConfig(this.all_Packet_store);
       resizable: true
     }));
   }
+  // deleteColumn(colId: string): void {
+  //   // Filter out the column with the specified colId
+  //   this.columnDefs = this.columnDefs.filter(col => col.field !== colId);
+  //   // Update the grid with the new column definitions
+  //   if (this.gridApi) {
+  //     this.gridApi.setColumnDefs(this.columnDefs);
+  //   }
+  // }
+  
 
   exportToCSV(): void {
     if (this.gridApi) {
@@ -166,6 +177,152 @@ this.parseChartConfig(this.all_Packet_store);
     link.href = URL.createObjectURL(blob);
     link.download = 'table-data.xlsx';
     link.click();
+  }
+
+  exportAllTablesAsPDF() {
+    if (!this.sendRowDynamic || this.sendRowDynamic.length === 0) {
+      console.error('No data available for export.');
+      return; // Exit if there's no data to export
+    }
+  
+    const docDefinition: any = {
+      content: [],
+      defaultStyle: {
+        // font: 'Roboto',
+      },
+      styles: {
+        tableHeader: {
+          bold: true,
+          fontSize: 14,
+          alignment: 'center',
+          fillColor: '#4CAF50',
+          color: '#fff',
+          margin: [0, 5],
+          padding: [5, 10],
+        },
+        tableBody: {
+          fontSize: 10,
+          alignment: 'center',
+          margin: [0, 5],
+          padding: [5, 10],
+        },
+        alternatingRow: {
+          fillColor: '#f9f9f9',
+        },
+        footer: {
+          fontSize: 10,
+          alignment: 'center',
+          margin: [0, 10],
+        },
+        title: {
+          fontSize: 18,
+          bold: true,
+          alignment: 'center',
+          margin: [0, 10],
+          color: '#333',
+        },
+      },
+      footer: function (currentPage: number, pageCount: number) {
+        return {
+          text: `Page ${currentPage} of ${pageCount}`,
+          alignment: 'center',
+          margin: [0, 10],
+        };
+      },
+    };
+  
+    // Dynamically extract column headers from rowData
+    const columnHeaders = this.columnDefs.map((column: any) => column.headerName);
+    const columnFields = this.columnDefs.map((column: any) => column.field);
+    console.log('columnFields checking',columnFields)
+    // const columns = Object.keys(this.rowData[0] || {});
+    // console.log('columns checking',columns)
+
+    if (columnHeaders.length === 0) {
+      console.error('No columns available for export.');
+      return;
+    }
+  
+    // Adjust page size dynamically
+    const columnCount = columnFields.length;
+    docDefinition.pageSize =
+      columnCount <= 6
+        ? 'A4'
+        : columnCount <= 10
+        ? 'A3'
+        : columnCount <= 15
+        ? 'A2'
+        : 'A1';
+  
+    // Add document title
+    docDefinition.content.push({
+      text: 'Exported Table Data',
+      style: 'title',
+      margin: [0, 10],
+    });
+  
+    // Build table body
+    const tableBody: any[] = [];
+  
+    // Add header row
+    tableBody.push(
+      columnFields.map((col: any) => ({
+        text: col,
+        style: 'tableHeader',
+      }))
+    );
+  
+    // Add data rows
+    this.sendRowDynamic.forEach((row: Record<string, any>, index: number) => {
+      const rowData = columnFields.map((col: string | number) => {
+        const cellData = row[col];
+        console.log('cellData checking',cellData)
+  
+        if (cellData === null || cellData === undefined) {
+          return ''; // Treat null/undefined as empty string
+        }
+  
+        if (typeof cellData === 'object') {
+          return JSON.stringify(cellData); // Convert objects to string
+        }
+  
+        if (typeof cellData === 'string' && cellData.includes('data:image')) {
+          return {
+            image: cellData,
+            width: 50,
+            height: 50,
+          }; // Render base64 images
+        }
+  
+        return cellData.toString(); // Convert all other data types to string
+      });
+  
+      // Push row as an array, not as an object
+      tableBody.push(rowData);
+    });
+  
+    // Add table to the document
+    docDefinition.content.push({
+      table: {
+        body: tableBody,
+        headerRows: 1,
+        widths: Array(columnFields.length).fill('auto'),
+      },
+      layout: {
+        fillColor: (rowIndex: number) => {
+          return rowIndex % 2 === 0 ? null : '#f9f9f9'; // Apply alternating row colors
+        },
+      },
+      margin: [0, 10],
+    });
+  
+    // Error handling during PDF generation
+    try {
+      pdfMake.createPdf(docDefinition).download('Data.pdf');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF. Please try again.');
+    }
   }
 
 

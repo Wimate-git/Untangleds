@@ -498,6 +498,11 @@
                 <div class="title">This Month</div>
                 <div class="example">E.g., Data for current month</div>
               </div>
+              <div class="list-item" (click)="selectValue('any', modal)" (mouseenter)="showTooltip('any')"
+              (mouseleave)="hideTooltip()">
+              <div class="title">Any</div>
+              <div class="example">E.g., Any</div>
+            </div>
             </div>
           
             <div class="list-column">

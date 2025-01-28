@@ -79,6 +79,7 @@ export class ChartUi1Component implements OnChanges {
 
       // Define the API Gateway URL
       const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+      console.log('check id',this.item.id)
     
       // Prepare the request body
       const requestBody = {
