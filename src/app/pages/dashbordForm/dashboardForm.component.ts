@@ -121,6 +121,9 @@ export class DashboardFormComponent implements OnInit {
                         this.filtermatchedData = this.groupForm 
                     }
                 }
+                else{
+                    this.filtermatchedData = this.groupForm 
+                }
 
                 console.log("GROUP LIST:",this.filtermatchedData)
 
@@ -206,6 +209,7 @@ export class DashboardFormComponent implements OnInit {
 
         }
         else {
+
             await this.api.GetMaster(this.client + "#formgroup#" + this.form_group + '#main', 1).then((result: any) => {
 
                 this.groupFormResponse = JSON.parse(result.metadata)
@@ -223,30 +227,28 @@ export class DashboardFormComponent implements OnInit {
 
                         console.log("FORMId PERMISSION")
 
-                        this.resultArray = this.formIDPermission
+                        // this.filtermatchedData = this.formIDPermission
 
+                        this.filtermatchedData = this.formIDPermission.filter((item: any) => this.groupForm.includes(item));
+
+                        console.log("PERMISSION NOT ALL:",this.filtermatchedData)
+
+
+                    }
+                    else{
+                        this.filtermatchedData = this.groupFormResponse.formList
                     }
                 }
                 else{
-                    this.resultArray = this.groupFormResponse.formList
+                    this.filtermatchedData = this.groupFormResponse.formList
+
+                    console.log("PERMISSION ALL:",this.filtermatchedData)
                 }
 
 
             }).catch((error) => {
                 console.log("FormGroup Error:", error)
             })
-
-            // await this.api.GetMaster(this.client + "#dynamic_form#lookup", 1).then((result: any) => {
-            //     if (result) {
-            //         this.helpherObj = JSON.parse(result.options)
-
-            //         this.formList = this.helpherObj.map((item: any) => item)
-
-            //         console.log("DYNAMIC FORMLIST:", this.formList)
-            //     }
-            // }).catch((error) => {
-            //     console.log("Error:", error)
-            // })
 
             if (this.id == 'Calendar') {
                 await this.api.GetMaster(this.client + "#systemCalendarQuery#lookup", 1).then((result: any) => {
@@ -280,7 +282,9 @@ export class DashboardFormComponent implements OnInit {
             this.cards = this.formList
                 .filter(data => {
                     // Check if the value at index 0 of the formList item matches any value in groupForm
-                    return this.resultArray.includes(data[0]);
+                    // return this.resultArray.includes(data[0]);
+
+                    return this.filtermatchedData.includes(data[0]);
                 })
                 .map(data => ({
                     // Your card structure here
