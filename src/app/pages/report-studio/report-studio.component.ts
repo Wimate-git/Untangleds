@@ -3484,7 +3484,9 @@ async extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: 
       // Process custom columns
       for (const custom of customColumnForm) {
         if (custom.predefined === "km Difference") {
-          rowValues.push(await this.calculateKmDifference(trackLocationObjects, obj.type,custom));
+          // rowValues.push(await this.calculateKmDifference(trackLocationObjects, obj.type,custom));
+          rowValues.push(await this.calculateKmDifference(trackLocationObjects, obj.type,custom))
+
         } else if (custom.predefined === "time_taken_distance") {
           rowValues.push(await this.calculateTimeTaken(trackLocationObjects, obj.type,custom));
         } else {
@@ -3510,7 +3512,7 @@ async extractTrackLocationData(data: any, trackLocationColumnIndex: any, index: 
 
     console.log("Custom Rows before adding values are here ",customColumnForm);
 
-    trackLocationRows.push(this.calculateAggregateRow(headers, customColumnForm));
+    trackLocationRows.push(this.calculateAggregateRow(headers, customColumnForm,trackLocationRows));
 
   
   return trackLocationRows;
@@ -3564,8 +3566,10 @@ async calculateKmDifference(trackLocationObjects: any[], currentType: string,cus
           endPosition.latitude, 
           endPosition.longitude
         );
+
+       
         custom.values.push(distance)
-        return `${distance.toFixed(2)} km`;
+        return distance.toFixed(2);
       }
     }
   }
@@ -3573,7 +3577,7 @@ async calculateKmDifference(trackLocationObjects: any[], currentType: string,cus
 }
 
 // Helper method for time taken calculation
-async calculateTimeTaken(trackLocationObjects: any[], currentType: string,custom:any): Promise<string> {
+async calculateTimeTaken(trackLocationObjects: any[], currentType: string,custom:any): Promise<any> {
   let timeCalculations = [
     {
       start: ['Accept to Start Travel','Open to Accept'],
@@ -3642,7 +3646,7 @@ async calculateTimeTaken(trackLocationObjects: any[], currentType: string,custom
   
           console.log("Time Difference:", result);
 
-          custom.values.push(diffInHours)
+          custom.values.push(result)
   
           // Return the formatted string
           return result;
@@ -3657,33 +3661,50 @@ async calculateTimeTaken(trackLocationObjects: any[], currentType: string,custom
 }
 
 // Helper method for aggregate calculations
-calculateAggregateRow(headers: string[], customColumnForm: any[]): any[] {
+calculateAggregateRow(headers: string[], customColumnForm: any[], rowValues: any[]): any[] {
   const aggregateRow = new Array(headers.length).fill('');
-  
+
   for (const custom of customColumnForm) {
-    if (custom.aggregate && custom.values?.length > 0) {
-      let aggregateValue = null;
-      
-      switch (custom.aggregate) {
-        case 'SUM': 
-          aggregateValue = custom.values.reduce((acc: any, val: any) => acc + val, 0);
-          break;
-        case 'AVG': 
-          aggregateValue = custom.values.reduce((acc: any, val: any) => acc + val, 0) / custom.values.length;
-          break;
-        case 'MIN': 
-          aggregateValue = Math.min(...custom.values);
-          break;
-        case 'MAX': 
-          aggregateValue = Math.max(...custom.values);
-          break;
+    const index = headers.indexOf(custom.columnName);
+    
+    if (index !== -1) {
+      if (custom.aggregate && rowValues) {
+        // Map through the rowValues and get the relevant column values
+        const getrowValues = rowValues
+          .map((item: any) => parseFloat(item[index]))
+          .slice(1) 
+          .filter((val: any) => !isNaN(val));
+        console.log("Row values to be calculated are here ", getrowValues);
+        
+        let aggregateValue: number | null = null;
+
+        switch (custom.aggregate) {
+          case 'SUM':
+            aggregateValue = getrowValues.reduce((acc: number, val: number) => acc + val, 0);
+            break;
+          case 'AVG':
+            aggregateValue = getrowValues.reduce((acc: number, val: number) => acc + val, 0) / getrowValues.length;
+            break;
+          case 'MIN':
+            aggregateValue = Math.min(...getrowValues);
+            break;
+          case 'MAX':
+            aggregateValue = Math.max(...getrowValues);
+            break;
+        }
+
+        // Format the aggregate value based on the predefined value
+        let formattedValue = aggregateValue?.toFixed(2); // Keep it as a decimal value
+
+        if (custom.predefined === 'km Difference') {
+          formattedValue += ' kms';
+        } else if (custom.predefined === 'time_taken_distance') {
+          formattedValue += ' hours';
+        }
+
+        // Update the correct position in aggregateRow
+        aggregateRow[headers.length - customColumnForm.length + customColumnForm.indexOf(custom)] = formattedValue;
       }
-
-      let formattedValue = `${parseInt(aggregateValue).toFixed(2)}`;
-      formattedValue += custom.predefined === 'km Difference' ? ' kms' : 
-                        custom.predefined === 'time_taken_distance' ? ' hours' : '';
-
-      aggregateRow[headers.length - customColumnForm.length + customColumnForm.indexOf(custom)] = formattedValue;
     }
   }
 
