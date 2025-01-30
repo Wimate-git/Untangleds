@@ -1051,7 +1051,8 @@ repopulate_fields(getValues: any): FormArray {
     { value: 'Day of Week', text: 'Day of Week' },
     { value: 'Monthly', text: 'Monthly' },
     { value: 'Day of Month', text: 'Day of Month' },
-    { value: 'Yearly', text: 'Yearly' }
+    { value: 'Yearly', text: 'Yearly' },
+    { value: 'Any', text: 'Any' }
   ];
   onValueChange(selectedValue: any): void {
     console.log('selectedValue check', selectedValue[0].value);  // Log the selected value

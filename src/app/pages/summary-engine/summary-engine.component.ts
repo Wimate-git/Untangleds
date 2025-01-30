@@ -232,6 +232,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   storeDrillDown: any;
   responseBody: any;
   responseRowData: any;
+  miniTableData: any;
+  emitEvent: any;
 
 
   createPieChart() {
@@ -4632,6 +4634,8 @@ console.log('Serialized Query Params:', serializedQueryParams);
       EquationParam:this.formatField(tile.EquationParam),
       multiTableWidget_Config:this.formatField(tile.multiTableWidget_Config),
       columnVisibility:this.formatField(tile.columnVisibility),
+      formFieldTexts:this.formatField(tile.formFieldTexts)
+
 
 
 
@@ -5951,11 +5955,22 @@ refreshFunction(){
   }
   helperInfo(event:any,templateref:any){
     console.log('event checking',event)
+    this.emitEvent = event
     this.modalService.open(templateref, { size: 'lg' });
     
 
 
   }
+  helperminiTableData(helperminiTableData:any){
+    console.log('event checking mini table',helperminiTableData)
+
+    this.miniTableData = helperminiTableData
+
+    
+
+
+  }
+
   helperChartClick(event:any,modalChart:any){
     console.log('event checking',event)
     this.modalService.open(modalChart, { size: 'lg' });

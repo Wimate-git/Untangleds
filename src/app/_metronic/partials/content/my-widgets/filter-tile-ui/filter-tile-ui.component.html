@@ -18,7 +18,7 @@
       height: 100%;
     "
   >
-    <!-- Chart Title -->
+    <!-- Custom Label -->
     <div
       class="processed-value-container"
       [style.font-size]="item.fontSize" 
@@ -35,6 +35,25 @@
       {{ item.custom_Label }}
     </div>
   
+    <!-- Array Items Displayed Horizontally -->
+    <div
+      [style.font-size]="item.fontSize" 
+      [style.color]="item.fontColor"
+      style="
+        display: flex; /* Align elements horizontally */
+        justify-content: center; /* Center items horizontally */
+        gap: 10px; /* Optional: Adds space between items */
+        font-weight: normal;
+        margin-bottom: 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: center;
+      "
+    >
+      <span *ngFor="let element of formattedFilterConditions">{{ element }}</span>
+    </div>
+  
     <!-- Parameter Name and Processed Value -->
     <div *ngFor="let config of parsedTileConfig" class="parameter-container" style="margin-bottom: 5px;">
       <div
@@ -49,6 +68,8 @@
       ></div>
     </div>
   </div>
+  
+  
   
 
     <!-- Action Menu -->

@@ -85,6 +85,7 @@
                       [hideButton]="hideButton" 
                       [all_Packet_store]="all_Packet_store" 
                       (sendCellInfo) = "helperInfo($event,nestedTable)"
+                      (sendminiTableData)="helperminiTableData($event)"
                    
             
                       (customEvent)="helperTile($event, MultiTableModal)" 
@@ -1832,8 +1833,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
 
   <ng-template #nestedTable let-modal>
     <app-nested-table
-      [modalData]="modalData"
-      [columnDefs]="nestedColumnDefs"
+    [miniTableData]="miniTableData" [emitEvent]="emitEvent"
     ></app-nested-table>
   </ng-template>
 

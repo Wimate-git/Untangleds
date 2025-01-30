@@ -26,6 +26,7 @@ export class MultiTableUiComponent implements OnInit{
   iconCellRenderer: (params: any) => string; 
   // @Output() sendCellInfo:
   @Output() sendCellInfo = new EventEmitter<any>();
+  @Output() sendminiTableData = new EventEmitter<any>();
 
   
   
@@ -51,6 +52,7 @@ export class MultiTableUiComponent implements OnInit{
   parsedColumns: any;
   columnLabelsArray: any;
   mutitableColumns: any;
+  extractRowData: any;
   ngOnInit(): void {
 
     
@@ -97,6 +99,8 @@ export class MultiTableUiComponent implements OnInit{
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
     console.log("tile data check from multi table Widget",this.item)
+    this.extractRowData = JSON.parse(this.item.rowData)
+    console.log('this.extractRowData checking',this.extractRowData)
     this.mutitableColumns = JSON.parse(this.item.multiTableWidget_Config)
     console.log('this.mutitableColumns checking',this.mutitableColumns)
     
@@ -134,15 +138,15 @@ try {
   this.parsedTableData = JSON.parse(this.tabledata);
   console.log('this.parsedTableData checking', this.parsedTableData);
 
-  // Generate column definitions from tableWidget_Config
-  const tableWidgetColumns = this.parsedTableData.map((column: { text: string; value: string }) => ({
-    headerName: column.text || 'Default Header', // Use a default name if text is missing
+  const tableWidgetColumns = this.parsedTableData.map((column: { text: any; value: string; }) => ({
+    headerName: column.text || 'Default Header',
     field: column.value,
     sortable: true,
     filter: true,
     resizable: true,
-    cellRenderer: column.value === 'dynamic_table_values' ? this.iconCellRenderer : undefined, // Add cellRenderer for specific column
+    cellRenderer: (column.value === 'dynamic_table_values') ? this.iconCellRenderer : undefined,
   }));
+  
   
   console.log('tableWidget column definitions:', tableWidgetColumns);
   
@@ -151,30 +155,23 @@ try {
 
   // Include additional columns from columnLabelsArray
   const additionalColumns = this.columnLabelsArray
-    .filter((label: string) => label && label.trim() !== '') // Filter out empty labels
-    .map((label: string) => ({
-      headerName: label,
-      field: label,
-      sortable: true,
-      filter: true,
-      resizable: true,
-    }));
+  .filter((label: any) => label && label.trim() !== '')
+  .map((label: any) => ({
+    headerName: label,
+    field: label,
+    sortable: true,
+    filter: true,
+    resizable: true,
+  }));
 
-  console.log('Filtered additional columns from columnLabelsArray:', additionalColumns);
+this.columnDefs = [...tableWidgetColumns, ...additionalColumns];
 
-  // Combine tableWidget columns and additional columns
-  this.columnDefs = [...tableWidgetColumns, ...additionalColumns];
   console.log('Final column definitions:', this.columnDefs);
-
+  console.log('this.extractRowData checking from',this.extractRowData)
+  this.sendminiTableData.emit(this.extractRowData)
+this.rowData = this.extractRowData
   // Generate dummy row data based on column definitions
-  const fields = this.columnDefs.map((col: { field: string }) => col.field);
-  this.rowData = Array.from({ length: 10 }).map((_, rowIndex) => {
-    const row: any = {};
-    fields.forEach((field: string | number) => {
-      row[field] = `${field}_Value_${rowIndex + 1}`; // Assign dummy values
-    });
-    return row;
-  });
+
 
   console.log('Generated dummy row data:', this.rowData);
 } catch (error) {
@@ -261,10 +258,17 @@ get shouldShowButton(): boolean {
    private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer
    
   ){
-
-    this.iconCellRenderer = function (params: any) {
-      return `<i class="bi bi-table" style="color: #204887; font-size: 25px;"></i>`; // Table icon with custom color
+    this.iconCellRenderer = function (params) {
+      // Check if 'dynamic_table_values' exists and is not empty
+      if (params.data.dynamic_table_values && Object.keys(params.data.dynamic_table_values).some(key => params.data.dynamic_table_values[key].length > 0)) {
+        // If conditions are met, return the icon HTML
+        return `<i class="bi bi-table" style="color: #204887; font-size: 25px;"></i>`;
+      } else {
+        // If conditions are not met, return an empty string
+        return '';
+      }
     };
+    
     
     
     
@@ -596,6 +600,7 @@ get shouldShowButton(): boolean {
     // modal.dismiss();
 
   }
+  
 
   
 

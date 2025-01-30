@@ -33,6 +33,9 @@ export class FilterTileUiComponent implements OnInit{
   @Input() isFullscreen: boolean = false; 
   @Input() summaryDashboardUpdate:any;
   @Input() hidingLink:any;
+  parsedFilterTileConfig: any;
+  combinedArray: any;
+  formattedFilterConditions: string[];
   ngOnInit(): void {
 
     
@@ -45,6 +48,13 @@ export class FilterTileUiComponent implements OnInit{
     console.log("tile data check from dynamic Title",this.item)
     this.filterTileConfig = this.item
     console.log('this.filterTileConfig check',this.filterTileConfig)
+    this.parsedFilterTileConfig =JSON.parse(this.filterTileConfig.filterTileConfig)
+    console.log('this.parsedFilterTileConfig checking',this.parsedFilterTileConfig)
+//     this.combinedArray = this.parsedFilterTileConfig.flatMap((item: any) => item);
+
+// console.log('Combined Array:', this.combinedArray);
+this.formattedFilterConditions = this.formatFilterConfig(this.parsedFilterTileConfig);
+console.log('this.formattedFilterConditions check',this.formattedFilterConditions)
   
   
 
@@ -90,6 +100,10 @@ export class FilterTileUiComponent implements OnInit{
 
   
 }
+
+
+
+
 get shouldShowButton(): boolean {
   return this.item.dashboardIds !== "";
 }
@@ -163,6 +177,28 @@ get shouldShowButton(): boolean {
   closeModal() {
     this.modalService.dismissAll(); // Close the modal programmatically
   }
+   formatFilterConfig(parsedFilterTileConfig: any[]): string[] {
+    // Initialize an array to hold the formatted strings for each condition
+    const formattedConditions: any[] = [];
+
+    // Iterate over each array of conditions
+    parsedFilterTileConfig.forEach((conditions) => {
+        // Map each condition to a formatted string
+        const formattedGroup = conditions.map((condition: { formField: any; operator: any; filterValue: any; }) => {
+            // Deconstruct necessary fields from the condition
+            const { formField, operator, filterValue } = condition;
+
+            // Return the formatted string
+            return `${formField} ${operator} ${filterValue}`;
+        }).join(' AND '); // Join all conditions within the same group with 'AND'
+
+        // Push the formatted group string to the main array
+        formattedConditions.push(formattedGroup);
+    });
+
+    return formattedConditions;
+}
+
   
 
 }

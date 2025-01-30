@@ -177,15 +177,21 @@
                             class="row g-3"
                             style="display: flex; flex-wrap: wrap; justify-content: space-between;"
                           >
-                            <div class="mb-3" style="width: 30%;">
-                              <label class="col-form-label fw-bold fs-6 required">Select Field</label>
-                              <select formControlName="formField" class="form-control" (change)="fetchDynamic(formlistValues,fieldIndex,conditionIndex, condition.get('formField')?.value);condition.get('filterValue')?.setValue('');">
-                                <option value="" disabled selected>Select Field</option>
-                                <ng-container *ngFor="let option of dynamicParamMap.get(fieldIndex) || []" >
-                                  <option [value]="option.value">{{ option.text }}</option>
-                                </ng-container>
-                              </select>
-                            </div>
+
+
+
+
+                          <div class="mb-3" style="width: 30%;">
+                            <label class="col-form-label fw-bold fs-6 required">Select Field</label>
+                            <ngx-select [items]="dynamicParamMap.get(fieldIndex) || []"
+                                        formControlName="formField"
+                                        optionValueField="value"
+                                        optionTextField="text"
+                                        (selectionChanges)="fetchDynamic($event, formlistValues, fieldIndex, conditionIndex, condition?.get('formField')?.value)"
+
+                                        placeholder="Select Field">
+                            </ngx-select>
+                          </div>
                 
                             <div class="mb-3" style="width: 30%;">
                               <label class="col-form-label fw-bold fs-6 required">Operator</label>
@@ -202,13 +208,13 @@
                 
                             <!-- Dynamic Value Field -->
                             <div class="mb-3" style="width: 30%;">
-                              <label class="col-form-label fw-bold fs-6 required">Value</label>
+                              <label class="col-form-label fw-bold fs-6 required">Value </label>
                               <ng-container *ngIf="condition.get('type')?.value as fieldType;">
                                 <ng-container *ngIf="fieldType === 'select'; else textInput">
-                                  <ng-container *ngIf="globalFieldData[conditionIndex]?.options?.length > 0; else noOptions">
+                                  <ng-container *ngIf="globalFieldData[fieldIndex]&&globalFieldData[fieldIndex][conditionIndex]?.options?.length > 0; else noOptions">
                                     <select formControlName="filterValue" class="form-control">
-                                      <option value="" disabled>Select Value</option>
-                                      <ng-container *ngFor="let option of globalFieldData[conditionIndex].options">
+                                      <option value="" disabled>Select Value </option>
+                                      <ng-container *ngFor="let option of globalFieldData[fieldIndex][conditionIndex].options">
                                         <option [ngValue]="option">{{ option }}</option>
                                       </ng-container>
                                     </select>
@@ -242,6 +248,15 @@
                               class="form-control form-control-solid"
                               placeholder="Select constant"
                               formControlName="parameterName">
+                          </div>
+                          <div class="col-md-4 mb-3" *ngIf = enableParameterName>
+                            <label for="fieldLabel" class="col-form-label fw-bold fs-6 "></label>
+                            <input
+                              id="fieldLabel"
+                              type="number"
+                              class="form-control form-control-solid"
+                              placeholder="Select constant"
+                              formControlName="fieldLabel">
                           </div>
                 
                           <!-- Remove Condition Button (for all conditions except the first) -->
