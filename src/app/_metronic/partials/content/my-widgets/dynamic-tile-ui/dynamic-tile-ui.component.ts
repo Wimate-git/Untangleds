@@ -49,19 +49,19 @@ export class DynamicTileUiComponent implements OnInit{
     // this.tileConfig = this.item.tileConfig
     this.parsedTileConfig = JSON.parse(this.item.tileConfig)
     console.log('this.parsedTileConfig check',this.parsedTileConfig)
-    if (Array.isArray(this.parsedTileConfig)) {
-      const sum = this.parsedTileConfig.reduce((acc, tile) => {
-        // Parse the processed_value as a number and add to accumulator
-        return acc + Number(tile.processed_value || 0); // Use || 0 to handle undefined or empty strings safely
-      }, 0); // Start with an accumulator value of 0
+    // if (Array.isArray(this.parsedTileConfig)) {
+    //   const sum = this.parsedTileConfig.reduce((acc, tile) => {
+    //     // Parse the processed_value as a number and add to accumulator
+    //     return acc + Number(tile.processed_value || 0); // Use || 0 to handle undefined or empty strings safely
+    //   }, 0); // Start with an accumulator value of 0
   
-      console.log('Total sum of processed_value:', sum);
-      this.showTotalSumValue = sum;
-      return sum;
-    } else {
-      console.error('parsedTileConfig is not an array');
-    // Return 0 or handle as needed
-    }
+    //   console.log('Total sum of processed_value:', sum);
+    //   this.showTotalSumValue = sum;
+    //   return sum;
+    // } else {
+    //   console.error('parsedTileConfig is not an array');
+    // // Return 0 or handle as needed
+    // }
 
   
 
