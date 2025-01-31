@@ -17,12 +17,32 @@ export class CustomInfoUiComponent implements OnInit{
   isModalOpen: boolean = false;
   ngOnChanges(changes: SimpleChanges): void {
  
-    console.log("custom info check ",this.item)
+    console.log("custom info check for ui ",this.tile1Config)
+    console.log('item checking',this.item)
+
     // console.log('tile1Config check',this.tile1Config)
  
 }
 ngOnInit(): void {
   
+}
+
+getDashboardId(): string | undefined {
+  // Check if 'tile1Config' exists and has the 'dashboardIds' property
+  if (this.tile1Config && this.tile1Config.dashboardIds) {
+    console.log("Data from tile1Config:", this.tile1Config.dashboardIds);
+    return this.tile1Config.dashboardIds;
+  }
+  // If not found, check 'item'
+  else if (this.item && this.item.dashboardIds) {
+    console.log("Data from item:", this.item.dashboardIds);
+    return this.item.dashboardIds;
+  }
+  // Return undefined if neither contains the dashboard ID
+  else {
+    console.warn("Dashboard ID is undefined in both 'tile1Config' and 'item'.");
+    return undefined;
+  }
 }
 
   openModal() {

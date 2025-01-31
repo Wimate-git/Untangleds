@@ -4634,7 +4634,9 @@ console.log('Serialized Query Params:', serializedQueryParams);
       EquationParam:this.formatField(tile.EquationParam),
       multiTableWidget_Config:this.formatField(tile.multiTableWidget_Config),
       columnVisibility:this.formatField(tile.columnVisibility),
-      formFieldTexts:this.formatField(tile.formFieldTexts)
+      formFieldTexts:this.formatField(tile.formFieldTexts),
+      equation:this.formatField(tile.equation),
+
 
 
 

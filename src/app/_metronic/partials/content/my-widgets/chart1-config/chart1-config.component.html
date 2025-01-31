@@ -3,6 +3,7 @@
   <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
 </div>
 <div class="container" *ngIf="createChart">
+  <div [formGroup]="createChart">
   <div class="row">
     <div class="col-md-6" [formGroup]="createChart">
       <label class="col-lg-12 col-form-label fw-bold fs-6 required">Parameters
@@ -26,12 +27,63 @@
         Title is required
       </div>
 
+
+
+
+
+
     </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-md-4 mb-3">
+      <div class="col-lg-12 form-check form-switch">
+      <label for="toggleCheck" class="col-lg-12 col-form-label fw-bold fs-6  mt-7">Enable Redirect</label>
+      <input class="form-check-input mt-10 mb-3 mb-lg-0" type="checkbox" formControlName="toggleCheck" id="toggleCheck" />
+      <span>{{ createChart.get('toggleCheck')?.value ? 'Enabled' : 'Disabled' }}</span>
+    </div>
+    </div>
+    
+    <!-- Conditionally Render Dashboard Ids Field -->
+  
+  
+  
+      <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
+        <label for="dashboardIds" class="col-form-label fw-bold fs-6">Summary Dashboard Id</label>
+        <ngx-select
+          id="dashboardIds"
+          [allowClear]="true"
+          formControlName="dashboardIds"
+          [items]="p1ValuesSummary"
+          optionValueField="value"
+          optionTextField="text"
+          placeholder="Select Parameter"
+          style="width: 100%;">
+        </ngx-select>
+      </div>
+    
+      <!-- Conditionally Render Select Type Field -->
+      <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
+        <label for="selectType" class="col-form-label fw-bold fs-6">Select Type</label>
+        <ngx-select
+          id="selectType"
+          [allowClear]="true"
+          formControlName="selectType"
+          [items]="SelectTypeSummary"
+          optionValueField="value"
+          optionTextField="text"
+          placeholder="Select Parameter"
+          style="width: 100%;">
+        </ngx-select>
+      </div>
+     </div>
 
   </div>
 </div>
 
 <!-- Modal body with Tabs -->
+
+
 <div class="card shadow-none rounded-0 w-100" [formGroup]="createChart" *ngIf="createChart" style="margin-top: 10px;">
 
   <div class="card card-custom">

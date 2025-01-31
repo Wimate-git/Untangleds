@@ -33,7 +33,7 @@ export class ChartUi1Component implements OnChanges {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
       console.log("Dynamic data check",this.item)
-      this.tile1Config = this.item
+   
       console.log('routeId checking from ui',this.routeId)
       console.log('SK_clientID checking',this.SK_clientID)
 
@@ -61,8 +61,8 @@ export class ChartUi1Component implements OnChanges {
       console.log('this.gridOptions check', this.gridOptions);
 
       
-     
-
+   
+      this.tile1Config = this.item
     
   }
   onBarClick(event: Highcharts.PointClickEventObject): void {
@@ -225,19 +225,20 @@ export class ChartUi1Component implements OnChanges {
     ){}
 
   helperDashboard(item:any,index:any,modalContent:any,selectType:any){
+    console.log('selectType checking dashboard',selectType)
     console.log('item checking from ',item)
-    if (typeof this.item.chartConfig === 'string') {
-      this.gridOptions = JSON.parse(this.item.chartConfig);
-    } else {
-      this.gridOptions = this.item.chartConfig; // Already an object
-    }
+    // if (typeof this.item.chartConfig === 'string') {
+    //   this.gridOptions = JSON.parse(this.item.chartConfig);
+    // } else {
+    //   this.gridOptions = this.item.chartConfig; // Already an object
+    // }
     const viewMode = true;
     const disableMenu = true
 
 
 console.log('this.gridOptions checking from chart',this.gridOptions)
     localStorage.setItem('isFullScreen', JSON.stringify(true));
-    const modulePath = this.gridOptions[0].dashboardIds; // Adjust with your module route
+    const modulePath = this.item.dashboardIds; // Adjust with your module route
     console.log('modulePath checking from chart',modulePath)
     const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}`;
     this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(window.location.origin +"/summary-engine/"+ modulePath+queryParams);

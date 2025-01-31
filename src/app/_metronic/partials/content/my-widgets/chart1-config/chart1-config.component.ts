@@ -97,6 +97,15 @@ export class Chart1ConfigComponent implements OnInit {
     this.setupRanges();
     this.dynamicData()
     this.dashboardIds(1)
+    this.createChart.get('toggleCheck')?.valueChanges.subscribe((isChecked) => {
+      if (isChecked) {
+        this.createChart.get('dashboardIds')?.enable();
+        this.createChart.get('selectType')?.enable();
+      } else {
+        this.createChart.get('dashboardIds')?.disable();
+        this.createChart.get('selectType')?.disable();
+      }
+    });
 
 
 
@@ -182,6 +191,9 @@ export class Chart1ConfigComponent implements OnInit {
       filterForm:[''],
       filterParameter:[[]],
       filterDescription:[''],
+      toggleCheck: [false], // Default toggle state
+      dashboardIds: [''],
+      selectType: [''],
       // custom_Label:['',Validators.required],
    
   
@@ -397,6 +409,9 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         filterParameter: this.createChart.value.filterParameter || {},
         filterDescription: this.createChart.value.filterDescription || '',
         custom_Label: this.createChart.value.custom_Label || '',
+        toggleCheck: this.createChart.value.toggleCheck,
+        dashboardIds: this.createChart.value.dashboardIds,
+        selectType: this.createChart.value.selectType,
       
 
   
@@ -487,6 +502,9 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     highchartsOptionsJson: this.chartFinalOptions,
     filterParameter:this.createChart.value.filterParameter,
     filterDescription:this.createChart.value.filterDescription,
+    toggleCheck:this.createChart.value.toggleCheck,
+    dashboardIds:this.createChart.value.dashboardIds,
+    selectType: this.createChart.value.selectType,
 
     // filterForm:this.createChart.value.filterForm,
     // filterParameter:this.createChart.value.filterParameter,
@@ -651,6 +669,10 @@ openChartModal1(tile: any, index: number) {
       filterDescription: tile.filterDescription,
       filterForm: tile.filterForm,
       filterParameter: [parsedFilterParameter], // Patch the parsed value here
+      toggleCheck: tile.toggleCheck,
+      dashboardIds: tile.dashboardIds,
+  
+      selectType: tile.selectType,
     });
 
     console.log('Updated all_fields:', this.all_fields);
@@ -748,6 +770,27 @@ repopulate_fields(getValues: any): FormArray {
   console.log('Final FormArray Values:', this.all_fields.value);
 
   return this.all_fields;
+}
+
+toggleCheckbox1(themeOrEvent: any): void {
+  // If it's a color picker input (e.g., from a custom input field)
+  if (themeOrEvent.target) {
+    this.selectedColor = themeOrEvent.target.value;  // Get the color from the input field
+  } else {
+    // Predefined theme selection (from color boxes)
+    const theme = themeOrEvent;
+
+    // Clear the selected state for all themes (ensure only one is selected)
+    this.themes.forEach(t => t.selected = false);  // Reset selection for all themes
+
+    // Toggle the selection state of the clicked theme
+    theme.selected = true;  // Select the clicked theme
+
+    this.selectedColor = theme.color;  // Set selected color based on the clicked theme
+  }
+
+  // Update the form control with the selected color
+  this.createChart.get('themeColor')?.setValue(this.selectedColor);
 }
 
 
@@ -1080,6 +1123,8 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     { value: 'Count_Multiple', text: 'Count Multiple' },
     { value: 'Count Dynamic', text: 'Count Dynamic' },
     { value: 'Count MultiplePram', text: 'Count MultiplePram' },
+    { value: 'Sum MultiplePram', text: 'Sum MultiplePram' },
+    
 
 
 

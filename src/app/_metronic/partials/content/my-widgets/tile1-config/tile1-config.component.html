@@ -2,6 +2,24 @@
 
     </ng-template> -->
 
+    <div class="container" *ngIf="createKPIWidget">
+      <div [formGroup]="createKPIWidget">
+      <div class="row">
+        <div class="col-md-6" [formGroup]="createKPIWidget">
+          <label class="col-lg-12 col-form-label fw-bold fs-6 ">Parameters
+          </label>
+          <input type="number" class="
+                            form-control form-control-lg form-control-solid
+                            mb-3 mb-lg-0" name="add_fields" formControlName="add_fields"
+            (keyup)="addControls($event,'html')" >
+        </div>
+
+      </div>
+    
+
+    
+      </div>
+    </div>
     <div class="modal-header">
         <h4 class="modal-title">Widget-1</h4>
         <button type="button" class="btn-close" aria-label="Close"   (click)="modal.dismiss()"></button>
@@ -384,7 +402,14 @@
               </div>
 
               <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'equation-tab'}" id="equation-tab"
-              role="tabpanel" aria-labelledby="equation-tabpane">
+              role="tabpanel" aria-labelledby="equation-tabpane" >
+              <form [formGroup]="createKPIWidget">
+          
+              <div formArrayName="all_fields">
+                <div *ngFor="let field of all_fields?.controls; let fieldIndex = index">
+
+                  <div [formGroupName]="fieldIndex"
+                    style="border: 2px solid rgb(201, 228, 239); padding: 10px; margin: 5px;border-radius: 5px;">
               
               <div class="row g-3 align-items-center mb-4">
                 <!-- Forms Field -->
@@ -403,21 +428,21 @@
                     [items]="listofFormValues"
                     optionValueField="value"
                     optionTextField="text"
-                    (selectionChanges)="selectFormParams1($event)"
+                    (selectionChanges)="selectFormParams1($event,fieldIndex)"
                     placeholder="Select Form"
                   ></ngx-select>
                 </div>
               
                 <!-- Form Fields -->
-                <div class="col-md-4 d-flex flex-column">
+                <div class="col-md-4 d-flex flex-column" *ngIf ="listofEquationParam&&listofEquationParam[fieldIndex]">
                   <label for="EquationParam" class="fw-bold fs-6 mb-2">Form Fields</label>
                   <p-multiSelect
                     id="parameterName"
                     formControlName="EquationParam"
-                    [options]="listofEquationParam"
+                    [options]="listofEquationParam[fieldIndex]"
                     optionLabel="text"
                     placeholder="Select Parameter"
-                    (onChange)="EquationparameterValue($event)"
+                    (onChange)="EquationparameterValue($event,fieldIndex)"
                   ></p-multiSelect>
                 </div>
               
@@ -442,6 +467,10 @@
                   ></ngx-select>
                 </div>
               </div>
+                  </div>
+                  </div>
+              </div>
+            </form>
               
               
               <div class="col-md-3">
@@ -449,9 +478,7 @@
                   type="button"
                   class="btn btn-primary w-100 mt-4"
                   (click)="addEquation()"
-                  [disabled]="!createKPIWidget.get('EquationFormList')?.value ||
-                             !createKPIWidget.get('EquationParam')?.value?.length ||
-                             !createKPIWidget.get('EquationOperation')?.value">
+               >
                   Add Equation
                 </button>
               </div>
@@ -469,9 +496,11 @@
                   {{ selectedEquationParameterValue }}
                 </textarea>
               </div>
+
+            </div>
             </div>
               
-            </div>
+  
             
       
           </div>
@@ -489,7 +518,7 @@
           class="btn btn-warning" 
        
           (click)="updateTile('tile');modal.dismiss() " 
-          *ngIf="isEditMode && isGirdMoved" 
+          *ngIf="isEditMode " 
          
           [disabled]="createKPIWidget?.invalid">
           Update

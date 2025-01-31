@@ -1824,24 +1824,114 @@ toggleCheckbox1(theme: any) {
   
   
   
-  getOptionsForField(
-    fieldIndex: number,
-    conditionIndex: number,
-    formFieldValue: string
-  ): void {
+  // getOptionsForField(
+  //   fieldIndex: number,
+  //   conditionIndex: number,
+  //   formFieldValue: string
+  // ): void {
+  //   console.log('fieldIndex check:', fieldIndex);
+  //   console.log('conditionIndex check:', conditionIndex);
+  //   console.log('formFieldValue check:', formFieldValue);
+  //   console.log('Final populateFormBuilder dynamic:', this.populateFormBuilder);
+  //   console.log('globalFieldData checking from option',this.globalFieldData)
+    
+  
+  //   try {
+  //     if (!this.globalFieldData[fieldIndex]) {
+  //       this.globalFieldData[fieldIndex] = {}; // Or however you need it structured
+  //   }
+  //   if (!this.globalFieldData[fieldIndex][conditionIndex]) {
+  //       this.globalFieldData[fieldIndex][conditionIndex] = {};
+  //   }
+  //     const fieldGroup = this.all_fields.at(fieldIndex) as FormGroup;
+  //     if (!fieldGroup) {
+  //       console.warn(`Field group is undefined for fieldIndex ${fieldIndex}`);
+  //       return;
+  //     }
+  
+  //     const conditions = fieldGroup.get('conditions') as FormArray;
+  //     if (!conditions || !conditions.controls[conditionIndex]) {
+  //       console.warn(`Conditions array or condition at index ${conditionIndex} is not defined for fieldIndex ${fieldIndex}`);
+  //       return;
+  //     }
+  
+  //     if (!formFieldValue) {
+  //       console.warn('formFieldValue is empty or invalid');
+  //       conditions.controls[conditionIndex].get('type')?.setValue('text');
+  //       this.globalFieldData[fieldIndex][conditionIndex] = { type: 'text', options: null };
+  //       return;
+  //     }
+  
+  //     // Use formlistValues to retrieve the form name by index
+  //     const formName = this.formlistValues[fieldIndex];
+  //     console.log('formName from formlistValues:', formName);
+  
+  //     if (!formName) {
+  //       console.warn(`Form name is missing for fieldIndex ${fieldIndex} in formlistValues`);
+  //       conditions.controls[conditionIndex].get('type')?.setValue('text');
+  //       this.globalFieldData[fieldIndex][conditionIndex] = { type: 'text', options: null };
+  //       return;
+  //     }
+  
+  //     const metadataAtFieldIndex = this.populateFormBuilder[fieldIndex];
+  //     console.log('metadataAtFieldIndex check:', metadataAtFieldIndex);
+  
+  //     if (!metadataAtFieldIndex || !metadataAtFieldIndex[formName]) {
+  //       console.error(`Form name '${formName}' not found in metadataAtFieldIndex. Available forms:`, Object.keys(metadataAtFieldIndex || {}));
+  //       conditions.controls[conditionIndex].get('type')?.setValue('text');
+  //       this.globalFieldData[fieldIndex][conditionIndex] = { type: 'text', options: null };
+  //       return;
+  //     }
+  
+  //     const matchingMetadata = metadataAtFieldIndex[formName];
+  //     console.log('matchingMetadata check:', matchingMetadata);
+  
+  //     const foundField = matchingMetadata.find((field: Field) => field.name === formFieldValue);
+  //     if (foundField) {
+  //       console.log(`Found field for ${formFieldValue}:`, foundField);
+  
+  //       // Handle case where type is 'select' but options are empty or invalid
+  //       if (
+  //         foundField.type === 'select' &&
+  //         (!foundField.options || foundField.options.length === 0 || foundField.options.every((option: string) => !option.trim()))
+  //       ) {
+  //         console.warn(`Field ${formFieldValue} has type 'select' but options are empty. Defaulting to type 'text'.`);
+  //         conditions.controls[conditionIndex].get('type')?.setValue('text');
+  //         this.globalFieldData[fieldIndex][conditionIndex] = { type: 'text', options: null };
+  //         return;
+  //       }
+  
+  //       // Set the type and options in the global variable
+  //       conditions.controls[conditionIndex].get('type')?.setValue(foundField.type || 'text');
+  //       this.globalFieldData[fieldIndex][conditionIndex] = { type: foundField.type, options: foundField.options || null };
+  //     } else {
+  //       console.warn(`Field with name ${formFieldValue} not found in metadata for index ${fieldIndex}`);
+  //       console.log('Available field names:', matchingMetadata.map((field: Field) => field.name));
+  //       conditions.controls[conditionIndex].get('type')?.setValue('text');
+  //       this.globalFieldData[fieldIndex][conditionIndex] = { type: 'text', options: null };
+  //     }
+  //   } catch (error) {
+  //     console.error('Error in getOptionsForField:', error);
+  //   }
+  // }
+  
+
+
+  getOptionsForField(fieldIndex: number, conditionIndex: number, formFieldValue: string): void {
     console.log('fieldIndex check:', fieldIndex);
     console.log('conditionIndex check:', conditionIndex);
     console.log('formFieldValue check:', formFieldValue);
     console.log('Final populateFormBuilder dynamic:', this.populateFormBuilder);
-    
+    console.log('globalFieldData checking from option', this.globalFieldData);
   
     try {
       if (!this.globalFieldData[fieldIndex]) {
         this.globalFieldData[fieldIndex] = {}; // Or however you need it structured
-    }
-    if (!this.globalFieldData[fieldIndex][conditionIndex]) {
+      }
+      if (!this.globalFieldData[fieldIndex][conditionIndex]) {
         this.globalFieldData[fieldIndex][conditionIndex] = {};
-    }
+      }
+  
       const fieldGroup = this.all_fields.at(fieldIndex) as FormGroup;
       if (!fieldGroup) {
         console.warn(`Field group is undefined for fieldIndex ${fieldIndex}`);
@@ -1861,10 +1951,8 @@ toggleCheckbox1(theme: any) {
         return;
       }
   
-      // Use formlistValues to retrieve the form name by index
       const formName = this.formlistValues[fieldIndex];
       console.log('formName from formlistValues:', formName);
-  
       if (!formName) {
         console.warn(`Form name is missing for fieldIndex ${fieldIndex} in formlistValues`);
         conditions.controls[conditionIndex].get('type')?.setValue('text');
@@ -1874,7 +1962,6 @@ toggleCheckbox1(theme: any) {
   
       const metadataAtFieldIndex = this.populateFormBuilder[fieldIndex];
       console.log('metadataAtFieldIndex check:', metadataAtFieldIndex);
-  
       if (!metadataAtFieldIndex || !metadataAtFieldIndex[formName]) {
         console.error(`Form name '${formName}' not found in metadataAtFieldIndex. Available forms:`, Object.keys(metadataAtFieldIndex || {}));
         conditions.controls[conditionIndex].get('type')?.setValue('text');
@@ -1889,20 +1976,15 @@ toggleCheckbox1(theme: any) {
       if (foundField) {
         console.log(`Found field for ${formFieldValue}:`, foundField);
   
-        // Handle case where type is 'select' but options are empty or invalid
-        if (
-          foundField.type === 'select' &&
-          (!foundField.options || foundField.options.length === 0 || foundField.options.every((option: string) => !option.trim()))
-        ) {
-          console.warn(`Field ${formFieldValue} has type 'select' but options are empty. Defaulting to type 'text'.`);
-          conditions.controls[conditionIndex].get('type')?.setValue('text');
-          this.globalFieldData[fieldIndex][conditionIndex] = { type: 'text', options: null };
-          return;
-        }
-  
         // Set the type and options in the global variable
-        conditions.controls[conditionIndex].get('type')?.setValue(foundField.type || 'text');
-        this.globalFieldData[fieldIndex][conditionIndex] = { type: foundField.type, options: foundField.options || null };
+        if (foundField.type === 'select' && foundField.options) {
+          const optionsWithAll = ['All', ...foundField.options];
+          conditions.controls[conditionIndex].get('type')?.setValue(foundField.type);
+          this.globalFieldData[fieldIndex][conditionIndex] = { type: foundField.type, options: optionsWithAll };
+        } else {
+          conditions.controls[conditionIndex].get('type')?.setValue(foundField.type || 'text');
+          this.globalFieldData[fieldIndex][conditionIndex] = { type: foundField.type, options: foundField.options || null };
+        }
       } else {
         console.warn(`Field with name ${formFieldValue} not found in metadata for index ${fieldIndex}`);
         console.log('Available field names:', matchingMetadata.map((field: Field) => field.name));
