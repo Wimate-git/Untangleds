@@ -502,7 +502,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     highchartsOptionsJson: this.chartFinalOptions,
     filterParameter:this.createChart.value.filterParameter,
     filterDescription:this.createChart.value.filterDescription,
-    toggleCheck:this.createChart.value.toggleCheck,
+    toggleCheck:this.createChart.value.toggleCheck||'',
     dashboardIds:this.createChart.value.dashboardIds ||'',
     selectType: this.createChart.value.selectType||'',
 
