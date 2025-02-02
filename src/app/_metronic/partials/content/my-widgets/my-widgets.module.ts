@@ -65,6 +65,7 @@ import { DataTableChart1Component } from './data-table-chart1/data-table-chart1.
 import { DataTableChart2Component } from './data-table-chart2/data-table-chart2.component';
 import { DataTableTile1Component } from './data-table-tile1/data-table-tile1.component';
 import { HttpClientModule } from '@angular/common/http';
+import { DataTableDynamicTileComponent } from './data-table-dynamic-tile/data-table-dynamic-tile.component';
 
 
 
@@ -105,7 +106,8 @@ import { HttpClientModule } from '@angular/common/http';
     DataTableShowComponent,
     DataTableChart1Component,
     DataTableChart2Component,
-    DataTableTile1Component
+    DataTableTile1Component,
+    DataTableDynamicTileComponent
 
 
 
@@ -185,7 +187,8 @@ import { HttpClientModule } from '@angular/common/http';
     DataTableShowComponent,
     DataTableChart1Component,
     DataTableChart2Component,
-    DataTableTile1Component
+    DataTableTile1Component,
+    DataTableDynamicTileComponent
   
 
     

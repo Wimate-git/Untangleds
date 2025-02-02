@@ -235,6 +235,9 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   miniTableData: any;
   emitEvent: any;
   FormNameMini: any;
+  paramsReadExport: any;
+  toRouteId: any;
+  fromRouterID: any='';
 
 
   createPieChart() {
@@ -998,13 +1001,14 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
   const viewMode = true;
   const disableMenu = true;
   const modulePath = packet.dashboardIds;
+  this.toRouteId = modulePath
   console.log('modulePath checking:', modulePath);
 
   localStorage.setItem('isFullScreen', JSON.stringify(true));
 
   // Append parsedFilterTileConfig to queryParams
   console.log('filterTileQueryParam',filterTileQueryParam)
-  const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}${filterTileQueryParam}`;
+  const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}${filterTileQueryParam}&from_routerID=${this.routeId}`;
 
   this.currentItem = packet;
   this.currentModalIndex = selectedMarkerIndex;
@@ -1019,7 +1023,11 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
         `${window.location.origin}/summary-engine/${modulePath}${queryParams}`
       );
       console.log('Opening modal with iframe URL:', this.currentiframeUrl);
+      console.log('QueryParams check', this.queryParams);
       this.modalService.open(this.modalContent, { size: 'xl' });
+      console.log('this.paramsReadExport',this.paramsReadExport)
+    
+
     } else {
       console.error('Modal content is undefined');
     }
@@ -1760,6 +1768,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
       this.queryParams = params;
     
       console.log('this.queryParams checking', this.queryParams);
+      // this.openQueryParams(this.queryParams)
       this.isEditModeView = false;
     
       if (params['viewMode']) {
@@ -1772,7 +1781,10 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
         this.disableMenuQP = params['disableMenu'] === 'true';
         sessionStorage.setItem('disableMenu', this.disableMenuQP.toString());
       }
-    
+    if(params['from_routerID']){
+      console.log(params['from_routerID'])
+      this.fromRouterID = params['from_routerID']
+    }
       console.log('params', params['filterTileConfig']);
       if (params['filterTileConfig']) {
         console.log('Raw filterTileConfig:', params['filterTileConfig']);
@@ -1802,6 +1814,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
         }
       } else {
         console.warn('filterTileConfig is not present in params.');
+        this.isFilterdetail= false
       }
     });
     
@@ -1894,6 +1907,11 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     this.lastSavedTime = null;
   }
 
+
+  }
+  openQueryParams(paramsRead:any){
+    console.log('paramsRead',paramsRead)
+    this.paramsReadExport = paramsRead
 
   }
   selectFormParams(event: any) {
@@ -2562,7 +2580,68 @@ setTimeout(() => {
           // Iterate through the dashboard and themes to find a matching 
           console.log('checkdta for filter',this.all_Packet_store)
           if(this.isFilterdetail){
-            this.updateSummary(this.storeFilterDetail, 'query_applied');
+            console.log('this.isFilterdetail',this.isFilterdetail)
+            console.log('this.storeFilterDetail',this.storeFilterDetail)
+            console.log('this.routeId',this.routeId)
+            console.log('this.toRouteId',this.toRouteId)
+            
+            const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+    
+            // Prepare the request body
+            const requestBody = {
+              body: JSON.stringify({
+                clientId: this.SK_clientID,
+                from_route_id: this.fromRouterID,
+
+                to_route_id:this.routeId,
+                // widgetId:this.storeDrillDown.id,
+            
+                MsgType:'Query_Params',
+                queryParams:this.storeFilterDetail
+              }),
+            };
+          
+            console.log('requestBody Tile', requestBody);
+          
+            // Send a POST request to the Lambda function with the body
+            this.http.post(apiUrl, requestBody).subscribe(
+              (response: any) => {
+                console.log('Lambda function triggered successfully:', response);
+                this.responseBody = JSON.parse(response.body)
+                console.log('this.responseBody checking',this.responseBody )
+                this.responseRowData = JSON.parse(this.responseBody.rowdata)
+                console.log('this.responseRowData checking',this.responseRowData)
+            
+                
+                
+            
+                // Display SweetAlert success message
+                // Swal.fire({
+                //   title: 'Success!',
+                //   text: 'Lambda function triggered successfully.',
+                //   icon: 'success',
+                //   confirmButtonText: 'OK'
+                // });
+          
+                // Proceed with route parameter handling
+      
+          
+         // Reset loading state
+              },
+              (error: any) => {
+                console.error('Error triggering Lambda function:', error);
+          
+                // Display SweetAlert error message
+                Swal.fire({
+                  title: 'Error!',
+                  text: 'Failed to trigger the Lambda function. Please try again.',
+                  icon: 'error',
+                  confirmButtonText: 'OK'
+                });
+         // Reset loading state
+              }
+            );
+            // this.updateSummary(this.storeFilterDetail, 'query_applied');
           }
           this.dashboard.forEach((gridItem: any) => {
             // Find the theme that matches the current grid item
@@ -4368,20 +4447,20 @@ setTimeout(() => {
   //   this.validateAndSubmit(tempObj, key);
   // }
   updateSummary(value: any, key: any) {
-    console.log('QueryParams check', this.queryParams);
-    try {
-      if (typeof this.queryParams.filterTileConfig === 'string') {
-        this.updatedQueryPramas = JSON.parse(this.queryParams.filterTileConfig);
-      } else {
-        console.error('Invalid or undefined filterTileConfig:', this.queryParams.filterTileConfig);
-        this.updatedQueryPramas = {}; // default to an empty object or handle as needed
-      }
-    } catch (e) {
-      console.error('Error parsing filterTileConfig:', e);
-      this.updatedQueryPramas = {}; // default to an empty object or handle as needed
-    }
 
-    console.log('this.updatedQueryPramas', this.updatedQueryPramas);
+    // try {
+    //   if (typeof this.queryParams.filterTileConfig === 'string') {
+    //     this.updatedQueryPramas = JSON.parse(this.queryParams.filterTileConfig);
+    //   } else {
+    //     console.error('Invalid or undefined filterTileConfig:', this.queryParams.filterTileConfig);
+    //     this.updatedQueryPramas = {}; // default to an empty object or handle as needed
+    //   }
+    // } catch (e) {
+    //   console.error('Error parsing filterTileConfig:', e);
+    //   this.updatedQueryPramas = {}; // default to an empty object or handle as needed
+    // }
+
+    // console.log('this.updatedQueryPramas', this.updatedQueryPramas);
 
     console.log('this.getLoggedUser check update', this.getLoggedUser);
   
@@ -4440,7 +4519,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
       metadata: JSON.stringify({
         ...this.allCompanyDetails,
         grid_details: this.formattedDashboard,
-        queryParams: serializedQueryParams, // Include params here
+      // Include params here
       }),
     };
   

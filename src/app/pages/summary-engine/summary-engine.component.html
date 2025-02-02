@@ -55,6 +55,7 @@
                 (click)="
                   item.grid_type === 'filterTile' ? helperFilter(item, i, FilterModal) :
                   item.grid_type === 'tile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,dataTableModalTile1) : null) :
+                item.grid_type === 'dynamicTile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,dataTableModalDynamicTile) : null) :
                   null
                 "
               >
@@ -1860,6 +1861,13 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   [responseRowData]="responseRowData"
   [all_Packet_store]="all_Packet_store"
     ></app-data-table-tile1>
+  </ng-template>
+
+  <ng-template #dataTableModalDynamicTile let-modal>
+    <app-data-table-dynamic-tile
+  [responseRowData]="responseRowData"
+  [all_Packet_store]="all_Packet_store"
+    ></app-data-table-dynamic-tile>
   </ng-template>
   </div>
 <!--   

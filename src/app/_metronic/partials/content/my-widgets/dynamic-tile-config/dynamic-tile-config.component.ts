@@ -459,9 +459,9 @@ export class DynamicTileConfigComponent implements OnInit{
       const updatedTile = {
         ...this.dashboard[this.editTileIndex], // Keep existing properties
 
-        dashboardIds:this.createChart.value.dashboardIds,
-        selectType: this.createChart.value.selectType,
-        toggleCheck:this.createChart.value.toggleCheck,
+        dashboardIds:this.createChart.value.dashboardIds ||'',
+        selectType: this.createChart.value.selectType ||'',
+        toggleCheck:this.createChart.value.toggleCheck ||'',
         themeColor: this.createChart.value.themeColor,
         fontSize: `${this.createChart.value.fontSize}px`,
         fontColor: this.createChart.value.fontColor,
@@ -471,7 +471,7 @@ export class DynamicTileConfigComponent implements OnInit{
         minitableEquation:this.createChart.value.minitableEquation,
         EquationOperationMini:this.createChart.value.EquationOperationMini,
         equation: this.createChart.value.equation_fields || [], 
-        equation_param:this.createChart.value.equation_param,
+        equation_param:this.createChart.value.equation_param ||'',
         // EquationFormList: this.createKPIWidget.value.EquationFormList,
         // EquationParam: this.createKPIWidget.value.EquationParam,
         // EquationOperation: this.createKPIWidget.value.EquationOperation,
