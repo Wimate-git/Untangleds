@@ -82,6 +82,16 @@ export class Tile1ConfigComponent implements OnInit {
   indexwiseOperationValue: any;
   paramCount: any;
 
+  filteredHeaders: any;
+  readMinitableName: any;
+  readMinitableLabel: any;
+  filteredResults: any;
+  extractedTables: unknown[];
+  readOperation: any;
+  FormRead: any;
+  selectedMiniTableFields: any;
+  userIsChanging: boolean;
+
 
  
   ngOnInit() {
@@ -212,7 +222,12 @@ export class Tile1ConfigComponent implements OnInit {
    
       EquationDesc:[''],
       columnVisibility:[[]],
-      rowData:[]
+      rowData:[],
+      miniForm:[''],
+      MiniTableNames:[''],
+      MiniTableFields:[''],
+      minitableEquation:[''],
+      EquationOperationMini:['']
 
 
     });
@@ -445,6 +460,11 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         columnVisibility:this.createKPIWidget.value.columnVisibility,
         rowData:this.createKPIWidget.value.rowData || '',
         noOfParams: this.noOfParams || 0,
+        miniForm:this.createKPIWidget.value.miniForm || '',
+        MiniTableNames:this.createKPIWidget.value.MiniTableNames ||'',
+        MiniTableFields:this.createKPIWidget.value.MiniTableFields ,
+        minitableEquation:this.createKPIWidget.value.minitableEquation,
+        EquationOperationMini:this.createKPIWidget.value.EquationOperationMini,
 
 
 
@@ -557,8 +577,13 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         // EquationFormList: this.createKPIWidget.value.EquationFormList,
         // EquationParam: this.createKPIWidget.value.EquationParam,
         // EquationOperation: this.createKPIWidget.value.EquationOperation,
-        EquationDesc: updatedEquationDesc, // Update with recalculated value
-        columnVisibility:this.createKPIWidget.value.columnVisibility
+        EquationDesc: this.createKPIWidget.value.EquationDesc, // Update with recalculated value
+        columnVisibility:this.createKPIWidget.value.columnVisibility,
+        miniForm:this.createKPIWidget.value.miniForm || '',
+        MiniTableNames:this.createKPIWidget.value.MiniTableNames ||'',
+        MiniTableFields:this.createKPIWidget.value.MiniTableFields ,
+        minitableEquation:this.createKPIWidget.value.minitableEquation,
+        EquationOperationMini:this.createKPIWidget.value.EquationOperationMini,
 
 
       };
@@ -777,64 +802,76 @@ addEquation(): void {
 
 
   const allFieldsArray = this.createKPIWidget.get('all_fields') as FormArray;
-
+console.log("allFieldsArray",allFieldsArray.value)
   // Ensure `this.operationValue` is an array before using push
-  if (!Array.isArray(this.operationValue)) {
-    this.operationValue = [];
-  } else {
-    this.operationValue.length = 0; // Reset array to avoid accumulation of old values
-  }
+  // if (!Array.isArray(this.operationValue)) {
+  //   this.operationValue = [];
+  // } else {
+  //   this.operationValue.length = 0; // Reset array to avoid accumulation of old values
+  // }
+ const equationTextArea = allFieldsArray.value.map((packet: any, index: number) => {
+    if(!Array.isArray(packet.EquationParam)){
+      packet.EquationParam = [packet.EquationParam]
+    }
+      // Initialize a string to collect all parameter texts
+      let tempText = packet.EquationParam.map((param:any) => `${packet.EquationFormList}.${param.text}.${param.value}`).join(',');
 
+      // Return the formatted string for this group of parameters
+      return `${packet.EquationOperation}(\${${tempText}})`;
+  })
+  .join(', ');
   // Loop through each group in the form array
-  allFieldsArray.controls.forEach((control, index) => {
-    // Safely cast the AbstractControl to FormGroup
-    const group = control as FormGroup;
+  // allFieldsArray.controls.forEach((control, index) => {
+  //   // Safely cast the AbstractControl to FormGroup
+  //   const group = control as FormGroup;
 
-    // Push operation value for the current group
-    this.operationValue.push(group.get('EquationOperation')?.value || '');
-    console.log(`Operation Value for index ${index}:`, this.operationValue);
-  });
+  //   // Push operation value for the current group
+  //   this.operationValue.push(group.get('EquationOperation')?.value || '');
+  //   console.log(`Operation Value for index ${index}:`, this.operationValue);
+  // });
 
-console.log('this.operationValue', this.operationValue)
-  let selectedParameters = this.selectedEquationParameterValue || [];
-  selectedParameters = selectedParameters.length > 0 ? selectedParameters.filter((param: any) => param != null) : [];
-  console.log('Selected Parameters:', selectedParameters);
+// console.log('this.operationValue', this.operationValue)
+//   let selectedParameters = this.selectedEquationParameterValue || [];
+//   selectedParameters = selectedParameters.length > 0 ? selectedParameters.filter((param: any) => param != null) : [];
+//   console.log('Selected Parameters:', selectedParameters);
 
-  if (selectedParameters.length > 0) {
-    const formattedParameters = selectedParameters
-        .map((params: any[], index: number) => {
-          if(!Array.isArray(params)){
-            params = [params]
-          }
-            // Initialize a string to collect all parameter texts
-            let tempText = params.map(param => `${this.formName[index]}.${param.text}.${param.value}`).join(',');
+//   if (selectedParameters.length > 0) {
+//     const formattedParameters = selectedParameters
+//         .map((params: any[], index: number) => {
+//           if(!Array.isArray(params)){
+//             params = [params]
+//           }
+//             // Initialize a string to collect all parameter texts
+//             let tempText = params.map(param => `${this.formName[index]}.${param.text}.${param.value}`).join(',');
 
-            // Return the formatted string for this group of parameters
-            return `${this.operationValue[index]}(\${${tempText}})`;
-        })
-        .join(', ');
+//             // Return the formatted string for this group of parameters
+//             return `${this.operationValue[index]}(\${${tempText}})`;
+//         })
+//         .join(', ');
 
-        console.log('formattedParameters',formattedParameters)
+//         console.log('formattedParameters',formattedParameters)
 
-    // const formattedEquation = `${this.operationValue}(${formattedParameters})`;
-    // console.log('Formatted Equation:', formattedEquation);
+//     // const formattedEquation = `${this.operationValue}(${formattedParameters})`;
+//     // console.log('Formatted Equation:', formattedEquation);
 
-    this.createKPIWidget.patchValue({
-        EquationDesc: formattedParameters,
-    });
-}
- else {
-      console.warn('No parameters selected or invalid format:', selectedParameters);
-      this.createKPIWidget.patchValue({
-          EquationDesc: '',
-      });
-  }
-  // Check if formName is set
-  if (!this.formName) {
-      console.error('Form name is not set. Cannot create equation.');
-      return;
-  }
-
+//     this.createKPIWidget.patchValue({
+//         EquationDesc: formattedParameters,
+//     });
+// }
+//  else {
+//       console.warn('No parameters selected or invalid format:', selectedParameters);
+//       // this.createKPIWidget.patchValue({
+//       //     EquationDesc: '',
+//       // });
+//   }
+//   // Check if formName is set
+//   if (!this.formName) {
+//       console.error('Form name is not set. Cannot create equation.');
+//       return;
+//   }
+  this.createKPIWidget.patchValue({
+    EquationDesc: equationTextArea,
+});
 
   console.log('this.formName checking', this.formName);
 
@@ -935,6 +972,19 @@ openKPIModal(tile: any, index: number) {
     this.selectedTile = tile;
     this.editTileIndex = index !== undefined ? index : null;
     console.log('Tile object from readback:', tile);
+    this.themes.forEach((theme) => theme.selected = false);
+
+    // Find the theme that matches the tile's themeColor
+    const matchingTheme = this.themes.find((theme) => theme.color === tile.themeColor);
+
+    if (matchingTheme) {
+      matchingTheme.selected = true;
+      console.log('Matching theme found and selected:', matchingTheme);
+    }
+
+    // Force change detection to update the UI
+    this.cd.detectChanges();
+
 
     // Parse multi_value if it is a string
     let parsedMultiValue = [];
@@ -983,6 +1033,19 @@ openKPIModal(tile: any, index: number) {
     } else if (Array.isArray(tile.columnVisibility)) {
       parsedColumnVisibility = tile.columnVisibility;
     }
+
+
+    let parsedMiniTableFields = [];
+    if (typeof tile.MiniTableFields === 'string') {
+      try {
+        parsedMiniTableFields = JSON.parse(tile.MiniTableFields);
+        console.log('Parsed filterParameter1:', parsedMiniTableFields);
+      } catch (error) {
+        console.error('Error parsing filterParameter1:', error);
+      }
+    } else {
+      parsedMiniTableFields = tile.MiniTableFields;
+    }
     this.paramCount = tile.noOfParams;
 
     console.log('Parsed columnVisibility:', parsedColumnVisibility);
@@ -1013,7 +1076,12 @@ openKPIModal(tile: any, index: number) {
       EquationParam: parsedEquationParam, // Set parsed EquationParam
       EquationOperation: tile.EquationOperation,
       EquationDesc: tile.EquationDesc,
-      columnVisibility: parsedColumnVisibility, // Set parsed columnVisibility
+      columnVisibility: parsedColumnVisibility,
+      miniForm:tile.miniForm || '',
+      MiniTableNames:tile.MiniTableNames ||'',
+      MiniTableFields:parsedMiniTableFields ,
+      minitableEquation:tile.minitableEquation,
+      EquationOperationMini:tile.EquationOperationMini, // Set parsed columnVisibility
       all_fields: this.repopulate_fields(tile),
     });
 
@@ -1622,6 +1690,197 @@ selectFormParams1(event: any[], index: number): void {
     this.noOfParams = noOfParams;
   }
   
+  miniTableFields(readFields:any){
+    console.log('readFields',readFields)
+    if (readFields && readFields.value && Array.isArray(readFields.value)) {
+      // Extract all 'value' properties from the selected items
+      const selectedValues = readFields.value.map((item: any) => item.value);
+
+      console.log('Extracted Values:', selectedValues);
+      
+      // Store the extracted values in a variable
+      this.selectedMiniTableFields = selectedValues;
+  }
+  }
+  AddMiniTableEquation() {
+    console.log('this.FormRead check:', this.FormRead);
+    console.log('this.readMinitableLabel check:', this.readMinitableLabel);
+    // console.log('this.selectedMiniTableFields check:', this.selectedMiniTableFields);
+    console.log('this.readOperation checking:', this.readOperation);
+    const miniTableFieldsValue = this.createKPIWidget.get('MiniTableFields')?.value;
+  console.log('Retrieved MiniTableFields from Form:', miniTableFieldsValue);
+  if (Array.isArray(miniTableFieldsValue)) {
+    // Extract the 'value' from each object
+    const extractedValues = miniTableFieldsValue.map((field: any) => field.value);
+    console.log('Extracted Values:', extractedValues);
+  
+    // Store in a variable
+    this.selectedMiniTableFields = extractedValues;
+  } else {
+    console.log('MiniTableFields is not an array or is empty.');
+  }
+  
+  
+    // Ensure all values are defined before constructing the equation
+    if (this.FormRead && this.readMinitableLabel && Array.isArray(this.selectedMiniTableFields)) {
+        let equation = '';
+  
+        if (this.readMinitableLabel === "trackLocation") {
+            // Remove "dynamic_table_values" for trackLocation
+            equation = this.selectedMiniTableFields
+                .map((field: string) => `\${${this.FormRead}.${this.readMinitableLabel}.${field}}`)
+                .join(',');
+        } else {
+            // Keep "dynamic_table_values" for other cases
+            equation = this.selectedMiniTableFields
+                .map((field: string) => `\${${this.FormRead}.dynamic_table_values.${this.readMinitableLabel}.${field}}`)
+                .join(',');
+        }
+  
+        // If an operation is provided, prepend it
+        if (this.readOperation && this.readOperation.trim() !== '') {
+            equation = `${this.readOperation}(${equation})`;
+        }
+  
+        console.log('Generated Equation:', equation);
+  
+        // Store the equation in the Angular form control
+        this.createKPIWidget.controls['minitableEquation'].setValue(equation);
+    } else {
+        console.log('Error: One or more required values are missing.');
+    }
+  }
+setUserSatus(){
+  this.userIsChanging = true
+  this.cdr.detectChanges()
+}
+
+
+selectedOperationMini(readOperation:any){
+  console.log('readOperation',readOperation)
+  this.readOperation = readOperation[0].value
+
+}
+checkSelectedFormPram(readForm:any){
+  console.log('readForm checking',readForm)
+  this.FormRead = readForm[0].value
+  this.fetchMiniTable(this.FormRead)
+
+}
+async fetchMiniTable(item: any) {
+  try {
+      this.extractedTables = []; // Initialize to prevent undefined errors
+      this.filteredResults = []; // Initialize formatted dropdown options
+
+      const resultMain: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#" + item + "#main", 1);
+      if (resultMain) {
+          console.log('Forms Checking:', resultMain);
+          const helpherObjmain = JSON.parse(resultMain.metadata);
+          console.log('Helper Object Main:', helpherObjmain);
+
+          const extractFormFields = helpherObjmain.formFields;
+
+          // Ensure extractedTables is set properly
+          this.extractedTables = Object.values(extractFormFields).filter((item: any) =>
+              typeof item === 'object' &&
+              item !== null &&
+              'name' in item &&
+              typeof item.name === 'string' &&
+              item.name.startsWith("table-") &&
+              item.validation && 
+              item.validation.formName_table // Ensure `formName_table` exists inside `validation`
+          );
+
+          // Format extracted tables for dropdown options
+          this.filteredResults = this.extractedTables.map((record: any) => ({
+              value: record.validation.formName_table, // Use `formName_table` as value
+              label: record.name // Use `name` as label
+          }));
+
+          // Add "Track Location" as an additional option
+          this.filteredResults.unshift({
+              value: 'trackLocation', 
+              label: 'trackLocation'
+          });
+
+          console.log('Dropdown Options:', this.filteredResults);
+      }
+  } catch (err) {
+      console.log("Error fetching the dynamic form data", err);
+  }
+}
+
+
+miniTableNames(readMinitableName:any){
+console.log('readMinitableName',readMinitableName)
+this.readMinitableName = readMinitableName[0].value
+this.readMinitableLabel = readMinitableName[0].data.label
+console.log('this.readMinitableLabel',this.readMinitableLabel)
+
+this.fetchMiniTableHeaders(this.readMinitableName)
+
+}
+
+async fetchMiniTableHeaders(item: any) {
+try {
+    this.filteredHeaders = []; // Initialize to store formatted dropdown options
+
+    // If item is "trackLocation", directly set predefined fields
+    if (item === "trackLocation") {
+        this.filteredHeaders = [
+            { value: "Date_and_time", label: "Date_and_time" },
+            { value: "label_id", label: "label_id" },
+            { value: "label_name", label: "label_name" },
+            { value: "type", label: "type" },
+
+        ];
+        console.log('Predefined Headers for Track Location:', this.filteredHeaders);
+        return; // Exit function early, no need to fetch from API
+    }
+
+    // Otherwise, proceed with fetching data from API
+    const resultHeaders: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#" + item + "#main", 1);
+
+    if (resultHeaders) {
+        console.log('Forms Checking:', resultHeaders);
+        const helpherObjmainHeaders = JSON.parse(resultHeaders.metadata);
+        console.log('Helper Object Main Headers:', helpherObjmainHeaders);
+
+        const extractFormFields = helpherObjmainHeaders.formFields;
+
+        // Ensure extracted headers are properly formatted
+        if (Array.isArray(extractFormFields)) {
+            this.filteredHeaders = extractFormFields.map((record: any) => ({
+                value: record.name,  // Set the 'name' field as value
+                label: record.label  // Set the 'label' field as label
+            }));
+        }
+
+        console.log('Formatted Headers:', this.filteredHeaders);
+    }
+} catch (err) {
+    console.log("Error fetching the dynamic form data", err);
+}
+}
+showValuesForMini = [
+  { value: 'sum', text: 'Sum' },
+  { value: 'min', text: 'Minimum' },
+  { value: 'max', text: 'Maximum' },
+  { value: 'average', text: 'Average' },
+  { value: 'latest', text: 'Latest' },
+  { value: 'previous', text: 'Previous' },
+  // { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
+  // { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
+  // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
+  // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
+  { value: 'Constant', text: 'Constant' },
+  { value: 'Live', text: 'Live' },
+  { value: 'Count', text: 'Count' },
+  { value: 'Count_Multiple', text: 'Count Multiple' },
+  { value: 'Count Dynamic', text: 'Count Dynamic' },
+
+
+]
   
 
 

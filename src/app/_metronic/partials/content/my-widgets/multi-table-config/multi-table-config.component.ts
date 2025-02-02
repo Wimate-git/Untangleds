@@ -55,6 +55,22 @@ export class MultiTableConfigComponent {
   dynamicFields: any;
   selectedParameterValueDupli: { value: any; text: any; };
   selectedParameterValueDupl: string;
+  FormRead: any;
+  extractedTables: unknown[];
+  structuredTableData: unknown;
+  filteredResults: {
+    value: any; // Use `name` as the dropdown value
+    label: any; // Use `validation.formName_table` as the dropdown label
+  }[];
+  readMinitableName: any;
+  extractedTableHeaders: any;
+  filteredHeaders: {
+    value: any; // Set the 'name' field as value
+    label: any; // Set the 'label' field as label
+  }[];
+  selectedMiniTableFields: any;
+  readMinitableLabel: any;
+  readOperation: any;
 
 
   ngOnInit(): void {
@@ -98,7 +114,12 @@ this.initializeTileFields()
       filterDescription: [''],
       filterParameter1:[''],
       // custom_Label1:[''],
-      filterDescription1:['']
+      filterDescription1:[''],
+      miniForm:[''],
+      MiniTableNames:[''],
+      MiniTableFields:[''],
+      minitableEquation:[''],
+      EquationOperation:['']
     });
   }
 
@@ -136,6 +157,111 @@ this.initializeTileFields()
     // Manually trigger change detection to ensure the UI reflects the changes
     this.cdr.detectChanges();
   }
+  checkSelectedFormPram(readForm:any){
+    console.log('readForm checking',readForm)
+    this.FormRead = readForm[0].value
+    this.fetchMiniTable(this.FormRead)
+
+  }
+  async fetchMiniTable(item: any) {
+    try {
+        this.extractedTables = []; // Initialize to prevent undefined errors
+        this.filteredResults = []; // Initialize formatted dropdown options
+
+        const resultMain: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#" + item + "#main", 1);
+        if (resultMain) {
+            console.log('Forms Checking:', resultMain);
+            const helpherObjmain = JSON.parse(resultMain.metadata);
+            console.log('Helper Object Main:', helpherObjmain);
+
+            const extractFormFields = helpherObjmain.formFields;
+
+            // Ensure extractedTables is set properly
+            this.extractedTables = Object.values(extractFormFields).filter((item: any) =>
+                typeof item === 'object' &&
+                item !== null &&
+                'name' in item &&
+                typeof item.name === 'string' &&
+                item.name.startsWith("table-") &&
+                item.validation && 
+                item.validation.formName_table // Ensure `formName_table` exists inside `validation`
+            );
+
+            // Format extracted tables for dropdown options
+            this.filteredResults = this.extractedTables.map((record: any) => ({
+                value: record.validation.formName_table, // Use `formName_table` as value
+                label: record.name // Use `name` as label
+            }));
+
+            // Add "Track Location" as an additional option
+            this.filteredResults.unshift({
+                value: 'trackLocation', 
+                label: 'trackLocation'
+            });
+
+            console.log('Dropdown Options:', this.filteredResults);
+        }
+    } catch (err) {
+        console.log("Error fetching the dynamic form data", err);
+    }
+}
+
+
+miniTableNames(readMinitableName:any){
+  console.log('readMinitableName',readMinitableName)
+  this.readMinitableName = readMinitableName[0].value
+  this.readMinitableLabel = readMinitableName[0].data.label
+  console.log('this.readMinitableLabel',this.readMinitableLabel)
+
+  this.fetchMiniTableHeaders(this.readMinitableName)
+
+}
+
+async fetchMiniTableHeaders(item: any) {
+  try {
+      this.filteredHeaders = []; // Initialize to store formatted dropdown options
+
+      // If item is "trackLocation", directly set predefined fields
+      if (item === "trackLocation") {
+          this.filteredHeaders = [
+              { value: "Date_and_time", label: "Date_and_time" },
+              { value: "label_id", label: "label_id" },
+              { value: "label_name", label: "label_name" },
+              { value: "type", label: "type" },
+
+          ];
+          console.log('Predefined Headers for Track Location:', this.filteredHeaders);
+          return; // Exit function early, no need to fetch from API
+      }
+
+      // Otherwise, proceed with fetching data from API
+      const resultHeaders: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#" + item + "#main", 1);
+
+      if (resultHeaders) {
+          console.log('Forms Checking:', resultHeaders);
+          const helpherObjmainHeaders = JSON.parse(resultHeaders.metadata);
+          console.log('Helper Object Main Headers:', helpherObjmainHeaders);
+
+          const extractFormFields = helpherObjmainHeaders.formFields;
+
+          // Ensure extracted headers are properly formatted
+          if (Array.isArray(extractFormFields)) {
+              this.filteredHeaders = extractFormFields.map((record: any) => ({
+                  value: record.name,  // Set the 'name' field as value
+                  label: record.label  // Set the 'label' field as label
+              }));
+          }
+
+          console.log('Formatted Headers:', this.filteredHeaders);
+      }
+  } catch (err) {
+      console.log("Error fetching the dynamic form data", err);
+  }
+}
+
+
+
+
   
 
 
@@ -193,7 +319,16 @@ this.initializeTileFields()
       conditions: conditionsArray, // Use the updated conditions array
       filterParameter1:this.createKPIWidget.value.filterParameter1,
       // custom_Label1:this.createKPIWidget.value.custom_Label1,
-      filterDescription1:this.createKPIWidget.value.filterDescription1
+      filterDescription1:this.createKPIWidget.value.filterDescription1,
+      miniForm:this.createKPIWidget.value.miniForm,
+      MiniTableNames:this.createKPIWidget.value.MiniTableNames,
+      MiniTableFields:this.createKPIWidget.value.MiniTableFields,
+      minitableEquation:this.createKPIWidget.value.minitableEquation,
+      EquationOperation:this.createKPIWidget.value.EquationOperation
+
+
+
+
 
     };
   
@@ -441,6 +576,17 @@ this.initializeTileFields()
       } else {
         parsedFilterParameter1 = tile.filterParameter1;
       }
+      let parsedMiniTableFields = [];
+      if (typeof tile.MiniTableFields === 'string') {
+        try {
+          parsedMiniTableFields = JSON.parse(tile.MiniTableFields);
+          console.log('Parsed filterParameter1:', parsedMiniTableFields);
+        } catch (error) {
+          console.error('Error parsing filterParameter1:', error);
+        }
+      } else {
+        parsedMiniTableFields = tile.MiniTableFields;
+      }
   
       // Set parsedConditions into FormArray
       const formArray = this.conditions;
@@ -463,6 +609,11 @@ this.initializeTileFields()
         custom_Label: tile.custom_Label,
         filterParameter1: parsedFilterParameter1, // Parsed array
         filterDescription1: tile.filterDescription1,
+        miniForm:tile.miniForm,
+        MiniTableNames:tile.MiniTableNames,
+        MiniTableFields:parsedMiniTableFields,
+        minitableEquation:tile.minitableEquation,
+        EquationOperation:tile.EquationOperation
         // custom_Label1: tile.custom_Label1,
       });
   
@@ -529,6 +680,11 @@ this.initializeTileFields()
         conditions: updatedConditions, // Directly assign the array
         filterParameter1: this.createKPIWidget.value.filterParameter1, // Parsed array
         filterDescription1: this.createKPIWidget.value.filterDescription1,
+        miniForm:this.createKPIWidget.value.miniForm,
+        MiniTableNames:this.createKPIWidget.value.MiniTableNames,
+        MiniTableFields:this.createKPIWidget.value.MiniTableFields,
+        minitableEquation:this.createKPIWidget.value.minitableEquation,
+        EquationOperation:this.createKPIWidget.value.EquationOperation
         // custom_Label1: this.createKPIWidget.value.custom_Label1,
       };
   
@@ -775,6 +931,91 @@ this.initializeTileFields()
       console.warn('Invalid event structure:', event);
     }
   }
-  
+  miniTableFields(readFields:any){
+    console.log('readFields',readFields)
+    if (readFields && readFields.value && Array.isArray(readFields.value)) {
+      // Extract all 'value' properties from the selected items
+      const selectedValues = readFields.value.map((item: any) => item.value);
+
+      console.log('Extracted Values:', selectedValues);
+      
+      // Store the extracted values in a variable
+      this.selectedMiniTableFields = selectedValues;
+  }
+  }
+  AddEquation() {
+    console.log('this.FormRead check:', this.FormRead);
+    console.log('this.readMinitableLabel check:', this.readMinitableLabel);
+    // console.log('this.selectedMiniTableFields check:', this.selectedMiniTableFields);
+    console.log('this.readOperation checking:', this.readOperation);
+    const miniTableFieldsValue = this.createKPIWidget.get('MiniTableFields')?.value;
+    console.log('Retrieved MiniTableFields from Form:', miniTableFieldsValue);
+    if (Array.isArray(miniTableFieldsValue)) {
+      // Extract the 'value' from each object
+      const extractedValues = miniTableFieldsValue.map((field: any) => field.value);
+      console.log('Extracted Values:', extractedValues);
+    
+      // Store in a variable
+      this.selectedMiniTableFields = extractedValues;
+    } else {
+      console.log('MiniTableFields is not an array or is empty.');
+    }
+
+    // Ensure all values are defined before constructing the equation
+    if (this.FormRead && this.readMinitableLabel && Array.isArray(this.selectedMiniTableFields)) {
+        let equation = '';
+
+        if (this.readMinitableLabel === "trackLocation") {
+            // Remove "dynamic_table_values" for trackLocation
+            equation = this.selectedMiniTableFields
+                .map((field: string) => `\${${this.FormRead}.${this.readMinitableLabel}.${field}}`)
+                .join(',');
+        } else {
+            // Keep "dynamic_table_values" for other cases
+            equation = this.selectedMiniTableFields
+                .map((field: string) => `\${${this.FormRead}.dynamic_table_values.${this.readMinitableLabel}.${field}}`)
+                .join(',');
+        }
+
+        // If an operation is provided, prepend it
+        if (this.readOperation && this.readOperation.trim() !== '') {
+            equation = `${this.readOperation}(${equation})`;
+        }
+
+        console.log('Generated Equation:', equation);
+
+        // Store the equation in the Angular form control
+        this.createKPIWidget.controls['minitableEquation'].setValue(equation);
+    } else {
+        console.log('Error: One or more required values are missing.');
+    }
+}
+
+showValues = [
+  { value: 'sum', text: 'Sum' },
+  { value: 'min', text: 'Minimum' },
+  { value: 'max', text: 'Maximum' },
+  { value: 'average', text: 'Average' },
+  { value: 'latest', text: 'Latest' },
+  { value: 'previous', text: 'Previous' },
+  { value: 'Difference', text: 'Diff' },
+
+  // { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
+  // { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
+  // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
+  // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
+  { value: 'Constant', text: 'Constant' },
+ 
+  { value: 'Count', text: 'Count' },
+  { value: 'Count Dynamic', text: 'Count Dynamic' },
+  { value: 'Equation', text: 'Equation' },
+
+]
+selectedOperation(readOperation:any){
+  this.readOperation = readOperation[0].value
+
+}
+
+
 
 }

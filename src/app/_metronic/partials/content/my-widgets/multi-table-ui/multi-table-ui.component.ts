@@ -27,6 +27,8 @@ export class MultiTableUiComponent implements OnInit{
   // @Output() sendCellInfo:
   @Output() sendCellInfo = new EventEmitter<any>();
   @Output() sendminiTableData = new EventEmitter<any>();
+  @Output() sendFormNameForMini = new EventEmitter<any>();
+  
 
   
   
@@ -53,6 +55,7 @@ export class MultiTableUiComponent implements OnInit{
   columnLabelsArray: any;
   mutitableColumns: any;
   extractRowData: any;
+  extractFormName: any;
   ngOnInit(): void {
 
     
@@ -99,8 +102,10 @@ export class MultiTableUiComponent implements OnInit{
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
     console.log("tile data check from multi table Widget",this.item)
-    this.extractRowData = JSON.parse(this.item.rowData)
-    console.log('this.extractRowData checking',this.extractRowData)
+    this.extractFormName = this.item.formlist
+    this.sendFormNameForMini.emit(this.extractFormName)
+
+
     this.mutitableColumns = JSON.parse(this.item.multiTableWidget_Config)
     console.log('this.mutitableColumns checking',this.mutitableColumns)
     
@@ -167,6 +172,8 @@ try {
 this.columnDefs = [...tableWidgetColumns, ...additionalColumns];
 
   console.log('Final column definitions:', this.columnDefs);
+      this.extractRowData = JSON.parse(this.item.rowData)
+    console.log('this.extractRowData checking',this.extractRowData)
   console.log('this.extractRowData checking from',this.extractRowData)
   this.sendminiTableData.emit(this.extractRowData)
 this.rowData = this.extractRowData

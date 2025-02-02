@@ -14,7 +14,14 @@
         style="font-weight: bold; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
         {{ item.chart_title }}
       </div>
+      <div 
+      [style.font-size]="item.fontSize" 
+      [style.color]="item.fontColor"
+      style="font-weight: bold; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+      {{ item.equationProcess }}
+    </div>
 
+     
       <!-- Parameter Name and Processed Value -->
       <div *ngFor="let config of parsedTileConfig" class="parameter-container" style="margin-bottom: 5px;">
         <div 

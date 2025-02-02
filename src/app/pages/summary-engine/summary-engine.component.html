@@ -86,6 +86,7 @@
                       [all_Packet_store]="all_Packet_store" 
                       (sendCellInfo) = "helperInfo($event,nestedTable)"
                       (sendminiTableData)="helperminiTableData($event)"
+                      (sendFormNameForMini)="helperForName($event)"
                    
             
                       (customEvent)="helperTile($event, MultiTableModal)" 
@@ -1833,7 +1834,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
 
   <ng-template #nestedTable let-modal>
     <app-nested-table
-    [miniTableData]="miniTableData" [emitEvent]="emitEvent"
+    [miniTableData]="miniTableData" [emitEvent]="emitEvent" [SK_clientID]="SK_clientID" [FormNameMini]="FormNameMini"
     ></app-nested-table>
   </ng-template>
 

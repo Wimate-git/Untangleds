@@ -234,6 +234,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   responseRowData: any;
   miniTableData: any;
   emitEvent: any;
+  FormNameMini: any;
 
 
   createPieChart() {
@@ -4530,7 +4531,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
             if (actionKey === 'add_map' || actionKey === 'update_map') {
               // window.location.reload(); // Reloads the current window
             } else if (actionKey === 'update_Dashboard' || actionKey === 'filter_add') {
-              this.reloadPage(); // Call the reloadPage function
+              // this.reloadPage(); // Call the reloadPage function
             }
             else if (actionKey === 'add_table' || actionKey === 'update_table'){
               // this.reloadPage(); 
@@ -4636,6 +4637,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
       columnVisibility:this.formatField(tile.columnVisibility),
       formFieldTexts:this.formatField(tile.formFieldTexts),
       equation:this.formatField(tile.equation),
+      MiniTableFields:this.formatField(tile.MiniTableFields)
 
 
 
@@ -5970,6 +5972,10 @@ refreshFunction(){
 
     
 
+
+  }
+  helperForName(receiveFormName:any){
+    this.FormNameMini = receiveFormName
 
   }
 

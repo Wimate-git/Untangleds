@@ -80,6 +80,25 @@ export class DynamicTileConfigComponent implements OnInit{
   dynamicparameterLab: any;
   dynamicparameterLabMap: any;
   fields: any;
+  filteredHeaders: {
+    value: any; // Set the 'name' field as value
+    label: any; // Set the 'label' field as label
+  }[];
+  readMinitableName: any;
+  readMinitableLabel: any;
+  filteredResults: any;
+  extractedTables: any[];
+  readOperation: any;
+  FormRead: any;
+  userIsChanging: boolean;
+  selectedMiniTableFields: any[];
+  noOfParamsEquation: any;
+  operationValue: any[]=[];
+  selectedEquationParameterValue: any=[];
+  formName: any[] = [];
+  listofEquationParam: any[]=[];
+  listofFormValues: any;
+  paramCountEquation: any;
 
 
  
@@ -97,6 +116,7 @@ export class DynamicTileConfigComponent implements OnInit{
     this.setupRanges();
     this.dynamicData()
     this.dashboardIds(1)
+    this.dynamicDataEquation()
     this.createChart.get('toggleCheck')?.valueChanges.subscribe((isChecked) => {
       if (isChecked) {
         this.createChart.get('dashboardIds')?.enable();
@@ -179,7 +199,10 @@ export class DynamicTileConfigComponent implements OnInit{
     // Initialize the form group
     this.createChart = this.fb.group({
       add_fields:[''],
+      equation_param:[''],
       all_fields:new FormArray([]),
+      equation_fields:new FormArray([]),
+
   
       widgetid: [this.generateUniqueId()],
       chart_title:[''],
@@ -190,6 +213,12 @@ export class DynamicTileConfigComponent implements OnInit{
 // Default unchecked
       dashboardIds: [''],
       selectType: [''],
+      miniForm:[''],
+      MiniTableNames:[''],
+      MiniTableFields:[''],
+      minitableEquation:[''],
+      EquationOperationMini:[''],
+      EquationDesc:[''],
     
       // themeColor: ['#000000', Validators.required],
   
@@ -278,11 +307,11 @@ export class DynamicTileConfigComponent implements OnInit{
             selectFromTime: [''],
             selectToTime: [''],
             // parameterValue: [''],
-            fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
+            // fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
             filterForm: [''],
             filterParameter: [''],
             filterDescription: [''],
-            custom_Label: ['', Validators.required],
+            // custom_Label: ['', Validators.required],
         // Dynamically set from the map
           })
         );
@@ -300,7 +329,9 @@ export class DynamicTileConfigComponent implements OnInit{
   }
   
   
-  
+  get equation_fields() {
+    return this.createChart.get('equation_fields') as FormArray;
+  }
   
   
   get all_fields() {
@@ -343,14 +374,23 @@ export class DynamicTileConfigComponent implements OnInit{
         fixedRowHeight: true,
         grid_type: 'dynamicTile',
         chart_title: this.createChart.value.chart_title || '', // Ensure this value exists
-        toggleCheck: this.createChart.value.toggleCheck,
+        toggleCheck: this.createChart.value.toggleCheck ||'',
         tileConfig: this.fields || [], // Updated fields with labels
         themeColor: this.createChart.value.themeColor,
         fontSize: `${this.createChart.value.fontSize}px`, // Added fontSize
         fontColor: this.createChart.value.fontColor,
         dashboardIds: this.createChart.value.dashboardIds,
         selectType: this.createChart.value.selectType,
-        noOfParams: this.noOfParams || 0, // Ensure noOfParams has a valid value
+        noOfParams: this.noOfParams || 0, // Ensure noOfParams has a valid value,
+        miniForm:this.createChart.value.miniForm || '',
+        MiniTableNames:this.createChart.value.MiniTableNames ||'',
+        MiniTableFields:this.createChart.value.MiniTableFields ,
+        minitableEquation:this.createChart.value.minitableEquation,
+        EquationOperationMini:this.createChart.value.EquationOperationMini,
+        equation: this.createChart.value.equation_fields || [], 
+        EquationDesc:this.createChart.value.EquationDesc,
+        equationParams:this.noOfParamsEquation,
+        equationProcess:''
       };
   
       console.log('New Tile Object:', newTile);
@@ -425,6 +465,17 @@ export class DynamicTileConfigComponent implements OnInit{
         themeColor: this.createChart.value.themeColor,
         fontSize: `${this.createChart.value.fontSize}px`,
         fontColor: this.createChart.value.fontColor,
+        miniForm:this.createChart.value.miniForm || '',
+        MiniTableNames:this.createChart.value.MiniTableNames ||'',
+        MiniTableFields:this.createChart.value.MiniTableFields ,
+        minitableEquation:this.createChart.value.minitableEquation,
+        EquationOperationMini:this.createChart.value.EquationOperationMini,
+        equation: this.createChart.value.equation_fields || [], 
+        equation_param:this.createChart.value.equation_param,
+        // EquationFormList: this.createKPIWidget.value.EquationFormList,
+        // EquationParam: this.createKPIWidget.value.EquationParam,
+        // EquationOperation: this.createKPIWidget.value.EquationOperation,
+        EquationDesc: this.createChart.value.EquationDesc,
    
     chart_title: this.createChart.value.chart_title,
     // fontSize: this.createChart.value.fontSize,
@@ -575,26 +626,60 @@ openDynamicTileModal(tile: any, index: number) {
 
     const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14;
 
-    // Set the selected theme based on tile.themeColor
     this.themes.forEach((theme) => {
       theme.selected = theme.color === tile.themeColor;
     });
 
     console.log('Themes after selection:', this.themes);
 
+    let parsedMiniTableFields = [];
+    if (tile.MiniTableFields) {
+      if (typeof tile.MiniTableFields === 'string') {
+        try {
+          parsedMiniTableFields = JSON.parse(tile.MiniTableFields);
+          console.log('Successfully Parsed MiniTableFields:', parsedMiniTableFields);
+        } catch (error) {
+          console.error('Error parsing MiniTableFields:', error);
+        }
+      } else {
+        parsedMiniTableFields = tile.MiniTableFields; // Already an object
+      }
+    }
+    let parsedEquationParam = [];
+    if (typeof tile.EquationParam === 'string') {
+      try {
+        parsedEquationParam = JSON.parse(tile.EquationParam);
+      } catch (error) {
+        console.error('Error parsing EquationParam:', error);
+      }
+    } else if (Array.isArray(tile.EquationParam)) {
+      parsedEquationParam = tile.equationParams;
+    }
+ 
     this.createChart = this.fb.group({
       add_fields: this.paramCount,
+      equation_param:tile.equation_param,
       chart_title: tile.chart_title || '',
-      themeColor: tile.themeColor || 'linear-gradient(to right, #ffffff, #000000)', // Fallback for themeColor
+      themeColor: tile.themeColor || 'linear-gradient(to right, #ffffff, #000000)',
       dashboardIds: tile.dashboardIds,
       fontSize: fontSizeValue,
       selectType: tile.selectType,
       fontColor: tile.fontColor || '#000000',
       toggleCheck: tile.toggleCheck,
+      miniForm: tile.miniForm || '',
+      MiniTableNames: tile.MiniTableNames || '',
+      MiniTableFields: [parsedMiniTableFields],  // Ensure it's an array inside FormGroup
+      minitableEquation: tile.minitableEquation,
+      EquationOperationMini: tile.EquationOperationMini,
+      EquationParam: parsedEquationParam, // Set parsed EquationParam
       all_fields: this.repopulate_fields(tile),
-    });
+      equation_fields:this.populate_equationFields(tile),
+      EquationDesc: tile.EquationDesc,
 
-    console.log('this.isEditMode check', this.isEditMode);
+    });
+    this.selectedEquationParameterValue = parsedEquationParam;
+
+    console.log('Final Form Values:', this.createChart.value);
     this.isEditMode = true;
   } else {
     this.selectedTile = null;
@@ -603,12 +688,12 @@ openDynamicTileModal(tile: any, index: number) {
       this.createChart.reset();
     }
 
-    // Reset theme selection if no tile is passed
     this.themes.forEach((theme) => {
       theme.selected = false;
     });
   }
 }
+
 
 
 
@@ -662,8 +747,8 @@ repopulate_fields(getValues: any) {
           selectFromTime: parsedtileConfig[i].selectFromTime || '',
           selectToTime: parsedtileConfig[i].selectToTime || '',
           filterDescription: parsedtileConfig[i].filterDescription || '',
-          custom_Label: parsedtileConfig[i].custom_Label || '',
-          fontSize: parsedtileConfig[i].fontSize || 14,
+          // custom_Label: parsedtileConfig[i].custom_Label || '',
+          // fontSize: parsedtileConfig[i].fontSize || 14,
           filterForm: parsedtileConfig[i].filterForm || '',
           filterParameter: this.fb.control(filterParameterValue), // Properly assign filterParameter as a form control
         }));
@@ -684,6 +769,145 @@ repopulate_fields(getValues: any) {
   console.log('Final fields:', this.all_fields);
 
   return this.all_fields;
+}
+
+populate_equationFields(getValues: any): FormArray {
+  if (!getValues || getValues === null) {
+    console.warn('No data to repopulate');
+    return this.equation_fields;
+  }
+
+  // Clear existing fields in the FormArray
+  this.equation_fields.clear();
+
+  // Parse `chartConfig` safely
+  let parsedChartConfig: any[] = [];
+  try {
+    if (typeof getValues.equation === 'string') {
+      parsedChartConfig = JSON.parse(getValues.equation || '[]');
+    } else if (Array.isArray(getValues.equation)) {
+      parsedChartConfig = getValues.equation;
+    }
+  } catch (error) {
+    console.error('Error parsing chartConfig:', error);
+    parsedChartConfig = [];
+  }
+
+  console.log('Parsed chartConfig:', parsedChartConfig);
+
+  // Populate FormArray based on parsedChartConfig
+  if (parsedChartConfig.length > 0) {
+    parsedChartConfig.forEach((configItem, index) => {
+      console.log(`Processing index ${index} - Full Object:`, configItem);
+
+      // Handle EquationFormList as a string
+      const EquationFormListValue = typeof configItem.EquationFormList === 'string' 
+        ? configItem.EquationFormList 
+        : '';
+
+      // Handle EquationParam as an array
+      const filterParameter1Value = Array.isArray(configItem.EquationParam)
+        ? configItem.EquationParam
+        : [];
+
+      // Handle EquationOperation as a string
+      const EquationOperationValue = typeof configItem.EquationOperation === 'string'
+        ? configItem.EquationOperation
+        : '';
+
+      // Create and push FormGroup into FormArray
+      this.equation_fields.push(
+        this.fb.group({
+          EquationFormList: this.fb.control(EquationFormListValue), // String handling
+          EquationOperation: this.fb.control(EquationOperationValue), // String handling
+          EquationParam: this.fb.control(filterParameter1Value), // Array handling
+        })
+      );
+
+      // Log the added FormGroup for debugging
+      console.log(`FormGroup at index ${index}:`, this.equation_fields.at(index).value);
+    });
+  } else {
+    console.warn('No parsed data to populate fields');
+  }
+
+  console.log('Final FormArray Values:', this.equation_fields.value);
+
+  return this.equation_fields;
+}
+
+
+
+addEquationControls(event: any, _type: string) {
+  console.log('event check', event);
+
+  let noOfParamsEquation: any = '';
+
+  if (_type === 'html' && event && event.target) {
+    const inputValue = event.target.value;
+    if (inputValue.trim() === '') {
+      return this.toast.open("Empty input is not allowed", "Check again", {
+        duration: 5000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+      });
+    }
+
+    if (Number(inputValue) < 0) {
+      return this.toast.open("Negative values are not allowed", "Check again", {
+        duration: 5000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+      });
+    }
+
+    try {
+      noOfParamsEquation = JSON.parse(inputValue);
+      if (typeof noOfParamsEquation !== 'number') {
+        throw new Error('Not a number'); // Ensure it's a number since you're comparing with length later
+      }
+    } catch (e) {
+      return this.toast.open("Invalid input: Not a valid number", "Check again", {
+        duration: 5000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+      });
+    }
+  } else if (_type === 'ts') {
+    if (event < 0) {
+      return this.toast.open("Negative values not allowed", "Check again", {
+        duration: 5000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+      });
+    }
+    noOfParamsEquation = event;
+  }
+
+  console.log('noOfParams check', noOfParamsEquation);
+
+  // Update all_fields based on noOfParams
+  if (this.createChart.value.equation_fields.length < noOfParamsEquation) {
+    for (let i = this.equation_fields.length; i < noOfParamsEquation; i++) {
+      this.equation_fields.push(
+        this.fb.group({
+          EquationFormList: [''],
+          EquationParam: [[]],
+          EquationOperation: [''],
+        })
+      );
+      console.log('this.all_fields check', this.equation_fields);
+    }
+  } else {
+    if (noOfParamsEquation !== "" && noOfParamsEquation !== undefined && noOfParamsEquation !== null) {
+      for (let i = this.equation_fields.length - 1; i >= noOfParamsEquation; i--) {
+        this.equation_fields.removeAt(i);
+      }
+    }
+  }
+
+  // Update noOfParams for use in addTile
+  this.noOfParamsEquation = noOfParamsEquation;
 }
 
 
@@ -761,6 +985,36 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
       console.error('Error:', error);
     }
   }
+  addEquation(): void {
+    const allFieldsArray = this.createChart.get('equation_fields') as FormArray;
+    console.log('allFieldsArray', allFieldsArray.value);
+  
+    const equationTextArea = allFieldsArray.value.map((packet: any, index: number) => {
+        if (!Array.isArray(packet.EquationParam)) {
+          packet.EquationParam = [packet.EquationParam];
+        }
+        let tempText = packet.EquationParam
+          .map((param: any) => `${packet.EquationFormList}.${param.text}.${param.value}`)
+          .join(',');
+  
+        return `${packet.EquationOperation}(\${${tempText}})`;
+      })
+      .join(', ');
+  
+    console.log('Formatted Equation:', equationTextArea); // Debugging
+  
+    // Patch value with change detection
+    this.createChart.patchValue({
+      EquationDesc: equationTextArea,
+    });
+  
+    this.createChart.get('EquationDesc')?.markAsTouched();
+    this.createChart.get('EquationDesc')?.updateValueAndValidity();
+    this.cdr.detectChanges();
+  
+    console.log('Updated Form Value:', this.createChart.value);
+  }
+  
   
   onMouseLeave(): void {
     this.isHovered = false;
@@ -860,6 +1114,9 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   SelectTypeSummary =[
     { value: 'NewTab', text: 'New Tab' },
     { value: 'Modal', text: 'Modal' },
+    { value: 'Same page Redirect', text: 'Same page Redirect' },
+
+    { value: 'drill down', text: 'drill down' },
   ]
   dynamicparameterValue(event: any, index: any): void {
     console.log('Event check for dynamic param:', event);
@@ -1092,7 +1349,8 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     { value: 'Day of Week', text: 'Day of Week' },
     { value: 'Monthly', text: 'Monthly' },
     { value: 'Day of Month', text: 'Day of Month' },
-    { value: 'Yearly', text: 'Yearly' }
+    { value: 'Yearly', text: 'Yearly' },
+    { value: 'any', text: 'any' }
   ];
   onValueChange(selectedValue: any): void {
     console.log('selectedValue check', selectedValue[0].value);  // Log the selected value
@@ -1315,5 +1573,367 @@ initializeChart(): void {
   }
 }
 
+miniTableFieldsRead(readFields:any){
+  console.log('readFields',readFields)
+  if (readFields && readFields.value && Array.isArray(readFields.value)) {
+    // Extract all 'value' properties from the selected items
+    const selectedValues = readFields.value.map((item: any) => item.value);
+
+    console.log('Extracted Values:', selectedValues);
+    
+    // Store the extracted values in a variable
+    this.selectedMiniTableFields = selectedValues;
+}
+}
+AddMiniTableEquation() {
+  console.log('this.FormRead check:', this.FormRead);
+  console.log('this.readMinitableLabel check:', this.readMinitableLabel);
+  // console.log('this.selectedMiniTableFields check:', this.selectedMiniTableFields);
+  console.log('this.readOperation checking:', this.readOperation);
+  const miniTableFieldsValue = this.createChart.get('MiniTableFields')?.value;
+console.log('Retrieved MiniTableFields from Form:', miniTableFieldsValue);
+if (Array.isArray(miniTableFieldsValue)) {
+  // Extract the 'value' from each object
+  const extractedValues = miniTableFieldsValue.map((field: any) => field.value);
+  console.log('Extracted Values:', extractedValues);
+
+  // Store in a variable
+  this.selectedMiniTableFields = extractedValues;
+} else {
+  console.log('MiniTableFields is not an array or is empty.');
+}
+
+
+  // Ensure all values are defined before constructing the equation
+  if (this.FormRead && this.readMinitableLabel && Array.isArray(this.selectedMiniTableFields)) {
+      let equation = '';
+
+      if (this.readMinitableLabel === "trackLocation") {
+          // Remove "dynamic_table_values" for trackLocation
+          equation = this.selectedMiniTableFields
+              .map((field: string) => `\${${this.FormRead}.${this.readMinitableLabel}.${field}}`)
+              .join(',');
+      } else {
+          // Keep "dynamic_table_values" for other cases
+          equation = this.selectedMiniTableFields
+              .map((field: string) => `\${${this.FormRead}.dynamic_table_values.${this.readMinitableLabel}.${field}}`)
+              .join(',');
+      }
+
+      // If an operation is provided, prepend it
+      if (this.readOperation && this.readOperation.trim() !== '') {
+          equation = `${this.readOperation}(${equation})`;
+      }
+
+      console.log('Generated Equation:', equation);
+
+      // Store the equation in the Angular form control
+      this.createChart.controls['minitableEquation'].setValue(equation);
+  } else {
+      console.log('Error: One or more required values are missing.');
+  }
+}
+setUserSatus(){
+this.userIsChanging = true
+this.cdr.detectChanges()
+}
+
+
+selectedOperationMini(readOperation:any){
+console.log('readOperation',readOperation)
+this.readOperation = readOperation[0].value
+
+}
+checkSelectedFormPram(readForm:any){
+console.log('readForm checking',readForm)
+this.FormRead = readForm[0].value
+this.fetchMiniTable(this.FormRead)
+
+}
+async fetchMiniTable(item: any) {
+try {
+    this.extractedTables = []; // Initialize to prevent undefined errors
+    this.filteredResults = []; // Initialize formatted dropdown options
+
+    const resultMain: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#" + item + "#main", 1);
+    if (resultMain) {
+        console.log('Forms Checking:', resultMain);
+        const helpherObjmain = JSON.parse(resultMain.metadata);
+        console.log('Helper Object Main:', helpherObjmain);
+
+        const extractFormFields = helpherObjmain.formFields;
+
+        // Ensure extractedTables is set properly
+        this.extractedTables = Object.values(extractFormFields).filter((item: any) =>
+            typeof item === 'object' &&
+            item !== null &&
+            'name' in item &&
+            typeof item.name === 'string' &&
+            item.name.startsWith("table-") &&
+            item.validation && 
+            item.validation.formName_table // Ensure `formName_table` exists inside `validation`
+        );
+
+        // Format extracted tables for dropdown options
+        this.filteredResults = this.extractedTables.map((record: any) => ({
+            value: record.validation.formName_table, // Use `formName_table` as value
+            label: record.name // Use `name` as label
+        }));
+
+        // Add "Track Location" as an additional option
+        this.filteredResults.unshift({
+            value: 'trackLocation', 
+            label: 'trackLocation'
+        });
+
+        console.log('Dropdown Options:', this.filteredResults);
+    }
+} catch (err) {
+    console.log("Error fetching the dynamic form data", err);
+}
+}
+
+
+miniTableNames(readMinitableName:any){
+console.log('readMinitableName',readMinitableName)
+this.readMinitableName = readMinitableName[0].value
+this.readMinitableLabel = readMinitableName[0].data.label
+console.log('this.readMinitableLabel',this.readMinitableLabel)
+
+this.fetchMiniTableHeaders(this.readMinitableName)
+
+}
+
+async fetchMiniTableHeaders(item: any) {
+try {
+  this.filteredHeaders = []; // Initialize to store formatted dropdown options
+
+  // If item is "trackLocation", directly set predefined fields
+  if (item === "trackLocation") {
+      this.filteredHeaders = [
+          { value: "Date_and_time", label: "Date_and_time" },
+          { value: "label_id", label: "label_id" },
+          { value: "label_name", label: "label_name" },
+          { value: "type", label: "type" },
+
+      ];
+      console.log('Predefined Headers for Track Location:', this.filteredHeaders);
+      return; // Exit function early, no need to fetch from API
+  }
+
+  // Otherwise, proceed with fetching data from API
+  const resultHeaders: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#" + item + "#main", 1);
+
+  if (resultHeaders) {
+      console.log('Forms Checking:', resultHeaders);
+      const helpherObjmainHeaders = JSON.parse(resultHeaders.metadata);
+      console.log('Helper Object Main Headers:', helpherObjmainHeaders);
+
+      const extractFormFields = helpherObjmainHeaders.formFields;
+
+      // Ensure extracted headers are properly formatted
+      if (Array.isArray(extractFormFields)) {
+          this.filteredHeaders = extractFormFields.map((record: any) => ({
+              value: record.name,  // Set the 'name' field as value
+              label: record.label  // Set the 'label' field as label
+          }));
+      }
+
+      console.log('Formatted Headers:', this.filteredHeaders);
+  }
+} catch (err) {
+  console.log("Error fetching the dynamic form data", err);
+}
+}
+showValuesForMini = [
+{ value: 'sum', text: 'Sum' },
+{ value: 'min', text: 'Minimum' },
+{ value: 'max', text: 'Maximum' },
+{ value: 'average', text: 'Average' },
+{ value: 'latest', text: 'Latest' },
+{ value: 'previous', text: 'Previous' },
+// { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
+// { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
+// { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
+// { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
+{ value: 'Constant', text: 'Constant' },
+{ value: 'Live', text: 'Live' },
+{ value: 'Count', text: 'Count' },
+{ value: 'Count_Multiple', text: 'Count Multiple' },
+{ value: 'Count Dynamic', text: 'Count Dynamic' },
+{ value: 'any', text: 'any' },
+
+
+]
+selectedOperation(selectedOperation: any): void {
+  if (selectedOperation && selectedOperation[0]) {
+    this.operationValue = selectedOperation[0].value;
+    console.log('this.operationValue:', this.operationValue);
+
+    // Synchronize with the form control
+    this.createChart.patchValue({
+      EquationOperation: this.operationValue,
+    });
+  } else {
+    console.warn('Invalid operation selected:', selectedOperation);
+  }
+}
+EquationparameterValue(event: any, fieldIndex: any): void {
+  console.log('Event check for dynamic param:', event);
+  console.log('Check field index:', fieldIndex);
+
+  if (event && event.value && Array.isArray(event.value)) {
+      const valuesArray = event.value;
+      const formattedValues = valuesArray.map((item: any) => {
+          const { value, text } = item;
+          return { value, text };
+      });
+
+      console.log(`Formatted Selected Items for index ${fieldIndex}:`, formattedValues);
+      const equationParamControlName = `EquationParam${fieldIndex}`;
+      const EquationParameter = this.createChart.get(equationParamControlName);
+
+      if (EquationParameter) {
+          EquationParameter.setValue(formattedValues);
+          this.cdr.detectChanges();
+      } else {
+          console.warn(`Form control not found: ${equationParamControlName}`);
+      }
+
+      // Ensure the array is initialized at the specific index
+      if (!this.selectedEquationParameterValue) {
+          this.selectedEquationParameterValue = [];
+      }
+
+      // Use the fieldIndex safely
+      this.selectedEquationParameterValue[fieldIndex] = formattedValues.length === 1 ? formattedValues[0] : formattedValues;
+  } else {
+      console.warn('Invalid event structure:', event);
+      this.resetEquationParameter(fieldIndex);
+  }
+}
+
+private resetEquationParameter(fieldIndex: any): void {
+  const equationParamControlName = `EquationParam${fieldIndex}`;
+  const EquationParameter = this.createChart.get(equationParamControlName);
+  
+  if (EquationParameter) {
+      EquationParameter.setValue([]); // Reset to an empty array
+  }
+  this.selectedEquationParameterValue[fieldIndex] = [];
+}
+selectFormParams1(event: any[], index: number): void {
+  console.log('Event checking from equa', event);
+
+  // Validate the event structure more rigorously
+  if (Array.isArray(event) && event.length > 0) {
+    event.forEach((entry, idx) => {
+      // Check each entry for the expected structure and data
+      if (entry && entry.data && typeof entry.data.text === 'string') {
+        const selectedTexteqa = entry.data.text; // Extract the form name, such as "Work Order"
+        console.log(`Selected Form Text from Equation at index ${idx}:`, selectedTexteqa);
+        this.updateFormName(selectedTexteqa, index);
+     
+
+        // Call the fetch function with the selected text and corresponding index
+        this.fetchDynamicFormDataEquation(selectedTexteqa, index);
+      } else {
+        // Log a warning if any entry is not in the expected format, include the entry index for reference
+        console.warn(`Entry at index ${idx} is not in the expected format or missing data:`, entry);
+      }
+    });
+  } else {
+    // Log an error if the event array is empty or not an array
+    console.error('Event data is not in the expected format or empty:', event);
+  }
+}
+
+
+updateFormName(selectedTexteqa: string, idx: number): void {
+  console.log(`Updating formName for index ${idx} with:`, selectedTexteqa);
+  this.formName[idx] = selectedTexteqa;  // Update the component level formName variable
+  console.log('this.formName',this.formName)
+  // this.indexwiseOperationValue[idx] = this.operationValue
+ 
+  
+  // Additional logic if you need to do something with this new form name
+}
+
+
+fetchDynamicFormDataEquation(value: any, index: any) {
+  console.log("Data from lookup:", value);
+  console.log('Index checking', index);
+
+  // Ensure listofEquationParam is initialized as an array
+  if (!Array.isArray(this.listofEquationParam)) {
+      this.listofEquationParam = [];
+  }
+
+  this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
+      .then((result: any) => {
+          if (result && result.metadata) {
+              try {
+                  const parsedMetadata = JSON.parse(result.metadata);
+                  const EquaformFields = parsedMetadata.formFields;
+                  console.log('FormFields check', EquaformFields);
+
+                  // Initialize the sub-array if it does not exist
+                  this.listofEquationParam[index] = this.listofEquationParam[index] || [];
+
+                  // Reset the list at the specified index to ensure it's clean on every fetch
+                  this.listofEquationParam[index] = EquaformFields.map((field: any) => {
+                      console.log('Field check', field);
+                      return { value: field.name, text: field.label };
+                  });
+
+                  // Optionally include timestamps
+                  ['created_time', 'updated_time'].forEach((timeKey) => {
+                      if (parsedMetadata[timeKey]) {
+                          this.listofEquationParam[index].push({
+                              value: parsedMetadata[timeKey].toString(),
+                              text: `${timeKey.replace('_', ' ').charAt(0).toUpperCase() + timeKey.slice(1).replace('_', ' ')}`
+                          });
+                      }
+                  });
+
+                  console.log('Transformed dynamic parameters:', this.listofEquationParam[index]);
+              } catch (error) {
+                  console.error("Error parsing metadata: ", error);
+                  this.toast.open("Failed to parse form data", "Error", {
+                      duration: 5000,
+                      horizontalPosition: 'right',
+                      verticalPosition: 'top',
+                  });
+              }
+          }
+      })
+      .catch((err) => {
+          console.error("Can't fetch form data: ", err);
+          this.toast.open("Failed to fetch form data", "Error", {
+              duration: 5000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top',
+          });
+      })
+      .finally(() => {
+          // Ensure change detection happens in all cases
+          this.cdr.detectChanges();
+      });
+}
+
+async dynamicDataEquation() {
+  // Fetching data based on index if needed
+  try {
+    const result: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#lookup", 1);
+    if (result) {
+      const helperObj = JSON.parse(result.options);
+      // Assuming you need to handle the data specific to an index or handle it globally
+      this.formList = helperObj.map((item: any) => item[0]); 
+      this.listofFormValues = this.formList.map((form: string) => ({ text: form, value: form }));
+    }
+  } catch (err) {
+    console.error("Error fetching the dynamic form data", err);
+  }
+}
 
 }
