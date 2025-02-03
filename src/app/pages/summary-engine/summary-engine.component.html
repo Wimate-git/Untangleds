@@ -131,7 +131,7 @@
                     </div>
                               <div *ngIf="item.grid_type === 'chart'"  >
                       <app-chart-ui1 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal1)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate" 
-                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalChart1)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)"></app-chart-ui1>
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalChart1)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)"></app-chart-ui1>
                     </div>
                     <div *ngIf="item.grid_type === 'Linechart'"  >
                       <app-chart-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal2)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" (sendCellInfo) = "helperChartClickChart2($event,dataTableModalChart2)"></app-chart-ui2>
@@ -520,6 +520,10 @@
     </label>
   
     <!-- Existing Menu Items -->
+    <!-- <a class="myMenu-item" *ngIf="!isSummaryEngine()"  
+    style="cursor: pointer;" [attr.title]="'Add Widgets'"    (click)="openModal('edit', all_Packet_store, summaryModal)">
+   <i style="color: white;" class="fa" ></i>
+   </a> -->
     <a title="Add Dashboard" class="myMenu-item" (click)="openModal('new',null, summaryModal)">
       <i style="color: white;" class="fa fa-plus"></i>
     </a>
@@ -536,7 +540,7 @@
     class="myMenu-item" 
     (click)="toggleMode()" 
     style="cursor: pointer;" 
-    [attr.title]="isEditModeView ? 'Edit Mode' : 'View Mode'">
+    [attr.title]="isEditModeView ? 'Widgets Edit Mode' : 'View Mode'">
     <i style="color: white;" class="fa" [ngClass]="isEditModeView ? 'fa-pencil-alt' : 'fa-eye'"></i>
  </a>
  
@@ -558,6 +562,7 @@
     style="cursor: pointer;" [attr.title]="'Duplicate Dashboard'">
    <i style="color: white;" class="fa" [ngClass]="'fa-clone'"></i>
  </a>
+
  
    
 
@@ -1847,7 +1852,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   <ng-template #dataTableModalChart1 let-modal>
     <app-data-table-chart1
    
-       [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store"
+       [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"
     ></app-data-table-chart1>
   </ng-template>
   <ng-template #dataTableModalChart2 let-modal>

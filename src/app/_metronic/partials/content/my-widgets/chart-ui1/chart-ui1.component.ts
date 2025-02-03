@@ -28,6 +28,8 @@ export class ChartUi1Component implements OnChanges {
   parsedResBody: any;
   processedData: any;
   @Output() paresdDataEmit = new EventEmitter<any>();
+  @Output() emitChartConfigTable = new EventEmitter<any>();
+  formTableConfig: {};
   
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
@@ -75,7 +77,16 @@ export class ChartUi1Component implements OnChanges {
       name: event.point.name,  // Pie chart label
       value: event.point.y     // Data value
     };
+console.log('checking data for chart',this.item)
+const chartConfig =JSON.parse(this.item.chartConfig)
+console.log('chartConfig check from chart ui',chartConfig)
+const extractcolumnVisibility = chartConfig
 
+this.formTableConfig = {
+  columnVisibility:extractcolumnVisibility,
+  formName:this.item.chartConfig.formlist
+  }
+  this.emitChartConfigTable.emit(this.formTableConfig); 
 
       // Define the API Gateway URL
       const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
@@ -88,7 +99,9 @@ export class ChartUi1Component implements OnChanges {
           routeId: this.routeId,
           widgetId:this.item.id,
           chartData:pointData,
-          MsgType:'DrillDown'
+          MsgType:'DrillDown',
+         
+
         }),
       };
     

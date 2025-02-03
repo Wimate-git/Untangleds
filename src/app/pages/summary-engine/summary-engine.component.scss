@@ -176,6 +176,7 @@ html, body {
     transition-duration: 180ms;
   }
   .myMenu-open-button {
+ 
     z-index: 2;
     transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
     transition-duration: 400ms;
@@ -228,6 +229,10 @@ html, body {
     transition-duration: 850ms;
     transform: translate3d(0,560px, 0);
   }
+  // .myMenu-open:checked ~ .myMenu-item:nth-child(10) {
+  //   transition-duration: 950ms;
+  //   transform: translate3d(0,630px, 0);
+  // }
 
 
   .custom-title-container {

@@ -251,7 +251,7 @@ export class Chart3ConfigComponent implements OnInit{
         this.all_fields.push(
           this.fb.group({
             formlist: ['', Validators.required],
-            parameterName: ['', Validators.required],
+            parameterName: [[], Validators.required],
             groupBy: ['', Validators.required],
             primaryValue: ['', Validators.required],
             groupByFormat: ['', Validators.required],
@@ -264,7 +264,8 @@ export class Chart3ConfigComponent implements OnInit{
             selectToTime: [''],
             parameterValue:[''],
             columnVisibility:[[]],
-            rowData:['']
+            rowData:[''],
+            formatType:['']
           })
         );
         console.log('this.all_fields check', this.all_fields);
@@ -679,12 +680,15 @@ repopulate_fields(getValues: any): FormArray {
             value: item.value || '',
           }))
         : [];
+        const arrayParameter = Array.isArray(configItem.parameterName)
+        ? configItem.parameterName
+        : [];
 
       // Push FormGroup into FormArray
       this.all_fields.push(
         this.fb.group({
           formlist: configItem.formlist || '',
-          parameterName: configItem.parameterName || '',
+          parameterName: this.fb.control(arrayParameter)||'',
           groupBy: configItem.groupBy || '',
           primaryValue: configItem.primaryValue || '',
           groupByFormat: configItem.groupByFormat || '',
@@ -694,6 +698,7 @@ repopulate_fields(getValues: any): FormArray {
           selectToTime: configItem.selectToTime || '',
           parameterValue: configItem.parameterValue || '',
           columnVisibility: this.fb.control(columnVisibility), // Use control to handle as an array
+          formatType:configItem.formatType||''
         })
       );
 
@@ -1438,7 +1443,11 @@ initializeChart(): void {
     console.error('Highcharts options are empty or undefined');
   }
 }
-
+FormatTypeValues = [
+  { value: 'Default', text: 'Default' },
+  { value: 'Rupee', text: 'Rupee' },
+  // { value: 'max', text: 'Maximum' },
+]
 
   
 

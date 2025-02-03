@@ -238,6 +238,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   paramsReadExport: any;
   toRouteId: any;
   fromRouterID: any='';
+  chartDataConfigExport: any;
 
 
   createPieChart() {
@@ -699,6 +700,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   summaryDashboardUpdate = false;
  hidingLink = false
  isFullscreen: boolean = false;
+
 
   isFullScreen = false; // Track the fullscreen state
 
@@ -1341,9 +1343,9 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
       }
       else if (item.grid_type === 'chart') {
         const baseHeight = 400; // Base height for the chart
-        const extraHeight = 40; // Additional height for labels, etc.
+        // const extraHeight = 40; // Additional height for labels, etc.
   
-        this.chartHeight[index] = Math.max(0, itemComponentHeight + extraHeight); // Adjust height
+        this.chartHeight[index] = Math.max(0, itemComponentHeight); // Adjust height
         this.chartWidth[index] = Math.max(0, itemComponentWidth);
   
         console.log(
@@ -3123,6 +3125,7 @@ setTimeout(() => {
 
   openModal(flag: string, getValues?: any, content?: any): void {
     console.log('getValues inside openModal', getValues);
+    this.showAddWidgetsTab = true;
 
     this.selectedTab = this.showModal ? 'add-widget' : 'add-dashboard';
 
@@ -4051,14 +4054,25 @@ setTimeout(() => {
   }
 
   onIDChange(event: Event): void {
-    const currentID = (event.target as HTMLInputElement).value.trim();
-
+    let currentID = (event.target as HTMLInputElement).value.trim();
+  
+    // Regular expression to allow only alphanumeric characters and underscores, excluding slashes
+    const validIDPattern = /^[a-zA-Z0-9_]*$/;
+  
+    if (!validIDPattern.test(currentID)) {
+      this.errorForUniqueID = 'Special characters (including / slash) are not allowed. Use only letters, numbers, and underscores.';
+      return;
+    } else {
+      this.errorForUniqueID = null; // Clear the error if input is valid
+    }
+  
     // Validate only if the input value has changed
     if (currentID !== this.previousValue) {
       this.previousValue = currentID; // Update previous value
       this.checkUniqueIdentifier(currentID);
     }
   }
+  
 
 
   checkUniqueName(): void {
@@ -6075,6 +6089,11 @@ refreshFunction(){
     console.log('rowDynamic checking',rowDynamic)
     this.sendRowDynamic = rowDynamic
     console.log('this.sendRowDynamic',this.sendRowDynamic)
+
+  }
+  emitchartDatatable(configChartTable:any){
+    console.log('configChartTable',configChartTable)
+    this.chartDataConfigExport = configChartTable
 
   }
 

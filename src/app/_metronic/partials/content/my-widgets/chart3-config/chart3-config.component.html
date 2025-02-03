@@ -92,10 +92,10 @@
   
                       <div class="col-md-4 mb-3">
                         <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields</label>
-                        <ngx-select id="parameterName" [allowClear]="true" formControlName="parameterName"
-                          [items]="listofDynamicParam" optionValueField="value" optionTextField="text"
-                          placeholder="Select Parameter" (selectionChanges)="parameterValueCheck($event,fieldIndex)" style="width: 100%;">
-                        </ngx-select>
+                        <p-multiSelect id="parameterName" formControlName="parameterName"
+                          [options]="listofDynamicParam"       optionLabel="text"
+                          placeholder="Select Parameter" (onChange)="parameterValueCheck($event,fieldIndex)" >
+                        </p-multiSelect>
                       </div>
   
                       <div class="col-md-4 mb-3">
@@ -192,6 +192,20 @@
                         
                       
                         ></p-multiSelect>
+                      </div>
+                      <div class="col-md-4 mb-3">
+                        <label for="parameterName" class="col-form-label fw-bold fs-6 ">Format Type</label>
+                        <ngx-select
+                          id="parameterName"
+                          [allowClear]="true"
+                          formControlName="formatType"
+                          [items]="FormatTypeValues"
+                          optionValueField="value"
+                          optionTextField="text"
+                          placeholder="Select Parameter"
+                      
+                          style="width: 100%;">
+                        </ngx-select>
                       </div>
                       <div class="col-md-4 mb-3" *ngIf = "shoRowData" >
                         <label for="constant" class="col-form-label fw-bold fs-6 "></label>
