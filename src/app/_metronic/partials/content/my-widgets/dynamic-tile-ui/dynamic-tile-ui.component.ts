@@ -34,6 +34,7 @@ export class DynamicTileUiComponent implements OnInit{
   tileConfig: any;
   tileTiltle: any;
   showTotalSumValue: any;
+  equationProcessValue: any;
   ngOnInit(): void {
 
     
@@ -49,6 +50,8 @@ export class DynamicTileUiComponent implements OnInit{
     // this.tileConfig = this.item.tileConfig
     this.parsedTileConfig = JSON.parse(this.item.tileConfig)
     console.log('this.parsedTileConfig check',this.parsedTileConfig)
+    this.equationProcessValue = this.item.equationProcess
+    console.log('this.equationProcessValue checking',this.equationProcessValue)
     // if (Array.isArray(this.parsedTileConfig)) {
     //   const sum = this.parsedTileConfig.reduce((acc, tile) => {
     //     // Parse the processed_value as a number and add to accumulator

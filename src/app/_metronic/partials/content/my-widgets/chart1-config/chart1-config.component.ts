@@ -328,7 +328,10 @@ export class Chart1ConfigComponent implements OnInit {
             selectToTime: [''],
             parameterValue:[''],
             columnVisibility:[[]],
-            rowData:['']
+            rowData:[''],
+            formatType:['']
+            
+
        
 
           })
@@ -757,6 +760,7 @@ repopulate_fields(getValues: any): FormArray {
           columnVisibility: this.fb.control(columnVisibility), // Use control to handle as an array
           filterParameter: this.fb.control(filterParameterValue), // Use control for dynamic handling
           filterParameter1: this.fb.control(filterParameter1Value), // Same for filterParameter1
+          formatType:configItem.formatType
         })
       );
 
@@ -1434,6 +1438,11 @@ initializeChart(): void {
     console.error('Highcharts options are empty or undefined');
   }
 }
+FormatTypeValues = [
+  { value: 'Default', text: 'Default' },
+  { value: 'Rupee', text: 'Rupee' },
+  // { value: 'max', text: 'Maximum' },
+]
 
 
 }
