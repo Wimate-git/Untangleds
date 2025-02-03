@@ -307,11 +307,11 @@ export class DynamicTileConfigComponent implements OnInit{
             selectFromTime: [''],
             selectToTime: [''],
             // parameterValue: [''],
-            // fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
+            fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
             filterForm: [''],
             filterParameter: [''],
             filterDescription: [''],
-            // custom_Label: ['', Validators.required],
+            custom_Label: ['', Validators.required],
         // Dynamically set from the map
           })
         );
@@ -747,8 +747,8 @@ repopulate_fields(getValues: any) {
           selectFromTime: parsedtileConfig[i].selectFromTime || '',
           selectToTime: parsedtileConfig[i].selectToTime || '',
           filterDescription: parsedtileConfig[i].filterDescription || '',
-          // custom_Label: parsedtileConfig[i].custom_Label || '',
-          // fontSize: parsedtileConfig[i].fontSize || 14,
+          custom_Label: parsedtileConfig[i].custom_Label || '',
+          fontSize: parsedtileConfig[i].fontSize || 14,
           filterForm: parsedtileConfig[i].filterForm || '',
           filterParameter: this.fb.control(filterParameterValue), // Properly assign filterParameter as a form control
         }));

@@ -125,13 +125,13 @@
                   aria-controls="filter-tab" aria-selected="false" (click)="selectedSettingsTab('filter-tab')">Filter</a>
               </li>
             </div>
-            <!-- <div class="col-2" role="Settings">
+            <div class="col-2" role="Settings">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="settings-tabpane" data-bs-toggle="tab" role="tab"
                   aria-controls="settings-tab" aria-selected="false"
                   (click)="selectedSettingsTab('settings-tab')">Settings</a>
               </li>
-            </div> -->
+            </div>
             <div class="col-2" role="Theme">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="theme-tabpane" data-bs-toggle="tab" role="tab" aria-controls="theme-tab" aria-selected="false" (click)="selectedSettingsTab('theme-tab')">Theme</a>
@@ -289,7 +289,7 @@
             </div>
   
             <!-- Settings Tab Content -->
-            <!-- <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab"
+             <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab"
               role="tabpanel" aria-labelledby="settings-tabpane">
               <div formArrayName="all_fields">
                 <div *ngFor="let field of all_fields.controls; let fieldIndex=index">
@@ -328,7 +328,7 @@
   
   
   
-            </div> -->
+            </div> 
   
 
             <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'filter-tab'}" id="filter-tab"
