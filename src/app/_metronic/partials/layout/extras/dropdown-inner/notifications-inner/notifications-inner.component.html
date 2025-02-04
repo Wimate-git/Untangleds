@@ -3,7 +3,7 @@
   [style.background-image]="'url(./assets/media/misc/menu-header-bg.jpg)'"
 >
   <h3 class="text-white fw-bold px-9 mt-10 mb-6">
-    Notifications <span class="fs-8 opacity-75 ps-3">24 reports</span>
+    Notifications <span class="fs-8 opacity-75 ps-3">{{alerts.length}}</span>
   </h3>
 
   <ul class="nav nav-line-tabs nav-line-tabs-2x nav-stretch fw-bold px-9">
@@ -24,7 +24,7 @@
       </a>
     </li>
 
-    <li class="nav-item">
+    <!-- <li class="nav-item">
       <a
         class="
           nav-link
@@ -39,9 +39,9 @@
       >
         Updates
       </a>
-    </li>
+    </li> -->
 
-    <li class="nav-item">
+    <!-- <li class="nav-item">
       <a
         class="
           nav-link
@@ -56,9 +56,10 @@
       >
         Logs
       </a>
-    </li>
+    </li> -->
   </ul>
 </div>
+
 
 <div class="tab-content">
   <div
@@ -67,21 +68,18 @@
     role="tabpanel"
     [ngClass]="activeTabId === 'kt_topbar_notifications_1' ? 'show active' : ''"
   >
-    <div class="scroll-y mh-325px my-5 px-8">
-      <div *ngFor="let alert of alerts" class="d-flex flex-stack py-4">
+    <div class="scroll-y mh-325px my-5 px-8 cursor-pointer" >
+      <div *ngFor="let alert of alerts" class="d-flex flex-stack py-4" (click)="toggleSelection(alert)"
+      [ngClass]="alert.isSelected ?'bg-gray' :'bg-transparent'">
         <div class="d-flex align-items-center">
           <div class="symbol symbol-35px me-4">
             <span class="symbol-label" [ngClass]="'bg-light-' + alert.state">
-              <span
-                [inlineSVG]="'./assets/media/' + alert.icon"
-                class="svg-icon fs-2"
-                [ngClass]="'svg-icon-' + alert.state"
-              ></span>
+             <img src="assets/media/icons8-bell-96.png" style="width: 50px;height: 50px;" alt="">
             </span>
           </div>
 
           <div class="mb-0 me-2">
-            <a href="#" class="fs-6 text-gray-800 text-hover-primary fw-bolder">
+            <a class="fs-6 text-gray-800 text-hover-primary fw-bolder">
               {{ alert.title }}
             </a>
             <div class="text-gray-500 fs-7">{{ alert.description }}</div>
@@ -92,7 +90,7 @@
       </div>
     </div>
 
-    <div class="py-3 text-center border-top">
+    <!-- <div class="py-3 text-center border-top">
       <a
         routerLink="/crafted/pages/profile"
         class="btn btn-color-gray-600 btn-active-color-primary"
@@ -100,10 +98,10 @@
         View All
         <app-keenicon name="arrow-right" class="fs-5"></app-keenicon>
       </a>
-    </div>
+    </div> -->
   </div>
 
-  <div
+  <!-- <div
     class="tab-pane fade"
     id="kt_topbar_notifications_2"
     role="tabpanel"
@@ -137,9 +135,9 @@
         />
       </div>
     </div>
-  </div>
+  </div> -->
 
-  <div
+  <!-- <div
     class="tab-pane fade"
     id="kt_topbar_notifications_3"
     role="tabpanel"
@@ -172,5 +170,5 @@
         <app-keenicon name="arrow-right" class="fs-5"></app-keenicon>
       </a>
     </div>
-  </div>
+  </div> -->
 </div>
