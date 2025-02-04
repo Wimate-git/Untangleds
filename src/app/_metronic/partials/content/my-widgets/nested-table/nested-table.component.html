@@ -8,16 +8,17 @@
   <div class="card-body pt-0">
     <div class="container1">
       <div *ngFor="let tableId of tableIds" class="ag-theme-alpine" style="width: 100%; height: 400px; margin-bottom: 20px;">
-        <h3></h3>
+        <h3>{{TableName}}</h3>
         <ag-grid-angular
-            [rowData]="dynamicTableValues[tableId]"
-            [columnDefs]="generateColumnDefs(tableId)"
-            [defaultColDef]="defaultColDef"
-            [pagination]="true"
-            [paginationPageSize]="5"
-            (gridReady)="onGridReady($event, tableId)"
-            style="width: 100%; height: 100%;">
-        </ag-grid-angular>
+        [rowData]="dynamicTableValues[tableId]"
+        [columnDefs]="columnDefsSet"
+        [defaultColDef]="defaultColDef"
+        [pagination]="true"
+        [paginationPageSize]="5"
+        (gridReady)="onGridReady($event, tableId)"
+        style="width: 100%; height: 100%;">
+      </ag-grid-angular>
+      
     </div>
     
     

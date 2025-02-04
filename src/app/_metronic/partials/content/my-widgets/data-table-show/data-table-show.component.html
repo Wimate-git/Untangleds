@@ -6,13 +6,19 @@
       <div class="container1">
         <div class="ag-theme-alpine" style="width: 100%; height: 400px;">
           <ag-grid-angular
-            [rowData]="sendRowDynamic"
-            [columnDefs]="columnDefs"
-            [defaultColDef]="defaultColDef"
-            [pagination]="true"
-            [paginationPageSize]="10"
-            style="width: 100%; height: 100%;"
-          ></ag-grid-angular>
+          [rowData]="sendRowDynamic"
+          [columnDefs]="columnDefs"
+          [defaultColDef]="{
+            flex: 1,
+            minWidth: 100,
+            filter: true,
+            resizable: true
+          }"
+          [pagination]="true"
+          [paginationPageSize]="10"
+          style="width: 100%; height: 100%;"
+          (gridReady)="onGridReady($event)"
+        ></ag-grid-angular>
         </div>
       </div>
     </div>

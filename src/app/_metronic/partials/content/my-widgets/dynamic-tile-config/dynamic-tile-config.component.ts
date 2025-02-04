@@ -126,6 +126,16 @@ export class DynamicTileConfigComponent implements OnInit{
         this.createChart.get('selectType')?.disable();
       }
     });
+
+    this.createChart.get('primaryValue')?.valueChanges.subscribe(value => {
+      if (value === 'Equation') {
+        this.createChart.get('staticEquation')?.enable();
+      } else {
+        this.createChart.get('staticEquation')?.disable();
+        this.createChart.get('staticEquation')?.setValue(''); // Reset value
+      }
+    });
+  
   
 
 
@@ -312,6 +322,7 @@ export class DynamicTileConfigComponent implements OnInit{
             filterParameter: [''],
             filterDescription: [''],
             custom_Label: ['', Validators.required],
+            EquationDesc:['']
         // Dynamically set from the map
           })
         );
@@ -751,6 +762,7 @@ repopulate_fields(getValues: any) {
           fontSize: parsedtileConfig[i].fontSize || 14,
           filterForm: parsedtileConfig[i].filterForm || '',
           filterParameter: this.fb.control(filterParameterValue), // Properly assign filterParameter as a form control
+          EquationDesc:parsedtileConfig[i].EquationDesc
         }));
 
         // Log to confirm the field was added correctly
@@ -1326,6 +1338,11 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     { value: 'Count', text: 'Count' },
     { value: 'Count_Multiple', text: 'Count Multiple' },
     { value: 'Count Dynamic', text: 'Count Dynamic' },
+    { value: 'Equation', text: 'Equation' },
+    { value: 'Count MultiplePram', text: 'Count Multiple Parameter' },
+    { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
+    { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
+    { value: 'sumArray', text: 'SumArray' },
 
 
   ]
@@ -1352,15 +1369,33 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     { value: 'Yearly', text: 'Yearly' },
     { value: 'any', text: 'any' }
   ];
-  onValueChange(selectedValue: any): void {
+  onValueChange(selectedValue: any, fieldIndex: number): void {
     console.log('selectedValue check', selectedValue[0].value);  // Log the selected value
   
     // Set the primaryValue form control to the selected value
     this.createChart.get('primaryValue')?.setValue(selectedValue[0].value);
   
+    // Access the form group of the primary field (assuming you're using a FormArray)
+    const fieldGroup = this.createChart.get('all_fields') as FormArray;
+  
+    // Iterate over each form group if you have a FormArray
+    fieldGroup.controls.forEach((group, index) => {
+      if (index === fieldIndex) {
+        if (selectedValue[0].value === 'Equation') {
+          group.get('staticEquation')?.enable();
+        } else {
+          group.get('staticEquation')?.disable();
+          group.get('staticEquation')?.setValue('');
+        }
+      }
+    });
+  
     // Trigger change detection to ensure the UI updates immediately (optional)
     this.cd.detectChanges();
   }
+  
+  
+  
 
   onValueSelect(onSelectValue:any){
     console.log('selectedValue check', onSelectValue[0].value);  // Log the selected value

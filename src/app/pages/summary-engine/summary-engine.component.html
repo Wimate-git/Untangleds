@@ -1,6 +1,6 @@
 
 
-<div class="d-flex align-items-center me-2 mb-7" *ngIf="!isSummaryEngine()">
+<div class="d-flex align-items-center me-2 mb-7" *ngIf="!isSummaryEngine()" style="gap: 10px;">
   <!-- Green button -->
   <button *ngIf="!isGirdMoved && summaryDashboardUpdate" type="button" class="btn fw-bold btn-success translateyr"
     ngbTooltip="To save dashboard position" (click)="positionSave()">All changes are saved</button>
@@ -10,12 +10,42 @@
     ngbTooltip="Unsaved changes. Click to save." (click)="positionSave()">
     {{ getLastSavedMessage() }}.
   </button>
+
+  <!-- Last Updated Time button -->
+  <button type="button" class="btn fw-bold btn-primary translateyr" ngbTooltip="Last Updated Time">
+    Last Updated Time: {{lastUpdatedTime}}
+  </button>
 </div>
+
+
+<!-- <div class="d-flex align-items-center me-2 mb-7" *ngIf="!isSummaryEngine()">
+
+  <button *ngIf="!isGirdMoved && summaryDashboardUpdate" type="button" class="btn fw-bold btn-success translateyr"
+    ngbTooltip="Last Updated Time" >Last Updated Tile</button>
+  
+
+  <button *ngIf="isGirdMoved && summaryDashboardUpdate" type="button" class="btn fw-bold btn-danger translateyr"
+    ngbTooltip="Unsaved changes. Click to save." (click)="positionSave()">
+    {{ getLastSavedMessage() }}.
+  </button>
+</div> -->
+<!-- <div class="d-flex align-items-center me-2 mb-7" *ngIf="!isSummaryEngine()">
+
+  <button *ngIf="!isGirdMoved && summaryDashboardUpdate" type="button" class="btn fw-bold btn-success translateyr"
+    ngbTooltip="Last Updated Time" >Last Updated Tile</button>
+  
+
+  <button *ngIf="isGirdMoved && summaryDashboardUpdate" type="button" class="btn fw-bold btn-danger translateyr"
+    ngbTooltip="Unsaved changes. Click to save." (click)="positionSave()">
+    {{ getLastSavedMessage() }}.
+  </button>
+</div> -->
 <!-- <div class="d-flex align-items-center me-2 mb-7" *ngIf="!isSummaryEngine()">
 
   <button *ngIf="!isGirdMoved && summaryDashboardUpdate" type="button" class="btn fw-bold btn-primary translateyr"
   ngbTooltip="Apply filter for Dashboard" >Filter</button>
 </div> -->
+
 
 <div class="page-content" #pageContent [ngClass]="{'full-screen-page': isFullScreen&&editButtonCheck}" >
   <div class="" id="kt_wrapper" >
@@ -138,7 +168,7 @@
                     </div>
                     <div *ngIf="item.grid_type === 'Columnchart'"  >
                       <app-chart-ui3 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal3)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton" [summaryDashboardUpdate]="summaryDashboardUpdate" 
-                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  (sendCellInfo) = "helperChartClick($event,dataTableModal)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)"></app-chart-ui3>
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  (sendCellInfo) = "helperChartClick($event,dataTableModal)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)"  (emitChartConfigTable)="emitchartDatatable($event)"></app-chart-ui3>
                     </div>
                     
                     <div *ngIf="item.grid_type === 'Areachart'"  >
@@ -524,6 +554,11 @@
     style="cursor: pointer;" [attr.title]="'Add Widgets'"    (click)="openModal('edit', all_Packet_store, summaryModal)">
    <i style="color: white;" class="fa" ></i>
    </a> -->
+
+   <a class="myMenu-item" *ngIf="!isSummaryEngine()" 
+   style="cursor: pointer;" [attr.title]="lastUpdatedTime">
+  <i style="color: white;" class="fa" [ngClass]="'fa-clock'"></i>
+  </a>
     <a title="Add Dashboard" class="myMenu-item" (click)="openModal('new',null, summaryModal)">
       <i style="color: white;" class="fa fa-plus"></i>
     </a>
@@ -562,6 +597,8 @@
     style="cursor: pointer;" [attr.title]="'Duplicate Dashboard'">
    <i style="color: white;" class="fa" [ngClass]="'fa-clone'"></i>
  </a>
+
+
 
  
    
@@ -1846,7 +1883,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
 
   <ng-template #dataTableModal let-modal>
     <app-data-table-show
-    [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store"
+    [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"
     ></app-data-table-show>
   </ng-template>
   <ng-template #dataTableModalChart1 let-modal>

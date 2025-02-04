@@ -1445,6 +1445,10 @@ selectFormParams1(event: any[], index: number): void {
     { value: 'Count', text: 'Count' },
     { value: 'Count Dynamic', text: 'Count Dynamic' },
     { value: 'Equation', text: 'Equation' },
+    { value: 'Count MultiplePram', text: 'Count Multiple Parameter' },
+    { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
+    { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
+    { value: 'sumArray', text: 'SumArray' },
 
   ]
 

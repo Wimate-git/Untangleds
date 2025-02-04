@@ -200,25 +200,29 @@
                           optionValueField="value" optionTextField="text" placeholder="Select Group" class="w-100">
                         </ngx-select>
                       </div> -->
-  
                       <div class="col-md-4 mb-3">
                         <label for="primaryValue" class="col-form-label fw-bold fs-6 required">
                           Primary Value
-                          <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top"
-                            title="Show Value As">
+                          <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Show Value As">
                             <i class="bi bi-info-circle fs-5"></i>
                           </span>
                         </label>
-                        <ngx-select id="primaryValue" [allowClear]="true" formControlName="primaryValue"
-                          [items]="showValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
-                          (selectionChanges)="onValueChange($event)" class="w-100"></ngx-select>
+                        <ngx-select
+                          id="primaryValue" 
+                          [allowClear]="true" 
+                          formControlName="primaryValue"
+                          [items]="showValues" 
+                          optionValueField="value" 
+                          optionTextField="text" 
+                          placeholder="Select Group"
+                          (selectionChanges)="onValueChange($event, fieldIndex)" 
+                          class="w-100">
+                        </ngx-select>
                       </div>
-                      <!-- <div class="col-md-4 mb-3" *ngIf="all_fields.value[fieldIndex].primaryValue === 'Count'">
-                        <label for="constant" class="col-form-label fw-bold fs-6 required">Parameter Value</label>
-                        <ngx-select id="primaryValue" [allowClear]="true" formControlName="parameterValue"
-                        [items]="showStatusValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
-                        (selectionChanges)="onValueChange($event)" class="w-100"  [disabled]="createChart.get('primaryValue')?.value !== 'count'" ></ngx-select>
-                      </div> -->
+                      
+                      <!-- Show only when primaryValue is 'Equation' -->
+
+                      
   
   
   
@@ -276,6 +280,17 @@
                         <label for="timeInput" class="col-form-label fw-bold fs-6 ">To Time</label>
                         <input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"
                           formControlName="selectToTime">
+                      </div>
+                      <div class="col-md-8 mb-3" *ngIf="all_fields.at(fieldIndex).get('primaryValue')?.value === 'Equation'">
+                        <label for="description" class="col-createChart-label fw-bold fs-6">Equation Description</label>
+                        <textarea
+                          id="description"
+                          formControlName="EquationDesc"
+                          class="form-control"
+                          rows="3"
+                          placeholder="Enter description"
+                          [disabled]="all_fields.at(fieldIndex).get('staticEquation')?.disabled ?? false">
+                        </textarea>
                       </div>
   
 

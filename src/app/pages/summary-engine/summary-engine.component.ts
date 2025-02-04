@@ -239,6 +239,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   toRouteId: any;
   fromRouterID: any='';
   chartDataConfigExport: any;
+  lastUpdatedTime: any;
 
 
   createPieChart() {
@@ -2535,6 +2536,17 @@ setTimeout(() => {
           this.createdUserName = this.all_Packet_store.createdUser;
 
           console.log('Before Parsing:', this.all_Packet_store);
+        // Assuming this.all_Packet_store.LastUpdate contains the epoch time
+        
+const formattedDate = new Date(this.all_Packet_store.LastUpdate);
+
+// For debugging, log the converted date and time
+console.log('this.lastUpdatedTime', formattedDate);
+
+// To format the date into a specific format (e.g., locale-specific date and time)
+this.lastUpdatedTime = formattedDate.toLocaleString();  // You can adjust the locale as needed
+console.log('Formatted Date:', this.lastUpdatedTime);
+
           console.log('this.storeFilterDetail checking',this.storeFilterDetail)
 
           // this.isFilterdetail=true
@@ -2603,7 +2615,7 @@ setTimeout(() => {
               }),
             };
           
-            console.log('requestBody Tile', requestBody);
+            console.log('requestBody for dashboardFilter', requestBody);
           
             // Send a POST request to the Lambda function with the body
             this.http.post(apiUrl, requestBody).subscribe(
@@ -2611,7 +2623,8 @@ setTimeout(() => {
                 console.log('Lambda function triggered successfully:', response);
                 this.responseBody = JSON.parse(response.body)
                 console.log('this.responseBody checking',this.responseBody )
-                this.responseRowData = JSON.parse(this.responseBody.rowdata)
+                this.responseRowData = JSON.parse(this.responseBody.Processed_Data
+                )
                 console.log('this.responseRowData checking',this.responseRowData)
             
                 
@@ -6050,14 +6063,16 @@ refreshFunction(){
     }
 
   }
-  helperInfo(event:any,templateref:any){
-    console.log('event checking',event)
-    this.emitEvent = event
+  helperInfo(event: any, templateref: any) {
+    console.log('event checking', event);
     this.modalService.open(templateref, { size: 'lg' });
-    
-
-
+  
+    setTimeout(() => {
+      this.emitEvent = event;
+      this.cdr.detectChanges();  // Detect changes after the modal is open
+    }, 500);
   }
+  
   helperminiTableData(helperminiTableData:any){
     console.log('event checking mini table',helperminiTableData)
 

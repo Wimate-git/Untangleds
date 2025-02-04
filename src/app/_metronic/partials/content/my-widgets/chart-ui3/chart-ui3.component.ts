@@ -26,6 +26,8 @@ export class ChartUi3Component implements OnInit{
   parsedResBody: any;
   processedData: any;
   @Output() paresdDataEmit = new EventEmitter<any>();
+  @Output() emitChartConfigTable = new EventEmitter<any>();
+  formTableConfig: { columnVisibility: any; formName: any; };
   
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
@@ -95,6 +97,15 @@ export class ChartUi3Component implements OnInit{
       value: event.point.y     // Data value
     };
     console.log('pointData checking column chart',pointData)
+    const chartConfig =JSON.parse(this.item.chartConfig)
+console.log('chartConfig check from chart ui',chartConfig)
+const extractcolumnVisibility = chartConfig
+
+    this.formTableConfig = {
+      columnVisibility:extractcolumnVisibility,
+      formName:this.item.chartConfig.formlist
+      }
+      this.emitChartConfigTable.emit(this.formTableConfig); 
 
 
       // Define the API Gateway URL

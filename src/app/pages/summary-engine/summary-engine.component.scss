@@ -175,6 +175,9 @@ html, body {
   .myMenu-item:nth-child(9) {
     transition-duration: 180ms;
   }
+  .myMenu-item:nth-child(10) {
+    transition-duration: 180ms;
+  }
   .myMenu-open-button {
  
     z-index: 2;
@@ -228,6 +231,10 @@ html, body {
   .myMenu-open:checked ~ .myMenu-item:nth-child(10) {
     transition-duration: 850ms;
     transform: translate3d(0,560px, 0);
+  }
+  .myMenu-open:checked ~ .myMenu-item:nth-child(11) {
+    transition-duration: 950ms;
+    transform: translate3d(0,630px, 0);
   }
   // .myMenu-open:checked ~ .myMenu-item:nth-child(10) {
   //   transition-duration: 950ms;
