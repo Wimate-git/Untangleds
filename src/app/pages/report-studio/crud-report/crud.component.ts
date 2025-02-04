@@ -94,6 +94,7 @@ export class CrudreportComponent implements OnInit, AfterViewInit, OnDestroy{
       sortable: false,
       title: 'Actions',
       render: (data: any, type: any, full: any) => {
+
         const editButton = `
           <button class="btn btn-icon btn-active-light-primary w-30px h-30px me-3" data-action="editQueryTable" data-id="${full.P1}">
             <i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i>
@@ -132,7 +133,7 @@ export class CrudreportComponent implements OnInit, AfterViewInit, OnDestroy{
     this.clickListener = this.renderer.listen(document, 'click', (event) => {
       const closestBtn = event.target.closest('.btn');
      
-      if (closestBtn) {
+      if (closestBtn ) {
         const { action, id } = closestBtn.dataset;
         this.idInAction = id;
 
@@ -147,6 +148,7 @@ export class CrudreportComponent implements OnInit, AfterViewInit, OnDestroy{
             break;
 
           case 'editQueryTable':
+            console.log("Edit is triggerd");
             this.editEvent.emit(this.idInAction);
             // this.modalRef = this.modalService.open(this.modal, this.modalConfig);
             break;

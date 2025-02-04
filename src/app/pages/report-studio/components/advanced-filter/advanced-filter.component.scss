@@ -1,0 +1,40 @@
+.border-text {
+    position: relative;
+    border: 1px ridge #000;
+}
+
+.border-text::before {
+    content: "Track Location"; /* Text that goes on the top right border */
+    position: absolute;
+    top: -10px; /* Places the text on top of the div */
+    right: 10px; /* Positions the text on the right side */
+    background-color: white; /* Optional: Background to make text visible */
+    padding: 0 5px; /* Optional: space around the text */
+    font-weight: bold; /* Optional: makes the text bold */
+}
+
+
+
+.border-text1 {
+    position: relative;
+    border: 1px ridge #000;
+}
+
+
+.border-text1::before {
+    content: "Mini Table"; /* Text that goes on the top right border */
+    position: absolute;
+    top: -10px; /* Places the text on top of the div */
+    right: 10px; /* Positions the text on the right side */
+    background-color: white; /* Optional: Background to make text visible */
+    padding: 0 5px; /* Optional: space around the text */
+    font-weight: bold; /* Optional: makes the text bold */
+}
+
+
+
+
+
+
+
+

@@ -18,6 +18,7 @@ import { MatMenuModule } from "@angular/material/menu";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { GoogleMapsModule } from '@angular/google-maps';
 import { DropdownModule } from "primeng/dropdown";
+import { AdvancedFilterComponent } from "./components/advanced-filter/advanced-filter.component";
 
 
 const routes: Routes = [
@@ -29,7 +30,7 @@ const routes: Routes = [
 
 
 @NgModule({
-  declarations: [ReportStudioComponent,SavedQueryComponent],
+  declarations: [ReportStudioComponent,SavedQueryComponent,AdvancedFilterComponent],
   imports: [
     AgGridAngular,
     RouterModule.forChild(routes),

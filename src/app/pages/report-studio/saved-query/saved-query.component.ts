@@ -175,8 +175,9 @@ export class SavedQueryComponent implements OnInit {
       columnVisibility:JSON.stringify(this.savedModulePacket.columnVisibility),
       tableState:JSON.stringify(JSON.parse(JSON.stringify(this.tableState))),
       customColumnMetadata:JSON.stringify(this.savedModulePacket.customColumnMetadata),
-      advancedCustomColumnMetadata:JSON.stringify(this.savedModulePacket.advancedCustomColumnMetadata),
-      advancedFilterColumnMetadata:JSON.stringify(this.savedModulePacket.advancedFilterColumnMetadata)
+      // advancedCustomColumnMetadata:JSON.stringify(this.savedModulePacket.advancedCustomColumnMetadata),
+      // advancedFilterColumnMetadata:JSON.stringify(this.savedModulePacket.advancedFilterColumnMetadata)
+      allAdvancedExcelConfigurations:JSON.stringify(this.savedModulePacket.allAdvancedExcelConfigurations)
     }
 
     console.log("Table state is here ",JSON.parse(JSON.stringify(this.tableState)));
@@ -195,7 +196,7 @@ export class SavedQueryComponent implements OnInit {
       if (value) {
 
         const username = this.username;
-        this.allUsers = JSON.parse(JSON.stringify(this.createSavedQuery.value.userIDs.map((item:any)=>item.PK)))
+        this.allUsers = this.createSavedQuery.value.userIDs && JSON.parse(JSON.stringify(this.createSavedQuery.value.userIDs.map((item:any)=>item.PK)))
 
         console.log("All users are here ",this.allUsers);
 
@@ -250,8 +251,9 @@ export class SavedQueryComponent implements OnInit {
         columnVisibility:JSON.stringify(this.savedModulePacket[2]),
         tableState:JSON.stringify(JSON.parse(JSON.stringify(this.tableState))),
         customColumnMetadata:JSON.stringify(this.savedModulePacket[4]),
-        advancedCustomColumnMetadata:JSON.stringify(this.savedModulePacket[5]),
-        advancedFilterColumnMetadata:JSON.stringify(this.savedModulePacket[6])
+        allAdvancedExcelConfigurations:JSON.stringify(this.savedModulePacket[5])
+        // advancedCustomColumnMetadata:JSON.stringify(this.savedModulePacket[5]),
+        // advancedFilterColumnMetadata:JSON.stringify(this.savedModulePacket[6])
       }
 
 
@@ -269,7 +271,7 @@ export class SavedQueryComponent implements OnInit {
       this.api.CreateMaster(tempObj).then(async (value: any)=>{  
         if (value) {
 
-          const userList = this.createSavedQuery.value.userIDs.map((item:any)=>item.PK)
+          const userList = this.createSavedQuery.value.userIDs && this.createSavedQuery.value.userIDs.map((item:any)=>item.PK)
   
           var item={
             P1:savedQueryTemp.queryName,
