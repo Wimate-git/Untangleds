@@ -71,6 +71,9 @@ export class NestedTableComponent {
   tableKeys: string[];
   @Input() SK_clientID:any
   @Input() FormNameMini:any
+  tableIds: string[] = [];  // Your array of table IDs
+  columnDefsMap: { [key: string]: any[] } = {}; 
+  tableNamesMap: { [key: string]: string } = {}; 
   
   
 
@@ -92,7 +95,7 @@ export class NestedTableComponent {
   gridConfigs: { tableName: string; columnDefs: { headerName: unknown; field: unknown; sortable: boolean; filter: boolean; resizable: boolean; }[]; rowData: any; }[];
   gridColumnApi: any;
   dynamicTableValues: { [key: string]: any[]; };
-  tableIds: string[];
+
   extractedTables: unknown[];
   fetchFormName: Promise<void>;
   extractedTableHeaders: any;
@@ -176,65 +179,7 @@ async processEvent(event: EmitEvent) {
   // ✅ **KEEPING YOUR EXISTING LOGIC UNCHANGED**
   for (const tableId of this.tableIds) {
       console.log(`Data for ${tableId}:`);
-      const tablesReceive = await this.fetchMiniTableData(this.assignFormName); 
 
-      if (!tablesReceive) {
-          console.log('No data received for tables');
-          return;
-      }
-
-      console.log('Received Tables:', tablesReceive);
-
-      // Iterate over the received tables and compare with tableId
-      const matchingTable = tablesReceive.find((table: any) => {
-        // Remove the `-table` suffix from the table name and tableId
-        const modifiedName = table.name.replace('-table', '');
-        const modifiedTableId = tableId.replace('-table', ''); // Remove -table from tableId
-    
-        console.log('modifiedName', modifiedName);
-        console.log('tableId check', tableId);
-        console.log('modifiedTableId check', modifiedTableId);
-    
-        return modifiedName === modifiedTableId;
-    });
-    console.log('matchingTable',matchingTable)
-    if (matchingTable) {
-      console.log(`Found matching table for tableId: ${tableId}`);
-      console.log('Matching Table:', matchingTable);
-  
-      // Store the matching table object in a variable
-      const matchedTableData: any = matchingTable;
-      console.log('Matched Table Data:', matchedTableData);
-      
-      // Accessing the validation field with a null check
-      const validation = matchedTableData?.validation ?? 'No validation field available';
-      console.log('Validation:', validation);
-      const validateFormName = validation.formName_table
-      console.log('validateFormName',validateFormName)
-      this.TableName = validateFormName
-      const columnDefs = await this.fetchMiniTableHeaders(validateFormName);
-      this.columnDefsSet =columnDefs
-console.log('Received Column Definitions:', columnDefs);
-console.log('this.generateColumnDefs[tableId]:', this.generateColumnDefs[tableId]);
-// this.generateColumnDefs[tableId]=columnDefs
-
-//  console.log('this.generateColumnDefs[tableId]',this.generateColumnDefs[tableId]) 
-//           const validation = matchedTableData?.validation;
-// console.log('Validation:', validation);
-  
-      // Extract formName_table from validation
-      // const formName = matchedTableData.validation?.formName_table ?? 'Not Provided';
-      // console.log(`formName_table: ${formName}`);
-  
-      // // Only add to formNames if formName_table is not 'Not Provided'
-      // if (formName !== 'Not Provided') {
-      //     formNames.add(formName); // Add to set to avoid duplicates
-      // }
-  
-      // Optionally, you can use matchedTableData for further processing
-  } else {
-      console.log(`No matching table found for tableId: ${tableId}`);
-  }
       this.dynamicTableValues[tableId].forEach(async (row: any, index: number) => {
           console.log(`Row ${index + 1}:`, row);
 
@@ -243,6 +188,79 @@ console.log('this.generateColumnDefs[tableId]:', this.generateColumnDefs[tableId
       
       });
   }
+
+
+  const tablesReceive = await this.fetchMiniTableData(this.assignFormName); 
+
+  if (!tablesReceive) {
+      console.log('No data received for tables');
+      return;
+  }
+  
+  console.log('Received Tables:', tablesReceive);
+  
+  // Array to store all matching tables
+  const matchingTables: any[] = [];
+  
+  // Iterate through each tableId in the array and check for matches
+  for (let tableId of this.tableIds) {
+      // Remove the `-table` suffix from the tableId
+      const modifiedTableId = tableId.replace('-table', '');
+  
+      console.log('Checking tableId:', tableId);
+      console.log('modifiedTableId:', modifiedTableId);
+  
+      // Find all matching tables
+      const foundTables = tablesReceive.filter((table: any) => {
+          const modifiedName = table.name.replace('-table', ''); // Remove the -table suffix from the table name
+          return modifiedName === modifiedTableId;
+      });
+  
+      // Add all found matching tables to the matchingTables array
+      if (foundTables.length > 0) {
+          matchingTables.push(...foundTables);
+      } else {
+          console.log(`No matching tables found for tableId: ${tableId}`);
+      }
+  }
+  
+  if (matchingTables.length > 0) {
+      console.log('Matching Tables:', matchingTables);
+  
+      // Loop over the matching tables and process them
+      for (let matchedTableData of matchingTables) {
+          console.log('Matched Table Data:', matchedTableData);
+  
+          // Accessing the validation field with a null check
+          const validation = matchedTableData?.validation ?? 'No validation field available';
+          console.log('Validation:', validation);
+  
+          // Ensure `validation.formName_table` exists and is being logged correctly for each table
+          const validateFormName = validation?.formName_table ?? 'No formName_table available';
+          console.log('validateFormName:', validateFormName);
+  
+          // Update TableName if it exists
+          this.tableNamesMap[matchedTableData.name] = validateFormName;
+          console.log('')
+          
+  
+          // Fetch column definitions
+          const tableId = matchedTableData.name + '-table';  // Add '-table' suffix to the tableId
+          console.log('tableId checking for columns', tableId);  // Log the updated tableId
+          
+
+          const columnDefs = await this.fetchMiniTableHeaders(validateFormName);
+
+          this.columnDefsMap[tableId] = columnDefs;
+          
+          this.columnDefsSet = columnDefs;
+          console.log('Received Column Definitions:', columnDefs);
+      }
+  } else {
+      console.log('No matching tables found for any tableId.');
+  }
+  
+  
 
   // ✅ **Trigger fetchMiniTableHeaders() for multiple form names**
   if (event.data && event.data.dynamic_table_values) {
@@ -258,46 +276,57 @@ console.log('this.generateColumnDefs[tableId]:', this.generateColumnDefs[tableId
 
 
 
-async fetchMiniTableHeaders(item: any) {
+async fetchMiniTableHeaders(items: any) {
   try {
-    const resultHeaders: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#" + item + "#main", 1);
+    // Check if items is an array or a single value
+    const formNames = Array.isArray(items) ? items : [items];
 
-    if (resultHeaders) {
-      console.log('forms checking', resultHeaders);
-      const helpherObjmainHeaders = JSON.parse(resultHeaders.metadata);
-      console.log('helpherObjmain checking', helpherObjmainHeaders);
+    const allColumnDefs = [];
 
-      // Ensure formFields exist and is an array
-      if (helpherObjmainHeaders?.formFields && Array.isArray(helpherObjmainHeaders.formFields)) {
+    // Iterate over each formName (whether single or multiple)
+    for (let formName of formNames) {
+      const resultHeaders: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#" + formName + "#main", 1);
 
-        // Initialize extractedTableHeaders as an object
-        if (!this.extractedTableHeaders) {
-          this.extractedTableHeaders = {};
+      if (resultHeaders) {
+        console.log('forms checking', resultHeaders);
+        const helpherObjmainHeaders = JSON.parse(resultHeaders.metadata);
+        console.log('helpherObjmain checking', helpherObjmainHeaders);
+
+        // Ensure formFields exist and is an array
+        if (helpherObjmainHeaders?.formFields && Array.isArray(helpherObjmainHeaders.formFields)) {
+
+          // Initialize extractedTableHeaders as an object
+          if (!this.extractedTableHeaders) {
+            this.extractedTableHeaders = {};
+          }
+
+          // Store extracted form fields by formLabel
+          const formLabel = helpherObjmainHeaders.formLabel;
+
+          if (!this.extractedTableHeaders[formLabel]) {
+            this.extractedTableHeaders[formLabel] = {
+              formFields: helpherObjmainHeaders.formFields,
+              columnDefs: helpherObjmainHeaders.formFields.map((field: { label: string; name: string }) => ({
+                headerName: field.label,
+                field: field.name,
+                sortable: true,
+                filter: true,
+                resizable: true
+              }))
+            };
+          }
+
+          console.log(`Extracted Form Fields for: ${formLabel}`);
+          console.log('Column Definitions:', this.extractedTableHeaders[formLabel].columnDefs);
+
+          // Add columnDefs of this form to the allColumnDefs array
+          allColumnDefs.push(this.extractedTableHeaders[formLabel].columnDefs);
         }
-
-        // Store extracted form fields by formLabel
-        const formLabel = helpherObjmainHeaders.formLabel;
-
-        if (!this.extractedTableHeaders[formLabel]) {
-          this.extractedTableHeaders[formLabel] = {
-            formFields: helpherObjmainHeaders.formFields,
-            columnDefs: helpherObjmainHeaders.formFields.map((field: { label: string; name: string }) => ({
-              headerName: field.label,
-              field: field.name,
-              sortable: true,
-              filter: true,
-              resizable: true
-            }))
-          };
-        }
-
-        console.log(`Extracted Form Fields for: ${formLabel}`);
-        console.log('Column Definitions:', this.extractedTableHeaders[formLabel].columnDefs);
-
-        // Return the columnDefs so that the caller can receive it
-        return this.extractedTableHeaders[formLabel].columnDefs;
       }
     }
+
+    // Return all columnDefs for the forms (single or multiple)
+    return allColumnDefs.length > 1 ? allColumnDefs : allColumnDefs[0];
   } catch (err) {
     console.log("Error fetching the dynamic form data", err);
   }
@@ -305,6 +334,7 @@ async fetchMiniTableHeaders(item: any) {
   // In case no data is fetched, return an empty array
   return [];
 }
+
 
 
 

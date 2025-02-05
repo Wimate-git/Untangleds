@@ -479,14 +479,14 @@ export class DynamicTileConfigComponent implements OnInit{
         miniForm:this.createChart.value.miniForm || '',
         MiniTableNames:this.createChart.value.MiniTableNames ||'',
         MiniTableFields:this.createChart.value.MiniTableFields ,
-        minitableEquation:this.createChart.value.minitableEquation,
-        EquationOperationMini:this.createChart.value.EquationOperationMini,
+        minitableEquation:this.createChart.value.minitableEquation ||'',
+        EquationOperationMini:this.createChart.value.EquationOperationMini ||'',
         equation: this.createChart.value.equation_fields || [], 
         equation_param:this.createChart.value.equation_param ||'',
         // EquationFormList: this.createKPIWidget.value.EquationFormList,
         // EquationParam: this.createKPIWidget.value.EquationParam,
         // EquationOperation: this.createKPIWidget.value.EquationOperation,
-        EquationDesc: this.createChart.value.EquationDesc,
+        EquationDesc: this.createChart.value.EquationDesc ||'',
    
     chart_title: this.createChart.value.chart_title,
     // fontSize: this.createChart.value.fontSize,
@@ -1009,7 +1009,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
           .map((param: any) => `${packet.EquationFormList}.${param.text}.${param.value}`)
           .join(',');
   
-        return `${packet.EquationOperation}(\${${tempText}})`;
+        return `(${packet.EquationOperation}(\${${tempText}}))`;
       })
       .join(', ');
   
@@ -1343,6 +1343,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
     { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
     { value: 'sumArray', text: 'SumArray' },
+    { value: 'Advance Equation', text: 'Advance Equation' },
 
 
   ]
@@ -1657,7 +1658,7 @@ if (Array.isArray(miniTableFieldsValue)) {
 
       // If an operation is provided, prepend it
       if (this.readOperation && this.readOperation.trim() !== '') {
-          equation = `${this.readOperation}(${equation})`;
+          equation = `(${this.readOperation}(${equation}))`;
       }
 
       console.log('Generated Equation:', equation);

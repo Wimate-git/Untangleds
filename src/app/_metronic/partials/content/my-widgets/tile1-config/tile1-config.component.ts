@@ -817,7 +817,7 @@ console.log("allFieldsArray",allFieldsArray.value)
       let tempText = packet.EquationParam.map((param:any) => `${packet.EquationFormList}.${param.text}.${param.value}`).join(',');
 
       // Return the formatted string for this group of parameters
-      return `${packet.EquationOperation}(\${${tempText}})`;
+      return `(${packet.EquationOperation}(\${${tempText}}))`;
   })
   .join(', ');
   // Loop through each group in the form array
@@ -1449,6 +1449,8 @@ selectFormParams1(event: any[], index: number): void {
     { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
     { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
     { value: 'sumArray', text: 'SumArray' },
+    { value: 'Advance Equation', text: 'Advance Equation' },
+    
 
   ]
 
@@ -1743,7 +1745,7 @@ selectFormParams1(event: any[], index: number): void {
   
         // If an operation is provided, prepend it
         if (this.readOperation && this.readOperation.trim() !== '') {
-            equation = `${this.readOperation}(${equation})`;
+            equation = `(${this.readOperation}(${equation}))`;
         }
   
         console.log('Generated Equation:', equation);

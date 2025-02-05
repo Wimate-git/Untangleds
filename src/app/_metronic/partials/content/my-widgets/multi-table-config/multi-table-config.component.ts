@@ -979,7 +979,7 @@ async fetchMiniTableHeaders(item: any) {
 
         // If an operation is provided, prepend it
         if (this.readOperation && this.readOperation.trim() !== '') {
-            equation = `${this.readOperation}(${equation})`;
+            equation = `(${this.readOperation}(${equation}))`;
         }
 
         console.log('Generated Equation:', equation);

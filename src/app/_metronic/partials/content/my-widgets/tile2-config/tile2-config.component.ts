@@ -677,6 +677,7 @@ generateUniqueId(): number {
     { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
     { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
     { value: 'sumArray', text: 'SumArray' },
+    { value: 'Advance Equation', text: 'Advance Equation' },
 
 
   ]
