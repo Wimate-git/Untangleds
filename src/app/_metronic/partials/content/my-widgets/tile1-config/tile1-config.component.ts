@@ -817,7 +817,7 @@ console.log("allFieldsArray",allFieldsArray.value)
       let tempText = packet.EquationParam.map((param:any) => `${packet.EquationFormList}.${param.text}.${param.value}`).join(',');
 
       // Return the formatted string for this group of parameters
-      return `(${packet.EquationOperation}(\${${tempText}}))`;
+      return `${packet.EquationOperation}(\${${tempText}})`;
   })
   .join(', ');
   // Loop through each group in the form array
@@ -870,7 +870,7 @@ console.log("allFieldsArray",allFieldsArray.value)
 //       return;
 //   }
   this.createKPIWidget.patchValue({
-    EquationDesc: equationTextArea,
+    EquationDesc: "("+equationTextArea+")",
 });
 
   console.log('this.formName checking', this.formName);
@@ -1745,13 +1745,13 @@ selectFormParams1(event: any[], index: number): void {
   
         // If an operation is provided, prepend it
         if (this.readOperation && this.readOperation.trim() !== '') {
-            equation = `(${this.readOperation}(${equation}))`;
+            equation = `${this.readOperation}(${equation})`;
         }
   
         console.log('Generated Equation:', equation);
   
         // Store the equation in the Angular form control
-        this.createKPIWidget.controls['minitableEquation'].setValue(equation);
+        this.createKPIWidget.controls['minitableEquation'].setValue("("+equation+")");
     } else {
         console.log('Error: One or more required values are missing.');
     }

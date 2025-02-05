@@ -35,7 +35,7 @@ getDashboardId(): string | undefined {
   }
   // If not found, check 'item'
   else if (this.item && this.item.dashboardIds) {
-    console.log("Data from item:", this.item.dashboardIds);
+    // console.log("Data from item:", this.item.dashboardIds);
     return this.item.dashboardIds;
   }
   // Return undefined if neither contains the dashboard ID

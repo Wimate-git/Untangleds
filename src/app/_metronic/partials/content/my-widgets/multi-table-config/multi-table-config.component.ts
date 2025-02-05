@@ -979,13 +979,13 @@ async fetchMiniTableHeaders(item: any) {
 
         // If an operation is provided, prepend it
         if (this.readOperation && this.readOperation.trim() !== '') {
-            equation = `(${this.readOperation}(${equation}))`;
+            equation = `${this.readOperation}(${equation})`;
         }
 
         console.log('Generated Equation:', equation);
 
         // Store the equation in the Angular form control
-        this.createKPIWidget.controls['minitableEquation'].setValue(equation);
+        this.createKPIWidget.controls['minitableEquation'].setValue("("+equation+")");
     } else {
         console.log('Error: One or more required values are missing.');
     }

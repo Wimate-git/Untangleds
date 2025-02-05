@@ -1009,7 +1009,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
           .map((param: any) => `${packet.EquationFormList}.${param.text}.${param.value}`)
           .join(',');
   
-        return `(${packet.EquationOperation}(\${${tempText}}))`;
+        return `${packet.EquationOperation}(\${${tempText}})`;
       })
       .join(', ');
   
@@ -1017,7 +1017,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   
     // Patch value with change detection
     this.createChart.patchValue({
-      EquationDesc: equationTextArea,
+      EquationDesc: "("+equationTextArea+")",
     });
   
     this.createChart.get('EquationDesc')?.markAsTouched();
@@ -1658,13 +1658,13 @@ if (Array.isArray(miniTableFieldsValue)) {
 
       // If an operation is provided, prepend it
       if (this.readOperation && this.readOperation.trim() !== '') {
-          equation = `(${this.readOperation}(${equation}))`;
+          equation = `${this.readOperation}(${equation}`;
       }
 
       console.log('Generated Equation:', equation);
 
       // Store the equation in the Angular form control
-      this.createChart.controls['minitableEquation'].setValue(equation);
+      this.createChart.controls['minitableEquation'].setValue("("+equation+")");
   } else {
       console.log('Error: One or more required values are missing.');
   }

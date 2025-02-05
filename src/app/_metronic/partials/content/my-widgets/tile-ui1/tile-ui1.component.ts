@@ -17,6 +17,8 @@ export class TileUi1Component implements OnInit{
   @Input() hidingLink:any;
   @Input() isFullscreen:  any; 
   @Output() sendCellInfo = new EventEmitter<any>();
+  @Input() tileWidth:any
+  @Input() tileHeight:any
   @Output() dashboardAction = new EventEmitter<{
     item: any;
     index: any;
@@ -162,5 +164,20 @@ get shouldShowButton(): boolean {
     this.modalService.dismissAll(); // Close the modal programmatically
   }
 
+  get fontSize(): number {
+    // Factor to adjust font size based on tile size
+    const factor = 7; 
+  
+    // Apply font size logic based on window width
+    if (window.innerWidth <= 430) {
+      return 28;  // For very small screens (mobile)
+    } else if (window.innerWidth > 430 && window.innerWidth <= 550) {
+      return 32;  // For smaller tablets or portrait mode
+    } else {
+      // For larger screens, calculate font size based on tile width and height
+      return (this.tileWidth + this.tileHeight) / 2 / factor;
+    }
+  }
+  
 
 }

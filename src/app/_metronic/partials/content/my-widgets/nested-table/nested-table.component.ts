@@ -368,5 +368,6 @@ async fetchMiniTableHeaders(items: any) {
     event.api.sizeColumnsToFit();
   }
 
+  
 
 }

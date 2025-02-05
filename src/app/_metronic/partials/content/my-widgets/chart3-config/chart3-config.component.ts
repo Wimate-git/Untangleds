@@ -77,6 +77,19 @@ export class Chart3ConfigComponent implements OnInit{
   selectedText: any;
   columnVisisbilityFields: any;
   shoRowData:boolean=false
+  userIsChanging: boolean;
+  readOperation: any;
+  FormRead: any;
+  extractedTables: unknown[];
+  filteredResults: {
+    value: any; // Use `formName_table` as value
+    label: any; // Use `name` as label
+  }[];
+  readMinitableName: any;
+  readMinitableLabel: any;
+  filteredHeaders: { value: string; label: string; }[];
+  selectedMiniTableFields: any;
+  listofFormValues: any;
   
 
 
@@ -185,6 +198,11 @@ export class Chart3ConfigComponent implements OnInit{
       filterForm:[''],
       filterParameter:[''],
       filterDescription:[''],
+      miniForm:[''],
+      MiniTableNames:[''],
+      MiniTableFields:[''],
+      minitableEquation:[''],
+      EquationOperationMini:['']
   
 
     });
@@ -347,6 +365,11 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
   
         highchartsOptionsJson: this.chartFinalOptions,
         noOfParams: this.noOfParams || 0,  // Ensure noOfParams has a valid value
+        miniForm:this.createChart.value.miniForm || '',
+        MiniTableNames:this.createChart.value.MiniTableNames ||'',
+        MiniTableFields:this.createChart.value.MiniTableFields ,
+        minitableEquation:this.createChart.value.minitableEquation,
+        EquationOperationMini:this.createChart.value.EquationOperationMini,
       };
   
       // Log the new tile object to verify it's being created correctly
@@ -432,6 +455,11 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     // fontColor: this.createChart.value.fontColor,
     chartConfig: this.createChart.value.all_fields,
     highchartsOptionsJson: this.chartFinalOptions,
+    miniForm:this.createChart.value.miniForm || '',
+    MiniTableNames:this.createChart.value.MiniTableNames ||'',
+    MiniTableFields:this.createChart.value.MiniTableFields ||'' ,
+    minitableEquation:this.createChart.value.minitableEquation ||'',
+    EquationOperationMini:this.createChart.value.EquationOperationMini ||'',
     // filterForm:this.createChart.value.filterForm,
     // filterParameter:this.createChart.value.filterParameter,
     // filterDescription:this.createChart.value.filterDescription,
@@ -587,6 +615,20 @@ openChartModal3(tile: any, index: number) {
      console.error('Error parsing filterParameter:', error);
    }
  } 
+
+ let parsedMiniTableFields = [];
+ if (typeof tile.MiniTableFields === 'string') {
+   try {
+     parsedMiniTableFields = JSON.parse(tile.MiniTableFields);
+     console.log('Parsed filterParameter1:', parsedMiniTableFields);
+   } catch (error) {
+     console.error('Error parsing filterParameter1:', error);
+   }
+ } else {
+   parsedMiniTableFields = tile.MiniTableFields;
+ }
+
+ console.log('Parsed FilterParameter:', parsedMiniTableFields);
  this.cdr.detectChanges()
 
  console.log('Parsed FilterParameter:', parsedFilterParameter);
@@ -606,6 +648,12 @@ openChartModal3(tile: any, index: number) {
 
       // filterForm:tile.filterForm,
       filterParameter: [parsedFilterParameter], 
+
+      miniForm:tile.miniForm || '',
+      MiniTableNames:tile.MiniTableNames ||'',
+      MiniTableFields: [parsedMiniTableFields],
+      minitableEquation:tile.minitableEquation,
+      EquationOperationMini:tile.EquationOperationMini, 
       // filterDescription:tile.filterDescription
 
 
@@ -1451,6 +1499,230 @@ FormatTypeValues = [
   // { value: 'max', text: 'Maximum' },
 ]
 
+setUserSatus(){
+  this.userIsChanging = true
+  this.cdr.detectChanges()
+}
+selectedOperationMini(readOperation:any){
+  console.log('readOperation',readOperation)
+  this.readOperation = readOperation[0].value
+
+}
+checkSelectedFormPram(readForm:any){
+  console.log('readForm checking',readForm)
+  this.FormRead = readForm[0].value
+  this.fetchMiniTable(this.FormRead)
+
+}
+async fetchMiniTable(item: any) {
+  try {
+      this.extractedTables = []; // Initialize to prevent undefined errors
+      this.filteredResults = []; // Initialize formatted dropdown options
+
+      const resultMain: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#" + item + "#main", 1);
+      if (resultMain) {
+          console.log('Forms Checking:', resultMain);
+          const helpherObjmain = JSON.parse(resultMain.metadata);
+          console.log('Helper Object Main:', helpherObjmain);
+
+          const extractFormFields = helpherObjmain.formFields;
+
+          // Ensure extractedTables is set properly
+          this.extractedTables = Object.values(extractFormFields).filter((item: any) =>
+              typeof item === 'object' &&
+              item !== null &&
+              'name' in item &&
+              typeof item.name === 'string' &&
+              item.name.startsWith("table-") &&
+              item.validation && 
+              item.validation.formName_table // Ensure `formName_table` exists inside `validation`
+          );
+
+          // Format extracted tables for dropdown options
+          this.filteredResults = this.extractedTables.map((record: any) => ({
+              value: record.validation.formName_table, // Use `formName_table` as value
+              label: record.name // Use `name` as label
+          }));
+
+          // Add "Track Location" as an additional option
+          this.filteredResults.unshift({
+              value: 'trackLocation', 
+              label: 'trackLocation'
+          });
+
+          console.log('Dropdown Options:', this.filteredResults);
+      }
+  } catch (err) {
+      console.log("Error fetching the dynamic form data", err);
+  }
+}
+
+
+miniTableNames(readMinitableName:any){
+console.log('readMinitableName',readMinitableName)
+this.readMinitableName = readMinitableName[0].value
+this.readMinitableLabel = readMinitableName[0].data.label
+console.log('this.readMinitableLabel',this.readMinitableLabel)
+
+this.fetchMiniTableHeaders(this.readMinitableName)
+
+}
+
+async fetchMiniTableHeaders(item: any) {
+  console.log('minitable name check',item)
+  // console.log('')
+try {
+    this.filteredHeaders = []; // Initialize to store formatted dropdown options
+
+    // If item is "trackLocation", directly set predefined fields
+    if (item === "trackLocation") {
+        this.filteredHeaders = [
+            { value: "Date_and_time", label: "Date_and_time" },
+            { value: "label_id", label: "label_id" },
+            { value: "label_name", label: "label_name" },
+            { value: "type", label: "type" },
+
+        ];
+        console.log('Predefined Headers for Track Location:', this.filteredHeaders);
+        return; // Exit function early, no need to fetch from API
+    }
+
+    // Otherwise, proceed with fetching data from API
+    const resultHeaders: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#" + item + "#main", 1);
+
+    if (resultHeaders) {
+        console.log('Forms Checking:', resultHeaders);
+        const helpherObjmainHeaders = JSON.parse(resultHeaders.metadata);
+        console.log('Helper Object Main Headers:', helpherObjmainHeaders);
+
+        const extractFormFields = helpherObjmainHeaders.formFields;
+
+        // Ensure extracted headers are properly formatted
+        if (Array.isArray(extractFormFields)) {
+            this.filteredHeaders = extractFormFields.map((record: any) => ({
+                value: record.name,  // Set the 'name' field as value
+                label: record.label  // Set the 'label' field as label
+            }));
+        }
+
+        this.cd.detectChanges()
+        
+        console.log('Formatted Headers:', this.filteredHeaders);
+    }
+} catch (err) {
+    console.log("Error fetching the dynamic form data", err);
+}
+}
+showValuesForMini = [
+  { value: 'sum', text: 'Sum' },
+  { value: 'min', text: 'Minimum' },
+  { value: 'max', text: 'Maximum' },
+  { value: 'average', text: 'Average' },
+  { value: 'latest', text: 'Latest' },
+  { value: 'previous', text: 'Previous' },
+  // { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
+  // { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
+  // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
+  // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
+  { value: 'Constant', text: 'Constant' },
+  { value: 'Live', text: 'Live' },
+  { value: 'Count', text: 'Count' },
+  { value: 'Count_Multiple', text: 'Count Multiple' },
+  { value: 'Count Dynamic', text: 'Count Dynamic' },
+
+
+]
+
+miniTableFields(readFields:any){
+  console.log('readFields',readFields)
+  if (readFields && readFields.value && Array.isArray(readFields.value)) {
+    // Extract all 'value' properties from the selected items
+    const selectedValues = readFields.value.map((item: any) => item.value);
+
+    console.log('Extracted Values:', selectedValues);
+    
+    // Store the extracted values in a variable
+    this.selectedMiniTableFields = selectedValues;
+}
+}
+AddMiniTableEquation() {
+  console.log('this.FormRead check:', this.FormRead);
+  console.log('this.readMinitableLabel check:', this.readMinitableLabel);
+  // console.log('this.selectedMiniTableFields check:', this.selectedMiniTableFields);
+  console.log('this.readOperation checking:', this.readOperation);
+  const miniTableFieldsValue = this.createChart.get('MiniTableFields')?.value;
+console.log('Retrieved MiniTableFields from Form:', miniTableFieldsValue);
+if (Array.isArray(miniTableFieldsValue)) {
+  // Extract the 'value' from each object
+  const extractedValues = miniTableFieldsValue.map((field: any) => field.value);
+  console.log('Extracted Values:', extractedValues);
+
+  // Store in a variable
+  this.selectedMiniTableFields = extractedValues;
+} else {
+  console.log('MiniTableFields is not an array or is empty.');
+}
+
+
+  // Ensure all values are defined before constructing the equation
+  if (this.FormRead && this.readMinitableLabel && Array.isArray(this.selectedMiniTableFields)) {
+      let equation = '';
+
+      if (this.readMinitableLabel === "trackLocation") {
+          // Remove "dynamic_table_values" for trackLocation
+          equation = this.selectedMiniTableFields
+              .map((field: string) => `\${${this.FormRead}.${this.readMinitableLabel}.${field}}`)
+              .join(',');
+      } else {
+          // Keep "dynamic_table_values" for other cases
+          equation = this.selectedMiniTableFields
+              .map((field: string) => `\${${this.FormRead}.dynamic_table_values.${this.readMinitableLabel}.${field}}`)
+              .join(',');
+      }
+
+      // If an operation is provided, prepend it
+      if (this.readOperation && this.readOperation.trim() !== '') {
+          equation = `${this.readOperation}(${equation})`;
+      }
+
+      console.log('Generated Equation:', equation);
+
+      // Store the equation in the Angular form control
+      this.createChart.controls['minitableEquation'].setValue("("+equation+")");
+  } else {
+      console.log('Error: One or more required values are missing.');
+  }
+}
+async dynamicDataEquation() {
+  // Fetching data based on index if needed
+  try {
+    const result: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#lookup", 1);
+    if (result) {
+      const helperObj = JSON.parse(result.options);
+      // Assuming you need to handle the data specific to an index or handle it globally
+      this.formList = helperObj.map((item: any) => item[0]); 
+      this.listofFormValues = this.formList.map((form: string) => ({ text: form, value: form }));
+    }
+  } catch (err) {
+    console.error("Error fetching the dynamic form data", err);
+  }
+}
+
+miniTableFieldsRead(readFields:any){
+  console.log('readFields',readFields)
+  if (readFields && readFields.value && Array.isArray(readFields.value)) {
+    // Extract all 'value' properties from the selected items
+    const selectedValues = readFields.value.map((item: any) => item.value);
+
+    console.log('Extracted Values:', selectedValues);
+    
+    // Store the extracted values in a variable
+    this.selectedMiniTableFields = selectedValues;
+}
+
+
+
+}
   
 
 }

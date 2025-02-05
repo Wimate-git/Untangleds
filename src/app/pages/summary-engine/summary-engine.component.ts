@@ -240,6 +240,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   fromRouterID: any='';
   chartDataConfigExport: any;
   lastUpdatedTime: any;
+  tileHeight: any []=[];
+  tileWidth: any []=[];
 
 
   createPieChart() {
@@ -1402,6 +1404,18 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
         console.log(
           `Resized ${item.grid_type} at index ${index}:`,
           `Height: ${this.mapHeight[index]}, Width: ${this.mapWidth[index]}, Top Margin: }`
+        );
+      }
+      else if (item.grid_type === 'tile') {
+        // const topMargin = 20; // Define the top margin value
+      
+        // Adjust height and width with the top margin
+        this.tileHeight[index] = itemComponentHeight ; // Subtract additional top margin
+        this.tileWidth[index] = itemComponentWidth ; // Subtract margin/padding for width
+      
+        console.log(
+          `Resized ${item.grid_type} at index ${index}:`,
+          `Height: ${this.tileHeight[index]}, Width: ${this.tileWidth[index]}, Top Margin: }`
         );
       }
       
@@ -2618,7 +2632,9 @@ console.log('Formatted Date:', this.lastUpdatedTime);
             console.log('requestBody for dashboardFilter', requestBody);
           
             // Send a POST request to the Lambda function with the body
+            console.log('this.all_Packet_store clearing',this.all_Packet_store)
             this.http.post(apiUrl, requestBody).subscribe(
+              
               (response: any) => {
                 console.log('Lambda function triggered successfully:', response);
                 this.responseBody = JSON.parse(response.body)

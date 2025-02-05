@@ -41,13 +41,13 @@
           <!-- Tab Navigation -->
           <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap"
             id="myTab_settings" role="tablist">
-            <div class="col-4" role="Data">
+            <div class="col-3" role="Data">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab"
                   aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Data</a>
               </li>
             </div>
-            <div class="col-4" role="Filter">
+            <div class="col-3" role="Filter">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="filter-tab" data-bs-toggle="tab" role="tab"
                   aria-controls="filter-tab" aria-selected="false" (click)="selectedSettingsTab('filter-tab')">Filter</a>
@@ -60,11 +60,17 @@
                   (click)="selectedSettingsTab('settings-tab')">Settings</a>
               </li>
             </div> -->
-            <div class="col-4" role="Advanced">
+            <div class="col-3" role="Advanced">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="advanced-tabpane" data-bs-toggle="tab" role="tab"
                   aria-controls="advanced-tab" aria-selected="false"
                   (click)="selectedSettingsTab('advanced-tab')">Advanced</a>
+              </li>
+            </div>
+            <div class="col-3" role="Mini Table">
+              <li class="nav-item">
+                <a class="nav-link text-active-primary me-6" id="minitable-tab" data-bs-toggle="tab" role="tab"
+                  aria-controls="minitable-tab" aria-selected="false" (click)="selectedSettingsTab('minitable-tab')">Advance Equation</a>
               </li>
             </div>
           </ul>
@@ -358,6 +364,110 @@
   
             </form>
             
+          </div>
+          <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'minitable-tab'}" id="minitable-tab" role="tabpanel" aria-labelledby="minitable-tab">
+            <div class="row">
+  
+            <div class="col-md-4 mb-3">
+              <label for="formlist" class="col-form-label fw-bold fs-6 ">
+                Forms
+                <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
+                  <i class="bi bi-info-circle fs-5"></i>
+                </span>
+              </label>
+              <ngx-select
+          
+                id="formlist"
+                [allowClear]="true"
+                name="icon"
+                formControlName="miniForm"
+                [items]="listofDeviceIds"
+                optionValueField="value"
+                optionTextField="text"
+                (focus)="setUserSatus()"
+                (selectionChanges)="checkSelectedFormPram($event)"
+                placeholder="Select Form">
+              </ngx-select>
+            </div>
+  
+            <div class="col-md-4 mb-3">
+              <label for="formlist" class="col-form-label fw-bold fs-6 ">
+                Mini Table Name
+                <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
+                  <i class="bi bi-info-circle fs-5"></i>
+                </span>
+              </label>
+              <ngx-select
+          
+                id="formlist"
+                [allowClear]="true"
+                name="icon"
+                formControlName="MiniTableNames"
+                [items]="filteredResults"
+                optionValueField="value"
+                optionTextField="text"
+                (focus)="setUserSatus()"
+                (selectionChanges)="miniTableNames($event)"
+                placeholder="Select Form">
+              </ngx-select>
+            </div>
+  
+     
+          <div class="col-md-4 mb-3">
+            <label class="fw-bold fs-6">Mini Table Fields</label>
+            <p-multiSelect
+                formControlName="MiniTableFields"
+                [options]="filteredHeaders"
+                optionLabel="label"  
+                placeholder="Select Form Fields"
+                (onChange)="miniTableFieldsRead($event)"  
+            ></p-multiSelect>
+        </div>
+      </div>
+      <div class="col-md-4 d-flex flex-column">
+        <label for="primaryValue" class="col-form-label fw-bold fs-6 mb-2">
+          Operation
+          <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Show Value As">
+            <i class="bi bi-info-circle fs-5"></i>
+          </span>
+        </label>
+        <ngx-select
+          id="primaryValue"
+          [allowClear]="true"
+          formControlName="EquationOperationMini"
+          [items]="showValues"
+          optionValueField="value"
+          optionTextField="text"
+          placeholder="Select Group"
+          (selectionChanges)="selectedOperationMini($event)"
+          class="w-100"
+        ></ngx-select>
+      </div>
+        
+  
+          <div class="col-md-3">
+            <button type="button" class="btn btn-primary w-100 mt-4" (click)="AddMiniTableEquation()">Add</button>
+          </div>
+        
+          <!-- Custom Label -->
+  
+  
+      
+        <div class="col-md-12 mb-3">
+          <label for="description" class="col-createChart-label fw-bold fs-6">Equation</label>
+          <textarea
+            id="description"
+            formControlName="minitableEquation"
+            class="form-control"
+            rows="3"
+            placeholder="Enter description"
+       
+          >
+            {{ selectedParameterValue }}
+          </textarea>
+        </div>
+  
+     
           </div>
           
           
