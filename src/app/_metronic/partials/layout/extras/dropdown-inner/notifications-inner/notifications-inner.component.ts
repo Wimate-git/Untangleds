@@ -1,7 +1,7 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
 import { LayoutService } from '../../../../../layout';
 import { APIService } from 'src/app/API.service';
-import { formatDistanceToNow } from 'date-fns';
+// import { formatDistanceToNow } from 'date-fns';
 import { Router } from '@angular/router';
 
 export type NotificationsTabsType =
@@ -71,6 +71,28 @@ export class NotificationsInnerComponent implements OnInit {
 
   }
 
+  formatDate(timestamp: number): string {
+    const now = new Date().getTime();
+    const diff = Math.floor((now - timestamp) / 1000);
+    const days = Math.floor(diff / 86400);
+    const months = Math.floor(days / 30); // Assuming an average of 30 days in a month
+    const years = Math.floor(months / 12); // Assuming 12 months in a year
+
+    if (diff < 60) {
+      return `${diff} second${diff > 1 ? 's' : ''} ago`;
+    } else if (diff < 3600) {
+      return `${Math.floor(diff / 60)} minute${Math.floor(diff / 60) > 1 ? 's' : ''} ago`;
+    } else if (diff < 86400) {
+      return `${Math.floor(diff / 3600)} hour${Math.floor(diff / 3600) > 1 ? 's' : ''} ago`;
+    } else if (months < 12) {
+      return `${months} month${months > 1 ? 's' : ''} ago`;
+    } else if (years < 2) {
+      return `${years} year ago`;
+    } else {
+      return `${years} years ago`;
+    }
+}
+
   async fetchAllData(requestBody:any) {
 
     fetch('https://gx2xgbmus8.execute-api.ap-south-1.amazonaws.com/test', {
@@ -128,7 +150,8 @@ export class NotificationsInnerComponent implements OnInit {
     this.alerts = this.app_notification.map(item => ({
       title: item.metadata.ID,
       description: item.metadata.message,
-      time: formatDistanceToNow(new Date(item.metadata.createdTime), { addSuffix: true }),  // Converts timestamp to readable date
+      // time: formatDistanceToNow(new Date(item.metadata.createdTime), { addSuffix: true }),  // Converts timestamp to readable date
+      time: this.formatDate(item.metadata.createdTime),
       // icon: 'icons/duotune/technology/teh008.svg', // Example icon, you might want to vary it
       state: 'primary', // Example state, this might also be dynamic based on your conditions
       isSelected:item.metadata.seen_flag,
