@@ -1,0 +1,35 @@
+
+
+
+<div class="approval-history-container">
+    <div class="approval-history-header">
+      <h3>Unconfirmed Users</h3>
+    </div>
+  
+    <div class="approval-history-list">
+      <table class="approval-table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Verification</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of unverifiedUsers" class="approval-row">
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td class="status">
+              <span class="badge badge-danger">Unconfirmed</span>
+            </td>
+            <td class="status" >
+                <a *ngIf="user && user.sentMail == undefined" class="badge btn badge-warning" (click)="resendVerification(user.username)" type="submit">Resend</a>
+                <a *ngIf="user && user.sentMail" class="badge btn badge-success" type="submit">Sent</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  

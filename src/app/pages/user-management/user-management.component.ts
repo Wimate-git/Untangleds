@@ -21,6 +21,7 @@ import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provid
 import { DynamicApiService } from '../dynamic-api.service';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { LocationPermissionService } from 'src/app/location-permission.service';
+import { UserVerifiedTableComponent } from './user-verified-table/user-verified-table.component';
 
 interface TreeNode {
   id: string;         // Assuming 'id' is a string
@@ -3325,6 +3326,53 @@ fetchDynamicLookupData(pk:any,sk:any):any {
 
 
     this.cd.detectChanges()
+  }
+
+
+
+
+  async showUnverifiedUsers(){
+
+    let storedResponse:any;
+
+    this.spinner.show()
+
+    const body = { "type": "cognitoServices",
+      "event":{
+          "path": "/listVerifiedUsers",
+          "queryStringParameters": {},
+          "clientID":this.SK_clientID
+      }
+    }
+
+
+    try {
+
+      const response = await this.DynamicApi.getData(body);
+      console.log("Response is here ",JSON.parse(response.body));
+
+      storedResponse = JSON.parse(response.body).users
+      .map((item: any) => {
+        if (item.attributes.email_verified !== 'true') {
+          // Return the user data for unverified users
+          return { username: item.username, email: item.attributes.email };
+        }
+        return null; 
+      })
+      .filter((user: any) => user !== null); 
+      this.spinner.hide();
+
+    } catch (error) {
+      console.error('Error calling dynamic lambda:', error);
+      this.spinner.hide();
+    }
+
+
+
+
+    const modalRef = this.modalService.open(UserVerifiedTableComponent,{ size: 'lg' })
+    modalRef.componentInstance.unverifiedUsers = storedResponse
+
   }
 
 } 

@@ -1,0 +1,84 @@
+/* General Styles for the Approval History Container */
+.approval-history-container {
+    max-width: 100%;
+    margin: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .approval-history-header h3 {
+    font-size: 1.5rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+  
+  /* Table Styles */
+  .approval-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .approval-table th, .approval-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .approval-table th {
+    background-color: #1b84ff;
+    color: white;
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+  
+  .approval-table td {
+    background-color: #ffffff;
+    color: #555;
+    font-size: 1rem;
+  }
+  
+  /* Hover Effect for Table Rows */
+  .approval-table tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  /* Badge Styles for Status */
+  .status .badge {
+    padding: 8px 12px;
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #f8285a;
+    border-radius: 4px;
+  }
+  
+  .status .badge-danger {
+    background-color: #f8285a;
+  }
+
+  .status .badge-success{
+    background-color: #15d61f;
+  }
+
+
+  .status .badge-warning{
+    background-color: #ee903e;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .approval-table th, .approval-table td {
+      padding: 8px;
+    }
+  
+    .approval-history-header h3 {
+      font-size: 1.2rem;
+    }
+  }
+  

@@ -12,12 +12,13 @@ import { MultiSelectModule } from "primeng/multiselect";
 import { SweetAlert2Module } from "@sweetalert2/ngx-sweetalert2";
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { UserExportComponent } from "./user-export/user-export.component";
+import { UserVerifiedTableComponent } from "./user-verified-table/user-verified-table.component";
 
 
 
 
 @NgModule({
-  declarations: [UserManagementComponent],
+  declarations: [UserManagementComponent,UserVerifiedTableComponent],
   imports: [
     RouterModule.forChild([
         {
@@ -41,7 +42,6 @@ import { UserExportComponent } from "./user-export/user-export.component";
     UserExportComponent,
     MultiSelectModule,
     SelectButtonModule,
-    
     
 ]
 })

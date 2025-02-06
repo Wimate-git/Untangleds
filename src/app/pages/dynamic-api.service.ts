@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -18,5 +18,20 @@ export class DynamicApiService {
     });
 
     return this.http.post<any>(this.apiUrl, data, { headers });
+  }
+
+
+
+  async getData(data: any): Promise<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    try {
+      const response = await firstValueFrom(this.http.post<any>(this.apiUrl, data, { headers }));
+      return response;  // Resolving the API response as a Promise
+    } catch (error) {
+      throw error;  // Propagate the error for handling in the component
+    }
   }
 }
