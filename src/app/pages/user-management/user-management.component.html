@@ -116,7 +116,7 @@
                                       " class="fv-plugins-message-container invalid-feedback">
                                             Username is required
                                         </div>
-                                    </div>
+                                    </div>     
         
         
                                     <div class="col-md-4">
@@ -425,41 +425,6 @@
         
         
                                
-                                    <!-- <div class="col-md-4" *ngIf="locationPermissionArray.length>0">
-                                        <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Location
-                                            Permission</label>
-        
-                                            <div class="custom-multiselect">
-        
-                                            <ng-multiselect-dropdown style="
-                                            display: inline-block; 
-                                            width: 100%;
-                                            padding: 0px ;
-                                            margin-bottom: 0;
-                                            font-weight: 0px;
-                                            line-height: 1.52857143;
-                                            text-align: left;
-                                            vertical-align: middle;
-                                            cursor: pointer;
-                                            background-image: none;
-                                            border-radius: 4px;
-                                          
-                                        " class="form-select form-select-solid form-select-lg fw-bold "
-                                            [placeholder]="'select devicetype permission'" [settings]="dropdownSettings"
-                                            [data]="locationPermissionArray" (onSelect)="onLocationSelect($event)"
-                                            [formControl]="$any(createUserField.controls['location_permission'])">
-                                        </ng-multiselect-dropdown>
-                
-                                    </div> -->
-        
-                                        <!-- <div *ngIf="
-                                            createUserField.get('location_permission')?.hasError('required') &&
-                                            createUserField.get('location_permission')?.touched
-                                      " class="fv-plugins-message-container invalid-feedback">
-                                            Location Permission is required
-                                        </div>
-                                    </div> -->
-        
         
                                     <div class="col-md-4" *ngIf="formList.length>0">
                                         <label class="required fw-semibold fs-6 mb-2">FormID Permission</label>
