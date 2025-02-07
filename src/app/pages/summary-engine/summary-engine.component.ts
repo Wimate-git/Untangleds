@@ -4660,7 +4660,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
             if (actionKey === 'add_map' || actionKey === 'update_map') {
               window.location.reload(); // Reloads the current window
             } else if (actionKey === 'update_Dashboard' || actionKey === 'filter_add') {
-              this.reloadPage(); // Call the reloadPage function
+              window.location.reload(); // Call the reloadPage function
             }
             else if (actionKey === 'add_table' || actionKey === 'update_table'){
               this.reloadPage(); 

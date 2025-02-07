@@ -2020,10 +2020,46 @@ console.log('tempMetadata',tempMetadata)
               
               // Handle the logic for the user dropdown here
               console.log("User list dropdown is here");
-            }else if(foundField.validation?.isDerivedUser === true && foundField.validation?.form){
+            }else if(foundField.validation?.lookup === true && foundField.validation?.form){
               const lookupKey = `${this.SK_clientID}#${foundField.validation.form}#lookup`;
+
+              const extractedIds = await this.fetchLookupFormData(lookupKey, 1, foundField.validation?.field);
+              console.log('Received Extracted IDs:', extractedIds);
+              const typeControl = conditions.controls[conditionIndex].get('type');
+              if (typeControl) {
+                typeControl.setValue(foundField.type); // Set the 'type' value
+            
+                // Now set the options once the 'type' is set
+                this.globalFieldData[fieldIndex][conditionIndex] = {
+                  type: foundField.type,
+                  options: extractedIds // Assign the resolved options here
+                };
+              } else {
+                console.error('Type control not found at index', conditionIndex);
+              }
               
 
+
+
+            }
+
+            else if(foundField.validation?.isDerivedUser === true && foundField.validation?.form){
+         
+              const lookupKey = `${this.SK_clientID}#${foundField.validation.form}#lookup`;
+              
+             const extractedDerivedUser = await this.fetchLookupIsDerivedUser(lookupKey,1,foundField.validation?.field)
+             const typeControl = conditions.controls[conditionIndex].get('type');
+             if (typeControl) {
+               typeControl.setValue(foundField.type); // Set the 'type' value
+           
+               // Now set the options once the 'type' is set
+               this.globalFieldData[fieldIndex][conditionIndex] = {
+                 type: foundField.type,
+                 options: extractedDerivedUser // Assign the resolved options here
+               };
+             } else {
+               console.error('Type control not found at index', conditionIndex);
+             }
 
 
             }
@@ -2103,6 +2139,102 @@ console.log('tempMetadata',tempMetadata)
   
     return this.userlistRead; // return userlistRead at the end of the function
   }
+  
+
+
+  async fetchLookupFormData(lookupKey: any, sk: any, readField: any): Promise<any[]> {
+    console.log('readField checking', readField);
+    console.log("Iam called Bro");
+    
+    try {
+      const response = await this.api.GetMaster(lookupKey, sk);
+  
+      if (response && response.options) {
+        if (typeof response.options === 'string') {
+          let data = JSON.parse(response.options);
+          console.log("form data check", data);
+  
+          // Declare extractedValues inside the function
+          let extractedValues: any[] = [];
+          
+          // Loop through data to find the matching value
+          data.forEach((entry: any) => {
+            entry.forEach((item: any) => {
+              if (item.includes(readField)) {
+                let splitValue = item.split('#');
+                let extractedId = splitValue[1]; // Get the value after '#'
+                extractedValues.push(extractedId);
+              }
+            });
+          });
+  
+          console.log('Extracted IDs:', extractedValues);
+  
+          // Return the extracted IDs
+          return extractedValues;
+          
+        } else {
+          console.error('response.options is not a string.');
+        }
+      } else {
+        console.log("Lookup to be displayed", this.userlistRead);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+    
+    // Return an empty array if no data is found
+    return [];
+  }
+
+  async fetchLookupIsDerivedUser(lookupKey: any, sk: any, readField: any): Promise<any[]> {
+    console.log('readField checking', readField);
+    console.log("Iam called Bro");
+    
+    try {
+      const response = await this.api.GetMaster(lookupKey, sk);
+  
+      if (response && response.options) {
+        if (typeof response.options === 'string') {
+          let data = JSON.parse(response.options);
+          console.log("is Derived user Data", data);
+          let extractedDerivedUsers: any[] = [];
+          
+          // Loop through data to find the matching value
+          data.forEach((entry: any) => {
+            entry.forEach((item: any) => {
+              if (item.includes(readField)) {
+                let splitValue = item.split('#');
+                let extractedId = splitValue[1]; // Get the value after '#'
+                extractedDerivedUsers.push(extractedId);
+              }
+            });
+          });
+  
+          console.log('Extracted IDs:', extractedDerivedUsers);
+  
+          // Return the extracted IDs
+          return extractedDerivedUsers;
+  
+          // Declare extractedValues inside the function
+
+   
+          
+        } else {
+          console.error('response.options is not a string.');
+        }
+      } else {
+        console.log("Lookup to be displayed", this.userlistRead);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+    
+    // Return an empty array if no data is found
+    return [];
+  }
+  
+  
   
   
   

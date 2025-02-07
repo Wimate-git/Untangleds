@@ -1533,7 +1533,7 @@ selectFormParams1(event: any[], index: number): void {
 
   SelectTypeSummary =[
     { value: 'NewTab', text: 'New Tab' },
-    { value: 'Modal', text: 'Modal' },
+    { value: 'Modal', text: 'Modal(Pop Up)' },
     { value: 'Same page Redirect', text: 'Same page Redirect' },
 
     { value: 'drill down', text: 'drill down' },

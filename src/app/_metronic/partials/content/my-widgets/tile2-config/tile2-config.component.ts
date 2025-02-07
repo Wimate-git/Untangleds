@@ -711,7 +711,8 @@ generateUniqueId(): number {
   ]
   SelectTypeSummary =[
     { value: 'NewTab', text: 'New Tab' },
-    { value: 'Modal', text: 'Modal' },
+    { value: 'Modal', text: 'Modal(Pop Up)' },
+
   ]
   fetchDynamicFormData(value: any) {
     console.log("Data from lookup:", value);

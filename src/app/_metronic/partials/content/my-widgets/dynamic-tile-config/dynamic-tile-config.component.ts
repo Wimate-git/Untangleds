@@ -1196,7 +1196,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
 
   SelectTypeSummary =[
     { value: 'NewTab', text: 'New Tab' },
-    { value: 'Modal', text: 'Modal' },
+    { value: 'Modal', text: 'Modal(Pop Up)' },
     { value: 'Same page Redirect', text: 'Same page Redirect' },
 
     { value: 'drill down', text: 'drill down' },

@@ -133,7 +133,7 @@ export class Tile3ConfigComponent implements OnInit{
 
   SelectTypeSummary =[
     { value: 'NewTab', text: 'New Tab' },
-    { value: 'Modal', text: 'Modal' },
+    { value: 'Modal', text: 'Modal(Pop Up)' },
   ]
 
   constructor(private summaryConfiguration: SharedService,private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
