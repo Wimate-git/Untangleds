@@ -2819,12 +2819,6 @@ mergeAndAddLocation(mappedResponse: any) {
 
 
 
-
-
-
-
-
-
     try{
       const wb = XLSX.utils.book_new(); 
 
@@ -3675,26 +3669,40 @@ calculateAggregateRow(headers: string[], customColumnForm: any[], rowValues: any
 
 
 csvToArray(csv: string): any[] {
+  console.log("Starting csvToArray function...");
+  
   // Split the CSV string by newlines (\r?\n) and map each row using splitCsv
   const rows = csv
-    .split(/\r?\n/)  // Split by both \n (Unix) and \r\n (Windows) line breaks
-    .map(row => this.splitCsv(row))  // Convert each row into an array using splitCsv
+    .split(/\r/)  // Split by both \n (Unix) and \r\n (Windows) line breaks
+    .map((row, index) => {
+      console.log(`Processing row #${index + 1}:`, row);
+      return this.splitCsv(row);  // Convert each row into an array using splitCsv
+    })
     .filter(row => row.length > 0);  // Filter out any empty rows
+  
+  console.log("Rows after splitting and filtering:", rows);
   
   return rows;
 }
 
 // Split the CSV row into individual fields while handling quoted values properly
 splitCsv(csv: string): string[] {
-  const regex = /"(.*?)"|\s*([^",\s]+)\s*/g;  // Regex to match quoted and unquoted fields
+  console.log("Starting splitCsv function...");
+  console.log("Input row to split:", csv);
+  
+  // const regex = /"(.*?)"|\s*([^",\s]+)\s*/g;  // Regex to match quoted and unquoted fields
+  const regex = /"([^"]*)"|([^",\r\n]+)/g;
   const result: string[] = [];
   let match;
 
   while ((match = regex.exec(csv)) !== null) {
     // The first capture group will be the quoted value, the second will be unquoted
+    console.log("Matched:", match);
     result.push(match[1] || match[2]); // Add the match to the result
   }
 
+  console.log("Final split result:", result);
+  
   return result;
 }
 
