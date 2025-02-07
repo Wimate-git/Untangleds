@@ -2832,7 +2832,10 @@ mergeAndAddLocation(mappedResponse: any) {
       const tableExports = await Promise.all(this.agGrids.toArray().map(async (gridInstance, index) => {
         const gridApi = gridInstance.api;
         const csvData = gridApi.getDataAsCsv();
+        console.log("CSV data is here ",csvData);
         let data = this.csvToArray(csvData || '');
+
+        console.log('CSV data after converting array ',data);
 
         if(data && data[0]){
           let headers = data && data[0] && data[0].map((header: string) => header.replace(/[\r\n]+/g, '').replace(/^"|"$/g, '').trim());
@@ -3278,16 +3281,6 @@ async extractMiniTableData(data: any[], tableColumnIndex: number, index: number)
               } 
             }
           }
-          else{
-            console.log("COndition doesNt match ",this.allAdvancedExcelConfigurations.advancedcustomMiniColumns.miniCustomColumns);
-          }
-
-
-
-
-    
-
-
 
 
           // If the table exists, gather the headers from the first row of the dynamic table

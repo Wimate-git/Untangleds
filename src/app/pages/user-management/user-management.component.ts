@@ -3148,10 +3148,25 @@ rdtListWorkAround :any =[{
       
   }
 
-  onModuleSelect(option: any) {
+  onModuleLocationSelect(option: any) {
     const selectedValues = this.createUserField.get('location_permission')?.value;
-    console.log('Selected Location Permissions:', selectedValues);    
+    
+    if(selectedValues.includes('All')){
+      this.createUserField.get('location_permission')?.setValue(['All'])
+    }
   }
+
+
+  onModuleSelect(option: any) {
+    const selectedValues = this.createUserField.get('form_permission')?.value; 
+    
+    if(selectedValues.includes('All')){
+      this.createUserField.get('form_permission')?.setValue(['All'])
+    }
+  }
+
+
+
 
   dynamicRedirectChanged(event:any){
 
