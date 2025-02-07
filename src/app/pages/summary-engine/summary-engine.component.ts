@@ -703,6 +703,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   summaryDashboardUpdate = false;
  hidingLink = false
  isFullscreen: boolean = false;
+ isValidID: boolean = true;
+ isDashboardConfigured: boolean = true;
 
 
   isFullScreen = false; // Track the fullscreen state
@@ -2225,7 +2227,7 @@ processFetchedData(result: any): void {
 
 
   openSummaryTable(content: any) {
-    this.modalService.open(content, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+    this.modalService.open(content, { size: 'lg', ariaLabelledBy: 'modal-basic-title' });
     this.showTable()
     // 
     this.reloadEvent.next(true);
@@ -2352,7 +2354,7 @@ setTimeout(() => {
 
   }
   openCreateContent(createcontent: any) {
-    this.modalService.open(createcontent, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+    this.modalService.open(createcontent, { size: 'lg', ariaLabelledBy: 'modal-basic-title' });
   }
 
   viewItem(id: string): void {
@@ -3151,22 +3153,18 @@ console.log('Formatted Date:', this.lastUpdatedTime);
     }
   }
 
-
   openModal(flag: string, getValues?: any, content?: any): void {
     console.log('getValues inside openModal', getValues);
-    this.showAddWidgetsTab = true;
-
-    this.selectedTab = this.showModal ? 'add-widget' : 'add-dashboard';
-
-    // Reset common modal state
+  
+    // Reset the common modal state
     this.errorForUniqueID = '';
-
+  
     // Switch case to handle different flags
     switch (flag) {
       case 'new':
         this.handleNewModal(content);
         break;
-
+  
       case 'Edit_ts':
         this.handleEditModal(getValues, content);
         break;
@@ -3177,14 +3175,18 @@ console.log('Formatted Date:', this.lastUpdatedTime);
         this.handleEditModalHtml(getValues, content);
         break;
     }
-    // if (content) {
-    //   this.modalService.open(content, { size: 'lg', backdrop: 'static' });
-    // }
   
-
+    // Check if the "Add Dashboard" tab is configured before switching to "Add Widgets"
+console.log('selectedTab checking',this.selectedTab)
+  
+    // Proceed with opening the modal as usual
+    this.showAddWidgetsTab = true;
+    this.selectedTab = this.showModal ? 'add-widget' : 'add-dashboard';
+  
     // Detect changes to ensure the view is updated
     this.cd.detectChanges();
   }
+  
 
   private handleNewModal(content: any): void {
     this.showHeading = true;
@@ -3204,7 +3206,7 @@ console.log('Formatted Date:', this.lastUpdatedTime);
     });
   
     // Open modal for new entry
-    this.modalService.open(content, { size: 'xl' });
+    this.modalService.open(content, { size: 'lg' });
   }
   
 
@@ -4084,23 +4086,28 @@ console.log('Formatted Date:', this.lastUpdatedTime);
 
   onIDChange(event: Event): void {
     let currentID = (event.target as HTMLInputElement).value.trim();
+    
+    console.log('currentID', currentID);
   
     // Regular expression to allow only alphanumeric characters and underscores, excluding slashes
     const validIDPattern = /^[a-zA-Z0-9_]*$/;
   
     if (!validIDPattern.test(currentID)) {
       this.errorForUniqueID = 'Special characters (including / slash) are not allowed. Use only letters, numbers, and underscores.';
-      return;
+      this.isValidID = false;  // Mark ID as invalid
     } else {
-      this.errorForUniqueID = null; // Clear the error if input is valid
+      this.errorForUniqueID = null;  // Clear the error if input is valid
+      this.isValidID = true;  // Mark ID as valid
     }
   
     // Validate only if the input value has changed
     if (currentID !== this.previousValue) {
       this.previousValue = currentID; // Update previous value
-      this.checkUniqueIdentifier(currentID);
+      this.checkUniqueIdentifier(currentID); // You can implement this to check for uniqueness
     }
   }
+  
+
   
 
 
@@ -4651,15 +4658,15 @@ console.log('Serialized Query Params:', serializedQueryParams);
           if (result.isConfirmed) {
             // Reload the page for specific action keys
             if (actionKey === 'add_map' || actionKey === 'update_map') {
-              // window.location.reload(); // Reloads the current window
+              window.location.reload(); // Reloads the current window
             } else if (actionKey === 'update_Dashboard' || actionKey === 'filter_add') {
-              // this.reloadPage(); // Call the reloadPage function
+              this.reloadPage(); // Call the reloadPage function
             }
             else if (actionKey === 'add_table' || actionKey === 'update_table'){
-              // this.reloadPage(); 
+              this.reloadPage(); 
             }
             else if(actionKey === 'add_multiTable' || actionKey === 'update_multiTable'){
-              // this.reloadPage(); 
+              this.reloadPage(); 
 
             }
           }
@@ -4934,8 +4941,11 @@ this.createSummaryField.patchValue({
 
 
   onAddWidgetTabClick() {
-    // Check if we're in add mode and widgets are not allowed
-    if (!this.showAddWidgetsTab && !this.showModal) {
+    console.log('showAddWidgetsTab:', this.showAddWidgetsTab);
+    console.log('showModal:', this.showModal);
+    console.log('selectedTab:', this.selectedTab);
+    
+    if (this.showAddWidgetsTab && !this.showModal) {
       Swal.fire({
         icon: 'warning',
         title: 'Create a Summary First',
@@ -4945,6 +4955,7 @@ this.createSummaryField.patchValue({
       this.selectedTab = 'add-widget'; // Proceed to the Add Widgets tab in edit mode
     }
   }
+  
   onAutoflowConfigTabClick() {
     // Check if in add mode and access is restricted
     if (!this.showAddWidgetsTab && !this.showModal) {

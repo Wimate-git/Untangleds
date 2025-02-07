@@ -733,12 +733,13 @@
         
   
         <!-- Conditionally Display Add Widgets Tab -->
-        <div class="col-6" role="Add Widgets">
+        <div class="col-6" role="Add Widgets" *ngIf="showAddWidgetsTab">
           <li class="nav-item">
-            <a class="nav-link text-active-primary me-6" id="add-widget-tab" data-bs-toggle="tab"
-            [class.active]="selectedTab === 'add-widget'" 
-              (click)="showAddWidgetsTab ? selectedTab = 'add-widget' : onAddWidgetTabClick()"
-              role="tab" aria-controls="add-widget" aria-selected="false">Add Widgets</a>
+<a class="nav-link text-active-primary me-6" id="add-widget-tab" data-bs-toggle="tab"
+  [class.active]="selectedTab === 'add-widget'" 
+  (click)="onAddWidgetTabClick()"
+  role="tab" aria-controls="add-widget" aria-selected="false">Add Widgets</a>
+
           </li>
         </div>
         
@@ -784,12 +785,18 @@
            [readonly]="showModal"
            required
            (input)="onIDChange($event)">
-    <span *ngIf="errorForUniqueID" style="color: #fc1900;">{{ errorForUniqueID }}</span>
+    <!-- Error Message -->
+    <span *ngIf="errorForUniqueID" style="color: #fc1900; font-size: 12px; font-weight: bold;">
+      {{ errorForUniqueID }}
+    </span>
     <div *ngIf="createSummaryField.get('summaryID')?.hasError('required') && createSummaryField.get('summaryID')?.touched"
          class="invalid-feedback">
       Summary ID is required
     </div>
   </div>
+  
+  
+  
   
   
   
@@ -1343,13 +1350,14 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
     <!-- <button type="button" class="btn btn-danger" (click)="modal.dismiss()">Cancel</button> -->
     
     <!-- Conditionally display the Save button for Add Summary -->
-    <button *ngIf="selectedTab === 'add-dashboard' && !showModal" 
-    type="button" 
-    class="btn btn-primary" 
-    [disabled]="createSummaryField.invalid || isDuplicateID || isDuplicateName" 
+    <button *ngIf="selectedTab === 'add-dashboard' && !showModal"
+    type="button"
+    class="btn btn-primary"
+    [disabled]="createSummaryField.invalid || isDuplicateID || isDuplicateName || !isValidID" 
     (click)="createNewSummary(); modal.dismiss()">
-  Save
-  </button>
+Save
+</button>
+
   
   
       

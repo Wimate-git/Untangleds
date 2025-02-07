@@ -115,6 +115,9 @@ makeTrueCheck:any = false
   fetchedValues: any;
   fieldlabelShow: any;
   fieldLabelsShow: any;
+  userlistRead: any;
+  userList: any;
+  userlistCheck: any;
 
 
  
@@ -146,6 +149,7 @@ makeTrueCheck:any = false
       }
     });
     this.checkData()
+   
   
 
     this.initializeShowDaysAgoField();
@@ -1797,7 +1801,7 @@ toggleCheckbox1(theme: any) {
                         validation: field.validation,
                     })),
                 };
-
+console.log('tempMetadata',tempMetadata)
                 this.populateFormBuilder[index] = JSON.parse(JSON.stringify(tempMetadata));
                 fetchedData.push(tempMetadata); // Push to the fetched data array
             }
@@ -1917,7 +1921,7 @@ toggleCheckbox1(theme: any) {
   
 
 
-  getOptionsForField(fieldIndex: number, conditionIndex: number, formFieldValue: string): void {
+  async getOptionsForField(fieldIndex: number, conditionIndex: number, formFieldValue: string): Promise<void> {
     console.log('fieldIndex check:', fieldIndex);
     console.log('conditionIndex check:', conditionIndex);
     console.log('formFieldValue check:', formFieldValue);
@@ -1977,14 +1981,61 @@ toggleCheckbox1(theme: any) {
         console.log(`Found field for ${formFieldValue}:`, foundField);
   
         // Set the type and options in the global variable
-        if (foundField.type === 'select' && foundField.options) {
-          const optionsWithAll = ['All', ...foundField.options];
-          conditions.controls[conditionIndex].get('type')?.setValue(foundField.type);
-          this.globalFieldData[fieldIndex][conditionIndex] = { type: foundField.type, options: optionsWithAll };
+        if (foundField.type === 'select') {
+          // Check if options are empty or contain only empty strings/spaces
+          const optionsIsEmpty = !foundField.options || foundField.options.every((option: string) => option.trim() === '');
+        
+          if (!optionsIsEmpty) {
+            // If options are not empty, proceed with appending 'All' to options
+            const optionsWithAll = ['All', ...foundField.options];
+            conditions.controls[conditionIndex].get('type')?.setValue(foundField.type);
+            this.globalFieldData[fieldIndex][conditionIndex] = { type: foundField.type, options: optionsWithAll };
+          } else {
+            // If options are considered empty, check if validation.user is true
+            if (foundField.validation && foundField.validation?.user === true) {
+              const lookupKey = `${this.SK_clientID}#user#lookup`;
+              console.log('lookupKey',lookupKey)
+
+     
+                // Ensure that you are awaiting the async function to get the resolved value
+                const optionsSet = await this.fetchLookupUser(lookupKey, 1); // Await the async function
+              
+                console.log('this.userlistCheck check', optionsSet); // Log the resolved value
+              
+                // Ensure the 'type' form control exists and is being updated properly
+                const typeControl = conditions.controls[conditionIndex].get('type');
+                
+                if (typeControl) {
+                  typeControl.setValue(foundField.type); // Set the 'type' value
+              
+                  // Now set the options once the 'type' is set
+                  this.globalFieldData[fieldIndex][conditionIndex] = {
+                    type: foundField.type,
+                    options: optionsSet // Assign the resolved options here
+                  };
+                } else {
+                  console.error('Type control not found at index', conditionIndex);
+                }
+ 
+              
+              // Handle the logic for the user dropdown here
+              console.log("User list dropdown is here");
+            }else if(foundField.validation?.isDerivedUser === true && foundField.validation?.form){
+              const lookupKey = `${this.SK_clientID}#${foundField.validation.form}#lookup`;
+              
+
+
+
+            }
+            // else if()
+          }
         } else {
-          conditions.controls[conditionIndex].get('type')?.setValue(foundField.type || 'text');
-          this.globalFieldData[fieldIndex][conditionIndex] = { type: foundField.type, options: foundField.options || null };
+          conditions.controls[conditionIndex].get('type')?.setValue('text');
+          this.globalFieldData[fieldIndex][conditionIndex] = { type: 'text', options: null };
+          // Handle other types if needed
         }
+        
+        
       } else {
         console.warn(`Field with name ${formFieldValue} not found in metadata for index ${fieldIndex}`);
         console.log('Available field names:', matchingMetadata.map((field: Field) => field.name));
@@ -1997,6 +2048,61 @@ toggleCheckbox1(theme: any) {
   }
   
   
+  async fetchLookupUser(lookupKey: any, sk: any) {
+    console.log("Iam called Bro");
+    try {
+      const response = await this.api.GetMaster(lookupKey, sk);
+  
+      if (response && response.options) {
+        if (typeof response.options === 'string') {
+          let data = JSON.parse(response.options);
+          console.log("d1 =", data);
+  
+          if (Array.isArray(data)) {
+            for (let index = 0; index < data.length; index++) {
+              const element = data[index];
+  
+              if (element !== null && element !== undefined) {
+                const key = Object.keys(element)[0];
+                const { P1, P2, P3, P4, P5, P6, P7 } = element[key];
+  
+                // Ensure userList is initialized
+                if (!this.userList) {
+                  this.userList = [];
+                }
+  
+                // Check if P1 exists before pushing
+                if (P1 !== undefined && P1 !== null) {
+                  this.userList.push({ P1, P2, P3, P4, P5, P6, P7 });
+                  console.log("Pushed to userList: ", { P1, P2, P3, P4, P5, P6, P7 });
+                  this.userlistRead = this.userList.map((item: { P1: any; }) => item.P1);
+                  console.log('this.userlistRead', this.userlistRead);
+                } else {
+                  console.warn("Skipping element because P1 is not defined or null");
+                }
+              } else {
+                break;
+              }
+            }
+  
+            // Continue fetching recursively
+            await this.dashboardIds(sk + 1);
+          } else {
+            console.error('Invalid data format - not an array.');
+            return this.userlistRead; // return userlistRead here
+          }
+        } else {
+          console.error('response.options is not a string.');
+        }
+      } else {
+        console.log("Lookup to be displayed", this.userlistRead);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  
+    return this.userlistRead; // return userlistRead at the end of the function
+  }
   
   
   

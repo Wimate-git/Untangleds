@@ -31,12 +31,12 @@
                   <a class="nav-link text-active-primary me-6" id="settings-tabpane" data-bs-toggle="tab" role="tab" aria-controls="settings-tab" aria-selected="false" (click)="selectedSettingsTab('settings-tab')">Settings</a>
                 </li>
               </div>
-              <div class="col-3" role="Settings">
+              <div class="col-2" role="Settings">
                 <li class="nav-item">
                   <a class="nav-link text-active-primary me-6" id="equation-tabpane" data-bs-toggle="tab" role="tab" aria-controls="equation-tab" aria-selected="false" (click)="selectedSettingsTab('equation-tab')">Equation</a>
                 </li>
               </div>
-              <div class="col-2" role="Mini Table">
+              <div class="col-3" role="Mini Table">
                 <li class="nav-item">
                   <a class="nav-link text-active-primary me-6" id="minitable-tab" data-bs-toggle="tab" role="tab"
                     aria-controls="minitable-tab" aria-selected="false" (click)="selectedSettingsTab('minitable-tab')">Advance Equation</a>
@@ -340,11 +340,15 @@
                         class="color-box"
                         [ngStyle]="{ 'background-image': theme.color }"
                         (click)="toggleCheckbox(theme)"
-                        [class.checked]="theme.selected">
+                        [class.checked]="theme.selected"
+                      >
                         <div *ngIf="theme.selected" class="checkmark">✔</div>
                       </div>
                     </div>
                   </div>
+                  
+                  
+                  
               
                   <!-- Font Size Input -->
                   <div class="col-md-6 mb-3">

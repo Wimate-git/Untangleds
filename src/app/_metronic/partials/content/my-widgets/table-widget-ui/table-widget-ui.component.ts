@@ -37,6 +37,7 @@ export class TableWidgetUiComponent implements OnInit{
   @ViewChild('agGrid') agGrid!: AgGridAngular;
   tableDataWithFormFilters: any = [];
   @ViewChildren(AgGridAngular) agGrids!: QueryList<AgGridAngular>;
+  pageSizeOptions = [10, 25, 50, 100];
   
   
   @Output() customEvent = new EventEmitter<{ arg1: any; arg2: number }>();
@@ -62,6 +63,7 @@ export class TableWidgetUiComponent implements OnInit{
   columnLabelsArray: any;
   finalColumns: any;
   customLabel: any;
+  formName: any;
   ngOnInit(): void {
 
     
@@ -88,6 +90,7 @@ export class TableWidgetUiComponent implements OnInit{
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
     console.log("tile data check from table Widget",this.item)
+    this.formName = this.item.formlist
     this.customLabel = this.item.custom_Label
     console.log('this.customLabel checcking',this.customLabel)
 // Parse the conditions
@@ -299,7 +302,7 @@ get shouldShowButton(): boolean {
   exportToCSV(): void {
     if (this.gridApi) {
       this.gridApi.exportDataAsCsv({
-        fileName: 'data.csv',
+        fileName: `${this.formName}`+'.csv',
         columnSeparator: ',',
       });
     } else {
@@ -367,7 +370,7 @@ get shouldShowButton(): boolean {
     const blob = new Blob([excelFile], { type: 'application/octet-stream' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'table-data.xlsx';
+    link.download = `${this.formName}`+'.xlsx';
     link.click();
   }
   
@@ -513,7 +516,7 @@ get shouldShowButton(): boolean {
   
     // Error handling during PDF generation
     try {
-      pdfMake.createPdf(docDefinition).download('table-data.pdf');
+      pdfMake.createPdf(docDefinition).download(`${this.formName}`+'.pdf');
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Failed to generate PDF. Please try again.');

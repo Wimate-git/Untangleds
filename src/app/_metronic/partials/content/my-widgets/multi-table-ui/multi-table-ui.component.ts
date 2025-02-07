@@ -29,6 +29,7 @@ export class MultiTableUiComponent implements OnInit{
   @Output() sendminiTableData = new EventEmitter<any>();
   @Output() sendFormNameForMini = new EventEmitter<any>();
   
+  pageSizeOptions = [10, 25, 50, 100];
 
   
   
@@ -103,6 +104,7 @@ export class MultiTableUiComponent implements OnInit{
  
     console.log("tile data check from multi table Widget",this.item)
     this.extractFormName = this.item.formlist
+    console.log('this.extractFormName',this.extractFormName)
     this.sendFormNameForMini.emit(this.extractFormName)
 
 
@@ -361,7 +363,7 @@ get shouldShowButton(): boolean {
   exportToCSV(): void {
     if (this.gridApi) {
       this.gridApi.exportDataAsCsv({
-        fileName: 'data.csv',
+        fileName: `${this.extractFormName}`+'.csv',
         columnSeparator: ',',
       });
     } else {
@@ -421,7 +423,7 @@ get shouldShowButton(): boolean {
     const blob = new Blob([excelFile], { type: 'application/octet-stream' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'table-data.xlsx';
+    link.download = `${this.extractFormName}`+'.xlsx';
     link.click();
   }
   
@@ -561,7 +563,7 @@ get shouldShowButton(): boolean {
   
     // Error handling during PDF generation
     try {
-      pdfMake.createPdf(docDefinition).download('table-data.pdf');
+      pdfMake.createPdf(docDefinition).download(`${this.extractFormName}`+'.pdf');
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Failed to generate PDF. Please try again.');

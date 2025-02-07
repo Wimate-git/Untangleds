@@ -80,13 +80,14 @@
 
 .color-boxes {
   display: flex;
+  flex-wrap: wrap; /* Allows wrapping of color boxes */
   gap: 10px;
 }
 
 .color-box {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 30px; /* Keeps the original width of the color boxes */
+  height: 30px; /* Keeps the original height of the color boxes */
   border-radius: 5px;
   cursor: pointer;
   display: flex;
@@ -118,19 +119,6 @@
 
 .color-box.checked {
   box-shadow: 0 0 10px rgba(0, 255, 0, 0.4); /* Optional: highlight color when checked */
-}
-
-.color-box {
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #ddd;
-  margin: 5px;
-  transition: transform 0.3s ease;
 }
 
 .color-box.checked {

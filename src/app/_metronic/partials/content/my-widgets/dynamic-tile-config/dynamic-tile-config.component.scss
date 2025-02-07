@@ -79,74 +79,62 @@
 }
 
 .color-boxes {
-display: flex;
-gap: 10px;
+  display: flex;
+  flex-wrap: wrap; /* Allows wrapping of color boxes */
+  gap: 10px;
 }
 
 .color-box {
-position: relative;
-width: 40px;
-height: 40px;
-border-radius: 5px;
-cursor: pointer;
-display: flex;
-justify-content: center;
-align-items: center;
-border: 2px solid transparent;
-transition: all 0.3s;
+  position: relative;
+  width: 30px; /* Keeps the original width of the color boxes */
+  height: 30px; /* Keeps the original height of the color boxes */
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid transparent;
+  transition: all 0.3s;
 }
 
 .color-box.checked {
-border: 2px solid #fff;
+  border: 2px solid #fff;
 }
 
 .color-box .checkmark {
-position: absolute;
-font-size: 20px;
-color: white;
-opacity: 1;
-transition: opacity 0.3s ease;
+  position: absolute;
+  font-size: 20px;
+  color: white;
+  opacity: 1;
+  transition: opacity 0.3s ease;
 }
 
 .color-box.checked .checkmark {
-opacity: 1;
+  opacity: 1;
 }
 
 .color-box:hover {
-box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 .color-box.checked {
-box-shadow: 0 0 10px rgba(0, 255, 0, 0.4); /* Optional: highlight color when checked */
-}
-
-.color-box {
-width: 40px;
-height: 40px;
-border-radius: 4px;
-cursor: pointer;
-display: flex;
-align-items: center;
-justify-content: center;
-border: 1px solid #ddd;
-margin: 5px;
-transition: transform 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.4); /* Optional: highlight color when checked */
 }
 
 .color-box.checked {
-border: 2px solid #000;
-transform: scale(1.1);
+  border: 2px solid #000;
+  transform: scale(1.1);
 }
 
 .checkmark {
-color: #fff;
-font-size: 1rem;
+  color: #fff;
+  font-size: 1rem;
 }
 
 .form-control-color {
-width: 50px;
-height: 38px;
-padding: 0;
-border-radius: 5px;
-border: 1px solid #ced4da;
+  width: 50px;
+  height: 38px;
+  padding: 0;
+  border-radius: 5px;
+  border: 1px solid #ced4da;
 }

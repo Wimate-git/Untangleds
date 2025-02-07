@@ -74,6 +74,7 @@ export class NestedTableComponent {
   tableIds: string[] = [];  // Your array of table IDs
   columnDefsMap: { [key: string]: any[] } = {}; 
   tableNamesMap: { [key: string]: string } = {}; 
+  pageSizeOptions = [10, 25, 50, 100];
   
   
 

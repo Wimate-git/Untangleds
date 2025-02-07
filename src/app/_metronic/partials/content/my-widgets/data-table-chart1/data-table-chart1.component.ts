@@ -22,6 +22,7 @@ export class DataTableChart1Component {
   
   columnDefs: any[]; 
   private gridApi!: GridApi;
+  pageSizeOptions = [10, 25, 50, 100];
 
   
 
@@ -33,6 +34,7 @@ export class DataTableChart1Component {
   // Dummy column definitions
 
   gridColumnApi: any;
+  FormName: any;
 
   onGridReady(params:any) {
     this.gridApi = params.api;
@@ -60,6 +62,9 @@ console.log('columnDefs check',this.columnDefs)
 console.log('sendRowDynamic checking from data table',this.sendRowDynamic)
 console.log('all_Packet_store from data table',this.all_Packet_store)
 console.log('chartDataConfigExport',this.chartDataConfigExport)
+this.FormName = this.chartDataConfigExport.columnVisibility[0].formlist
+console.log('this.FormName',this.FormName)
+
 // this.parseChartConfig(this.all_Packet_store);
 this.parseChartConfig(this.chartDataConfigExport)
     
@@ -115,7 +120,7 @@ this.parseChartConfig(this.chartDataConfigExport)
   exportToCSV(): void {
     if (this.gridApi) {
       this.gridApi.exportDataAsCsv({
-        fileName: 'data.csv',
+        fileName: `${this.FormName}`+'.csv',
         columnSeparator: ',',
       });
     } else {
@@ -171,7 +176,7 @@ this.parseChartConfig(this.chartDataConfigExport)
     const blob = new Blob([excelFile], { type: 'application/octet-stream' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'table-data.xlsx';
+    link.download = `${this.FormName}`+'.xlsx';
     link.click();
   }
 
@@ -314,7 +319,7 @@ this.parseChartConfig(this.chartDataConfigExport)
   
     // Error handling during PDF generation
     try {
-      pdfMake.createPdf(docDefinition).download('Data.pdf');
+      pdfMake.createPdf(docDefinition).download(`${this.FormName}`+'.pdf');
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Failed to generate PDF. Please try again.');

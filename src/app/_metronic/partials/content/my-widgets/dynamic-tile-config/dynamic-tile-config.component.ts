@@ -605,23 +605,94 @@ alert('cloned tile')
   
 
 
-themes = [
-  { color: "linear-gradient(to right, #ff7e5f, #feb47b)", selected: false }, // Warm Sunset
-  { color: "linear-gradient(to right, #6a11cb, #2575fc)", selected: false }, // Cool Blue-Purple
-  { color: "linear-gradient(to right, #ff6a00, #ee0979)", selected: false }, // Fiery Red-Orange
-  { color: "linear-gradient(to right, #36d1dc, #5b86e5)", selected: false }, // Aqua Blue
-  { color: "linear-gradient(to right, #56ab2f, #a8e063)", selected: false }, // Fresh Green
-  { color: "linear-gradient(to right, #ff9966, #ff5e62)", selected: false }, // Orange-Red Glow
-  { color: "linear-gradient(to right, #373b44, #4286f4)", selected: false }, // Subtle Blue-Grey
-  { color: "linear-gradient(to right, #8e44ad, #3498db)", selected: false }, // Vibrant Purple-Blue
-  { color: "linear-gradient(to right, #fdc830, #f37335)", selected: false }, // Golden Sunburst
-  { color: "linear-gradient(to right, #16a085, #f4d03f)", selected: false }, // Teal to Yellow
-  { color: "linear-gradient(to right, #9cecfb, #65c7f7, #0052d4)", selected: false }, // Light to Deep Blue
-  { color: "linear-gradient(to right, #00c6ff, #0072ff)", selected: false }, // Bright Blue
-  { color: "linear-gradient(to right, #11998e, #38ef7d)", selected: false }, // Mint Green
-  { color: "linear-gradient(to right, #ff9a9e, #fad0c4)", selected: false }, // Pink Pastel
-  { color: "linear-gradient(to right, #fc5c7d, #6a82fb)", selected: false }  // Pink to Blue
-];
+
+  themes = [
+    { color: "linear-gradient(to right, #ff7e5f, #feb47b)", selected: false }, // Warm Sunset
+    { color: "linear-gradient(to right, #6a11cb, #2575fc)", selected: false }, // Cool Blue-Purple
+    { color: "linear-gradient(to right, #ff6a00, #ee0979)", selected: false }, // Fiery Red-Orange
+    { color: "linear-gradient(to right, #36d1dc, #5b86e5)", selected: false }, // Aqua Blue
+    { color: "linear-gradient(to right, #56ab2f, #a8e063)", selected: false }, // Fresh Green
+    { color: "linear-gradient(to right, #ff9966, #ff5e62)", selected: false }, // Orange-Red Glow
+  
+    { color: "linear-gradient(to right, #8e44ad, #3498db)", selected: false }, // Vibrant Purple-Blue
+    { color: "linear-gradient(to right, #fdc830, #f37335)", selected: false }, // Golden Sunburst
+    { color: "linear-gradient(to right, #16a085, #f4d03f)", selected: false }, // Teal to Yellow
+    { color: "linear-gradient(to right, #9cecfb, #65c7f7, #0052d4)", selected: false }, // Light to Deep Blue
+    { color: "linear-gradient(to right, #00c6ff, #0072ff)", selected: false }, // Bright Blue
+    { color: "linear-gradient(to right, #11998e, #38ef7d)", selected: false }, // Mint Green
+    { color: "linear-gradient(to right, #ff9a9e, #fad0c4)", selected: false }, // Pink Pastel
+    { color: "linear-gradient(to right, #fc5c7d, #6a82fb)", selected: false } , // Pink to Blue
+    { color: "linear-gradient(to right, #1D2671, #C33764)", selected: false }, // Deep Purple to Reddish Pink
+    { color: "linear-gradient(to right, #5433FF, #20BDFF, #A5FECB)", selected: false }, // Multicolor Cool Spectrum
+    { color: "linear-gradient(to right, #FF5F6D, #FFC371)", selected: false }, // Soft Pink to Orange
+    { color: "linear-gradient(to right, #C6FFDD, #FBD786, #f7797d)", selected: false }, // Pastel Multicolor
+    { color: "linear-gradient(to right, #B24592, #F15F79)", selected: false }, // Purple-Pink Gradient
+    { color: "linear-gradient(to right, #7F7FD5, #86A8E7, #91EAE4)", selected: false }, // Light Purple-Blue
+    { color: "linear-gradient(to right, #FF512F, #F09819)", selected: false }, // Vivid Orange to Yellow
+    { color: "linear-gradient(to right, #00B4DB, #0083B0)", selected: false }, // Aqua to Deep Blue
+    { color: "linear-gradient(to right, #70E1F5, #FFD194)", selected: false }, // Sky Blue to Soft Yellow
+    { color: "linear-gradient(to right, #373B44, #4286F4)", selected: false }, // Dark Blue to Grey
+    { color: "linear-gradient(to right, #614385, #516395)", selected: false }, // Moody Purple to Blue
+    { color: "linear-gradient(to right, #000428, #004e92)", selected: false }, // Midnight Blue
+  
+    { color: "linear-gradient(to right, #3A1C71, #D76D77, #FFAF7B)", selected: false }, // Purple to Peach
+    { color: "linear-gradient(to right, #4568DC, #B06AB3)", selected: false },
+    { color: "linear-gradient(to right, #32cd32, #adff2f)", selected: false }, // Soft Blue to Purple
+    { color: "linear-gradient(to right, #6a0dad, #e6e6fa)", selected: false },
+    { color: "linear-gradient(to right, #4b0082, #9370db)", selected: false },
+    { color: "linear-gradient(to right, #008000, #00ff00)", selected: false },
+    { color: "linear-gradient(to right, #9400d3, #fff0f5)", selected: false },
+    { color: "linear-gradient(to right, #9b30ff, #8a2be2)", selected: false },
+  
+  
+    { color: "linear-gradient(to right, #228b22, #98fb98)", selected: false },
+    { color: "linear-gradient(to right, #8B4513, #A52A2A)", selected: false },
+    { color: "linear-gradient(to right, #D2691E, #CD853F)", selected: false },
+    { color: "linear-gradient(to right, #6B4226, #C2B280)", selected: false },
+    { color: "linear-gradient(to right, #8B4513, #F4A300)", selected: false },
+    { color: "linear-gradient(to right, #004d40, #00bcd4)", selected: false },
+    { color: "linear-gradient(to right, #A52A2A, #F5DEB3)", selected: false },
+    { color: "linear-gradient(to right, #800000, #b03060)", selected: false },
+    { color: "linear-gradient(to right, #008080, #20b2aa)", selected: false },
+   
+  
+    { color: "linear-gradient(to right, #006666, #48c9b0)", selected: false },
+    { color: "linear-gradient(to right, #2b5876, #4e4376)", selected: false },
+    { color: "linear-gradient(to right, #800080, #800080)", selected: false },
+    { color: "linear-gradient(to right, #808000, #808000)", selected: false },
+    { color: "linear-gradient(to right, #BC8F8F, #BC8F8F)", selected: false },
+    { color: "linear-gradient(to right, #696969, #696969)", selected: false },
+    { color: "linear-gradient(to right, #4E0707, #4E0707)", selected: false },
+    { color: "linear-gradient(to right, #FF4500, #FF4500)", selected: false },
+    { color: "linear-gradient(to right, #3A5311, #3A5311)", selected: false },
+    { color: "linear-gradient(to right, #1338BE, #1338BE)", selected: false },
+    { color: "linear-gradient(to right, #004F98, #004F98)", selected: false },
+    { color: "linear-gradient(to right, #A1045A, #A1045A)", selected: false },
+    { color: "linear-gradient(to right, #563C5C, #563C5C)", selected: false },
+    { color: "linear-gradient(to right, #655967, #655967)", selected: false },
+  
+  
+  
+    
+  
+  
+    
+  
+  
+  
+  
+    
+  
+  
+    
+    
+  
+  
+    
+    
+  
+    
+  ];
 
 
 openDynamicTileModal(tile: any, index: number) {

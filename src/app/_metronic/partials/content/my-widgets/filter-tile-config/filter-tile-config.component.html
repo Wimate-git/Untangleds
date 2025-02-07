@@ -210,8 +210,8 @@
                             <!-- Dynamic Value Field -->
                             <div class="mb-3" style="width: 30%;">
                               <label class="col-form-label fw-bold fs-6 required">Value </label>
-                              <ng-container *ngIf="condition.get('type')?.value as fieldType;">
-                                <ng-container *ngIf="fieldType === 'select'; else textInput">
+                              <ng-container *ngIf="globalFieldData[fieldIndex]&&globalFieldData[fieldIndex][conditionIndex] ;">
+                                <ng-container *ngIf="globalFieldData[fieldIndex][conditionIndex]?.type === 'select'; else textInput">
                                   <ng-container *ngIf="globalFieldData[fieldIndex]&&globalFieldData[fieldIndex][conditionIndex]?.options?.length > 0; else noOptions">
                                     <select formControlName="filterValue" class="form-control">
                                       <option value="" disabled>Select Value </option>

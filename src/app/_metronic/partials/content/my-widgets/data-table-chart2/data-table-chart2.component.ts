@@ -17,7 +17,7 @@ export class DataTableChart2Component {
   // @Input() columnDefs: any[] = []; 
 
 
-
+  pageSizeOptions = [10, 25, 50, 100];
 
   // Dummy column definitions
 
