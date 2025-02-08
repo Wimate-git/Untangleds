@@ -424,7 +424,7 @@
   
             <!--begin::Table body-->
             <tbody *ngIf="lookup_data_summaryCopy && lookup_data_summaryCopy.length > 0; else noDataTemplate">
-              <tr *ngFor="let item of lookup_data_summaryCopy | slice:0:20">
+              <tr *ngFor="let item of filterDuplicates(lookup_data_summaryCopy) ">
                 <td>
                   <div class="d-flex align-items-center">
                     <span class="text-gray-500 fw-semibold d-block fs-7 me-2">
@@ -542,8 +542,9 @@
   z-index: 100;
   right:44px;
   flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20 gap-2">
+
   
-  <nav class="myMenu" #tooltipContainer *ngIf="!disableMenuQP && summaryPermission?.includes('None') === false">
+  <nav class="myMenu" #tooltipContainer *ngIf="!disableMenuQP && (userPermission === 'All' || summaryPermission?.includes('None') === false)" >
     <input type="checkbox" href="#" class="myMenu-open" name="myMenu-open" id="myMenu-open" />
     <label class="myMenu-open-button" for="myMenu-open">
       <span class="hamburger hamburger-1"></span>
@@ -565,7 +566,7 @@
       <i style="color: white;" class="fa fa-plus"></i>
     </a>
 <a class="myMenu-item" #myLink 
-   *ngIf="editButtonCheck && summaryDashboardUpdate" 
+*ngIf="(editButtonCheck && summaryDashboardUpdate) || (editButtonCheck && userPermission === 'All')"
    title="Edit Dashboard" 
    (click)="openModal('edit', all_Packet_store, summaryModal)">
     <i style="color: white;" class="fa fa-edit"></i>
@@ -573,7 +574,7 @@
     <a class="myMenu-item" (click)="openSummaryTable(content)" title="Search dashboard">
       <i style="color: white;" class="fa fa-search"></i>
     </a>
-    <a *ngIf="!isSummaryEngine() && summaryDashboardUpdate" 
+    <a *ngIf="(!isSummaryEngine() && summaryDashboardUpdate) ||( userPermission === 'All')"
     class="myMenu-item" 
     (click)="toggleMode()" 
     style="cursor: pointer;" 
@@ -1353,10 +1354,11 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
     <button *ngIf="selectedTab === 'add-dashboard' && !showModal"
     type="button"
     class="btn btn-primary"
-    [disabled]="createSummaryField.invalid || isDuplicateID || isDuplicateName || !isValidID" 
+    [disabled]="createSummaryField.invalid || isDuplicateID || isDuplicateName || !isValidID"
     (click)="createNewSummary(); modal.dismiss()">
-Save
-</button>
+    Save
+  </button>
+  
 
   
   

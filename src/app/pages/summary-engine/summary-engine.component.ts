@@ -242,15 +242,19 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   lastUpdatedTime: any;
   tileHeight: any []=[];
   tileWidth: any []=[];
+  userPermissions: boolean | undefined;
+  permissionIdCheck: any;
+  permissionsMetaData: any;
+  userPermissionsRead: any;
+  userPermission: any;
 
 
   createPieChart() {
     const chartOptions: any = {
       chart: {
         inverted: false,
-      
         type: 'pie',
-     // Set the chart height
+        // Set the chart height
       },
       title: {
         text: '',
@@ -263,11 +267,10 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
       },
       plotOptions: {
         pie: {
-          // allowPointSelect: true,
+          innerSize: '50%',  // This creates the donut shape by setting the inner size
           cursor: null,  // Hide pointer cursor
           dataLabels: {
-            enabled: false,
-            // format: '{point.name}: {point.percentage:.1f}%',
+            enabled: false,  // Disable data labels
           },
           showInLegend: false,  // Hide slices in legend
         },
@@ -284,32 +287,26 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
             {
               name: 'Sales',
               y: 30,
-    
             },
             {
               name: 'Marketing',
               y: 20,
-         
             },
             {
               name: 'Development',
               y: 25,
-           
             },
             {
               name: 'Customer Support',
               y: 15,
-      
             },
             {
               name: 'Research',
               y: 10,
-      
             },
             {
               name: 'HR',
               y: 10,
-
             },
           ],
         },
@@ -318,6 +315,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   
     Highcharts.chart('pieChart', chartOptions);
   }
+  
   
   createLineChart(){
 
@@ -1781,7 +1779,14 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
   ngOnInit() {
 
     this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
+    this.SK_clientID = this.getLoggedUser.clientID;
+    console.log('this.SK_clientID check', this.SK_clientID)
+    this.userdetails = this.getLoggedUser.username;
+    console.log('user name permissions check',this.userdetails)
+    this.fetchUserPermissions(1)
+    
     this.initializeCompanyFields();
+
     this.route.queryParams.subscribe((params) => {
       console.log('params check', params);
       this.queryParams = params;
@@ -1840,15 +1845,14 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     // this.dropdownSettings = this.devicesList.getMultiSelectSettings();
 
     console.log('this.getLoggedUser check', this.getLoggedUser)
-    this.permissionIdLocal = this.getLoggedUser.permission_ID
-    console.log('this.permissionIdLocal checking',this.permissionIdLocal)
+
+    
   
     // this.getWorkFlowDetails = this.summaryConfiguration.getLoggedUserDetails()
     // console.log('this.getLoggedUser check',this.getWorkFlowDetails)
 
-    this.SK_clientID = this.getLoggedUser.clientID;
-    console.log('this.SK_clientID check', this.SK_clientID)
-    this.fetchPermissionIdMain(1, this.permissionIdLocal);
+  
+
     this.route.paramMap.subscribe(params => {
       this.routeId = params.get('id');
       if (this.routeId) {
@@ -1888,6 +1892,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     this.fetchContractOrderMasterlookup(1)
     this.permissionIds(1)
     this.fetchCompanyLookupdata(1)
+   
          this.rowData = [
         {
           'location': 'India',
@@ -2227,7 +2232,7 @@ processFetchedData(result: any): void {
 
 
   openSummaryTable(content: any) {
-    this.modalService.open(content, { size: 'lg', ariaLabelledBy: 'modal-basic-title' });
+    this.modalService.open(content, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
     this.showTable()
     // 
     this.reloadEvent.next(true);
@@ -3999,8 +4004,15 @@ console.log('selectedTab checking',this.selectedTab)
     return '200px';  // Default height
   }
 
-
-
+  filterDuplicates(data: any[]) {
+    // Remove duplicates based on the P1 field
+    const uniqueData = Array.from(new Set(data.map((item: any) => item.P1))) // Create unique P1 values
+      .map((P1Value) => data.find((item: any) => item.P1 === P1Value)); // Retrieve the first occurrence of each P1 value
+  
+    // Slice the result to only keep the first 20 items
+    return uniqueData.slice(0, 20);
+  }
+  
   
   loadData() {
     this.lookup_data_summary1 = [];
@@ -4016,18 +4028,34 @@ console.log('selectedTab checking',this.selectedTab)
         this.lookup_data_summaryCopy.sort((a, b) => b.P4 - a.P4);
         console.log('Sorted Data:', this.lookup_data_summaryCopy);
   
-        // Filter data based on permissions
-        if (this.summaryPermission.includes('None')) {
-          console.log("Permission includes 'None'. No dashboards will be displayed.");
-          this.lookup_data_summaryCopy = []; // Set the data to an empty array
-        } else if (this.summaryPermission.includes('All')) {
+        // Check the permission ID before applying the filter
+        if (this.userPermission === "All") {
           console.log("Permission is 'All'. Displaying all dashboards...");
           // No filtering needed, show all data
         } else {
-          console.log("Restricted permissions. Filtering dashboards...");
-          this.lookup_data_summaryCopy = this.lookup_data_summaryCopy.filter((item: any) =>
-            this.summaryPermission.includes(item.P1)
-          );
+          // If permissionIdLocal is not 'All', then apply permissions-based filtering
+
+          console.log('Restricted permissions. Filtering dashboards...',this.summaryPermission);
+          if (this.summaryPermission.includes('None')) {
+            this.lookup_data_summaryCopy = []; 
+            console.log("Permission includes 'None'. No dashboards will be displayed.");
+        // Set the data to an empty array
+          } else if (this.summaryPermission.includes('All')) {
+            console.log("Permission is 'All'. Displaying all dashboards...");
+            // No filtering needed, show all data
+          }else {
+            console.log("Restricted permissions. Filtering dashboards...");
+            this.lookup_data_summaryCopy = this.lookup_data_summaryCopy
+              .filter((item: any) => this.summaryPermission.includes(item.P1)) // Apply permission filter
+              .reduce((uniqueItems: any[], currentItem: any) => {
+                // Check if the current item's P1 is already in the uniqueItems array
+                if (!uniqueItems.some(item => item.P1 === currentItem.P1)) {
+                  uniqueItems.push(currentItem); // If not, add it to the array
+                }
+                return uniqueItems;
+              }, []); // Initialize with an empty array
+          }
+          
         }
   
         // Process each item in the data for parsed icons
@@ -4083,29 +4111,37 @@ console.log('selectedTab checking',this.selectedTab)
       this.isDuplicateID = false; // Reset the flag
     }
   }
-
   onIDChange(event: Event): void {
-    let currentID = (event.target as HTMLInputElement).value.trim();
+    let currentID = (event.target as HTMLInputElement).value;
+    console.log('currentID checking',currentID)
+  
+    // Check if spaces are present before or after trimming
+    const hasLeadingOrTrailingSpaces = currentID !== currentID.trim();
     
-    console.log('currentID', currentID);
-  
-    // Regular expression to allow only alphanumeric characters and underscores, excluding slashes
-    const validIDPattern = /^[a-zA-Z0-9_]*$/;
-  
-    if (!validIDPattern.test(currentID)) {
-      this.errorForUniqueID = 'Special characters (including / slash) are not allowed. Use only letters, numbers, and underscores.';
-      this.isValidID = false;  // Mark ID as invalid
+    if (hasLeadingOrTrailingSpaces) {
+      this.errorForUniqueID = 'Leading or trailing spaces are not allowed.';
+      this.isValidID = false;  // Mark ID as invalid due to spaces
     } else {
-      this.errorForUniqueID = null;  // Clear the error if input is valid
-      this.isValidID = true;  // Mark ID as valid
+      // Regular expression to allow only alphanumeric characters and underscores
+      const validIDPattern = /^[a-zA-Z0-9_]+$/;
+  
+      if (!validIDPattern.test(currentID.trim())) {
+        this.errorForUniqueID = 'Special characters (including spaces or slash) are not allowed. Use only letters, numbers, and underscores.';
+        this.isValidID = false;  // Mark ID as invalid
+      } else {
+        this.errorForUniqueID = null;  // Clear the error if input is valid
+        this.isValidID = true;  // Mark ID as valid
+      }
     }
   
     // Validate only if the input value has changed
     if (currentID !== this.previousValue) {
       this.previousValue = currentID; // Update previous value
-      this.checkUniqueIdentifier(currentID); // You can implement this to check for uniqueness
+      this.checkUniqueIdentifier(currentID); // Check for uniqueness if necessary
     }
   }
+  
+  
   
 
   
@@ -4325,18 +4361,25 @@ console.log('selectedTab checking',this.selectedTab)
             let responseData = resp || []; // Default to an empty array if resp is null
             console.log("responseData", responseData);
   
-            // Permission-based filtering
-            if (this.summaryPermission.includes('None')) {
-              console.log("Permission includes 'None'. No data will be displayed.");
-              responseData = []; // Set responseData to an empty array
-            } else if (this.summaryPermission.includes('All')) {
+            // Apply Permission-Based Filtering
+            if (this.userPermission === "All") {
+              console.log('permissionIdCheck',this.permissionIdCheck)
               console.log("Permission is 'All'. Displaying all data.");
-              // No filtering needed
+              // No filtering needed, show all data
             } else {
               console.log("Restricted permissions. Filtering data...");
-              responseData = responseData.filter((item: any) =>
-                this.summaryPermission.includes(item.P1)
-              );
+              if (this.summaryPermission.includes('None')) {
+                console.log("Permission includes 'None'. No data will be displayed.");
+                responseData = []; // Set responseData to an empty array
+              } else if (this.summaryPermission.includes('All')) {
+                console.log("Permission is 'All'. Displaying all data.");
+                // No filtering needed
+              } else {
+                console.log("Restricted permissions. Filtering data...");
+                responseData = responseData.filter((item: any) =>
+                  this.summaryPermission.includes(item.P1)
+                );
+              }
             }
   
             // Example filtering for search
@@ -4458,15 +4501,11 @@ console.log('selectedTab checking',this.selectedTab)
       ],
       createdRow: (row: Node, data: any, dataIndex: number) => {
         console.log('Data from columns', data);
-      
-
       },
-      
-      
-      
       pageLength: 10, // Set default page size to 10
     };
   }
+  
   
   
   
@@ -6116,11 +6155,11 @@ refreshFunction(){
 
   helperChartClick(event:any,modalChart:any){
     console.log('event checking',event)
-    this.modalService.open(modalChart, { size: 'lg' });
+    this.modalService.open(modalChart, { size: 'xl' });
   }
   helperChartClickChart1(event:any,modalChart:any){
     console.log('event checking',event)
-    this.modalService.open(modalChart, { size: 'lg' });
+    this.modalService.open(modalChart, { size: 'xl' });
   }
 
   helperChartClickChart2(event:any,modalChart:any){
@@ -6138,6 +6177,55 @@ refreshFunction(){
     this.chartDataConfigExport = configChartTable
 
   }
+  async fetchUserPermissions(sk: any) {
+    this.userdetails = this.getLoggedUser.username;
+    this.userClient = this.userdetails + "#user" + "#main";
+    console.log('this.tempClient from form service check', this.userClient);
+  
+    this.userPermissions = await this.api.GetMaster(this.userClient, sk).then(permission => {
+      if (permission) {
+        console.log('data checking from add form', permission);
+        const metadataString: string | null | undefined = permission.metadata;
+  
+        // Check if metadataString is a valid string before parsing
+        if (typeof metadataString === 'string') {
+          try {
+            // Parse the JSON string into a JavaScript object
+            this.permissionsMetaData = JSON.parse(metadataString);
+            console.log('Parsed Metadata Object from location', this.permissionsMetaData);
+            const readPermission_Id = this.permissionsMetaData.permission_ID
+            console.log('readPermission_Id check',readPermission_Id)
+
+  
+            // Check if permission_ID is 'All'
+            if (readPermission_Id !== "All") {
+              // this.permissionIdCheck = this.metadataObject.permission_ID; // Store the permission ID
+              console.log('Stored permission ID:', readPermission_Id);
+              this.fetchPermissionIdMain(1, readPermission_Id);
+              this.loadData();
+            } else if(readPermission_Id=="All"){
+             this.userPermission = readPermission_Id
+             this.loadData();
+          
+              console.log('this.userPermissionsRead',this.userPermission)
+              console.log('Permission ID is "All", skipping action.');
+            }
+  
+          
+  
+          } catch (error) {
+            console.error('Error parsing JSON:', error);
+          }
+        } else {
+          console.log('Metadata is not a valid string:', this.metadataObject);
+        }
+  
+        // Return based on location_permission and form_permission
+        return this.modifyList(this.metadataObject.location_permission, this.metadataObject.form_permission) === "All-All" ? false : true;
+      }
+    });
+  }
+  
 
 
 

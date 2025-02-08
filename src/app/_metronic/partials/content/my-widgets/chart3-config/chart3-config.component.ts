@@ -270,7 +270,7 @@ export class Chart3ConfigComponent implements OnInit{
           this.fb.group({
             formlist: ['', Validators.required],
             parameterName: [[], Validators.required],
-            groupBy: ['', Validators.required],
+ 
             primaryValue: ['', Validators.required],
             groupByFormat: ['', Validators.required],
             constantValue: [''],
@@ -534,7 +534,7 @@ alert('cloned tile')
     clonedTile.fixedRowHeight = tile.fixedRowHeight;
     clonedTile.grid_type = tile.grid_type;
     clonedTile.formlist = tile.formlist;
-    clonedTile.groupBy = tile.groupBy;
+ 
     clonedTile.groupByFormat = tile.groupByFormat;
     clonedTile.predefinedSelectRange = tile.predefinedSelectRange;
     clonedTile.selectedRangeType = tile.selectedRangeType;
@@ -737,7 +737,7 @@ repopulate_fields(getValues: any): FormArray {
         this.fb.group({
           formlist: configItem.formlist || '',
           parameterName: this.fb.control(arrayParameter)||'',
-          groupBy: configItem.groupBy || '',
+  
           primaryValue: configItem.primaryValue || '',
           groupByFormat: configItem.groupByFormat || '',
           constantValue: configItem.constantValue || '',

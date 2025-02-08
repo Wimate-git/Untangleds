@@ -207,7 +207,7 @@ export class Tile1ConfigComponent implements OnInit {
       processed_value: [''],
       selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
       selectedRangeLabelWithDates: [''],
-      selectedRangeType: ['', Validators.required],
+
       themeColor: ['', Validators.required],
       fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['#000000', Validators.required], // Default to black
@@ -446,7 +446,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         filterParameter: this.createKPIWidget.value.filterParameter,
         filterDescription: this.createKPIWidget.value.filterDescription,
         parameterNameRead: this.parameterNameRead,
-        selectedRangeType: this.createKPIWidget.value.selectedRangeType,
+  
         themeColor: this.createKPIWidget.value.themeColor,
         fontSize: `${this.createKPIWidget.value.fontSize}px`,
         fontColor: this.createKPIWidget.value.fontColor,
@@ -557,7 +557,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         constantValue: updatedConstantValue,
         processed_value: processedValue,
         multi_value: multiValue,
-        selectedRangeType: this.createKPIWidget.value.selectedRangeType,
+
         startDate: this.createKPIWidget.value.startDate ||'',
         endDate: this.createKPIWidget.value.endDate ||'',
         themeColor: this.createKPIWidget.value.themeColor,
@@ -916,7 +916,7 @@ alert('cloned tile')
     // clonedTile.groupBy = tile.groupBy;
     clonedTile.groupByFormat = tile.groupByFormat;
     // clonedTile.predefinedSelectRange = tile.predefinedSelectRange;
-    clonedTile.selectedRangeType = tile.selectedRangeType;
+
     clonedTile.themeColor = tile.themeColor;
 
     // Add the cloned tile to the dashboard at the correct position
@@ -1130,7 +1130,7 @@ openKPIModal(tile: any, index: number) {
       constantValue: parsedMultiValue[0]?.constantValue !== undefined ? parsedMultiValue[0].constantValue : 0,
       processed_value: parsedMultiValue[0]?.processed_value !== undefined ? parsedMultiValue[0].processed_value : 0,
       selectedRangeCalendarTimeRight: tile.selectedRangeCalendarTimeRight,
-      selectedRangeType: tile.selectedRangeType,
+
       themeColor: tile.themeColor,
       fontSize: tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14,
       fontColor: tile.fontColor,
