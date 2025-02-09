@@ -1,8 +1,4 @@
 <div class="modal-header d-flex justify-content-between align-items-center">
-  <!-- Close Button -->
-  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()" style="margin-right: 30px;"></button>
-
-  <!-- Action Menu (3 Dots Dropdown) -->
   <div class="action-menu-container d-flex align-items-center" style="gap: 50px;">
     <div class="dropdown">
       <button 
@@ -28,6 +24,11 @@
       </mat-menu>
     </div>
   </div>
+  <!-- Close Button -->
+  <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()" style="margin-right: 30px;"></button>
+
+  <!-- Action Menu (3 Dots Dropdown) -->
+
 </div>
 
 

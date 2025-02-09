@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { GridApi ,Column} from 'ag-grid-community';
 
 import pdfMake from 'pdfmake/build/pdfmake';
@@ -42,7 +42,7 @@ export class DataTableShowComponent {
   FormName: any;
 
 
-  constructor() {}
+  constructor(private modalService: NgbModal) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log('columnDefs check',this.columnDefs)
@@ -86,9 +86,7 @@ console.log('this.FormName',this.FormName)
 
 
   closeModal(): void {
-    if (this.modalRef) {
-      this.modalRef.close(); // Close the modal
-    }
+this.modalService.dismissAll()
   }
 
   onGridReady(params:any) {

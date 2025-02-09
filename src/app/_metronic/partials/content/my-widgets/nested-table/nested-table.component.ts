@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { GridApi ,Column} from 'ag-grid-community';
 import { APIService } from 'src/app/API.service';
 interface TableData {
@@ -107,7 +107,7 @@ export class NestedTableComponent {
 
 
 
-  constructor(private api: APIService) {}
+  constructor(private api: APIService,private modalService: NgbModal) {}
 
   ngOnChanges(changes: SimpleChanges): void {
 
@@ -353,10 +353,9 @@ async fetchMiniTableHeaders(items: any) {
   // }
 
   closeModal(): void {
-    if (this.modalRef) {
-      this.modalRef.close(); // Close the modal
-    }
-  }
+    this.modalService.dismissAll()
+      }
+    
 
 
   updateGrids() {
