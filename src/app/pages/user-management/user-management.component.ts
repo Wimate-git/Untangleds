@@ -2164,6 +2164,15 @@ rdtListWorkAround :any =[{
         this.dynamicRedirectID(getValues.default_module)
 
 
+        console.log("Asad redirectionURL ",this.redirectionURL);
+        if(this.redirectionURL && this.redirectionURL.includes('/')){
+          const redirectionID = this.redirectionURL.split('/')
+
+          console.log("Asad redirectionURL ",redirectionID);
+          this.createUserField.get('location_object')?.setValue(`${this.redirectionURL.split('/')[redirectionID.length-1]}`)
+        }
+
+
           console.log("Final thing on openModal :",this.createUserField.value);
         this.cd.detectChanges()
       }
@@ -2570,6 +2579,13 @@ rdtListWorkAround :any =[{
 
 
           if(result){
+
+
+            // if(redirectionURL){
+
+            // }
+
+
             let userTable: any = [];
 
             if (typeof this.data_temp  !== 'undefined') {
@@ -2621,6 +2637,7 @@ rdtListWorkAround :any =[{
                 let default_module=this.data_temp [allData].default_module
                 let others = this.data_temp [allData].others
                 let add_updateTime = new Date(this.data_temp [allData].updated).toLocaleString();
+                let redirectionURL = this.data_temp[allData].redirectionURL
                 
         
                 userTable.push({
@@ -2669,7 +2686,8 @@ rdtListWorkAround :any =[{
                   add_updateTime: add_updateTime,
                   location_object:location_object,
                   default_module:default_module,
-                  others:others
+                  others:others,
+                  redirectionURL:redirectionURL
                 })
               }
             }
@@ -3201,13 +3219,17 @@ rdtListWorkAround :any =[{
         this.redirectionURL =  '/summary-engine/'+eventData
         break;
       case 'Dashboard':
-        this.redirectionURL =  '/dashboard/dashboardFrom/'+eventData
+        this.redirectionURL =  '/dashboard/dashboardFrom/Forms/'+eventData
         break;
       case 'Projects':
         this.redirectionURL =  '/project-dashboard/project-template-dashboard/'+eventData
         break;
       case 'Project - Detail':
         this.redirectionURL =  '/view-dreamboard/Project%20Detail/'+eventData
+        break;
+      case 'None':
+        this.redirectionURL =  dashUrl
+        this.dynamicIDArray = []
         break;
   }
   
