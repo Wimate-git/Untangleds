@@ -1177,6 +1177,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
     { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
     { value: 'sumArray', text: 'SumArray' },
+    { value: 'Advance Equation', text: 'Advance Equation' },
     
 
 
