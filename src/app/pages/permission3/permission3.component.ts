@@ -556,14 +556,14 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       label: ["", Validators.required],
       description: ["", Validators.required],
       time: ["",],
-      filterOption: [''],
+      filterOption: ['',Validators.required],
       no_of_request: ["",],
       no_of_records: ["",],
       size: ["",],
       setting: ["",],
       user_grade: ["",],
       api_enable: [false,],
-      formgroup: [[]],
+      formgroup: [[],Validators.required],
       dreamBoardIDs: [[], Validators.required],
       advance_report: [[]],
       powerboardId: [[]],
@@ -607,9 +607,12 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       // });
 
       const conditionGroup = this.fb.group({
-        field: ['', Validators.required],
-        operator: ['', Validators.required],
-        value: ['', Validators.required],
+        // field: ['', Validators.required],
+        // operator: ['', Validators.required],
+        // value: ['', Validators.required],
+        field: [''],
+        operator: [''],
+        value: [''],
         operatorBetween: [''],
         dropdown: [false],
       });
