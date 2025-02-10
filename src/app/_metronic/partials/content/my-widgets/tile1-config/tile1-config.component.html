@@ -225,6 +225,24 @@
 
 
                     <div class="col-md-4 mb-3">
+                      <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Module Names</label>
+                      <ngx-select
+                        id="parameterName"
+                        [allowClear]="true"
+                        formControlName="ModuleNames"
+                        [items]="showModuleNames"
+                        optionValueField="value"
+                        optionTextField="text"
+                        placeholder="Select Parameter"
+                        (selectionChanges)="moduleSelection($event)"
+                    
+                        style="width: 100%;">
+                      </ngx-select>
+                    </div>
+
+
+
+                    <div class="col-md-4 mb-3">
                       <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Redirect To</label>
                       <ngx-select
                         id="parameterName"

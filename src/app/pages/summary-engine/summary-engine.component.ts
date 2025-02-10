@@ -247,6 +247,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   permissionsMetaData: any;
   userPermissionsRead: any;
   userPermission: any;
+  readFilterEquation: any;
+  permissionIdRequest: any;
 
 
   createPieChart() {
@@ -718,6 +720,9 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     console.log('this.routeId check', this.routeId);
     console.log('client id check', this.SK_clientID);
   this.spinner.show('dataProcess')
+  console.log('permissionList',this.readFilterEquation)
+  console.log('this.permissionsMetaData',this.permissionIdRequest)
+  console.log('this.parsedPermission',this.parsedPermission)
     // Define the API Gateway URL
     const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
   
@@ -726,6 +731,10 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
       body: JSON.stringify({
         clientId: this.SK_clientID,
         routeId: this.routeId,
+        permissionId:this.permissionIdRequest,
+        permissionList:this.readFilterEquation
+
+
       }),
     };
   
@@ -1783,6 +1792,8 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     console.log('this.SK_clientID check', this.SK_clientID)
     this.userdetails = this.getLoggedUser.username;
     console.log('user name permissions check',this.userdetails)
+    const savedMode = localStorage.getItem('editModeState');
+    this.isEditModeView = savedMode ? JSON.parse(savedMode) : false;
     this.fetchUserPermissions(1)
     
     this.initializeCompanyFields();
@@ -1879,8 +1890,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     // this.addJsonValidation();
     this.showTable()
     this.addFromService()
-    const savedMode = localStorage.getItem('editModeState');
-    this.isEditModeView = savedMode ? JSON.parse(savedMode) : false;
+
 
 
     // Update options based on the retrieved mode
@@ -1920,8 +1930,15 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     //   this.isGirdMoved = JSON.parse(savedState);
     //   localStorage.removeItem('isGirdMoved'); // Clean up storage
     // }
-  const savedGridMoved = localStorage.getItem('isGirdMoved');
-  this.isGirdMoved = savedGridMoved ? JSON.parse(savedGridMoved) : false;
+    const storedMode = localStorage.getItem('editModeState');
+    if (storedMode !== null) {
+      this.isEditModeView = storedMode === 'true'; // Convert stored string back to boolean
+    } else {
+      this.isEditModeView = false; // Default to View Mode if not found in localStorage
+    }
+  
+    console.log('Initial Mode (On Load):', this.isEditModeView ? 'Widgets Edit Mode' : 'View Mode');
+    this.updateOptions(); 
 
   // Retrieve `lastSavedTime` if needed
   const savedLastTime = localStorage.getItem('lastSavedTime');
@@ -2032,6 +2049,8 @@ async fetchPermissionIdMain(clientID: number, p1Value: string) {
     if (result && result.metadata) {
       this.parsedPermission = JSON.parse(result.metadata);
       console.log('Parsed permission metadata:', this.parsedPermission);
+    this.readFilterEquation =this.parsedPermission 
+    console.log('this.readFilterEquation check',this.readFilterEquation)
 
       this.summaryPermission = this.parsedPermission.summaryList;
       console.log('this.summaryPermission check', this.summaryPermission);
@@ -2985,13 +3004,24 @@ console.log('Formatted Date:', this.lastUpdatedTime);
 
 
     }
-    else if(event.data.arg1.grid_type=='chart'){
-      console.log('event check', event)
+    else if (event.data.arg1.grid_type === 'chart') {
+      console.log('event check chart1', event);
+    
+      // Store all company details
       this.allCompanyDetails = event.all_Packet_store;
-      this.dashboard.push(event.data.arg1)
-  
-
+    
+      // Directly update the id and push the object into the dashboard in one line
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
     }
+    
+    
+    
+    
     else if(event.data.arg1.grid_type=='Linechart'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
@@ -5998,25 +6028,32 @@ refreshFunction(){
     }
   }
   toggleMode(): void {
-    console.log('Current Mode (Before Toggle):', this.isEditModeView ? 'Edit Mode' : 'View Mode');
+    console.log('Current Mode (Before Toggle):', this.isEditModeView ? 'Widgets Edit Mode' : 'View Mode');
+  
+    // Show spinner while toggling mode
     this.spinner.show();
     setTimeout(() => {
       this.spinner.hide();
     }, 1000);
-
+  
+    // Check permission to toggle mode
     if (!this.summaryDashboardUpdate) {
       console.warn('Update permission is false. Staying in View Mode.');
-      this.isEditModeView = false; // Ensure grid stays in View Mode
-      this.updateOptions(); // Reflect the correct mode in options
+      this.isEditModeView = false;  // Ensure grid stays in View Mode if update permission is false
+      this.updateOptions();  // Reflect the correct mode in options
       return;
     }
-
-    // Toggle between Edit and View modes
+  
+    // If the user has the necessary permission, toggle the mode
     this.isEditModeView = !this.isEditModeView;
-    this.updateOptions(); // Update grid options
-    console.log('Current Mode (After Toggle):', this.isEditModeView ? 'Edit Mode' : 'View Mode');
-    localStorage.setItem('editModeState', this.isEditModeView.toString()); // Save state
+    this.updateOptions();  // Update grid options based on mode
+  
+    console.log('Current Mode (After Toggle):', this.isEditModeView ? 'Widgets Edit Mode' : 'View Mode');
+  
+    // Store the mode in localStorage
+    localStorage.setItem('editModeState', this.isEditModeView.toString());
   }
+  
 
 
   // gridTitle: { cols: number; rows: number; y: number; x: number; themeColor: string }[] = [
@@ -6193,8 +6230,10 @@ refreshFunction(){
             // Parse the JSON string into a JavaScript object
             this.permissionsMetaData = JSON.parse(metadataString);
             console.log('Parsed Metadata Object from location', this.permissionsMetaData);
+            this.permissionIdRequest = this.permissionsMetaData
             const readPermission_Id = this.permissionsMetaData.permission_ID
             console.log('readPermission_Id check',readPermission_Id)
+           
 
   
             // Check if permission_ID is 'All'
@@ -6205,6 +6244,7 @@ refreshFunction(){
               this.loadData();
             } else if(readPermission_Id=="All"){
              this.userPermission = readPermission_Id
+    
              this.loadData();
           
               console.log('this.userPermissionsRead',this.userPermission)

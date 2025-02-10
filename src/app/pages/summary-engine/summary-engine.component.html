@@ -544,7 +544,7 @@
   flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20 gap-2">
 
   
-  <nav class="myMenu" #tooltipContainer *ngIf="!disableMenuQP && (userPermission === 'All' || summaryPermission?.includes('None') === false)" >
+  <nav class="myMenu" #tooltipContainer *ngIf="!disableMenuQP ||  !(summaryPermission?.includes('None')) || userPermission === 'All'" >
     <input type="checkbox" href="#" class="myMenu-open" name="myMenu-open" id="myMenu-open" />
     <label class="myMenu-open-button" for="myMenu-open">
       <span class="hamburger hamburger-1"></span>
@@ -574,7 +574,7 @@
     <a class="myMenu-item" (click)="openSummaryTable(content)" title="Search dashboard">
       <i style="color: white;" class="fa fa-search"></i>
     </a>
-    <a *ngIf="!isSummaryEngine() && summaryDashboardUpdate"
+    <a *ngIf="!isSummaryEngine() || summaryDashboardUpdate || userPermission === 'All'"
     class="myMenu-item" 
     (click)="toggleMode()" 
     style="cursor: pointer;" 

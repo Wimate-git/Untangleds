@@ -91,6 +91,7 @@ export class Tile1ConfigComponent implements OnInit {
   FormRead: any;
   selectedMiniTableFields: any;
   userIsChanging: boolean;
+  summaryIds: string[];
 
 
  
@@ -227,7 +228,8 @@ export class Tile1ConfigComponent implements OnInit {
       MiniTableNames:[''],
       MiniTableFields:[''],
       minitableEquation:[''],
-      EquationOperationMini:['']
+      EquationOperationMini:[''],
+      ModuleNames:['']
 
 
     });
@@ -267,36 +269,34 @@ export class Tile1ConfigComponent implements OnInit {
   }
   
 
-  async dashboardIds(sk: any) {
+  async dashboardIds(sk: any): Promise<string[]> {
     console.log("Iam called Bro");
     try {
       const response = await this.api.GetMaster(this.SK_clientID + "#summary#lookup", sk);
-
+  
       if (response && response.options) {
         if (typeof response.options === 'string') {
           let data = JSON.parse(response.options);
           console.log("d1 =", data);
-
+  
           if (Array.isArray(data)) {
             for (let index = 0; index < data.length; index++) {
               const element = data[index];
-
+  
               if (element !== null && element !== undefined) {
                 const key = Object.keys(element)[0];
                 const { P1, P2, P3, P4, P5, P6, P7, P8, P9 } = element[key];
-
+  
                 // Ensure dashboardIdsList is initialized
                 if (!this.dashboardIdsList) {
                   this.dashboardIdsList = [];
                 }
-
+  
                 // Check if P1 exists before pushing
                 if (P1 !== undefined && P1 !== null) {
                   this.dashboardIdsList.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9 });
                   console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5, P6, P7, P8, P9 });
-                  console.log('this.dashboardIdsList check',this.dashboardIdsList)
-                  this.p1ValuesSummary = this.dashboardIdsList.map((item: { P1: any; }) => item.P1);
-console.log('P1 values: dashboard', this.p1ValuesSummary);
+                  console.log('this.dashboardIdsList check', this.dashboardIdsList);
                 } else {
                   console.warn("Skipping element because P1 is not defined or null");
                 }
@@ -304,22 +304,32 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
                 break;
               }
             }
-
+  
+            // Store P1 values and return them
+            this.p1ValuesSummary = this.dashboardIdsList.map((item: { P1: any }) => item.P1);
+            console.log('P1 values: dashboard', this.p1ValuesSummary);
+  
             // Continue fetching recursively
             await this.dashboardIds(sk + 1);
+            return this.p1ValuesSummary; // Return collected values
           } else {
             console.error('Invalid data format - not an array.');
+            return [];
           }
         } else {
           console.error('response.options is not a string.');
+          return [];
         }
       } else {
         console.log("Lookup to be displayed", this.dashboardIdsList);
+        return this.p1ValuesSummary; // Return collected values
       }
     } catch (error) {
       console.error('Error:', error);
+      return [];
     }
   }
+  
   p1Values(arg0: string, p1Values: any) {
     throw new Error('Method not implemented.');
   }
@@ -1958,6 +1968,71 @@ showValuesForMini = [
 
 ]
   
+
+showModuleNames = [
+  { value: 'None', text: 'None' },
+  { value: 'Forms', text: 'Forms' },
+  { value: 'Dashboard', text: 'Dashboard' },
+  { value: 'Dashboard - Group', text: 'Dashboard - Group' },
+  { value: 'Summary Dashboard', text: 'Summary Dashboard' },
+  { value: 'Projects', text: 'Projects' },
+  { value: 'Project - Detail', text: 'Project - Detail' },
+  { value: 'Project - Group', text: 'Project - Group' },
+
+]
+
+  async moduleSelection(event: any): Promise<void> {
+  const selectedValue = event[0].value; // Get selected value
+  console.log('selectedValue checking',selectedValue)
+  switch (selectedValue) {
+    case 'None':
+      console.log('No module selected');
+      // Add specific logic here
+      break;
+
+    case 'Forms':
+      console.log('Forms module selected');
+      // Add specific logic for Forms
+      break;
+
+    case 'Dashboard':
+      console.log('Dashboard module selected');
+      // Add specific logic for Dashboard
+      break;
+
+    case 'Dashboard - Group':
+      console.log('Dashboard - Group module selected');
+      // Add specific logic for Dashboard - Group
+      break;
+
+    case 'Summary Dashboard':
+      this.summaryIds = await this.dashboardIds(1); // Await and get P1 values
+      console.log('Fetched P1 values:', this.p1ValuesSummary);
+      console.log('Summary Dashboard module selected');
+      // Add specific logic for Summary Dashboard
+      break;
+
+    case 'Projects':
+      console.log('Projects module selected');
+      // Add specific logic for Projects
+      break;
+
+    case 'Project - Detail':
+      console.log('Project - Detail module selected');
+      // Add specific logic for Project - Detail
+      break;
+
+    case 'Project - Group':
+      console.log('Project - Group module selected');
+      // Add specific logic for Project - Group
+      break;
+
+    default:
+      console.log('Invalid selection');
+      break;
+  }
+}
+
 
 
 }
