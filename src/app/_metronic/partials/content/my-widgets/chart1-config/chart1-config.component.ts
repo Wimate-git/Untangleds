@@ -205,7 +205,7 @@ export class Chart1ConfigComponent implements OnInit {
       filterForm:[''],
       filterParameter:[[]],
       filterDescription:[''],
-      toggleCheck: [false], // Default toggle state
+      toggleCheck: [], // Default toggle state
       dashboardIds: [''],
       selectType: [''],
       miniForm:[''],

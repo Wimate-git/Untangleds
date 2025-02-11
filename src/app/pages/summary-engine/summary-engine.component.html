@@ -544,7 +544,7 @@
   flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20 gap-2">
 
   
-  <nav class="myMenu" #tooltipContainer *ngIf="!disableMenuQP ||  !(summaryPermission?.includes('None')) || userPermission === 'All'" >
+  <nav class="myMenu" #tooltipContainer *ngIf="(!disableMenuQP ||  !(summaryPermission?.includes('None')) || userPermission === 'All')&&!isNone" >
     <input type="checkbox" href="#" class="myMenu-open" name="myMenu-open" id="myMenu-open" />
     <label class="myMenu-open-button" for="myMenu-open">
       <span class="hamburger hamburger-1"></span>
@@ -877,6 +877,27 @@
                     <span class="text-muted">No icon selected</span>
                 </ng-template>
             </div>
+
+                        <!-- Enable Dashboard Filter -->
+                        <div class="col-lg-4 col-md-4 col-sm-6 mb-4 mt-4">
+                          <div class="d-flex align-items-center">
+                            <label for="toggleCheck" class="col-form-label fw-bold fs-6  me-2">
+                              Live Dashboard 
+                            </label>
+                            <div class="form-check form-switch">
+                              <input
+                              class="form-check-input"
+                              type="checkbox"
+                              name="add_fields"
+                          
+                              formControlName="toggleCheck"
+                        
+                              id="toggleCheck"
+                            >
+                            
+                            </div>
+                          </div>
+                        </div>
             
             </div>
   

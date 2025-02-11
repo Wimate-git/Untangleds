@@ -9,6 +9,23 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { APIService } from 'src/app/API.service';
 import { LocationPermissionService } from 'src/app/location-permission.service';
 import { SharedService } from 'src/app/pages/shared.service';
+import Swal from 'sweetalert2';
+
+interface ListItem {
+  [key: string]: {
+    P1: any;
+    P2: any;
+    P3: any;
+    P4: any;
+    P5: any;
+    P6: any;
+    P7: any;
+    P8: any;
+    P9:any;
+    P10:any;
+    P11:any;
+  };
+}
 
 @Component({
   selector: 'app-tile1-config',
@@ -92,6 +109,19 @@ export class Tile1ConfigComponent implements OnInit {
   selectedMiniTableFields: any;
   userIsChanging: boolean;
   summaryIds: string[];
+  dynamicIDArray: any[];
+  lookup_All_temp: any;
+  IdsFetch: string[];
+  dashboardList: any;
+  dashboardListRead: any;
+  FormNames: any;
+  projectListRead: any;
+  projectList: any;
+  projectDetailListRead: any[];
+  projectDetailList: any[];
+  redirectionURL: string;
+  reportStudioListRead: any;
+  reportStudioDetailList: any;
 
 
  
@@ -116,6 +146,8 @@ export class Tile1ConfigComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange',this.all_Packet_store)
     console.log('isGirdMoved check',this.isGirdMoved)
+
+
   }
   convertTo12HourFormat(time: string): string {
     if (!time) return '';
@@ -475,6 +507,7 @@ export class Tile1ConfigComponent implements OnInit {
         MiniTableFields:this.createKPIWidget.value.MiniTableFields ,
         minitableEquation:this.createKPIWidget.value.minitableEquation,
         EquationOperationMini:this.createKPIWidget.value.EquationOperationMini,
+        ModuleNames:this.createKPIWidget.value.ModuleNames,
 
 
 
@@ -576,7 +609,7 @@ export class Tile1ConfigComponent implements OnInit {
         selectFromTime: this.createKPIWidget.value.selectFromTime,
         selectToTime: this.createKPIWidget.value.selectToTime,
         dashboardIds: this.createKPIWidget.value.dashboardIds ||'',
-        selectType: this.createKPIWidget.value.selectType,
+        selectType: this.createKPIWidget.value.selectType ||'',
         filterParameter: this.createKPIWidget.value.filterParameter,
         filterDescription: this.createKPIWidget.value.filterDescription,
         parameterNameRead: this.parameterNameRead,
@@ -591,9 +624,10 @@ export class Tile1ConfigComponent implements OnInit {
         columnVisibility:this.createKPIWidget.value.columnVisibility,
         miniForm:this.createKPIWidget.value.miniForm || '',
         MiniTableNames:this.createKPIWidget.value.MiniTableNames ||'',
-        MiniTableFields:this.createKPIWidget.value.MiniTableFields ,
-        minitableEquation:this.createKPIWidget.value.minitableEquation,
-        EquationOperationMini:this.createKPIWidget.value.EquationOperationMini,
+        MiniTableFields:this.createKPIWidget.value.MiniTableFields ||'',
+        minitableEquation:this.createKPIWidget.value.minitableEquation||'',
+        EquationOperationMini:this.createKPIWidget.value.EquationOperationMini||'',
+        ModuleNames:this.createKPIWidget.value.ModuleNames||''
 
 
       };
@@ -1162,6 +1196,7 @@ openKPIModal(tile: any, index: number) {
       MiniTableFields:parsedMiniTableFields ,
       minitableEquation:tile.minitableEquation,
       EquationOperationMini:tile.EquationOperationMini, // Set parsed columnVisibility
+      ModuleNames:tile.ModuleNames,
       all_fields: this.repopulate_fields(tile),
     });
 
@@ -1538,6 +1573,8 @@ selectFormParams1(event: any[], index: number): void {
   FormatTypeValues = [
     { value: 'Default', text: 'Default' },
     { value: 'Rupee', text: 'Rupee' },
+    { value: 'Distance', text: 'Distance' },
+    { value: 'Days & Hours', text: 'Days & Hours' },
     // { value: 'max', text: 'Maximum' },
 ]
 
@@ -1978,6 +2015,7 @@ showModuleNames = [
   { value: 'Projects', text: 'Projects' },
   { value: 'Project - Detail', text: 'Project - Detail' },
   { value: 'Project - Group', text: 'Project - Group' },
+  {value: 'Report Studio', text: 'Report Studio'}
 
 ]
 
@@ -1992,40 +2030,76 @@ showModuleNames = [
 
     case 'Forms':
       console.log('Forms module selected');
+      this.FormNames=this.listofDeviceIds
+      console.log('this.FormNames checking',this.FormNames)
+      this.dynamicIDArray = []
+      this.dynamicIDArray = this.FormNames
       // Add specific logic for Forms
       break;
 
     case 'Dashboard':
       console.log('Dashboard module selected');
-      // Add specific logic for Dashboard
+      this.IdsFetch = await this.dashboardIdsFetching(1)
+  
+      console.log('IdsFetch checking',this.IdsFetch)
+      this.dynamicIDArray = []
+      this.dynamicIDArray = this.IdsFetch
+    
       break;
+      // Add specific logic for Dashboard
+
 
     case 'Dashboard - Group':
       console.log('Dashboard - Group module selected');
+      this.dynamicIDArray = []
       // Add specific logic for Dashboard - Group
       break;
 
     case 'Summary Dashboard':
       this.summaryIds = await this.dashboardIds(1); // Await and get P1 values
-      console.log('Fetched P1 values:', this.p1ValuesSummary);
+      console.log('Fetched P1 values:', this.summaryIds);
+      this.dynamicIDArray = [];
+      this.dynamicIDArray = this.summaryIds
+      
       console.log('Summary Dashboard module selected');
       // Add specific logic for Summary Dashboard
       break;
 
     case 'Projects':
       console.log('Projects module selected');
+      const projectList = await this.fetchDynamicLookupData(1)
+      console.log('projectList checking',projectList)
+      
+      this.dynamicIDArray = []
+      this.dynamicIDArray = projectList
+      break;
       // Add specific logic for Projects
       break;
 
     case 'Project - Detail':
       console.log('Project - Detail module selected');
+      const projectDetailList = await this.ProjectDetailLookupData(1)
+
+      this.dynamicIDArray = []
+      this.dynamicIDArray = projectDetailList
+
       // Add specific logic for Project - Detail
       break;
 
     case 'Project - Group':
       console.log('Project - Group module selected');
+      this.dynamicIDArray = []
       // Add specific logic for Project - Group
       break;
+      case 'Report Studio':
+        console.log('Project - Group module selected');
+        this.dynamicIDArray = []
+        const ReportStudioLookup = await this.reportStudioLookupData(1)
+
+        this.dynamicIDArray = []
+        this.dynamicIDArray = ReportStudioLookup
+        // Add specific logic for Project - Group
+        break;
 
     default:
       console.log('Invalid selection');
@@ -2033,6 +2107,302 @@ showModuleNames = [
   }
 }
 
+async fetchDynamicLookupData(sk: any): Promise<string[]> {
+  console.log("I am called Bro");
+  try {
+    const response = await this.api.GetMaster(this.SK_clientID + "#folder#lookup", sk);
+
+    if (response && response.options) {
+      if (typeof response.options === 'string') {
+        let data = JSON.parse(response.options);
+        console.log("dashboard data checking", data);
+
+        if (Array.isArray(data)) {
+          for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+
+            if (element !== null && element !== undefined) {
+              const key = Object.keys(element)[0]; // Extract L1, L2, etc.
+              if (key && element[key]) {
+                const { P1, P2, P3, P4, P5 } = element[key];
+
+                // Ensure dashboardIdsList is initialized
+                if (!this.projectListRead) {
+                  this.projectListRead = [];
+                }
+
+                // Check if P1 exists before pushing
+                if (P1 !== undefined && P1 !== null) {
+                  this.projectListRead.push({ P1, P2, P3, P4, P5 });
+                  console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5 });
+                } else {
+                  console.warn("Skipping element because P1 is not defined or null");
+                }
+              } else {
+                console.warn("Skipping malformed element", element);
+              }
+            }
+          }
+
+          // Store only P1 values
+          this.projectList = this.projectListRead.map((item: { P1: any }) => item.P1);
+          console.log('dashboardIdList', this.projectList);
+
+          // Continue fetching recursively if needed
+          await this.fetchDynamicLookupData(sk + 1);
+          return this.projectList; // Return collected values
+        } else {
+          console.error('Invalid data format - not an array.');
+          return [];
+        }
+      } else {
+        console.error('response.options is not a string.');
+        return [];
+      }
+    } else {
+      console.log("Lookup to be displayed", this.dashboardIdsList);
+      return this.dashboardIdList; // Return collected values
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+}
+
+async dashboardIdsFetching(sk: any): Promise<string[]> {
+  console.log("I am called Bro");
+  try {
+    const response = await this.api.GetMaster(this.SK_clientID + "#formgroup#lookup", sk);
+
+    if (response && response.options) {
+      if (typeof response.options === 'string') {
+        let data = JSON.parse(response.options);
+        console.log("dashboard data checking", data);
+
+        if (Array.isArray(data)) {
+          for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+
+            if (element !== null && element !== undefined) {
+              const key = Object.keys(element)[0]; // Extract L1, L2, etc.
+              if (key && element[key]) {
+                const { P1, P2, P3, P4, P5 } = element[key];
+
+                // Ensure dashboardIdsList is initialized
+                if (!this.dashboardListRead) {
+                  this.dashboardListRead = [];
+                }
+
+                // Check if P1 exists before pushing
+                if (P1 !== undefined && P1 !== null) {
+                  this.dashboardListRead.push({ P1, P2, P3, P4, P5 });
+                  console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5 });
+                } else {
+                  console.warn("Skipping element because P1 is not defined or null");
+                }
+              } else {
+                console.warn("Skipping malformed element", element);
+              }
+            }
+          }
+
+          // Store only P1 values
+          this.dashboardList = this.dashboardListRead.map((item: { P1: any }) => item.P1);
+          console.log('dashboardIdList', this.dashboardList);
+
+          // Continue fetching recursively if needed
+          await this.dashboardIdsFetching(sk + 1);
+          return this.dashboardList; // Return collected values
+        } else {
+          console.error('Invalid data format - not an array.');
+          return [];
+        }
+      } else {
+        console.error('response.options is not a string.');
+        return [];
+      }
+    } else {
+      console.log("Lookup to be displayed", this.dashboardIdsList);
+      return this.dashboardIdList; // Return collected values
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+}
+
+async ProjectDetailLookupData(sk: any): Promise<string[]> {
+  console.log("I am called Bro");
+  try {
+    const response = await this.api.GetMaster(this.SK_clientID + "#project#lookup", sk);
+
+    if (response && response.options) {
+      if (typeof response.options === 'string') {
+        let data = JSON.parse(response.options);
+        console.log("dashboard data checking", data);
+
+        if (Array.isArray(data)) {
+          for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+
+            if (element !== null && element !== undefined) {
+              const key = Object.keys(element)[0]; // Extract L1, L2, etc.
+              if (key && element[key]) {
+                const { P1, P2, P3, P4, P5 } = element[key];
+
+                // Ensure dashboardIdsList is initialized
+                if (!this.projectDetailListRead) {
+                  this.projectDetailListRead = [];
+                }
+
+                // Check if P1 exists before pushing
+                if (P1 !== undefined && P1 !== null) {
+                  this.projectDetailListRead.push({ P1, P2, P3, P4, P5 });
+                  console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5 });
+                } else {
+                  console.warn("Skipping element because P1 is not defined or null");
+                }
+              } else {
+                console.warn("Skipping malformed element", element);
+              }
+            }
+          }
+
+          // Store only P1 values
+          this.projectDetailList = this.projectDetailListRead.map((item: { P1: any }) => item.P1);
+          console.log('dashboardIdList', this.projectDetailList);
+
+          // Continue fetching recursively if needed
+          await this.ProjectDetailLookupData(sk + 1);
+          return this.projectDetailList; // Return collected values
+        } else {
+          console.error('Invalid data format - not an array.');
+          return [];
+        }
+      } else {
+        console.error('response.options is not a string.');
+        return [];
+      }
+    } else {
+      console.log("Lookup to be displayed", this.dashboardIdsList);
+      return this.dashboardIdList; // Return collected values
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+}
+
+async reportStudioLookupData(sk: any): Promise<string[]> {
+  console.log("I am called Bro");
+  try {
+    const response = await this.api.GetMaster(this.SK_clientID + "#savedquery#lookup", sk);
+    console.log('saved query response',response)
+
+    if (response && response.options) {
+      if (typeof response.options === 'string') {
+        let data = JSON.parse(response.options);
+        console.log("dashboard data checking", data);
+
+        if (Array.isArray(data)) {
+          for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+
+            if (element !== null && element !== undefined) {
+              const key = Object.keys(element)[0]; // Extract L1, L2, etc.
+              if (key && element[key]) {
+                const { P1, P2, P3 } = element[key];
+
+                // Ensure dashboardIdsList is initialized
+                if (!this.reportStudioListRead) {
+                  this.reportStudioListRead = [];
+                }
+
+                // Check if P1 exists before pushing
+                if (P1 !== undefined && P1 !== null) {
+                  this.reportStudioListRead.push({ P1, P2, P3});
+                  console.log("Pushed to dashboardIdsList: ", { P1, P2, P3 });
+                } else {
+                  console.warn("Skipping element because P1 is not defined or null");
+                }
+              } else {
+                console.warn("Skipping malformed element", element);
+              }
+            }
+          }
+
+          // Store only P1 values
+          this.reportStudioDetailList = this.reportStudioListRead.map((item: { P1: any }) => item.P1);
+          console.log('dashboardIdList', this.reportStudioDetailList);
+
+          // Continue fetching recursively if needed
+          await this.reportStudioLookupData(sk + 1);
+          return this.reportStudioDetailList; // Return collected values
+        } else {
+          console.error('Invalid data format - not an array.');
+          return [];
+        }
+      } else {
+        console.error('response.options is not a string.');
+        return [];
+      }
+    } else {
+      console.log("Lookup to be displayed", this.dashboardIdsList);
+      return this.dashboardIdList; // Return collected values
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+}
+
+
+
+dynamicRedirectChanged(event:any){
+
+  let eventData;
+  if(event && event.target && event.target.value){
+    eventData = event.target.value
+  }
+  else{
+    eventData = event
+  }
+
+   let dashUrl = '/dashboard'
+  let projecturl = '/project-dashboard'
+
+  const selectedModule = this.createKPIWidget.get('ModuleNames')?.value
+
+  console.log("selected module name read",selectedModule);
+
+
+//   switch(selectedModule){
+//     case 'Dashboard - Group':
+//       this.redirectionURL =  dashUrl
+//       this.dynamicIDArray = []
+//       break;
+//     case 'Project - Group':
+//       this.redirectionURL = projecturl
+//       this.dynamicIDArray = []
+//       break
+//     case 'Forms':
+//       this.redirectionURL =  '/view-dreamboard/Forms/'+eventData
+//       break;
+//     case 'Summary Dashboard':
+//       this.redirectionURL =  '/summary-engine/'+eventData
+//       break;
+//     case 'Dashboard':
+//       this.redirectionURL =  '/dashboard/dashboardFrom/'+eventData
+//       break;
+//     case 'Projects':
+//       this.redirectionURL =  '/project-dashboard/project-template-dashboard/'+eventData
+//       break;
+//     case 'Project - Detail':
+//       this.redirectionURL =  '/view-dreamboard/Project%20Detail/'+eventData
+//       break;
+// }
+
+}
 
 
 }

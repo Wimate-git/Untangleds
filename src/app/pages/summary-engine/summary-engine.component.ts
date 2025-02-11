@@ -6,7 +6,7 @@ import { AbstractControl, FormControl, FormGroup, UntypedFormArray, UntypedFormB
 import { Config } from 'datatables.net';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CompactType, DisplayGrid, GridsterConfig, GridsterItem, GridsterItemComponentInterface, GridType } from 'angular-gridster2';
-import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 
 import { LocationPermissionService } from 'src/app/location-permission.service';
 import * as $ from 'jquery';
@@ -249,6 +249,10 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   userPermission: any;
   readFilterEquation: any;
   permissionIdRequest: any;
+  redirectionURL: string = '';
+  dynamicIDArray: never[];
+  isNone: boolean= false;
+  savedQueryParam: any;
 
 
   createPieChart() {
@@ -803,6 +807,7 @@ invokeHelperDashboard(item: any, index: number, template: any,modaref:any): void
 
 
 this.showDrillDownData(item)
+this.redirectModule(item)
 
   this.currentModalIndex = index;
 
@@ -825,6 +830,64 @@ this.showDrillDownData(item)
     //   keyboard: false
     // });
 
+}
+
+
+redirectModule(recieveItem: any) {
+  console.log('recieveItem check', recieveItem);
+  const moduleName = recieveItem.dashboardIds;
+  console.log('moduleName checking',moduleName)
+  let dashUrl = '/dashboard';
+  let projecturl = '/project-dashboard';
+  const selectedModule = recieveItem.ModuleNames;
+
+  console.log("I am triggered here", selectedModule);
+
+  switch (selectedModule) {
+    case 'Dashboard - Group':
+      this.redirectionURL = dashUrl;
+      this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+      this.dynamicIDArray = [];
+      break;
+    case 'Project - Group':
+      this.redirectionURL = projecturl;
+      this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+      this.dynamicIDArray = [];
+      break;
+    case 'Forms':
+      this.redirectionURL = `/view-dreamboard/Forms/${moduleName}`;
+      this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+      break;
+    case 'Summary Dashboard':
+      this.redirectionURL = `/summary-engine/${moduleName}`;
+      this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+      break;
+    case 'Dashboard':
+      this.redirectionURL = `/dashboard/dashboardFrom/Forms/${moduleName}`;
+      this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+      break;
+    case 'Projects':
+      this.redirectionURL = `/project-dashboard/project-template-dashboard/${moduleName}`;
+      this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+      break;
+    case 'Project - Detail':
+      this.redirectionURL = `/view-dreamboard/Project%20Detail/${moduleName}`;
+        this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+
+      break;
+      case 'Report Studio':
+        this.router.navigate(['/reportStudio'], { queryParams: { savedQuery: moduleName } });
+
+        // this.redirectionURL = `/reportStudio?savedQuery=${moduleName}`;
+        break;
+    default:
+      console.error("Unknown module: ", selectedModule);
+      return;
+  }
+
+  // // Ensure the redirection is triggered
+  // console.log("Redirecting to:", this.redirectionURL);
+  // this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
 }
 showDrillDownData(dynamicDrill:any){
   console.log('dynamicDrill checking',dynamicDrill)
@@ -1639,7 +1702,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     return tooltip ? tooltip.text : false;
   };
 
-
+  @HostListener('unloaded')
   ngOnDestroy(): void {
     console.log('SummaryEngineComponent destroyed.');
   }
@@ -1799,11 +1862,9 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     this.initializeCompanyFields();
 
     this.route.queryParams.subscribe((params) => {
-      console.log('params check', params);
-      this.queryParams = params;
+      console.log('Received queryParams:', params);
     
-      console.log('this.queryParams checking', this.queryParams);
-      // this.openQueryParams(this.queryParams)
+      this.queryParams = params;
       this.isEditModeView = false;
     
       if (params['viewMode']) {
@@ -1816,31 +1877,27 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
         this.disableMenuQP = params['disableMenu'] === 'true';
         sessionStorage.setItem('disableMenu', this.disableMenuQP.toString());
       }
-    if(params['from_routerID']){
-      console.log(params['from_routerID'])
-      this.fromRouterID = params['from_routerID']
-    }
-      console.log('params', params['filterTileConfig']);
+    
+      if (params['from_routerID']) {
+        console.log('from_routerID:', params['from_routerID']);
+        this.fromRouterID = params['from_routerID'];
+      }
+    
       if (params['filterTileConfig']) {
         console.log('Raw filterTileConfig:', params['filterTileConfig']);
     
         try {
-          // Ensure the value is a valid JSON string
           const parsedFilterTileConfig = JSON.parse(params['filterTileConfig'].trim());
           console.log('Parsed filterTileConfig:', parsedFilterTileConfig);
     
-          // Flatten the nested array structure if necessary
           const flattenedConfig = parsedFilterTileConfig.flat();
           console.log('Flattened filterTileConfig:', flattenedConfig);
     
-          // Check if flattenedConfig is an array and has elements
           if (Array.isArray(flattenedConfig) && flattenedConfig.length > 0) {
             console.log('Triggering updateSummary with add_tile');
             alert('I am triggered');
-            console.log('all_Packet_store checking',this.all_Packet_store)
-          this.isFilterdetail=true
-          this.storeFilterDetail = flattenedConfig
-          // this.updateSummary(flattenedConfig, 'add_tile');
+            this.isFilterdetail = true;
+            this.storeFilterDetail = flattenedConfig;
           } else {
             console.warn('Flattened filterTileConfig is empty or not valid:', flattenedConfig);
           }
@@ -1849,9 +1906,23 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
         }
       } else {
         console.warn('filterTileConfig is not present in params.');
-        this.isFilterdetail= false
+        this.isFilterdetail = false;
+      }
+    
+      // ✅ New logic to handle 'savedQuery' for Report Studio
+      if (params['savedQuery']) {
+        console.log('✅ Received savedQuery:', params['savedQuery']);
+        this.savedQueryParam = params['savedQuery'];
+    
+        // Load data based on savedQuery
+        this.loadReportData(this.savedQueryParam);
       }
     });
+    
+    // Function to process the savedQuery parameter
+
+    
+    
     
     // this.dropdownSettings = this.devicesList.getMultiSelectSettings();
 
@@ -1947,7 +2018,12 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
   } else {
     this.lastSavedTime = null;
   }
-
+  this.router.events.subscribe(event => { if (event instanceof NavigationEnd) { 
+    console.log('Navigation ended, reloading window...');
+     window.location.reload(); // Reload the window on navigation end } }); } 
+  }
+});
+  
 
   }
   openQueryParams(paramsRead:any){
@@ -1967,7 +2043,10 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
       console.error('Event data is not in the expected format:', event);
     }
   }
-
+  loadReportData(savedQuery: string) {
+    console.log('Loading report data for:', savedQuery);
+    // Add logic to load the report data based on savedQuery
+  }
 
   async permissionIds(sk: any) {
     console.log("I am called Bro");
@@ -3236,6 +3315,7 @@ console.log('selectedTab checking',this.selectedTab)
       summaryName: '',
       summarydesc: '',
       iconSelect: '',
+      toggleCheck:''
       
       
     });
@@ -3246,6 +3326,7 @@ console.log('selectedTab checking',this.selectedTab)
   
 
   private handleEditModal(getValues: any, content: any): void {
+    console.log('getValueschecking',getValues)
     if (getValues) {
       this.showHeading = false;
       this.showModal = true;
@@ -3267,7 +3348,8 @@ console.log('selectedTab checking',this.selectedTab)
         summaryName: getValues.summaryName,
         summarydesc: getValues.summaryDesc || '', // Default to empty string if summaryDesc is undefined
         iconSelect: getValues.summaryIcon || '',
-        tilesList:getValues.tilesList  // Default to empty string if summaryIcon is undefined
+        tilesList:getValues.tilesList,  // Default to empty string if summaryIcon is undefined
+ toggleCheck: getValues.toggleCheck
       });
       this.cd.detectChanges(); 
     }
@@ -3303,7 +3385,9 @@ console.log('selectedTab checking',this.selectedTab)
         summaryName: getValues.summaryName,
         summarydesc: getValues.summaryDesc,
         iconSelect: getValues.summaryIcon,
-        tilesList:this.tilesListDefault
+        tilesList:this.tilesListDefault,
+        toggleCheck:getValues.toggleCheck
+
           // Assign the entire icon object here
       });
       console.log('this.createSummaryField from editModal', this.createSummaryField);
@@ -3381,7 +3465,8 @@ console.log('selectedTab checking',this.selectedTab)
       'summaryName': ['', Validators.required],
       'summarydesc': ['', Validators.required],
       'iconSelect': [[], Validators.required],
-      'tilesList':['Tiles']
+      'tilesList':['Tiles'],
+      toggleCheck: [false], // Default toggle state
 
      
 
@@ -3572,6 +3657,7 @@ console.log('selectedTab checking',this.selectedTab)
       summaryDesc: duplicateData.summaryDesc,
       summaryIcon: duplicateData.summaryIcon,
       iconObject: duplicateData.iconObject,
+      toggleCheck:duplicateData.toggleCheck,
       crDate: createdDate,
       upDate: updatedDate,
       createdUser: this.getLoggedUser.username, // Set the creator's username
@@ -3591,6 +3677,7 @@ console.log('selectedTab checking',this.selectedTab)
         summaryName: this.allCompanyDetails.summaryName,
         summaryDesc: this.allCompanyDetails.summaryDesc,
         summaryIcon: this.allCompanyDetails.summaryIcon,
+        toggleCheck:this.allCompanyDetails.toggleCheck,
         grid_details:duplicateData.grid_details,
         created: createdDateISO,
         updated: updatedDateISO,
@@ -4068,6 +4155,7 @@ console.log('selectedTab checking',this.selectedTab)
           console.log('Restricted permissions. Filtering dashboards...',this.summaryPermission);
           if (this.summaryPermission.includes('None')) {
             this.lookup_data_summaryCopy = []; 
+            this.isNone =true
             console.log("Permission includes 'None'. No dashboards will be displayed.");
         // Set the data to an empty array
           } else if (this.summaryPermission.includes('All')) {
@@ -4603,6 +4691,7 @@ console.log('selectedTab checking',this.selectedTab)
         summaryName: this.allCompanyDetails.summaryName || this.all_Packet_store.summaryName,
         summaryDesc: this.allCompanyDetails.summaryDesc || this.all_Packet_store.summaryDesc,
         iconObject: this.allCompanyDetails.iconObject || this.all_Packet_store.iconObject,
+        toggleCheck:this.allCompanyDetails.toggleCheck ||''
       };
       console.log('Updated allCompanyDetails with Packet Store:', this.allCompanyDetails);
     }
@@ -4611,6 +4700,7 @@ console.log('selectedTab checking',this.selectedTab)
     this.allCompanyDetails.summaryID = this.allCompanyDetails.summaryID ;
     this.allCompanyDetails.summaryName = this.allCompanyDetails.summaryName ;
     this.allCompanyDetails.summaryDesc = this.allCompanyDetails.summaryDesc ;
+
   
     console.log('Final allCompanyDetails:', this.allCompanyDetails);
   
@@ -4854,6 +4944,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
       summaryDesc: this.createSummaryField.value.summarydesc,
       summaryIcon: this.createSummaryField.value.iconSelect,
       iconObject: this.previewObjDisplay,
+      toggleCheck:this.createSummaryField.value.toggleCheck,
       updated: new Date().toISOString(),
       createdUser: this.getLoggedUser?.username || this.createdUserName
     };
@@ -4884,6 +4975,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
       // jsonData: parsedJsonData,
       summaryIcon: this.createSummaryField.value.iconSelect,
       iconObject: this.previewObjDisplay,
+      toggleCheck:this.createSummaryField.value.toggleCheck,
 
       // Add the selected icon
       crDate: createdDate, // Created date
@@ -4908,6 +5000,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
         summaryDesc: this.allCompanyDetails.summaryDesc,
         // jsonData: this.allCompanyDetails.jsonData,
         summaryIcon: this.createSummaryField.value.iconSelect,
+        toggleCheck:this.createSummaryField.value.toggleCheck,
         // Include selected icon in the metadata
         created: createdDateISO, // Created date in ISO format
         updated: updatedDateISO,   // Updated date in ISO format
@@ -6244,7 +6337,7 @@ refreshFunction(){
               this.loadData();
             } else if(readPermission_Id=="All"){
              this.userPermission = readPermission_Id
-    
+    this.summaryDashboardUpdate= true
              this.loadData();
           
               console.log('this.userPermissionsRead',this.userPermission)

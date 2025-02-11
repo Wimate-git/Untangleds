@@ -248,10 +248,11 @@
                         id="parameterName"
                         [allowClear]="true"
                         formControlName="dashboardIds"
-                        [items]="p1ValuesSummary"
+                        [items]="dynamicIDArray"
                         optionValueField="value"
                         optionTextField="text"
                         placeholder="Select Parameter"
+                        (selectionChanges)="dynamicRedirectChanged($event)"
                     
                         style="width: 100%;">
                       </ngx-select>
