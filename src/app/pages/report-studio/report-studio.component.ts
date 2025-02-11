@@ -2327,7 +2327,7 @@ async evaluateTemplate(template: string, metadata: any, getkey: any) {
       const metadataKey = Object.keys(metadata).find(key => getkey === 'split' ? key === variableName.split('.')[1] : key === variableName);
 
       // Substitute the value or keep the original match if no value is found
-      const substitutedValue = metadataKey ? metadata[metadataKey] : match;
+      const substitutedValue = metadataKey ? metadata[metadataKey] : match == '${System.Username.}'?this.username:match;
 
       // Wrap string values in quotes to ensure they are correctly evaluated
       const formattedValue = typeof substitutedValue === 'string' ? `'${substitutedValue}'` : substitutedValue;
