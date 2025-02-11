@@ -7,6 +7,7 @@ import { Tooltip } from 'bootstrap';
 // import moment from 'moment';
 // import { IRoleModel, RoleService } from 'src/app/_fake/services/role.service';
 import { Config } from 'datatables.net';
+import { AuditTrailService } from '../services/auditTrail.service';
 import {
   Validators,
   UntypedFormGroup,
@@ -94,6 +95,7 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private fb: FormBuilder,
     private api: APIService,
+    private auditTrail: AuditTrailService
   ) { }
 
   ngAfterViewInit(): void {
@@ -419,6 +421,8 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
     console.log("DATATABLE:", this.datatableConfig)
+
+    this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.client)
     //   this.roles$ = this.roleService.getRoles();
 
     // await this.addFromService()
@@ -485,6 +489,21 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
     }).catch((error) => {
       console.log("DREAMBOARD DELLETE ID ERROR:", error)
     })
+
+    const UserDetails = {
+      "User Name": this.users,
+      "Action": "Deleted",
+      "Module Name": "FormGroup",
+      "Form Name": "FormGroup",
+      "Description": "Record is Deleted",
+      "User Id": this.users,
+      "Client Id": this.client,
+      "created_time": Date.now(),
+      "updated_time": Date.now()
+    }
+
+    this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+
 
   }
 
@@ -629,6 +648,21 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
         this.showAlert(successAlert);
         this.reloadEvent.emit(true);
 
+        const UserDetails = {
+          "User Name": this.users,
+          "Action": "Added",
+          "Module Name": "FormGroup",
+          "Form Name": "FormGroup",
+          "Description": "Record is Added",
+          "User Id": this.users,
+          "Client Id": this.client,
+          "created_time": Date.now(),
+          "updated_time": Date.now()
+        }
+  
+        this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+  
+
       } catch (error) {
         console.error("Dreamboard add request error:", error);
         errorAlert.text = this.extractText(error);
@@ -688,6 +722,21 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.showAlert(successAlert);
         this.reloadEvent.emit(true);
+
+        const UserDetails = {
+          "User Name": this.users,
+          "Action": "Edited",
+          "Module Name": "FormGroup",
+          "Form Name": "FormGroup",
+          "Description": "Record is Edited",
+          "User Id": this.users,
+          "Client Id": this.client,
+          "created_time": Date.now(),
+          "updated_time": Date.now()
+        }
+  
+        this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+  
 
       }).catch((error) => {
         console.log('UPDATE WORK ORDER ERROR:', error)

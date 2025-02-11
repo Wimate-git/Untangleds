@@ -5,6 +5,7 @@ import { ChangeDetectorRef } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
 import Swal,{ SweetAlertOptions } from 'sweetalert2';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { AuditTrailService } from '../services/auditTrail.service';
 
 
 
@@ -50,7 +51,8 @@ export class DashboardComponent implements OnInit {
   constructor(
     private api: APIService,
     private cdr: ChangeDetectorRef,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private auditTrail: AuditTrailService
 
   ) {
 
@@ -60,6 +62,8 @@ export class DashboardComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.spinner.show()
 
+    
+
     setTimeout(async () => {
       this.login_detail = localStorage.getItem('userAttributes')
 
@@ -68,7 +72,7 @@ export class DashboardComponent implements OnInit {
 
       this.client = this.loginDetail_string.clientID
       this.user = this.loginDetail_string.username
-
+      this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.client)
       const test = await this.api.GetMaster(this.user + '#user#main', 1);
       this.permission_data = JSON.parse(JSON.parse(JSON.stringify(test.metadata)))
 
@@ -111,34 +115,11 @@ export class DashboardComponent implements OnInit {
               this.iconData = { class1: '', class2: '', label: '', value: '' };
               if (item.P4) {
 
-                // const request_data = {
-                //   bucket_name: "dreamboard-dynamic",
-                //   operation_type: "generate",
-                //   "key": item.P4,
-                // };
 
                 try {
                   this.iconData = JSON.parse(item.P4);
 
-                  console.log("ICON DATA:", this.iconData)
-
-                  // Call your API endpoint that triggers the Lambda function
-                  // const response = await fetch('https://3luwbeeuk0.execute-api.ap-south-1.amazonaws.com/s1/s3Bucket', {
-                  //   method: 'POST',
-                  //   body: JSON.stringify(request_data)
-                  // });
-
-                  // const data = await response.json();
-                  // console.log(data);
-
-                  // const data_ = JSON.parse(data.body);
-
-                  // console.log("DATA_:", data_)
-                  // const data_1 = JSON.parse(data_.data);
-                  // console.log('data_1 :', data_1);
-
-                  // this.url = data_1[0].url;
-                  // console.log("URL:", this.url);
+                  
                 }
                 catch (error) {
 
@@ -160,10 +141,37 @@ export class DashboardComponent implements OnInit {
               };
             })
           );
-
+          const UserDetails = {
+            "User Name": this.user,
+            "Action": "View",
+            "Module Name": "Dashboard",
+            "Form Name": "Dashboard Group",
+            "Description": "Record is View",
+            "User Id": this.user,
+            "Client Id": this.client,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+    
+          this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+    
 
         }
         else {
+
+          const UserDetails = {
+            "User Name": this.user,
+            "Action": "View",
+            "Module Name": "Dashboard",
+            "Form Name": "Dashboard Group",
+            "Description": "Record is View",
+            "User Id": this.user,
+            "Client Id": this.client,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+    
+          this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
 
           const filteredData = this.formgroup.filter(data => {      // this.formgroup getting form permission table
             const key = Object.keys(data)[0];
@@ -182,31 +190,9 @@ export class DashboardComponent implements OnInit {
               this.iconData = { class1: '', class2: '', label: '', value: '' };
               if (item.P4) {
 
-                // const request_data = {
-                //   bucket_name: "dreamboard-dynamic",
-                //   operation_type: "generate",
-                //   "key": item.P4,
-                // };
-
                 try {
                   this.iconData = JSON.parse(item.P4);
-                  // Call your API endpoint that triggers the Lambda function
-                  // const response = await fetch('https://3luwbeeuk0.execute-api.ap-south-1.amazonaws.com/s1/s3Bucket', {
-                  //   method: 'POST',
-                  //   body: JSON.stringify(request_data)
-                  // });
-
-                  // const data = await response.json();
-                  // console.log(data);
-
-                  // const data_ = JSON.parse(data.body);
-
-                  // console.log("DATA_:", data_)
-                  // const data_1 = JSON.parse(data_.data);
-                  // console.log('data_1 :', data_1);
-
-                  // this.url = data_1[0].url;
-                  // console.log("URL:", this.url);
+                 
                 }
                 catch (error) {
 
@@ -230,8 +216,23 @@ export class DashboardComponent implements OnInit {
             })
           );
         }
+
       }
       else {
+
+        const UserDetails = {
+          "User Name": this.user,
+          "Action": "View",
+          "Module Name": "Dashboard",
+          "Form Name": "Dashboard Group",
+          "Description": "Record is View",
+          "User Id": this.user,
+          "Client Id": this.client,
+          "created_time": Date.now(),
+          "updated_time": Date.now()
+        }
+  
+        this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
         await this.api.GetMaster(this.client + "#formgroup#lookup", 1).then((result: any) => {
           if (result) {
             const helpherObj = JSON.parse(result.options)
@@ -254,7 +255,7 @@ export class DashboardComponent implements OnInit {
               try {
                 this.iconData = JSON.parse(item.P4);
 
-                console.log("ICON DATA:", this.iconData)
+                // console.log("ICON DATA:", this.iconData)
               }
               catch (error) {
 

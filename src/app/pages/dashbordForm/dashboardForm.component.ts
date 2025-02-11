@@ -6,11 +6,12 @@ import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { ActivatedRoute, Route } from "@angular/router";
 import { NgxSpinnerService } from 'ngx-spinner';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { AuditTrailService } from '../services/auditTrail.service';
 interface Node {
     id: string;
     parent: string;
     text: string;
-    node_type:string;
+    node_type: string;
 }
 
 @Component({
@@ -49,7 +50,7 @@ export class DashboardFormComponent implements OnInit {
     formIDPermission: any;
     locationPermission: any;
     filtermatchedData: any;
-    tree_reponse: any[] =[]
+    tree_reponse: any[] = []
     tree_response_1: any;
     filteredFormValueTree: string[];
 
@@ -59,13 +60,15 @@ export class DashboardFormComponent implements OnInit {
         private api: APIService,
         private cdr: ChangeDetectorRef,
         private route: ActivatedRoute,
-        private spinner: NgxSpinnerService
+        private spinner: NgxSpinnerService,
+        private auditTrail: AuditTrailService
     ) { }
 
 
     async ngOnInit(): Promise<void> {
 
         this.spinner.show()
+       
 
         this.route.paramMap.subscribe(params => {
             console.log(this.route)
@@ -82,10 +85,12 @@ export class DashboardFormComponent implements OnInit {
 
         this.client = this.loginDetail_string.clientID
         this.user = this.loginDetail_string.username
-    
 
-        console.log("FORM ID PERMISSION:",this.formIDPermission)
-        console.log("LOCATION PERMISSION:",this.locationPermission )
+     this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.client)
+
+
+        console.log("FORM ID PERMISSION:", this.formIDPermission)
+        console.log("LOCATION PERMISSION:", this.locationPermission)
 
         const test = await this.api.GetMaster(this.user + '#user#main', 1);
         this.permission_data = JSON.parse(JSON.parse(JSON.stringify(test.metadata)))
@@ -93,8 +98,8 @@ export class DashboardFormComponent implements OnInit {
         console.log("PERMISSION DATA:", this.permission_data)
         this.formIDPermission = this.permission_data.form_permission
         this.locationPermission = this.permission_data.location_permission
-        console.log("FORM ID PERMISSION:",this.formIDPermission)
-        console.log("LOCATION PERMISSION:",this.locationPermission )
+        console.log("FORM ID PERMISSION:", this.formIDPermission)
+        console.log("LOCATION PERMISSION:", this.locationPermission)
 
         if (this.permission_data.permission_ID !== 'All') {
 
@@ -117,62 +122,66 @@ export class DashboardFormComponent implements OnInit {
 
                 this.groupForm = this.groupFormResponse.formList
 
-                if(this.locationPermission.includes('All')){
+                if (this.locationPermission.includes('All')) {
 
-                    if(!this.formIDPermission.includes('All')){
+                    if (!this.formIDPermission.includes('All')) {
 
                         console.log(this.formIDPermission)
 
-                       this.filtermatchedData = this.formIDPermission.filter((item: any) => this.groupForm.includes(item));
+                        //    this.filtermatchedData = this.formIDPermission.filter((item: any) => this.groupForm.includes(item));
+
+                        this.filtermatchedData = this.formIDPermission
+
+                        console.log("AFTER FILTER :", this.filtermatchedData)
 
                     }
-                    else{
-                        this.filtermatchedData = this.groupForm 
+                    else {
+                        this.filtermatchedData = this.groupForm
                     }
                 }
-                else{
+                else {
                     // this.filtermatchedData = this.groupForm 
 
                     // console.log(`${this.client}#${this.loginDetail_string.companyID}#location#main`)
 
-                   await this.api.GetMaster(`${this.client}#${this.loginDetail_string.companyID}#location#main`,1).then(async (result)=>{
-                    if(result){
-                        console.log("TREE RESPONSE:",JSON.parse(JSON.parse(JSON.stringify(result.metadata))))
+                    await this.api.GetMaster(`${this.client}#${this.loginDetail_string.companyID}#location#main`, 1).then(async (result) => {
+                        if (result) {
+                            console.log("TREE RESPONSE:", JSON.parse(JSON.parse(JSON.stringify(result.metadata))))
 
-                        this.tree_reponse = JSON.parse(JSON.parse(JSON.stringify(result.metadata)))
+                            this.tree_reponse = JSON.parse(JSON.parse(JSON.stringify(result.metadata)))
 
-                        console.log("TREE RESPONSE 2:",JSON.parse(JSON.parse(JSON.stringify(this.tree_reponse[0].tree))))
+                            console.log("TREE RESPONSE 2:", JSON.parse(JSON.parse(JSON.stringify(this.tree_reponse[0].tree))))
 
-                        this.tree_response_1 = JSON.parse(JSON.parse(JSON.stringify(this.tree_reponse[0].tree)))
+                            this.tree_response_1 = JSON.parse(JSON.parse(JSON.stringify(this.tree_reponse[0].tree)))
 
-                        const keyLocation = this.locationPermission.length === 1 && this.locationPermission[0] === "All" ? "All" : "Not all";
-                        const keyDevices = this.formIDPermission.length === 1 && this.formIDPermission[0] === "All" ? "All" : "Not all";
+                            const keyLocation = this.locationPermission.length === 1 && this.locationPermission[0] === "All" ? "All" : "Not all";
+                            const keyDevices = this.formIDPermission.length === 1 && this.formIDPermission[0] === "All" ? "All" : "Not all";
 
-                        if(`${keyLocation}-${keyDevices}` !== "All-All"){
+                            if (`${keyLocation}-${keyDevices}` !== "All-All") {
 
-                            const returnValueTree = await this.modifyList(this.locationPermission, this.formIDPermission,this.tree_response_1 );
+                                const returnValueTree = await this.modifyList(this.locationPermission, this.formIDPermission, this.tree_response_1);
 
-                            console.log("FilterValuetreee",returnValueTree)
+                                console.log("FilterValuetreee", returnValueTree)
 
-                            if (returnValueTree.length > 0) {
-                                // Extracting text for nodes with node_type "device"
-                                this.filtermatchedData = returnValueTree
-                                    .filter(node => node.node_type === "device")
-                                    .flatMap(node => node.text || []);
+                                if (returnValueTree.length > 0) {
+                                    // Extracting text for nodes with node_type "device"
+                                    this.filtermatchedData = returnValueTree
+                                        .filter(node => node.node_type === "device")
+                                        .flatMap(node => node.text || []);
                                     console.log("jsonModified_in_service_final", this.filtermatchedData);
-                            }
-                            if (returnValueTree.length == 0){
-                                this.filtermatchedData = []
-                            }
+                                }
+                                if (returnValueTree.length == 0) {
+                                    this.filtermatchedData = []
+                                }
 
+                            }
+                            console.log("GROUP LIST:", this.filtermatchedData)
                         }
-                        console.log("GROUP LIST:",this.filtermatchedData)
-                    }
-                   })
+                    })
 
                 }
 
-               
+
 
 
             }).catch((error) => {
@@ -186,77 +195,76 @@ export class DashboardFormComponent implements OnInit {
 
             console.log("ALLOW FORMS:", allowedForms)
 
-            if (this.id == 'Calendar') {
-                await this.api.GetMaster(this.client + "#systemCalendarQuery#lookup", 1).then((result: any) => {
-                    if (result) {
-                        this.helpherObj = JSON.parse(result.options)
+           
+            setTimeout(async () => {
+                if (this.id == 'Calendar') {
+                    await this.api.GetMaster(this.client + "#systemCalendarQuery#lookup", 1).then((result: any) => {
+                        if (result) {
+                            this.helpherObj = JSON.parse(result.options)
+    
+                            this.formList = this.helpherObj.map((item: any) => item)
+    
+                            console.log("DYNAMIC FORMLIST:", this.formList)
+                        }
+                    }).catch((error) => {
+                        console.log("Error:", error)
+                    })
+                }
+                else {
+    
+                    await this.api.GetMaster(this.client + "#dynamic_form#lookup", 1).then((result: any) => {
+                        if (result) {
+                            this.helpherObj = JSON.parse(result.options)
+    
+                            this.formList = this.helpherObj.map((item: any) => item)
+    
+                            console.log("DYNAMIC FORMLIST:", this.formList)
+                        }
+                    }).catch((error) => {
+                        console.log("Error:", error)
+                    })
+                }
 
-                        this.formList = this.helpherObj.map((item: any) => item)
+                let matchingItems = []
+                if (allowedForms.includes('All')) {      //dynamicEntrie selected all 
+                    matchingItems = this.filtermatchedData.filter((item: any) => this.groupFormResponse.formList.includes(item));
+                }
+                else {
+                    // matchingItems = allowedForms.filter((item: any) => this.groupFormResponse.formList.includes(item));
 
-                        console.log("DYNAMIC FORMLIST:", this.formList)
-                    }
-                }).catch((error) => {
-                    console.log("Error:", error)
-                })
-            }
-            else {
-
-
-                await this.api.GetMaster(this.client + "#dynamic_form#lookup", 1).then((result: any) => {
-                    if (result) {
-                        this.helpherObj = JSON.parse(result.options)
-
-                        this.formList = this.helpherObj.map((item: any) => item)
-
-                        console.log("DYNAMIC FORMLIST:", this.formList)
-                    }
-                }).catch((error) => {
-                    console.log("Error:", error)
-                })
-            }
-             setTimeout(()=>{
-
-            
-            let matchingItems = []
-            if (allowedForms.includes('All')) {      //dynamicEntrie selected all 
-                matchingItems = this.filtermatchedData.filter((item: any) => this.groupFormResponse.formList.includes(item));
-            }
-            else {
-                // matchingItems = allowedForms.filter((item: any) => this.groupFormResponse.formList.includes(item));
-
-                matchingItems = this.filtermatchedData.filter((item: any) => this.groupFormResponse.formList.includes(item));
-            }
-
-
-            console.log("Match Item:", matchingItems)
-
-            // If you want to push the matching items to another array
-            this.resultArray = []
-            this.resultArray.push(...matchingItems);
-
-            console.log(this.resultArray);
+                    matchingItems = this.filtermatchedData.filter((item: any) => allowedForms.includes(item));
+                }
 
 
-            this.cards = this.formList
-                .filter(data => {
-                    // Check if the value at index 0 of the formList item matches any value in groupForm
-                    return this.resultArray.includes(data[0]);
-                })
-                .map(data => ({
-                    // Your card structure here
-                    icon: 'https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/public/Climaveneta/Live+Contract/liveContract.png',
-                    name: data[0],  // Name from formList index 0
-                    job: data[1],   // Job description from formList index 1
-                    avgEarnings: data[3] ? new Date(data[3] * 1000).toLocaleDateString('en-GB', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric'
-                    }) : '',  // Handle cases where values may be empty
-                    totalEarnings: data[0] || '',  // Fallback if index 5 is empty
-                    online: this.id  // Placeholder for online status
-                }));
+                console.log("Match Item:", matchingItems)
 
-                console.log("CARD 259:",this.cards)
+                // If you want to push the matching items to another array
+                this.resultArray = []
+                this.resultArray.push(...matchingItems);
+
+                console.log(this.resultArray);
+
+
+                this.cards = this.formList
+                    .filter(data => {
+                        // Check if the value at index 0 of the formList item matches any value in groupForm
+                        return this.resultArray.includes(data[0]);
+                    })
+                    .map(data => ({
+                        // Your card structure here
+                        icon: 'https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/public/Climaveneta/Live+Contract/liveContract.png',
+                        name: data[0],  // Name from formList index 0
+                        job: data[1],   // Job description from formList index 1
+                        avgEarnings: data[3] ? new Date(data[3] * 1000).toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                        }) : '',  // Handle cases where values may be empty
+                        totalEarnings: data[0] || '',  // Fallback if index 5 is empty
+                        online: this.id  // Placeholder for online status
+                    }));
+
+                console.log("CARD 259:", this.cards)
 
                 if (this.cards.length == 0) {
                     const errorAlert_icon: SweetAlertOptions = {
@@ -264,14 +272,28 @@ export class DashboardFormComponent implements OnInit {
                         title: 'No Forms data available.',
                         text: '',
                     };
-        
+
                     this.showAlert(errorAlert_icon)
                 }
                 this.loading = false;
                 this.spinner.hide()
                 this.cdr.detectChanges();
 
-            },2000)
+            }, 2000)
+
+            const UserDetails = {
+                "User Name": this.user,
+                "Action": "View",
+                "Module Name": "Dashboard Form",
+                "Form Name": "Dashboard Form",
+                "Description": "Record is View",
+                "User Id": this.user,
+                "Client Id": this.client,
+                "created_time": Date.now(),
+                "updated_time": Date.now()
+              }
+        
+              this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
 
         }
         else {
@@ -287,62 +309,64 @@ export class DashboardFormComponent implements OnInit {
 
                 this.resultArray = this.groupFormResponse.formList
 
-                if(this.locationPermission.includes('All')){
+                if (this.locationPermission.includes('All')) {
 
-                    if(!this.formIDPermission.includes('All')){
+                    if (!this.formIDPermission.includes('All')) {
 
                         console.log("FORMId PERMISSION")
 
                         // this.filtermatchedData = this.formIDPermission
 
-                        this.filtermatchedData = this.formIDPermission.filter((item: any) => this.groupForm.includes(item));
+                        // this.filtermatchedData = this.formIDPermission.filter((item: any) => this.groupForm.includes(item));
 
-                        console.log("PERMISSION NOT ALL:",this.filtermatchedData)
+                        // console.log("PERMISSION NOT ALL:",this.filtermatchedData)
+
+                        this.filtermatchedData = this.formIDPermission
 
 
                     }
-                    else{
+                    else {
                         this.filtermatchedData = this.groupFormResponse.formList
                     }
                 }
-                else{
+                else {
                     // this.filtermatchedData = this.groupFormResponse.formList
 
-                    this.api.GetMaster(`${this.client}#${this.loginDetail_string.companyID}#location#main`,1).then(async (result)=>{
-                        if(result){
-                            console.log("TREE RESPONSE:",JSON.parse(JSON.parse(JSON.stringify(result.metadata))))
-    
+                    this.api.GetMaster(`${this.client}#${this.loginDetail_string.companyID}#location#main`, 1).then(async (result) => {
+                        if (result) {
+                            console.log("TREE RESPONSE:", JSON.parse(JSON.parse(JSON.stringify(result.metadata))))
+
                             this.tree_reponse = JSON.parse(JSON.parse(JSON.stringify(result.metadata)))
-    
-                            console.log("TREE RESPONSE 2:",JSON.parse(JSON.parse(JSON.stringify(this.tree_reponse[0].tree))))
-    
+
+                            console.log("TREE RESPONSE 2:", JSON.parse(JSON.parse(JSON.stringify(this.tree_reponse[0].tree))))
+
                             this.tree_response_1 = JSON.parse(JSON.parse(JSON.stringify(this.tree_reponse[0].tree)))
-    
+
                             const keyLocation = this.locationPermission.length === 1 && this.locationPermission[0] === "All" ? "All" : "Not all";
                             const keyDevices = this.formIDPermission.length === 1 && this.formIDPermission[0] === "All" ? "All" : "Not all";
-    
-                            if(`${keyLocation}-${keyDevices}` !== "All-All"){
-    
-                                const returnValueTree = await this.modifyList(this.locationPermission, this.formIDPermission,this.tree_response_1 );
-    
-                                console.log("FilterValuetreee",returnValueTree)
-    
+
+                            if (`${keyLocation}-${keyDevices}` !== "All-All") {
+
+                                const returnValueTree = await this.modifyList(this.locationPermission, this.formIDPermission, this.tree_response_1);
+
+                                console.log("FilterValuetreee", returnValueTree)
+
                                 if (returnValueTree.length > 0) {
                                     // Extracting text for nodes with node_type "device"
                                     this.filtermatchedData = returnValueTree
                                         .filter(node => node.node_type === "device")
                                         .flatMap(node => node.text || []);
-                                        console.log("jsonModified_in_service_final", this.filtermatchedData);
+                                    console.log("jsonModified_in_service_final", this.filtermatchedData);
                                 }
-                                if (returnValueTree.length == 0){
+                                if (returnValueTree.length == 0) {
                                     this.filtermatchedData = []
                                 }
-    
+
                             }
                         }
-                       })
+                    })
 
-                    console.log("PERMISSION ALL:",this.filtermatchedData)
+                    console.log("PERMISSION ALL:", this.filtermatchedData)
                 }
 
 
@@ -350,56 +374,60 @@ export class DashboardFormComponent implements OnInit {
                 console.log("FormGroup Error:", error)
             })
 
-            if (this.id == 'Calendar') {
-                await this.api.GetMaster(this.client + "#systemCalendarQuery#lookup", 1).then((result: any) => {
-                    if (result) {
-                        this.helpherObj = JSON.parse(result.options)
+            
 
-                        this.formList = this.helpherObj.map((item: any) => item)
+           
+            setTimeout(async () => {
 
-                        console.log("DYNAMIC FORMLIST:", this.formList)
-                    }
-                }).catch((error) => {
-                    console.log("Error:", error)
-                })
-            }
-            else {
+                if (this.id == 'Calendar') {
+                    await this.api.GetMaster(this.client + "#systemCalendarQuery#lookup", 1).then((result: any) => {
+                        if (result) {
+                            this.helpherObj = JSON.parse(result.options)
+    
+                            this.formList = this.helpherObj.map((item: any) => item)
+    
+                            console.log("DYNAMIC FORMLIST:", this.formList)
+                        }
+                    }).catch((error) => {
+                        console.log("Error:", error)
+                    })
+                }
+                else {
+    
+    
+                    await this.api.GetMaster(this.client + "#dynamic_form#lookup", 1).then((result: any) => {
+                        if (result) {
+                            this.helpherObj = JSON.parse(result.options)
+    
+                            this.formList = this.helpherObj.map((item: any) => item)
+    
+                            console.log("DYNAMIC FORMLIST:", this.formList)
+                        }
+                    }).catch((error) => {
+                        console.log("Error:", error)
+                    })
+                }
 
+                this.cards = this.formList
+                    .filter(data => {
+                        // Check if the value at index 0 of the formList item matches any value in groupForm
+                        // return this.resultArray.includes(data[0]);
 
-                await this.api.GetMaster(this.client + "#dynamic_form#lookup", 1).then((result: any) => {
-                    if (result) {
-                        this.helpherObj = JSON.parse(result.options)
-
-                        this.formList = this.helpherObj.map((item: any) => item)
-
-                        console.log("DYNAMIC FORMLIST:", this.formList)
-                    }
-                }).catch((error) => {
-                    console.log("Error:", error)
-                })
-            }
-            setTimeout(()=>{
-
-            this.cards = this.formList
-                .filter(data => {
-                    // Check if the value at index 0 of the formList item matches any value in groupForm
-                    // return this.resultArray.includes(data[0]);
-
-                    return this.filtermatchedData.includes(data[0]);
-                })
-                .map(data => ({
-                    // Your card structure here
-                    icon: 'https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/public/Climaveneta/Live+Contract/liveContract.png',
-                    name: data[0],  // Name from formList index 0
-                    job: data[1],   // Job description from formList index 1
-                    avgEarnings: data[3] ? new Date(data[3] * 1000).toLocaleDateString('en-GB', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric'
-                    }) : '',  // Handle cases where values may be empty
-                    totalEarnings: data[0] || '',  // Fallback if index 5 is empty
-                    online: ''  // Placeholder for online status
-                }));
+                        return this.filtermatchedData.includes(data[0]);
+                    })
+                    .map(data => ({
+                        // Your card structure here
+                        icon: 'https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/public/Climaveneta/Live+Contract/liveContract.png',
+                        name: data[0],  // Name from formList index 0
+                        job: data[1],   // Job description from formList index 1
+                        avgEarnings: data[3] ? new Date(data[3] * 1000).toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                        }) : '',  // Handle cases where values may be empty
+                        totalEarnings: data[0] || '',  // Fallback if index 5 is empty
+                        online: ''  // Placeholder for online status
+                    }));
 
                 if (this.cards.length == 0) {
                     const errorAlert_icon: SweetAlertOptions = {
@@ -407,16 +435,30 @@ export class DashboardFormComponent implements OnInit {
                         title: 'No Forms data available.',
                         text: '',
                     };
-        
+
                     this.showAlert(errorAlert_icon)
                 }
                 this.loading = false;
                 this.spinner.hide()
                 this.cdr.detectChanges();
+            }
+
+            ), 2000
         }
 
-    ),2000}
-
+        const UserDetails = {
+            "User Name": this.user,
+            "Action": "View",
+            "Module Name": "Dashboard Form",
+            "Form Name": "Dashboard Form",
+            "Description": "Record is View",
+            "User Id": this.user,
+            "Client Id": this.client,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+    
+          this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
         console.log("CARDS ON FORMLIST:", this.cards.length)
 
         // if (this.cards.length == 0) {
@@ -432,7 +474,7 @@ export class DashboardFormComponent implements OnInit {
         // this.spinner.hide()
         // this.cdr.detectChanges();
     }
-    
+
 
     searchQuery = '';
     get filteredCards() {
@@ -458,13 +500,13 @@ export class DashboardFormComponent implements OnInit {
         this.cdr.detectChanges();
         this.noticeSwal.fire();
     }
-   
+
     async modifyList(locationPermission: any, formPermission: any, originalArray: Node[]): Promise<Node[]> {
         const keyLocation = locationPermission.length === 1 && locationPermission[0] === "All" ? "All" : "Not all";
         const keyDevices = formPermission.length === 1 && formPermission[0] === "All" ? "All" : "Not all";
-    
+
         console.log("modifyList:", `${keyLocation}-${keyDevices}`);
-    
+
         switch (`${keyLocation}-${keyDevices}`) {
             case "All-All":
                 return [];
@@ -480,15 +522,15 @@ export class DashboardFormComponent implements OnInit {
                 console.log("Unrecognized case");
                 return [];
         }
-      }
-    
-      async calculateNodesToShow(permissions: any, originalData: Node[]): Promise<Node[]> {
+    }
+
+    async calculateNodesToShow(permissions: any, originalData: Node[]): Promise<Node[]> {
         let nodeMap = this.enhanceNodeMap(originalData);
         let nodesToShow: Node[] = [];
         permissions.forEach((permission: string) => {
             const keyText = "text_" + permission;
             const nodes = nodeMap[keyText] || [];
-    
+
             nodes.forEach((permittedNode: Node) => {
                 if (permittedNode && !nodesToShow.includes(permittedNode)) {
                     nodesToShow.push(permittedNode);
@@ -498,22 +540,22 @@ export class DashboardFormComponent implements OnInit {
             });
         });
         return nodesToShow.filter((v, i, a) => a.findIndex((t) => t.id === v.id) === i);
-      }
-    
-      enhanceNodeMap(originalData: Node[]): Record<string, Node[]> {
+    }
+
+    enhanceNodeMap(originalData: Node[]): Record<string, Node[]> {
         let nodeMap: Record<string, Node[]> = {};
         originalData.forEach((node) => {
             const textKey = "text_" + node.text;
-    
+
             if (!nodeMap[textKey]) {
                 nodeMap[textKey] = [];
             }
             nodeMap[textKey].push(node);
         });
         return nodeMap;
-      }
-    
-      collectDescendants(node: Node, result: Node[], originalData: Node[]): void {
+    }
+
+    collectDescendants(node: Node, result: Node[], originalData: Node[]): void {
         let children = originalData.filter((n) => n.parent === node.id);
         children.forEach((child) => {
             if (!result.includes(child)) {
@@ -521,9 +563,9 @@ export class DashboardFormComponent implements OnInit {
                 this.collectDescendants(child, result, originalData);
             }
         });
-      }
-    
-      markAncestors(node: Node, result: Node[], originalData: Node[]): void {
+    }
+
+    markAncestors(node: Node, result: Node[], originalData: Node[]): void {
         if (node.parent !== "#") {
             const parentNode = originalData.find((n) => n.id === node.parent);
             if (parentNode && !result.includes(parentNode)) {
@@ -531,7 +573,7 @@ export class DashboardFormComponent implements OnInit {
                 this.markAncestors(parentNode, result, originalData);
             }
         }
-      }
-    
+    }
+
 
 }

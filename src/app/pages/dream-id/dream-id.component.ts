@@ -3,6 +3,7 @@ import { APIService } from 'src/app/API.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Route } from "@angular/router";
 import { param } from 'jquery';
+import { AuditTrailService } from '../services/auditTrail.service';
 
 @Component({
   selector: 'app-dream-id',
@@ -38,6 +39,7 @@ export class DreamIdComponent implements OnInit {
     private changeDetection: ChangeDetectorRef,
     private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
+    private auditTrail: AuditTrailService
 
   ) { }
 
@@ -67,6 +69,8 @@ export class DreamIdComponent implements OnInit {
     // this.loginDetail = JSON.parse(localStorage.getItem("currentUser")) 
     this.client = this.loginDetail_string.clientID
     this.user = this.loginDetail_string.username
+
+    this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.client)
 
     console.log("CLIENT ID", this.client)
     console.log("USER ID", this.user)
@@ -158,6 +162,21 @@ export class DreamIdComponent implements OnInit {
             this.url_result = this.response.HTML;
             console.log("URL RES", this.url_result);
             const timestamp = new Date().getTime();
+
+            const UserDetails = {
+              "User Name": this.user,
+              "Action": "View",
+              "Module Name": "Dreamboard Iframe",
+              "Form Name": "Dreamboard Iframe",
+              "Description": "Record is View",
+              "User Id": this.user,
+              "Client Id": this.client,
+              "created_time": Date.now(),
+              "updated_time": Date.now()
+            }
+      
+            this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+      
 
             // Build the URL based on whether formId is provided or not
             this.url = `https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/` + this.url_result +
@@ -263,7 +282,7 @@ export class DreamIdComponent implements OnInit {
               `&loginDetail=${JSON.stringify(JSON.stringify(this.loginDetail_string))}` +
               `&userPermissions=${userPermissions}` +
               `&theme=${this.theme}` +
-              params_url + `&project=${JSON.stringify((this.project))}`+
+              JSON.stringify(JSON.stringify(params_url)) + `&project=${JSON.stringify((this.project))}`+
               `&cacheBuster=${cacheBustingToken}`;
 
 

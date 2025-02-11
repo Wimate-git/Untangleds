@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { DataTablesResponse, IUserModel, UserService } from 'src/app/_fake/services/user-service';
 import { SweetAlertOptions } from 'sweetalert2';
 import { Tooltip } from 'bootstrap';
+import { AuditTrailService } from '../services/auditTrail.service';
 
 // import moment from 'moment';
 // import { IRoleModel, RoleService } from 'src/app/_fake/services/role.service';
@@ -86,6 +87,7 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
         private fb: FormBuilder,
         private api: APIService,
         private apiCallService : ApiCallService ,        // dreamboard
+        private auditTrail : AuditTrailService
     )
      { }
   
@@ -261,6 +263,8 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
   
 
       console.log("DATATABLE:",this.datatableConfig )
+
+      this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.client)
     //   this.roles$ = this.roleService.getRoles();
     }
   
@@ -298,6 +302,21 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
     //   this.apiService.deleteUser(id).subscribe(() => {
     //     this.reloadEvent.emit(true);
     //   });
+
+    const UserDetails = {
+        "User Name": this.users,
+        "Action": "Deleted",
+        "Module Name": "Dreamboard",
+        "Form Name": "Dreamboard",
+        "Description": "Record is Deleted",
+        "User Id": this.users,
+        "Client Id": this.client,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+
     }
   
     edit(P1:any) {
@@ -329,7 +348,7 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
                 (response) => {
                     console.log('GET request successful:', JSON.parse(response.body));
                     this.HTML_code = JSON.parse(response.body).data;
-                    console.log("html", this.HTML_code);
+                    // console.log("html", this.HTML_code);
                     this.dreamboardForm.get('HTML')?.setValue( this.HTML_code.replace(/^"(.*)"$/, '$1'))
                 },
                 (error) => {
@@ -605,47 +624,24 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
                         P4:this.dreamboardForm.value.updatedTime,
                     };
 
-                    // if (this.dreamboardForm.value.devices === 'code') {
-                    //     const requestData = {
-                    //         bucket_name: "dreamboard-dynamic",
-                    //         bucket_region: "ap-south-1",
-                    //         operation_type: "store",
-                    //         key: this.dreamboardForm.value.HTML,
-                    //         data: this.HTML_content,
-                    //         contentType: "text/html"
-                    //     };
-                    //     console.log("REQ DATA:", requestData);
-
-                    //     // POST request for file storage
-                    //     this.apiCallService.postData(requestData).subscribe(
-                    //         (response) => {
-                    //             console.log('POST request successful:', response);
-                    //         },
-                    //         (error) => {
-                    //             console.error('Error in POST request:', error);
-                    //         }
-                    //     );
-                    // } else {
-                    //     // Handle file upload
-                    //     console.log(this.files);
-                    //     const key = `public/${this.client}/${this.dreamboardForm.value.dreamboardId}/`;
-                    //     const readFilePromises = [];
-                    //     for (const file of this.files) {
-                    //         const ch = file.webkitRelativePath;
-                    //         const file_path = key + `${ch}`;
-                    //         console.log("FILEPATH:", file_path);
-                    //         console.log("FILE:", file);
-
-                    //         readFilePromises.push(this.readFile(file, file_path));
-                    //     }
-                    //     await Promise.all(readFilePromises).catch((err) => {
-                    //         console.error("File upload failed:", err);
-                    //     });
-                    // }
-
                     await this.createLookupdreamboard(this.dreamboardItem, 1, this.client+'#dreamboard#lookup');
                     this.showAlert(successAlert);
                     this.reloadEvent.emit(true);
+
+                    const UserDetails = {
+                        "User Name": this.users,
+                        "Action": "Added",
+                        "Module Name": "Dreamboard",
+                        "Form Name": "Dreamboard",
+                        "Description": "Record is Added",
+                        "User Id": this.users,
+                        "Client Id": this.client,
+                        "created_time": Date.now(),
+                        "updated_time": Date.now()
+                      }
+                
+                      this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+                
 
                 } catch (error) {
                     console.error("Dreamboard add request error:", error);
@@ -745,6 +741,21 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
                 this.showAlert(successAlert);
                 this.reloadEvent.emit(true);
+
+                const UserDetails = {
+                    "User Name": this.users,
+                    "Action": "Edited",
+                    "Module Name": "Dreamboard",
+                    "Form Name": "Dreamboard",
+                    "Description": "Record is Edited",
+                    "User Id": this.users,
+                    "Client Id": this.client,
+                    "created_time": Date.now(),
+                    "updated_time": Date.now()
+                  }
+            
+                  this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+            
 
             }).catch((error) => {
                 console.log('UPDATE WORK ORDER ERROR:', error)

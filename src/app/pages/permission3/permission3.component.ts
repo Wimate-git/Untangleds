@@ -1,9 +1,10 @@
 import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
-import { Observable } from 'rxjs';
+import { Observable, using } from 'rxjs';
 import { DataTablesResponse, IUserModel, UserService } from 'src/app/_fake/services/user-service';
 import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { Config } from 'datatables.net';
+import { AuditTrailService } from '../services/auditTrail.service';
 import {
   Validators,
   UntypedFormGroup,
@@ -141,13 +142,14 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   addItem: boolean = false
   loading: boolean = false;
   formSelect: any;
-  summaryList: any[]=[];
+  summaryList: any[] = [];
 
   constructor(
     private cdr: ChangeDetectorRef,
     private fb: FormBuilder,
     private api: APIService,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private auditTrail: AuditTrailService
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -290,6 +292,8 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     await this.fetchUserList(1)
 
     await this.fetchSummaryList(1)
+
+    this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.client)
 
   }
 
@@ -501,7 +505,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
     this.formSelect = value.split('-')
 
-    const dymanic_form_result = await this.api.GetMaster(this.client + '#formgroup#' + this.formSelect[0]+ '#main', 1)
+    const dymanic_form_result = await this.api.GetMaster(this.client + '#formgroup#' + this.formSelect[0] + '#main', 1)
 
     console.log("DYNMAIC FORM:", JSON.parse(JSON.stringify(dymanic_form_result)))
 
@@ -556,20 +560,20 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       label: ["", Validators.required],
       description: ["", Validators.required],
       time: ["",],
-      filterOption: ['',Validators.required],
+      filterOption: ['', Validators.required],
       no_of_request: ["",],
       no_of_records: ["",],
       size: ["",],
       setting: ["",],
       user_grade: ["",],
       api_enable: [false,],
-      formgroup: [[],Validators.required],
+      formgroup: [[], Validators.required],
       dreamBoardIDs: [[], Validators.required],
       advance_report: [[]],
       powerboardId: [[]],
       magicboardId: [[]],
       userList: [[]],
-      summaryList:[[]],
+      summaryList: [[]],
       permissionsList: this.fb.array([], Validators.required),
       dynamicEntries: this.fb.array([]),
       conditions: this.fb.array([]),
@@ -773,7 +777,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
   addDynamicData() {
 
-    this.formName =''
+    this.formName = ''
 
 
     this.permissionForm.markAsDirty();
@@ -868,60 +872,60 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
         this.permissionForm.get('dynamicForm')?.setValue(entry.get('dynamicForm')?.value);
         this.permissionForm.get('permission')?.setValue(entry.get('permission')?.value);
         this.permissionForm.get('fieldValue')?.setValue(entry.get('fieldValue')?.value); // Set fieldValue
-    
-       await this.dynamicFormSelect(dynamicFormValue)
+
+        await this.dynamicFormSelect(dynamicFormValue)
 
 
-     if(this.selectedFilterOption == 'default'){
+        if (this.selectedFilterOption == 'default') {
 
-      this.spinner.show()
+          this.spinner.show()
 
-       setTimeout(async () => {
-        console.log('This message is delayed by 2 seconds');
-    
-        while (this.conditions.length > 0) {
-          this.conditions.removeAt(0);
-        }
-      const fieldValue = entry.get('fieldValue')?.value;
-      if (fieldValue) {
-        const conditionRegex = /\${(.*?)}\s*(==|!=|<=|>=|<|>)\s*"(.*?)"/g;
-        let match;
+          setTimeout(async () => {
+            console.log('This message is delayed by 2 seconds');
 
-        while ((match = conditionRegex.exec(fieldValue)) !== null) {
-          const [_, field, operator, value] = match;
-          const conditionGroup = this.fb.group({
-            field: [field.trim(), Validators.required],
-            operator: [operator.trim(), Validators.required],
-            value: [value.trim(), Validators.required],
-            operatorBetween: [''], // We'll handle AND/OR separately below
-            dropdown: [field.includes("single-select")], // Determine dropdown based on field format
-          });
-          this.conditions.push(conditionGroup);
-
-
-          const fieldEvent = { target: { value: field.trim() } }; // Mock the field selection event
-          await this.onFormSelection(fieldEvent, this.conditions.length - 1);
-        }
-
-        // Handle AND/OR operators between conditions
-        const operatorBetweenRegex = /(&&|\|\|)/g;
-        const operators = fieldValue.match(operatorBetweenRegex);
-        if (operators) {
-          this.conditions.controls.forEach((condition, index) => {
-            if (index < operators.length) {
-              condition.get('operatorBetween')?.setValue(operators[index]);
+            while (this.conditions.length > 0) {
+              this.conditions.removeAt(0);
             }
-          });
+            const fieldValue = entry.get('fieldValue')?.value;
+            if (fieldValue) {
+              const conditionRegex = /\${(.*?)}\s*(==|!=|<=|>=|<|>)\s*"(.*?)"/g;
+              let match;
+
+              while ((match = conditionRegex.exec(fieldValue)) !== null) {
+                const [_, field, operator, value] = match;
+                const conditionGroup = this.fb.group({
+                  field: [field.trim(), Validators.required],
+                  operator: [operator.trim(), Validators.required],
+                  value: [value.trim(), Validators.required],
+                  operatorBetween: [''], // We'll handle AND/OR separately below
+                  dropdown: [field.includes("single-select")], // Determine dropdown based on field format
+                });
+                this.conditions.push(conditionGroup);
+
+
+                const fieldEvent = { target: { value: field.trim() } }; // Mock the field selection event
+                await this.onFormSelection(fieldEvent, this.conditions.length - 1);
+              }
+
+              // Handle AND/OR operators between conditions
+              const operatorBetweenRegex = /(&&|\|\|)/g;
+              const operators = fieldValue.match(operatorBetweenRegex);
+              if (operators) {
+                this.conditions.controls.forEach((condition, index) => {
+                  if (index < operators.length) {
+                    condition.get('operatorBetween')?.setValue(operators[index]);
+                  }
+                });
+              }
+            }
+          }, 2000);
+          this.spinner.hide();
         }
       }
-    }, 2000);
-    this.spinner.hide();
-  }
-    }
-    
+
       // Optionally, you can remove the entry after loading it for editing
       this.dynamicEntries.removeAt(index);
-     
+
     }
     else {
       const errorAlert_1: SweetAlertOptions = {
@@ -931,7 +935,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       };
       this.showAlert(errorAlert_1)
 
-    
+
     }
   }
 
@@ -1018,6 +1022,20 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
       await this.updatepermissionlookup(1, P1, 'delete', this.permissionItem)
 
+      const UserDetails = {
+        "User Name": this.users,
+        "Action": "Deleted",
+        "Module Name": "Permission",
+        "Form Name": "Permission",
+        "Description": "Record is Deleted",
+        "User Id": this.users,
+        "Client Id": this.client,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+
     }).catch((error) => {
       console.log("DREAMBOARD DELLETE ID ERROR:", error)
     })
@@ -1031,7 +1049,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     this.selectedFilterOption = ''
     console.log("EDIT ID:", P1)
     this.data_temp = []
-    this.fieldList =[]
+    this.fieldList = []
     this.addItem = false
 
     this.addCondition()
@@ -1072,7 +1090,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
             conditions: this.fb.array([]),
             field: this.data_temp[0].field,
             userList: [this.data_temp[0].userList],
-            summaryList:[this.data_temp[0].summaryList],
+            summaryList: [this.data_temp[0].summaryList],
             fieldValue: this.data_temp[0].fieldValue,
             createdTime: [this.data_temp[0].createdTime],
             updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
@@ -1181,6 +1199,21 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
         this.showAlert(successAlert);
         this.reloadEvent.emit(true);
 
+
+        const UserDetails = {
+          "User Name": this.users,
+          "Action": "Added",
+          "Module Name": "Permission",
+          "Form Name": "Permission",
+          "Description": "Record is Added",
+          "User Id": this.users,
+          "Client Id": this.client,
+          "created_time": Date.now(),
+          "updated_time": Date.now()
+        }
+
+        this.auditTrail.mappingAuditTrailData(UserDetails, this.client)
+
       } catch (error) {
         console.error("Dreamboard add request error:", error);
         errorAlert.text = this.extractText(error);
@@ -1248,6 +1281,19 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
         this.showAlert(successAlert);
         this.reloadEvent.emit(true);
+        const UserDetails = {
+          "User Name": this.users,
+          "Action": "Edited",
+          "Module Name": "Permission",
+          "Form Name": "Permission",
+          "Description": "Record is Edited",
+          "User Id": this.users,
+          "Client Id": this.client,
+          "created_time": Date.now(),
+          "updated_time": Date.now()
+        }
+
+        this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
 
       }).catch((error) => {
         console.log('UPDATE WORK ORDER ERROR:', error)
@@ -1437,9 +1483,9 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
         // this.formgroupIDs = this.formgroupIDs.map((item: any) => item.P1)
 
         this.formgroupIDs = this.formgroupIDs.map((item: any) => {
-            // Check if item[1] is not empty and concatenate with item[0]
-            return `${item.P1}-${item.P2}`
-          });
+          // Check if item[1] is not empty and concatenate with item[0]
+          return `${item.P1}-${item.P2}`
+        });
 
         this.formgroupIDs.unshift("All");
 
@@ -1533,7 +1579,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
                 const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
                 const { P1, P2, P3, P4, P5, P6, P7 } = element[key]; // Extract values from the nested object
                 this.summaryList.push({ P1, P2, P3, P4, P5, P6, P7 }); // Push an array containing P1, P2, and P3 values
-                console.log("d2 =", this.summaryList)
+                // console.log("d2 =", this.summaryList)
               } else {
                 break;
               }
@@ -1542,7 +1588,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
             this.summaryList.sort((a: any, b: any) => {
               return b.P5 - a.P5; // Compare P5 values in descending order
             });
-            console.log("Lookup sorting", this.summaryList);
+            // console.log("Lookup sorting", this.summaryList);
             // Continue fetching recursively
             await this.fetchSummaryList(sk + 1);
           } else {
