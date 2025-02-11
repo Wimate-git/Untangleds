@@ -145,6 +145,12 @@ columns: any;
   isFormMiniOptionFilterVisible: boolean = false;
   isCustomMiniTable: boolean = false;
   editedQueryName: any = '';
+  formIDPermission: any = [];
+  locationPermission: any = [];
+  companyID: any;
+  filtermatchedData: any = [];
+  permissionForm: any = [];
+  formsToDisplay: any = [];
 
    constructor(private fb:FormBuilder,private api:APIService,private configService:SharedService,private scheduleAPI:scheduleApiService,
     private toast:MatSnackBar,private spinner:NgxSpinnerService,private cd:ChangeDetectorRef,private modalService: NgbModal,private moduleDisplayService: ModuleDisplayService,
@@ -208,9 +214,15 @@ columns: any;
     this.editOperation = false
 
     this.getLoggedUser = this.configService.getLoggedUserDetails()
+
+    console.log("Local Storage is here ",this.getLoggedUser);
+
     this.SK_clientID = this.getLoggedUser.clientID;
     this.username = this.getLoggedUser.username;
     this.permissionID = this.getLoggedUser.permission_ID
+    this.formIDPermission = this.getLoggedUser.form_permission
+    this.locationPermission = this.getLoggedUser.location_permission
+    this.companyID = this.getLoggedUser.companyID
 
     this.addFromService()
 
@@ -247,7 +259,13 @@ columns: any;
     });
 
 
-    this.checkPermissions()
+    try{
+      this.checkPermissions()
+    }
+    catch(error){
+      console.log("Error checking form permissions ",error);
+    }
+
 
 
     
@@ -293,40 +311,240 @@ columns: any;
 
 
   async checkPermissions(){
-    try {
-      await this.api.GetMaster(`${this.SK_clientID}#permission#${this.permissionID}#main`, 1).then((result: any) => {
-        if (result) {
+    //Get the user configuratyion
+    const userResponse = await this.api.GetMaster(`${this.username}#user#main`, 1);
 
-          console.log("Result is here ",result);
+    if(userResponse && userResponse.metadata){
+    
+      console.log("userResponse.metadata ",userResponse.metadata);
+    
+      const tempHolder = JSON.parse(userResponse.metadata)
+      this.permissionID = tempHolder.permission_ID
+      this.formIDPermission = tempHolder.form_permission
+      this.locationPermission = tempHolder.location_permission
+      this.companyID = tempHolder.companyID
+    }
 
-          const helpherObj = JSON.parse(result.metadata).advance_report;
-          this.adminAccess = helpherObj.includes('All Report ID Access') == true
 
-          const tempholder = JSON.parse(JSON.parse(result.metadata).dynamicEntries)
 
-         const permissionChecker = tempholder.filter((item:any)=>item.dynamicForm.includes('All'))
-
-         console.log("Permission checker is here ",permissionChecker);
-
-         if(permissionChecker && Array.isArray(permissionChecker) && permissionChecker.length > 0){
-
-         }
-         else{
-          this.validForms = tempholder.filter((item:any)=>item.permission.includes('Read') == true)
-
-          this.formList = this.validForms.map((item:any)=>item.dynamicForm[0])
-         }
-
+    const keyLocation = Array.isArray(this.locationPermission) && this.locationPermission.length === 1 && this.locationPermission[0] === "All" ? "All" : "Not all";
+    const keyDevices = Array.isArray(this.formIDPermission) && this.formIDPermission.length === 1 && this.formIDPermission[0] === "All" ? "All" : "Not all";
+    
         
 
-         this.cd.detectChanges()
 
+
+    if (this.permissionID !== 'All') { 
+
+      const permisson_response = await this.api.GetMaster(this.SK_clientID + '#permission#' + this.permissionID + '#main', 1);
+      const permission_data = permisson_response && JSON.parse(JSON.parse(JSON.stringify(permisson_response.metadata)))
+      this.permissionForm = permission_data && JSON.parse(permission_data.dynamicEntries)   // Dymaic Entries 
+      console.log("PERMISSION FORM:", this.permissionForm)
+
+      const result = await this.api.GetMaster(`${this.SK_clientID}#${this.companyID}#location#main`,1)
+      if(result){
+        console.log("TREE RESPONSE:",JSON.parse(JSON.parse(JSON.stringify(result.metadata))))
+
+        const tree_reponse = JSON.parse(JSON.parse(JSON.stringify(result.metadata)))
+
+        console.log("TREE RESPONSE 2:",JSON.parse(JSON.parse(JSON.stringify(tree_reponse[0].tree))))
+
+        const tree_response_1 = JSON.parse(JSON.parse(JSON.stringify(tree_reponse[0].tree)))
+
+
+        this.validForms = this.permissionForm.filter((item:any)=>item.permission.includes('Read') == true)
+        console.log("Valid forms are here ", this.validForms);
+        const allowedForms = this.validForms.reduce((acc: string[], permission: any) => {
+          return acc.concat(permission.dynamicForm);
+        }, []);
+        console.log("ALLOW FORMS:", allowedForms)
+
+
+
+        console.log("keyLocation ,keyDevices ",keyLocation,keyDevices);
+
+        if(`${keyLocation}-${keyDevices}` == "Not all-Not all" || `${keyLocation}-${keyDevices}` == "Not all-All"){
+
+            const returnValueTree = await this.modifyList(this.locationPermission, this.formIDPermission,tree_response_1 );
+
+            console.log("FilterValuetreee",returnValueTree)
+
+            if (returnValueTree.length > 0) {
+                // Extracting text for nodes with node_type "device"
+                this.filtermatchedData = returnValueTree
+                    .filter((node:any) => node.node_type === "device")
+                    .flatMap((node:any) => node.text || []);
+                    console.log("jsonModified_in_service_final", this.filtermatchedData);
+            }
+            if (returnValueTree.length == 0){
+                this.filtermatchedData = []
+            }
+
+          
+            console.log("GROUP LIST:",this.filtermatchedData)
+    
+            this.filtermatchedData = this.filtermatchedData.filter((item:any)=>allowedForms.includes(item))
+    
+    
+            this.formsToDisplay = this.filtermatchedData
+
+          }
+          else if(`${keyLocation}-${keyDevices}` == "All-All"){
+
+          
+
+            let matchingItems = []
+            if (allowedForms.includes('All')) {      
+                matchingItems =this.formList;
+            }
+            else{
+              matchingItems = allowedForms
+            }
+
+            this.formsToDisplay = matchingItems
+          } 
+          else{
+            this.filtermatchedData = this.formIDPermission
+
+            this.formsToDisplay = this.filtermatchedData.filter((ele:any)=>allowedForms.includes(ele))
+          }
         }
-      });
-    } catch (err) {
-      console.log("Error fetching the dynamic form data ", err);
+
+  
+
+    }
+    else{
+          this.api.GetMaster(`${this.SK_clientID}#${this.companyID}#location#main`,1).then(async (result)=>{
+            if(result){
+                console.log("TREE RESPONSE:",JSON.parse(JSON.parse(JSON.stringify(result.metadata))))
+
+                const tree_reponse = JSON.parse(JSON.parse(JSON.stringify(result.metadata)))
+
+                console.log("TREE RESPONSE 2:",JSON.parse(JSON.parse(JSON.stringify(tree_reponse[0].tree))))
+
+                const tree_response_1 = JSON.parse(JSON.parse(JSON.stringify(tree_reponse[0].tree)))
+
+                const keyLocation = Array.isArray(this.locationPermission) && this.locationPermission.length === 1 && this.locationPermission[0] === "All" ? "All" : "Not all";
+                const keyDevices = Array.isArray(this.formIDPermission) &&  this.formIDPermission.length === 1 && this.formIDPermission[0] === "All" ? "All" : "Not all";
+
+                if(`${keyLocation}-${keyDevices}` !== "All-All"){
+
+                    const returnValueTree = await this.modifyList(this.locationPermission, this.formIDPermission,tree_response_1 );
+
+                    console.log("FilterValuetreee",returnValueTree)
+
+                    if (returnValueTree.length > 0) {
+                        // Extracting text for nodes with node_type "device"
+                        this.filtermatchedData = returnValueTree
+                            .filter((node:any) => node.node_type === "device")
+                            .flatMap((node:any) => node.text || []);
+                            console.log("jsonModified_in_service_final", this.filtermatchedData);
+                    }
+                    if (returnValueTree.length == 0){
+                        this.filtermatchedData = []
+                    }
+
+                    this.formsToDisplay = this.filtermatchedData
+
+                }
+                else{
+                  this.formsToDisplay = this.formList
+                }
+            }
+          })
+    }
+
+
+    // this.formsToDisplay = this.formsToDisplay.filter((item:any) => item != 'All')
+
+    console.log("Permission is being checked and the forms to display are ",this.formsToDisplay);
+
+  }
+
+
+
+  async modifyList(locationPermission: any, formPermission: any, originalArray: Node[]): Promise<Node[]> {
+    const keyLocation = Array.isArray(this.locationPermission) && locationPermission.length === 1 && locationPermission[0] === "All" ? "All" : "Not all";
+    const keyDevices = Array.isArray(this.formIDPermission) && formPermission.length === 1 && formPermission[0] === "All" ? "All" : "Not all";
+
+    console.log("modifyList:", `${keyLocation}-${keyDevices}`);
+
+    switch (`${keyLocation}-${keyDevices}`) {
+        case "All-All":
+            return [];
+        case "Not all-All":
+            return this.calculateNodesToShow(locationPermission, originalArray);
+        case "All-Not all":
+            return this.calculateNodesToShow(formPermission, originalArray);
+        case "Not all-Not all":
+            const data1 = await this.calculateNodesToShow(locationPermission, originalArray);
+            const data2 = await this.calculateNodesToShow(formPermission, data1);
+            return data2;
+        default:
+            console.log("Unrecognized case");
+            return [];
     }
   }
+
+
+
+
+  async calculateNodesToShow(permissions: any, originalData: Node[]): Promise<Node[]> {
+    let nodeMap = this.enhanceNodeMap(originalData);
+    let nodesToShow: Node[] = [];
+    permissions && permissions.forEach((permission: string) => {
+        const keyText = "text_" + permission;
+        const nodes = nodeMap[keyText] || [];
+
+        nodes.forEach((permittedNode: Node) => {
+            if (permittedNode && !nodesToShow.includes(permittedNode)) {
+                nodesToShow.push(permittedNode);
+                this.collectDescendants(permittedNode, nodesToShow, originalData);
+                this.markAncestors(permittedNode, nodesToShow, originalData);
+            }
+        });
+    });
+    return nodesToShow.filter((v:any, i, a) => a.findIndex((t:any) => t.id === v.id) === i);
+  }
+
+  enhanceNodeMap(originalData: Node[]): Record<string, Node[]> {
+    let nodeMap: Record<string, Node[]> = {};
+    originalData.forEach((node:any) => {
+        const textKey = "text_" + node.text;
+
+        if (!nodeMap[textKey]) {
+            nodeMap[textKey] = [];
+        }
+        nodeMap[textKey].push(node);
+    });
+    return nodeMap;
+  }
+
+  collectDescendants(node: any, result: Node[], originalData: Node[]): void {
+    let children = originalData.filter((n:any) => n.parent === node.id);
+    children.forEach((child) => {
+        if (!result.includes(child)) {
+            result.push(child);
+            this.collectDescendants(child, result, originalData);
+        }
+    });
+  }
+
+  markAncestors(node: any, result: Node[], originalData: Node[]): void {
+    if (node.parent !== "#") {
+        const parentNode = originalData.find((n:any) => n.id === node.parent);
+        if (parentNode && !result.includes(parentNode)) {
+            result.push(parentNode);
+            this.markAncestors(parentNode, result, originalData);
+        }
+    }
+  }
+
+
+
+
+
+
 
 
   openModal(content: any) {
@@ -1107,6 +1325,7 @@ async onFilterChange(event: any,getValue:any,key:any) {
 
    async onSubmit() {
 
+
     console.log("reportMetadata.excelSheets ",this.reportsFeilds.value.excelSheets);
 
     this.trackLocationMapFlag = false
@@ -1246,6 +1465,24 @@ async onFilterChange(event: any,getValue:any,key:any) {
   
 
   async prepareData(groupedData: { [key: string]: any[] },formMap:any) {
+
+    let allowedForms:any
+    if(this.permissionForm){
+      allowedForms =  this.permissionForm.map((item:any)=>{
+        if (item.fieldValue && item.fieldValue.trim() !== '') {
+          return {formName:item.dynamicForm[0],fieldValue:item.fieldValue}
+        }
+        else{
+          return null
+        }
+      }).filter((item:any)=>item != null)
+  
+      console.log("All allowedForms ",allowedForms);
+    }
+
+
+
+
     const tableDataWithFormFilters:any = [];
 
     const formConditions = this.formFieldsGroup.value.forms
@@ -1288,6 +1525,44 @@ async onFilterChange(event: any,getValue:any,key:any) {
 
 
       console.log("After getting options ",tempMetaArray);
+
+
+
+      //Check whether insitial Master Filters are there
+      try{
+        if(this.permissionForm){
+
+  
+          if(allowedForms && Array.isArray(allowedForms) && allowedForms.length > 0){
+
+
+            const filterMaster = allowedForms.find((item:any)=>item.formName == formFilter)
+
+            console.log("filterMaster ",filterMaster);
+
+            if(filterMaster && filterMaster['fieldValue'] != null && filterMaster['fieldValue'] != ''){
+
+              let tempArray:any = []
+              for(let data of tempMetaArray){
+                if(await this.evaluateTemplate(filterMaster['fieldValue'],data,'split') == true){
+                  tempArray.push(data)
+                }
+              }
+              tempMetaArray = tempArray
+            }
+          }
+  
+        }
+      }
+      catch(error){
+        console.log("Error while evaluating the master filters ",error);
+      }
+      
+
+
+      console.log("After Master filter Data is here ",tempMetaArray);
+
+
 
 
 
@@ -1944,6 +2219,9 @@ locationCellRenderer(params: any) {
 
 
   clearFeilds() {
+
+
+    
 
 
     this.editedQueryName = ''
