@@ -71,26 +71,48 @@ export class NotificationsInnerComponent implements OnInit {
 
   }
 
-  formatDate(timestamp: number): string {
-    const now = new Date().getTime();
-    const diff = Math.floor((now - timestamp) / 1000);
-    const days = Math.floor(diff / 86400);
-    const months = Math.floor(days / 30); // Assuming an average of 30 days in a month
-    const years = Math.floor(months / 12); // Assuming 12 months in a year
+//   formatDate(timestamp: number): string {
+//     const now = new Date().getTime();
+//     const diff = Math.floor((now - timestamp) / 1000);
+//     const days = Math.floor(diff / 86400);
+//     const months = Math.floor(days / 30); // Assuming an average of 30 days in a month
+//     const years = Math.floor(months / 12); // Assuming 12 months in a year
 
-    if (diff < 60) {
-      return `${diff} second${diff > 1 ? 's' : ''} ago`;
-    } else if (diff < 3600) {
-      return `${Math.floor(diff / 60)} minute${Math.floor(diff / 60) > 1 ? 's' : ''} ago`;
-    } else if (diff < 86400) {
-      return `${Math.floor(diff / 3600)} hour${Math.floor(diff / 3600) > 1 ? 's' : ''} ago`;
-    } else if (months < 12) {
-      return `${months} month${months > 1 ? 's' : ''} ago`;
-    } else if (years < 2) {
-      return `${years} year ago`;
-    } else {
-      return `${years} years ago`;
-    }
+//     if (diff < 60) {
+//       return `${diff} second${diff > 1 ? 's' : ''} ago`;
+//     } else if (diff < 3600) {
+//       return `${Math.floor(diff / 60)} minute${Math.floor(diff / 60) > 1 ? 's' : ''} ago`;
+//     } else if (diff < 86400) {
+//       return `${Math.floor(diff / 3600)} hour${Math.floor(diff / 3600) > 1 ? 's' : ''} ago`;
+//     } else if (months < 12) {
+//       return `${months} month${months > 1 ? 's' : ''} ago`;
+//     } else if (years < 2) {
+//       return `${years} year ago`;
+//     } else {
+//       return `${years} years ago`;
+//     }
+// }
+
+formatDate(timestamp: number): string {
+  const now = new Date().getTime();
+  const diff = Math.floor((now - timestamp) / 1000);
+  const days = Math.floor(diff / 86400);
+  const months = Math.floor(days / 30); // Assuming an average of 30 days in a month
+  const years = Math.floor(days / 365); // More accurate for years
+  
+  if (diff < 60) {
+    return `${diff} second${diff !== 1 ? 's' : ''} ago`;
+  } else if (diff < 3600) {
+    return `${Math.floor(diff / 60)} minute${Math.floor(diff / 60) !== 1 ? 's' : ''} ago`;
+  } else if (diff < 86400) {
+    return `${Math.floor(diff / 3600)} hour${Math.floor(diff / 3600) !== 1 ? 's' : ''} ago`;
+  } else if (days < 30) { 
+    return `${days} day${days !== 1 ? 's' : ''} ago`;
+  } else if (months < 12) {
+    return `${months} month${months !== 1 ? 's' : ''} ago`;
+  } else {
+    return `${years} year${years !== 1 ? 's' : ''} ago`;
+  }
 }
 
   async fetchAllData(requestBody:any) {
