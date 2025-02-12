@@ -1497,8 +1497,14 @@ FormatTypeValues = [
   { value: 'Rupee', text: 'Rupee' },
   { value: 'Distance', text: 'Distance' },
   { value: 'Days & Hours', text: 'Days & Hours' },
+  { value: 'Hours', text: 'Hours' },
+  { value: 'Minutes', text: 'Minutes' },
+  { value: 'Days', text: 'Days' },
+  {value:'Label With Value',text:'Label With Value'}
   // { value: 'max', text: 'Maximum' },
 ]
+
+
 
 setUserSatus(){
   this.userIsChanging = true

@@ -80,6 +80,9 @@
                 [item]="item"
                 [style.background]="item.themeColor"
                 class="rounded"
+                 [matTooltip]="getDimensions(item,i)"
+                  [matTooltipPosition]="'below'"
+                
                 [style.height.px]="item.grid_type === 'chart' ? 300 : null" 
                 [style.width.px]="item.grid_type === 'chart' ? 400 : null" 
                 (click)="
@@ -106,6 +109,8 @@
                       (customEvent2)="emitDelete6($event)"
                       [tileWidth]="tileWidth[i]" 
                        [tileHeight]="tileHeight[i]"
+                       [liveDataTile]="liveDataTile"
+               
                    >
                     </app-tile-ui1>
                   </div>
@@ -163,7 +168,7 @@
                     </div>
                               <div *ngIf="item.grid_type === 'chart'"  >
                       <app-chart-ui1 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal1)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate" 
-                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalChart1)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)"></app-chart-ui1>
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalChart1)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart"></app-chart-ui1>
                     </div>
                     <div *ngIf="item.grid_type === 'Linechart'"  >
                       <app-chart-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal2)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" (sendCellInfo) = "helperChartClickChart2($event,dataTableModalChart2)"></app-chart-ui2>
@@ -541,10 +546,11 @@
   <div style="top: 1%;
   z-index: 100;
   right:44px;
-  flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20 gap-2">
+  flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20 gap-2" 
+   [style.visibility]="hideNavMenu ||  !(!disableMenuQP&&(!(summaryPermission?.includes('None')) || userPermission === 'All'))&&!isNone?'hidden':'visible' ">
 
   
-  <nav class="myMenu" #tooltipContainer *ngIf="(!disableMenuQP&&(!(summaryPermission?.includes('None')) || userPermission === 'All'))&&!isNone" >
+  <nav class="myMenu" #tooltipContainer  >
     <input type="checkbox" href="#" class="myMenu-open" name="myMenu-open" id="myMenu-open" />
     <label class="myMenu-open-button" for="myMenu-open">
       <span class="hamburger hamburger-1"></span>

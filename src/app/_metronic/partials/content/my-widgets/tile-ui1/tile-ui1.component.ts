@@ -19,6 +19,10 @@ export class TileUi1Component implements OnInit{
   @Output() sendCellInfo = new EventEmitter<any>();
   @Input() tileWidth:any
   @Input() tileHeight:any
+  @Input() liveDataTile:any
+  
+  
+
   @Output() dashboardAction = new EventEmitter<{
     item: any;
     index: any;
@@ -49,6 +53,20 @@ export class TileUi1Component implements OnInit{
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
     console.log("tile data check from tile1 ",this.item)
+    console.log('this.liveDataTile from child',this.liveDataTile)
+
+    this.liveDataTile = this.liveDataTile.map((item: { multi_value: string; }) => {
+      return {
+          ...item,
+          multi_value: JSON.parse(item.multi_value)
+      };
+  });
+  
+  console.log('Updated liveDataTile:', this.liveDataTile);
+  
+
+    
+
    
 
    
@@ -86,7 +104,7 @@ export class TileUi1Component implements OnInit{
 
 
 
-    this.tile1Config = this.item
+    this.tile1Config = this.item || this.liveDataTile
 
   
  

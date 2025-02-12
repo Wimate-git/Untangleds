@@ -1584,6 +1584,7 @@ selectFormParams1(event: any[], index: number): void {
     { value: 'Hours', text: 'Hours' },
     { value: 'Minutes', text: 'Minutes' },
     { value: 'Days', text: 'Days' },
+    {value:'Label With Value',text:'Label With Value'}
     // { value: 'max', text: 'Maximum' },
 ]
 

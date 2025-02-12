@@ -24,6 +24,8 @@ export class ChartUi1Component implements OnChanges {
   @Output() sendCellInfo = new EventEmitter<any>();
   @Input() routeId:any
   @Input() SK_clientID:any
+  @Input() liveDataChart:any
+  
   checkResBody: any;
   parsedResBody: any;
   processedData: any;
@@ -34,7 +36,8 @@ export class ChartUi1Component implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
-      console.log("Dynamic data check",this.item)
+      console.log("Dynamic data check fro chart1",this.item)
+      console.log('liveDataChart from child chart1',this.liveDataChart)
    
       console.log('routeId checking from ui',this.routeId)
       console.log('SK_clientID checking',this.SK_clientID)
@@ -207,7 +210,7 @@ this.formTableConfig = {
   }
 
   createPieChart() {
-    console.log('this.chartOptions in initialization', this.chartOptions);
+    console.log('this.chartOptions in initialization>>>>>', this.chartOptions);
   
     // Fix the series data structure
     this.chartOptions.series = this.chartOptions.series.map((series: any) => {

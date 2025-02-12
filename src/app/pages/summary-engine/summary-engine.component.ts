@@ -253,6 +253,11 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   dynamicIDArray: never[];
   isNone: boolean= false;
   savedQueryParam: any;
+  liveDataTile: any;
+  liveDataChart: any;
+  hideNavMenu: boolean =true;
+  isFading: boolean = false;
+  inactivityTimer: any;
 
 
   createPieChart() {
@@ -686,7 +691,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   private editTileIndex: number | null = null;
   private widgetIdCounter = 0;
 
-  isMenuOpen: boolean = false; // Tracks dropdown menu state
+  isMenuOpen: boolean ; // Tracks dropdown menu state
   @ViewChild(MatMenuTrigger) triggerBtn: MatMenuTrigger;
   allUpdateTile: { summaryID: any; summaryName: any; summaryDesc: any; summaryIcon: any; updated: Date; createdUser: any; };
   groupByFormat: any;
@@ -727,6 +732,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   console.log('permissionList',this.readFilterEquation)
   console.log('this.permissionsMetaData',this.permissionIdRequest)
   console.log('this.parsedPermission',this.parsedPermission)
+  console.log('this.userdetails from request',this.userdetails)
     // Define the API Gateway URL
     const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
   
@@ -736,7 +742,9 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
         clientId: this.SK_clientID,
         routeId: this.routeId,
         permissionId:this.permissionIdRequest,
-        permissionList:this.readFilterEquation
+        permissionList:this.readFilterEquation,
+        userName:this.userdetails
+
 
 
       }),
@@ -748,6 +756,16 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     this.http.post(apiUrl, requestBody).subscribe(
       (response) => {
         console.log('Lambda function triggered successfully:', response);
+        
+        const constLiveData = JSON.parse((response as any)?.body);
+        console.log('constLiveData check',constLiveData)
+        const processedData = constLiveData.Processed_Data.metadata.grid_details
+
+        console.log('processedData check',processedData)
+        this.liveDashboardDataFormat(processedData)
+
+
+
         this.spinner.hide('dataProcess')
         // Display SweetAlert success message
         // Swal.fire({
@@ -788,6 +806,48 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     localStorage.setItem('fullscreen', 'true');
     console.log('Fullscreen enabled');
 }
+
+liveDashboardDataFormat(processedData: any) {
+  console.log('Processed Data:', processedData);
+
+  let chartData: any = [];
+  let tileData: any = [];
+
+  processedData.forEach((packet: any) => {
+    switch (packet.grid_type) {
+      case "chart":
+     
+        console.log("Matched Chart Packet:", packet);
+        chartData.push(packet);
+        console.log('chartData after push',chartData)
+  
+
+        this.liveDataChart = chartData
+
+        break;
+      case "tile":
+        console.log("Matched Tile Packet:", packet);
+ 
+        tileData.push(packet);
+        console.log('tileData after push',tileData)
+    
+
+ 
+        this.liveDataTile = tileData
+        console.log('this.liveDataTile chec',this.liveDataTile)
+        break;
+      default:
+        console.warn("Unknown grid type:", packet.grid_type, "Packet:", packet);
+        break;
+    }
+  });
+
+  console.log("Final Chart Data:", chartData);
+  console.log("Final Tile Data:", tileData);
+
+  return { chartData, tileData };
+}
+
 
 checkAndSetFullscreen(): void {
     const isFullscreen = localStorage.getItem('fullscreen') === 'true';
@@ -1643,6 +1703,8 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
         }
       }
     });
+
+    this.resetInactivityTimer()
 
 
 
@@ -6322,7 +6384,7 @@ refreshFunction(){
             // Parse the JSON string into a JavaScript object
             this.permissionsMetaData = JSON.parse(metadataString);
             console.log('Parsed Metadata Object from location', this.permissionsMetaData);
-            this.permissionIdRequest = this.permissionsMetaData
+            this.permissionIdRequest = this.permissionsMetaData.permission_ID
             const readPermission_Id = this.permissionsMetaData.permission_ID
             console.log('readPermission_Id check',readPermission_Id)
            
@@ -6360,8 +6422,89 @@ refreshFunction(){
   
 
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
 
+    const menuCheckbox = document.querySelector('.myMenu-open') as HTMLInputElement;
+
+    // Update the isMenuOpen flag
+    if (menuCheckbox) {
+      this.isMenuOpen = menuCheckbox.checked;
+    }
+
+    if (menuCheckbox && !target.closest('.myMenu')) {
+      menuCheckbox.checked = false;
+      this.isMenuOpen = false; // Menu is now collapsed
+
+    }
+
+    this.showMenuTemporarily();
+    this.cdr.detectChanges();
+  }
+
+  // Detect scroll, touchstart, or mousemove events
+  @HostListener('window:scroll', [])
+  @HostListener('document:touchstart', ['$event'])
+  @HostListener('document:mousemove', [])
+  // @HostListener('document:keydown', ['$event']) // Listen for keyboard key presses
+  @HostListener('document:wheel', ['$event']) // Listen for mouse wheel scroll
+  onUserActivity(): void {
+    this.showMenuTemporarily();
+    this.cdr.detectChanges();
+  }
+
+  // Method to show menu temporarily and reset timer
+  private showMenuTemporarily(): void {
+    this.hideNavMenu = false; // Show the menu
+    this.isFading = false; // Reset fading state
+    this.resetInactivityTimer(); // Reset the timer
+    this.cdr.detectChanges();
+  }
+
+  // Reset inactivity timer
+  private resetInactivityTimer(): void {
+    if (this.inactivityTimer) {
+      clearTimeout(this.inactivityTimer);
+    }
+
+    // Start fading after 2 seconds
+    setTimeout(() => {
+      if (!this.isMenuOpen) {
+        this.isFading = true; // Begin fade effect
+        this.cdr.detectChanges();
+      }
+    }, 3000);
+
+    // Hide menu after 5 seconds of inactivity only if the menu is collapsed
+    this.inactivityTimer = setTimeout(() => {
+      if (!this.isMenuOpen) {
+        this.hideNavMenu = true;
+        this.isFading = false; // Reset fading state
+        this.cdr.detectChanges();
+      }
+    }, 5000);
+  }
+  getDimensions(item: any, index: any): string {
+    if (this.isEditModeView) {
+      return '';
+    }
   
+    const widthHeightMap: { [key: string]: { width?: number[], height?: number[] ,heightOffset:number,widthOffset:number} } = {
+      tile: { width: this.tileWidth, height: this.tileHeight, heightOffset: 80, widthOffset: 30},
+   
+      chart: { width: this.chartWidth, height: this.chartHeight, heightOffset: 10, widthOffset: 30  },
+      map: { width: this.mapWidth, height: this.mapHeight, heightOffset: 80, widthOffset: 30  },
+ 
+
+    };
+
+    const dimensions:any = widthHeightMap[item.grid_type] || { width: this.tileWidth, height: this.tileHeight };
+    const width:any = dimensions.width?.[index] + dimensions.widthOffset;
+    const height:any = dimensions.height?.[index] + dimensions.heightOffset;;
+
+    return `width: ${width?.toFixed(2) ?? 'N/A'}px, height: ${height?.toFixed(2) ?? 'N/A'}px`;
+  }
 
 
 
