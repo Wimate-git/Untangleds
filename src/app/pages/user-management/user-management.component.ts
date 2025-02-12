@@ -22,6 +22,7 @@ import { DynamicApiService } from '../dynamic-api.service';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { LocationPermissionService } from 'src/app/location-permission.service';
 import { UserVerifiedTableComponent } from './user-verified-table/user-verified-table.component';
+import { AuditTrailService } from '../services/auditTrail.service';
 
 interface TreeNode {
   id: string;         // Assuming 'id' is a string
@@ -172,10 +173,11 @@ rdtListWorkAround :any =[{
   tempUserID: string;
   combinationOfUser: any = [];
   tempUpdateUser: any;
+  username: any;
 
   constructor(private apiService: UserService,private configService:SharedService,private fb:FormBuilder
     ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal,private DynamicApi:DynamicApiService,
-    private locationPermissionService:LocationPermissionService){}
+    private locationPermissionService:LocationPermissionService,private auditTrail:AuditTrailService){}
 
 
     reloadTable(){
@@ -193,6 +195,11 @@ rdtListWorkAround :any =[{
     this.SK_clientID = this.getLoggedUser.clientID;
 
     this.Allpermission = this.getLoggedUser.permission_ID == 'All'?true:false;
+
+    this.username = this.getLoggedUser.username
+
+
+    this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
 
     console.log("All the permissions are here ",this.Allpermission);
  
@@ -678,6 +685,7 @@ rdtListWorkAround :any =[{
   delete(id: number) {
     console.log("Deleted username will be", id);
     this.deleteUser(id, 'delete');
+
   }
 
   create() {
@@ -690,6 +698,29 @@ rdtListWorkAround :any =[{
   edit(P1: any) {
     console.log("Edit is clicked ");
     this.openModalHelpher(P1)
+
+
+    try{
+      const UserDetails = {
+        "User Name": this.username,
+        "Action": "View",
+        "Module Name": "User Management",
+        "Form Name": 'User Management',
+       "Description": `${P1} username details were Viewed`,
+        "User Id": this.username,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+  
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+    }
+    catch(error){
+      console.log("Error while creating audit trails ",error);
+    }
+
+
+
   }
 
   openModalUser(modalTemplate: TemplateRef<any>) {
@@ -1213,6 +1244,32 @@ rdtListWorkAround :any =[{
 
           this.datatableConfig = {}
           this.lookup_data_user = []
+
+
+          try{
+            const UserDetails = {
+              "User Name": this.username,
+              "Action": "Edited",
+              "Module Name": "User Management",
+              "Form Name": 'User Management',
+             "Description": `${masterUser.P1} username details were Edited`,
+              "User Id": this.username,
+              "Client Id": this.SK_clientID,
+              "created_time": Date.now(),
+              "updated_time": Date.now()
+            }
+        
+            this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+          }
+          catch(error){
+            console.log("Error while creating audit trails ",error);
+          }
+
+
+
+
+
+
 
 
           this.showAlert(successAlert)
@@ -1801,6 +1858,28 @@ rdtListWorkAround :any =[{
           await this.createLookUpRdt(items,1,tempClient+"#user"+"#lookup")
 
           await this.createLookUpRdt(masterUser,1,"#user#All");
+
+
+          try{
+            const UserDetails = {
+              "User Name": this.username,
+              "Action": "Created",
+              "Module Name": "User Management",
+              "Form Name": 'User Management',
+             "Description": `${masterUser.P1} username was Created`,
+              "User Id": this.username,
+              "Client Id": this.SK_clientID,
+              "created_time": Date.now(),
+              "updated_time": Date.now()
+            }
+        
+            this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+          }
+          catch(error){
+            console.log("Error while creating audit trails ",error);
+          }
+      
+
 
           this.datatableConfig = {}
           this.lookup_data_user = []
@@ -2562,6 +2641,27 @@ rdtListWorkAround :any =[{
         $('td:eq(0)', row).addClass('d-flex align-items-center');
       },
     };
+
+
+    try{
+      const UserDetails = {
+        "User Name": this.username,
+        "Action": "View",
+        "Module Name": "User Management",
+        "Form Name": 'User Management',
+       "Description": `User Table was Viewed`,
+        "User Id": this.username,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+  
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+    }
+    catch(error){
+      console.log("Error while creating audit trails ",error);
+    }
+
   
   }
   
@@ -2984,6 +3084,7 @@ rdtListWorkAround :any =[{
           
           await this.fetchAllusersData(1,masterUser.P1,'update',masterUser)
 
+
           // this.createNewUser(this.allUserDetails, 'update');
 
           // await this.loading()
@@ -3117,6 +3218,32 @@ rdtListWorkAround :any =[{
         await this.fetchTimeMachineById(1, items.P1, 'delete', items);
 
         await this.fetchAllusersData(1, deletedUser.P1, 'delete', items)
+
+
+        try{
+          const UserDetails = {
+            "User Name": this.username,
+            "Action": "Deleted",
+            "Module Name": "User Management",
+            "Form Name": 'User Management',
+           "Description": `${items.P1} username was Deleted`,
+            "User Id": this.username,
+            "Client Id": this.SK_clientID,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+      
+          this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+        }
+        catch(error){
+          console.log("Error while creating audit trails ",error);
+        }
+    
+
+
+
+
+
 
         this.spinner.hide()
 
@@ -3403,6 +3530,32 @@ fetchDynamicLookupData(pk:any,sk:any):any {
       console.error('Error calling dynamic lambda:', error);
       this.spinner.hide();
     }
+
+
+
+
+    try{
+      const UserDetails = {
+        "User Name": this.username,
+        "Action": "View",
+        "Module Name": "User Management",
+        "Form Name": 'User Management',
+       "Description": `Unconfirmed usernames details were Viewed`,
+        "User Id": this.username,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+  
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+    }
+    catch(error){
+      console.log("Error while creating audit trails ",error);
+    }
+
+
+
+
 
 
 

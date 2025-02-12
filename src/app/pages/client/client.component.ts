@@ -13,6 +13,7 @@ import { SwalComponent } from "@sweetalert2/ngx-sweetalert2";
 import { S3bucketService } from "src/app/modules/auth/services/s3bucket.service";
 import { stringify } from "querystring";
 import { HttpClient } from "@angular/common/http";
+import { AuditTrailService } from "../services/auditTrail.service";
 
 
 interface ListItem {
@@ -118,15 +119,18 @@ export class ClientComponent implements OnInit {
     temporderedUrls: any[] = [undefined, undefined, undefined, undefined];
 
     iconList: any[] = []; 
+  username: any;
   
 
     async ngOnInit(){
 
-
       this.getLoggedUser = this.companyconfig.getLoggedUserDetails()
 
       this.SK_clientID = this.getLoggedUser.clientID;
+      this.username = this.getLoggedUser.username
       // this.SK_clientID = 'WIMATE_ADMIN';
+
+      this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
     
       this.initializeClientFields();
       this.addFromService();
@@ -155,7 +159,7 @@ export class ClientComponent implements OnInit {
     }
 
     
-    constructor(private fb: UntypedFormBuilder,private cd:ChangeDetectorRef,private api: APIService,private toast: MatSnackBar,private companyconfig:SharedService,private S3service:S3bucketService,private http: HttpClient){
+    constructor(private fb: UntypedFormBuilder,private cd:ChangeDetectorRef,private api: APIService,private toast: MatSnackBar,private companyconfig:SharedService,private S3service:S3bucketService,private http: HttpClient,private auditTrail:AuditTrailService){
 
     }
   
@@ -261,6 +265,30 @@ export class ClientComponent implements OnInit {
           $('td:eq(0)', row).addClass('d-flex align-items-center');
         },
       };
+
+
+
+
+
+        try{
+          const UserDetails = {
+            "User Name": this.username,
+            "Action": "View",
+            "Module Name": "Client",
+            "Form Name": 'Client',
+          "Description": `Client Table was Viewed`,
+            "User Id": this.username,
+            "Client Id": this.SK_clientID,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+      
+          this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+        }
+        catch(error){
+          console.log("Error while creating audit trails ",error);
+        }
+
     
     }
 
@@ -295,6 +323,28 @@ export class ClientComponent implements OnInit {
     // $('#clientModal').modal('show');
     // this.openModalHelpher(P1)
     this.openModalHelpher(P1);
+
+
+
+    try{
+      const UserDetails = {
+        "User Name": this.username,
+        "Action": "View",
+        "Module Name": "Client",
+        "Form Name": 'Client',
+       "Description": `${P1} client details were Viewed`,
+        "User Id": this.username,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+  
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+    }
+    catch(error){
+      console.log("Error while creating audit trails ",error);
+    }
+
   }
 
 
@@ -1081,6 +1131,28 @@ export class ClientComponent implements OnInit {
           await this.api.CreateMaster(tempItems)
         }
 
+
+
+        try{
+          const UserDetails = {
+            "User Name": this.username,
+            "Action": "Created",
+            "Module Name": "Client",
+            "Form Name": 'Client',
+          "Description": `${items.P1} client was Created`,
+            "User Id": this.username,
+            "Client Id": this.SK_clientID,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+      
+          this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+        }
+        catch(error){
+          console.log("Error while creating audit trails ",error);
+        }
+
+
         this.showAlert(successAlert)
 
         this.reloadEvent.next(true);
@@ -1300,6 +1372,27 @@ showAlert(swalOptions: SweetAlertOptions) {
 
         this.showAlert(successAlert)
 
+
+
+        try{
+          const UserDetails = {
+            "User Name": this.username,
+            "Action": "Edited",
+            "Module Name": "Client",
+            "Form Name": 'Client',
+            "Description": `${items.P1} client was Edited`,
+            "User Id": this.username,
+            "Client Id": this.SK_clientID,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+      
+          this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+        }
+        catch(error){
+          console.log("Error while creating audit trails ",error);
+        }
+
         this.reloadEvent.next(true)
 
         this.addFromService();
@@ -1466,6 +1559,29 @@ showAlert(swalOptions: SweetAlertOptions) {
               // await this.deleteWholeclient(1,items.P1, 'delete', items);
 
               await this.fetchTimeMachineById(1, items.P1, 'delete', items);
+
+
+
+              try{
+                const UserDetails = {
+                  "User Name": this.username,
+                  "Action": "Deleted",
+                  "Module Name": "Client",
+                  "Form Name": 'Client',
+                "Description": `${items.P1} client was Deleted`,
+                  "User Id": this.username,
+                  "Client Id": this.SK_clientID,
+                  "created_time": Date.now(),
+                  "updated_time": Date.now()
+                }
+            
+                this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+              }
+              catch(error){
+                console.log("Error while creating audit trails ",error);
+              }
+    
+
 
               this.reloadEvent.next(true)
 

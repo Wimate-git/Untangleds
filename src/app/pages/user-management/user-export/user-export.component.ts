@@ -10,6 +10,7 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { DynamicApiService } from '../../dynamic-api.service';
 import { AuthenticationDetails, CognitoUser, CognitoUserAttribute, CognitoUserPool } from 'amazon-cognito-identity-js';
 import Swal from 'sweetalert2';
+import { AuditTrailService } from '../../services/auditTrail.service';
 
 interface ListItem {
   [key: string]: {
@@ -42,9 +43,10 @@ export class UserExportComponent {
   allUserDetails: any;
   maxlength: number = 500;
   userPool: any;
+  username: any;
 
   constructor(private modalService: NgbModal, private excelValidator: ExcelValidatorService,private api:APIService,private sharedAPi:SharedService,private spinner:NgxSpinnerService,
-    private DynamicApi:DynamicApiService
+    private DynamicApi:DynamicApiService,private loggedInUser:SharedService,private auditTrail:AuditTrailService
   ){}
 
   @Input() listofSK:any;
@@ -59,6 +61,15 @@ export class UserExportComponent {
   error = '';
   validationErrors: string[] = [];
   isUploading:boolean = false
+
+
+  ngOnInit(){
+
+    this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
+
+    const logInUserData = this.loggedInUser.getLoggedUserDetails()
+    this.username = logInUserData.username
+  }
 
 
   reloadTable(){
@@ -218,6 +229,29 @@ export class UserExportComponent {
   
     // Export the file as Users.xlsx
     XLSX.writeFile(wb, filename);
+
+
+
+    try{
+      const UserDetails = {
+        "User Name": this.username,
+        "Action": "View",
+        "Module Name": "User Management",
+        "Form Name": 'User Management',
+        "Description": `User Template was Downloaded`,
+        "User Id": this.username,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+  
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+    }
+    catch(error){
+      console.log("Error while creating audit trails ",error);
+    }
+
+
   }
   
 
@@ -271,6 +305,28 @@ export class UserExportComponent {
 
       console.log("Fetched data is here ",fetchedData);
       this.downloadExcell(fetchedData,'users_xlsx')
+
+
+
+
+    try{
+      const UserDetails = {
+        "User Name": this.username,
+        "Action": "View",
+        "Module Name": "User Management",
+        "Form Name": 'User Management',
+        "Description": `User List Exported/Downloaded`,
+        "User Id": this.username,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+  
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+    }
+    catch(error){
+      console.log("Error while creating audit trails ",error);
+    }
   }
 
 
@@ -396,6 +452,31 @@ export class UserExportComponent {
 
       this.reloadTable()         
       console.log('File uploaded successfully:', this.selectedFile);
+
+
+
+      try{
+        const UserDetails = {
+          "User Name": this.username,
+          "Action": "Created",
+          "Module Name": "User Management",
+          "Form Name": 'User Management',
+          "Description": `Users were Imported through excel`,
+          "User Id": this.username,
+          "Client Id": this.SK_clientID,
+          "created_time": Date.now(),
+          "updated_time": Date.now()
+        }
+    
+        this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+      }
+      catch(error){
+        console.log("Error while creating audit trails ",error);
+      }
+
+
+
+
       modal.close();
     } catch (err) {
       this.error = 'Error uploading file. Please try again.',err;
@@ -523,6 +604,29 @@ export class UserExportComponent {
           await this.fetchAllusersData(1,masterUser.P1,'update',masterUser)
 
           await this.updateCognitoAttributes(this.allUserDetails);
+
+
+
+          try{
+            const UserDetails = {
+              "User Name": this.username,
+              "Action": "Edited",
+              "Module Name": "User Management",
+              "Form Name": 'User Management',
+             "Description": `${masterUser.P1} User was Edited Through Excel`,
+              "User Id": this.username,
+              "Client Id": this.SK_clientID,
+              "created_time": Date.now(),
+              "updated_time": Date.now()
+            }
+        
+            this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+          }
+          catch(error){
+            console.log("Error while creating audit trails ",error);
+          }
+
+
     }
     catch(error){
       console.log("Error in object Creation ",error);
@@ -761,6 +865,27 @@ export class UserExportComponent {
           await this.createLookUpRdt(masterUser,1,"#user#All");
 
           await this.addtoCognitoTable(this.allUserDetails);
+
+
+          try{
+            const UserDetails = {
+              "User Name": this.username,
+              "Action": "Created",
+              "Module Name": "User Management",
+              "Form Name": 'User Management',
+             "Description": `${masterUser.P1} User was Created Through Excel`,
+              "User Id": this.username,
+              "Client Id": this.SK_clientID,
+              "created_time": Date.now(),
+              "updated_time": Date.now()
+            }
+        
+            this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+          }
+          catch(error){
+            console.log("Error while creating audit trails ",error);
+          }
+
         
       
     }

@@ -9,6 +9,7 @@ import { APIService } from 'src/app/API.service';
 import { SharedService } from '../shared.service';
 import { DynamicApiService } from '../dynamic-api.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { AuditTrailService } from '../services/auditTrail.service';
 
 //Version Date 5 Dec Asad 2025
 
@@ -45,9 +46,10 @@ export class ConnectionSettingsComponent implements OnInit{
 
 
   communicationTypeArray = ['Telegram','SMS','Push Notification','WhatsApp','Email']
+  username: any;
 
   constructor(private fb:FormBuilder,private cd:ChangeDetectorRef,private api:APIService,private notifyConfig:SharedService,
-    private DynamicApi:DynamicApiService,private toast:MatSnackBar
+    private DynamicApi:DynamicApiService,private toast:MatSnackBar,private auditTrail:AuditTrailService
   ){}
   
   swalOptions: SweetAlertOptions = {};
@@ -73,6 +75,9 @@ export class ConnectionSettingsComponent implements OnInit{
   ngOnInit(): void {
     this.getLoggedUser = this.notifyConfig.getLoggedUserDetails()
     this.SK_clientID = this.getLoggedUser.clientID;
+    this.username = this.getLoggedUser.username
+
+    this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
 
     this.initializeForm()
 
@@ -322,6 +327,30 @@ toggleSubmitButton(): void {
         $('td:eq(0)', row).addClass('d-flex align-items-center');
       },
     };
+
+
+
+
+
+    try{
+      const UserDetails = {
+        "User Name": this.username,
+        "Action": "View",
+        "Module Name": "Communication",
+        "Form Name": 'Communication',
+      "Description": `Communication Table was Viewed`,
+        "User Id": this.username,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+  
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+    }
+    catch(error){
+      console.log("Error while creating audit trails ",error);
+    }
+
   
   }
 
@@ -406,6 +435,26 @@ toggleSubmitButton(): void {
 
   edit(P1: any) {
     this.openModalHelpher(P1)
+
+
+    try{
+      const UserDetails = {
+        "User Name": this.username,
+        "Action": "View",
+        "Module Name": "Communication",
+        "Form Name": 'Communication',
+      "Description": `${P1} Communication details were Viewed`,
+        "User Id": this.username,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+  
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+    }
+    catch(error){
+      console.log("Error while creating audit trails ",error);
+    }
   }
 
 
@@ -432,6 +481,30 @@ toggleSubmitButton(): void {
             if (value) {
 
               await this.fetchTimeMachineById(1,items.P1, 'delete', items);
+
+
+
+              try{
+                const UserDetails = {
+                  "User Name": this.username,
+                  "Action": "Deleted",
+                  "Module Name": "Communication",
+                  "Form Name": 'Communication',
+                "Description": `${items.P1} Communication ID was Deleted`,
+                  "User Id": this.username,
+                  "Client Id": this.SK_clientID,
+                  "created_time": Date.now(),
+                  "updated_time": Date.now()
+                }
+            
+                this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+              }
+              catch(error){
+                console.log("Error while creating audit trails ",error);
+              }
+
+
+
 
               this.reloadEvent.next(true)
 
@@ -872,6 +945,34 @@ toggleSubmitButton(): void {
       await this.createLookUpRdt(items,1,tempClient)
 
 
+      try{
+        const UserDetails = {
+          "User Name": this.username,
+          "Action": "Created",
+          "Module Name": "Communication",
+          "Form Name": 'Communication',
+        "Description": `${items.P1} Communication ID was Created`,
+          "User Id": this.username,
+          "Client Id": this.SK_clientID,
+          "created_time": Date.now(),
+          "updated_time": Date.now()
+        }
+    
+        this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+      }
+      catch(error){
+        console.log("Error while creating audit trails ",error);
+      }
+
+
+
+
+
+
+
+
+
+
       if(this.createConnectionField.value.email != '' && this.selectedComms.includes('Email')){
         const body = { type: "verifyIdentities",email:this.createConnectionField.value.email};
 
@@ -1106,6 +1207,27 @@ toggleSubmitButton(): void {
 
       if (value) {
         await this.fetchTimeMachineById(1,items.P1, 'update', items);
+
+
+        try{
+          const UserDetails = {
+            "User Name": this.username,
+            "Action": "Edited",
+            "Module Name": "Communication",
+            "Form Name": 'Communication',
+          "Description": `${items.P1} Communication ID was Edited`,
+            "User Id": this.username,
+            "Client Id": this.SK_clientID,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+      
+          this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+        }
+        catch(error){
+          console.log("Error while creating audit trails ",error);
+        }
+  
 
 
         if(this.selectedComms.includes('Email')){

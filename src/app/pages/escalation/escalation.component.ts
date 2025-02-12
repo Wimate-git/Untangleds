@@ -10,6 +10,7 @@ import { ApiSearch, Config } from 'datatables.net';
 import { APIService } from 'src/app/API.service';
 import { SharedService } from '../shared.service';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { AuditTrailService } from '../services/auditTrail.service';
 
 interface ListItem {
   [key: string]: {
@@ -106,11 +107,12 @@ export class EscalationComponent implements OnInit {
   seletedPK: any;
   lookup_users: any = [];
   editOperation: boolean = false;
+  username: any;
 
 
   constructor(private fb: FormBuilder,
     public router: Router,private toast: MatSnackBar,
-    private cd: ChangeDetectorRef,private api:APIService,private notifyConfig:SharedService) { 
+    private cd: ChangeDetectorRef,private api:APIService,private notifyConfig:SharedService,private auditTrail:AuditTrailService) { 
       this.initializeDeviceFields()
     }
 
@@ -125,6 +127,9 @@ export class EscalationComponent implements OnInit {
     this.getLoggedUser = this.notifyConfig.getLoggedUserDetails()
 
     this.SK_clientID = this.getLoggedUser.clientID;
+    this.username = this.getLoggedUser.username;
+
+    this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
 
     this.Lookupdata=[]
     
@@ -166,6 +171,31 @@ export class EscalationComponent implements OnInit {
     console.log("Edited username is here ", P1);
     $('#exampleModal').modal('show');
     this.openModal(P1)
+
+
+
+
+
+
+    try{
+      const UserDetails = {
+        "User Name": this.username,
+        "Action": "View",
+        "Module Name": "Escalation Matrix",
+        "Form Name": 'Escalation Matrix',
+      "Description": `${P1} Escalation Matrix details were Viewed`,
+        "User Id": this.username,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+    }
+    catch(error){
+      console.log("Error while creating audit trails ",error);
+    }
+
   }
 
 
@@ -404,6 +434,32 @@ console.log("PARRAY3:",permissionsArray)
 
         await this.createLookUpRdt(item,1,this.SK_clientID+"#notification"+"#lookup")
         // this.auditTrialServices.audit_trail('2.1', "Notification Matrix", "Add", "Creating new Notification Matrix Config in the Lookup Table", "1")
+
+
+
+        try{
+          const UserDetails = {
+            "User Name": this.username,
+            "Action": "Created",
+            "Module Name": "Escalation Matrix",
+            "Form Name": 'Escalation Matrix',
+          "Description": `${item.P1} Escalation Matrix was Created`,
+            "User Id": this.username,
+            "Client Id": this.SK_clientID,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+
+          this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+        }
+        catch(error){
+          console.log("Error while creating audit trails ",error);
+        }
+
+
+
+
+
 
         this.reloadEvent.next(true)
 
@@ -696,6 +752,37 @@ console.log("PARRAY3:",permissionsArray)
         console.log("lookup data ",item);
     
         await this.fetchTimeMachineById(1,this.notificationForm.controls.PK.value, 'update', item);
+
+
+        try{
+          const UserDetails = {
+            "User Name": this.username,
+            "Action": "Edited",
+            "Module Name": "Escalation Matrix",
+            "Form Name": 'Escalation Matrix',
+          "Description": `${item.P1} Escalation Matrix was Edited`,
+            "User Id": this.username,
+            "Client Id": this.SK_clientID,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+
+          this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+        }
+        catch(error){
+          console.log("Error while creating audit trails ",error);
+        }
+
+
+
+
+
+
+
+
+
+
+
         // this.auditTrialServices.audit_trail('2.1', "Notification Matrix", "Update", "Updating the Lookup Table", "1")
         this.showAlert(successAlert)
         this.cd.detectChanges()
@@ -957,6 +1044,27 @@ console.log("PARRAY3:",permissionsArray)
         $('td:eq(0)', row).addClass('d-flex align-items-center');
       }
   };
+
+
+      try{
+        const UserDetails = {
+          "User Name": this.username,
+          "Action": "View",
+          "Module Name": "Escalation Matrix",
+          "Form Name": 'Escalation Matrix',
+        "Description": `Escalation Matrix table was Viewed`,
+          "User Id": this.username,
+          "Client Id": this.SK_clientID,
+          "created_time": Date.now(),
+          "updated_time": Date.now()
+        }
+
+        this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+      }
+      catch(error){
+        console.log("Error while creating audit trails ",error);
+      }
+
   
   }
 
@@ -990,6 +1098,32 @@ console.log("PARRAY3:",permissionsArray)
             // this.auditTrialServices.audit_trail('2.1', "Notification Matrix", "Delete", "Deleting the NM in the Main Table", "1")
 
             await this.fetchTimeMachineById(1, this.allPB_details, 'delete', item)
+
+
+
+
+          try{
+            const UserDetails = {
+              "User Name": this.username,
+              "Action": "Deleted",
+              "Module Name": "Escalation Matrix",
+              "Form Name": 'Escalation Matrix',
+            "Description": `${item.P1} Escalation Matrix was Deleted`,
+              "User Id": this.username,
+              "Client Id": this.SK_clientID,
+              "created_time": Date.now(),
+              "updated_time": Date.now()
+            }
+
+            this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+          }
+          catch(error){
+            console.log("Error while creating audit trails ",error);
+          }
+
+
+
+
 
 
             this.reloadEvent.next(true)

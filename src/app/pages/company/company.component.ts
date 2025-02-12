@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
 import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
+import { AuditTrailService } from '../services/auditTrail.service';
 
 interface ListItem {
   [key: string]: {
@@ -87,17 +88,22 @@ export class CompanyComponent implements OnInit{
   listofClientIDs: any = [];
   lookup_data_company: any = [];
   editOperation: boolean = false;
+  username: any;
 
 
   constructor(private fb: UntypedFormBuilder, private companyConfiguration: SharedService,
     private api: APIService, private toast: MatSnackBar, private sanitizer: DomSanitizer,
-    private router:Router,private cd:ChangeDetectorRef) { }
+    private router:Router,private cd:ChangeDetectorRef,private auditTrail:AuditTrailService) { }
 
   ngOnInit() {
     
     this.getLoggedUser = this.companyConfiguration.getLoggedUserDetails()
 
     this.SK_clientID = this.getLoggedUser.clientID;
+
+    this.username = this.getLoggedUser.username
+
+    this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
 
     this.addFromService();
     this.initializeCompanyFields();
@@ -123,6 +129,26 @@ export class CompanyComponent implements OnInit{
     // console.log("Edited username is here ", P1);
     // $('#companyModal').modal('show');
     this.openModalHelpher(P1)
+
+
+    try{
+      const UserDetails = {
+        "User Name": this.username,
+        "Action": "View",
+        "Module Name": "Company",
+        "Form Name": 'Company',
+        "Description": `${P1} Company was Viewed`,
+        "User Id": this.username,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+  
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+    }
+    catch(error){
+      console.log("Error while creating audit trails ",error);
+    }
   }
 
 
@@ -233,6 +259,29 @@ export class CompanyComponent implements OnInit{
         $('td:eq(0)', row).addClass('d-flex align-items-center');
       },
     };
+
+
+
+
+
+    try{
+      const UserDetails = {
+        "User Name": this.username,
+        "Action": "View",
+        "Module Name": "Company",
+        "Form Name": 'Company',
+        "Description": `Company Table was Viewed`,
+        "User Id": this.username,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+  
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+    }
+    catch(error){
+      console.log("Error while creating audit trails ",error);
+    }
   
   }
   
@@ -1100,6 +1149,29 @@ export class CompanyComponent implements OnInit{
 
                     this.showAlert(successAlert)
 
+                    try{
+                      const UserDetails = {
+                        "User Name": this.username,
+                        "Action": "Created",
+                        "Module Name": "Company",
+                        "Form Name": 'Company',
+                        "Description": `${items.P1} Company was Created`,
+                        "User Id": this.username,
+                        "Client Id": this.SK_clientID,
+                        "created_time": Date.now(),
+                        "updated_time": Date.now()
+                      }
+                  
+                      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+                    }
+                    catch(error){
+                      console.log("Error while creating audit trails ",error);
+                    }
+      
+
+
+
+
                     this.reloadEvent.next(true)
         
         
@@ -1319,6 +1391,31 @@ export class CompanyComponent implements OnInit{
 
         this.lookup_data_company = []
 
+
+        try{
+          const UserDetails = {
+            "User Name": this.username,
+            "Action": "Edited",
+            "Module Name": "Company",
+            "Form Name": 'Company',
+            "Description": `${items.P1} Company was Edited`,
+            "User Id": this.username,
+            "Client Id": this.SK_clientID,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+      
+          this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+        }
+        catch(error){
+          console.log("Error while creating audit trails ",error);
+        }
+
+
+
+
+
+
         this.reloadEvent.next(true)
 
         //alert('Configuration updated successfully');
@@ -1467,6 +1564,25 @@ export class CompanyComponent implements OnInit{
               await this.fetchTimeMachineById(1,items.P1, 'delete', items);
 
               await this.api.DeleteMaster(locationObj)
+
+              try{
+                const UserDetails = {
+                  "User Name": this.username,
+                  "Action": "Deleted",
+                  "Module Name": "Company",
+                  "Form Name": 'Company',
+                  "Description": `${items.P1} Company was Deleted`,
+                  "User Id": this.username,
+                  "Client Id": this.SK_clientID,
+                  "created_time": Date.now(),
+                  "updated_time": Date.now()
+                }
+            
+                this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+              }
+              catch(error){
+                console.log("Error while creating audit trails ",error);
+              }
 
               this.reloadEvent.next(true)
 
