@@ -25,6 +25,7 @@ import { MiniTableComponent } from './mini-table/mini-table.component';
 import { DynamicModalComponent } from './dynamic-modal/dynamic-modal.component';
 import { FullscreenService } from './services/fullscreen.service';
 import { AdvancedFilterComponent } from './components/advanced-filter/advanced-filter.component';
+import { AuditTrailService } from '../services/auditTrail.service';
 
 interface ListItem {
   [key: string]: {
@@ -151,10 +152,12 @@ columns: any;
   filtermatchedData: any = [];
   permissionForm: any = [];
   formsToDisplay: any = [];
+  filterType: string = '';
+  totalRecordsViewed: number = 0;
 
    constructor(private fb:FormBuilder,private api:APIService,private configService:SharedService,private scheduleAPI:scheduleApiService,
     private toast:MatSnackBar,private spinner:NgxSpinnerService,private cd:ChangeDetectorRef,private modalService: NgbModal,private moduleDisplayService: ModuleDisplayService,
-    private route: ActivatedRoute,private router:Router,  public fullscreenService: FullscreenService
+    private route: ActivatedRoute,private router:Router,  public fullscreenService: FullscreenService,public auditTrail:AuditTrailService
    ){
 
     this.gridOptions = <GridOptions>{
@@ -226,6 +229,9 @@ columns: any;
 
     this.addFromService()
 
+
+
+    this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
 
 
      this.formFieldsGroup = this.fb.group({
@@ -550,6 +556,30 @@ columns: any;
   openModal(content: any) {
     this.modalRef = this.modalService.open(this.SavedQuery, { size: 'xl' });
 
+
+
+    try{
+      const UserDetails = {
+        "User Name": this.username,
+        "Action": "View",
+        "Module Name": "Report Studio",
+        "Form Name": 'Report Studio',
+       "Description": `Saved Query Table was Viewed`,
+        "User Id": this.username,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+  
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+    }
+    catch(error){
+      console.log("Error while creating audit trails ",error);
+    }
+
+
+
+
     this.showQueryTable();
   }
 
@@ -657,6 +687,8 @@ columns: any;
     this.reportsFeilds.get('daysAgo')?.clearValidators();
 
     const config = this.dateTypeConfig[value];
+
+    this.filterType = value
 
     if (config) {
       if (config.showDate) {
@@ -1678,6 +1710,38 @@ async onFilterChange(event: any,getValue:any,key:any) {
     console.log("Table rows are here ",this.tableDataWithFormFilters);
 
 
+    this.totalRecordsViewed = 0
+    for(let ele of this.tableDataWithFormFilters){
+      this.totalRecordsViewed = this.totalRecordsViewed + ele.rows.length
+    }
+
+
+    try{
+      const UserDetails = {
+        "User Name": this.username,
+        "Action": "View",
+        "Module Name": "Report Studio",
+        "Form Name": this.selectedForms.join(),
+       "Description": `${this.filterType} filter applied. Total records viewed: ${this.totalRecordsViewed}`,
+        "User Id": this.username,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+  
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+    }
+    catch(error){
+      console.log("Error while creating audit trails ",error);
+    }
+
+
+
+
+
+
+
+
     console.log("All the trackLocation array are here ",this.trackLocationArray);
     if(this.trackLocationArray && Array.isArray(this.trackLocationArray) && this.trackLocationArray.length > 0){
       this.trackLocationMapFlag = true
@@ -2101,6 +2165,29 @@ locationCellRenderer(params: any) {
 
 
   openTrackLocationModal(lat: string) {
+
+
+    try{
+      const UserDetails = {
+        "User Name": this.username,
+        "Action": "View",
+        "Module Name": "Report Studio",
+        "Form Name": this.selectedForms.join(),
+        "Description": `Track History Map Viewed`,
+        "User Id": this.username,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+  
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+    }
+    catch(error){
+      console.log("Error while creating audit trails ",error);
+    }
+
+
+
     const modalRef = this.modalService.open(MapModalComponent, { size: 'lg' });
     modalRef.componentInstance.coordinates = lat;
   }
@@ -2590,6 +2677,31 @@ mergeAndAddLocation(mappedResponse: any) {
      
               await this.fetchTimeMachineById(1, getValue, 'delete', item)
 
+
+
+              try{
+                const UserDetails = {
+                  "User Name": this.username,
+                  "Action": "Deleted",
+                  "Module Name": "Report Studio",
+                  "Form Name": "Report Studio",
+                  "Description": `${getValue} Saved Query was Deleted`,
+                  "User Id": this.username,
+                  "Client Id": this.SK_clientID,
+                  "created_time": Date.now(),
+                  "updated_time": Date.now()
+                }
+            
+                this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+              }
+              catch(error){
+                console.log("Error while creating audit trails ",error);
+              }
+      
+
+
+
+
               this.modalService.dismissAll(this.SavedQuery)
 
               this.reloadEvent.next(true)
@@ -2701,6 +2813,9 @@ mergeAndAddLocation(mappedResponse: any) {
 
   
     async editSavedQuery(P1: any,key:any) {
+
+
+      
 
       this.editedQueryName = P1
 
@@ -2841,6 +2956,38 @@ mergeAndAddLocation(mappedResponse: any) {
            else{
             this.visibiltyflag = false
            }
+
+
+
+           try{
+            const UserDetails = {
+              "User Name": this.username,
+              "Action": "View",
+              "Module Name": "Report Studio",
+              "Form Name": this.selectedForms.join(),
+              "Description": `${ this.editedQueryName} Saved Query was Viewed`,
+              "User Id": this.username,
+              "Client Id": this.SK_clientID,
+              "created_time": Date.now(),
+              "updated_time": Date.now()
+            }
+      
+            this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+          }
+          catch(error){
+            console.log("Error in Audit Trail Data ",error);
+          }
+
+
+
+
+
+
+
+
+
+
+
 
            this.onSubmit()
            this.onSubmitFlag = false
@@ -3068,6 +3215,7 @@ mergeAndAddLocation(mappedResponse: any) {
 
   async exportAllTablesAsExcel() {
 
+
     const excelSheets = this.reportsFeilds.value.excelSheets
 
     this.spinner.show()
@@ -3275,6 +3423,25 @@ mergeAndAddLocation(mappedResponse: any) {
       this.spinner.hide()
     }
 
+
+    try{
+      const UserDetails = {
+        "User Name": this.username,
+        "Action": "View",
+        "Module Name": "Report Studio",
+        "Form Name": this.selectedForms.join(),
+      "Description": `${this.filterType} filter applied. Total records Excel export: ${this.totalRecordsViewed}`,
+        "User Id": this.username,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+    }
+    catch(error){
+      console.log("Error in Audit Trail Data ",error);
+    }
 
     this.spinner.hide()
   }
@@ -4827,7 +4994,30 @@ splitCsv(csv: string): string[] {
       this.isFullScreen = !this.isFullScreen;
       this.showHeading = !this.showHeading
     } 
- 
+
+
+
+
+    if(this.isFullScreen){
+      try{
+        const UserDetails = {
+          "User Name": this.username,
+          "Action": "View",
+          "Module Name": "Report Studio",
+          "Form Name": this.selectedForms.join(),
+         "Description": `Records were Viewed in Full Screen Mode`,
+          "User Id": this.username,
+          "Client Id": this.SK_clientID,
+          "created_time": Date.now(),
+          "updated_time": Date.now()
+        }
+    
+        this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+      }
+      catch(error){
+        console.log("Error while creating audit trails ",error);
+      }  
+    }
     this.isFormVisible = true
   }
 

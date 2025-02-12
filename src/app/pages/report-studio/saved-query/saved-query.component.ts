@@ -6,6 +6,7 @@ import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { SharedService } from '../../shared.service';
 import { APIService } from 'src/app/API.service';
 import { table } from 'console';
+import { AuditTrailService } from '../../services/auditTrail.service';
 
 
 interface ListItem {
@@ -49,7 +50,7 @@ export class SavedQueryComponent implements OnInit {
   allUsers: any;
 
   constructor(private moduleDisplayService: ModuleDisplayService,private fb:FormBuilder,private cd:ChangeDetectorRef,private notifyConfig:SharedService,
-    private api:APIService
+    private api:APIService,private auditTrail:AuditTrailService
   ) {}
 
   async ngOnInit() {
@@ -210,6 +211,33 @@ export class SavedQueryComponent implements OnInit {
 
         await this.fetchTimeMachineById(1,this.SK_clientID+"#savedquery"+"#lookup", 'update', item);
         this.showAlert(successAlert)
+
+
+
+
+        try{
+          const UserDetails = {
+            "User Name": this.username,
+            "Action": "Edited",
+            "Module Name": "Report Studio",
+            "Form Name": this.savedModulePacket.reportMetadata.form_permission.join(),
+            "Description": `${savedQueryTemp.queryName} Saved Query was Edited`,
+            "User Id": this.username,
+            "Client Id": this.SK_clientID,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+      
+          this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+        }
+        catch(error){
+          console.log("Error while creating audit trails ",error);
+        }
+
+
+
+
+
       }
       else {
         alert('Error in Creating Dashboard Configuration');
@@ -280,6 +308,38 @@ export class SavedQueryComponent implements OnInit {
         }
           await this.createLookUpRdt(item,1,this.SK_clientID+"#savedquery"+"#lookup")
           this.showAlert(successAlert)
+
+
+
+
+
+          try{
+            const UserDetails = {
+              "User Name": this.username,
+              "Action": "Created",
+              "Module Name": "Report Studio",
+              "Form Name": this.savedModulePacket[0].form_permission.join(),
+              "Description": `${savedQueryTemp.queryName} Saved Query was Created`,
+              "User Id": this.username,
+              "Client Id": this.SK_clientID,
+              "created_time": Date.now(),
+              "updated_time": Date.now()
+            }
+        
+            this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+          }
+          catch(error){
+            console.log("Error while creating audit trails ",error);
+          }
+
+
+
+
+
+
+
+
+
         }
         else {
           alert('Error in Creating Dashboard Configuration');
