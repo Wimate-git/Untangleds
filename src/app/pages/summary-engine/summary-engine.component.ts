@@ -3313,7 +3313,7 @@ console.log('selectedTab checking',this.selectedTab)
       summaryName: '',
       summarydesc: '',
       iconSelect: '',
-      toggleCheck:''
+      LiveDashboard:''
       
       
     });
@@ -3347,7 +3347,7 @@ console.log('selectedTab checking',this.selectedTab)
         summarydesc: getValues.summaryDesc || '', // Default to empty string if summaryDesc is undefined
         iconSelect: getValues.summaryIcon || '',
         tilesList:getValues.tilesList,  // Default to empty string if summaryIcon is undefined
- toggleCheck: getValues.toggleCheck
+        LiveDashboard: getValues.LiveDashboard
       });
       this.cd.detectChanges(); 
     }
@@ -3384,7 +3384,7 @@ console.log('selectedTab checking',this.selectedTab)
         summarydesc: getValues.summaryDesc,
         iconSelect: getValues.summaryIcon,
         tilesList:this.tilesListDefault,
-        toggleCheck:getValues.toggleCheck
+        LiveDashboard:getValues.LiveDashboard
 
           // Assign the entire icon object here
       });
@@ -3464,7 +3464,7 @@ console.log('selectedTab checking',this.selectedTab)
       'summarydesc': ['', Validators.required],
       'iconSelect': [[], Validators.required],
       'tilesList':['Tiles'],
-      toggleCheck: [false], // Default toggle state
+      LiveDashboard: [false], // Default toggle state
 
      
 
@@ -3655,7 +3655,7 @@ console.log('selectedTab checking',this.selectedTab)
       summaryDesc: duplicateData.summaryDesc,
       summaryIcon: duplicateData.summaryIcon,
       iconObject: duplicateData.iconObject,
-      toggleCheck:duplicateData.toggleCheck,
+      LiveDashboard:duplicateData.LiveDashboard,
       crDate: createdDate,
       upDate: updatedDate,
       createdUser: this.getLoggedUser.username, // Set the creator's username
@@ -3675,7 +3675,7 @@ console.log('selectedTab checking',this.selectedTab)
         summaryName: this.allCompanyDetails.summaryName,
         summaryDesc: this.allCompanyDetails.summaryDesc,
         summaryIcon: this.allCompanyDetails.summaryIcon,
-        toggleCheck:this.allCompanyDetails.toggleCheck,
+        LiveDashboard:this.allCompanyDetails.LiveDashboard,
         grid_details:duplicateData.grid_details,
         created: createdDateISO,
         updated: updatedDateISO,
@@ -4689,7 +4689,7 @@ console.log('selectedTab checking',this.selectedTab)
         summaryName: this.allCompanyDetails.summaryName || this.all_Packet_store.summaryName,
         summaryDesc: this.allCompanyDetails.summaryDesc || this.all_Packet_store.summaryDesc,
         iconObject: this.allCompanyDetails.iconObject || this.all_Packet_store.iconObject,
-        toggleCheck:this.allCompanyDetails.toggleCheck ||''
+        LiveDashboard:this.allCompanyDetails.LiveDashboard ||''
       };
       console.log('Updated allCompanyDetails with Packet Store:', this.allCompanyDetails);
     }
@@ -4943,7 +4943,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
       summaryDesc: this.createSummaryField.value.summarydesc,
       summaryIcon: this.createSummaryField.value.iconSelect,
       iconObject: this.previewObjDisplay,
-      toggleCheck:this.createSummaryField.value.toggleCheck,
+      LiveDashboard:this.createSummaryField.value.LiveDashboard,
       updated: new Date().toISOString(),
       createdUser: this.getLoggedUser?.username || this.createdUserName
     };
@@ -4974,7 +4974,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
       // jsonData: parsedJsonData,
       summaryIcon: this.createSummaryField.value.iconSelect,
       iconObject: this.previewObjDisplay,
-      toggleCheck:this.createSummaryField.value.toggleCheck,
+      LiveDashboard:this.createSummaryField.value.LiveDashboard,
 
       // Add the selected icon
       crDate: createdDate, // Created date
@@ -4999,7 +4999,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
         summaryDesc: this.allCompanyDetails.summaryDesc,
         // jsonData: this.allCompanyDetails.jsonData,
         summaryIcon: this.createSummaryField.value.iconSelect,
-        toggleCheck:this.createSummaryField.value.toggleCheck,
+        LiveDashboard:this.createSummaryField.value.LiveDashboard,
         // Include selected icon in the metadata
         created: createdDateISO, // Created date in ISO format
         updated: updatedDateISO,   // Updated date in ISO format
