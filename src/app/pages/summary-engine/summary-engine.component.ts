@@ -807,6 +807,7 @@ invokeHelperDashboard(item: any, index: number, template: any,modaref:any): void
 
 
   this.showDrillDownData(item)
+  this.redirectModule(item)
   
     this.currentModalIndex = index;
   
