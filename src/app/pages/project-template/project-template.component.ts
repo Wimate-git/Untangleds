@@ -195,9 +195,9 @@ export class ProjectTemplateComponent implements OnInit, AfterViewInit, OnDestro
         color: ["", Validators.required],
         iconSelect:['',Validators.required],
         iconObject:[''],
-        label: ['',Validators.required],
-        forms: ['',Validators.required],
-        field: ['',Validators.required],
+        label: [''],
+        forms: [''],
+        field: [''],
         label_1:['',Validators.required],
         label_2:['',Validators.required],
         label_3:['',Validators.required],
@@ -214,33 +214,6 @@ export class ProjectTemplateComponent implements OnInit, AfterViewInit, OnDestro
 
 }
 
-
-// addValues() {
-//   // Get selected values from the dropdowns
-
-//   const selectedLabel = this.projectForm.get('label')?.value;
-//   const selectedForm = this.projectForm.get('forms')?.value;
-//   const selectedField = this.projectForm.get('field')?.value;
-
-//   if (!selectedLabel || !selectedForm || !selectedField) {
-//       alert('Please select all fields before adding!');
-//       return;
-//   }
-
-//   // Concatenate the values into a string
-//   // const valueToAdd = `Form: ${selectedForm}, Field: ${selectedField}`;
-
-//   const valueToAdd = `${selectedForm}.${selectedField}`;
-
-//   // Update the corresponding input field
-//   this.projectForm.get(selectedLabel)?.setValue(valueToAdd);
-
-//   this.projectForm.patchValue({
-//     label: '',
-//     forms: '',
-//     field: '',
-// });
-// }
 
 addValues() {
   // Get selected values from the dropdowns
@@ -304,10 +277,6 @@ addValues() {
     console.log("Current Selected Form Groups:", this.selectedFormGroups);
 
   }
-
-  // onselect(seletedForm: any):void{
-  //  console.log("SELECTED FORMS:",seletedForm)
-  // }
 
   async ngOnInit(): Promise<void> {
 

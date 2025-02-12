@@ -187,7 +187,7 @@ export class FolderConfigurationComponent implements OnInit, AfterViewInit, OnDe
         color: ["", Validators.required],
         formList:[[],Validators.required],
         iconSelect:['',Validators.required],
-        iconObject:['',Validators.required],
+        iconObject:[''],
         remarks:[''],
         createdTime: [Math.ceil(((new Date()).getTime()) / 1000)],
         updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],

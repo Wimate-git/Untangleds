@@ -202,7 +202,7 @@ export class ProjectComponent implements OnInit, AfterViewInit, OnDestroy {
         label_2:[''],
         label_3:[''],
         form_record:[''],
-        forms:[''],
+        forms:['',Validators.required],
         createdTime:[Math.ceil(((new Date()).getTime()) / 1000)],
         updatedTime:[Math.ceil(((new Date()).getTime()) / 1000)],
     });
@@ -511,7 +511,7 @@ export class ProjectComponent implements OnInit, AfterViewInit, OnDestroy {
       const formValue = this.projectForm.value;
 
       this.projectForm.value.form_record = this.formData.formList.map((label: any) => ({
-        [label]: '' // Use Date.now() to get the current epoch time in milliseconds
+        [label]: null // Use Date.now() to get the current epoch time in milliseconds
     }));
 
       this.projectForm.value.iconObject = this.previewObjDisplay
@@ -551,7 +551,8 @@ export class ProjectComponent implements OnInit, AfterViewInit, OnDestroy {
           P9: this.projectForm.value.label_1,
           P10: this.projectForm.value.label_2,
           P11: this.projectForm.value.label_3,
-          P12: this.projectForm.value.forms
+          P12: this.projectForm.value.forms,
+          P13: JSON.stringify(this.projectForm.value.form_record)
           // P12: JSON.stringify(this.projectForm.value.form_record),
         };
 
@@ -609,6 +610,8 @@ export class ProjectComponent implements OnInit, AfterViewInit, OnDestroy {
           P9: this.updateResponse.label_1,
           P10: this.updateResponse.label_2,
           P11: this.updateResponse.label_3,
+          P12: this.updateResponse.forms,
+          P13: JSON.stringify(this.updateResponse.form_record)
           // P12: this.updateResponse.form_record,
           // P13: this.updateResponse.forms
 
