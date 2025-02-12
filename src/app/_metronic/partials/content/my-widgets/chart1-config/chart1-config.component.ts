@@ -1178,6 +1178,10 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
     { value: 'sumArray', text: 'SumArray' },
     { value: 'Advance Equation', text: 'Advance Equation' },
+    { value: 'sum_difference', text: 'Sum Difference' },
+    { value: 'distance_sum', text: 'Distance Sum' },
+    { value: 'Count Multiple Minitable', text: 'Count Multiple Minitable' },
+    
     
 
 
@@ -1491,6 +1495,8 @@ initializeChart(): void {
 FormatTypeValues = [
   { value: 'Default', text: 'Default' },
   { value: 'Rupee', text: 'Rupee' },
+  { value: 'Distance', text: 'Distance' },
+  { value: 'Days & Hours', text: 'Days & Hours' },
   // { value: 'max', text: 'Maximum' },
 ]
 

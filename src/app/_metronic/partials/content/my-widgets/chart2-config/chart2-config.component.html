@@ -90,13 +90,13 @@
                         </ngx-select>
                       </div>
   
-                      <div class="col-md-4 mb-3">
-                        <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Parameter</label>
-                        <ngx-select id="parameterName" [allowClear]="true" formControlName="parameterName"
-                          [items]="listofDynamicParam" optionValueField="value" optionTextField="text"
-                          placeholder="Select Parameter" (selectionChanges)="parameterValueCheck($event,fieldIndex)" style="width: 100%;">
-                        </ngx-select>
-                      </div>
+                    <div class="col-md-4 mb-3">
+                      <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields</label>
+                      <p-multiSelect id="parameterName" formControlName="parameterName"
+                        [options]="listofDynamicParam"       optionLabel="text"
+                        placeholder="Select Parameter" (onChange)="parameterValueCheck($event,fieldIndex)" >
+                      </p-multiSelect>
+                    </div>
   
                       <!-- <div class="col-md-4 mb-3">
                         <label for="groupBy" class="col-createChart-label fw-bold fs-6 required">Group By</label>
@@ -304,18 +304,27 @@
             <form [formGroup]="createChart">
             
               <div class="row g-3 align-items-end mb-4">
+                <div class="col-md-4 mb-3">
+                  <label for="formlist" class="col-createChart-label fw-bold fs-6 required">Forms</label>
+                  <ngx-select id="filterFormList" [allowClear]="true" name="icon" formControlName="filterFormList"
+                    [items]="listofDeviceIds" optionValueField="value" optionTextField="text"
+                    (selectionChanges)="selectfilterFormList($event)" placeholder="Select createChart">
+                  </ngx-select>
+                </div>
                 <!-- Form Fields -->
                 <div class="col-md-4">
                   <label for="parameterName" class="fw-bold fs-6">Form Fields</label>
                   <p-multiSelect
-                    id="parameterName"
-                    formControlName="filterParameter"
-                    [options]="listofDynamicParam"
-                    optionLabel="text"
-                    placeholder="Select Parameter"
-                    (onChange)="dynamicparameterValue($event)"
+                  id="parameterName"
+                  formControlName="filterParameterLine"
+                  [options]="listofDynamicParamFilter"
+                  optionLabel="text"
+                  optionValue="value" 
+                  placeholder="Select Parameter"
+                  (onChange)="selectfilterFields($event)"
+                  >
+                </p-multiSelect>
                 
-                  ></p-multiSelect>
                 </div>
               
                 <!-- Add Button -->

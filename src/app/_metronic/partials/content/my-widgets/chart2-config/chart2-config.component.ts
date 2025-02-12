@@ -77,6 +77,7 @@ export class Chart2ConfigComponent implements OnInit{
   columnVisisbilityFields: any;
   selectedText: any;
   shoRowData:boolean = false
+  listFormFields: void;
 
 
  
@@ -95,6 +96,14 @@ export class Chart2ConfigComponent implements OnInit{
     this.dynamicData()
 
 
+    
+
+  }
+
+  selectfilterFormList(filterFormValue:any){
+    console.log('filterFormValue check',filterFormValue)
+    const filterValue = filterFormValue[0].value
+    this.fetchDynamicFormDataFilter(filterValue)
 
   }
   ngOnChanges(changes: SimpleChanges): void {
@@ -175,8 +184,10 @@ export class Chart2ConfigComponent implements OnInit{
       chart_title:[''],
       highchartsOptionsJson:[JSON.stringify(this.defaultHighchartsOptionsJson,null,4)],
       filterForm:[''],
-      filterParameter:[''],
+   
       filterDescription:[''],
+      filterParameterLine:[[]],
+      filterFormList:['']
       // custom_Label:['',Validators.required]
 
     });
@@ -215,6 +226,10 @@ export class Chart2ConfigComponent implements OnInit{
     }
   }
 
+  selectfilterFields(filterFormField:any){
+    console.log('filterFormField check',filterFormField)
+
+  }
   addControls(event: any, _type: string) {
     console.log('event check', event);
   
@@ -243,7 +258,7 @@ export class Chart2ConfigComponent implements OnInit{
         this.all_fields.push(
           this.fb.group({
             formlist: ['', Validators.required],
-            parameterName: ['', Validators.required],
+            parameterName: [[], Validators.required],
             // groupBy: ['', Validators.required],
             primaryValue: ['', Validators.required],
             groupByFormat: ['', Validators.required],
@@ -383,8 +398,10 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         themeColor: 'var(--bs-body-bg)',  // Default theme color
         chartConfig: this.createChart.value.all_fields || [],  // Default to empty array if missing
         filterForm: this.createChart.value.filterForm || {},
-        filterParameter: this.createChart.value.filterParameter || {},
+      
         filterDescription: this.createChart.value.filterDescription || '',
+        filterParameterLine: this.createChart.value.filterParameterLine || {},
+        filterFormList: this.createChart.value.filterFormList ||'',
         // custom_Label: this.createChart.value.custom_Label || '',
   
         highchartsOptionsJson: this.chartFinalOptions,
@@ -469,10 +486,12 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     // fontSize: this.createChart.value.fontSize,
     // themeColor: this.createChart.value.themeColor,
     // fontColor: this.createChart.value.fontColor,
-    filterParameter:this.createChart.value.filterParameter,
+
     filterDescription:this.createChart.value.filterDescription,
     chartConfig: this.createChart.value.all_fields,
     highchartsOptionsJson: this.chartFinalOptions,
+    filterParameterLine:this.createChart.value.filterParameterLine,
+    filterFormList:this.createChart.value.filterFormList,
     // filterForm:this.createChart.value.filterForm,
     // filterParameter:this.createChart.value.filterParameter,
     // filterDescription:this.createChart.value.filterDescription,
@@ -624,9 +643,9 @@ openChartModal2(tile: any, index: number) {
 
  // Default to 14px if undefined
  let parsedFilterParameter = [];
- if (tile.filterParameter) {
+ if (tile.filterParameterLine) {
    try {
-     parsedFilterParameter = JSON.parse(tile.filterParameter);
+     parsedFilterParameter = JSON.parse(tile.filterParameterLine);
    } catch (error) {
      console.error('Error parsing filterParameter:', error);
    }
@@ -635,6 +654,7 @@ openChartModal2(tile: any, index: number) {
  console.log('Parsed FilterParameter:', parsedFilterParameter);
     console.log('this.paramCount check',this.paramCount)
     this.initializeTileFields();
+  
     // Initialize form fields and pre-select values
     this.createChart = this.fb.group({
 
@@ -646,9 +666,10 @@ openChartModal2(tile: any, index: number) {
       fontSize:fontSizeValue,
       filterDescription:tile.filterDescription,
       filterForm:tile.filterForm,
+      filterFormList:tile.filterFormList,
 
       // filterForm:tile.filterForm,
-      filterParameter: [parsedFilterParameter], 
+      filterParameterLine: [parsedFilterParameter], 
       // filterDescription:tile.filterDescription
 
 
@@ -702,6 +723,16 @@ repopulate_fields(getValues: any): FormArray {
   try {
     if (typeof getValues.chartConfig === 'string') {
       parsedChartConfig = JSON.parse(getValues.chartConfig || '[]');
+      console.log('parsedChartConfig check',parsedChartConfig[0].formlist)
+
+      this.fetchDynamicFormData(parsedChartConfig[0].formlist).then((data: any[]) => {
+        console.log('Updated listFormFields:', data);
+        this.listofDynamicParam = [...data]; // Ensure reference update for change detection
+        this.cdr.detectChanges(); // Manually trigger change detection
+      });
+      
+      
+      
     } else if (Array.isArray(getValues.chartConfig)) {
       parsedChartConfig = getValues.chartConfig;
     }
@@ -723,12 +754,15 @@ repopulate_fields(getValues: any): FormArray {
             value: item.value || '',
           }))
         : [];
+        const arrayParameter = Array.isArray(configItem.parameterName)
+        ? configItem.parameterName
+        : [];
 
       // Push FormGroup into FormArray
       this.all_fields.push(
         this.fb.group({
           formlist: configItem.formlist || '',
-          parameterName: configItem.parameterName || '',
+          parameterName: this.fb.control(arrayParameter) || '',
           primaryValue: configItem.primaryValue || '',
           groupByFormat: configItem.groupByFormat || '',
           constantValue: configItem.constantValue || '',
@@ -782,52 +816,58 @@ repopulate_fields(getValues: any): FormArray {
   onMouseLeave(): void {
     this.isHovered = false;
   }
-  fetchDynamicFormData(value: any) {
+  fetchDynamicFormData(value: any): Promise<any[]> {
     console.log("Data from lookup:", value);
-
-    this.api
+  
+    return this.api
       .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
       .then((result: any) => {
         if (result && result.metadata) {
           const parsedMetadata = JSON.parse(result.metadata);
-          console.log('parsedMetadata check dynamic',parsedMetadata)
+          console.log('parsedMetadata check dynamic', parsedMetadata);
           const formFields = parsedMetadata.formFields;
-          console.log('formFields check',formFields)
-
+          console.log('formFields check', formFields);
+  
           // Initialize the list with formFields labels
           this.listofDynamicParam = formFields.map((field: any) => {
-            console.log('field check',field)
+            console.log('field check', field);
             return {
               value: field.name,
               text: field.label
             };
           });
-
+  
           // Include created_time and updated_time
           if (parsedMetadata.created_time) {
             this.listofDynamicParam.push({
               value: parsedMetadata.created_time.toString(),
-              text: 'Created Time' // You can customize the label here if needed
+              text: 'Created Time' // Customize the label here if needed
             });
           }
-
+  
           if (parsedMetadata.updated_time) {
             this.listofDynamicParam.push({
               value: parsedMetadata.updated_time.toString(),
-              text: 'Updated Time' // You can customize the label here if needed
+              text: 'Updated Time' // Customize the label here if needed
             });
           }
-
+  
           console.log('Transformed dynamic parameters:', this.listofDynamicParam);
-
+          
           // Trigger change detection to update the view
           this.cdr.detectChanges();
+  
+          return this.listofDynamicParam; // Ensure the promise resolves with data
+        } else {
+          return [];
         }
       })
       .catch((err) => {
         console.log("Can't fetch", err);
+        return []; // Handle errors gracefully
       });
   }
+  
 
   fetchDynamicFormDataFilter(value: any) {
     console.log("Data from lookup:", value);
@@ -926,19 +966,27 @@ repopulate_fields(getValues: any): FormArray {
 
   onAdd(): void {
     // Capture the selected parameters (which will be an array of objects with text and value)
-    const selectedParameters =  this.selectedParameterValue;
-    console.log('selectedParameters checking', selectedParameters);
+    const filterParameterLineValue = this.createChart.get('filterParameterLine')?.value;
+    console.log('filterParameterLine',filterParameterLineValue)
+    const selectedOptions = this.listofDynamicParamFilter.filter((option: { value: any; }) => 
+      filterParameterLineValue.includes(option.value)
+    );
   
-    if (Array.isArray(selectedParameters)) {
+    console.log('Selected Values:', filterParameterLineValue); // Array of selected values
+    console.log('Selected Texts:', selectedOptions.map((option: { text: any; }) => option.text));
+
+    console.log('selectedParameters checking', selectedOptions);
+  
+    if (Array.isArray(selectedOptions)) {
       // Format the selected parameters to include both text and value
-      this.selectedParameterValue = selectedParameters
-        .map(param => `${param.text}-\${${param.value}}`) // Include both text and value
+      this.selectedParameterValue = selectedOptions
+        .map((param: { text: any; value: any; }) => `${param.text}-\${${param.value}}`) // Include both text and value
         .join(' '); // Join them with a comma and space
-    } else if (selectedParameters) {
+    } else if (selectedOptions) {
       // If only one parameter is selected, format it directly
-      this.selectedParameterValue = `${selectedParameters.text}-\${${selectedParameters.value}}`;
+      this.selectedParameterValue = `${selectedOptions.text}-\${${selectedOptions.value}}`;
     } else {
-      console.warn('No parameters selected or invalid format:', selectedParameters);
+      console.warn('No parameters selected or invalid format:', selectedOptions);
       this.selectedParameterValue = ''; // Fallback in case of no selection
     }
   
@@ -952,6 +1000,7 @@ repopulate_fields(getValues: any): FormArray {
     // Manually trigger change detection to ensure the UI reflects the changes
     this.cdr.detectChanges();
   }
+
   
 
 
@@ -988,18 +1037,18 @@ repopulate_fields(getValues: any): FormArray {
     }
   }
 
-  selectFormParamsFilter(event: any) {
-    if (event && event[0] && event[0].data) {
-      const selectedFilterText = event[0].data.text;  // Adjust based on the actual structure
-      console.log('Selected Form Text:', selectedFilterText);
+  // selectFormParamsFilter(event: any) {
+  //   if (event && event[0] && event[0].data) {
+  //     const selectedFilterText = event[0].data.text;  // Adjust based on the actual structure
+  //     console.log('Selected Form Text:', selectedFilterText);
 
-      if (selectedFilterText) {
-        this.fetchDynamicFormDataFilter(selectedFilterText);
-      }
-    } else {
-      console.error('Event data is not in the expected format:', event);
-    }
-  }
+  //     if (selectedFilterText) {
+  //       this.fetchDynamicFormDataFilter(selectedFilterText);
+  //     }
+  //   } else {
+  //     console.error('Event data is not in the expected format:', event);
+  //   }
+  // }
 
   groupByOptions = [
     { value: 'none', text: 'None' },

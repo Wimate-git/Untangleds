@@ -196,13 +196,15 @@ export class Chart3ConfigComponent implements OnInit{
       chart_title:[''],
       highchartsOptionsJson:[JSON.stringify(this.defaultHighchartsOptionsJson,null,4)],
       filterForm:[''],
-      filterParameter:[''],
+   
       filterDescription:[''],
       miniForm:[''],
       MiniTableNames:[''],
       MiniTableFields:[''],
       minitableEquation:[''],
-      EquationOperationMini:['']
+      EquationOperationMini:[''],
+      filterParameterLine:[[]],
+      filterFormList:['']
   
 
     });
@@ -359,7 +361,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         themeColor: 'var(--bs-body-bg)',  // Default theme color
         chartConfig: this.createChart.value.all_fields || [],  // Default to empty array if missing
         filterForm: this.createChart.value.filterForm || {},
-        filterParameter: this.createChart.value.filterParameter || {},
+   
         filterDescription: this.createChart.value.filterDescription || '',
         custom_Label: this.createChart.value.custom_Label || '',
   
@@ -370,6 +372,8 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         MiniTableFields:this.createChart.value.MiniTableFields ,
         minitableEquation:this.createChart.value.minitableEquation,
         EquationOperationMini:this.createChart.value.EquationOperationMini,
+        filterParameterLine: this.createChart.value.filterParameterLine || {},
+        filterFormList: this.createChart.value.filterFormList ||'',
       };
   
       // Log the new tile object to verify it's being created correctly
@@ -448,7 +452,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
 
    
     chart_title: this.createChart.value.chart_title,
-    filterParameter:this.createChart.value.filterParameter,
+
     filterDescription:this.createChart.value.filterDescription,
     // fontSize: this.createChart.value.fontSize,
     // themeColor: this.createChart.value.themeColor,
@@ -460,6 +464,8 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     MiniTableFields:this.createChart.value.MiniTableFields ||'' ,
     minitableEquation:this.createChart.value.minitableEquation ||'',
     EquationOperationMini:this.createChart.value.EquationOperationMini ||'',
+    filterParameterLine:this.createChart.value.filterParameterLine,
+    filterFormList:this.createChart.value.filterFormList,
     // filterForm:this.createChart.value.filterForm,
     // filterParameter:this.createChart.value.filterParameter,
     // filterDescription:this.createChart.value.filterDescription,
@@ -608,13 +614,13 @@ openChartModal3(tile: any, index: number) {
 
  // Default to 14px if undefined
  let parsedFilterParameter = [];
- if (tile.filterParameter) {
+ if (tile.filterParameterLine) {
    try {
-     parsedFilterParameter = JSON.parse(tile.filterParameter);
+     parsedFilterParameter = JSON.parse(tile.filterParameterLine);
    } catch (error) {
      console.error('Error parsing filterParameter:', error);
    }
- } 
+ }
 
  let parsedMiniTableFields = [];
  if (typeof tile.MiniTableFields === 'string') {
@@ -645,9 +651,10 @@ openChartModal3(tile: any, index: number) {
       fontSize:fontSizeValue,
       filterDescription:tile.filterDescription,
       filterForm:tile.filterForm,
+      filterFormList:tile.filterFormList,
 
       // filterForm:tile.filterForm,
-      filterParameter: [parsedFilterParameter], 
+      filterParameterLine: [parsedFilterParameter], 
 
       miniForm:tile.miniForm || '',
       MiniTableNames:tile.MiniTableNames ||'',
@@ -895,19 +902,27 @@ repopulate_fields(getValues: any): FormArray {
 
   onAdd(): void {
     // Capture the selected parameters (which will be an array of objects with text and value)
-    const selectedParameters =  this.selectedParameterValue;
-    console.log('selectedParameters checking', selectedParameters);
+    const filterParameterLineValue = this.createChart.get('filterParameterLine')?.value;
+    console.log('filterParameterLine',filterParameterLineValue)
+    const selectedOptions = this.listofDynamicParamFilter.filter((option: { value: any; }) => 
+      filterParameterLineValue.includes(option.value)
+    );
   
-    if (Array.isArray(selectedParameters)) {
+    console.log('Selected Values:', filterParameterLineValue); // Array of selected values
+    console.log('Selected Texts:', selectedOptions.map((option: { text: any; }) => option.text));
+
+    console.log('selectedParameters checking', selectedOptions);
+  
+    if (Array.isArray(selectedOptions)) {
       // Format the selected parameters to include both text and value
-      this.selectedParameterValue = selectedParameters
-        .map(param => `${param.text}-\${${param.value}}`) // Include both text and value
+      this.selectedParameterValue = selectedOptions
+        .map((param: { text: any; value: any; }) => `${param.text}-\${${param.value}}`) // Include both text and value
         .join(' '); // Join them with a comma and space
-    } else if (selectedParameters) {
+    } else if (selectedOptions) {
       // If only one parameter is selected, format it directly
-      this.selectedParameterValue = `${selectedParameters.text}-\${${selectedParameters.value}}`;
+      this.selectedParameterValue = `${selectedOptions.text}-\${${selectedOptions.value}}`;
     } else {
-      console.warn('No parameters selected or invalid format:', selectedParameters);
+      console.warn('No parameters selected or invalid format:', selectedOptions);
       this.selectedParameterValue = ''; // Fallback in case of no selection
     }
   
@@ -921,7 +936,6 @@ repopulate_fields(getValues: any): FormArray {
     // Manually trigger change detection to ensure the UI reflects the changes
     this.cdr.detectChanges();
   }
-  
 
 
   parameterValueCheck(event:any,index:any){
@@ -1099,6 +1113,9 @@ repopulate_fields(getValues: any): FormArray {
     { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
     { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
     { value: 'sumArray', text: 'SumArray' },
+    { value: 'sum_difference', text: 'Sum Difference' },
+    { value: 'distance_sum', text: 'Distance Sum' },
+    { value: 'Count Multiple Minitable', text: 'Count Multiple Minitable' },
 
 
   ]
@@ -1496,6 +1513,8 @@ initializeChart(): void {
 FormatTypeValues = [
   { value: 'Default', text: 'Default' },
   { value: 'Rupee', text: 'Rupee' },
+  { value: 'Distance', text: 'Distance' },
+  { value: 'Days & Hours', text: 'Days & Hours' },
   // { value: 'max', text: 'Maximum' },
 ]
 
@@ -1723,6 +1742,16 @@ miniTableFieldsRead(readFields:any){
 
 
 }
-  
+
+selectfilterFields(filterFormField:any){
+  console.log('filterFormField check',filterFormField)
+
+}
+selectfilterFormList(filterFormValue:any){
+  console.log('filterFormValue check',filterFormValue)
+  const filterValue = filterFormValue[0].value
+  this.fetchDynamicFormDataFilter(filterValue)
+
+}
 
 }

@@ -675,12 +675,12 @@
                     <div class="title">Last 24 Hours</div>
                     <div class="example">E.g., Last 24 hours of data</div>
                   </div>
-                  <div class="list-item" (click)="selectValue('Today', modal)" (mouseenter)="showTooltip('Today')"
-                    (mouseleave)="hideTooltip()">
+                  <div class="list-item active" (click)="selectValue('Today', modal)" (mouseenter)="showTooltip('Today')"
+                    (mouseleave)="hideTooltip()" >
                     <div class="title">Today</div>
                     <div class="example">E.g., Data from 00:00 hrs to now</div>
                   </div>
-                  <div class="list-item" (click)="selectValue('Yesterday', modal)" (mouseenter)="showTooltip('Yesterday')"
+                  <div class="list-item active" (click)="selectValue('Yesterday', modal)" (mouseenter)="showTooltip('Yesterday')"
                     (mouseleave)="hideTooltip()">
                     <div class="title">Yesterday</div>
                     <div class="example">E.g., Data from previous day</div>

@@ -1565,6 +1565,12 @@ selectFormParams1(event: any[], index: number): void {
     { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
     { value: 'sumArray', text: 'SumArray' },
     { value: 'Advance Equation', text: 'Advance Equation' },
+    { value: 'sum_difference', text: 'Sum Difference' },
+    { value: 'sum_difference', text: 'Sum Difference' },
+    { value: 'distance_sum', text: 'Distance Sum' },
+    
+    
+
     
 
   ]
@@ -1575,6 +1581,9 @@ selectFormParams1(event: any[], index: number): void {
     { value: 'Rupee', text: 'Rupee' },
     { value: 'Distance', text: 'Distance' },
     { value: 'Days & Hours', text: 'Days & Hours' },
+    { value: 'Hours', text: 'Hours' },
+    { value: 'Minutes', text: 'Minutes' },
+    { value: 'Days', text: 'Days' },
     // { value: 'max', text: 'Maximum' },
 ]
 

@@ -806,31 +806,30 @@ checkAndSetFullscreen(): void {
 invokeHelperDashboard(item: any, index: number, template: any,modaref:any): void {
 
 
-this.showDrillDownData(item)
-this.redirectModule(item)
-
-  this.currentModalIndex = index;
-
-    this.currentItem = item
-
-    console.log('item checking',item)
-
-    this.setModuleID(item, index,modaref)
-
-    const viewModeQP = true;
-    const disableMenuQP = true;
-
-
-    localStorage.setItem('viewMode', viewModeQP.toString());
-    localStorage.setItem('disableMenu', disableMenuQP.toString());
-    this.cdr.detectChanges()
-    // this.modalService.open(template, {
-    //   size: 'xl',
-    //   backdrop: 'static',
-    //   keyboard: false
-    // });
-
-}
+  this.showDrillDownData(item)
+  
+    this.currentModalIndex = index;
+  
+      this.currentItem = item
+  
+      console.log('item checking',item)
+  
+      this.setModuleID(item, index,modaref)
+  
+      const viewModeQP = true;
+      const disableMenuQP = true;
+  
+  
+      localStorage.setItem('viewMode', viewModeQP.toString());
+      localStorage.setItem('disableMenu', disableMenuQP.toString());
+      this.cdr.detectChanges()
+      // this.modalService.open(template, {
+      //   size: 'xl',
+      //   backdrop: 'static',
+      //   keyboard: false
+      // });
+  
+  }
 
 
 redirectModule(recieveItem: any) {
@@ -1086,6 +1085,7 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
   // Append parsedFilterTileConfig to queryParams
   console.log('filterTileQueryParam',filterTileQueryParam)
   const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}${filterTileQueryParam}&from_routerID=${this.routeId}`;
+  console.log('queryParams checking for modal',queryParams)
 
   this.currentItem = packet;
   this.currentModalIndex = selectedMarkerIndex;
@@ -1855,16 +1855,17 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     console.log('this.SK_clientID check', this.SK_clientID)
     this.userdetails = this.getLoggedUser.username;
     console.log('user name permissions check',this.userdetails)
-    const savedMode = localStorage.getItem('editModeState');
-    this.isEditModeView = savedMode ? JSON.parse(savedMode) : false;
+
     this.fetchUserPermissions(1)
     
     this.initializeCompanyFields();
 
     this.route.queryParams.subscribe((params) => {
-      console.log('Received queryParams:', params);
-    
+      console.log('params check', params);
       this.queryParams = params;
+    
+      console.log('this.queryParams checking', this.queryParams);
+      // this.openQueryParams(this.queryParams)
       this.isEditModeView = false;
     
       if (params['viewMode']) {
@@ -1875,29 +1876,34 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     
       if (params['disableMenu']) {
         this.disableMenuQP = params['disableMenu'] === 'true';
+        console.log('this.disableMenuQP check',this.disableMenuQP)
         sessionStorage.setItem('disableMenu', this.disableMenuQP.toString());
       }
-    
-      if (params['from_routerID']) {
-        console.log('from_routerID:', params['from_routerID']);
-        this.fromRouterID = params['from_routerID'];
-      }
-    
+    if(params['from_routerID']){
+      console.log(params['from_routerID'])
+      this.fromRouterID = params['from_routerID']
+    }
+      console.log('params', params['filterTileConfig']);
       if (params['filterTileConfig']) {
         console.log('Raw filterTileConfig:', params['filterTileConfig']);
     
         try {
+          // Ensure the value is a valid JSON string
           const parsedFilterTileConfig = JSON.parse(params['filterTileConfig'].trim());
           console.log('Parsed filterTileConfig:', parsedFilterTileConfig);
     
+          // Flatten the nested array structure if necessary
           const flattenedConfig = parsedFilterTileConfig.flat();
           console.log('Flattened filterTileConfig:', flattenedConfig);
     
+          // Check if flattenedConfig is an array and has elements
           if (Array.isArray(flattenedConfig) && flattenedConfig.length > 0) {
             console.log('Triggering updateSummary with add_tile');
             alert('I am triggered');
-            this.isFilterdetail = true;
-            this.storeFilterDetail = flattenedConfig;
+            console.log('all_Packet_store checking',this.all_Packet_store)
+          this.isFilterdetail=true
+          this.storeFilterDetail = flattenedConfig
+          // this.updateSummary(flattenedConfig, 'add_tile');
           } else {
             console.warn('Flattened filterTileConfig is empty or not valid:', flattenedConfig);
           }
@@ -1906,18 +1912,14 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
         }
       } else {
         console.warn('filterTileConfig is not present in params.');
-        this.isFilterdetail = false;
-      }
-    
-      // ✅ New logic to handle 'savedQuery' for Report Studio
-      if (params['savedQuery']) {
-        console.log('✅ Received savedQuery:', params['savedQuery']);
-        this.savedQueryParam = params['savedQuery'];
-    
-        // Load data based on savedQuery
-        this.loadReportData(this.savedQueryParam);
+        this.isFilterdetail= false
       }
     });
+    
+    // this.dropdownSettings = this.devicesList.getMultiSelectSettings();
+
+
+
     
     // Function to process the savedQuery parameter
 
@@ -1963,7 +1965,8 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     this.addFromService()
 
 
-
+    const savedMode = localStorage.getItem('editModeState');
+    this.isEditModeView = savedMode ? JSON.parse(savedMode) : false;
     // Update options based on the retrieved mode
     this.updateOptions();
 
@@ -2001,16 +2004,10 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     //   this.isGirdMoved = JSON.parse(savedState);
     //   localStorage.removeItem('isGirdMoved'); // Clean up storage
     // }
-    const storedMode = localStorage.getItem('editModeState');
-    if (storedMode !== null) {
-      this.isEditModeView = storedMode === 'true'; // Convert stored string back to boolean
-    } else {
-      this.isEditModeView = false; // Default to View Mode if not found in localStorage
-    }
-  
-    console.log('Initial Mode (On Load):', this.isEditModeView ? 'Widgets Edit Mode' : 'View Mode');
-    this.updateOptions(); 
 
+  
+    const savedGridMoved = localStorage.getItem('isGirdMoved');
+    this.isGirdMoved = savedGridMoved ? JSON.parse(savedGridMoved) : false;
   // Retrieve `lastSavedTime` if needed
   const savedLastTime = localStorage.getItem('lastSavedTime');
   if (savedLastTime) {
@@ -4925,7 +4922,8 @@ console.log('Serialized Query Params:', serializedQueryParams);
       columnVisibility:this.formatField(tile.columnVisibility),
       formFieldTexts:this.formatField(tile.formFieldTexts),
       equation:this.formatField(tile.equation),
-      MiniTableFields:this.formatField(tile.MiniTableFields)
+      MiniTableFields:this.formatField(tile.MiniTableFields),
+      filterParameterLine:this.formatField(tile.filterParameterLine)
 
 
 
@@ -6121,7 +6119,7 @@ refreshFunction(){
     }
   }
   toggleMode(): void {
-    console.log('Current Mode (Before Toggle):', this.isEditModeView ? 'Widgets Edit Mode' : 'View Mode');
+    console.log('Current Mode (Before Toggle):', this.isEditModeView ? 'Edit Mode' : 'View Mode');
   
     // Show spinner while toggling mode
     this.spinner.show();
@@ -6141,7 +6139,7 @@ refreshFunction(){
     this.isEditModeView = !this.isEditModeView;
     this.updateOptions();  // Update grid options based on mode
   
-    console.log('Current Mode (After Toggle):', this.isEditModeView ? 'Widgets Edit Mode' : 'View Mode');
+    console.log('Current Mode (After Toggle):', this.isEditModeView ? 'Edit Mode' : 'View Mode');
   
     // Store the mode in localStorage
     localStorage.setItem('editModeState', this.isEditModeView.toString());
