@@ -244,6 +244,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   tileWidth: any []=[];
   tableHeight:any []=[];
   tableWidth:any [] = [];
+  titleHeight:any [] =[];
+  titleWidth:any [] = [];
   userPermissions: boolean | undefined;
   permissionIdCheck: any;
   permissionsMetaData: any;
@@ -1574,6 +1576,20 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
           `Height: ${this.tableHeight[index]}, Width: ${this.tableWidth[index]}, Top Margin: }`
         );
       }
+      else if (item.grid_type === 'TableWidget') {
+        // const topMargin = 20; // Define the top margin value
+      
+        // Adjust height and width with the top margin
+        this.titleHeight[index] = itemComponentHeight ; // Subtract additional top margin
+        this.titleWidth[index] = itemComponentWidth ; // Subtract margin/padding for width
+      
+        console.log(
+          `Resized ${item.grid_type} at index ${index}:`,
+          `Height: ${this.titleHeight[index]}, Width: ${this.titleWidth[index]}, Top Margin: }`
+        );
+      }
+      
+
       
     } else {
       console.warn('Item not found in dashboard array');
@@ -6522,6 +6538,7 @@ refreshFunction(){
       Columnchart:{ width: this.chartWidth, height: this.chartHeight, heightOffset: 80, widthOffset: 30  },
       dynamicTile:{ width: this.tileWidth, height: this.tileHeight, heightOffset: 80, widthOffset: 30  },
       TableWidget:{ width: this.tableWidth, height: this.tableHeight, heightOffset: 80, widthOffset: 30  },
+      title:{ width: this.titleWidth, height: this.titleHeight, heightOffset: 80, widthOffset: 30  },
 
 
 
