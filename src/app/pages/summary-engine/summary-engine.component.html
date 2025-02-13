@@ -171,7 +171,8 @@
                       [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalChart1)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart"></app-chart-ui1>
                     </div>
                     <div *ngIf="item.grid_type === 'Linechart'"  >
-                      <app-chart-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal2)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" (sendCellInfo) = "helperChartClickChart2($event,dataTableModalChart2)"></app-chart-ui2>
+                      <app-chart-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal2)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" (sendCellInfo) = "helperChartClickChart2($event,dataTableModalChart2)" [summaryDashboardUpdate]="summaryDashboardUpdate" [hideButton]="hideButton" [routeId]="routeId" [SK_clientID]="SK_clientID"
+                      (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)"></app-chart-ui2>
                     </div>
                     <div *ngIf="item.grid_type === 'Columnchart'"  >
                       <app-chart-ui3 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal3)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton" [summaryDashboardUpdate]="summaryDashboardUpdate" 
@@ -1935,12 +1936,15 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
     <app-data-table-chart2
     [modalData]="modalData"
       [columnDefs]="nestedColumnDefs"
+      [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"
     ></app-data-table-chart2>
   </ng-template>
   <ng-template #dataTableModalTile1 let-modal>
     <app-data-table-tile1
   [responseRowData]="responseRowData"
   [all_Packet_store]="all_Packet_store"
+  [storeDrillDown]="storeDrillDown"
+
     ></app-data-table-tile1>
   </ng-template>
 

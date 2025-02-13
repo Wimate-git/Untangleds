@@ -242,6 +242,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   lastUpdatedTime: any;
   tileHeight: any []=[];
   tileWidth: any []=[];
+  tableHeight:any []=[];
+  tableWidth:any [] = [];
   userPermissions: boolean | undefined;
   permissionIdCheck: any;
   permissionsMetaData: any;
@@ -866,6 +868,7 @@ checkAndSetFullscreen(): void {
 invokeHelperDashboard(item: any, index: number, template: any,modaref:any): void {
 
 
+
   this.showDrillDownData(item)
   this.redirectModule(item)
   
@@ -953,6 +956,14 @@ showDrillDownData(dynamicDrill:any){
   console.log('dynamicDrill checking',dynamicDrill)
   this.storeDrillDown = dynamicDrill
   console.log('this.storeDrillDown',this.storeDrillDown.id)
+  const pointData ={
+    name:this.storeDrillDown.multi_value[0].value,
+    value:this.storeDrillDown.multi_value[0].processed_value
+  }
+ 
+  console.log('pointData for Tile',pointData)
+
+
         // Define the API Gateway URL
         const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
     
@@ -962,7 +973,7 @@ showDrillDownData(dynamicDrill:any){
             clientId: this.SK_clientID,
             routeId: this.routeId,
             widgetId:this.storeDrillDown.id,
-            TileData:'',
+            TileData:pointData,
             MsgType:'DrillDown'
           }),
         };
@@ -1549,6 +1560,18 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
         console.log(
           `Resized ${item.grid_type} at index ${index}:`,
           `Height: ${this.tileHeight[index]}, Width: ${this.tileWidth[index]}, Top Margin: }`
+        );
+      }
+      else if (item.grid_type === 'TableWidget') {
+        // const topMargin = 20; // Define the top margin value
+      
+        // Adjust height and width with the top margin
+        this.tableHeight[index] = itemComponentHeight ; // Subtract additional top margin
+        this.tableWidth[index] = itemComponentWidth ; // Subtract margin/padding for width
+      
+        console.log(
+          `Resized ${item.grid_type} at index ${index}:`,
+          `Height: ${this.tableHeight[index]}, Width: ${this.tableWidth[index]}, Top Margin: }`
         );
       }
       
@@ -6495,6 +6518,13 @@ refreshFunction(){
    
       chart: { width: this.chartWidth, height: this.chartHeight, heightOffset: 10, widthOffset: 30  },
       map: { width: this.mapWidth, height: this.mapHeight, heightOffset: 80, widthOffset: 30  },
+      Linechart:{ width: this.chartWidth, height: this.chartHeight, heightOffset: 80, widthOffset: 30  },
+      Columnchart:{ width: this.chartWidth, height: this.chartHeight, heightOffset: 80, widthOffset: 30  },
+      dynamicTile:{ width: this.tileWidth, height: this.tileHeight, heightOffset: 80, widthOffset: 30  },
+      TableWidget:{ width: this.tableWidth, height: this.tableHeight, heightOffset: 80, widthOffset: 30  },
+
+
+
  
 
     };

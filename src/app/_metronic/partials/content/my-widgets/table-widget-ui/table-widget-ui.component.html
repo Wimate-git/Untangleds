@@ -37,17 +37,17 @@
       <div class="action-menu-container d-flex align-items-center"
       style="position: absolute; top: 3px; right: 10px; gap: 10px;">
    <!-- Edit Button -->
-   <button *ngIf="!isEditModeView && !hideButton && summaryDashboardUpdate && hidingLink"
+   <button *ngIf="!isEditModeView && !hideButton && summaryDashboardUpdate"
            class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px"
            (click)="edit_each_tileUI(item, index)"
            aria-haspopup="menu"
            aria-expanded="false"
            style="background: none; border: none; cursor: pointer;">
-     <i class="bi bi-pencil" style="color: black;"></i>
+     <i class="bi bi-pencil" style="color: var(--bs-body-color);"></i>
    </button>
  
    <div class="dropdown">
-     <button *ngIf="!isEditModeView && summaryDashboardUpdate && hidingLink"
+     <button *ngIf="!isEditModeView && summaryDashboardUpdate "
              [matMenuTriggerFor]="menu"
              class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px">
        <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>

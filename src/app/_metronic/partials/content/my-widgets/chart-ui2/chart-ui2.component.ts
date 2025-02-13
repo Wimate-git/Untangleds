@@ -1,5 +1,10 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
+import { Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import Highcharts from 'highcharts';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-chart-ui2',
@@ -13,6 +18,17 @@ export class ChartUi2Component implements OnInit{
   @Input() chartWidth:any
   @Input() chartHeight:any
   @Output() sendCellInfo = new EventEmitter<any>();
+  @Input() summaryDashboardUpdate:any;
+  @Input() hidingLink:any;
+  @Input () hideButton:any
+  @Input() routeId:any
+  @Input() SK_clientID:any
+  @Output() emitChartConfigTable = new EventEmitter<any>();
+  formTableConfig: {};
+  checkResBody: any;
+  parsedResBody: any;
+  processedData: any;
+  @Output() paresdDataEmit = new EventEmitter<any>();
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
@@ -43,6 +59,10 @@ export class ChartUi2Component implements OnInit{
 
     
   }
+  constructor(
+    private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient
+    
+   ){}
   ngAfterViewInit(){
     setTimeout(() => {
       this.createLineChart()
@@ -95,10 +115,86 @@ export class ChartUi2Component implements OnInit{
     console.log('item chacke',this.item.grid_details)
   }
   onBarClick(event: Highcharts.PointClickEventObject): void {
-    console.log('Pie clicked:', {
+    console.log('Line chart clicked:', {
+      name: event.point.name, // Use `name` for pie chart labels
+   
       value: event.point.y,
   
     });
+    const pointData = {
+      name: event.point.name,  // Pie chart label
+      value: event.point.y     // Data value
+    };
+    console.log('checking data for chart',this.item)
+const chartConfig =JSON.parse(this.item.chartConfig)
+console.log('chartConfig check from chart ui',chartConfig)
+const extractcolumnVisibility = chartConfig
+
+this.formTableConfig = {
+  columnVisibility:extractcolumnVisibility,
+  formName:this.item.chartConfig.formlist
+  }
+  this.emitChartConfigTable.emit(this.formTableConfig); 
+
+      // Define the API Gateway URL
+      const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+      console.log('check id',this.item.id)
+    
+      // Prepare the request body
+      const requestBody = {
+        body: JSON.stringify({
+          clientId: this.SK_clientID,
+          routeId: this.routeId,
+          widgetId:this.item.id,
+          chartData:pointData,
+          MsgType:'DrillDown',
+         
+
+        }),
+      };
+    
+      console.log('requestBody checking', requestBody);
+    
+      // Send a POST request to the Lambda function with the body
+      this.http.post(apiUrl, requestBody).subscribe(
+        (response: any) => {
+          console.log('Lambda function triggered successfully:', response);
+          this.checkResBody = response.body
+          console.log('this.checkResBody',this.checkResBody)
+          this.parsedResBody = JSON.parse(this.checkResBody)
+          console.log('this.parsedResBody checking',this.parsedResBody)
+          this.processedData = JSON.parse(this.parsedResBody.rowdata)
+          console.log('this.processedData check',this.processedData)
+          this.paresdDataEmit.emit(this.processedData); 
+          
+          
+      
+          // Display SweetAlert success message
+          // Swal.fire({
+          //   title: 'Success!',
+          //   text: 'Lambda function triggered successfully.',
+          //   icon: 'success',
+          //   confirmButtonText: 'OK'
+          // });
+    
+          // Proceed with route parameter handling
+
+    
+   // Reset loading state
+        },
+        (error: any) => {
+          console.error('Error triggering Lambda function:', error);
+    
+          // Display SweetAlert error message
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to trigger the Lambda function. Please try again.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+   // Reset loading state
+        }
+      );
   
     // Emit the cell info if needed
     this.sendCellInfo.emit(event);
@@ -110,7 +206,8 @@ export class ChartUi2Component implements OnInit{
     this.chartOptions.series = this.chartOptions.series.map((series: any) => {
       return {
         ...series,
-        data: series.data.map((value: number, index: number) => ({
+        data: series.data.map((value: any, index: number) => ({
+          name: value.name, 
           y: value,
           customIndex: index,
           events: {
