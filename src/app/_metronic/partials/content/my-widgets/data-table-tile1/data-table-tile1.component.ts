@@ -19,6 +19,7 @@ export class DataTableTile1Component {
   @Input() storeDrillDown :any
 
   private gridApi!: GridApi;
+  pageSizeOptions = [10, 25, 50, 100];
   
 
   //   [responseRowData]="responseRowData"
