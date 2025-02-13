@@ -1576,7 +1576,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
           `Height: ${this.tableHeight[index]}, Width: ${this.tableWidth[index]}, Top Margin: }`
         );
       }
-      else if (item.grid_type === 'TableWidget') {
+      else if (item.grid_type === 'title') {
         // const topMargin = 20; // Define the top margin value
       
         // Adjust height and width with the top margin
