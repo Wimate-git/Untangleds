@@ -41,7 +41,7 @@ export class ExcelValidatorService {
         if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
         if (/\s/.test(value)) return { isValid: false, error: 'Cannot contain Whitespaces' };
         if (/[A-Z]/.test(value)) return { isValid: false, error: 'Cannot contain uppercase letters' };
-        if (value.length < 3) return { isValid: false, error: 'Must be at least 3 characters long' };
+        // if (value.length < 3) return { isValid: false, error: 'Must be at least 3 characters long' };
         return { isValid: true };
       }
     },

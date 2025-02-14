@@ -900,12 +900,12 @@ rdtListWorkAround :any =[{
     console.log('Password is here:', password);
     // Updated regex: includes special character requirement
     // const temp_Password = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{6,}$/;
-    const temp_Password = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>?`~_-]).{6,}$/;
+    const temp_Password = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>?`~_-]).{8,}$/;
     this.errorForInvalidName = ''; // Clear previous error
     if (!temp_Password.test(password)) {
       this.createUserField.setErrors({ invalidForm: true });
         this.errorForInvalidName =
-            "Password must contain at least 1 numeric character, at least 1 lowercase letter, at least 1 uppercase letter, at least 1 special character, and be at least 6 characters long.";
+            "Password must contain at least 1 numeric character, at least 1 lowercase letter, at least 1 uppercase letter, at least 1 special character, and be at least 8 characters long.";
     }
     console.log(this.errorForInvalidName);
 }
@@ -1336,8 +1336,8 @@ rdtListWorkAround :any =[{
 
           this.updateCognitoAttributes();
 
-
           this.showAlert(successAlert)
+  
           this.reloadEvent.next(true)
 
           //alert('Configuration updated successfully');
@@ -1390,6 +1390,7 @@ rdtListWorkAround :any =[{
 
 
   updateCognitoAttributes() {
+
 
     let authenticationData = {
       Username: this.tempUpdateUser,
@@ -1477,15 +1478,32 @@ rdtListWorkAround :any =[{
 
       
 
-      onFailure: function (err) {
+      onFailure: function (err) {13419
         console.log("Cognito Error",err);
 
         if(err.message != 'User is disabled.'){
-          alert(err)
+          Swal.fire(err.message)
+          if(err.message == 'User is not confirmed.'){
+            Swal.fire({
+              icon: 'error',
+              title: 'User is not confirmed!',
+              text: 'User details weren\'t updated in Cognito.'
+            });
+          }
+          else{
+            Swal.fire({
+              icon: 'error',
+              title: 'Error!',
+              text: err.message
+            });
+          }
         }
       },
 
     });
+
+
+
   }
 
 
@@ -3679,6 +3697,8 @@ fetchDynamicLookupData(pk:any,sk:any):any {
 
     const modalRef = this.modalService.open(UserVerifiedTableComponent,{ size: 'lg' })
     modalRef.componentInstance.unverifiedUsers = storedResponse
+    modalRef.componentInstance.username = this.username
+    modalRef.componentInstance.SK_clientID = this.SK_clientID
 
   }
 

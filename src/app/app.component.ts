@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { TranslationService } from './modules/i18n';
 // language list
 import { locale as enLang } from './modules/i18n/vocabs/en';
@@ -8,6 +8,8 @@ import { locale as jpLang } from './modules/i18n/vocabs/jp';
 import { locale as deLang } from './modules/i18n/vocabs/de';
 import { locale as frLang } from './modules/i18n/vocabs/fr';
 import { ThemeModeService } from './_metronic/partials/layout/theme-mode-switcher/theme-mode.service';
+import { NetworkService } from './network.service';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -19,10 +21,16 @@ import { ThemeModeService } from './_metronic/partials/layout/theme-mode-switche
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
+
+  private networkSubscription: Subscription;
+  isOnline: boolean = navigator.onLine;
+
+
   constructor(
     private translationService: TranslationService,
-    private modeService: ThemeModeService
+    private modeService: ThemeModeService,
+    private networkService: NetworkService
   ) {
     // register translations
     this.translationService.loadTranslations(
@@ -37,5 +45,21 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.modeService.init();
+
+    this.networkSubscription = this.networkService.getNetworkStatus()
+    .subscribe(online => {
+      this.isOnline = online;
+      if (!online) {
+        // Optional: Add any additional offline handling
+        console.log('Application is offline');
+      }
+    });
+  }
+
+
+  ngOnDestroy() {
+    if (this.networkSubscription) {
+      this.networkSubscription.unsubscribe();
+    }
   }
 }

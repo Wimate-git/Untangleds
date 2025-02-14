@@ -274,6 +274,11 @@ columns: any;
 
 
 
+
+    
+
+
+
     
     this.routeSub = this.route.queryParams.subscribe((params) => {
       this.savedQuery = params['savedQuery'];
@@ -317,6 +322,29 @@ columns: any;
 
 
   async checkPermissions(){
+
+
+    try{
+      const UserDetails = {
+        "User Name": this.username,
+        "Action": "View",
+        "Module Name": "Report Studio",
+        "Form Name": this.selectedForms.join(),
+        "Description": `Report Studio was viewed`,
+        "User Id": this.username,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+  
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+    }
+    catch(error){
+      console.log("Error while creating audit trails ",error);
+    }
+
+
+
     //Get the user configuratyion
     const userResponse = await this.api.GetMaster(`${this.username}#user#main`, 1);
 
@@ -420,6 +448,13 @@ columns: any;
 
     }
     else{
+      const keyLocation = Array.isArray(this.locationPermission) && this.locationPermission.length === 1 && this.locationPermission[0] === "All" ? "All" : "Not all";
+      const keyDevices = Array.isArray(this.formIDPermission) &&  this.formIDPermission.length === 1 && this.formIDPermission[0] === "All" ? "All" : "Not all";
+
+      if(`${keyLocation}-${keyDevices}` == "All-All"){
+        this.formsToDisplay = this.formList
+      }
+
           this.api.GetMaster(`${this.SK_clientID}#${this.companyID}#location#main`,1).then(async (result)=>{
             if(result){
                 console.log("TREE RESPONSE:",JSON.parse(JSON.parse(JSON.stringify(result.metadata))))
@@ -453,9 +488,7 @@ columns: any;
                     this.formsToDisplay = this.filtermatchedData
 
                 }
-                else{
-                  this.formsToDisplay = this.formList
-                }
+               
             }
           })
     }
@@ -3430,7 +3463,7 @@ mergeAndAddLocation(mappedResponse: any) {
         "Action": "View",
         "Module Name": "Report Studio",
         "Form Name": this.selectedForms.join(),
-      "Description": `${this.filterType} filter applied. Total records Excel export: ${this.totalRecordsViewed}`,
+      "Description": `Exported Excel file with ${this.totalRecordsViewed} records. Filter applied: ${this.filterType}`,
         "User Id": this.username,
         "Client Id": this.SK_clientID,
         "created_time": Date.now(),

@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, Input } from '@angular/core';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DynamicApiService } from '../../dynamic-api.service';
 import Swal from 'sweetalert2';
+import { AuditTrailService } from '../../services/auditTrail.service';
 
 @Component({
   selector: 'app-user-verified-table',
@@ -11,10 +12,14 @@ import Swal from 'sweetalert2';
 })
 export class UserVerifiedTableComponent{
   unverifiedUsers: any[] = [];
-  isModalOpen: boolean = false;
+  isModalOpen: boolean = true;
+  @Input() username:any;
+  @Input() SK_clientID:any;
 
 
-  constructor(private DynamicApi:DynamicApiService){}
+
+
+  constructor(private DynamicApi:DynamicApiService,private auditTrail:AuditTrailService,public modal: NgbActiveModal,){}
 
 
  ngOnInit(){
@@ -29,7 +34,7 @@ export class UserVerifiedTableComponent{
     "event":{
       path: "/resendVerification",
       queryStringParameters: {
-          email: "asadulla@wimate.in"
+          email: "dummy@wimate.in"
       },
       username:userName
     }
@@ -50,6 +55,37 @@ export class UserVerifiedTableComponent{
           showConfirmButton: false,
           timer: 1500,
         });
+
+
+        try{
+          const UserDetails = {
+            "User Name": this.username,
+            "Action": "View",
+            "Module Name": "User Management",
+            "Form Name": 'User Management',
+           "Description": `Verification mail sent successfully to ${userName}`,
+            "User Id": this.username,
+            "Client Id": this.SK_clientID,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+      
+          this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+        }
+        catch(error){
+          console.log("Error while creating audit trails ",error);
+        }
+    
+    
+
+
+
+
+
+
+
+
+
       }
       else{
         Swal.fire({
@@ -77,5 +113,7 @@ export class UserVerifiedTableComponent{
 
 
 }
+
+
 
 }

@@ -15,6 +15,7 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 // import { formatDistanceToNow } from 'date-fns';
 // #fake-start#
 import { FakeAPIService } from './_fake/fake-api.service';
+import { NetworkService } from './network.service';
 // #fake-end#
 
 function appInitializer(authService: AuthService) {
@@ -55,6 +56,7 @@ function appInitializer(authService: AuthService) {
       multi: true,
       deps: [AuthService],
     },
+    NetworkService
   ],
   bootstrap: [AppComponent],
 })
