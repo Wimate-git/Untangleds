@@ -256,6 +256,10 @@ export class LoginComponent implements OnInit, OnDestroy {
             errorMessage = 'There was an issue with the network. Please check your connection and try again.';
             break;
           // Add more custom error handling cases as needed
+          case 'Incorrect username or password.':
+            errorTitle ='⚠️ Incorrect Credentials',
+            errorMessage = 'Username or Password is Incorrect please try again.'
+            break;
           default:
             errorTitle = '⚠️ Unknown Error';
             errorMessage = 'An unexpected error occurred. Please try again later.';

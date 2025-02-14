@@ -458,7 +458,7 @@ export class UserExportComponent {
       try{
         const UserDetails = {
           "User Name": this.username,
-          "Action": "Created",
+          "Action": "Created/Edited",
           "Module Name": "User Management",
           "Form Name": 'User Management',
           "Description": `Users were Imported through excel`,
@@ -777,6 +777,7 @@ export class UserExportComponent {
             escalation_telegram: userFields[20] ,
             // cognito_update:userFields[21] ,
             // enable_user: userFields[22] ,
+            enable_user:true,
             updated: new Date()
           }
   
