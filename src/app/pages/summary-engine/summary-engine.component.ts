@@ -2940,7 +2940,10 @@ console.log('Formatted Date:', this.lastUpdatedTime);
                 // widgetId:this.storeDrillDown.id,
             
                 MsgType:'Query_Params',
-                queryParams:this.storeFilterDetail
+                queryParams:this.storeFilterDetail,
+                permissionId:this.permissionIdRequest,
+                permissionList:this.readFilterEquation,
+                userName:this.userdetails
               }),
             };
           

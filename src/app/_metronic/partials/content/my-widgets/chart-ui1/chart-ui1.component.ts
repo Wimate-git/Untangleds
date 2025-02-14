@@ -25,6 +25,13 @@ export class ChartUi1Component implements OnChanges {
   @Input() routeId:any
   @Input() SK_clientID:any
   @Input() liveDataChart:any
+
+  @Input() permissionIdRequest:any
+  @Input() readFilterEquation:any
+  @Input() userdetails:any
+  
+  
+  
   
   checkResBody: any;
   parsedResBody: any;
@@ -137,12 +144,16 @@ this.formTableConfig = {
   columnVisibility:extractcolumnVisibility,
   formName:this.item.chartConfig.formlist
   }
+  console.log('this.permissionIdRequest',this.permissionIdRequest)
+  console.log('this.readFilterEquation',this.readFilterEquation)
+  console.log('this.userdetails',this.userdetails)
   this.emitChartConfigTable.emit(this.formTableConfig); 
 
       // Define the API Gateway URL
       const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
       console.log('check id',this.item.id)
     
+
       // Prepare the request body
       const requestBody = {
         body: JSON.stringify({
@@ -151,6 +162,10 @@ this.formTableConfig = {
           widgetId:this.item.id,
           chartData:pointData,
           MsgType:'DrillDown',
+          permissionId:this.permissionIdRequest,
+          permissionList:this.readFilterEquation,
+          userName:this.userdetails
+
          
 
         }),

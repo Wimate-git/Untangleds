@@ -23,6 +23,9 @@ export class ChartUi3Component implements OnInit{
   @Input() routeId:any
   @Input() SK_clientID:any
   @Input() liveDataColumnChart:any
+  @Input() permissionIdRequest:any
+  @Input() readFilterEquation:any
+  @Input() userdetails:any
   
   checkResBody: any;
   parsedResBody: any;
@@ -166,7 +169,10 @@ const extractcolumnVisibility = chartConfig
           routeId: this.routeId,
           widgetId:this.item.id,
           chartData:pointData,
-          MsgType:'DrillDown'
+          MsgType:'DrillDown',
+          permissionId:this.permissionIdRequest,
+          permissionList:this.readFilterEquation,
+          userName:this.userdetails
         }),
       };
     

@@ -1,72 +1,96 @@
-<div class="modal-header">
-    <h4 class="modal-title">Filter Tile</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+<div class="modal-header d-flex justify-content-between align-items-center">
+  <!-- Title -->
+  <h4 class=" col-md-4 modal-title mb-0">Filter </h4>
+
+  <!-- Form Section -->
+  <div class="container-fluid p-0" *ngIf="createChart">
+    <div [formGroup]="createChart" class="row align-items-center">
+      <!-- Toggle Switch Section -->
+      <div class="col-lg-6 col-md-8 col-sm-12 mt-2">
+        <div class="d-flex align-items-center">
+          <label for="toggleCheck" class="fw-bold fs-6 required me-2">
+            Enable Dashboard Filter
+          </label>
+          <div class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              name="add_fields"
+              [checked]="makeTrueCheck"
+              formControlName="add_fields"
+              (change)="addControls($event, 'html', formlistValues.length, formlistValues)"
+              id="toggleCheck"
+            >
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <!-- Close Button -->
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+</div>
+
   <div class="container" *ngIf="createChart">
     <div [formGroup]="createChart">
-
-        <div class="row align-items-center">
-            <!-- Enable Dashboard Filter -->
-            <div class="col-lg-6 col-md-6 col-sm-6 mb-4 mt-4">
-                <div class="d-flex align-items-center">
-                  <label for="toggleCheck" class="col-form-label fw-bold fs-6 required me-2">
-                    Enable Dashboard Filter
-                  </label>
-                  <div class="form-check form-switch">
-                    <input
-                    class="form-check-input"
-                    type="checkbox"
-                    name="add_fields"
-                    [checked]="makeTrueCheck"
-                    formControlName="add_fields"
-                    (change)="addControls($event, 'html', formlistValues.length, formlistValues)"
-                    id="toggleCheck"
-                  >
-                  
-                  </div>
-                </div>
-              </div>
-              
-          
-            <!-- Date Type -->
-            <div class="col-lg-6 col-md-6 col-sm-6 mb-4 mt-4">
-              <div class="form-group row align-items-center">
-                <label 
-                  for="dateTypeSelect" 
-                  class="col-lg-4 col-md-4 col-sm-4 col-form-label text-lg-end text-md-start text-sm-start fw-bold required">
-                  Date Type
-                </label>
-                <div class="col-lg-8 col-md-8 col-sm-8">
-                  <select 
-                    formControlName="dateType" 
-                    id="dateTypeSelect" 
-                    class="form-select form-select-solid form-select-lg"
-                    aria-label="Select Date Type">
-                    <option [value]="null" [selected]="true" disabled>Select Date Type</option>
-                    <option value="is">is</option>
-                    <option value=">=">&gt;=</option>
-                    <option value="<=">&lt;=</option>
-                    <option value="between">between</option>
-                    <option value="between time">between time</option>
-                    <option value="less than days ago">less than days ago</option>
-                    <option value="more than days ago">more than days ago</option>
-                    <option value="in the past">in the past</option> 
-                    <option value="days ago">days ago</option>
-                    <option value="today">today</option>
-                    <option value="yesterday">yesterday</option>
-                    <option value="this week">this week</option>
-                    <option value="last week">last week</option>
-                    <option value="last 2 weeks">last 2 weeks</option>
-                    <option value="this month">this month</option>
-                    <option value="last month">last month</option>
-                    <option value="this year">this year</option>
-                    <option value="any">any</option>
-                    <option value="latest 10">latest 10</option>
-                  </select>
-                </div>
-              </div>
+      <div class="row align-items-center mt-4">
+        <!-- Date Filter (Left Side) -->
+        <div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+          <div class="form-group row align-items-center">
+            <label 
+              for="dateTypeSelect" 
+              class="col-lg-4 col-md-4 col-sm-4 col-form-label text-lg-end text-md-start text-sm-start fw-bold required">
+              Date Filter
+            </label>
+            <div class="col-lg-8 col-md-8 col-sm-8">
+              <select 
+                formControlName="dateType" 
+                id="dateTypeSelect" 
+                class="form-select form-select-solid form-select-lg"
+                aria-label="Select Date Type">
+                <option [value]="null" [selected]="true" disabled>Select Date Type</option>
+                <option value="is">is</option>
+                <option value=">=">&gt;=</option>
+                <option value="<=">&lt;=</option>
+                <option value="between">between</option>
+                <option value="between time">between time</option>
+                <option value="less than days ago">less than days ago</option>
+                <option value="more than days ago">more than days ago</option>
+                <option value="in the past">in the past</option> 
+                <option value="days ago">days ago</option>
+                <option value="today">today</option>
+                <option value="yesterday">yesterday</option>
+                <option value="this week">this week</option>
+                <option value="last week">last week</option>
+                <option value="last 2 weeks">last 2 weeks</option>
+                <option value="this month">this month</option>
+                <option value="last month">last month</option>
+                <option value="this year">this year</option>
+                <option value="any">any</option>
+                <option value="latest 10">latest 10</option>
+              </select>
             </div>
-            
+          </div>
+        </div>
+      
+        <!-- Custom Label (Right Side) -->
+        <div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+          <div class="form-group row align-items-center">
+            <label for="custom_Label" class="col-lg-4 col-md-4 col-sm-4 col-form-label text-lg-end text-md-start text-sm-start fw-bold required">
+              Custom Label
+            </label>
+            <div class="col-lg-8 col-md-8 col-sm-8">
+              <input type="text" class="form-control form-control-solid" name="custom_Label" formControlName="custom_Label">
+            </div>
+          </div>
+        </div>
+      </div>
+      
+
+
+          <div class="row">
+
+
             <div *ngIf="dateType?.value === 'days ago' || dateType?.value === 'less than days ago' || dateType?.value === 'more than days ago' || dateType?.value === 'in the past'" class="mb-7">
               <div class="form-group row ps-4 mb-2">
                 <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Number of Days</label>
@@ -101,20 +125,12 @@
                 </div>
             </div>
         </div>
-            
-            
-            
           </div>
 
-          <div class="row">
+    
 
-         <div class="col-md-6 mb-3">
-                        <label for="custom_Label" class="col-form-label fw-bold fs-6  required">Custom Label</label>
-                        <input type="text" class="form-control form-control-solid"  name="custom_Label"
-                          formControlName="custom_Label">
-                      </div>
 
-          </div>
+  
           
 
       
@@ -208,7 +224,7 @@
                             </div>
                 
                             <!-- Dynamic Value Field -->
-                            <div class="mb-3" style="width: 30%;">
+                            <!-- <div class="mb-3" style="width: 30%;">
                               <label class="col-form-label fw-bold fs-6 required">Value </label>
                               <ng-container *ngIf="globalFieldData[fieldIndex]&&globalFieldData[fieldIndex][conditionIndex] ;">
                                 <ng-container *ngIf="globalFieldData[fieldIndex][conditionIndex]?.type === 'select'; else textInput">
@@ -228,10 +244,48 @@
                               <ng-template #textInput>
                                 <input type="text" formControlName="filterValue" placeholder="Enter value" class="form-control" />
                               </ng-template>
+                            </div> -->
+                            
+                            
+                            
+                            <div class="mb-3" style="width: 30%;">
+                              <label class="col-form-label fw-bold fs-6 required">Value</label>
+                            
+                              <!-- Check if data exists -->
+                              <ng-container *ngIf="globalFieldData[fieldIndex] && globalFieldData[fieldIndex][conditionIndex];">
+                                
+                                <!-- Check if type is 'select' -->
+                                <ng-container *ngIf="globalFieldData[fieldIndex][conditionIndex]?.type === 'select'; else textInput">
+                                  
+                                  <!-- Check if options exist -->
+                                  <ng-container *ngIf="globalFieldData[fieldIndex][conditionIndex]?.options?.length > 0; else noOptions">
+                                    
+                                    <!-- ngx-select Implementation -->
+                                    <ngx-select 
+                                      formControlName="filterValue"
+                                      [items]="globalFieldData[fieldIndex][conditionIndex].options"
+                                      optionValueField="value"
+                                      optionTextField="text"
+                                      [allowClear]="true"
+                                      placeholder="Select Value"
+                                      style="width: 100%;">
+                                    </ngx-select>
+                                    
+                                  </ng-container>
+                            
+                                  <!-- If no options, show text input -->
+                                  <ng-template #noOptions>
+                                    <input type="text" formControlName="filterValue" placeholder="Enter value" class="form-control" />
+                                  </ng-template>
+                            
+                                </ng-container>
+                              </ng-container>
+                            
+                              <!-- Default text input when type is not 'select' -->
+                              <ng-template #textInput>
+                                <input type="text" formControlName="filterValue" placeholder="Enter value" class="form-control" />
+                              </ng-template>
                             </div>
-                            
-                            
-                            
                             
                             
                             

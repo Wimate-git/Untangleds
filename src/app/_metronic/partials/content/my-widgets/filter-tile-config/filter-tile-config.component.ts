@@ -534,7 +534,7 @@ makeTrueCheck:any = false
           conditions: this.fb.array([
             this.fb.group({
               formField: ['', Validators.required],
-              operator: ['', Validators.required],
+              operator: ['==', Validators.required],
               filterValue: ['', Validators.required],
               operatorBetween: ['', Validators.required],
               parameterName: [formValue[index] || '', Validators.required],
@@ -579,7 +579,7 @@ makeTrueCheck:any = false
   
     const newConditionPush = this.fb.group({
       formField: ['', Validators.required],
-      operator: ['', Validators.required],
+      operator: ['==', Validators.required],
       filterValue: ['', Validators.required],
       operatorBetween: ['', Validators.required],
       type: ['text'],

@@ -30,6 +30,9 @@ export class ChartUi2Component implements OnInit{
   checkResBody: any;
   parsedResBody: any;
   processedData: any;
+  @Input() permissionIdRequest:any
+  @Input() readFilterEquation:any
+  @Input() userdetails:any
   @Output() paresdDataEmit = new EventEmitter<any>();
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
@@ -194,6 +197,9 @@ this.formTableConfig = {
           widgetId:this.item.id,
           chartData:pointData,
           MsgType:'DrillDown',
+          permissionId:this.permissionIdRequest,
+          permissionList:this.readFilterEquation,
+          userName:this.userdetails
          
 
         }),
