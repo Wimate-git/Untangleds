@@ -589,6 +589,8 @@ rdtListWorkAround :any =[{
         console.log("companies to be displayed",this.company_data);  
         
         this.listofCompanyIDs = this.company_data.map((item:any)=>item.P1)
+
+        this.listofCompanyIDs = Array.from(new Set(this.listofCompanyIDs))
       }
     } catch (error) {
       console.error('Error:', error);
@@ -2292,8 +2294,8 @@ rdtListWorkAround :any =[{
           'allowOtherClient': [{value:false,disabled:!this.Allpermission}],
           'allowNewClient': [{value:getValues.allowNewClient}],
           'allowOtherCompanyID': getValues.allowOtherCompanyID,
-          'allowNewCompanyID': [{value:false,disabled:!this.Allpermission}],
-          'companyID': [{value:getValues.clientID,disabled:true}],
+          'allowNewCompanyID': [{value:false,disabled:this.Allpermission == false}],
+          'companyID': [{value:getValues.clientID,disabled:this.Allpermission == false}],
           'username':  {value:getValues.username,disabled:this.editOperation},
           'description': getValues.description,
           'mobile': getValues.testMobile,

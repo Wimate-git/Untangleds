@@ -142,9 +142,9 @@
                             </div>
         
                             <div class="container" style="margin-left: 10px;">
-                                <div class="row mb-7" *ngIf="this.adminLogin">
+                                <div class="row mb-7" >
         
-                                    <div class="col-md-4 form-check form-switch">
+                                    <div class="col-md-4 form-check form-switch" *ngIf="this.adminLogin">
                                         <div class="col-lg-12">
                                             <input class="col-lg-6 form-check-input" formControlName="allowOtherClient"
                                                 type="checkbox" (change)="switchInputs($event)">
