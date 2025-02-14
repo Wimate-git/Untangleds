@@ -270,6 +270,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   liveDataColumnChart: any;
   liveDataDynamicTile: any;
   liveDataTableTile: any;
+  helpherObjCalender: any;
 
 
   createPieChart() {
@@ -1003,6 +1004,7 @@ redirectModule(recieveItem: any) {
 
   console.log("I am triggered here", selectedModule);
 
+
   switch (selectedModule) {
     case 'Dashboard - Group':
       this.redirectionURL = dashUrl;
@@ -1040,6 +1042,15 @@ redirectModule(recieveItem: any) {
 
         // this.redirectionURL = `/reportStudio?savedQuery=${moduleName}`;
         break;
+        case 'Calender':
+          this.redirectionURL = `/dashboard/dashboardFrom/Calendar/${moduleName}`;
+   
+          this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+          // this.router.navigate(['/reportStudio'], { queryParams: { savedQuery: moduleName } });
+     
+  
+          // this.redirectionURL = `/reportStudio?savedQuery=${moduleName}`;
+          break;
     default:
       console.error("Unknown module: ", selectedModule);
       return;
@@ -1048,6 +1059,23 @@ redirectModule(recieveItem: any) {
   // // Ensure the redirection is triggered
   // console.log("Redirecting to:", this.redirectionURL);
   // this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+}
+
+
+
+fetchCalender(){
+   this.api.GetMaster(this.SK_clientID + "#systemCalendarQuery#lookup", 1).then((result: any) => {
+    if (result) {
+        this.helpherObjCalender = JSON.parse(result.options)
+        console.log('this.helpherObjCalender check',this.helpherObjCalender)
+
+        this.formList = this.helpherObjCalender.map((item: any) => item)
+
+        console.log("DYNAMIC FORMLIST:", this.formList)
+    }
+}).catch((error) => {
+    console.log("Error:", error)
+})
 }
 showDrillDownData(dynamicDrill:any,modalref:any){
   console.log('dynamicDrill checking',dynamicDrill)
@@ -2189,6 +2217,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     this.fetchContractOrderMasterlookup(1)
     this.permissionIds(1)
     this.fetchCompanyLookupdata(1)
+    // this.fetchCalender()
    
          this.rowData = [
         {

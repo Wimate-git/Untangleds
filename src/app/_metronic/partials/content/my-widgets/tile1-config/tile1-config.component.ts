@@ -109,7 +109,7 @@ export class Tile1ConfigComponent implements OnInit {
   selectedMiniTableFields: any;
   userIsChanging: boolean;
   summaryIds: string[];
-  dynamicIDArray: any[];
+  dynamicIDArray: any;
   lookup_All_temp: any;
   IdsFetch: string[];
   dashboardList: any;
@@ -122,6 +122,8 @@ export class Tile1ConfigComponent implements OnInit {
   redirectionURL: string;
   reportStudioListRead: any;
   reportStudioDetailList: any;
+  helpherObjCalender: any;
+  formListTitles: any;
 
 
  
@@ -2035,7 +2037,8 @@ showModuleNames = [
   { value: 'Projects', text: 'Projects' },
   { value: 'Project - Detail', text: 'Project - Detail' },
   { value: 'Project - Group', text: 'Project - Group' },
-  {value: 'Report Studio', text: 'Report Studio'}
+  {value: 'Report Studio', text: 'Report Studio'},
+  {value:'Calender', text:'Calender'}
 
 ]
 
@@ -2116,16 +2119,53 @@ showModuleNames = [
         this.dynamicIDArray = []
         const ReportStudioLookup = await this.reportStudioLookupData(1)
 
-        this.dynamicIDArray = []
+    
         this.dynamicIDArray = ReportStudioLookup
         // Add specific logic for Project - Group
         break;
+        case 'Calender':
+          console.log('Project - Group module selected');
+     
+          this.dynamicIDArray = []
+          const CalenderLookup = await this.fetchCalender()
+          console.log('CalenderLookup check',CalenderLookup)
+  
+      
+          this.dynamicIDArray = CalenderLookup
+          // Add specific logic for Project - Group
+          break;
 
     default:
       console.log('Invalid selection');
       break;
   }
 }
+
+async fetchCalender(): Promise<string[]> {
+  try {
+    const result: any = await this.api.GetMaster(this.SK_clientID + "#systemCalendarQuery#lookup", 1);
+
+    if (result) {
+      this.helpherObjCalender = JSON.parse(result.options);
+      console.log('this.helpherObjCalender check', this.helpherObjCalender);
+
+      this.formList = this.helpherObjCalender.map((item: any) => item);
+      console.log("DYNAMIC FORMLIST:", this.formList);
+
+      // Extract the first element (0th index) from each record in formList
+      this.formListTitles = this.formList.map((item: any[]) => item[0]);
+      console.log("Extracted Titles:", this.formListTitles);
+
+      return this.formListTitles; // ✅ Return extracted titles
+    }
+
+    return []; // Return empty array if no result
+  } catch (error) {
+    console.error("Error:", error);
+    return []; // Return empty array in case of error
+  }
+}
+
 
 async fetchDynamicLookupData(sk: any): Promise<string[]> {
   console.log("I am called Bro");
