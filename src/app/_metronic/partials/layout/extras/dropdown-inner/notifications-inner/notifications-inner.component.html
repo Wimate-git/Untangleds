@@ -70,7 +70,7 @@
   >
     <div class="scroll-y mh-325px my-5 px-8 cursor-pointer" >
       <div *ngFor="let alert of alerts" class="d-flex flex-stack py-4" (click)="toggleSelection(alert)"
-      [ngClass]="alert.isSelected ?'bg-gray' :'bg-transparent'">
+      [ngClass]="alert.isSelected ?'bg-lightgrey;' :'bg-white'">
         <div class="d-flex align-items-center">
           <div class="symbol symbol-35px me-4">
             <span class="symbol-label" [ngClass]="'bg-light-' + alert.state">

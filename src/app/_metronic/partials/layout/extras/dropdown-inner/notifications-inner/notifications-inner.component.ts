@@ -4,6 +4,7 @@ import { APIService } from 'src/app/API.service';
 // import { formatDistanceToNow } from 'date-fns';
 import { Router } from '@angular/router';
 
+
 export type NotificationsTabsType =
   | 'kt_topbar_notifications_1'
   | 'kt_topbar_notifications_2'
@@ -37,6 +38,8 @@ export class NotificationsInnerComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
 
+    this.reloadComponentEveryMinute();
+
     this.login_detail = localStorage.getItem('userAttributes')
 
       this.loginDetail_string = JSON.parse(this.login_detail)
@@ -45,7 +48,39 @@ export class NotificationsInnerComponent implements OnInit {
       this.client = this.loginDetail_string.clientID
       this.user = this.loginDetail_string.username
 
-      const today = new Date(); // Current date
+      // const today = new Date(); // Current date
+      //   const todayepoch = today.getTime();
+
+      //   const fiveYearsAgo = new Date();
+      //   fiveYearsAgo.setFullYear(today.getFullYear() - 1); // Subtract 2 years
+      //   const epochTime = fiveYearsAgo.getTime();
+
+
+      
+      // const requestBody = {
+      //   "operation": "Between",
+      //   "pk": `${this.client}#app notification#${this.user}#main`,
+      //   "sk1": epochTime,
+      //   "sk2": todayepoch,
+      //   "ascending": false,
+      //   "limit": 100,
+      //   "lastEvaluatedKey": null
+      // };
+
+
+      // // this.notification(1)
+
+      // await this.fetchAllData(requestBody)
+
+
+      this.fetchNotification();
+
+  }
+
+
+  async fetchNotification(){
+
+    const today = new Date(); // Current date
         const todayepoch = today.getTime();
 
         const fiveYearsAgo = new Date();
@@ -69,29 +104,25 @@ export class NotificationsInnerComponent implements OnInit {
 
       await this.fetchAllData(requestBody)
 
+  
   }
 
-//   formatDate(timestamp: number): string {
-//     const now = new Date().getTime();
-//     const diff = Math.floor((now - timestamp) / 1000);
-//     const days = Math.floor(diff / 86400);
-//     const months = Math.floor(days / 30); // Assuming an average of 30 days in a month
-//     const years = Math.floor(months / 12); // Assuming 12 months in a year
+reloadComponentEveryMinute() {
+  setTimeout(async () => {
+    console.log("AFTER ! MIN")
 
-//     if (diff < 60) {
-//       return `${diff} second${diff > 1 ? 's' : ''} ago`;
-//     } else if (diff < 3600) {
-//       return `${Math.floor(diff / 60)} minute${Math.floor(diff / 60) > 1 ? 's' : ''} ago`;
-//     } else if (diff < 86400) {
-//       return `${Math.floor(diff / 3600)} hour${Math.floor(diff / 3600) > 1 ? 's' : ''} ago`;
-//     } else if (months < 12) {
-//       return `${months} month${months > 1 ? 's' : ''} ago`;
-//     } else if (years < 2) {
-//       return `${years} year ago`;
-//     } else {
-//       return `${years} years ago`;
-//     }
-// }
+    // window.location.reload();
+       this.main_table_data =[]
+    await this.fetchNotification();
+
+    this.reloadComponentEveryMinute();
+
+    // this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+    //   this.router.navigate([this.router.url]); // Reload the current component
+    // });
+  }, 60000); // 60,000 ms = 1 minute
+}
+
 
 formatDate(timestamp: number): string {
   const now = new Date().getTime();
