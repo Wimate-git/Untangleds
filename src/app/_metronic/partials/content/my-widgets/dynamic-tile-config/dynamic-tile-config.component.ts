@@ -99,6 +99,24 @@ export class DynamicTileConfigComponent implements OnInit{
   listofEquationParam: any[]=[];
   listofFormValues: any;
   paramCountEquation: any;
+  FormNames: any;
+
+  IdsFetch: string[];
+  summaryIds: any;
+  projectList: any;
+  projectListRead: any[];
+  dashboardListRead: any[];
+  dashboardList: any[];
+  projectDetailListRead: any[];
+  projectDetailList: any[];
+  dashboardIdList: any[];
+  reportStudioListRead: any[];
+  reportStudioDetailList: any[];
+  dynamicIDArray :any
+  columnVisisbilityFields: any;
+  selectedText: any;
+  listofFormParam: any;
+
 
 
  
@@ -117,6 +135,7 @@ export class DynamicTileConfigComponent implements OnInit{
     this.dynamicData()
     this.dashboardIds(1)
     this.dynamicDataEquation()
+    this.dynamicDataDrill()
     this.createChart.get('toggleCheck')?.valueChanges.subscribe((isChecked) => {
       if (isChecked) {
         this.createChart.get('dashboardIds')?.enable();
@@ -133,6 +152,15 @@ export class DynamicTileConfigComponent implements OnInit{
       } else {
         this.createChart.get('staticEquation')?.disable();
         this.createChart.get('staticEquation')?.setValue(''); // Reset value
+      }
+    });
+    this.createChart.get('selectType')?.valueChanges.subscribe((selectedType) => {
+      if (selectedType === 'drill down') {
+        this.createChart.get('drillDownForm')?.enable();
+        this.createChart.get('columnVisibility')?.enable();
+      } else {
+        this.createChart.get('drillDownForm')?.disable();
+        this.createChart.get('columnVisibility')?.disable();
       }
     });
   
@@ -222,13 +250,17 @@ export class DynamicTileConfigComponent implements OnInit{
       toggleCheck: [false], // Default toggle state
 // Default unchecked
       dashboardIds: [''],
-      selectType: [''],
+ 
       miniForm:[''],
       MiniTableNames:[''],
       MiniTableFields:[''],
       minitableEquation:[''],
       EquationOperationMini:[''],
       EquationDesc:[''],
+      columnVisibility:[[]],
+      ModuleNames:[''],
+      selectType: [''],
+      drillDownForm:['']
     
       // themeColor: ['#000000', Validators.required],
   
@@ -400,8 +432,12 @@ export class DynamicTileConfigComponent implements OnInit{
         EquationOperationMini:this.createChart.value.EquationOperationMini,
         equation: this.createChart.value.equation_fields || [], 
         EquationDesc:this.createChart.value.EquationDesc,
-        equationParams:this.noOfParamsEquation,
-        equationProcess:''
+        equationParams:this.noOfParamsEquation ||'',
+        equationProcess:'',
+        columnVisibility:this.createChart.value.columnVisibility ||[],
+        ModuleNames:this.createChart.value.ModuleNames ||'',
+        drillDownForm:this.createChart.value.drillDownForm ||'',
+        // selectType: this.createChart.value.ModuleNames,
       };
   
       console.log('New Tile Object:', newTile);
@@ -499,6 +535,9 @@ export class DynamicTileConfigComponent implements OnInit{
     // filterDescription:this.createChart.value.filterDescription,
     // Include noOfParams
     noOfParams:this.dashboard[this.editTileIndex].noOfParams,
+    ModuleNames:this.createChart.value.ModuleNames||'',
+    columnVisibility:this.createChart.value.columnVisibility ||'',
+    drillDownForm:this.createChart.value.drillDownForm ||''
 
 
       };
@@ -737,6 +776,17 @@ openDynamicTileModal(tile: any, index: number) {
     } else if (Array.isArray(tile.EquationParam)) {
       parsedEquationParam = tile.equationParams;
     }
+    let parsedColumnVisibility = [];
+    if (typeof tile.columnVisibility === 'string') {
+      try {
+        parsedColumnVisibility = JSON.parse(tile.columnVisibility);
+      } catch (error) {
+        console.error('Error parsing columnVisibility:', error);
+      }
+    } else if (Array.isArray(tile.columnVisibility)) {
+      parsedColumnVisibility = tile.columnVisibility;
+    }
+    console.log('parsedColumnVisibility checking',parsedColumnVisibility)
  
     this.createChart = this.fb.group({
       add_fields: this.paramCount,
@@ -757,6 +807,9 @@ openDynamicTileModal(tile: any, index: number) {
       all_fields: this.repopulate_fields(tile),
       equation_fields:this.populate_equationFields(tile),
       EquationDesc: tile.EquationDesc,
+      ModuleNames:tile.ModuleNames,
+      columnVisibility: [parsedColumnVisibility] ,
+      drillDownForm:tile.drillDownForm,
 
     });
     this.selectedEquationParameterValue = parsedEquationParam;
@@ -1015,36 +1068,34 @@ addEquationControls(event: any, _type: string) {
   onMouseEnter(): void {
     this.isHovered = true;
   }
-  async dashboardIds(sk: any) {
+  async dashboardIds(sk: any): Promise<string[]> {
     console.log("Iam called Bro");
     try {
       const response = await this.api.GetMaster(this.SK_clientID + "#summary#lookup", sk);
-
+  
       if (response && response.options) {
         if (typeof response.options === 'string') {
           let data = JSON.parse(response.options);
           console.log("d1 =", data);
-
+  
           if (Array.isArray(data)) {
             for (let index = 0; index < data.length; index++) {
               const element = data[index];
-
+  
               if (element !== null && element !== undefined) {
                 const key = Object.keys(element)[0];
                 const { P1, P2, P3, P4, P5, P6, P7, P8, P9 } = element[key];
-
+  
                 // Ensure dashboardIdsList is initialized
                 if (!this.dashboardIdsList) {
                   this.dashboardIdsList = [];
                 }
-
+  
                 // Check if P1 exists before pushing
                 if (P1 !== undefined && P1 !== null) {
                   this.dashboardIdsList.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9 });
                   console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5, P6, P7, P8, P9 });
-                  console.log('this.dashboardIdsList check',this.dashboardIdsList)
-                  this.p1ValuesSummary = this.dashboardIdsList.map((item: { P1: any; }) => item.P1);
-console.log('P1 values: dashboard', this.p1ValuesSummary);
+                  console.log('this.dashboardIdsList check', this.dashboardIdsList);
                 } else {
                   console.warn("Skipping element because P1 is not defined or null");
                 }
@@ -1052,20 +1103,29 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
                 break;
               }
             }
-
+  
+            // Store P1 values and return them
+            this.p1ValuesSummary = this.dashboardIdsList.map((item: { P1: any }) => item.P1);
+            console.log('P1 values: dashboard', this.p1ValuesSummary);
+  
             // Continue fetching recursively
             await this.dashboardIds(sk + 1);
+            return this.p1ValuesSummary; // Return collected values
           } else {
             console.error('Invalid data format - not an array.');
+            return [];
           }
         } else {
           console.error('response.options is not a string.');
+          return [];
         }
       } else {
         console.log("Lookup to be displayed", this.dashboardIdsList);
+        return this.p1ValuesSummary; // Return collected values
       }
     } catch (error) {
       console.error('Error:', error);
+      return [];
     }
   }
   addEquation(): void {
@@ -2045,4 +2105,531 @@ async dynamicDataEquation() {
   }
 }
 
+showModuleNames = [
+  { value: 'None', text: 'None' },
+  { value: 'Forms', text: 'Forms' },
+  { value: 'Dashboard', text: 'Dashboard' },
+  { value: 'Dashboard - Group', text: 'Dashboard - Group' },
+  { value: 'Summary Dashboard', text: 'Summary Dashboard' },
+  { value: 'Projects', text: 'Projects' },
+  { value: 'Project - Detail', text: 'Project - Detail' },
+  { value: 'Project - Group', text: 'Project - Group' },
+  {value: 'Report Studio', text: 'Report Studio'}
+
+]
+async moduleSelection(event: any): Promise<void> {
+  const selectedValue = event[0].value; // Get selected value
+  console.log('selectedValue checking',selectedValue)
+  switch (selectedValue) {
+    case 'None':
+      console.log('No module selected');
+      // Add specific logic here
+      break;
+
+    case 'Forms':
+      console.log('Forms module selected');
+      this.FormNames=this.listofDeviceIds
+      console.log('this.FormNames checking',this.FormNames)
+      this.dynamicIDArray = []
+      this.dynamicIDArray = this.FormNames
+      // Add specific logic for Forms
+      break;
+
+    case 'Dashboard':
+      console.log('Dashboard module selected');
+      this.IdsFetch = await this.dashboardIdsFetching(1)
+  
+      console.log('IdsFetch checking',this.IdsFetch)
+      this.dynamicIDArray = []
+      this.dynamicIDArray = this.IdsFetch
+    
+      break;
+      // Add specific logic for Dashboard
+
+
+    case 'Dashboard - Group':
+      console.log('Dashboard - Group module selected');
+      this.dynamicIDArray = []
+      // Add specific logic for Dashboard - Group
+      break;
+
+    case 'Summary Dashboard':
+      this.summaryIds = await this.dashboardIds(1); // Await and get P1 values
+      console.log('Fetched P1 values:', this.summaryIds);
+      this.dynamicIDArray = [];
+      this.dynamicIDArray = this.summaryIds
+      
+      console.log('Summary Dashboard module selected');
+      // Add specific logic for Summary Dashboard
+      break;
+
+    case 'Projects':
+      console.log('Projects module selected');
+      const projectList = await this.fetchDynamicLookupData(1)
+      console.log('projectList checking',projectList)
+      
+      this.dynamicIDArray = []
+      this.dynamicIDArray = projectList
+      break;
+      // Add specific logic for Projects
+      break;
+
+    case 'Project - Detail':
+      console.log('Project - Detail module selected');
+      const projectDetailList = await this.ProjectDetailLookupData(1)
+
+      this.dynamicIDArray = []
+      this.dynamicIDArray = projectDetailList
+
+      // Add specific logic for Project - Detail
+      break;
+
+    case 'Project - Group':
+      console.log('Project - Group module selected');
+      this.dynamicIDArray = []
+      // Add specific logic for Project - Group
+      break;
+      case 'Report Studio':
+        console.log('Project - Group module selected');
+        this.dynamicIDArray = []
+        const ReportStudioLookup = await this.reportStudioLookupData(1)
+
+        this.dynamicIDArray = []
+        this.dynamicIDArray = ReportStudioLookup
+        // Add specific logic for Project - Group
+        break;
+
+    default:
+      console.log('Invalid selection');
+      break;
+  }
+}
+
+
+async dashboardIdsFetching(sk: any): Promise<string[]> {
+  console.log("I am called Bro");
+  try {
+    const response = await this.api.GetMaster(this.SK_clientID + "#formgroup#lookup", sk);
+
+    if (response && response.options) {
+      if (typeof response.options === 'string') {
+        let data = JSON.parse(response.options);
+        console.log("dashboard data checking", data);
+
+        if (Array.isArray(data)) {
+          for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+
+            if (element !== null && element !== undefined) {
+              const key = Object.keys(element)[0]; // Extract L1, L2, etc.
+              if (key && element[key]) {
+                const { P1, P2, P3, P4, P5 } = element[key];
+
+                // Ensure dashboardIdsList is initialized
+                if (!this.dashboardListRead) {
+                  this.dashboardListRead = [];
+                }
+
+                // Check if P1 exists before pushing
+                if (P1 !== undefined && P1 !== null) {
+                  this.dashboardListRead.push({ P1, P2, P3, P4, P5 });
+                  console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5 });
+                } else {
+                  console.warn("Skipping element because P1 is not defined or null");
+                }
+              } else {
+                console.warn("Skipping malformed element", element);
+              }
+            }
+          }
+
+          // Store only P1 values
+          this.dashboardList = this.dashboardListRead.map((item: { P1: any }) => item.P1);
+          console.log('dashboardIdList', this.dashboardList);
+
+          // Continue fetching recursively if needed
+          await this.dashboardIdsFetching(sk + 1);
+          return this.dashboardList; // Return collected values
+        } else {
+          console.error('Invalid data format - not an array.');
+          return [];
+        }
+      } else {
+        console.error('response.options is not a string.');
+        return [];
+      }
+    } else {
+      console.log("Lookup to be displayed", this.dashboardIdsList);
+      return this.dashboardIdList; // Return collected values
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+}
+
+async ProjectDetailLookupData(sk: any): Promise<string[]> {
+  console.log("I am called Bro");
+  try {
+    const response = await this.api.GetMaster(this.SK_clientID + "#project#lookup", sk);
+
+    if (response && response.options) {
+      if (typeof response.options === 'string') {
+        let data = JSON.parse(response.options);
+        console.log("dashboard data checking", data);
+
+        if (Array.isArray(data)) {
+          for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+
+            if (element !== null && element !== undefined) {
+              const key = Object.keys(element)[0]; // Extract L1, L2, etc.
+              if (key && element[key]) {
+                const { P1, P2, P3, P4, P5 } = element[key];
+
+                // Ensure dashboardIdsList is initialized
+                if (!this.projectDetailListRead) {
+                  this.projectDetailListRead = [];
+                }
+
+                // Check if P1 exists before pushing
+                if (P1 !== undefined && P1 !== null) {
+                  this.projectDetailListRead.push({ P1, P2, P3, P4, P5 });
+                  console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5 });
+                } else {
+                  console.warn("Skipping element because P1 is not defined or null");
+                }
+              } else {
+                console.warn("Skipping malformed element", element);
+              }
+            }
+          }
+
+          // Store only P1 values
+          this.projectDetailList = this.projectDetailListRead.map((item: { P1: any }) => item.P1);
+          console.log('dashboardIdList', this.projectDetailList);
+
+          // Continue fetching recursively if needed
+          await this.ProjectDetailLookupData(sk + 1);
+          return this.projectDetailList; // Return collected values
+        } else {
+          console.error('Invalid data format - not an array.');
+          return [];
+        }
+      } else {
+        console.error('response.options is not a string.');
+        return [];
+      }
+    } else {
+      console.log("Lookup to be displayed", this.dashboardIdsList);
+      return this.dashboardIdList; // Return collected values
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+}
+
+async reportStudioLookupData(sk: any): Promise<string[]> {
+  console.log("I am called Bro");
+  try {
+    const response = await this.api.GetMaster(this.SK_clientID + "#savedquery#lookup", sk);
+    console.log('saved query response',response)
+
+    if (response && response.options) {
+      if (typeof response.options === 'string') {
+        let data = JSON.parse(response.options);
+        console.log("dashboard data checking", data);
+
+        if (Array.isArray(data)) {
+          for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+
+            if (element !== null && element !== undefined) {
+              const key = Object.keys(element)[0]; // Extract L1, L2, etc.
+              if (key && element[key]) {
+                const { P1, P2, P3 } = element[key];
+
+                // Ensure dashboardIdsList is initialized
+                if (!this.reportStudioListRead) {
+                  this.reportStudioListRead = [];
+                }
+
+                // Check if P1 exists before pushing
+                if (P1 !== undefined && P1 !== null) {
+                  this.reportStudioListRead.push({ P1, P2, P3});
+                  console.log("Pushed to dashboardIdsList: ", { P1, P2, P3 });
+                } else {
+                  console.warn("Skipping element because P1 is not defined or null");
+                }
+              } else {
+                console.warn("Skipping malformed element", element);
+              }
+            }
+          }
+
+          // Store only P1 values
+          this.reportStudioDetailList = this.reportStudioListRead.map((item: { P1: any }) => item.P1);
+          console.log('dashboardIdList', this.reportStudioDetailList);
+
+          // Continue fetching recursively if needed
+          await this.reportStudioLookupData(sk + 1);
+          return this.reportStudioDetailList; // Return collected values
+        } else {
+          console.error('Invalid data format - not an array.');
+          return [];
+        }
+      } else {
+        console.error('response.options is not a string.');
+        return [];
+      }
+    } else {
+      console.log("Lookup to be displayed", this.dashboardIdsList);
+      return this.dashboardIdList; // Return collected values
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+}
+
+
+
+async fetchDynamicLookupData(sk: any): Promise<string[]> {
+  console.log("I am called Bro");
+  try {
+    const response = await this.api.GetMaster(this.SK_clientID + "#folder#lookup", sk);
+
+    if (response && response.options) {
+      if (typeof response.options === 'string') {
+        let data = JSON.parse(response.options);
+        console.log("dashboard data checking", data);
+
+        if (Array.isArray(data)) {
+          for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+
+            if (element !== null && element !== undefined) {
+              const key = Object.keys(element)[0]; // Extract L1, L2, etc.
+              if (key && element[key]) {
+                const { P1, P2, P3, P4, P5 } = element[key];
+
+                // Ensure dashboardIdsList is initialized
+                if (!this.projectListRead) {
+                  this.projectListRead = [];
+                }
+
+                // Check if P1 exists before pushing
+                if (P1 !== undefined && P1 !== null) {
+                  this.projectListRead.push({ P1, P2, P3, P4, P5 });
+                  console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5 });
+                } else {
+                  console.warn("Skipping element because P1 is not defined or null");
+                }
+              } else {
+                console.warn("Skipping malformed element", element);
+              }
+            }
+          }
+
+          // Store only P1 values
+          this.projectList = this.projectListRead.map((item: { P1: any }) => item.P1);
+          console.log('dashboardIdList', this.projectList);
+
+          // Continue fetching recursively if needed
+          await this.fetchDynamicLookupData(sk + 1);
+          return this.projectList; // Return collected values
+        } else {
+          console.error('Invalid data format - not an array.');
+          return [];
+        }
+      } else {
+        console.error('response.options is not a string.');
+        return [];
+      }
+    } else {
+      console.log("Lookup to be displayed", this.dashboardIdsList);
+      return this.dashboardIdList; // Return collected values
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+}
+
+dynamicRedirectChanged(event:any){
+
+  let eventData;
+  if(event && event.target && event.target.value){
+    eventData = event.target.value
+  }
+  else{
+    eventData = event
+  }
+
+   let dashUrl = '/dashboard'
+  let projecturl = '/project-dashboard'
+
+  const selectedModule = this.createChart.get('ModuleNames')?.value
+
+  console.log("selected module name read",selectedModule);
+
+
+//   switch(selectedModule){
+//     case 'Dashboard - Group':
+//       this.redirectionURL =  dashUrl
+//       this.dynamicIDArray = []
+//       break;
+//     case 'Project - Group':
+//       this.redirectionURL = projecturl
+//       this.dynamicIDArray = []
+//       break
+//     case 'Forms':
+//       this.redirectionURL =  '/view-dreamboard/Forms/'+eventData
+//       break;
+//     case 'Summary Dashboard':
+//       this.redirectionURL =  '/summary-engine/'+eventData
+//       break;
+//     case 'Dashboard':
+//       this.redirectionURL =  '/dashboard/dashboardFrom/'+eventData
+//       break;
+//     case 'Projects':
+//       this.redirectionURL =  '/project-dashboard/project-template-dashboard/'+eventData
+//       break;
+//     case 'Project - Detail':
+//       this.redirectionURL =  '/view-dreamboard/Project%20Detail/'+eventData
+//       break;
+// }
+
+}
+
+// getFormControlValue(selectedTextConfi:any): void {
+//   // const formlistControl = this.createChart.get('formlist');
+//   console.log('Formlist Control Value:', selectedTextConfi);
+//   this.fetchDynamicFormDataConfig(selectedTextConfi);
+// }
+
+// fetchDynamicFormDataConfig(value: any) {
+//   console.log("Data from lookup:", value);
+
+//   this.api
+//     .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
+//     .then((result: any) => {
+//       if (result && result.metadata) {
+//         const parsedMetadata = JSON.parse(result.metadata);
+//         console.log('parsedMetadata check dynamic',parsedMetadata)
+//         const formFields = parsedMetadata.formFields;
+//         console.log('formFields check',formFields)
+
+//         // Initialize the list with formFields labels
+//         this.columnVisisbilityFields = formFields.map((field: any) => {
+//           console.log('field check',field)
+//           return {
+//             value: field.name,
+//             text: field.label
+//           };
+//         });
+
+//         // Include created_time and updated_time
+//         if (parsedMetadata.created_time) {
+//           this.columnVisisbilityFields.push({
+//             value: parsedMetadata.created_time.toString(),
+//             text: 'Created Time' // You can customize the label here if needed
+//           });
+//         }
+
+//         if (parsedMetadata.updated_time) {
+//           this.columnVisisbilityFields.push({
+//             value: parsedMetadata.updated_time.toString(),
+//             text: 'Updated Time' // You can customize the label here if needed
+//           });
+//         }
+
+//         console.log('Transformed dynamic parameters config', this.columnVisisbilityFields);
+
+//         // Trigger change detection to update the view
+//         this.cdr.detectChanges();
+//       }
+//     })
+//     .catch((err) => {
+//       console.log("Can't fetch", err);
+//     });
+// }
+
+selectFormParamsDrill(event: any) {
+  if (event && event[0] && event[0].data) {
+    this.selectedText = event[0].data.text;  // Adjust based on the actual structure
+    console.log('Selected Form Text:', this.selectedText);
+ 
+
+    if (this.selectedText) {
+      this.fetchDynamicFormDataDrill(this.selectedText);
+    }
+  } else {
+    console.error('Event data is not in the expected format:', event);
+  }
+}
+
+fetchDynamicFormDataDrill(value: any) {
+  console.log("Data from lookup:", value);
+
+  this.api
+    .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
+    .then((result: any) => {
+      if (result && result.metadata) {
+        const parsedMetadata = JSON.parse(result.metadata);
+        const formFields = parsedMetadata.formFields;
+        console.log('formFields check',formFields)
+
+        // Initialize the list with formFields labels
+        this.columnVisisbilityFields = formFields.map((field: any) => {
+          console.log('field check',field)
+          return {
+            value: field.name,
+            text: field.label
+          };
+        });
+
+        // Include created_time and updated_time
+        if (parsedMetadata.created_time) {
+          this.columnVisisbilityFields.push({
+            value: parsedMetadata.created_time.toString(),
+            text: 'Created Time' // You can customize the label here if needed
+          });
+        }
+
+        if (parsedMetadata.updated_time) {
+          this.columnVisisbilityFields.push({
+            value: parsedMetadata.updated_time.toString(),
+            text: 'Updated Time' // You can customize the label here if needed
+          });
+        }
+
+        console.log('Transformed dynamic parameters:', this.columnVisisbilityFields);
+
+        // Trigger change detection to update the view
+        this.cdr.detectChanges();
+      }
+    })
+    .catch((err) => {
+      console.log("Can't fetch", err);
+    });
+}
+
+async dynamicDataDrill(){
+  try {
+    const result: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#lookup", 1);
+    if (result) {
+      console.log('forms chaecking',result)
+      const helpherObj = JSON.parse(result.options);
+      console.log('helpherObj checking',helpherObj)
+      this.formList = helpherObj.map((item: [string]) => item[0]); // Explicitly define the type
+      this.listofFormParam = this.formList.map((form: string) => ({ text: form, value: form })); // Explicitly define the type here too
+      console.log('listofFormParam',this.listofFormParam)
+      console.log('this.formList check from location', this.formList);
+    }
+  } catch (err) {
+    console.log("Error fetching the dynamic form data", err);
+  }
+}
 }

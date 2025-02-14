@@ -52,17 +52,128 @@ export class TileUi1Component implements OnInit{
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
-    console.log("tile data check from tile1 ",this.item)
-    console.log('this.liveDataTile from child',this.liveDataTile)
+    // console.log("tile data check from tile1 ",this.item)
+    // console.log('this.liveDataTile from child',this.liveDataTile)
 
-    this.liveDataTile = this.liveDataTile.map((item: { multi_value: string; }) => {
-      return {
-          ...item,
-          multi_value: JSON.parse(item.multi_value)
-      };
+  //   this.liveDataTile = this.liveDataTile.map((item: { multi_value: string; }) => {
+  //     return {
+  //         ...item,
+  //         multi_value: JSON.parse(item.multi_value)
+  //     };
+  // });\
+
+  // Debugging logs
+// console.log("Initial this.item:", this.item);
+// console.log("Initial this.liveDataTile:", this.liveDataTile);
+if (this.all_Packet_store?.LiveDashboard === true) {
+  console.log("✅ LiveDashboard is TRUE - Updating multi_value...");
+
+  if (this.item && this.liveDataTile && Array.isArray(this.liveDataTile)) {
+      // Find the matching packet from this.liveDataTile based on id
+      const matchingLiveTile = this.liveDataTile.find(liveTile => liveTile.id === this.item.id);
+
+      console.log('🔍 Matching Live Tile:', matchingLiveTile);
+
+      // Update multi_value only if a match is found
+      if (matchingLiveTile && matchingLiveTile.multi_value) {
+          if (Array.isArray(matchingLiveTile.multi_value)) {
+              this.item.multi_value = matchingLiveTile.multi_value; // Assign directly if already an array
+          } else if (typeof matchingLiveTile.multi_value === "string") {
+              try {
+                  this.item.multi_value = JSON.parse(matchingLiveTile.multi_value); // Parse if stringified JSON
+              } catch (error) {
+                  console.error("⚠️ JSON Parsing Error for multi_value:", matchingLiveTile.multi_value, error);
+              }
+          }
+      }
+
+      console.log('✅ Updated this.item:', this.item);
+      let description = this.item.filterDescription; // This will contain your string
+      console.log('description check', description);
+      
+      // Split the description by '&&'
+      let conditions = description.split('&&').map((cond: string) => cond.trim());
+      
+      // Iterate over each condition to extract values
+      let extractedValues: any[] = [];
+      
+      conditions.forEach((condition: string) => {
+        // Use regex to capture the value after "=="
+        let regex = /\$\{[^\}]+\}==(['"]?)(.+?)\1/;
+        let match = condition.match(regex);
+        
+        if (match) {
+          let value = match[2].trim(); // Extract the value after ==
+          extractedValues.push(value); // Store the extracted value
+        }
+      });
+      
+      // Assign the first extracted value to descriptionData
+      if (extractedValues.length > 0) {
+        this.descriptionData = extractedValues[0];
+        console.log('this.descriptionData check', this.descriptionData);
+      } else {
+        this.primaryValue = this.item.multi_value[0].value;
+      }
+      
+      // Log all extracted values
+      console.log('Extracted Values:', extractedValues);
+      
+  
+  
+  
+      this.tile1Config = this.item 
+  } else {
+      console.warn("⚠️ Either this.item is empty or this.liveDataTile is not an array.");
+  }
+} else {
+  console.log("❌ LiveDashboard is FALSE - Keeping original item.");
+  console.log('this.Item',this.item)
+  let description = this.item.filterDescription; // This will contain your string
+  console.log('description check', description);
+  
+  // Split the description by '&&'
+  let conditions = description.split('&&').map((cond: string) => cond.trim());
+  
+  // Iterate over each condition to extract values
+  let extractedValues: any[] = [];
+  
+  conditions.forEach((condition: string) => {
+    // Use regex to capture the value after "=="
+    let regex = /\$\{[^\}]+\}==(['"]?)(.+?)\1/;
+    let match = condition.match(regex);
+    
+    if (match) {
+      let value = match[2].trim(); // Extract the value after ==
+      extractedValues.push(value); // Store the extracted value
+    }
   });
   
-  console.log('Updated liveDataTile:', this.liveDataTile);
+  // Assign the first extracted value to descriptionData
+  if (extractedValues.length > 0) {
+    this.descriptionData = extractedValues[0];
+    console.log('this.descriptionData check', this.descriptionData);
+  } else {
+    this.primaryValue = this.item.multi_value[0].value;
+  }
+  
+  // Log all extracted values
+  console.log('Extracted Values:', extractedValues);
+  
+
+
+
+  this.tile1Config = this.item 
+
+  // Do nothing, retain the existing this.item as is
+}
+
+
+
+
+
+
+
   
 
     
@@ -70,41 +181,7 @@ export class TileUi1Component implements OnInit{
    
 
    
-    let description = this.item.filterDescription; // This will contain your string
-    console.log('description check', description);
-    
-    // Split the description by '&&'
-    let conditions = description.split('&&').map((cond: string) => cond.trim());
-    
-    // Iterate over each condition to extract values
-    let extractedValues: any[] = [];
-    
-    conditions.forEach((condition: string) => {
-      // Use regex to capture the value after "=="
-      let regex = /\$\{[^\}]+\}==(['"]?)(.+?)\1/;
-      let match = condition.match(regex);
-      
-      if (match) {
-        let value = match[2].trim(); // Extract the value after ==
-        extractedValues.push(value); // Store the extracted value
-      }
-    });
-    
-    // Assign the first extracted value to descriptionData
-    if (extractedValues.length > 0) {
-      this.descriptionData = extractedValues[0];
-      console.log('this.descriptionData check', this.descriptionData);
-    } else {
-      this.primaryValue = this.item.multi_value[0].value;
-    }
-    
-    // Log all extracted values
-    console.log('Extracted Values:', extractedValues);
-    
 
-
-
-    this.tile1Config = this.item || this.liveDataTile
 
   
  

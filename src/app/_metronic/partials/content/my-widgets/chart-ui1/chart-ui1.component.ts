@@ -43,26 +43,74 @@ export class ChartUi1Component implements OnChanges {
       console.log('SK_clientID checking',this.SK_clientID)
 
 
-      if (typeof this.item.highchartsOptionsJson === 'string') {
-        try {
-          this.chartOptions = JSON.parse(this.item.highchartsOptionsJson);
-          console.log('this.chartOptions', this.chartOptions);
-        } catch (error) {
-          console.error('Error parsing JSON:', error);
-        }
-      } else {
-        // If it's already an object, assign it directly
-        this.chartOptions = this.item.highchartsOptionsJson;
-        console.log('this.chartOptions', this.chartOptions);
-      }
+      if (this.all_Packet_store?.LiveDashboard === true) {
+        console.log("✅ LiveDashboard is TRUE - Updating highchartsOptionsJson & chartConfig...");
+    
+        if (this.item && this.liveDataChart && Array.isArray(this.liveDataChart)) {
+            // Find the matching packet from this.liveDataChart based on id
+            const matchingLiveChart = this.liveDataChart.find(liveChart => liveChart.id === this.item.id);
+    
+            console.log('🔍 Matching Live Chart for ID:', this.item.id, matchingLiveChart);
+    
+            // Update highchartsOptionsJson and chartConfig only if a match is found
+            if (matchingLiveChart) {
+                this.item.highchartsOptionsJson = matchingLiveChart.highchartsOptionsJson;
+                this.item.chartConfig = matchingLiveChart.chartConfig;
+            }
+    
+            console.log('✅ Updated this.item: after Live', this.item);
+            if (typeof this.item.highchartsOptionsJson === 'string') {
+              try {
+                this.chartOptions = JSON.parse(this.item.highchartsOptionsJson);
+                console.log('this.chartOptions', this.chartOptions);
+              } catch (error) {
+                console.error('Error parsing JSON:', error);
+              }
+            } else {
+              // If it's already an object, assign it directly
+              this.chartOptions = this.item.highchartsOptionsJson;
+              console.log('this.chartOptions', this.chartOptions);
+            }
+            
       
+            if (typeof this.item.chartConfig === 'string') {
+              this.gridOptions = JSON.parse(this.item.chartConfig);
+            } else {
+              this.gridOptions = this.item.chartConfig; // Already an object
+            }
+        } else {
+            console.warn("⚠️ Either this.item is empty or this.liveDataChart is not an array.");
+        }
+    } else {
+        console.log("❌ LiveDashboard is FALSE - Keeping original item.");
+        if (typeof this.item.highchartsOptionsJson === 'string') {
+          try {
+            this.chartOptions = JSON.parse(this.item.highchartsOptionsJson);
+            console.log('this.chartOptions', this.chartOptions);
+          } catch (error) {
+            console.error('Error parsing JSON:', error);
+          }
+        } else {
+          // If it's already an object, assign it directly
+          this.chartOptions = this.item.highchartsOptionsJson;
+          console.log('this.chartOptions', this.chartOptions);
+        }
+        
+  
+        if (typeof this.item.chartConfig === 'string') {
+          this.gridOptions = JSON.parse(this.item.chartConfig);
+        } else {
+          this.gridOptions = this.item.chartConfig; // Already an object
+        }
+        // Do nothing, retain the existing this.item as is
+    }
+    
 
-      if (typeof this.item.chartConfig === 'string') {
-        this.gridOptions = JSON.parse(this.item.chartConfig);
-      } else {
-        this.gridOptions = this.item.chartConfig; // Already an object
-      }
-      console.log('this.chartOptions check', this.chartOptions);
+
+
+
+
+      console.log('this.chartOptions check before live', this.chartOptions);
       console.log('this.gridOptions check', this.gridOptions);
 
       

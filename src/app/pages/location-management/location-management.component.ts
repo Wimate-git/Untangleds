@@ -8,6 +8,7 @@ import { APIService, GetMasterQuery } from 'src/app/API.service';
 import Swal from 'sweetalert2';
 import { SharedService } from '../shared.service';
 import { LocationPermissionService } from 'src/app/location-permission.service';
+import { AuditTrailService } from '../services/auditTrail.service';
 interface TreeNode {
   id: string;         // Assuming 'id' is a string
   text: string;       // Assuming 'text' is a string
@@ -150,7 +151,7 @@ export class LocationManagementComponent implements OnInit {
       constructor(private fb: UntypedFormBuilder, private companyConfiguration: SharedService,
         private powerboardConfiguration: SharedService,
         private devicesList: SharedService, private api: APIService, private toast: MatSnackBar, private crn: ChangeDetectorRef,
-        private router: Router,private locationPermissionService:LocationPermissionService,private cdr:ChangeDetectorRef
+        private router: Router,private locationPermissionService:LocationPermissionService,private cdr:ChangeDetectorRef,private auditTrail: AuditTrailService
       ) 
       
       {  
@@ -184,6 +185,7 @@ export class LocationManagementComponent implements OnInit {
         this.fetchdreamboardlookup(1)
         this.fetchpowerboardlookup(1)
         this.fetchmagicboardlookup(1)
+        this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
      
 
         // this.SK_clientID = this.userClientIDCognito.attributes["custom:clientID"];
@@ -1403,6 +1405,20 @@ export class LocationManagementComponent implements OnInit {
             })
             //alert('Error in adding User Configuration');
           }
+
+          const UserDetails = {
+            "User Name": this.userdetails,
+            "Action": "Updated",
+            "Module Name": "Location Management",
+            "Form Name": "Location Management",
+            "Description": "Location is Updated",
+            "User Id": this.userdetails,
+            "Client Id": this.SK_clientID,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+      
+          this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
         }).catch(err => {
           console.log('err for updation', err);
           this.toast.open("Error in updating new Location Configuration ", "Check again", {
@@ -1440,35 +1456,23 @@ export class LocationManagementComponent implements OnInit {
           'powerboard_view': this.final_list.original.powerboard_view && this.final_list.original.powerboard_view.id !== null ? this.final_list.original.powerboard_view.id : ""
         })
     console.log('this.createLocationField check location',this.createLocationField)
-      //   {
-      //     "area": 1,
-      //     "parent": "ITC#1716284934389",
-      //     "magicboard_view": [
-      //         {
-      //             "text": "ITC",
-      //             "value": "ITC"
-      //         }
-      //     ],
-      //     "description": "ITC Mysuru",
-      //     "summary_types": "",
-      //     "mobile_view": {
-      //         "id": []
-      //     },
-      //     "dreamboard_view": {
-      //         "id": []
-      //     },
-      //     "node_type": "location",
-      //     "powerboard_view": {
-      //         "id": "ITC"
-      //     },
-      //     "id": "ITC Mysuru#1716284954951",
-      //     "text": "ITC Mysuru",
-      //     "summary_enable": false,
-      //     "leadership_view": {
-      //         "id": []
-      //     },
-      //     "state": {}
-      // }
+
+
+    const UserDetails = {
+      "User Name": this.userdetails,
+      "Action": "View",
+      "Module Name": "Location Management",
+      "Form Name": "Location Management",
+      "Description": "Location View",
+      "User Id": this.userdetails,
+      "Client Id": this.SK_clientID,
+      "created_time": Date.now(),
+      "updated_time": Date.now()
+    }
+
+    this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+
+
       }
     
       addLocation() {
@@ -1560,6 +1564,20 @@ export class LocationManagementComponent implements OnInit {
       // }
     this.crn.detectChanges()
         // console.log('after values assigned',this.createDeviceField);
+
+        const UserDetails = {
+          "User Name": this.userdetails,
+          "Action": "View",
+          "Module Name": "Location Management",
+          "Form Name": "Location Management",
+          "Description": "Location Form View",
+          "User Id": this.userdetails,
+          "Client Id": this.SK_clientID,
+          "created_time": Date.now(),
+          "updated_time": Date.now()
+        }
+    
+        this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
     
       }
     
@@ -1690,6 +1708,20 @@ this.temp =JSON.parse(this.temp)
                     allowOutsideClick: false,
                 });
             }
+
+          const UserDetails = {
+            "User Name": this.userdetails,
+            "Action": "Deleted",
+            "Module Name": "Location Management",
+            "Form Name": "Location Management",
+            "Description": "Location Form is Deleted",
+            "User Id": this.userdetails,
+            "Client Id": this.SK_clientID,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+      
+          this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
         }).catch(err => {
             console.error('Error during API update:', err);
             this.toast.open("Error in deleting Location Configuration", "Check again", {

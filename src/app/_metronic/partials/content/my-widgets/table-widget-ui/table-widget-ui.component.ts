@@ -33,6 +33,9 @@ export class TableWidgetUiComponent implements OnInit{
   @Input() isEditModeView:any;
   @Input() summaryDashboardUpdate:any;
   @Input() hidingLink:any;
+  @Input() liveDataTableTile:any;
+
+  
   @Input() isFullscreen: boolean = false; 
   @ViewChild('agGrid') agGrid!: AgGridAngular;
   tableDataWithFormFilters: any = [];
@@ -87,79 +90,163 @@ export class TableWidgetUiComponent implements OnInit{
 
 
   ngOnChanges(changes: SimpleChanges): void {
+    console.log('liveDataTableTile checking',this.liveDataTableTile)
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
- 
-    console.log("tile data check from table Widget",this.item)
-    this.formName = this.item.formlist
-    this.customLabel = this.item.custom_Label
-    console.log('this.customLabel checcking',this.customLabel)
-// Parse the conditions
-this.parsedColumns = JSON.parse(this.item.conditions);
-console.log('this.parsedColumns checking', this.parsedColumns);
-
-// Extract columnLabel values
-const columnLabels = this.parsedColumns.map((column: { columnLabel: string }) => column.columnLabel);
-
-// Log or store the extracted column labels
-console.log('Extracted column labels:', columnLabels);
-
-// Store in a variable
-this.columnLabelsArray = columnLabels; // Example variable to hold the column labels
-console.log('this.columnLabelsArray checking',this.columnLabelsArray)
-
-
-
+    if (this.all_Packet_store?.LiveDashboard === true) {
+      console.log("✅ LiveDashboard is TRUE - Updating highchartsOptionsJson & chartConfig...");
   
+      if (this.item && this.liveDataTableTile && Array.isArray(this.liveDataTableTile)) {
+          // Find the matching packet from this.liveDataChart based on id
+          const matchingLiveChart = this.liveDataTableTile.find(liveChart => liveChart.id === this.item.id);
+  
+          console.log('🔍 Matching Live Chart for ID:', this.item.id, matchingLiveChart);
+  
+          // Update highchartsOptionsJson and chartConfig only if a match is found
+          if (matchingLiveChart) {
+              this.item.tableWidget_Config = matchingLiveChart.tableWidget_Config;
+              this.item.rowData =matchingLiveChart.rowData
+     
+          }
+  
+          console.log('✅ Updated this.item: after Live', this.item);
+          this.formName = this.item.formlist
+          this.customLabel = this.item.custom_Label
+          console.log('this.customLabel checcking',this.customLabel)
+      // Parse the conditions
+      this.parsedColumns = JSON.parse(this.item.conditions);
+      console.log('this.parsedColumns checking', this.parsedColumns);
+      
+      // Extract columnLabel values
+      const columnLabels = this.parsedColumns.map((column: { columnLabel: string }) => column.columnLabel);
+      
+      // Log or store the extracted column labels
+      console.log('Extracted column labels:', columnLabels);
+      
+      // Store in a variable
+      this.columnLabelsArray = columnLabels; // Example variable to hold the column labels
+      console.log('this.columnLabelsArray checking',this.columnLabelsArray)
+        
+      this.tabledata = this.item.tableWidget_Config; // This will contain your data
+      console.log('description check', this.tabledata);
+      
+      try {
+        this.tabledata = this.item.tableWidget_Config; // Source data for columns
+        console.log('description check', this.tabledata);
+      
+        // Parse tableWidget_Config
+        this.parsedTableData = JSON.parse(this.tabledata);
+        console.log('this.parsedTableData checking', this.parsedTableData);
+      
+        // Generate column definitions from tableWidget_Config
+        const tableWidgetColumns = this.parsedTableData.map((column: { text: string; value: string }) => ({
+          headerName: column.text || 'Default Header', // Use a default name if text is missing
+          field: column.value,
+          sortable: true,
+          filter: true,
+          resizable: true,
+        }));
+      
+        console.log('tableWidget column definitions:', tableWidgetColumns);
+      
+        // Include additional columns from columnLabelsArray
+        const additionalColumns = this.columnLabelsArray
+          .filter((label: string) => label && label.trim() !== '') // Filter out empty labels
+          .map((label: string) => ({
+            headerName: label,
+            field: label,
+            sortable: true,
+            filter: true,
+            resizable: true,
+          }));
+      
+        console.log('Filtered additional columns from columnLabelsArray:', additionalColumns);
+      
+        // Combine tableWidget columns and additional columns
+        this.columnDefs = [...tableWidgetColumns, ...additionalColumns];
+        console.log('Final column definitions:', this.columnDefs);
+        this.finalColumns = this.columnDefs
+      
+        // Parse row data
+        this.rowData = JSON.parse(this.item.rowData);
+        console.log('this.rowData', this.rowData);
+      } catch (error) {
+        console.error('Error parsing table data:', error);
+      }
 
-   
-
-   
-this.tabledata = this.item.tableWidget_Config; // This will contain your data
-console.log('description check', this.tabledata);
-
-try {
-  this.tabledata = this.item.tableWidget_Config; // Source data for columns
+      } else {
+          console.warn("⚠️ Either this.item is empty or this.liveDataChart is not an array.");
+      }
+  } else {
+      console.log("❌ LiveDashboard is FALSE - Keeping original item.");
+      this.formName = this.item.formlist
+      this.customLabel = this.item.custom_Label
+      console.log('this.customLabel checcking',this.customLabel)
+  // Parse the conditions
+  this.parsedColumns = JSON.parse(this.item.conditions);
+  console.log('this.parsedColumns checking', this.parsedColumns);
+  
+  // Extract columnLabel values
+  const columnLabels = this.parsedColumns.map((column: { columnLabel: string }) => column.columnLabel);
+  
+  // Log or store the extracted column labels
+  console.log('Extracted column labels:', columnLabels);
+  
+  // Store in a variable
+  this.columnLabelsArray = columnLabels; // Example variable to hold the column labels
+  console.log('this.columnLabelsArray checking',this.columnLabelsArray)
+    
+  this.tabledata = this.item.tableWidget_Config; // This will contain your data
   console.log('description check', this.tabledata);
-
-  // Parse tableWidget_Config
-  this.parsedTableData = JSON.parse(this.tabledata);
-  console.log('this.parsedTableData checking', this.parsedTableData);
-
-  // Generate column definitions from tableWidget_Config
-  const tableWidgetColumns = this.parsedTableData.map((column: { text: string; value: string }) => ({
-    headerName: column.text || 'Default Header', // Use a default name if text is missing
-    field: column.value,
-    sortable: true,
-    filter: true,
-    resizable: true,
-  }));
-
-  console.log('tableWidget column definitions:', tableWidgetColumns);
-
-  // Include additional columns from columnLabelsArray
-  const additionalColumns = this.columnLabelsArray
-    .filter((label: string) => label && label.trim() !== '') // Filter out empty labels
-    .map((label: string) => ({
-      headerName: label,
-      field: label,
+  
+  try {
+    this.tabledata = this.item.tableWidget_Config; // Source data for columns
+    console.log('description check', this.tabledata);
+  
+    // Parse tableWidget_Config
+    this.parsedTableData = JSON.parse(this.tabledata);
+    console.log('this.parsedTableData checking', this.parsedTableData);
+  
+    // Generate column definitions from tableWidget_Config
+    const tableWidgetColumns = this.parsedTableData.map((column: { text: string; value: string }) => ({
+      headerName: column.text || 'Default Header', // Use a default name if text is missing
+      field: column.value,
       sortable: true,
       filter: true,
       resizable: true,
     }));
+  
+    console.log('tableWidget column definitions:', tableWidgetColumns);
+  
+    // Include additional columns from columnLabelsArray
+    const additionalColumns = this.columnLabelsArray
+      .filter((label: string) => label && label.trim() !== '') // Filter out empty labels
+      .map((label: string) => ({
+        headerName: label,
+        field: label,
+        sortable: true,
+        filter: true,
+        resizable: true,
+      }));
+  
+    console.log('Filtered additional columns from columnLabelsArray:', additionalColumns);
+  
+    // Combine tableWidget columns and additional columns
+    this.columnDefs = [...tableWidgetColumns, ...additionalColumns];
+    console.log('Final column definitions:', this.columnDefs);
+    this.finalColumns = this.columnDefs
+  
+    // Parse row data
+    this.rowData = JSON.parse(this.item.rowData);
+    console.log('this.rowData', this.rowData);
+  } catch (error) {
+    console.error('Error parsing table data:', error);
+  }
 
-  console.log('Filtered additional columns from columnLabelsArray:', additionalColumns);
+      // Do nothing, retain the existing this.item as is
+  }
+ 
 
-  // Combine tableWidget columns and additional columns
-  this.columnDefs = [...tableWidgetColumns, ...additionalColumns];
-  console.log('Final column definitions:', this.columnDefs);
-  this.finalColumns = this.columnDefs
 
-  // Parse row data
-  this.rowData = JSON.parse(this.item.rowData);
-  console.log('this.rowData', this.rowData);
-} catch (error) {
-  console.error('Error parsing table data:', error);
-}
 
 
 

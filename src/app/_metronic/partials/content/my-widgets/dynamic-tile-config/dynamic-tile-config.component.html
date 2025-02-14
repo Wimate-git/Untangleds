@@ -68,9 +68,90 @@
       
       <!-- Conditionally Render Dashboard Ids Field -->
    
+      <div  *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
+        <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Module Names</label>
+        <ngx-select
+          id="parameterName"
+          [allowClear]="true"
+          formControlName="ModuleNames"
+          [items]="showModuleNames"
+          optionValueField="value"
+          optionTextField="text"
+          placeholder="Select Parameter"
+          (selectionChanges)="moduleSelection($event)"
+      
+          style="width: 100%;">
+        </ngx-select>
+      </div>
 
 
-        <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
+
+      <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
+        <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Redirect To</label>
+        <ngx-select
+          id="parameterName"
+          [allowClear]="true"
+          formControlName="dashboardIds"
+          [items]="dynamicIDArray"
+          optionValueField="value"
+          optionTextField="text"
+          placeholder="Select Parameter"
+          (selectionChanges)="dynamicRedirectChanged($event)"
+      
+          style="width: 100%;">
+        </ngx-select>
+      </div>
+
+      <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
+        <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Select Type</label>
+        <ngx-select
+          id="selectType"
+          [allowClear]="true"
+          formControlName="selectType"
+          [items]="SelectTypeSummary"
+          optionValueField="value"
+          optionTextField="text"
+          placeholder="Select Parameter"
+         
+          style="width: 100%;">
+        </ngx-select>
+      </div>
+
+      <div *ngIf="createChart.get('selectType')?.value" class="col-md-4 mb-3">
+        <label for="formlist" class="col-form-label fw-bold fs-6 required">
+          Forms
+          <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
+            <i class="bi bi-info-circle fs-5"></i>
+          </span>
+        </label>
+        <ngx-select
+    
+          id="formlist"
+          [allowClear]="true"
+          name="icon"
+          formControlName="drillDownForm"
+          [items]="listofFormParam"
+          optionValueField="value"
+          optionTextField="text"
+          (selectionChanges)="selectFormParamsDrill($event)"
+          placeholder="Select Form">
+        </ngx-select>
+      </div>
+
+      <div *ngIf="createChart.get('selectType')?.value"  class="col-md-4">
+        <label for="columnVisibility" class="fw-bold fs-6 ">column Visibility</label>
+        <p-multiSelect
+          id="columnVisibility"
+          formControlName="columnVisibility"
+          [options]="columnVisisbilityFields"
+          optionLabel="text"
+          placeholder="Select Parameter"
+        
+      
+        ></p-multiSelect>
+      </div>
+
+        <!-- <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
           <label for="dashboardIds" class="col-form-label fw-bold fs-6">Redirect To</label>
           <ngx-select
             id="dashboardIds"
@@ -84,7 +165,7 @@
           </ngx-select>
         </div>
       
-        <!-- Conditionally Render Select Type Field -->
+ 
         <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
           <label for="selectType" class="col-form-label fw-bold fs-6">Select Type</label>
           <ngx-select
@@ -97,7 +178,7 @@
             placeholder="Select Parameter"
             style="width: 100%;">
           </ngx-select>
-        </div>
+        </div> -->
        </div>
     </div>
 

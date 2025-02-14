@@ -144,7 +144,7 @@
 
                   <div *ngIf="item.grid_type === 'TableWidget'" >
                     <app-table-widget-ui [item]="item" [index]="i" (customEvent)="helperTile($event,tableModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"   [summaryDashboardUpdate]="summaryDashboardUpdate" 
-                    [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" ></app-table-widget-ui>
+                    [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" [liveDataTableTile]="liveDataTableTile"></app-table-widget-ui>
                   </div>
                   
                                 <div *ngIf="item.grid_type === 'tile2'" >
@@ -172,11 +172,11 @@
                     </div>
                     <div *ngIf="item.grid_type === 'Linechart'"  >
                       <app-chart-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal2)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" (sendCellInfo) = "helperChartClickChart2($event,dataTableModalChart2)" [summaryDashboardUpdate]="summaryDashboardUpdate" [hideButton]="hideButton" [routeId]="routeId" [SK_clientID]="SK_clientID"
-                      (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)"></app-chart-ui2>
+                      (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataLineChart]="liveDataLineChart"></app-chart-ui2>
                     </div>
                     <div *ngIf="item.grid_type === 'Columnchart'"  >
                       <app-chart-ui3 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal3)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton" [summaryDashboardUpdate]="summaryDashboardUpdate" 
-                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  (sendCellInfo) = "helperChartClick($event,dataTableModal)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)"  (emitChartConfigTable)="emitchartDatatable($event)"></app-chart-ui3>
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  (sendCellInfo) = "helperChartClick($event,dataTableModal)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)"  (emitChartConfigTable)="emitchartDatatable($event)" [liveDataColumnChart]="liveDataColumnChart"></app-chart-ui3>
                     </div>
                     
                     <div *ngIf="item.grid_type === 'Areachart'"  >
@@ -213,7 +213,7 @@
                       <app-chart-ui5 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal5)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" ></app-chart-ui5>
                     </div> -->
                     <div *ngIf="item.grid_type === 'dynamicTile'"  >
-                      <app-dynamic-tile-ui [item]="item" [index]="i" (customEvent)="helperTile($event,DynamicTileModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton" ></app-dynamic-tile-ui>
+                      <app-dynamic-tile-ui [item]="item" [index]="i" (customEvent)="helperTile($event,DynamicTileModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton"  [liveDataDynamicTile]="liveDataDynamicTile"></app-dynamic-tile-ui>
                     </div>
                     <div  *ngIf="item.grid_type === 'filterTile'">
                       <app-filter-tile-ui    [item]="item" 

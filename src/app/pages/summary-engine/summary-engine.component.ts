@@ -57,6 +57,7 @@ import { GridApi ,Column, ColDef} from 'ag-grid-community';
 import { MapConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/map-config/map-config.component';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MultiTableConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/multi-table-config/multi-table-config.component';
+import { AuditTrailService } from '../services/auditTrail.service';
 
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
@@ -246,6 +247,9 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   tableWidth:any [] = [];
   titleHeight:any [] =[];
   titleWidth:any [] = [];
+  DynamicTileHeight:any [] = [];
+  DynamicTileWidth:any [] = [];
+
   userPermissions: boolean | undefined;
   permissionIdCheck: any;
   permissionsMetaData: any;
@@ -262,6 +266,10 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   hideNavMenu: boolean =true;
   isFading: boolean = false;
   inactivityTimer: any;
+  liveDataLineChart: any;
+  liveDataColumnChart: any;
+  liveDataDynamicTile: any;
+  liveDataTableTile: any;
 
 
   createPieChart() {
@@ -816,6 +824,10 @@ liveDashboardDataFormat(processedData: any) {
 
   let chartData: any = [];
   let tileData: any = [];
+  let lineChart:any = [];
+  let columnChart:any =[];
+  let dynamicTile:any = [];
+  let TableWidget:any =[];
 
   processedData.forEach((packet: any) => {
     switch (packet.grid_type) {
@@ -840,6 +852,61 @@ liveDashboardDataFormat(processedData: any) {
         this.liveDataTile = tileData
         console.log('this.liveDataTile chec',this.liveDataTile)
         break;
+        case "Linechart":
+          console.log("Matched Tile Packet:", packet);
+   
+          lineChart.push(packet);
+          console.log('lineChart after push',lineChart)
+      
+  
+   
+          this.liveDataLineChart = lineChart
+          console.log('this.liveDataLineChart chec',this.liveDataLineChart)
+          break;
+          case "Columnchart":
+            console.log("Matched Tile Packet:", packet);
+     
+            columnChart.push(packet);
+            console.log('columnChart after push',columnChart)
+        
+    
+     
+            this.liveDataColumnChart = columnChart
+            console.log('this.liveDataLineChart chec',this.liveDataLineChart)
+            break;
+            case "dynamicTile":
+              console.log("Matched Tile Packet:", packet);
+       
+              dynamicTile.push(packet);
+              console.log('dynamicTile after push',dynamicTile)
+          
+      
+       
+              this.liveDataDynamicTile = dynamicTile
+              console.log('this.liveDataLineChart chec',this.liveDataDynamicTile)
+              break;
+
+
+              case "TableWidget":
+                console.log("Matched Tile Packet:", packet);
+         
+                TableWidget.push(packet);
+                console.log('TableWidget after push',TableWidget)
+            
+        
+         
+                this.liveDataTableTile = TableWidget
+                console.log('this.liveDataLineChart chec',this.liveDataTableTile)
+                break;
+
+
+              
+
+
+            
+
+          
+
       default:
         console.warn("Unknown grid type:", packet.grid_type, "Packet:", packet);
         break;
@@ -868,19 +935,47 @@ checkAndSetFullscreen(): void {
     }
 }
 invokeHelperDashboard(item: any, index: number, template: any,modaref:any): void {
+  console.log('item check for switch case',item)
+  const selectedType = item.selectType
+  console.log('selectedType checking',selectedType)
+  console.log('modaref check',modaref)
 
 
 
-  this.showDrillDownData(item)
-  this.redirectModule(item)
+
+  // this.showDrillDownData(item)
+  // this.redirectModule(item)
   
     this.currentModalIndex = index;
   
       this.currentItem = item
   
       console.log('item checking',item)
+      switch (selectedType) {
+        case 'drill down': // Assuming 'Drill Down' is the expected value for drill-down cases
+        this.showDrillDownData(item,modaref);
+        break;
+        case 'NewTab':
+          this.setModuleID(item, index, modaref);
+          break;
+        case 'Same page Redirect':
+          this.setModuleID(item, index, modaref);
+          break;
+        case 'Modal':
+          this.setModuleID(item, index, modaref);
+          break;
+    
   
-      this.setModuleID(item, index,modaref)
+          case '': // Assuming 'Drill Down' is the expected value for drill-down cases
+          this.redirectModule(item);
+          break;
+    
+        default:
+          this.redirectModule(item); // Handle empty or undefined types
+          break;
+      }
+  
+      // this.setModuleID(item, index,modaref)
   
       const viewModeQP = true;
       const disableMenuQP = true;
@@ -954,7 +1049,7 @@ redirectModule(recieveItem: any) {
   // console.log("Redirecting to:", this.redirectionURL);
   // this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
 }
-showDrillDownData(dynamicDrill:any){
+showDrillDownData(dynamicDrill:any,modalref:any){
   console.log('dynamicDrill checking',dynamicDrill)
   this.storeDrillDown = dynamicDrill
   console.log('this.storeDrillDown',this.storeDrillDown.id)
@@ -962,7 +1057,7 @@ showDrillDownData(dynamicDrill:any){
     name:this.storeDrillDown.multi_value[0].value,
     value:this.storeDrillDown.multi_value[0].processed_value
   }
- 
+  this.modalService.open(modalref, { size: 'lg' });
   console.log('pointData for Tile',pointData)
 
 
@@ -1020,7 +1115,7 @@ showDrillDownData(dynamicDrill:any){
      // Reset loading state
           }
         );
-
+      
 }
 
 helperTileClick(event:any,modalChart:any){
@@ -1588,6 +1683,21 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
           `Height: ${this.titleHeight[index]}, Width: ${this.titleWidth[index]}, Top Margin: }`
         );
       }
+      else if (item.grid_type === 'dynamicTile') {
+        // const topMargin = 20; // Define the top margin value
+      
+        // Adjust height and width with the top margin
+        this.DynamicTileHeight[index] = itemComponentHeight ; // Subtract additional top margin
+        this.DynamicTileWidth[index] = itemComponentWidth ; // Subtract margin/padding for width
+      
+        console.log(
+          `Resized ${item.grid_type} at index ${index}:`,
+          `Height: ${this.DynamicTileHeight[index]}, Width: ${this.DynamicTileWidth[index]}, Top Margin: }`
+        );
+      }
+  
+
+      
       
 
       
@@ -1731,7 +1841,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
   nineBlocks = Array.from({ length: 9 }, (_, i) => ({ label: `KPI ${i + 1}` }));
 
   constructor(private summaryConfiguration: SharedService, private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
-    private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector,
+    private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector, private auditTrail: AuditTrailService,
     private spinner: NgxSpinnerService, private zone: NgZone,private http: HttpClient,  private sanitizer: DomSanitizer, // Inject DomSanitizer
 
   ) {
@@ -1953,6 +2063,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
   ngOnInit() {
 
     this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
+
     this.SK_clientID = this.getLoggedUser.clientID;
     console.log('this.SK_clientID check', this.SK_clientID)
     this.userdetails = this.getLoggedUser.username;
@@ -2123,7 +2234,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
   }
 });
   
-
+this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
   }
   openQueryParams(paramsRead:any){
     console.log('paramsRead',paramsRead)
@@ -3539,6 +3650,21 @@ console.log('selectedTab checking',this.selectedTab)
         );
       }
 
+
+      const UserDetails = {
+        "User Name": this.userdetails,
+        "Action": "Deleted",
+        "Module Name": "Summary Dashboard",
+        "Form Name": "Summary Dashboard",
+        "Description": "Dashboard is Deleted",
+        "User Id": this.userdetails,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+  
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+
     }).catch(err => {
       console.log('error for deleting', err);
     })
@@ -4850,6 +4976,19 @@ console.log('Serialized Query Params:', serializedQueryParams);
     };
   
     console.log('Items prepared for fetchTimeMachineById:', items);
+    const UserDetails = {
+      "User Name": this.userdetails,
+      "Action": "Updated",
+      "Module Name": "Summary Dashboard",
+      "Form Name": "Summary Dashboard",
+      "Description": "Dashboard is Updated",
+      "User Id": this.userdetails,
+      "Client Id": this.SK_clientID,
+      "created_time": Date.now(),
+      "updated_time": Date.now()
+    }
+
+    this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
   
     // Trigger fetchTimeMachineById
     if (items.P1) {
@@ -5182,6 +5321,20 @@ this.createSummaryField.patchValue({
           timer: 1500
         });
       }
+
+      const UserDetails = {
+        "User Name": this.userdetails,
+        "Action": "Created",
+        "Module Name": "Summary Dashboard",
+        "Form Name": "Summary Dashboard",
+        "Description": "Dashboard is Created",
+        "User Id": this.userdetails,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
 
     }).catch(err => {
       console.log('err for creation', err);
@@ -6536,7 +6689,7 @@ refreshFunction(){
       map: { width: this.mapWidth, height: this.mapHeight, heightOffset: 80, widthOffset: 30  },
       Linechart:{ width: this.chartWidth, height: this.chartHeight, heightOffset: 80, widthOffset: 30  },
       Columnchart:{ width: this.chartWidth, height: this.chartHeight, heightOffset: 80, widthOffset: 30  },
-      dynamicTile:{ width: this.tileWidth, height: this.tileHeight, heightOffset: 80, widthOffset: 30  },
+      dynamicTile:{ width: this.DynamicTileWidth, height: this.DynamicTileHeight, heightOffset: 80, widthOffset: 30  },
       TableWidget:{ width: this.tableWidth, height: this.tableHeight, heightOffset: 80, widthOffset: 30  },
       title:{ width: this.titleWidth, height: this.titleHeight, heightOffset: 80, widthOffset: 30  },
 

@@ -247,7 +247,7 @@ export class Tile1ConfigComponent implements OnInit {
       selectFromTime: [''],
       selectToTime: [''],
       dashboardIds: [''],
-      selectType: [''],
+  
       filterParameter: [[]], // Initialize as an array to handle multiple or single values
       filterDescription: [''],
       formatType:[''],
@@ -255,13 +255,15 @@ export class Tile1ConfigComponent implements OnInit {
    
       EquationDesc:[''],
       columnVisibility:[[]],
+      ModuleNames:[''],
+      selectType: [''],
       rowData:[],
       miniForm:[''],
       MiniTableNames:[''],
       MiniTableFields:[''],
       minitableEquation:[''],
       EquationOperationMini:[''],
-      ModuleNames:['']
+    
 
 
     });
@@ -621,13 +623,14 @@ export class Tile1ConfigComponent implements OnInit {
         // EquationParam: this.createKPIWidget.value.EquationParam,
         // EquationOperation: this.createKPIWidget.value.EquationOperation,
         EquationDesc: this.createKPIWidget.value.EquationDesc, // Update with recalculated value
-        columnVisibility:this.createKPIWidget.value.columnVisibility,
+    
         miniForm:this.createKPIWidget.value.miniForm || '',
         MiniTableNames:this.createKPIWidget.value.MiniTableNames ||'',
         MiniTableFields:this.createKPIWidget.value.MiniTableFields ||'',
         minitableEquation:this.createKPIWidget.value.minitableEquation||'',
         EquationOperationMini:this.createKPIWidget.value.EquationOperationMini||'',
-        ModuleNames:this.createKPIWidget.value.ModuleNames||''
+        ModuleNames:this.createKPIWidget.value.ModuleNames||'',
+        columnVisibility:this.createKPIWidget.value.columnVisibility,
 
 
       };
@@ -1190,13 +1193,14 @@ openKPIModal(tile: any, index: number) {
       EquationParam: parsedEquationParam, // Set parsed EquationParam
       EquationOperation: tile.EquationOperation,
       EquationDesc: tile.EquationDesc,
-      columnVisibility: parsedColumnVisibility,
+   
       miniForm:tile.miniForm || '',
       MiniTableNames:tile.MiniTableNames ||'',
       MiniTableFields:parsedMiniTableFields ,
       minitableEquation:tile.minitableEquation,
       EquationOperationMini:tile.EquationOperationMini, // Set parsed columnVisibility
       ModuleNames:tile.ModuleNames,
+      columnVisibility: parsedColumnVisibility,
       all_fields: this.repopulate_fields(tile),
     });
 
