@@ -17,7 +17,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import bootstrap from 'bootstrap';
 import { environment } from 'src/environments/environment';
-import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
+import { AdminDeleteUserCommandInput, CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
 import { DynamicApiService } from '../dynamic-api.service';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { LocationPermissionService } from 'src/app/location-permission.service';
@@ -1146,6 +1146,7 @@ rdtListWorkAround :any =[{
     }
 
 
+  
     console.log("temp obj is here ",tempObj);
 
 
@@ -1233,17 +1234,82 @@ rdtListWorkAround :any =[{
       
       this.api.UpdateMaster(tempObj).then(async value => {
 
+        this.spinner.show()
+
         if (value) {
+
+       
 
           await this.fetchTimeMachineById(1,this.tempUpdateUser, 'update', items);
 
           await this.fetchAllusersData(1,this.tempUpdateUser,'update',masterUser)
+
+          this.spinner.hide()
+
+
+      
 
           // await this.loading()
           // await this.showTable()
 
           this.datatableConfig = {}
           this.lookup_data_user = []
+
+
+            //Create Query Paramter Strings for cognito service for enable or disable the user
+            let QueryParam = {}
+            if(this.allUserDetails.enable_user == true){
+              QueryParam = {
+                "path": "/enableUser",
+                "queryStringParameters": {
+                "email": masterUser.P3,
+                "username":masterUser.P1,
+                "clientID": masterUser.P2
+              }
+              }
+            }
+            else{
+              QueryParam = {
+                "path": "/disableUser",
+                "queryStringParameters": {
+                "email": masterUser.P3,
+                "username":masterUser.P1,
+                "clientID": masterUser.P2
+              }
+              }
+            }
+
+
+
+
+                const body = { "type": "cognitoServices",
+                "event":QueryParam
+                }
+
+
+          try {
+
+            const response = await this.DynamicApi.getData(body);
+            console.log("Response is here ",JSON.parse(response.body));
+
+          } catch (error) {
+            console.error('Error calling dynamic lambda:', error);
+            this.spinner.hide();
+          }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
           try{
@@ -1263,13 +1329,12 @@ rdtListWorkAround :any =[{
           }
           catch(error){
             console.log("Error while creating audit trails ",error);
+      
           }
 
 
 
-
-
-
+          this.updateCognitoAttributes();
 
 
           this.showAlert(successAlert)
@@ -1293,7 +1358,7 @@ rdtListWorkAround :any =[{
 
           //___________________updating cutom attributes__________________________in aws cognito
 
-          this.updateCognitoAttributes();
+ 
 
         }
         else {
@@ -1303,6 +1368,7 @@ rdtListWorkAround :any =[{
       }).catch(err => {
         this.showAlert(errorAlert)
         console.log('error for updating', err);
+        this.spinner.hide()
       })
     }
 
@@ -1315,6 +1381,9 @@ rdtListWorkAround :any =[{
       
       this.deleteUser(this.allUserDetails, 'update_delete');
     }
+
+
+
 
   }
 
@@ -1406,12 +1475,19 @@ rdtListWorkAround :any =[{
         });
       },
 
+      
+
       onFailure: function (err) {
-        alert(err);
+        console.log("Cognito Error",err);
+
+        if(err.message != 'User is disabled.'){
+          alert(err)
+        }
       },
 
     });
   }
+
 
 
 
@@ -1634,7 +1710,7 @@ rdtListWorkAround :any =[{
           alert_levels: this.createUserField.value.alert_levels,
           permission_ID: this.createUserField.value.permission_ID,
           report_to: this.createUserField.value.report_to,
-          enable_user: this.createUserField.value.enable_user == null ? false : this.createUserField.value.enable_user,
+          enable_user: true,
           disable_user: this.createUserField.value.disable_user == null ? false : this.createUserField.value.disable_user,
           // health_check: this.createUserField.value.health_check == null ? false : this.createUserField.value.health_check,
           // device_timeout: this.createUserField.value.device_timeout == null ? false : this.createUserField.value.device_timeout,
@@ -1831,7 +1907,7 @@ rdtListWorkAround :any =[{
 
         if (value) {
 
-          const body = { type: "userVerify", username:masterUser.P1,name: this.createUserField.value.name,email:masterUser.P3,clientID:this.SK_clientID};
+          const body = { type: "userVerify", username:masterUser.P1,name: this.createUserField.value.name,email:masterUser.P3,clientID:masterUser.P2};
 
 
           this.DynamicApi.sendData(body).subscribe(response => {
@@ -3259,13 +3335,54 @@ rdtListWorkAround :any =[{
           'success'
         );
       }
-    } catch (error) {
+    } catch (error:any) {
 
       this.spinner.hide()
       console.log('Error during deletion', error);
-      Swal.fire('User not confirmed' + '' + 'and User configuration not removed');
+
+      if (error.message === 'User does not exist.') {
+        const date = Math.ceil(((new Date()).getTime()) / 1000);
+        const items = {
+          P1: getValues.username,
+        };
+  
+        const deletedUser = {
+          P1:getValues.username,
+          P2:getValues.clientID
+        }
+    
+        const value = await this.api.DeleteMaster(this.allUserDetails);
+        if (value) {
+          await this.fetchTimeMachineById(1, items.P1, 'delete', items);
+  
+          await this.fetchAllusersData(1, deletedUser.P1, 'delete', items)
+
+
+          this.reloadEvent.next(true)
+  
+          Swal.fire(
+            'Removed!',
+            'User configuration successfully.',
+            'success'
+          );
+
+        }
+      }
+      else{
+        alert(error)
+      }
+
+
+
+
+      // Swal.fire('User not confirmed' + '' + 'and User configuration not removed');
     }
   };
+
+
+
+
+
 
 
   async onCloneUser(){

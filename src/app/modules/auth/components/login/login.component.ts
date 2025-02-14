@@ -228,26 +228,47 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.spinner.hide()
       console.log("User details are here ", this.userDetails);
     
-    } catch (error) {
-      this.spinner.hide()
+    } catch (error: any) {
+      this.spinner.hide();
       console.error("Login error: ", error);
       this.hasError = true;
-
+  
+      let errorMessage = 'An unexpected error occurred. Please try again later.';
+      let errorTitle = '⚠️ Login Error';
+  
+      // Check if error.message exists and adjust response based on error type
+      if (error.message) {
+        switch (error.message) {
+          case 'User is disabled.':
+            errorTitle = '⚠️ User is Disabled';
+            errorMessage = 'Access to the username or password is restricted.';
+            break;
+          case 'Incorrect credentials.':
+            errorTitle = '⚠️ Incorrect Credentials';
+            errorMessage = 'Username or Password is Incorrect. Please try again.';
+            break;
+          case 'Account locked.':
+            errorTitle = '⚠️ Account Locked';
+            errorMessage = 'Your account has been locked due to multiple failed login attempts.';
+            break;
+          case 'Network error.':
+            errorTitle = '⚠️ Network Error';
+            errorMessage = 'There was an issue with the network. Please check your connection and try again.';
+            break;
+          // Add more custom error handling cases as needed
+          default:
+            errorTitle = '⚠️ Unknown Error';
+            errorMessage = 'An unexpected error occurred. Please try again later.';
+        }
+      }
+  
       return Swal.fire({
-        title: '⚠️ Incorrect Credentials',
-        text: 'Username or Password is Incorrect please try again.',
+        title: errorTitle,
+        text: errorMessage,
         icon: 'error',
         confirmButtonText: 'OK'
       });
     }
-    
-    // catch(err:any){
-     
-      
-      
-    //   console.log("Error in Log in");
-    // }
-   
   }
 
   ngOnDestroy() {

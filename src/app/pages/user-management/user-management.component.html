@@ -567,28 +567,32 @@
                                             </label>
                                         </div>
                                     </div>
+
+
+
+                                    <div class="col-md-4 form-check form-switch">
+        
+                                        <div class="col-lg-12" *ngIf="editOperation">
+                                            <input class="col-lg-6 form-check-input" formControlName="enable_user"
+                                                type="checkbox">
+                                            <label class=" fw-semibold fs-6 mb-2" style="padding-top: 0px;">
+                                                <b>Enable User</b>
+                                            </label>
+                                        
+                                        </div>
                                     
         
                                    
                                 </div>
                             </div>
         
-                            <div class="container" style="margin-left: 10px;display: none;" *ngIf="this.adminLogin"> 
+                            <div class="container" style="margin-left: 10px;" > 
                                 <div class="row mb-7">
         
-                                    <div class="col-md-4 form-check form-switch">
-        
-                                        <div class="col-lg-12">
-                                            <input class="col-lg-6 form-check-input" formControlName="enable_user"
-                                                type="checkbox">
-                                            <label class=" fw-semibold fs-6 mb-2" style="padding-top: 0px;">
-                                                <b>Account</b>
-                                            </label>
-                                            
-                                        </div>
+                                 
         
                                         
-                                            <div class="col-lg-12">
+                                            <div class="col-lg-12" *ngIf="this.adminLogin">
                                                 <input class="col-lg-6 form-check-input" formControlName="cognito_update"
                                                     type="checkbox">
                                                 <label class=" fw-semibold fs-6 mb-2" style="padding-top: 0px;">
