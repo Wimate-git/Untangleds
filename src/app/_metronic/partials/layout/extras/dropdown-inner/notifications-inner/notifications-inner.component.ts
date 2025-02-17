@@ -38,7 +38,7 @@ export class NotificationsInnerComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
 
-    this.reloadComponentEveryMinute();
+    // this.reloadComponentEveryMinute();
 
     this.login_detail = localStorage.getItem('userAttributes')
 
@@ -48,32 +48,32 @@ export class NotificationsInnerComponent implements OnInit {
       this.client = this.loginDetail_string.clientID
       this.user = this.loginDetail_string.username
 
-      // const today = new Date(); // Current date
-      //   const todayepoch = today.getTime();
+      const today = new Date(); // Current date
+        const todayepoch = today.getTime();
 
-      //   const fiveYearsAgo = new Date();
-      //   fiveYearsAgo.setFullYear(today.getFullYear() - 1); // Subtract 2 years
-      //   const epochTime = fiveYearsAgo.getTime();
+        const fiveYearsAgo = new Date();
+        fiveYearsAgo.setFullYear(today.getFullYear() - 1); // Subtract 2 years
+        const epochTime = fiveYearsAgo.getTime();
 
 
       
-      // const requestBody = {
-      //   "operation": "Between",
-      //   "pk": `${this.client}#app notification#${this.user}#main`,
-      //   "sk1": epochTime,
-      //   "sk2": todayepoch,
-      //   "ascending": false,
-      //   "limit": 100,
-      //   "lastEvaluatedKey": null
-      // };
+      const requestBody = {
+        "operation": "Between",
+        "pk": `${this.client}#app notification#${this.user}#main`,
+        "sk1": epochTime,
+        "sk2": todayepoch,
+        "ascending": false,
+        "limit": 100,
+        "lastEvaluatedKey": null
+      };
 
 
-      // // this.notification(1)
+      // this.notification(1)
 
-      // await this.fetchAllData(requestBody)
+      await this.fetchAllData(requestBody)
 
 
-      this.fetchNotification();
+      // this.fetchNotification();
 
   }
 
@@ -152,7 +152,7 @@ formatDate(timestamp: number): string {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': 'zVXYfTmcru1xXMnUQaqU697Cqux1gaCDZOriwJe5'
+        // 'x-api-key': 'zVXYfTmcru1xXMnUQaqU697Cqux1gaCDZOriwJe5'
       },
       body: JSON.stringify(requestBody)
     })
