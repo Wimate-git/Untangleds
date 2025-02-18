@@ -204,7 +204,7 @@ getFormInputData(formHeading: string,client:any) {
         .catch(error => {
           //  hideLoadingSpinnerm_view()
             console.error('Error loading form:', error);
-            alert('Failed to load form data.');
+            // alert('Failed to load form data.');
         });
 }
 

@@ -10,6 +10,7 @@ import { AuthenticationDetails, CognitoUser, CognitoUserPool } from 'amazon-cogn
 import Swal from 'sweetalert2';
 import { APIService } from 'src/app/API.service';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { AuditTrailService } from 'src/app/pages/services/auditTrail.service';
 
 
 @Component({
@@ -41,6 +42,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private api:APIService,private spinner:NgxSpinnerService,
+    private auditTrail:AuditTrailService
   ) {
     this.isLoading$ = this.authService.isLoading$;
     // redirect to home if already logged in
@@ -140,6 +142,9 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     console.log("Logged in user is here ",this.f.email.value);
 
+
+    let metaData:any
+
     try {
       this.spinner.show()
       const user = await this.authService.signIn((this.f.email.value).toLowerCase(), this.f.password.value);
@@ -162,7 +167,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         const result:any = await this.api.GetMaster(`${(this.f.email.value).toLowerCase()}#user#main`, 1);
         if (result) {
 
-          const metaData = JSON.parse(result.metadata)
+          metaData = JSON.parse(result.metadata)
 
           console.log(`result is here ${clientID} != ${metaData.clientID}`);
 
@@ -177,6 +182,8 @@ export class LoginComponent implements OnInit, OnDestroy {
               });
             }
           }
+
+            this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', metaData.clientID)
 
 
             //Redirection logic is here 
@@ -195,6 +202,32 @@ export class LoginComponent implements OnInit, OnDestroy {
         console.error("Error in fetching the user ", user);
       }
 
+      //Wait for the form to be populated before adding the audit trails
+      setTimeout(() => {
+        if(metaData){
+
+          try{
+            const UserDetails = {
+              "User Name": metaData.username,
+              "Action": "Login",
+              "Module Name": "Login",
+              "Form Name": "Login",
+             "Description": `${metaData.username} successfully logged into the application`,
+              "User Id": metaData.username,
+              "Client Id": metaData.clientID,
+              "created_time": Date.now(),
+              "updated_time": Date.now()
+            }
+        
+            this.auditTrail.mappingAuditTrailData(UserDetails,metaData.clientID)
+            console.log("Audit trails for login created ");
+          }
+          catch(error){
+            console.log("Error while creating audit trails ",error);
+          }
+        }
+      }, 500);
+
     
       const loginCredentials = {
         username: this.f.email.value,
@@ -208,6 +241,8 @@ export class LoginComponent implements OnInit, OnDestroy {
         .pipe(first())
         .subscribe((user: UserModel | undefined) => {
           if (user) {
+
+
             this.router.navigate([this.returnUrl]);
           } else {
             this.hasError = true;

@@ -10,6 +10,7 @@ import { APIService } from 'src/app/API.service';
 import { Router } from '@angular/router';
 import { DynamicApiService } from 'src/app/pages/dynamic-api.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { AuditTrailService } from 'src/app/pages/services/auditTrail.service';
 
 enum ErrorStates {
   NotSubmitted,
@@ -38,7 +39,7 @@ export class ForgotPasswordComponent implements OnInit {
   selectedUser: any;
   errorForInvalidName: any = '';
   constructor(private fb: FormBuilder, private authService: AuthService,
-    private cd:ChangeDetectorRef,private api:APIService, private router:Router,private DynamicApi:DynamicApiService,private toast:MatSnackBar) {
+    private cd:ChangeDetectorRef,private api:APIService, private router:Router,private DynamicApi:DynamicApiService,private toast:MatSnackBar,  private auditTrail:AuditTrailService) {
     this.isLoading$ = this.authService.isLoading$;
   }
 
@@ -156,10 +157,16 @@ async forgotCognitoPass() {
 
   var authuser = this.forgotPasswordForm.get('email')?.value;
 
-  if(authuser.includes('@')){
-    const result = await this.fetchAllUsersData(1) 
-    this.filterUser = result.filter((item:any)=>item.P3 == authuser)
+  const result = await this.fetchAllUsersData(1) 
 
+  this.filterUser = result.filter((item:any)=>item.P3 == authuser || item.P1 == authuser)
+
+  console.log("Filtered user is ",this.filterUser);
+
+  this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.filterUser[0].P2)
+
+  if(authuser.includes('@')){
+   
     if(this.filterUser.length == 1){
       authuser = this.filterUser[0].P1
       this.selectedUser = this.filterUser[0].P1
@@ -168,6 +175,9 @@ async forgotCognitoPass() {
   else{
     this.selectedUser = authuser.toLowerCase()
   }
+
+
+  //Get the client ID here
 
   console.log("Entered Auth is here ", authuser);
 
@@ -188,6 +198,29 @@ async forgotCognitoPass() {
       onSuccess: () => {
         console.log('Call to forgotPassword successful');
         this.showVerificationFields = true; // Show the verification fields
+
+
+
+        try{
+          const UserDetails = {
+            "User Name": this.selectedUser,
+            "Action": "Login",
+            "Module Name": "Forgot Password",
+            "Form Name": "Forgot Password",
+            "Description": `${this.selectedUser} initiated a password reset request and received a reset code.`,
+            "User Id": this.selectedUser,
+            "Client Id": this.filterUser && this.filterUser[0].P2,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+      
+          this.auditTrail.mappingAuditTrailData(UserDetails,this.filterUser && this.filterUser[0].P2)
+          console.log("Audit trails for login created ");
+        }
+        catch(error){
+          console.log("Error while creating audit trails ",error);
+        }
+
 
         this.cd.detectChanges()
       },
@@ -244,6 +277,34 @@ async confirmNewPassword() {
       const result = await this.api.GetMaster(this.selectedUser+'#user#main',1)
 
       console.log("Result is here for getting data ",result);
+
+
+
+
+
+      try{
+        const UserDetails = {
+          "User Name": this.selectedUser,
+          "Action": "Login",
+          "Module Name": "Forgot Password",
+          "Form Name": "Forgot Password",
+          "Description": `${this.selectedUser} successfully reset their password.`,
+          "User Id": this.selectedUser,
+          "Client Id": this.filterUser && this.filterUser[0].P2,
+          "created_time": Date.now(),
+          "updated_time": Date.now()
+        }
+    
+        this.auditTrail.mappingAuditTrailData(UserDetails,this.filterUser && this.filterUser[0].P2)
+        console.log("Audit trails for login created ");
+      }
+      catch(error){
+        console.log("Error while creating audit trails ",error);
+      }
+
+
+
+
 
       const tempResult = JSON.parse(result.metadata || '')
 

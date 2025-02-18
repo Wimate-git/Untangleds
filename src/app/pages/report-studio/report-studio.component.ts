@@ -324,6 +324,24 @@ columns: any;
   async checkPermissions(){
 
 
+
+    try {
+      await this.api.GetMaster(this.SK_clientID + "#dynamic_form#lookup", 1).then((result: any) => {
+        if (result) {
+          const helpherObj = JSON.parse(result.options);
+    
+          // Corrected the map function
+          this.formList = helpherObj.map((item: any) => (item[0]));
+
+          console.log("Form list is here ",this.formList);
+        }
+      });
+    } catch (err) {
+      console.log("Error fetching the dynamic form data ", err);
+    }
+
+
+
     try{
       const UserDetails = {
         "User Name": this.username,
@@ -497,6 +515,9 @@ columns: any;
     // this.formsToDisplay = this.formsToDisplay.filter((item:any) => item != 'All')
 
     console.log("Permission is being checked and the forms to display are ",this.formsToDisplay);
+
+
+    this.cd.detectChanges()
 
   }
 
@@ -1427,11 +1448,20 @@ async onFilterChange(event: any,getValue:any,key:any) {
     this.spinner.show();
 
     // this.selectedItem = this.selectedValues;
-    
-  
-    if (['between', 'between time'].includes(this.reportsFeilds.get('dateType')?.value)) {
+
+
+    if(['between time'].includes(this.reportsFeilds.get('dateType')?.value)){
       const startEpoch = new Date(this.reportsFeilds.get('startDate')?.value).getTime();
+      
       const endEpoch = new Date(this.reportsFeilds.get('endDate')?.value).getTime();
+
+
+      console.log("Between time is checked ",startEpoch,endEpoch);
+
+
+      // const endDate = new Date(this.reportsFeilds.get('endDate')?.value);
+      // endDate.setHours(23, 59, 59, 999);
+      // const endDateTimestamp = endDate.getTime();
 
 
       if (startEpoch >=  endEpoch) {
@@ -1450,6 +1480,42 @@ async onFilterChange(event: any,getValue:any,key:any) {
         dateType: this.reportsFeilds.get('dateType')?.value,
         clientID: this.SK_clientID,
         conditionValue: [startEpoch, endEpoch]
+      };
+
+
+      console.log("After body is here ",body);
+    }
+
+
+    
+  
+    else if (['between'].includes(this.reportsFeilds.get('dateType')?.value)) {
+      const startEpoch = new Date(this.reportsFeilds.get('startDate')?.value).getTime();
+      
+      // const endEpoch = new Date(this.reportsFeilds.get('endDate')?.value).getTime();
+
+
+      const endDate = new Date(this.reportsFeilds.get('endDate')?.value);
+      endDate.setHours(23, 59, 59, 999);
+      const endDateTimestamp = endDate.getTime() + (5.5 * 60 * 60 * 1000);
+
+
+      if (startEpoch >=  endDateTimestamp) {
+      
+          Swal.fire({
+            title: "Error",
+            text: "Please ensure that the start date is earlier than the end date and all fields are filled correctly.",
+            icon: "error",
+            confirmButtonText: "Got it"
+          });
+          this.spinner.hide()
+          return;
+      }
+  
+      body = { 
+        dateType: this.reportsFeilds.get('dateType')?.value,
+        clientID: this.SK_clientID,
+        conditionValue: [startEpoch, endDateTimestamp]
       };
     }
 
@@ -1490,7 +1556,7 @@ async onFilterChange(event: any,getValue:any,key:any) {
         body.formFilter = item;
       }
   
-      // console.log("Request body is here ", body);
+      console.log("Request body is here ", body);
   
       try {
 
@@ -2299,24 +2365,7 @@ locationCellRenderer(params: any) {
 
 
   async addFromService(){    
-    try {
-      await this.api.GetMaster(this.SK_clientID + "#dynamic_form#lookup", 1).then((result: any) => {
-        if (result) {
-          const helpherObj = JSON.parse(result.options);
-    
-          // Corrected the map function
-          this.formList = helpherObj.map((item: any) => (item[0]));
-
-          console.log("Form list is here ",this.formList);
-        }
-      });
-    } catch (err) {
-      console.log("Error fetching the dynamic form data ", err);
-    }
-
-
-
-
+ 
 
     try{
       const result = await this.fetchUserLookupdata(1,`${this.SK_clientID}#user#lookup`,'')
