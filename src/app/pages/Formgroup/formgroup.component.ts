@@ -318,6 +318,8 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
     this.client = this.loginDetail_string.clientID
     this.users = this.loginDetail_string.username
 
+    this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.client)
+
     this.datatableConfig = {}
     this.lookup_data_user = []
     this.datatableConfig = {
@@ -422,7 +424,19 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
 
     console.log("DATATABLE:", this.datatableConfig)
 
-    this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.client)
+    const UserDetails = {
+      "User Name": this.users,
+      "Action": "View",
+      "Module Name": "FormGroup",
+      "Form Name": "FormGroup",
+      "Description": "Table is Viewed",
+      "User Id": this.users,
+      "Client Id": this.client,
+      "created_time": Date.now(),
+      "updated_time": Date.now()
+    }
+
+    this.auditTrail.mappingAuditTrailData(UserDetails, this.client)
     //   this.roles$ = this.roleService.getRoles();
 
     // await this.addFromService()
@@ -445,30 +459,6 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
       this.deleteResponse = JSON.parse(res.metadata)
 
       console.log("AFTER JSON PARSE:", this.deleteResponse)
-
-
-      // var formData_ = {
-      //   "bucket_name": "dreamboard-dynamic",
-      //   "bucket_region": "ap-south-1",
-      //   "operation_type": "delete",
-      //   "key": this.deleteResponse.selectedImage,
-      // }
-      // fetch('https://3luwbeeuk0.execute-api.ap-south-1.amazonaws.com/s1/s3Bucket', { // Replace with your server endpoint
-      //   method: 'POST',
-      //   body: JSON.stringify(formData_)
-      // })
-      //   .then(response => response.json())
-      //   .then(data => {
-
-      //     console.log(data)
-
-      //   })
-      //   .catch(error => {
-
-      //     console.error('Error:', error)
-
-
-      //   });
 
       this.formgroupItem = {
         P1: this.deleteResponse.formgroupId,
@@ -495,7 +485,7 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
       "Action": "Deleted",
       "Module Name": "FormGroup",
       "Form Name": "FormGroup",
-      "Description": "Record is Deleted",
+      "Description": `Record ${this.deleteResponse.formgroupId} is Deleted`,
       "User Id": this.users,
       "Client Id": this.client,
       "created_time": Date.now(),
@@ -541,6 +531,20 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
           });
 
           this.onTypeChange(this.data_temp[0].filterOption)
+
+          const UserDetails = {
+            "User Name": this.users,
+            "Action": "View",
+            "Module Name": "FormGroup",
+            "Form Name": "FormGroup",
+            "Description": `Record ${this.data_temp[0].formgroupId} is Viewed`,
+            "User Id": this.users,
+            "Client Id": this.client,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+      
+          this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
         }
 
       }
@@ -650,10 +654,10 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
 
         const UserDetails = {
           "User Name": this.users,
-          "Action": "Added",
+          "Action": "Created",
           "Module Name": "FormGroup",
           "Form Name": "FormGroup",
-          "Description": "Record is Added",
+          "Description": `Record ${this.formgroupForm.value.formgroupId} is Created`,
           "User Id": this.users,
           "Client Id": this.client,
           "created_time": Date.now(),
@@ -728,7 +732,7 @@ export class FormgroupComponent implements OnInit, AfterViewInit, OnDestroy {
           "Action": "Edited",
           "Module Name": "FormGroup",
           "Form Name": "FormGroup",
-          "Description": "Record is Edited",
+          "Description": `Record ${this.updateResponse.formgroupId} is Edited`,
           "User Id": this.users,
           "Client Id": this.client,
           "created_time": Date.now(),

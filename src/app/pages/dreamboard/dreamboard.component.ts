@@ -154,6 +154,8 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.client=this.loginDetail_string.clientID
     this.users=this.loginDetail_string.username
 
+    this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.client)
+
     if(this.client == 'WIMATE_ADMIN'){
 
         this.show = true
@@ -260,11 +262,25 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
           $('td:eq(0)', row).addClass('d-flex align-items-center');
         },
       };
+
+      const UserDetails = {
+        "User Name": this.users,
+        "Action": "View",
+        "Module Name": "Dreamboard",
+        "Form Name": "Dreamboard",
+        "Description": "Table is Viewed",
+        "User Id": this.users,
+        "Client Id": this.client,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
   
 
       console.log("DATATABLE:",this.datatableConfig )
 
-      this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.client)
+     
     //   this.roles$ = this.roleService.getRoles();
     }
   
@@ -308,7 +324,7 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
         "Action": "Deleted",
         "Module Name": "Dreamboard",
         "Form Name": "Dreamboard",
-        "Description": "Record is Deleted",
+        "Description": `Record ${this.deleteResponse.dreamboardId} is Deleted`,
         "User Id": this.users,
         "Client Id": this.client,
         "created_time": Date.now(),
@@ -368,6 +384,22 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
                     createdTime: [this.data_temp[0].createdTime],
                     updatedTime: [Math.ceil(((new Date()).getTime()) / 1000)],
                 }); 
+
+
+                const UserDetails = {
+                    "User Name": this.users,
+                    "Action": "View",
+                    "Module Name": "Dreamboard",
+                    "Form Name": "Dreamboard",
+                    "Description": `Record ${this.data_temp[0].dreamboardId} is Viewed`,
+                    "User Id": this.users,
+                    "Client Id": this.client,
+                    "created_time": Date.now(),
+                    "updated_time": Date.now()
+                  }
+            
+                  this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+            
            }
 
         }
@@ -630,10 +662,10 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
                     const UserDetails = {
                         "User Name": this.users,
-                        "Action": "Added",
+                        "Action": "Created",
                         "Module Name": "Dreamboard",
                         "Form Name": "Dreamboard",
-                        "Description": "Record is Added",
+                        "Description": `Record ${this.dreamboardForm.value.dreamboardId} is Created`,
                         "User Id": this.users,
                         "Client Id": this.client,
                         "created_time": Date.now(),
@@ -747,7 +779,7 @@ export class DreamboardComponent implements OnInit, AfterViewInit, OnDestroy {
                     "Action": "Edited",
                     "Module Name": "Dreamboard",
                     "Form Name": "Dreamboard",
-                    "Description": "Record is Edited",
+                    "Description": `Record ${this.updateResponse.dreamboardId} is Edited`,
                     "User Id": this.users,
                     "Client Id": this.client,
                     "created_time": Date.now(),

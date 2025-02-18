@@ -166,6 +166,9 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     this.client = this.loginDetail_string.clientID
     this.users = this.loginDetail_string.username
 
+
+    this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.client)
+
     this.advance_report = [
       'Mail Permission',
       'All Report ID Access',
@@ -293,7 +296,21 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
     await this.fetchSummaryList(1)
 
-    this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.client)
+
+    const UserDetails = {
+      "User Name": this.users,
+      "Action": "View",
+      "Module Name": "Permission",
+      "Form Name": "Permission",
+      "Description": "Table is Viewed",
+      "User Id": this.users,
+      "Client Id": this.client,
+      "created_time": Date.now(),
+      "updated_time": Date.now()
+    }
+
+    this.auditTrail.mappingAuditTrailData(UserDetails, this.client)
+
 
   }
 
@@ -1027,7 +1044,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
         "Action": "Deleted",
         "Module Name": "Permission",
         "Form Name": "Permission",
-        "Description": "Record is Deleted",
+        "Description": `Record ${this.deleteResponse.permissionID} is Deleted`,
         "User Id": this.users,
         "Client Id": this.client,
         "created_time": Date.now(),
@@ -1100,6 +1117,20 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
           this.updatePermissions();
 
           this.populateDynamicEntries(JSON.parse(this.data_temp[0].dynamicEntries))
+
+          const UserDetails = {
+            "User Name": this.users,
+            "Action": "View",
+            "Module Name": "Permission",
+            "Form Name": "Permission",
+            "Description": `Record ${this.deleteResponse.permissionID} is Viewed`,
+            "User Id": this.users,
+            "Client Id": this.client,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+    
+          this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
         }
 
       }
@@ -1202,10 +1233,10 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
         const UserDetails = {
           "User Name": this.users,
-          "Action": "Added",
+          "Action": "Created",
           "Module Name": "Permission",
           "Form Name": "Permission",
-          "Description": "Record is Added",
+          "Description": `Record ${this.permissionForm.value.permissionID} is Created`,
           "User Id": this.users,
           "Client Id": this.client,
           "created_time": Date.now(),
@@ -1286,7 +1317,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
           "Action": "Edited",
           "Module Name": "Permission",
           "Form Name": "Permission",
-          "Description": "Record is Edited",
+          "Description": `Record ${this.updateResponse.permissionID} is Edited`,
           "User Id": this.users,
           "Client Id": this.client,
           "created_time": Date.now(),

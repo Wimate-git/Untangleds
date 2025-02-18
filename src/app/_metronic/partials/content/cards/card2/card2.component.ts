@@ -1,7 +1,7 @@
 import { Component, input, Input, OnInit } from '@angular/core';
 import { IconUserModel } from '../icon-user.model';
 import { Router } from '@angular/router';
-
+import { AuditTrailService } from 'src/app/pages/services/auditTrail.service'; 
 @Component({
   selector: 'app-card2',
   templateUrl: './card2.component.html',
@@ -24,14 +24,27 @@ export class Card2Component implements OnInit{
  
 
   id: string;
+  login_detail: any;
+  loginDetail_string: any;
+  client: any;
+  user: any;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private auditTrail: AuditTrailService) {}
 
 
   ngOnInit(): void {
     console.log("CARD2 LOAD")
 
     console.log("COMPONENT:",this.componentSource)
+
+    this.login_detail = localStorage.getItem('userAttributes')
+
+      this.loginDetail_string = JSON.parse(this.login_detail)
+      console.log("AFTER JSON STRINGIFY", this.loginDetail_string)
+
+      this.client = this.loginDetail_string.clientID
+      this.user = this.loginDetail_string.username
+      this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.client)
 
   }
 
@@ -54,11 +67,41 @@ export class Card2Component implements OnInit{
 
     if(this.componentSource == 'dashboard'){
 
+      const UserDetails = {
+        "User Name": this.user,
+        "Action": "View",
+        "Module Name": "Dashboard",
+        "Form Name": "Dashboard Group",
+        "Description": `Record ${data.title} is Viewed`,
+        "User Id": this.user,
+        "Client Id": this.client,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+
+
       
        this.router.navigate([`dashboard/dashboardFrom/${this.id}/${data.title}`]);
 
     }
     else if(this.componentSource == 'dashboardForm'){
+
+      const UserDetails = {
+        "User Name": this.user,
+        "Action": "View",
+        "Module Name": "DashboardForm",
+        "Form Name": "DashboardForm",
+        "Description": `Record ${data.title} is Viewed`,
+        "User Id": this.user,
+        "Client Id": this.client,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+
 
       
 
