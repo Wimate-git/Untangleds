@@ -4,6 +4,7 @@ import { TranslationService } from '../../../../../../modules/i18n';
 import { AuthService, UserType } from '../../../../../../modules/auth';
 import { signOut } from 'aws-amplify/auth';
 import { SharedService } from 'src/app/pages/shared.service';
+import { AuditTrailService } from 'src/app/pages/services/auditTrail.service';
 
 @Component({
   selector: 'app-user-inner',
@@ -22,12 +23,13 @@ export class UserInnerComponent implements OnInit, OnDestroy {
   username: any;
   email: any;
   imageUrlData: any;
+  sk_ClientID: any;
 
   constructor(
     private auth: AuthService,
     private translationService: TranslationService,
     private shared:SharedService,
-    private cd:ChangeDetectorRef
+    private cd:ChangeDetectorRef,private auditTrail:AuditTrailService
   ) {}
 
   ngOnInit(): void {
@@ -38,6 +40,12 @@ export class UserInnerComponent implements OnInit, OnDestroy {
     this.getLoggedUser = this.shared.getLoggedUserDetails()
 
     this.username = this.getLoggedUser.username;
+
+    this.sk_ClientID = this.getLoggedUser.clientID;
+
+
+
+    this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL',  this.sk_ClientID)
 
     this.email = this.getLoggedUser.email;
 
@@ -69,6 +77,36 @@ export class UserInnerComponent implements OnInit, OnDestroy {
   
 
   logout() {
+
+
+    try{
+      const UserDetails = {
+        "User Name": this.username,
+        "Action": "Logout",
+        "Module Name": "Logout",
+        "Form Name": "Logout",
+       "Description": `${this.username} logged out from the application`,
+        "User Id": this.username,
+        "Client Id": this.sk_ClientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+  
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.sk_ClientID)
+      console.log("Audit trails for login created ");
+    }
+    catch(error){
+      console.log("Error while creating audit trails ",error);
+    }
+
+
+
+
+
+
+
+
+
     this.auth.logout();
     document.location.reload();
     signOut()
