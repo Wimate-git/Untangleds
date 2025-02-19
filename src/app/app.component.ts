@@ -98,7 +98,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private showLowBandwidthToast() {
     if (!this.lowBandwidthToast && !this.offlineToast) { // Don't show if offline
       this.lowBandwidthToast = this.snackBar.open('⚠️ The connection is slow. Some features might not work properly.', '', {
-        duration: 0,
+        duration: 3000,
         horizontalPosition: 'center',
         verticalPosition: 'top',
         panelClass: ['network-low-bandwidth']
