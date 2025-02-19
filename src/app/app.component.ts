@@ -42,47 +42,110 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    console.log("Navigator connection", (navigator as any).connection);
 
-    this.isOnline$ = this.networkStatus.isOnline();
-    this.isLowBandwidth$ = this.networkStatus.isLowBandwidth();
 
-    // Handle offline status
-    this.subscriptions.add(
-      this.isOnline$.subscribe(isOnline => {
-        console.log("Network status: Online Status", isOnline);
-        if (!isOnline) {
-          this.dismissLowBandwidthToast(); // Dismiss low bandwidth toast when offline
-          this.showOfflineToast();
-        } else {
-          this.dismissOfflineToast();
-          // Check bandwidth after coming back online
-          this.checkBandwidth();
-        }
-      })
-    );
+    try{
+      console.log("Navigator connection", (navigator as any).connection);
 
-    // Handle low bandwidth
-    this.subscriptions.add(
-      this.isLowBandwidth$.subscribe(isLowBandwidth => {
-        console.log("Network status: Low Bandwidth Status", isLowBandwidth);
-        if (isLowBandwidth) {
-          this.showLowBandwidthToast();
-        } else {
-          this.dismissLowBandwidthToast();
-        }
-      })
-    );
+      this.isOnline$ = this.networkStatus.isOnline();
+      this.isLowBandwidth$ = this.networkStatus.isLowBandwidth();
+  
+     
+  
+     
+  
+      // Handle offline status
+      this.subscriptions.add(
+        this.isOnline$.subscribe(isOnline => {
+          console.log("Network status: Online Status", isOnline);
+          if (!isOnline) {
+            this.dismissLowBandwidthToast(); // Dismiss low bandwidth toast when offline
+            this.showOfflineToast();
 
-    // Log full network status updates
-    this.subscriptions.add(
-      this.networkStatus.getNetworkStatus().subscribe(status => {
-        console.log('Full network status:', status);
-      })
-    );
+          } else {
+            this.dismissOfflineToast();
+            // Check bandwidth after coming back online
+            if(/firefox|fxios/i.test(navigator.userAgent) == false){
+              console.log("Not an firefox ");
+              this.checkBandwidth();
+            }
+  
+         
+          }
+        })
+      );
+  
+      // Handle low bandwidth
+      this.subscriptions.add(
+        this.isLowBandwidth$.subscribe(isLowBandwidth => {
+          console.log("Network status: Low Bandwidth Status", isLowBandwidth);
+          if (isLowBandwidth) {
+            if(/firefox|fxios/i.test(navigator.userAgent) == false){
+              console.log("Not an firefox ");
+              this.showLowBandwidthToast();
+            }
+          } else {
+            this.dismissLowBandwidthToast();
+          }
+        })
+      );
+  
+      // Log full network status updates
+      this.subscriptions.add(
+        this.networkStatus.getNetworkStatus().subscribe(status => {
+          console.log('Full network status:', status);
+        })
+      );
+    }
+    catch(error){
+      console.log("Error in checking internet status ",error);
+    }
 
     this.modeService.init();
   }
+
+  // ngOnInit() {
+  //   console.log("Navigator connection", (navigator as any).connection);
+
+  //   this.isOnline$ = this.networkStatus.isOnline();
+  //   this.isLowBandwidth$ = this.networkStatus.isLowBandwidth();
+
+  //   // Handle offline status
+  //   this.subscriptions.add(
+  //     this.isOnline$.subscribe(isOnline => {
+  //       console.log("Network status: Online Status", isOnline);
+  //       if (!isOnline) {
+  //         this.dismissLowBandwidthToast(); // Dismiss low bandwidth toast when offline
+  //         this.showOfflineToast();
+  //       } else {
+  //         this.dismissOfflineToast();
+  //         // Check bandwidth after coming back online
+  //         this.checkBandwidth();
+  //       }
+  //     })
+  //   );
+
+  //   // Handle low bandwidth
+  //   this.subscriptions.add(
+  //     this.isLowBandwidth$.subscribe(isLowBandwidth => {
+  //       console.log("Network status: Low Bandwidth Status", isLowBandwidth);
+  //       if (isLowBandwidth) {
+  //         this.showLowBandwidthToast();
+  //       } else {
+  //         this.dismissLowBandwidthToast();
+  //       }
+  //     })
+  //   );
+
+  //   // Log full network status updates
+  //   this.subscriptions.add(
+  //     this.networkStatus.getNetworkStatus().subscribe(status => {
+  //       console.log('Full network status:', status);
+  //     })
+  //   );
+
+  //   this.modeService.init();
+  // }
 
   private showOfflineToast() {
     if (!this.offlineToast) {
