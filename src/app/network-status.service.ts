@@ -25,7 +25,7 @@ export class NetworkStatusService {
   });
 
   private readonly PING_URL = 'https://www.google.com/generate_204';
-  private readonly PING_INTERVAL = 10000; // 10 seconds
+  private readonly PING_INTERVAL = 60000; // 10 seconds
 
   constructor() {
     this.initializeNetworkListeners();
