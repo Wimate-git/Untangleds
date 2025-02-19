@@ -187,8 +187,18 @@
                       <app-chart-ui5 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal5)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store"></app-chart-ui5>
                     </div> 
                     <div *ngIf="item.grid_type === 'title'" >
-                      <app-title-ui [item]="item" [index]="i" (customEvent)="helperTile($event,TitleModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate" 
-                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"></app-title-ui>
+                      <app-title-ui     [item]="item" 
+                      [index]="i" 
+                    
+                      [isEditModeView]="isEditModeView" 
+                      [hideButton]="hideButton" 
+                      [all_Packet_store]="all_Packet_store" 
+                   
+            
+                      (customEvent)="helperTile($event, KPIModal)" 
+                      (customEvent1)="emitDuplicate($event)" 
+                      (customEvent2)="emitDelete6($event)"
+></app-title-ui>
   
                  
                     
@@ -246,6 +256,14 @@
                       (customEvent2)="emitDelete6($event)"
                       ></app-map-ui >
                  
+                    </div>
+                    <div *ngIf="item.grid_type === 'HTMLtile'">
+                   
+                      <app-html-tile-ui 
+                        [item]="item" 
+                        [item]="item" [index]="i" (customEvent)="helperTile($event,htmlTileModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"   [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                        [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen">
+                      </app-html-tile-ui>
                     </div>
   
              
@@ -1010,7 +1028,7 @@
       </div>
       <!-- <button (click)="createChartGauge()">click me</button> -->
   
-      <div *ngIf="showGrid && selectedTile !== 'Title' &&  selectedTile !== 'Chart' &&  selectedTile !== 'DynamicTile' && selectedTile !== 'FilterTile' && selectedTile !== 'TableTile' && selectedTile !== 'MapWidget'&& selectedTile !== 'MultiTableWidget' " class="grid-container">
+      <div *ngIf="showGrid && selectedTile !== 'Title' &&  selectedTile !== 'Chart' &&  selectedTile !== 'DynamicTile' && selectedTile !== 'FilterTile' && selectedTile !== 'TableTile' && selectedTile !== 'MapWidget'&& selectedTile !== 'MultiTableWidget' &&  selectedTile !=='Html Tile' " class="grid-container">
         <div class="grid-item highlight" tabindex="0" (click)="openKPIModal(KPIModal,modal);modal.dismiss"  style="background: linear-gradient(to right, #ff7e5f, #feb47b); padding: 20px; border-radius: 8px; color: white;">
           <div>Label</div>
           <div class="value" tabindex="0">Value</div>
@@ -1335,6 +1353,49 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
           </div>
         </div>
         
+      </div>
+
+
+
+      <div *ngIf="showGrid" class="container" style="margin-top: 10px;">
+        <div class="row">
+          <div class="col-md-12 d-flex justify-content-center align-items-center">
+          <!-- Grid item spanning full width -->
+      
+            <div  *ngIf="showHTMLtileGrid" 
+       >
+
+<button
+class="grid-item col bg-light-primary px-6 py-8 rounded-2 mb-7"
+style="width: 350px; height: 250px; display: flex; justify-content: center; align-items: center; border: 0;"
+>
+<div
+  class="grid-item highlight"
+  tabindex="0"
+  (click)="openHTMLModalTile(htmlTileModal, modal)" 
+  style="
+    width: 300px;
+    height: 200px;
+    background: linear-gradient(to right, #373B44, #4286F4);
+    padding: 20px;
+    border-radius: 8px;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  "
+>
+  <div class="value fw-bold" tabindex="0">HTML Tile</div>
+</div>
+</button>
+  
+</div>
+      
+      
+      
+          </div>
+  
+        </div>
       </div>
 
 
@@ -1953,6 +2014,13 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   [responseRowData]="responseRowData"
   [all_Packet_store]="all_Packet_store"
     ></app-data-table-dynamic-tile>
+  </ng-template>
+
+  <ng-template #htmlTileModal let-modal>
+    <app-html-tile-config
+    [modal]="modal" [dashboard]="dashboard" 
+    (dashboardChange)="getGridDetails($event)" (update_PowerBoard_config)="updateSummaryHelper2($event)" [modal]="modal" [all_Packet_store]="all_Packet_store" (send_all_Packet_store)="allPacketStoreReceiver($event)"[isGirdMoved]="isGirdMoved"
+    ></app-html-tile-config>
   </ng-template>
   </div>
 <!--   

@@ -1,0 +1,148 @@
+.html-preview-frame {
+    width: 100%;
+    height: 600px; 
+    border: none;
+    background: #fff;
+  }
+  
+
+  .list-item {
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.3s ease;
+  }
+  
+  .list-item.active {
+    background-color: #e6f7ff;
+  }
+  
+  .list-item:hover {
+    background-color: #f0f0f0;
+  }
+  .list-item {
+    position: relative;
+  }
+  
+  .list-item .tooltip-content {
+    visibility: hidden;
+    background-color: #333;
+    color: #fff;
+    text-align: left;
+    border-radius: 4px;
+    padding: 8px;
+    position: absolute;
+    top: -10px;
+    left: 110%;
+    width: 200px;
+    z-index: 1;
+    font-size: 13px;
+    line-height: 1.2;
+  }
+  
+  .list-item:hover .tooltip-content {
+    visibility: visible;
+  }
+
+  .container1 {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.list-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.list-column {
+    width: 48%;
+}
+
+.list-item {
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.list-item:hover, .list-item.active {
+    background-color: #e7f1ff;
+    color: #004085;
+}
+
+.title {
+    font-weight: bold;
+}
+
+.example {
+ 
+    font-size: 14px;
+}
+
+.color-boxes {
+  display: flex;
+  flex-wrap: wrap; /* Allows wrapping of color boxes */
+  gap: 10px;
+}
+
+.color-box {
+  position: relative;
+  width: 30px; /* Keeps the original width of the color boxes */
+  height: 30px; /* Keeps the original height of the color boxes */
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid transparent;
+  transition: all 0.3s;
+}
+
+.color-box.checked {
+  border: 2px solid #fff;
+}
+
+.color-box .checkmark {
+  position: absolute;
+  font-size: 20px;
+  color: white;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.color-box.checked .checkmark {
+  opacity: 1;
+}
+
+.color-box:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.color-box.checked {
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.4); /* Optional: highlight color when checked */
+}
+
+.color-box.checked {
+  border: 2px solid #000;
+  transform: scale(1.1);
+}
+
+.checkmark {
+  color: #fff;
+  font-size: 1rem;
+}
+
+.form-control-color {
+  width: 50px;
+  height: 38px;
+  padding: 0;
+  border-radius: 5px;
+  border: 1px solid #ced4da;
+}

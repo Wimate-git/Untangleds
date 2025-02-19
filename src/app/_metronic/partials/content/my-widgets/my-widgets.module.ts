@@ -66,6 +66,8 @@ import { DataTableChart2Component } from './data-table-chart2/data-table-chart2.
 import { DataTableTile1Component } from './data-table-tile1/data-table-tile1.component';
 import { HttpClientModule } from '@angular/common/http';
 import { DataTableDynamicTileComponent } from './data-table-dynamic-tile/data-table-dynamic-tile.component';
+import { HtmlTileConfigComponent } from './html-tile-config/html-tile-config.component';
+import { HtmlTileUiComponent } from './html-tile-ui/html-tile-ui.component';
 
 
 
@@ -107,7 +109,9 @@ import { DataTableDynamicTileComponent } from './data-table-dynamic-tile/data-ta
     DataTableChart1Component,
     DataTableChart2Component,
     DataTableTile1Component,
-    DataTableDynamicTileComponent
+    DataTableDynamicTileComponent,
+    HtmlTileConfigComponent,
+    HtmlTileUiComponent
 
 
 
@@ -188,7 +192,9 @@ import { DataTableDynamicTileComponent } from './data-table-dynamic-tile/data-ta
     DataTableChart1Component,
     DataTableChart2Component,
     DataTableTile1Component,
-    DataTableDynamicTileComponent
+    DataTableDynamicTileComponent,
+    HtmlTileConfigComponent,
+    HtmlTileUiComponent
   
 
     

@@ -58,6 +58,7 @@ import { MapConfigComponent } from 'src/app/_metronic/partials/content/my-widget
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MultiTableConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/multi-table-config/multi-table-config.component';
 import { AuditTrailService } from '../services/auditTrail.service';
+import { HtmlTileConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/html-tile-config/html-tile-config.component';
 
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
@@ -159,6 +160,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   @ViewChild(TableWidgetConfigComponent, { static: false }) TableWidgetConfigComponent: TableWidgetConfigComponent;
   @ViewChild(MapConfigComponent, { static: false }) MapConfigComponent: MapConfigComponent;
   @ViewChild(MultiTableConfigComponent, { static: false }) MultiTableConfigComponent: MultiTableConfigComponent;
+  @ViewChild(HtmlTileConfigComponent, { static: false }) HtmlTileConfigComponent: HtmlTileConfigComponent;
   
   
  
@@ -249,6 +251,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   titleWidth:any [] = [];
   DynamicTileHeight:any [] = [];
   DynamicTileWidth:any [] = [];
+  HTMLtileHeight:any [] = [];
+  HTMLtileWidth:any [] = [];
 
   userPermissions: boolean | undefined;
   permissionIdCheck: any;
@@ -271,6 +275,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   liveDataDynamicTile: any;
   liveDataTableTile: any;
   helpherObjCalender: any;
+  showHTMLtileGrid: boolean;
 
 
   createPieChart() {
@@ -755,7 +760,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
         clientId: this.SK_clientID,
         routeId: this.routeId,
         permissionId:this.permissionIdRequest,
-        permissionList:this.readFilterEquation,
+        permissionList:this.readFilterEquation || [],
         userName:this.userdetails
 
 
@@ -1723,6 +1728,18 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
           `Height: ${this.DynamicTileHeight[index]}, Width: ${this.DynamicTileWidth[index]}, Top Margin: }`
         );
       }
+        else if (item.grid_type === 'HTMLtile') {
+          // const topMargin = 20; // Define the top margin value
+        
+          // Adjust height and width with the top margin
+          this.HTMLtileHeight[index] = itemComponentHeight ; // Subtract additional top margin
+          this.HTMLtileWidth[index] = itemComponentWidth ; // Subtract margin/padding for width
+        
+          console.log(
+            `Resized ${item.grid_type} at index ${index}:`,
+            `Height: ${this.HTMLtileHeight[index]}, Width: ${this.HTMLtileWidth[index]}, Top Margin: }`
+          );
+      }
   
 
       
@@ -2217,6 +2234,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     this.fetchContractOrderMasterlookup(1)
     this.permissionIds(1)
     this.fetchCompanyLookupdata(1)
+    // this.reloadPage();
     // this.fetchCalender()
    
          this.rowData = [
@@ -2590,6 +2608,7 @@ processFetchedData(result: any): void {
     {value:'TableTile',label:'TableTile'},
     {value:'MapWidget',label:'MapWidget'},
     {value:'MultiTableWidget',label:'MultiTableWidget'},
+    {value:'Html Tile',label:'Html Tile'}
     
     
 
@@ -2609,7 +2628,7 @@ processFetchedData(result: any): void {
 
 
       // Update visibility based on the selected tile
-      this.showGrid = this.selectedTile === 'Tiles' || this.selectedTile === 'Title' || this.selectedTile === 'Chart'|| this.selectedTile === 'DynamicTile' || this.selectedTile === 'FilterTile' || this.selectedTile === 'TableTile' || this.selectedTile === 'MapWidget' || this.selectedTile === 'MultiTableWidget';
+      this.showGrid = this.selectedTile === 'Tiles' || this.selectedTile === 'Title' || this.selectedTile === 'Chart'|| this.selectedTile === 'DynamicTile' || this.selectedTile === 'FilterTile' || this.selectedTile === 'TableTile' || this.selectedTile === 'MapWidget' || this.selectedTile === 'MultiTableWidget' ||this.selectedTile ==='Html Tile';
 
       
       this.showTitleGrid = this.selectedTile === 'Title'; // Show specific grid for Title
@@ -2620,6 +2639,7 @@ processFetchedData(result: any): void {
                     this.showMapGrid =  this.selectedTile === 'MapWidget'
                               this.showMapGrid =  this.selectedTile === 'MapWidget'
                               this.showMultiTableGrid = this.selectedTile === 'MultiTableWidget'
+                              this.showHTMLtileGrid = this.selectedTile === 'Html Tile'
 
 
             
@@ -3097,6 +3117,16 @@ console.log('Formatted Date:', this.lastUpdatedTime);
         this.MultiTableConfigComponent.openMultiTableModal(event.arg1, event.arg2);
       }, 500);
     }
+    if(event.arg1.grid_type=='HTMLtile'){
+      this.modalService.open(KPIModal, { size: 'lg' });
+
+    
+      // Access the component instance and trigger `openKPIModal`
+      setTimeout(() => {
+       
+        this.HtmlTileConfigComponent.openHTMLtile(event.arg1, event.arg2);
+      }, 500);
+    }
     if(event.arg1.grid_type=='TableWidget'){
       this.modalService.open(KPIModal, { size: 'lg' });
 
@@ -3274,6 +3304,13 @@ console.log('Formatted Date:', this.lastUpdatedTime);
       this.dashboard.push(event.data.arg1)
  
     }
+    else if(event.data.arg1.grid_type=='HTMLtile'){
+      console.log('event check', event)
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push(event.data.arg1)
+ 
+    }
+
     else if(event.data.arg1.grid_type=='MultiTableWidget'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
@@ -3807,6 +3844,7 @@ console.log('selectedTab checking',this.selectedTab)
   }
 
   getGridDetails(data: any) {
+    console.log('data checking before',data)
     this.dashboard = data;
     console.log('this.dashboard check', this.dashboard)
     //console.log('myh grid',this.grid_details)
@@ -5135,23 +5173,26 @@ console.log('Serialized Query Params:', serializedQueryParams);
   
   
   
-  private formatField(value: any): string {
+  private formatField(value: any, fieldName: string = ''): string {
     try {
       let parsedValue;
   
-      // Step 1: Parse if the value is a string
+      // ✅ Ensure `htmlTextArea` is always properly stringified
+
+      
+      
+  
+      // Step 1: Parse if the value is a string and JSON valid
       if (typeof value === 'string') {
         parsedValue = JSON.parse(value);
       } else {
-        // Assume it's already parsed, directly assign it
-        parsedValue = value;
+        parsedValue = value; // Assume it's already parsed
       }
   
-      // Step 2: Check if the parsed value is an array with `filterDescription`
+      // Step 2: Process arrays normally
       if (Array.isArray(parsedValue)) {
         const formattedArray = parsedValue.map((item) => {
           if (item.filterDescription && item.filterParameter && item.filterParameter1 && item.filterDescription1) {
-            // Replace placeholders in filterDescription with corresponding text
             let formattedDescription = item.filterDescription;
             item.filterParameter.forEach((param: any) => {
               const placeholder = `\${${param.value}}`;
@@ -5169,14 +5210,14 @@ console.log('Serialized Query Params:', serializedQueryParams);
         return JSON.stringify(formattedArray); // Convert back to a string
       }
   
-      // Step 3: For non-array objects, just stringify the value
-      return JSON.stringify(parsedValue || []);
+      return JSON.stringify(parsedValue || []); // Convert non-arrays to string
     } catch (error) {
-      // Handle errors gracefully
-      console.error('Error formatting field:', value, error);
-      return '[]';
+      console.error(`Error formatting field "${fieldName}":`, value, error);
+      return JSON.stringify([]); // Return empty array string if error
     }
   }
+  
+  
   
   private formatDashboardTiles(dashboard: any[]): any[] {
     return dashboard.map(tile => ({
@@ -5196,7 +5237,9 @@ console.log('Serialized Query Params:', serializedQueryParams);
       formFieldTexts:this.formatField(tile.formFieldTexts),
       equation:this.formatField(tile.equation),
       MiniTableFields:this.formatField(tile.MiniTableFields),
-      filterParameterLine:this.formatField(tile.filterParameterLine)
+      filterParameterLine:this.formatField(tile.filterParameterLine),
+  
+      parameterName:this.formatField(tile.parameterName)
 
 
 
@@ -6512,6 +6555,14 @@ refreshFunction(){
     modal.dismiss();
 
   }
+  openHTMLModalTile(htmlTileModal:TemplateRef<any>,modal:any){
+    this.modalService.open(htmlTileModal, {size: 'lg' });
+    modal.dismiss();
+
+  }
+
+
+  
 
   openFilterModal(FilterModal:TemplateRef<any>,modal:any){
     this.modalService.open(FilterModal, {size: 'lg' });
@@ -6623,6 +6674,8 @@ refreshFunction(){
             } else if(readPermission_Id=="All"){
              this.userPermission = readPermission_Id
     this.summaryDashboardUpdate= true
+
+    // this.fetchPermissionIdMain(1, readPermission_Id);
              this.loadData();
           
               console.log('this.userPermissionsRead',this.userPermission)
@@ -6724,6 +6777,7 @@ refreshFunction(){
       dynamicTile:{ width: this.DynamicTileWidth, height: this.DynamicTileHeight, heightOffset: 80, widthOffset: 30  },
       TableWidget:{ width: this.tableWidth, height: this.tableHeight, heightOffset: 80, widthOffset: 30  },
       title:{ width: this.titleWidth, height: this.titleHeight, heightOffset: 80, widthOffset: 30  },
+      HTMLtile:{width:this.HTMLtileWidth,  height:this.HTMLtileHeight, heightOffset: 80, widthOffset: 30  },
 
 
 

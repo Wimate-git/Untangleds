@@ -1,0 +1,108 @@
+<!-- <div *ngIf="item.grid_type === 'HTMLtile'" >
+    <div class="grid-item"
+         tabindex="0"
+         [style.background]="item.themeColor"
+         style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out;"
+       >
+       <div class="row text_3d" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+
+
+      </div>
+      
+        <div 
+        class="action-menu-container d-flex align-items-center" 
+        style="position: absolute; top: 10px; right: 10px; gap: 10px; z-index: 1000;">
+        
+  
+        <button 
+        *ngIf="!isEditModeView && !hideButton"
+        (click)="edit_each_tileUI(item,index)"
+          class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
+          aria-haspopup="menu" 
+          aria-expanded="false" 
+          style="background: none; border: none; cursor: pointer;">
+          <i class="bi bi-pencil" style="color: black;"></i> 
+        </button>
+
+        <button 
+        *ngIf="isEditModeView  && hideButton "
+  
+        (click)="helperDashboard(item, index,modalContent,item.selectType)"
+        class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
+        aria-haspopup="menu" 
+        aria-expanded="false" 
+        style="background: none; border: none; cursor: pointer;">
+        <i class="bi bi-graph-up" style="color: black;"></i> 
+      </button>
+
+
+        <div 
+      
+          class="dropdown" 
+          style="position: relative;">
+          <button
+          *ngIf="!isEditModeView && !hideButton"
+          [matMenuTriggerFor]="menu"
+          class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" >
+          <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>
+        </button>
+      
+        <mat-menu #menu="matMenu" class="mat-elevation-z4">
+          <button mat-menu-item (click)="edit_each_duplicate(item,index)" >
+            <i class="bi bi-files fs-4"></i>
+            <span>Duplicate</span>
+          </button>
+          <button mat-menu-item (click)="deleteTile(item,index)">
+            <i class="bi bi-trash fs-4"></i>
+            <span>Delete</span>
+          </button>
+        </mat-menu>
+        </div>
+      </div>
+      
+    </div>
+  </div> -->
+
+
+
+
+
+<div *ngIf="item.grid_type === 'HTMLtile'" >
+  <iframe #previewFrame class="html-preview-frame"></iframe>
+
+
+
+  <div class="action-menu-container d-flex align-items-center"
+  style="position: absolute; top: 10px; right: 10px; gap: 10px;z-index: 50;">
+
+  <button *ngIf="!isEditModeView && !hideButton && summaryDashboardUpdate " style="z-index: 50;"
+       class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px"
+       (click)="edit_each_tileUI(item, index)"
+       aria-haspopup="menu"
+       aria-expanded="false"
+       style="background: none; border: none; cursor: pointer;">
+       <i class="bi bi-pencil" style="color: var(--bs-body-color);"></i>
+  
+  </button>
+  
+
+  <div class="dropdown">
+  <button *ngIf="!isEditModeView && summaryDashboardUpdate "
+         [matMenuTriggerFor]="menu"
+         class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px">
+   <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>
+  </button>
+  <mat-menu #menu="matMenu" class="mat-elevation-z4">
+   <button mat-menu-item (click)="edit_each_duplicate(item, index)">
+     <i class="bi bi-files fs-4"></i>
+     <span>Duplicate</span>
+   </button>
+   <button mat-menu-item (click)="deleteTile(item, index)">
+     <i class="bi bi-trash fs-4"></i>
+     <span>Delete</span>
+   </button>
+  </mat-menu>
+  </div>
+  </div>
+
+</div>

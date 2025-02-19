@@ -48,9 +48,10 @@ export class TileUi1Component implements OnInit{
     
   }
 
-
+ 
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
+    console.log('this.liveDataTile check',this.liveDataTile)
  
     // console.log("tile data check from tile1 ",this.item)
     // console.log('this.liveDataTile from child',this.liveDataTile)

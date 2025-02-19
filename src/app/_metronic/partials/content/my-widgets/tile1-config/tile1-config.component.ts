@@ -1563,10 +1563,7 @@ selectFormParams1(event: any[], index: number): void {
     { value: 'average', text: 'Average' },
     { value: 'latest', text: 'Latest' },
     { value: 'previous', text: 'Previous' },
-    // { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
-    // { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
-    // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
-    // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
+
     { value: 'Constant', text: 'Constant' },
    
     { value: 'Count', text: 'Count' },
