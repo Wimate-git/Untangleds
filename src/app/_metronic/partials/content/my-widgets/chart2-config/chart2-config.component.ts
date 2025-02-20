@@ -271,7 +271,8 @@ export class Chart2ConfigComponent implements OnInit{
             selectToTime: [''],
             parameterValue:[''],
             columnVisibility:[[]],
-            rowData:['']
+            rowData:[''],
+            undefinedCheckLabel:['']
           })
         );
         console.log('this.all_fields check', this.all_fields);
@@ -770,6 +771,7 @@ repopulate_fields(getValues: any): FormArray {
           selectFromTime: configItem.selectFromTime || '',
           selectToTime: configItem.selectToTime || '',
           parameterValue: configItem.parameterValue || '',
+          undefinedCheckLabel:configItem.undefinedCheckLabel || '',
           columnVisibility: this.fb.control(columnVisibility), // Initialize columnVisibility as a control
         })
       );

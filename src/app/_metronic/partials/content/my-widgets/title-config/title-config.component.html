@@ -182,6 +182,66 @@
                 />
               </div>
             </div>
+
+            <div class="row">
+
+            <div class="col-md-4 mb-3">
+              <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Module Names</label>
+              <ngx-select
+                id="parameterName"
+                [allowClear]="true"
+                formControlName="ModuleNames"
+                [items]="showModuleNames"
+                optionValueField="value"
+                optionTextField="text"
+                placeholder="Select Parameter"
+                (selectionChanges)="moduleSelection($event)"
+            
+                style="width: 100%;">
+              </ngx-select>
+            </div>
+
+
+
+            <div class="col-md-4 mb-3">
+              <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Redirect To</label>
+              <ngx-select
+                id="parameterName"
+                [allowClear]="true"
+                formControlName="dashboardIds"
+                [items]="dynamicIDArray"
+                optionValueField="value"
+                optionTextField="text"
+                placeholder="Select Parameter"
+                (selectionChanges)="dynamicRedirectChanged($event)"
+            
+                style="width: 100%;">
+              </ngx-select>
+            </div>
+    
+              <!-- Select Type -->
+              <div class="col-md-4">
+                <div class="d-flex flex-column">
+                  <label for="dashboardIds" class="col-form-label fw-bold fs-6">Select Type</label>
+                  <ngx-select
+                    id="selectType"
+                    [allowClear]="true"
+                    formControlName="selectType"
+                    [items]="SelectTypeSummary"
+                    optionValueField="value"
+                    optionTextField="text"
+                    placeholder="Select Parameter"
+                  >
+                  </ngx-select>
+                </div>
+              </div>
+            
+              <!-- Column Visibility -->
+
+     
+          </div>
+
+
             
             
             <!-- Name Container -->

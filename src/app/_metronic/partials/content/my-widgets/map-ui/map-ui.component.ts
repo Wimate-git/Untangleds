@@ -24,6 +24,7 @@ export class MapUiComponent implements OnInit{
   @Input () hideButton:any
   @Input() mapWidth:any
   @Input() mapHeight:any
+  @Input() liveDataMapTile:any
     //  [chartHeight]="chartHeight[i]"  
     //                   [chartWidth]="chartWidth[i]"
   iframeUrl: any;
@@ -57,8 +58,46 @@ export class MapUiComponent implements OnInit{
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
+    console.log('liveDataMapTile checking',this.liveDataMapTile)
  
-    console.log("tile data check from dynamic Title",this.item)
+  
+
+      if (this.all_Packet_store?.LiveDashboard === true) {
+    console.log("✅ LiveDashboard is TRUE - Updating multi_value...");
+  
+    if (this.item && this.liveDataMapTile && Array.isArray(this.liveDataMapTile)) {
+        // Find the matching packet from this.liveDataTile based on id
+        const matchingLiveTile = this.liveDataMapTile.find(liveTile => liveTile.id === this.item.id);
+  
+        console.log('🔍 Matching Live Tile:', matchingLiveTile);
+  
+        // Update multi_value only if a match is found
+        if (matchingLiveTile && matchingLiveTile.MapConfig) {
+            if (Array.isArray(matchingLiveTile.MapConfig)) {
+                this.item.MapConfig = matchingLiveTile.MapConfig; // Assign directly if already an array
+            } else if (typeof matchingLiveTile.MapConfig === "string") {
+                try {
+                    this.item.MapConfig = matchingLiveTile.MapConfig; // Parse if stringified JSON
+                } catch (error) {
+                    console.error("⚠️ JSON Parsing Error for multi_value:", matchingLiveTile.MapConfig, error);
+                }
+            }
+        }
+        console.log("map tile live check",this.item)
+
+        
+    
+    
+    
+   
+    } else {
+        console.warn("⚠️ Either this.item is empty or this.liveDataTile is not an array.");
+    }
+  } else {
+
+  
+    // Do nothing, retain the existing this.item as is
+  }
 // Parse the MapConfig and log parsed data
 this.parsedData = JSON.parse(this.item.MapConfig);
 console.log('Parsed data check:', this.parsedData);
@@ -267,6 +306,10 @@ get shouldShowButton(): boolean {
   //     .map((part) => part.trim()) // Trim any extra spaces
   //     .join('<br />'); // Join with line breaks
   // }
+
+
+
+  
   
 
 }

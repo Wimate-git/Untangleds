@@ -285,7 +285,8 @@ export class Chart3ConfigComponent implements OnInit{
             parameterValue:[''],
             columnVisibility:[[]],
             rowData:[''],
-            formatType:['']
+            formatType:[''],
+            undefinedCheckLabel:['']
           })
         );
         console.log('this.all_fields check', this.all_fields);
@@ -661,6 +662,7 @@ openChartModal3(tile: any, index: number) {
       MiniTableFields: [parsedMiniTableFields],
       minitableEquation:tile.minitableEquation,
       EquationOperationMini:tile.EquationOperationMini, 
+      
       // filterDescription:tile.filterDescription
 
 
@@ -753,7 +755,8 @@ repopulate_fields(getValues: any): FormArray {
           selectToTime: configItem.selectToTime || '',
           parameterValue: configItem.parameterValue || '',
           columnVisibility: this.fb.control(columnVisibility), // Use control to handle as an array
-          formatType:configItem.formatType||''
+          formatType:configItem.formatType||'',
+          undefinedCheckLabel:configItem.undefinedCheckLabel||''
         })
       );
 

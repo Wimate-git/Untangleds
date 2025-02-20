@@ -276,6 +276,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   liveDataTableTile: any;
   helpherObjCalender: any;
   showHTMLtileGrid: boolean;
+  checkLiveDashboard: any;
+  liveDataMapTile: any;
 
 
   createPieChart() {
@@ -747,8 +749,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     console.log('this.routeId check', this.routeId);
     console.log('client id check', this.SK_clientID);
   this.spinner.show('dataProcess')
-  console.log('permissionList',this.readFilterEquation)
-  console.log('this.permissionsMetaData',this.permissionIdRequest)
+
   console.log('this.parsedPermission',this.parsedPermission)
   console.log('this.userdetails from request',this.userdetails)
     // Define the API Gateway URL
@@ -834,6 +835,7 @@ liveDashboardDataFormat(processedData: any) {
   let columnChart:any =[];
   let dynamicTile:any = [];
   let TableWidget:any =[];
+  let MapWidget: any = [];
 
   processedData.forEach((packet: any) => {
     switch (packet.grid_type) {
@@ -904,6 +906,17 @@ liveDashboardDataFormat(processedData: any) {
                 this.liveDataTableTile = TableWidget
                 console.log('this.liveDataLineChart chec',this.liveDataTableTile)
                 break;
+                case "Map":
+                  console.log("Matched Tile Packet:", packet);
+           
+                  MapWidget.push(packet);
+                  console.log('MapWidget after push',MapWidget)
+              
+          
+           
+                  this.liveDataMapTile = MapWidget
+                  console.log('this.liveDataMapTile chec',this.liveDataTableTile)
+                  break;
 
 
               
@@ -2105,7 +2118,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
 
 
 
-  ngOnInit() {
+  async ngOnInit() {
 
     this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
 
@@ -2114,7 +2127,9 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     this.userdetails = this.getLoggedUser.username;
     console.log('user name permissions check',this.userdetails)
 
-    this.fetchUserPermissions(1)
+    
+     this.fetchUserPermissions(1)
+    // console.log('readPermission_Id checking initialize',readPermission_Id)
     
     this.initializeCompanyFields();
 
@@ -2282,6 +2297,14 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
 });
   
 this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
+
+// console.log('this.permissionsMetaData from initialize',this.permissionIdRequest)
+// console.log('permissionList',this.readFilterEquation)
+// console.log('this.permissionsMetaData',this.permissionIdRequest)
+
+// console.log('check live',this.checkLiveDashboard )
+// this.reloadPage()
+
   }
   openQueryParams(paramsRead:any){
     console.log('paramsRead',paramsRead)
@@ -2724,6 +2747,7 @@ setTimeout(() => {
   }
 
   viewItem(id: string): void {
+    console.log('this.all_Packet_store check viewItem',this.lookup_data_summaryCopy)
     // Toggle the full-screen state
     // this.isFullScreen = !this.isFullScreen;
     // this.isFullView = !this.isFullView;
@@ -2738,6 +2762,9 @@ setTimeout(() => {
 
     // Set the state to Edit Mode
     this.showModal = true; // Open modal in edit mode
+
+
+ 
   }
   dashboardRedirect(id: string): void {
     // Toggle the full-screen state
@@ -2918,6 +2945,8 @@ setTimeout(() => {
           this.createdUserName = this.all_Packet_store.createdUser;
 
           console.log('Before Parsing:', this.all_Packet_store);
+    
+   
         // Assuming this.all_Packet_store.LastUpdate contains the epoch time
         
 const formattedDate = new Date(this.all_Packet_store.LastUpdate);
@@ -2971,7 +3000,14 @@ console.log('Formatted Date:', this.lastUpdatedTime);
           }
 
           // Match themeColor and set selected to true
-
+          this.checkLiveDashboard = this.all_Packet_store.LiveDashboard
+          console.log('checkLiveDashboard check',this.checkLiveDashboard)
+          if(this.checkLiveDashboard==true){
+              //  this.reloadPage()      
+          
+          }else{
+          
+          }
 
           // Iterate through the dashboard and themes to find a matching 
           console.log('checkdta for filter',this.all_Packet_store)
@@ -3045,6 +3081,7 @@ console.log('Formatted Date:', this.lastUpdatedTime);
             );
             // this.updateSummary(this.storeFilterDetail, 'query_applied');
           }
+
           this.dashboard.forEach((gridItem: any) => {
             // Find the theme that matches the current grid item
             const matchingTheme = this.themes.find(theme => theme.color === gridItem.themeColor);
@@ -5137,7 +5174,8 @@ console.log('Serialized Query Params:', serializedQueryParams);
               this.reloadPage();  // Call the reloadPage function
             }
             else if (actionKey === 'add_table' || actionKey === 'update_table'){
-              this.reloadPage(); 
+              window.location.reload();
+              // this.reloadPage(); 
             }
             else if(actionKey === 'add_multiTable' || actionKey === 'update_multiTable'){
               this.reloadPage(); 
@@ -6666,7 +6704,9 @@ refreshFunction(){
             // Parse the JSON string into a JavaScript object
             this.permissionsMetaData = JSON.parse(metadataString);
             console.log('Parsed Metadata Object from location', this.permissionsMetaData);
-            this.permissionIdRequest = this.permissionsMetaData.permission_ID
+            const permissionId = this.permissionsMetaData.permission_ID
+            console.log('this.permissionIdRequest check from function',permissionId)
+            this.permissionIdRequest = permissionId
             const readPermission_Id = this.permissionsMetaData.permission_ID
             console.log('readPermission_Id check',readPermission_Id)
            
@@ -6689,7 +6729,7 @@ refreshFunction(){
               console.log('Permission ID is "All", skipping action.');
             }
   
-          
+          return readPermission_Id
   
           } catch (error) {
             console.error('Error parsing JSON:', error);
@@ -6785,6 +6825,7 @@ refreshFunction(){
       TableWidget:{ width: this.tableWidth, height: this.tableHeight, heightOffset: 80, widthOffset: 30  },
       title:{ width: this.titleWidth, height: this.titleHeight, heightOffset: 80, widthOffset: 30  },
       HTMLtile:{width:this.HTMLtileWidth,  height:this.HTMLtileHeight, heightOffset: 80, widthOffset: 30  },
+     
 
 
 

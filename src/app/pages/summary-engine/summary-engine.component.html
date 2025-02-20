@@ -89,6 +89,8 @@
                   item.grid_type === 'filterTile' ? helperFilter(item, i, FilterModal) :
                   item.grid_type === 'tile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,dataTableModalTile1) : null) :
                 item.grid_type === 'dynamicTile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,dataTableModalDynamicTile) : null) :
+                item.grid_type === 'title' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,TitleModal) : null) :
+                
                   null
                 "
               >
@@ -195,7 +197,7 @@
                       [all_Packet_store]="all_Packet_store" 
                    
             
-                      (customEvent)="helperTile($event, KPIModal)" 
+                      (customEvent)="helperTile($event, TitleModal)" 
                       (customEvent1)="emitDuplicate($event)" 
                       (customEvent2)="emitDelete6($event)"
 ></app-title-ui>
@@ -249,7 +251,7 @@
                       [isEditModeView]="isEditModeView" 
                       [hideButton]="hideButton" 
                       [all_Packet_store]="all_Packet_store" 
-           
+           [liveDataMapTile]="liveDataMapTile"
                
                       (customEvent)="helperTile($event, MapModal)" 
                       (customEvent1)="emitDuplicate($event)" 

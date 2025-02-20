@@ -1090,6 +1090,7 @@ themes = [
   { color: "linear-gradient(to right, #A1045A, #A1045A)", selected: true },
   { color: "linear-gradient(to right, #563C5C, #563C5C)", selected: false },
   { color: "linear-gradient(to right, #655967, #655967)", selected: false },
+  // { color: "linear-gradient(to right, #707070, #707070)", selected: false },
 
 
 

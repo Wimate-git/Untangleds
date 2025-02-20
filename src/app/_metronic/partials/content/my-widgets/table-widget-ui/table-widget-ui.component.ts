@@ -157,6 +157,10 @@ export class TableWidgetUiComponent implements OnInit{
             sortable: true,
             filter: true,
             resizable: true,
+            cellRenderer: (params: { value: string; }) => {
+              // put the value in bold
+              return 'Value is <b>' + params.value + '</b>';
+          }
           }));
       
         console.log('Filtered additional columns from columnLabelsArray:', additionalColumns);
@@ -226,6 +230,11 @@ export class TableWidgetUiComponent implements OnInit{
         sortable: true,
         filter: true,
         resizable: true,
+        cellRenderer: (params: { value: string; }) => {
+          return params.value
+          // put the value in bold
+          // return 'Value is <b>' + params.value + '</b>';
+      }
       }));
   
     console.log('Filtered additional columns from columnLabelsArray:', additionalColumns);

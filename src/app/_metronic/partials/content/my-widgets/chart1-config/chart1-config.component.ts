@@ -348,7 +348,8 @@ export class Chart1ConfigComponent implements OnInit {
             parameterValue:[''],
             columnVisibility:[[]],
             rowData:[''],
-            formatType:['']
+            formatType:[''],
+            undefinedCheckLabel:['']
             
 
        
@@ -439,6 +440,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         MiniTableFields:this.createChart.value.MiniTableFields ,
         minitableEquation:this.createChart.value.minitableEquation,
         EquationOperationMini:this.createChart.value.EquationOperationMini,
+    
       
 
   
@@ -807,7 +809,8 @@ repopulate_fields(getValues: any): FormArray {
           columnVisibility: this.fb.control(columnVisibility), // Use control to handle as an array
           filterParameter: this.fb.control(filterParameterValue), // Use control for dynamic handling
           filterParameter1: this.fb.control(filterParameter1Value), // Same for filterParameter1
-          formatType:configItem.formatType ||''
+          formatType:configItem.formatType ||'',
+          undefinedCheckLabel:configItem.undefinedCheckLabel ||''
         })
       );
 

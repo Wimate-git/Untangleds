@@ -138,6 +138,11 @@
                           placeholder="Select constant" formControlName="constantValue"
                           [disabled]="createChart.get('primaryValue')?.value !== 'Constant'" />
                       </div>
+                      <div class="col-md-4 mb-3" >
+                        <label  class="col-form-label fw-bold fs-6 ">Undefined Format</label>
+                        <input id="undefinedCheckLabel" type="text" class="form-control form-control-solid" placeholder="Enter Value"
+                          formControlName="undefinedCheckLabel">
+                      </div>
   
   
                       <div class="col-md-4 mb-3">

@@ -739,6 +739,7 @@ this.initializeTileFields()
   predefinedList = [
     {value:'Progress',text:'Progress'},
     {value:'Rating',text:'Rating'},
+    {value:'HTML',text:'HTML'},
     {value:'None',text:'None'},
 
   ]

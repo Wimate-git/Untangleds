@@ -28,7 +28,7 @@
       style="position: absolute; top: 10px; right: 10px; gap: 10px;">
       <!-- Edit Button -->
       <button 
-      *ngIf="!isEditModeView && !hideButton && summaryDashboardUpdate "
+      *ngIf="!isEditModeView && !hideButton "
       (click)="edit_each_tileUI(item,index)"
         class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
         aria-haspopup="menu" 
@@ -44,7 +44,7 @@
    
     >
     <button
-    *ngIf="!isEditModeView && summaryDashboardUpdate"
+    *ngIf="!isEditModeView "
     [matMenuTriggerFor]="menu"
     class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" data-bs-auto-close="outside" >
     <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>
