@@ -217,6 +217,7 @@ export class HtmlTileConfigComponent implements OnInit{
       htmlTextArea: [],
       OperationValue:[''],
       groupByFormat: [''],
+      htmlTextArea_processed:['']
      
     
 
@@ -249,9 +250,10 @@ export class HtmlTileConfigComponent implements OnInit{
 
         formlist: this.createKPIWidget.value.formlist,
         parameterName: this.createKPIWidget.value.parameterName,
-        htmlTextArea:this.createKPIWidget.value.htmlTextArea,
+        htmlTextArea:this.createKPIWidget.value.htmlTextArea ||'',
         groupByFormat: this.createKPIWidget.value.groupByFormat,
-        OperationValue:this.createKPIWidget.value.OperationValue
+        OperationValue:this.createKPIWidget.value.OperationValue,
+        htmlTextArea_processed:''
         
       };
   

@@ -23,7 +23,7 @@
               <div class="col-2" role="Filter">
                 <li class="nav-item">
                   <a class="nav-link text-active-primary me-6" id="filter-tab" data-bs-toggle="tab" role="tab"
-                    aria-controls="filter-tab" aria-selected="false" (click)="selectedSettingsTab('filter-tab')">Filter/Label</a>
+                    aria-controls="filter-tab" aria-selected="false" (click)="selectedSettingsTab('filter-tab')">Filter</a>
                 </li>
               </div>
               <div class="col-3" role="Settings">
@@ -69,6 +69,10 @@
                       (selectionChanges)="selectFormParams($event)"
                       placeholder="Select Form">
                     </ngx-select>
+                    <div *ngIf="createKPIWidget.get('formlist')?.touched && createKPIWidget.get('formlist')?.invalid" class="text-danger">
+                      <div *ngIf="createKPIWidget.get('formlist')?.errors?.required">Form is required.</div>
+                    </div>
+                  
                   </div>
             
                   <div class="col-md-4 mb-3">
@@ -84,12 +88,15 @@
                       (selectionChanges)="parameterValue($event)"
                       style="width: 100%;">
                     </ngx-select>
+                    <div *ngIf="createKPIWidget.get('parameterName')?.touched && createKPIWidget.get('parameterName')?.invalid" class="text-danger">
+                      <div *ngIf="createKPIWidget.get('parameterName')?.errors?.required">Form Fields is required.</div>
+                    </div>
                   </div>
 
                   <div class="col-md-4 mb-3">
                     <label for="parameterName" class="col-form-label fw-bold fs-6 required">Format Type</label>
                     <ngx-select
-                      id="parameterName"
+                      id="formatType"
                       [allowClear]="true"
                       formControlName="formatType"
                       [items]="FormatTypeValues"
@@ -99,6 +106,9 @@
                   
                       style="width: 100%;">
                     </ngx-select>
+                    <div *ngIf="createKPIWidget.get('formatType')?.touched && createKPIWidget.get('formatType')?.invalid" class="text-danger">
+                      <div *ngIf="createKPIWidget.get('formatType')?.errors?.required">Format Type is required.</div>
+                    </div>
                   </div>
 
 
@@ -136,6 +146,9 @@
                       class="w-100"
                
                     ></ngx-select>
+                    <div *ngIf="createKPIWidget.get('primaryValue')?.touched && createKPIWidget.get('primaryValue')?.invalid" class="text-danger">
+                      <div *ngIf="createKPIWidget.get('primaryValue')?.errors?.required">Primary Value is required.</div>
+                    </div>
                   </div>
             
                   <div class="col-md-4 mb-3" *ngIf="primaryValue?.value === 'Constant'">
@@ -158,6 +171,9 @@
                       [formControl]="groupByFormatControl"
                       (click)="openModalCalender()"
                       readonly>
+                      <div *ngIf="createKPIWidget.get('groupByFormat')?.touched && createKPIWidget.get('groupByFormat')?.invalid" class="text-danger">
+                        <div *ngIf="createKPIWidget.get('groupByFormat')?.errors?.required"> Group By Format is required.</div>
+                      </div>
                   </div>
             
                   <div class="col-md-4 mb-3" *ngIf="showIdField">
@@ -257,34 +273,57 @@
                         style="width: 100%;">
                       </ngx-select>
                     </div>
-
-                    <div class="col-md-4 mb-3">
-                      <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Select Type</label>
-                      <ngx-select
-                        id="selectType"
-                        [allowClear]="true"
-                        formControlName="selectType"
-                        [items]="SelectTypeSummary"
-                        optionValueField="value"
-                        optionTextField="text"
-                        placeholder="Select Parameter"
-                       
-                        style="width: 100%;">
-                      </ngx-select>
-                    </div>
-
-                    <div class="col-md-4">
-                      <label for="columnVisibility" class="fw-bold fs-6 ">column Visibility</label>
-                      <p-multiSelect
-                        id="columnVisibility"
-                        formControlName="columnVisibility"
-                        [options]="columnVisisbilityFields"
-                        optionLabel="text"
-                        placeholder="Select Parameter"
-                      
+                    <div class="row g-3 align-items-center">
+                      <!-- Select Type -->
+                      <div class="col-md-4">
+                        <div class="d-flex flex-column">
+                          <label for="dashboardIds" class="col-form-label fw-bold fs-6">Select Type</label>
+                          <ngx-select
+                            id="selectType"
+                            [allowClear]="true"
+                            formControlName="selectType"
+                            [items]="SelectTypeSummary"
+                            optionValueField="value"
+                            optionTextField="text"
+                            placeholder="Select Parameter"
+                          >
+                          </ngx-select>
+                        </div>
+                      </div>
                     
-                      ></p-multiSelect>
+                      <!-- Column Visibility -->
+                      <div class="col-md-4" style="margin-top:30px;">
+                        <div class="d-flex flex-column">
+                          <label for="columnVisibility" class="fw-bold fs-6">Column Visibility</label>
+                          <p-multiSelect
+                            id="columnVisibility"
+                            formControlName="columnVisibility"
+                            [options]="columnVisisbilityFields"
+                            optionLabel="text"
+                            placeholder="Select Parameter"
+                            >
+                          </p-multiSelect>
+                        </div>
+                      </div>
+                    
+                      <!-- Custom Label -->
+                      <div class="col-md-4">
+                        <div class="d-flex flex-column">
+                          <label for="custom_Label" class="col-form-label fw-bold fs-6 required">Custom Label</label>
+                          <input
+                            type="text"
+                            class="form-control form-control-solid"
+                            id="custom_Label"
+                            name="custom_Label"
+                            formControlName="custom_Label"
+                          />
+                          <div *ngIf="createKPIWidget.get('custom_Label')?.touched && createKPIWidget.get('custom_Label')?.invalid" class="text-danger">
+                            <div *ngIf="createKPIWidget.get('custom_Label')?.errors?.required"> Custom Label is required.</div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
+                    
                     <div class="col-md-4 mb-3" *ngIf = "shoRowData" >
                       <label for="constant" class="col-form-label fw-bold fs-6 "></label>
                       <input id="constant" type="number" class="form-control form-control-solid"
@@ -319,16 +358,7 @@
                 </div>
               
                 <!-- Custom Label -->
-                <div class="col-md-5">
-                  <label for="custom_Label" class="col-form-label fw-bold fs-6 required">Custom Label</label>
-                  <input
-                    type="text"
-                    class="form-control form-control-solid"
-                    id="custom_Label"
-                    name="custom_Label"
-                    formControlName="custom_Label"
-                  />
-                </div>
+
               </div>
             
               <div class="col-md-12 mb-3">
@@ -371,7 +401,7 @@
               
                   <!-- Font Size Input -->
                   <div class="col-md-6 mb-3">
-                    <label for="fontSize" class="col-form-label fw-bold fs-6 required">Font Size</label>
+                    <label for="fontSize" class="col-form-label fw-bold fs-6 ">Font Size</label>
                     <input
                       id="fontSize"
                       type="number"
@@ -387,7 +417,7 @@
               
                   <!-- Font Color Input -->
                   <div class="col-md-6 mb-3">
-                    <label for="fontColor" class="col-form-label fw-bold fs-6 required">Font Color</label>
+                    <label for="fontColor" class="col-form-label fw-bold fs-6 ">Font Color</label>
                     <div class="d-flex align-items-center">
                       <!-- Color Picker Input -->
                       <input
@@ -642,12 +672,15 @@
       
           <div class="modal-footer" style="margin-top: 20px;">
             <button type="button" class="btn btn-secondary" (click)="modal.dismiss()"  >Close</button>
-      <button type="button" class="btn btn-primary" 
-     
-      (click)="addTile('tile');modal.dismiss()" 
-      *ngIf="!isEditMode" 
-      
-      [disabled]="createKPIWidget?.invalid">Save</button>
+            <button 
+            type="button" 
+            class="btn btn-primary"  
+            (click)="validateAndSubmit()" 
+            *ngIf="!isEditMode"
+          >
+            Save
+          </button>
+          
       <button 
           type="button" 
           class="btn btn-warning" 
@@ -675,12 +708,12 @@
                     <div class="title">Last 24 Hours</div>
                     <div class="example">E.g., Last 24 hours of data</div>
                   </div>
-                  <div class="list-item active" (click)="selectValue('Today', modal)" (mouseenter)="showTooltip('Today')"
+                  <div class="list-item " (click)="selectValue('Today', modal)" (mouseenter)="showTooltip('Today')"
                     (mouseleave)="hideTooltip()" >
                     <div class="title">Today</div>
                     <div class="example">E.g., Data from 00:00 hrs to now</div>
                   </div>
-                  <div class="list-item active" (click)="selectValue('Yesterday', modal)" (mouseenter)="showTooltip('Yesterday')"
+                  <div class="list-item " (click)="selectValue('Yesterday', modal)" (mouseenter)="showTooltip('Yesterday')"
                     (mouseleave)="hideTooltip()">
                     <div class="title">Yesterday</div>
                     <div class="example">E.g., Data from previous day</div>

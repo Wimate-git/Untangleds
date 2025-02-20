@@ -100,6 +100,9 @@
                   (click)="openModalCalender()"
                   readonly>
               </div>
+
+
+
               <div class="card card-custom p-2 mt-5">
                 <h3 class="text-center text-primary"></h3> 
               
@@ -180,42 +183,70 @@
           [formGroup]="condition"
           style="border: 2px solid rgb(21, 163, 219); padding: 10px; margin: 5px; border-radius: 5px;"
         >
-          <div class="row g-3 align-items-end mb-4">
-            <div class="col-md-4">
-              <label for="constant-{{ i }}" class="col-form-label fw-bold fs-6 ">Column Label</label>
-              <input
-                id="constant-{{ i }}"
-                type="text"
-                class="form-control form-control-solid"
-                placeholder="Enter Label"
-                formControlName="columnLabel"
-              />
-            </div>
-        
-            <div class="col-md-5">
-              <label for="parameterName-{{ i }}" class="fw-bold fs-6 ">Form Fields</label>
-              <p-multiSelect
-                id="parameterName-{{ i }}"
-                formControlName="filterParameter"
-                [options]="listofDynamicParam"
-                optionLabel="text"
-                placeholder="Select Form Fields"
-              ></p-multiSelect>
-            </div>
-        
-            <div class="col-md-3">
-              <button
-                type="button"
-                class="btn btn-primary w-100"
-                (click)="onAdd(i)"
-              >
-                Add
-              </button>
-            </div>
+        <div class="row g-3 align-items-center mb-4">
+          <!-- Column Label -->
+          <div class="col-md-4">
+            <label for="constant-{{ i }}" class="col-form-label fw-bold fs-6">Column Label</label>
+            <input
+              id="constant-{{ i }}"
+              type="text"
+              class="form-control form-control-solid"
+              placeholder="Enter Label"
+              formControlName="columnLabel"
+            />
           </div>
         
+          <!-- Form Fields -->
+          <div class="col-md-4" style="margin-top: 30px;">
+            <label for="parameterName-{{ i }}" class="fw-bold fs-6">Form Fields</label>
+            <p-multiSelect
+              id="parameterName-{{ i }}"
+              formControlName="filterParameter"
+              [options]="listofDynamicParam"
+              optionLabel="text"
+              placeholder="Select Form Fields"
+          
+            ></p-multiSelect>
+          </div>
+        
+          <!-- Predefined Scripts -->
+          <div class="col-md-4" style="margin-top: 30px;">
+            <label for="PredefinedScripts-{{ i }}" class="col-form-label fw-bold fs-6">
+              Predefined Scripts
+              <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Predefined Scripts from the list">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+            </label>
+            <ngx-select
+              id="PredefinedScripts-{{ i }}"
+              [allowClear]="true"
+              formControlName="PredefinedScripts"
+              [items]="predefinedList"
+              optionValueField="value"
+              optionTextField="text"
+              placeholder="Select Form"
+              style="width: 100%;"
+            >
+            </ngx-select>
+          </div>
+        </div>
+        
+        <!-- Add Button in a New Row for Proper Alignment -->
+        <div class="row">
+          <div class="col-md-5">
+            <button
+              type="button"
+              class="btn btn-light w-100"
+              (click)="onAdd(i)"
+            >
+              Insert Field into Equation/HTML
+            </button>
+          </div>
+        </div>
+        
+        
           <div class="col-md-12 mb-3">
-            <label for="description-{{ i }}" class="col-createChart-label fw-bold fs-6 ">Equation</label>
+            <label for="description-{{ i }}" class="col-createChart-label fw-bold fs-6 ">Equation/HTML</label>
             <textarea
               id="description-{{ i }}"
               formControlName="filterDescription"

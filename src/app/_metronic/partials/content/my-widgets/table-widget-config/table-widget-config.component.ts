@@ -98,7 +98,8 @@ this.initializeTileFields()
       filterDescription: [''],
       filterParameter1:[''],
       // custom_Label1:[''],
-      filterDescription1:['']
+      filterDescription1:[''],
+  
     });
   }
 
@@ -193,7 +194,8 @@ this.initializeTileFields()
       conditions: conditionsArray, // Use the updated conditions array
       filterParameter1:this.createKPIWidget.value.filterParameter1,
       // custom_Label1:this.createKPIWidget.value.custom_Label1,
-      filterDescription1:this.createKPIWidget.value.filterDescription1
+      filterDescription1:this.createKPIWidget.value.filterDescription1,
+      // PredefinedScripts:this.createKPIWidget.value.PredefinedScripts
 
     };
   
@@ -403,7 +405,9 @@ this.initializeTileFields()
         formArray.push(this.fb.group({
           columnLabel: [condition.columnLabel || ''],
           filterParameter: [condition.filterParameter || []],
-          filterDescription: [condition.filterDescription || '']
+          filterDescription: [condition.filterDescription || ''],
+          PredefinedScripts:[condition.PredefinedScripts || '']
+
         }));
       });
   
@@ -468,6 +472,7 @@ this.initializeTileFields()
           columnLabel: condition.columnLabel,
           filterParameter: condition.filterParameter,
           filterDescription: condition.filterDescription,
+          PredefinedScripts:condition.PredefinedScripts
         };
       });
   
@@ -659,6 +664,7 @@ this.initializeTileFields()
       columnLabel: [''],
       filterParameter: [[]],
       filterDescription: [''],
+      PredefinedScripts:['']
     });
 
     this.conditions.push(conditionGroup); // Add the FormGroup to the FormArray
@@ -730,5 +736,11 @@ this.initializeTileFields()
     }
   }
   
+  predefinedList = [
+    {value:'Progress',text:'Progress'},
+    {value:'Rating',text:'Rating'},
+    {value:'None',text:'None'},
+
+  ]
   
 }

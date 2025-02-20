@@ -228,6 +228,8 @@ export class Tile1ConfigComponent implements OnInit {
  
   ]
   initializeTileFields(): void {
+    const defaultTheme = { color: "linear-gradient(to right, #A1045A, #A1045A)", selected: true };
+    this.selectedColor = defaultTheme.color;
 
     // Initialize the form group
     this.createKPIWidget = this.fb.group({
@@ -243,7 +245,7 @@ export class Tile1ConfigComponent implements OnInit {
       selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
       selectedRangeLabelWithDates: [''],
 
-      themeColor: ['', Validators.required],
+      themeColor: [this.selectedColor, Validators.required],
       fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['#000000', Validators.required], // Default to black
       selectFromTime: [''],
@@ -252,7 +254,7 @@ export class Tile1ConfigComponent implements OnInit {
   
       filterParameter: [[]], // Initialize as an array to handle multiple or single values
       filterDescription: [''],
-      formatType:[''],
+      formatType:['',Validators.required],
       custom_Label:['',Validators.required],
    
       EquationDesc:[''],
@@ -269,6 +271,28 @@ export class Tile1ConfigComponent implements OnInit {
 
 
     });
+  }
+  
+  validateAndSubmit() {
+    if (this.createKPIWidget.invalid) {
+      // ✅ Mark all fields as touched to trigger validation messages
+      Object.values(this.createKPIWidget.controls).forEach(control => {
+        if (control instanceof FormControl) {
+          control.markAsTouched();
+          control.updateValueAndValidity();
+        } else if (control instanceof FormArray) {
+          control.controls.forEach((group) => {
+            (group as FormGroup).markAllAsTouched();
+          });
+        }
+      });
+  
+      return; // 🚨 Stop execution if the form is invalid
+    }
+  
+    // ✅ Proceed with saving only if form is valid
+    this.addTile('tile');
+    this.modal.dismiss();
   }
   
   
@@ -1063,7 +1087,7 @@ themes = [
   { color: "linear-gradient(to right, #3A5311, #3A5311)", selected: false },
   { color: "linear-gradient(to right, #1338BE, #1338BE)", selected: false },
   { color: "linear-gradient(to right, #004F98, #004F98)", selected: false },
-  { color: "linear-gradient(to right, #A1045A, #A1045A)", selected: false },
+  { color: "linear-gradient(to right, #A1045A, #A1045A)", selected: true },
   { color: "linear-gradient(to right, #563C5C, #563C5C)", selected: false },
   { color: "linear-gradient(to right, #655967, #655967)", selected: false },
 

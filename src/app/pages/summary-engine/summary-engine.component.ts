@@ -2431,6 +2431,10 @@ async fetchPermissionIdMain(clientID: number, p1Value: string) {
         this.summaryDashboardUpdate = summaryDashboardItem.update;
         // Set default mode based on `update` permission
         this.isEditModeView = this.summaryDashboardUpdate; // Default to view mode if update is false
+        // this.hideButton = 
+        // const savedMode = localStorage.getItem('editModeState');
+        // console.log('savedMode checking',savedMode)
+        // this.isEditModeView = savedMode ? JSON.parse(savedMode) : false;
         this.updateOptions(); // Ensure options reflect the correct mode
       }
 
