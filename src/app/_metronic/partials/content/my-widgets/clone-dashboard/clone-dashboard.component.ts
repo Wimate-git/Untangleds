@@ -154,30 +154,37 @@ export class CloneDashboardComponent implements OnInit {
   }
   checkDuplicateSummaryId(): void {
     const enteredID = this.duplicateForm.get('summaryId')?.value?.trim();
-    console.log('enteredID checking',enteredID)
+    console.log('enteredID checking', enteredID);
   
     if (!enteredID) {
-      // Reset errors if the input is empty
+      // Reset errors and isDuplicate flag if the input is empty
       this.duplicateForm.get('summaryId')?.setErrors(null);
+      this.isDuplicate = false;
       return;
     }
+  
     console.log("summary lookup data check from", this.lookup_data_summary1);
     const isDuplicateID = this.lookup_data_summary1.some((item: { P1: any; }) => item.P1 === enteredID);
-    
-    console.log('isDuplicateID checking',isDuplicateID)
+  
+    console.log('isDuplicateID checking', isDuplicateID);
   
     if (isDuplicateID) {
       this.isDuplicate = true;
       this.duplicateForm.get('summaryId')?.setErrors({ duplicate: true }); // Set the duplicate error
     } else {
+      this.isDuplicate = false; // ✅ Reset isDuplicate when the ID is unique
+  
       const control = this.duplicateForm.get('summaryId');
       if (control?.errors) {
         const errors = { ...control.errors }; // Spread the existing errors into a new object
         delete errors['duplicate']; // Remove the duplicate error
         control.setErrors(Object.keys(errors).length ? errors : null); // Reset errors or clear them if empty
+      } else {
+        control?.setErrors(null); // Ensure errors are fully cleared
       }
     }
   }
+  
   
   
 

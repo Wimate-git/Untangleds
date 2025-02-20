@@ -3932,6 +3932,7 @@ console.log('selectedTab checking',this.selectedTab)
     this.createNewSummaryDuplicate(event);
   }
   createNewSummaryDuplicate(duplicateData: any) {
+    console.log('duplicateData check',duplicateData)
     this.defaultValue = 'Tiles';
   
     // Validate the input
@@ -3944,6 +3945,7 @@ console.log('selectedTab checking',this.selectedTab)
   
     const createdDate = Math.ceil(new Date().getTime() / 1000); // Created date
     const updatedDate = Math.ceil(new Date().getTime() / 1000); // Updated date
+    // LiveDashboard:this.createSummaryField.value.LiveDashboard,
   
     // Prepare summary details using duplicateData
     this.allCompanyDetails = {
@@ -3956,6 +3958,7 @@ console.log('selectedTab checking',this.selectedTab)
       crDate: createdDate,
       upDate: updatedDate,
       createdUser: this.getLoggedUser.username, // Set the creator's username
+
     };
   
     console.log('Summary data:', this.allCompanyDetails);
