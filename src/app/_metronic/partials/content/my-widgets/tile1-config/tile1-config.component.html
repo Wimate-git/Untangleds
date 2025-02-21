@@ -94,7 +94,7 @@
                   </div>
 
                   <div class="col-md-4 mb-3">
-                    <label for="parameterName" class="col-form-label fw-bold fs-6 required">Format Type</label>
+                    <label  class="col-form-label fw-bold fs-6 required">Format Type</label>
                     <ngx-select
                       id="formatType"
                       [allowClear]="true"
@@ -243,7 +243,7 @@
                     <div class="col-md-4 mb-3">
                       <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Module Names</label>
                       <ngx-select
-                        id="parameterName"
+                    
                         [allowClear]="true"
                         formControlName="ModuleNames"
                         [items]="showModuleNames"
@@ -261,7 +261,7 @@
                     <div class="col-md-4 mb-3">
                       <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Redirect To</label>
                       <ngx-select
-                        id="parameterName"
+                     
                         [allowClear]="true"
                         formControlName="dashboardIds"
                         [items]="dynamicIDArray"
@@ -340,9 +340,9 @@
               <div class="row g-3 align-items-end mb-4">
                 <!-- Form Fields -->
                 <div class="col-md-4">
-                  <label for="parameterName" class="fw-bold fs-6">Form Fields</label>
+                  <label  class="fw-bold fs-6">Form Fields</label>
                   <p-multiSelect
-                    id="parameterName"
+            
                     formControlName="filterParameter"
                     [options]="listofDynamicParam"
                     optionLabel="text"
@@ -498,7 +498,7 @@
                 <div class="col-md-4 d-flex flex-column" *ngIf ="listofEquationParam&&listofEquationParam[fieldIndex]">
                   <label for="EquationParam" class="fw-bold fs-6 mb-2">Form Fields</label>
                   <p-multiSelect
-                    id="parameterName"
+                
                     formControlName="EquationParam"
                     [options]="listofEquationParam[fieldIndex]"
                     optionLabel="text"

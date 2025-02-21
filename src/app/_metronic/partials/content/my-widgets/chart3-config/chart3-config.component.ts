@@ -529,7 +529,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
       parameterName: `${tile.parameterName}`, // Copy the parameterName as is (no "Copy" appended)
       multi_value: tile.multi_value.map((value: any) => ({ ...value })) // Deep copy of multi_value
     };
-alert('cloned tile')
+// alert('cloned tile')
     // Ensure all fields are properly copied
     clonedTile.x = tile.x;
     clonedTile.y = tile.y;

@@ -112,6 +112,8 @@
                       [tileWidth]="tileWidth[i]" 
                        [tileHeight]="tileHeight[i]"
                        [liveDataTile]="liveDataTile"
+                       [summaryDashboardView]="summaryDashboardView"
+                       [summaryDashboardUpdate]="summaryDashboardUpdate"
                
                    >
                     </app-tile-ui1>
@@ -127,7 +129,8 @@
                       (sendCellInfo) = "helperInfo($event,nestedTable)"
                       (sendminiTableData)="helperminiTableData($event)"
                       (sendFormNameForMini)="helperForName($event)"
-                   
+                      [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                      [summaryDashboardView]="summaryDashboardView"
             
                       (customEvent)="helperTile($event, MultiTableModal)" 
                       (customEvent1)="emitDuplicate($event)" 
@@ -145,7 +148,8 @@
                   (customEvent2)="emitDelete6($event)" -->
 
                   <div *ngIf="item.grid_type === 'TableWidget'" >
-                    <app-table-widget-ui [item]="item" [index]="i" (customEvent)="helperTile($event,tableModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"   [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                    <app-table-widget-ui [item]="item" [index]="i" (customEvent)="helperTile($event,tableModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"     [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                    [summaryDashboardView]="summaryDashboardView" 
                     [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" [liveDataTableTile]="liveDataTableTile"></app-table-widget-ui>
                   </div>
                   
@@ -169,15 +173,16 @@
                       <app-tile-ui6 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal5)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"></app-tile-ui6>
                     </div>
                               <div *ngIf="item.grid_type === 'chart'"  >
-                      <app-chart-ui1 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal1)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                      <app-chart-ui1 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal1)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
+                 
                       [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalChart1)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails"></app-chart-ui1>
                     </div>
                     <div *ngIf="item.grid_type === 'Linechart'"  >
-                      <app-chart-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal2)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" (sendCellInfo) = "helperChartClickChart2($event,dataTableModalChart2)" [summaryDashboardUpdate]="summaryDashboardUpdate" [hideButton]="hideButton" [routeId]="routeId" [SK_clientID]="SK_clientID"
+                      <app-chart-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal2)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" (sendCellInfo) = "helperChartClickChart2($event,dataTableModalChart2)" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView" [hideButton]="hideButton" [routeId]="routeId" [SK_clientID]="SK_clientID"
                       (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataLineChart]="liveDataLineChart" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [permissionIdRequest]="permissionIdRequest"></app-chart-ui2>
                     </div>
                     <div *ngIf="item.grid_type === 'Columnchart'"  >
-                      <app-chart-ui3 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal3)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton" [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                      <app-chart-ui3 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal3)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
                       [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  (sendCellInfo) = "helperChartClick($event,dataTableModal)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)"  (emitChartConfigTable)="emitchartDatatable($event)" [liveDataColumnChart]="liveDataColumnChart" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [permissionIdRequest]="permissionIdRequest"></app-chart-ui3>
                     </div>
                     
@@ -195,7 +200,7 @@
                       [isEditModeView]="isEditModeView" 
                       [hideButton]="hideButton" 
                       [all_Packet_store]="all_Packet_store" 
-                   
+                      [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
             
                       (customEvent)="helperTile($event, TitleModal)" 
                       (customEvent1)="emitDuplicate($event)" 
@@ -225,7 +230,8 @@
                       <app-chart-ui5 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal5)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" ></app-chart-ui5>
                     </div> -->
                     <div *ngIf="item.grid_type === 'dynamicTile'"  >
-                      <app-dynamic-tile-ui [item]="item" [index]="i" (customEvent)="helperTile($event,DynamicTileModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton"  [liveDataDynamicTile]="liveDataDynamicTile"></app-dynamic-tile-ui>
+                      <app-dynamic-tile-ui [item]="item" [index]="i" (customEvent)="helperTile($event,DynamicTileModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton"  [liveDataDynamicTile]="liveDataDynamicTile"       [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                      [summaryDashboardView]="summaryDashboardView"></app-dynamic-tile-ui>
                     </div>
                     <div  *ngIf="item.grid_type === 'filterTile'">
                       <app-filter-tile-ui    [item]="item" 
@@ -235,6 +241,7 @@
                       [hideButton]="hideButton" 
                       [all_Packet_store]="all_Packet_store" 
                       [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                      [summaryDashboardView]="summaryDashboardView"
                       [hidingLink]="hidingLink"
                       (customEvent)="helperTile($event, FilterModal)" 
                       (customEvent1)="emitDuplicate($event)" 
@@ -252,6 +259,7 @@
                       [hideButton]="hideButton" 
                       [all_Packet_store]="all_Packet_store" 
            [liveDataMapTile]="liveDataMapTile"
+           [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
                
                       (customEvent)="helperTile($event, MapModal)" 
                       (customEvent1)="emitDuplicate($event)" 
@@ -356,7 +364,7 @@
               <div class="d-flex align-items-center gap-4 ms-3" style="text-align: left;">
                 <!-- Begin Create Button -->
   <!-- Begin Create Button -->
-  <button data-bs-toggle="tooltip" title="Create Dashboard"
+  <button data-bs-toggle="tooltip" *ngIf="summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)" title="Create Dashboard"
       class="btn bg-success text-white fw-semibold d-flex align-items-center" (click)="openModal('new', null, summaryModal)">
       <i class="bi bi-plus-square-fill fs-3 text-white me-2"></i>Create
   </button>
@@ -589,11 +597,11 @@
    style="cursor: pointer;" [attr.title]="lastUpdatedTime">
   <i style="color: white;" class="fa" [ngClass]="'fa-clock'"></i>
   </a>
-    <a title="Add Dashboard" class="myMenu-item" (click)="openModal('new',null, summaryModal)">
+    <a *ngIf="summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)" title="Add Dashboard" class="myMenu-item" (click)="openModal('new',null, summaryModal)">
       <i style="color: white;" class="fa fa-plus"></i>
     </a>
 <a class="myMenu-item" #myLink 
-*ngIf="(editButtonCheck && summaryDashboardUpdate) || (editButtonCheck && userPermission === 'All')"
+*ngIf="(editButtonCheck && summaryDashboardUpdate && summaryDashboardView) || (editButtonCheck && userPermission === 'All')"
    title="Edit Dashboard" 
    (click)="openModal('edit', all_Packet_store, summaryModal)">
     <i style="color: white;" class="fa fa-edit"></i>
@@ -601,29 +609,40 @@
     <a class="myMenu-item" (click)="openSummaryTable(content)" title="Search dashboard">
       <i style="color: white;" class="fa fa-search"></i>
     </a>
-    <a *ngIf="!isSummaryEngine()&& (summaryDashboardUpdate || userPermission === 'All')"
+    <a *ngIf="!isSummaryEngine() && (summaryDashboardUpdate || userPermission === 'All' || !summaryDashboardView)"
     class="myMenu-item" 
     (click)="toggleMode()" 
     style="cursor: pointer;" 
     [attr.title]="isEditModeView ? 'Widgets Edit Mode' : 'View Mode'">
     <i style="color: white;" class="fa" [ngClass]="isEditModeView ? 'fa-pencil-alt' : 'fa-eye'"></i>
- </a>
+</a>
+
+ 
+ 
  
  
  
     
     <!-- New Full View Icon -->
-    <a class="myMenu-item" *ngIf="!isSummaryEngine()"   (click)="toggleFullScreenFullView()" style="cursor: pointer;" [attr.title]="isFullView ? 'Exit Full View' : 'Full View'">
-      <i style="color: white;" class="fa" [ngClass]="isFullView ? 'fa-compress' : 'fa-expand'"></i>
-    </a>
+    <a class="myMenu-item full-view-btn" *ngIf="!isSummaryEngine()"  
+    (click)="toggleFullScreenFullView()" 
+    style="cursor: pointer;" 
+    [attr.title]="isFullScreen ? 'Exit Full View' : 'Full View'">
+    <i style="color: white;" class="fa" [ngClass]="{'fa-expand': !isFullScreen, 'fa-compress': isFullScreen}"></i>
+</a>
+
+
+
+
+ 
     <a class="myMenu-item" *ngIf="!isSummaryEngine()" (click)="reloadPage()" style="cursor: pointer;" [attr.title]="'Refresh Data'">
       <i style="color: white;" class="fa" [ngClass]="isFullView ? 'fa-refresh' : 'fa-refresh'"></i>
     </a>
-    <a class="myMenu-item" *ngIf="!isSummaryEngine()" (click)="saveGridLayout()" style="cursor: pointer;" [attr.title]="'Save Dashboard'">
+    <a class="myMenu-item" *ngIf="!isSummaryEngine() && (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))" (click)="saveGridLayout()" style="cursor: pointer;" [attr.title]="'Save Dashboard'">
       <i style="color: white;" class="fa" [ngClass]="isFullView ? 'fa-save' : 'fa-save'"></i>
     </a>
 
-    <a class="myMenu-item" *ngIf="!isSummaryEngine()" (click)="openCloneDashboard(stepperModal, '')" 
+    <a class="myMenu-item" *ngIf="!isSummaryEngine() && (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))" (click)="openCloneDashboard(stepperModal, '')" 
     style="cursor: pointer;" [attr.title]="'Duplicate Dashboard'">
    <i style="color: white;" class="fa" [ngClass]="'fa-clone'"></i>
  </a>

@@ -59,6 +59,7 @@ ngOnInit(){
   this.SK_clientID = this.getLoggedUser.clientID;
   console.log('this.SK_clientID check', this.SK_clientID)
   this.initializeTitleFields()
+  this.dynamicData()
   this.dashboardIds(1)
 }
 

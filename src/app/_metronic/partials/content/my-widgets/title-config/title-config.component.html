@@ -8,9 +8,12 @@
       <div class="fv-row" [formGroup]="createTitle">
         <div class="modal-body">
           <div class="card-body pt-0">
-            <div class="d-flex flex-wrap align-items-center gap-3">
+            <!-- <div class="d-flex flex-wrap align-items-center gap-3"> -->
   
             <!-- Rich Text Editor Toolbar -->
+             <div class="row">
+            <div class="col-md-3">
+
             <div class="mb-3">
               <label for="fontSelector" class="col-form-label fw-bold fs-6 me-2 ">Font Type:</label>
               <div class="d-flex align-items-center gap-2">
@@ -46,8 +49,9 @@
               </button>
               </div>
             </div>
+            </div>
         
-            
+            <div class="col-md-3">
               <!-- Alignment Buttons -->
               <div class="mb-3">
                 <label for="fontSelector" class="col-form-label fw-bold fs-6 me-2">Font Align:</label>
@@ -78,8 +82,9 @@
                 </button>
                 </div>
               </div>
+            </div>
               
-            
+            <div class="col-md-3">
               <!-- Font Family Selector -->
               <div class="mb-3">
                 <label for="fontSelector" class="col-form-label fw-bold fs-6">Choose Font Style:</label>
@@ -108,11 +113,16 @@
                   <option value="Garamond" style="font-family: 'Garamond';">Garamond</option>
                   <option value="Palatino Linotype" style="font-family: 'Palatino Linotype';">Palatino Linotype</option>
                   <option value="Arial Black" style="font-family: 'Arial Black';">Arial Black</option>
+                  <option value="Sans-serif" style="font-family: 'Sans-serif';">Sans-serif</option>
+      <option value="Inter" style="font-family: 'Inter';">Inter</option>
+      <option value="Helvetica" style="font-family: 'Helvetica';">Helvetica</option>
                 </select>
               </div>
+            </div>
+
               
             
-            
+            <div class="col-md-3">
               <!-- Font Size Selector -->
               <div class="mb-3">
                 <!-- <label  class="col-form-label fw-bold fs-6 required">Date Range Label</label> -->
@@ -147,6 +157,8 @@
               <option value="100px">100</option>
             </select>
           </div>
+            </div>
+          </div>
             
             
               <!-- Background Color Picker -->
@@ -154,8 +166,9 @@
               
         
             <div class="color-picker-row" style="display: flex; gap: 1rem; align-items: center;">
+              <div class="col-md-6">
               <!-- Background Color Picker -->
-              <div class="color-picker-container">
+              <div class="color-picker-container ">
                 <label for="bgColorPicker" class="col-form-label fw-bold fs-6">Choose Background Color:</label>
                 <input
                   id="bgColorPicker"
@@ -167,9 +180,11 @@
                   title="Choose Name container background color"
                 />
               </div>
+            </div>
               
               <!-- Text Color Picker -->
-              <div class="color-picker-container">
+              <div class="col-md-6">
+              <div class="color-picker-container ">
                 <label for="textColorPicker" class="col-form-label fw-bold fs-6">Choose Text Color:</label>
                 <input
                   id="textColorPicker"
@@ -182,64 +197,65 @@
                 />
               </div>
             </div>
-
+            </div>
             <div class="row">
 
-            <div class="col-md-4 mb-3">
-              <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Module Names</label>
-              <ngx-select
-                id="parameterName"
-                [allowClear]="true"
-                formControlName="ModuleNames"
-                [items]="showModuleNames"
-                optionValueField="value"
-                optionTextField="text"
-                placeholder="Select Parameter"
-                (selectionChanges)="moduleSelection($event)"
-            
-                style="width: 100%;">
-              </ngx-select>
-            </div>
-
-
-
-            <div class="col-md-4 mb-3">
-              <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Redirect To</label>
-              <ngx-select
-                id="parameterName"
-                [allowClear]="true"
-                formControlName="dashboardIds"
-                [items]="dynamicIDArray"
-                optionValueField="value"
-                optionTextField="text"
-                placeholder="Select Parameter"
-                (selectionChanges)="dynamicRedirectChanged($event)"
-            
-                style="width: 100%;">
-              </ngx-select>
-            </div>
-    
-              <!-- Select Type -->
-              <div class="col-md-4">
-                <div class="d-flex flex-column">
-                  <label for="dashboardIds" class="col-form-label fw-bold fs-6">Select Type</label>
-                  <ngx-select
-                    id="selectType"
-                    [allowClear]="true"
-                    formControlName="selectType"
-                    [items]="SelectTypeSummary"
-                    optionValueField="value"
-                    optionTextField="text"
-                    placeholder="Select Parameter"
-                  >
-                  </ngx-select>
-                </div>
+              <div class="col-md-4 mb-3">
+                <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Module Names</label>
+                <ngx-select
+                  id="parameterName"
+                  [allowClear]="true"
+                  formControlName="ModuleNames"
+                  [items]="showModuleNames"
+                  optionValueField="value"
+                  optionTextField="text"
+                  placeholder="Select Module Name"
+                  (selectionChanges)="moduleSelection($event)"
+              
+                  style="width: 100%;">
+                </ngx-select>
               </div>
-            
-              <!-- Column Visibility -->
+  
+  
+  
+              <div class="col-md-4 mb-3">
+                <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Redirect To</label>
+                <ngx-select
+                  id="parameterName"
+                  [allowClear]="true"
+                  formControlName="dashboardIds"
+                  [items]="dynamicIDArray"
+                  optionValueField="value"
+                  optionTextField="text"
+                  placeholder="Redirect To"
+                  (selectionChanges)="dynamicRedirectChanged($event)"
+              
+                  style="width: 100%;">
+                </ngx-select>
+              </div>
+      
+                <!-- Select Type -->
+                <div class="col-md-4">
+                  <div class="d-flex flex-column">
+                    <label for="dashboardIds" class="col-form-label fw-bold fs-6">Select Type</label>
+                    <ngx-select
+                      id="selectType"
+                      [allowClear]="true"
+                      formControlName="selectType"
+                      [items]="SelectTypeSummary"
+                      optionValueField="value"
+                      optionTextField="text"
+                      placeholder="Select Type"
+                    >
+                    </ngx-select>
+                  </div>
+                </div>
+              
+                <!-- Column Visibility -->
+  
+       
+            </div>
 
-     
-          </div>
 
 
             
@@ -284,7 +300,7 @@
           
   
   
-          </div>
+    
         </div>
         </div>
         </div>

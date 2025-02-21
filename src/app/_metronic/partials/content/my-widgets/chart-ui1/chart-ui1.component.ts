@@ -29,6 +29,8 @@ export class ChartUi1Component implements OnChanges {
   @Input() permissionIdRequest:any
   @Input() readFilterEquation:any
   @Input() userdetails:any
+  @Input () summaryDashboardView :any
+  @Input() summaryDashboardUpdate:any;
   
   
   
@@ -233,7 +235,7 @@ this.formTableConfig = {
 
   // @Output() customEvent2 = new EventEmitter<{ arg1: any; arg2: number }>();
   @Input()  all_Packet_store: any;
-  @Input() summaryDashboardUpdate:any;
+
   @Input() hidingLink:any;
   @Input() isFullscreen: boolean = false; 
 

@@ -14,6 +14,7 @@ export class TitleUiComponent {
   @Output() customEvent1 = new EventEmitter<{ data: { arg1: any; arg2: number }; all_Packet_store: any }>();
   @Output() customEvent2 = new EventEmitter<{ data: { arg1: any; arg2: number }; all_Packet_store: any }>();
   @Input()  all_Packet_store: any;
+  @Input () summaryDashboardView :any
   @Input() summaryDashboardUpdate:any;
   @Input() hidingLink:any;
   @Input() isFullscreen: boolean = false; 

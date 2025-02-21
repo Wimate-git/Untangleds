@@ -32,6 +32,8 @@ export class TableWidgetUiComponent implements OnInit{
   @Input() index:any
   @Input() isEditModeView:any;
   @Input() summaryDashboardUpdate:any;
+  @Input() summaryDashboardView:any;
+
   @Input() hidingLink:any;
   @Input() liveDataTableTile:any;
 
@@ -403,7 +405,7 @@ get shouldShowButton(): boolean {
       });
     } else {
       console.error('Grid API is not initialized!');
-      alert('Unable to export to CSV. Please ensure the grid is loaded.');
+      // alert('Unable to export to CSV. Please ensure the grid is loaded.');
     }
   }
 
@@ -415,13 +417,13 @@ get shouldShowButton(): boolean {
       });
     } else {
       console.error('Grid API is not initialized!');
-      alert('Unable to export to Excel. Please ensure the grid is loaded.');
+      // alert('Unable to export to Excel. Please ensure the grid is loaded.');
     }
   }
   exportAllTablesAsExcel() {
     if (!this.rowData || this.rowData.length === 0) {
       console.error('No data available for export.');
-      alert('No data available for export.');
+      // alert('No data available for export.');
       return; // Exit if there's no data to export
     }
     console.log('this.rowData checking',this.rowData)
@@ -438,7 +440,7 @@ get shouldShowButton(): boolean {
   
     if (columnHeaders.length === 0) {
       console.error('No columns available for export.');
-      alert('No columns available for export.');
+      // alert('No columns available for export.');
       return;
     }
   
@@ -615,7 +617,7 @@ get shouldShowButton(): boolean {
       pdfMake.createPdf(docDefinition).download(`${this.formName}`+'.pdf');
     } catch (error) {
       console.error('Error generating PDF:', error);
-      alert('Failed to generate PDF. Please try again.');
+      // alert('Failed to generate PDF. Please try again.');
     }
   }
   

@@ -30,7 +30,7 @@
     <!-- Action Menu -->
     <div class="action-menu-container d-flex align-items-center"
          style="position: absolute; top: 3px; right: 10px; gap: 10px;">
-      <button *ngIf="!isEditModeView && !hideButton"
+      <button *ngIf="!isEditModeView && !hideButton && (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))"
               class="btn btn-icon btn-custom"
               (click)="edit_each_tileUI(item, index)"
               style="background: none; border: none;">
@@ -38,7 +38,7 @@
       </button>
 
       <div class="dropdown">
-        <button *ngIf="!isEditModeView && !hideButton"
+        <button *ngIf="!isEditModeView && !hideButton && (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))"
                 [matMenuTriggerFor]="menu"
                 class="btn btn-icon btn-custom">
           <i class="bi bi-three-dots-vertical"></i>

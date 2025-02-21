@@ -26,6 +26,8 @@ export class ChartUi3Component implements OnInit{
   @Input() permissionIdRequest:any
   @Input() readFilterEquation:any
   @Input() userdetails:any
+  @Input () summaryDashboardView :any
+  @Input() summaryDashboardUpdate:any;
   
   checkResBody: any;
   parsedResBody: any;
@@ -240,7 +242,7 @@ const extractcolumnVisibility = chartConfig
 
   // @Output() customEvent2 = new EventEmitter<{ arg1: any; arg2: number }>();
   @Input()  all_Packet_store: any;
-  @Input() summaryDashboardUpdate:any;
+
   @Input() hidingLink:any;
   @Input () hideButton:any
   @Input() isFullscreen: boolean = false; 

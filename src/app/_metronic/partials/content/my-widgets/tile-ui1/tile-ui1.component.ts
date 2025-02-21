@@ -13,7 +13,7 @@ export class TileUi1Component implements OnInit{
   @Input() item:any
   @Input() index:any
   @Input() isEditModeView:any;
-  @Input() summaryDashboardUpdate:any;
+
   @Input() hidingLink:any;
   @Input() isFullscreen:  any; 
   @Output() sendCellInfo = new EventEmitter<any>();
@@ -43,6 +43,9 @@ export class TileUi1Component implements OnInit{
   splitData: any;
   descriptionData: any;
   primaryValue: any;
+  @Input () summaryDashboardView :any
+  @Input() summaryDashboardUpdate:any;
+
   ngOnInit(): void {
 
     

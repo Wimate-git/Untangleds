@@ -74,6 +74,7 @@ import { HtmlTileUiComponent } from './html-tile-ui/html-tile-ui.component';
 
 
 
+
 @NgModule({
   declarations: [TileUi1Component,Tile1ConfigComponent,Tile2ConfigComponent,TileUi2Component,Tile3ConfigComponent,TileUi3Component,TileUi4Component,Tile4ConfigComponent,
     TileUi5Component,
@@ -146,6 +147,7 @@ import { HtmlTileUiComponent } from './html-tile-ui/html-tile-ui.component';
     MultiSelectModule,
     GoogleMapsModule ,
     HttpClientModule,
+
   
   ],
   exports:[

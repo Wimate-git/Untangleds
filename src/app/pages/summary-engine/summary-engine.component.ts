@@ -55,7 +55,7 @@ import { TableWidgetConfigComponent } from 'src/app/_metronic/partials/content/m
 import { AgGridAngular } from 'ag-grid-angular';
 import { GridApi ,Column, ColDef} from 'ag-grid-community';
 import { MapConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/map-config/map-config.component';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, Title } from '@angular/platform-browser';
 import { MultiTableConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/multi-table-config/multi-table-config.component';
 import { AuditTrailService } from '../services/auditTrail.service';
 import { HtmlTileConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/html-tile-config/html-tile-config.component';
@@ -254,6 +254,9 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   HTMLtileHeight:any [] = [];
   HTMLtileWidth:any [] = [];
 
+  filterTileHeight:any []=[];
+  filterTileWidth:any []=[];
+
   userPermissions: boolean | undefined;
   permissionIdCheck: any;
   permissionsMetaData: any;
@@ -278,6 +281,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   showHTMLtileGrid: boolean;
   checkLiveDashboard: any;
   liveDataMapTile: any;
+  summaryDashboardView: any;
 
 
   createPieChart() {
@@ -749,7 +753,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     console.log('this.routeId check', this.routeId);
     console.log('client id check', this.SK_clientID);
   this.spinner.show('dataProcess')
-
+console.log('this.readFilterEquation checking',this.readFilterEquation)
   console.log('this.parsedPermission',this.parsedPermission)
   console.log('this.userdetails from request',this.userdetails)
     // Define the API Gateway URL
@@ -1103,7 +1107,7 @@ showDrillDownData(dynamicDrill:any,modalref:any){
     name:this.storeDrillDown.multi_value[0].value,
     value:this.storeDrillDown.multi_value[0].processed_value
   }
-  this.modalService.open(modalref, { size: 'lg' });
+  this.modalService.open(modalref, { size: 'xl' });
   console.log('pointData for Tile',pointData)
 
 
@@ -1166,7 +1170,7 @@ showDrillDownData(dynamicDrill:any,modalref:any){
 
 helperTileClick(event:any,modalChart:any){
   console.log('event checking',event)
-  this.modalService.open(modalChart, { size: 'lg' });
+  this.modalService.open(modalChart, { size: 'xl' });
 
 }
 // setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): void {
@@ -1334,7 +1338,7 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
     if (modaref && modaref instanceof TemplateRef) {
       console.log('Opening modal with modaref:', modaref);
       this.modalService.open(modaref, {
-        size: 'lg',
+        size: 'xl',
         backdrop: true, // Allows closing by clicking outside of the modal
         centered: true
       });
@@ -1366,27 +1370,29 @@ exitFullScreen(): void {
 closeModal1() {
   this.modalService.dismissAll(); // Close the modal programmatically
 }
+handleKeyDown = (event: KeyboardEvent): void => {
+  if (event.key === 'Escape' && this.isFullScreen) {
+      this.toggleFullScreenFullView(false); // Exit fullscreen
+  }
+};
 
 toggleFullScreenFullView(enterFullscreen?: boolean): void {
-    // Allow direct control of fullscreen state or toggle if no parameter is provided
-    if (enterFullscreen !== undefined) {
-        this.isFullScreen = enterFullscreen;
-    } else {
-        this.isFullScreen = !this.isFullScreen; // Toggle fullscreen
-    }
+  if (enterFullscreen !== undefined) {
+      this.isFullScreen = enterFullscreen;
+  } else {
+      this.isFullScreen = !this.isFullScreen; // Toggle fullscreen
+  }
 
-    this.hidingLink = this.isFullScreen; // Update hidingLink state
+  console.log('Fullscreen state updated:', this.isFullScreen);
+  this.updateOptions(); // Update any dependent options
 
-    console.log('Fullscreen state updated:', this.isFullScreen);
-    this.updateOptions(); // Update any dependent options
-
-    if (this.isFullScreen) {
-        console.log('Entered fullscreen mode');
-        // Additional logic for entering fullscreen
-    } else {
-        console.log('Exited fullscreen mode');
-        // Additional logic for exiting fullscreen
-    }
+  if (this.isFullScreen) {
+      console.log('Entered fullscreen mode');
+      // Additional logic for entering fullscreen
+  } else {
+      console.log('Exited fullscreen mode');
+      // Additional logic for exiting fullscreen
+  }
 }
 
 
@@ -1754,6 +1760,18 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
           );
       }
   
+      else if (item.grid_type === 'filterTile') {
+        // const topMargin = 20; // Define the top margin value
+      
+        // Adjust height and width with the top margin
+        this.filterTileHeight[index] = itemComponentHeight ; // Subtract additional top margin
+        this.filterTileWidth[index] = itemComponentWidth ; // Subtract margin/padding for width
+      
+        console.log(
+          `Resized ${item.grid_type} at index ${index}:`,
+          `Height: ${this.filterTileHeight[index]}, Width: ${this.filterTileWidth[index]}, Top Margin: }`
+        );
+    }
 
       
       
@@ -1901,7 +1919,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
   constructor(private summaryConfiguration: SharedService, private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector, private auditTrail: AuditTrailService,
     private spinner: NgxSpinnerService, private zone: NgZone,private http: HttpClient,  private sanitizer: DomSanitizer, // Inject DomSanitizer
-
+    private titleService: Title
   ) {
     this.resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
@@ -1975,6 +1993,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
   @HostListener('unloaded')
   ngOnDestroy(): void {
     console.log('SummaryEngineComponent destroyed.');
+    document.removeEventListener('keydown', this.handleKeyDown);
   }
   ngAfterViewInit(): void {
     console.log('this.allCompanyDetails',this.createSummaryField.value)
@@ -2119,6 +2138,9 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
 
 
   async ngOnInit() {
+    this.route.data.subscribe(data => {
+      this.titleService.setTitle(data['title']); // Set tab title dynamically
+    });
 
     this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
 
@@ -2126,6 +2148,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     console.log('this.SK_clientID check', this.SK_clientID)
     this.userdetails = this.getLoggedUser.username;
     console.log('user name permissions check',this.userdetails)
+
 
     
      this.fetchUserPermissions(1)
@@ -2297,6 +2320,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
 });
   
 this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
+document.removeEventListener('keydown', this.handleKeyDown);
 
 // console.log('this.permissionsMetaData from initialize',this.permissionIdRequest)
 // console.log('permissionList',this.readFilterEquation)
@@ -2410,6 +2434,9 @@ async fetchPermissionIdMain(clientID: number, p1Value: string) {
       console.log('Parsed permission metadata:', this.parsedPermission);
     this.readFilterEquation =this.parsedPermission 
     console.log('this.readFilterEquation check',this.readFilterEquation)
+    console.log('this.routeId permissions', this.routeId);
+    
+
 
       this.summaryPermission = this.parsedPermission.summaryList;
       console.log('this.summaryPermission check', this.summaryPermission);
@@ -2452,8 +2479,12 @@ async fetchPermissionIdMain(clientID: number, p1Value: string) {
 
       if (summaryDashboardItem) {
         this.summaryDashboardUpdate = summaryDashboardItem.update;
+        this.summaryDashboardView = summaryDashboardItem.view
+
+        console.log('this.summaryDashboardUpdate check',this.summaryDashboardUpdate)
+        // (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)) 
         // Set default mode based on `update` permission
-        this.isEditModeView = this.summaryDashboardUpdate; // Default to view mode if update is false
+        this.isEditModeView = this.summaryDashboardUpdate ||this.summaryDashboardUpdate && !this.summaryDashboardView; // Default to view mode if update is false
         // this.hideButton = 
         // const savedMode = localStorage.getItem('editModeState');
         // console.log('savedMode checking',savedMode)
@@ -2743,7 +2774,7 @@ setTimeout(() => {
 
   }
   openCreateContent(createcontent: any) {
-    this.modalService.open(createcontent, { size: 'lg', ariaLabelledBy: 'modal-basic-title' });
+    this.modalService.open(createcontent, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
   }
 
   viewItem(id: string): void {
@@ -2930,8 +2961,9 @@ setTimeout(() => {
     { color: "linear-gradient(to right, #fc5c7d, #6a82fb)", selected: false }  // Pink to Blue
   ];
 
-  openModalHelpher(getValue: any) {
+  openModalHelpher(getValue: any) : Promise<any> {
     console.log("Data from lookup:", getValue);
+    return new Promise((resolve, reject) => {
 
     this.api
       .GetMaster(`${this.SK_clientID}#${getValue}#summary#main`, 1)
@@ -3000,14 +3032,7 @@ console.log('Formatted Date:', this.lastUpdatedTime);
           }
 
           // Match themeColor and set selected to true
-          this.checkLiveDashboard = this.all_Packet_store.LiveDashboard
-          console.log('checkLiveDashboard check',this.checkLiveDashboard)
-          if(this.checkLiveDashboard==true){
-              //  this.reloadPage()      
-          
-          }else{
-          
-          }
+
 
           // Iterate through the dashboard and themes to find a matching 
           console.log('checkdta for filter',this.all_Packet_store)
@@ -3107,16 +3132,21 @@ console.log('Formatted Date:', this.lastUpdatedTime);
           this.cdr.detectChanges();
           this.bindDataToGridster(this.all_Packet_store); // Pass the object to bindDataToGridster
           this.openModal('Edit_ts', this.all_Packet_store); // Open modal with the data
+
+          resolve(this.all_Packet_store);
+        }else{
+          reject("No metadata found");
         }
       })
       .catch((err) => {
         console.log("Can't fetch", err);
       });
+    });
   }
 
   helperFilter(data:any,index:any, KPIModal: TemplateRef<any>){
     if(data.grid_type=='filterTile'){
-    this.modalService.open(KPIModal, { size: 'lg' });
+    this.modalService.open(KPIModal, { size: 'xl' });
 
     // Access the component instance and trigger `openKPIModal`
     setTimeout(() => {
@@ -3125,7 +3155,7 @@ console.log('Formatted Date:', this.lastUpdatedTime);
     }, 500);
   }
   else if(data.grid_type=='tile'){
-    this.modalService.open(KPIModal, { size: 'lg' });
+    this.modalService.open(KPIModal, { size: 'xl' });
 
     // Access the component instance and trigger `openKPIModal`
     setTimeout(() => {
@@ -3139,7 +3169,7 @@ console.log('Formatted Date:', this.lastUpdatedTime);
   helperTile(event: any, KPIModal: TemplateRef<any>) {
     console.log('KPIModal check',KPIModal)
     if(event.arg1.grid_type=='tile'){
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -3149,7 +3179,7 @@ console.log('Formatted Date:', this.lastUpdatedTime);
       }, 500);
     }
     if(event.arg1.grid_type=='MultiTableWidget'){
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -3159,7 +3189,7 @@ console.log('Formatted Date:', this.lastUpdatedTime);
       }, 500);
     }
     if(event.arg1.grid_type=='HTMLtile'){
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -3169,7 +3199,7 @@ console.log('Formatted Date:', this.lastUpdatedTime);
       }, 500);
     }
     if(event.arg1.grid_type=='TableWidget'){
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -3179,7 +3209,7 @@ console.log('Formatted Date:', this.lastUpdatedTime);
       }, 500);
     }
     if(event.arg1.grid_type=='Map'){
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -3193,14 +3223,14 @@ console.log('Formatted Date:', this.lastUpdatedTime);
     
     else if(event.arg1.grid_type=='tile2'){
       console.log('modal check',KPIModal)
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
       console.log('event check', event)
       setTimeout(() => {
         this.tileConfig2Component.openKPIModal1(event.arg1, event.arg2)
       }, 500);
     }
     else if(event.arg1.grid_type=='tile3'){
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
       console.log('event check', event)
   
       setTimeout(() => {
@@ -3209,14 +3239,14 @@ console.log('Formatted Date:', this.lastUpdatedTime);
 
     }
     else if (event.arg1.grid_type=='tile4'){
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
       console.log('event check', event)
       setTimeout(() => {
         this.tileConfig4Component?.openKPIModal3(event.arg1, event.arg2)
       }, 500);
     }
     else if(event.arg1.grid_type=='tile5'){
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
       console.log('event check', event)
       setTimeout(() => {
         this.tileConfig5Component?.openKPIModal4(event.arg1, event.arg2)
@@ -3224,14 +3254,14 @@ console.log('Formatted Date:', this.lastUpdatedTime);
 
     }
     else if(event.arg1.grid_type=='tile6'){
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
       console.log('event check', event)
       setTimeout(() => {
         this.tileConfig6Component?.openKPIModal5(event.arg1, event.arg2)
       }, 500);
     }
     else if(event.arg1.grid_type=='title'){
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
       console.log('event check', event)
       setTimeout(() => {
         this.titleConfigComponent.openTitleModal(event.arg1, event.arg2)
@@ -3240,7 +3270,7 @@ console.log('Formatted Date:', this.lastUpdatedTime);
     }
 
     else if(event.arg1.grid_type=='chart'){
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
       console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig1Component.openChartModal1(event.arg1, event.arg2)
@@ -3249,7 +3279,7 @@ console.log('Formatted Date:', this.lastUpdatedTime);
     }
 
     else if(event.arg1.grid_type=='Linechart'){
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
       console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig2Component.openChartModal2(event.arg1, event.arg2)
@@ -3258,7 +3288,7 @@ console.log('Formatted Date:', this.lastUpdatedTime);
     }
 
     else if(event.arg1.grid_type=='Columnchart'){
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
       console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig3Component.openChartModal3(event.arg1, event.arg2)
@@ -3267,7 +3297,7 @@ console.log('Formatted Date:', this.lastUpdatedTime);
     }
 
     else if(event.arg1.grid_type=='Areachart'){
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
       console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig4Component.openChartModal4(event.arg1, event.arg2)
@@ -3275,7 +3305,7 @@ console.log('Formatted Date:', this.lastUpdatedTime);
 
     }
     else if(event.arg1.grid_type=='Barchart'){
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
       console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig5Component.openChartModal5(event.arg1, event.arg2)
@@ -3283,7 +3313,7 @@ console.log('Formatted Date:', this.lastUpdatedTime);
 
     }
     else if(event.arg1.grid_type=='dynamicTile'){
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
       console.log('event check dynamic tile', event)
     
       // Access the component instance and trigger `openKPIModal`
@@ -3294,7 +3324,7 @@ console.log('Formatted Date:', this.lastUpdatedTime);
     }
 
     else if(event.arg1.grid_type=='title'){
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
       console.log('event check dynamic tile', event)
     
       // Access the component instance and trigger `openKPIModal`
@@ -3305,7 +3335,7 @@ console.log('Formatted Date:', this.lastUpdatedTime);
     }
 
     else if(event.arg1.grid_type=='filterTile'){
-      this.modalService.open(KPIModal, { size: 'lg' });
+      this.modalService.open(KPIModal, { size: 'xl' });
       console.log('event check dynamic tile', event)
       console.log('event.arg1 checking',event.arg1)
       console.log('event.arg2 checking',event.arg2)
@@ -3641,7 +3671,7 @@ console.log('selectedTab checking',this.selectedTab)
     });
   
     // Open modal for new entry
-    this.modalService.open(content, { size: 'lg' });
+    this.modalService.open(content, { size: 'xl' });
   }
   
 
@@ -3719,7 +3749,7 @@ console.log('selectedTab checking',this.selectedTab)
     }
 
     // Open modal for editing
-    this.modalService.open(content, { size: 'lg' });
+    this.modalService.open(content, { size: 'xl' });
   }
 
 
@@ -5218,26 +5248,25 @@ console.log('Serialized Query Params:', serializedQueryParams);
   
   
   
-  private formatField(value: any, fieldName: string = ''): string {
+
+
+  private formatField(value: any): string {
     try {
       let parsedValue;
   
-      // ✅ Ensure `htmlTextArea` is always properly stringified
-
-      
-      
-  
-      // Step 1: Parse if the value is a string and JSON valid
+      // Step 1: Parse if the value is a string
       if (typeof value === 'string') {
         parsedValue = JSON.parse(value);
       } else {
-        parsedValue = value; // Assume it's already parsed
+        // Assume it's already parsed, directly assign it
+        parsedValue = value;
       }
   
-      // Step 2: Process arrays normally
+      // Step 2: Check if the parsed value is an array with `filterDescription`
       if (Array.isArray(parsedValue)) {
         const formattedArray = parsedValue.map((item) => {
           if (item.filterDescription && item.filterParameter && item.filterParameter1 && item.filterDescription1) {
+            // Replace placeholders in filterDescription with corresponding text
             let formattedDescription = item.filterDescription;
             item.filterParameter.forEach((param: any) => {
               const placeholder = `\${${param.value}}`;
@@ -5255,10 +5284,12 @@ console.log('Serialized Query Params:', serializedQueryParams);
         return JSON.stringify(formattedArray); // Convert back to a string
       }
   
-      return JSON.stringify(parsedValue || []); // Convert non-arrays to string
+      // Step 3: For non-array objects, just stringify the value
+      return JSON.stringify(parsedValue || []);
     } catch (error) {
-      console.error(`Error formatting field "${fieldName}":`, value, error);
-      return JSON.stringify([]); // Return empty array string if error
+      // Handle errors gracefully
+      console.error('Error formatting field:', value, error);
+      return '[]';
     }
   }
   
@@ -5284,7 +5315,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
       MiniTableFields:this.formatField(tile.MiniTableFields),
       filterParameterLine:this.formatField(tile.filterParameterLine),
   
-      parameterName:this.formatField(tile.parameterName)
+      // parameterName:this.formatField(tile.parameterName)
 
 
 
@@ -6535,60 +6566,60 @@ refreshFunction(){
     this.createTitle.patchValue({ customLabel: inputValue }, { emitEvent: false });
   }
   openKPIModal(KPIModal: TemplateRef<any>,modal: any) {
-    this.modalService.open(KPIModal, { size: 'lg', ariaLabelledBy: 'modal-basic-title' });
+    this.modalService.open(KPIModal, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
     modal.dismiss();
   }
 
   openKPIModal1(KPIModal1: TemplateRef<any>,modal:any) {
 
-    this.modalService.open(KPIModal1, { size: 'lg', ariaLabelledBy: 'modal-basic-title' });
+    this.modalService.open(KPIModal1, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
     modal.dismiss();
 
   }
   openKPIModal2(KPIModal2: TemplateRef<any>,modal:any) {
   
-    this.modalService.open(KPIModal2, { size: 'lg' });
+    this.modalService.open(KPIModal2, { size: 'xl' });
     modal.dismiss();
  
 
   }
   openKPIModal3(KPIModal3: TemplateRef<any>,modal:any) {
-    this.modalService.open(KPIModal3, { size: 'lg' });
+    this.modalService.open(KPIModal3, { size: 'xl' });
     modal.dismiss();
   }
   openKPIModal4(KPIModal4: TemplateRef<any>,modal:any) {
-    this.modalService.open(KPIModal4, { size: 'lg' });
+    this.modalService.open(KPIModal4, { size: 'xl' });
     modal.dismiss();
   }
   openKPIModal5(KPIModal5: TemplateRef<any>,modal:any) {
-    this.modalService.open(KPIModal5, { size: 'lg' });
+    this.modalService.open(KPIModal5, { size: 'xl' });
     modal.dismiss();
   }
   openTitleModal(TitleModal: TemplateRef<any>,modal:any) {
-    this.modalService.open(TitleModal, { size: 'lg' });
+    this.modalService.open(TitleModal, { size: 'xl' });
     modal.dismiss();
   }
   openChartModal1(ChartModal1: TemplateRef<any>,modal:any) {
-    this.modalService.open(ChartModal1, { size: 'lg' });
+    this.modalService.open(ChartModal1, { size: 'xl' });
     modal.dismiss();
   }
   openChartModal2(ChartModal2: TemplateRef<any>,modal:any) {
-    this.modalService.open(ChartModal2, { size: 'lg' });
+    this.modalService.open(ChartModal2, { size: 'xl' });
     modal.dismiss();
   }
 
   openChartModal3(ChartModal3: TemplateRef<any>,modal:any) {
-    this.modalService.open(ChartModal3, { size: 'lg' });
+    this.modalService.open(ChartModal3, { size: 'xl' });
     modal.dismiss();
   }
 
   openChartModal4(ChartModal4: TemplateRef<any>,modal:any) {
-    this.modalService.open(ChartModal4, { size: 'lg' });
+    this.modalService.open(ChartModal4, { size: 'xl' });
     modal.dismiss();
   }
 
   openChartModal5(ChartModal5: TemplateRef<any>,modal:any) {
-    this.modalService.open(ChartModal5, { size: 'lg' });
+    this.modalService.open(ChartModal5, { size: 'xl' });
     modal.dismiss();
   }
   openCloneDashboard(stepperModal: TemplateRef<any>,modal:any) {
@@ -6596,12 +6627,12 @@ refreshFunction(){
     modal.dismiss();
   }
   openDynamicTileModal(DynamicTileModal:TemplateRef<any>,modal:any){
-    this.modalService.open(DynamicTileModal, {size: 'lg' });
+    this.modalService.open(DynamicTileModal, {size: 'xl' });
     modal.dismiss();
 
   }
   openHTMLModalTile(htmlTileModal:TemplateRef<any>,modal:any){
-    this.modalService.open(htmlTileModal, {size: 'lg' });
+    this.modalService.open(htmlTileModal, {size: 'xl' });
     modal.dismiss();
 
   }
@@ -6610,22 +6641,22 @@ refreshFunction(){
   
 
   openFilterModal(FilterModal:TemplateRef<any>,modal:any){
-    this.modalService.open(FilterModal, {size: 'lg' });
+    this.modalService.open(FilterModal, {size: 'xl' });
     modal.dismiss();
 
   }
   openTableModal(tableModal:TemplateRef<any>,modal:any){
-    this.modalService.open(tableModal, {size: 'lg' });
+    this.modalService.open(tableModal, {size: 'xl' });
     modal.dismiss();
 
   }
   openMapModal(MapModal:TemplateRef<any>,modal:any){
-    this.modalService.open(MapModal, {size: 'lg' });
+    this.modalService.open(MapModal, {size: 'xl' });
     modal.dismiss();
 
   }
   openMultiTableModal(MultiTableModal:TemplateRef<any>,modal:any){
-    this.modalService.open(MultiTableModal, {size: 'lg' });
+    this.modalService.open(MultiTableModal, {size: 'xl' });
     modal.dismiss();
 
   }
@@ -6642,7 +6673,7 @@ refreshFunction(){
   }
   helperInfo(event: any, templateref: any) {
     console.log('event checking', event);
-    this.modalService.open(templateref, { size: 'lg' });
+    this.modalService.open(templateref, { size: 'xl' });
   
     setTimeout(() => {
       this.emitEvent = event;
@@ -6675,7 +6706,7 @@ refreshFunction(){
 
   helperChartClickChart2(event:any,modalChart:any){
     console.log('event checking',event)
-    this.modalService.open(modalChart, { size: 'lg' });
+    this.modalService.open(modalChart, { size: 'xl' });
   }
   helperRow(rowDynamic:any){
     console.log('rowDynamic checking',rowDynamic)
@@ -6709,7 +6740,31 @@ refreshFunction(){
             this.permissionIdRequest = permissionId
             const readPermission_Id = this.permissionsMetaData.permission_ID
             console.log('readPermission_Id check',readPermission_Id)
-           
+     
+            console.log('this.routeId permissions', this.routeId);
+            this.openModalHelpher(this.routeId)
+  .then((data) => {
+    console.log('✅ this.all_Packet_store permissions:', data); // ✅ Now you will get the correct data
+    const livedatacheck = data
+    console.log('livedatacheck',livedatacheck)
+    this.checkLiveDashboard = livedatacheck.LiveDashboard
+    console.log('this.checkLiveDashboard check',this.checkLiveDashboard)
+    if(this.checkLiveDashboard==true){
+      this.reloadPage()      
+ 
+ }else{
+ 
+ }
+
+  })
+  .catch((error) => {
+    console.error('❌ Error fetching data:', error);
+  });
+
+         
+
+    console.log('checkLiveDashboard check from permission',this.checkLiveDashboard)
+ 
 
   
             // Check if permission_ID is 'All'
@@ -6825,6 +6880,9 @@ refreshFunction(){
       TableWidget:{ width: this.tableWidth, height: this.tableHeight, heightOffset: 80, widthOffset: 30  },
       title:{ width: this.titleWidth, height: this.titleHeight, heightOffset: 80, widthOffset: 30  },
       HTMLtile:{width:this.HTMLtileWidth,  height:this.HTMLtileHeight, heightOffset: 80, widthOffset: 30  },
+      // filterTile{width:this.filterTileWidth,  height:this.filterTileHeight, heightOffset: 80, widthOffset: 30 },
+      // filterTileHeight:any []=[];
+      // filterTileWidth:any []=[];
      
 
 

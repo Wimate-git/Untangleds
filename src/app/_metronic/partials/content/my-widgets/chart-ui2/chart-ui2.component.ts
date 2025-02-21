@@ -18,13 +18,15 @@ export class ChartUi2Component implements OnInit{
   @Input() chartWidth:any
   @Input() chartHeight:any
   @Output() sendCellInfo = new EventEmitter<any>();
-  @Input() summaryDashboardUpdate:any;
+
   @Input() hidingLink:any;
   @Input () hideButton:any
   @Input() routeId:any
   @Input() SK_clientID:any
   @Output() emitChartConfigTable = new EventEmitter<any>();
   @Input () liveDataLineChart:any
+  @Input () summaryDashboardView :any
+  @Input() summaryDashboardUpdate:any;
   
   formTableConfig: {};
   checkResBody: any;

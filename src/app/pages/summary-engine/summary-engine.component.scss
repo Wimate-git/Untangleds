@@ -83,7 +83,7 @@ html, body {
   }
   
   .myMenu-item, .myMenu-open-button {
-    background: #009EF7;
+    background: #009EF7; /* Default background */
     border-radius: 100%;
     width: 50px;
     height: 50px;
@@ -95,7 +95,17 @@ html, body {
     line-height: 50px;
     transform: translate3d(0, 0, 0);
     transition: transform ease-out 200ms;
-  }
+}
+
+.myMenu-item.full-view-btn {
+  background: #dc3545 !important; /* Bootstrap danger color */
+}
+
+
+
+
+#dc3545
+
   
   .myMenu-open {
     display: none;

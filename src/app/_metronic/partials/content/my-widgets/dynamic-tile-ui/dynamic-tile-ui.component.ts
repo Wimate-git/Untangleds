@@ -25,6 +25,9 @@ export class DynamicTileUiComponent implements OnInit{
   @Input()  all_Packet_store: any;
   @Input () hideButton:any
   @Input () liveDataDynamicTile:any
+  @Input () summaryDashboardUpdate:any
+  @Input() summaryDashboardView:any
+  // (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))
   
   iframeUrl: any;
   selectedMarkerIndex: any;

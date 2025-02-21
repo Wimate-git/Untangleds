@@ -31,6 +31,7 @@ export class FilterTileUiComponent implements OnInit{
   tileTiltle: any;
   filterTileConfig: any;
   @Input() isFullscreen: boolean = false; 
+  @Input () summaryDashboardView :any
   @Input() summaryDashboardUpdate:any;
   @Input() hidingLink:any;
   parsedFilterTileConfig: any;
@@ -50,6 +51,7 @@ export class FilterTileUiComponent implements OnInit{
     console.log('this.filterTileConfig check',this.filterTileConfig)
     this.parsedFilterTileConfig =JSON.parse(this.filterTileConfig.filterTileConfig)
     console.log('this.parsedFilterTileConfig checking',this.parsedFilterTileConfig)
+    
 //     this.combinedArray = this.parsedFilterTileConfig.flatMap((item: any) => item);
 
 // console.log('Combined Array:', this.combinedArray);
@@ -99,6 +101,46 @@ console.log('this.formattedFilterConditions check',this.formattedFilterCondition
  
 
   
+}
+
+shouldApplyMessage(): boolean {
+  if (!this.parsedFilterTileConfig || !Array.isArray(this.parsedFilterTileConfig)) {
+    return false;
+  }
+
+  for (const subArray of this.parsedFilterTileConfig) {
+    if (Array.isArray(subArray)) {
+      for (const item of subArray) {
+        if (item.filterValue && item.filterValue.trim() !== '') {
+          return true; // At least one valid filter applied
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+shouldShowNotAppliedMessage(): boolean {
+  if (this.item.dateType === 'any') {
+    return false; // If dateType is 'any', we don't show "Not Applied"
+  }
+
+  if (!this.parsedFilterTileConfig || !Array.isArray(this.parsedFilterTileConfig)) {
+    return true; // If the parsed config is empty or not an array, consider it "Not Applied"
+  }
+
+  for (const subArray of this.parsedFilterTileConfig) {
+    if (Array.isArray(subArray)) {
+      for (const item of subArray) {
+        if (item.filterValue && item.filterValue.trim() !== '') {
+          return false; // If any valid filter is applied, don't show "Not Applied"
+        }
+      }
+    }
+  }
+
+  return true; // If no filters have values, show "Not Applied"
 }
 
 

@@ -18,6 +18,8 @@ export class MultiTableUiComponent implements OnInit{
   @Input() index:any
   @Input() isEditModeView:any;
   @Input() summaryDashboardUpdate:any;
+  @Input() summaryDashboardView:any;
+
   @Input() hidingLink:any;
   @Input() isFullscreen: boolean = false; 
   @ViewChild('agGrid') agGrid!: AgGridAngular;
@@ -368,7 +370,7 @@ get shouldShowButton(): boolean {
       });
     } else {
       console.error('Grid API is not initialized!');
-      alert('Unable to export to CSV. Please ensure the grid is loaded.');
+      // alert('Unable to export to CSV. Please ensure the grid is loaded.');
     }
   }
 
@@ -380,13 +382,13 @@ get shouldShowButton(): boolean {
       });
     } else {
       console.error('Grid API is not initialized!');
-      alert('Unable to export to Excel. Please ensure the grid is loaded.');
+      // alert('Unable to export to Excel. Please ensure the grid is loaded.');
     }
   }
   exportAllTablesAsExcel() {
     if (!this.rowData || this.rowData.length === 0) {
       console.error('No data available for export.');
-      alert('No data available for export.');
+      // alert('No data available for export.');
       return; // Exit if there's no data to export
     }
   
@@ -396,7 +398,7 @@ get shouldShowButton(): boolean {
     const columnHeaders = Object.keys(this.rowData[0]);
     if (columnHeaders.length === 0) {
       console.error('No columns available for export.');
-      alert('No columns available for export.');
+      // alert('No columns available for export.');
       return;
     }
   
@@ -566,7 +568,7 @@ get shouldShowButton(): boolean {
       pdfMake.createPdf(docDefinition).download(`${this.extractFormName}`+'.pdf');
     } catch (error) {
       console.error('Error generating PDF:', error);
-      alert('Failed to generate PDF. Please try again.');
+      // alert('Failed to generate PDF. Please try again.');
     }
   }
   

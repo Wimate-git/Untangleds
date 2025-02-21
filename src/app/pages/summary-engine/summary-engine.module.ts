@@ -96,11 +96,18 @@ import { GoogleMapsModule } from '@angular/google-maps';
       {
         path: '',
         component: SummaryEngineComponent,
+        data: { 
+          title: 'Summary Engine' 
+        }
       },
       {
         path: 'summary-engine/:id',
         component: SummaryEngineComponent,
+        data: { 
+          title: 'Summary Engine' 
+        }
       },
+
     ])
   ],
   

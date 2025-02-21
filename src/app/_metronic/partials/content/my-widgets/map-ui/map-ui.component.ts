@@ -37,6 +37,9 @@ export class MapUiComponent implements OnInit{
   tileConfig: any;
   tileTiltle: any;
   selectedMarker: any;
+  @Input () summaryDashboardUpdate:any
+  @Input() summaryDashboardView:any
+
   @ViewChild(MapInfoWindow) infoWindow!: MapInfoWindow; // Reference the InfoWindow
   @ViewChild(GoogleMap) map!: GoogleMap;
 
@@ -124,7 +127,7 @@ if (Array.isArray(this.parsedData)) {
             marker_info:marker.marker_info
           };
 
-          console.log('baseMarker checking',baseMarker)
+          // console.log('baseMarker checking',baseMarker)
           // Include marker_info for "Track Location" and "Graphic Location"
           if (
             packet.label === "Track Location" ||
