@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { APIService } from 'src/app/API.service';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, Title } from '@angular/platform-browser';
 import { ActivatedRoute, Route } from "@angular/router";
 import { param } from 'jquery';
 import { AuditTrailService } from '../services/auditTrail.service';
@@ -39,9 +39,12 @@ export class DreamIdComponent implements OnInit {
     private changeDetection: ChangeDetectorRef,
     private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
-    private auditTrail: AuditTrailService
+    private auditTrail: AuditTrailService,
+    private titleService:Title
+  ){
 
-  ) { }
+
+   this.titleService.setTitle('Modules') }
 
   async ngOnInit() {
 

@@ -26,6 +26,7 @@ import { DynamicModalComponent } from './dynamic-modal/dynamic-modal.component';
 import { FullscreenService } from './services/fullscreen.service';
 import { AdvancedFilterComponent } from './components/advanced-filter/advanced-filter.component';
 import { AuditTrailService } from '../services/auditTrail.service';
+import { Title } from '@angular/platform-browser';
 
 interface ListItem {
   [key: string]: {
@@ -157,8 +158,11 @@ columns: any;
 
    constructor(private fb:FormBuilder,private api:APIService,private configService:SharedService,private scheduleAPI:scheduleApiService,
     private toast:MatSnackBar,private spinner:NgxSpinnerService,private cd:ChangeDetectorRef,private modalService: NgbModal,private moduleDisplayService: ModuleDisplayService,
-    private route: ActivatedRoute,private router:Router,  public fullscreenService: FullscreenService,public auditTrail:AuditTrailService
+    private route: ActivatedRoute,private router:Router,  public fullscreenService: FullscreenService,public auditTrail:AuditTrailService,private titleService:Title
    ){
+
+
+    this.titleService.setTitle('Report Studio')
 
     this.gridOptions = <GridOptions>{
       context: {

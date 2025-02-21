@@ -79,7 +79,7 @@ export class AuthService implements OnDestroy {
         // console.log('Successfully logged in', result);
       },
       onFailure: (err) => {
-        alert(err);
+        // alert(err);
       },
     });
   }
@@ -94,7 +94,8 @@ export class AuthService implements OnDestroy {
     if (cognitoUser != null) {
         cognitoUser.getSession((err:any, session:any) =>{
             if (err) {
-                alert(err.message || JSON.stringify(err));
+                console.log("Error logging session ",err);
+                // alert(err.message || JSON.stringify(err));
                 return;
             }
             if (session.isValid()) {
