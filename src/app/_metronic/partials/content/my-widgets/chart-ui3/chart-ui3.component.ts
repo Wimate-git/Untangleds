@@ -35,7 +35,9 @@ export class ChartUi3Component implements OnInit{
   @Output() paresdDataEmit = new EventEmitter<any>();
   @Output() emitChartConfigTable = new EventEmitter<any>();
   formTableConfig: { columnVisibility: any; formName: any; };
-  
+  isMobile: boolean = false;
+  mobileChartWidth: number = window.innerWidth * 0.85;  // Custom mobile width
+  mobileChartHeight: number = window.innerWidth * 0.87; 
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
@@ -282,6 +284,13 @@ const extractcolumnVisibility = chartConfig
   }
   ngOnInit(){
     console.log('item chacke',this.item.grid_details)
+    this.detectScreenSize()
+  }
+
+  detectScreenSize() {
+    this.isMobile = window.innerWidth <= 760; // Adjust breakpoint as needed
+    // if (this.isMobile)
+      // alert(`${this.mobileChartWidth}, 'X',${this.mobileChartHeight}`)
   }
 
   createBarChart() {

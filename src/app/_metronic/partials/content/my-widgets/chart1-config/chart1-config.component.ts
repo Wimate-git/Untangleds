@@ -349,7 +349,8 @@ export class Chart1ConfigComponent implements OnInit {
             columnVisibility:[[]],
             rowData:[''],
             formatType:[''],
-            undefinedCheckLabel:['']
+            undefinedCheckLabel:[''],
+            custom_Label:['']
             
 
        
@@ -810,7 +811,8 @@ repopulate_fields(getValues: any): FormArray {
           filterParameter: this.fb.control(filterParameterValue), // Use control for dynamic handling
           filterParameter1: this.fb.control(filterParameter1Value), // Same for filterParameter1
           formatType:configItem.formatType ||'',
-          undefinedCheckLabel:configItem.undefinedCheckLabel ||''
+          undefinedCheckLabel:configItem.undefinedCheckLabel ||'',
+          custom_Label:configItem.custom_Label ||''
         })
       );
 

@@ -36,6 +36,10 @@ export class ChartUi2Component implements OnInit{
   @Input() readFilterEquation:any
   @Input() userdetails:any
   @Output() paresdDataEmit = new EventEmitter<any>();
+  isMobile: boolean = false;
+  mobileChartWidth: number = window.innerWidth * 0.85;  // Custom mobile width
+  mobileChartHeight: number = window.innerWidth * 0.87; // Custom mobile height
+  
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
@@ -164,7 +168,15 @@ export class ChartUi2Component implements OnInit{
   }
   ngOnInit(){
     console.log('item chacke',this.item.grid_details)
+    this.detectScreenSize()
   }
+
+  detectScreenSize() {
+    this.isMobile = window.innerWidth <= 760; // Adjust breakpoint as needed
+    // if (this.isMobile)
+      // alert(`${this.mobileChartWidth}, 'X',${this.mobileChartHeight}`)
+  }
+  
   onBarClick(event: Highcharts.PointClickEventObject): void {
     console.log('Line chart clicked:', {
       name: event.point.name, // Use `name` for pie chart labels

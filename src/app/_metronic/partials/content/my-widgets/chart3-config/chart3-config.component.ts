@@ -286,7 +286,8 @@ export class Chart3ConfigComponent implements OnInit{
             columnVisibility:[[]],
             rowData:[''],
             formatType:[''],
-            undefinedCheckLabel:['']
+            undefinedCheckLabel:[''],
+            custom_Label:['']
           })
         );
         console.log('this.all_fields check', this.all_fields);
@@ -756,7 +757,8 @@ repopulate_fields(getValues: any): FormArray {
           parameterValue: configItem.parameterValue || '',
           columnVisibility: this.fb.control(columnVisibility), // Use control to handle as an array
           formatType:configItem.formatType||'',
-          undefinedCheckLabel:configItem.undefinedCheckLabel||''
+          undefinedCheckLabel:configItem.undefinedCheckLabel||'',
+          custom_Label: configItem.custom_Label||''
         })
       );
 
