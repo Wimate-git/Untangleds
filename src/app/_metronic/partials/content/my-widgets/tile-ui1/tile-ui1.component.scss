@@ -12,6 +12,25 @@
     width: 100%; /* Ensure it takes up full width of its parent */
     height: auto; /* Remove 100% height to make it responsive */
   }
+  @media (max-width: 760px) {
+    .text_3d {
+      position:unset !important;
+      top: unset !important;       /* Reset top */
+      right: unset !important;     /* Reset right */
+      transform: unset !important; /* Reset transform */
+      font-size: 25px;  /* Optionally adjust font size for smaller screens */
+    }
+    .grid-item{
+      align-items: center !important;
+    }
+    .processed-value-container {
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      // width: 100%; /* Ensure it takes up full width of its parent */
+      // height: unset; /* Remove 100% height to make it responsive */
+    }
+  }
   .grid-item-content {
     background-color: gray;
     color: white;

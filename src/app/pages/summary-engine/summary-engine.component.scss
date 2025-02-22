@@ -101,11 +101,6 @@ html, body {
   background: #dc3545 !important; /* Bootstrap danger color */
 }
 
-
-
-
-#dc3545
-
   
   .myMenu-open {
     display: none;
@@ -693,6 +688,436 @@ google-map {
 gridster-item {
   cursor: pointer;
 }
+
+
+@media (max-width: 760px) {
+  .tile1-style {
+    display: flex !important;
+    justify-content: center !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    align-content: center !important;
+  }
+
+  .tile-style {
+    display: flex !important;
+    flex-direction: column !important;
+    align-content: center !important;
+    justify-content: center !important;
+    //   align-items: center !important;
+
+  }
+
+  .tile2-style {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+  }
+
+  .chart1-style {
+    // display: flex !important;
+    // flex-direction: column !important;
+    // align-content: center !important;
+    // justify-content: center !important;
+    // align-items: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-content: center !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .chart2-style {
+    display: flex !important;
+    flex-direction: column !important;
+    align-content: center !important;
+    justify-content: center !important;
+    align-items: center !important;
+
+  }
+
+  .chart3-style {
+    display: flex !important;
+    flex-direction: column !important;
+    align-content: center !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .mo-btn-style {
+    height: 350px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-content: center !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .inverted-mo-btn-style {
+    height: 350px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-content: center !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .dropdown-mo-style {
+    height: 250px !important;
+  }
+  .amo-tile-style {
+    height: 150px !important;
+  }
+
+  .inverted-mo-toggle-style {
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-content: center !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .mo-slider-style {
+    display: flex !important;
+    flex-direction: column !important;
+    align-content: center !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .mo-push-btn-style {
+    height: 350px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-content: center !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .mo-title-wid-style {
+    display: flex !important;
+    flex-direction: column !important;
+    align-content: center !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+  .mo-tile1-wid-style{
+    display: flex !important;
+    flex-direction: column !important;
+    align-content: center !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .mo-tile4-style {
+    display: flex !important;
+    flex-direction: column !important;
+    align-content: center !important;
+    justify-content: center !important;
+  }
+}
+.mo-title-wid-style {
+  display: flex !important;
+  flex-direction: column !important;
+  align-content: center !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+.mo-tile1-wid-style{
+  display: flex !important;
+  flex-direction: column !important;
+  align-content: center !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+.desktop-style {
+  width: 900px;
+  transform: translate(-20%, 0);
+}
+
+/* Override for mobile view */
+@media (max-width: 760px) {
+  .desktop-style {
+    width: auto;
+    /* Adjust for mobile, or remove this style */
+    transform: none;
+    /* Remove or adjust for mobile */
+  }
+}
+
+/* Mobile View */
+@media (max-width: 760px) {
+  .custom-tile-button .card {
+    height: 180px;
+    /* Adjust card height for mobile */
+  }
+
+  /* Ensure icon and text stay in one row on mobile */
+  .custom-tile-button .row {
+    flex-direction: row;
+    /* Ensure icon and text stay on the same line */
+    align-items: center;
+    /* Vertically align items in the center */
+    justify-content: flex-start;
+    /* Align items to the left */
+  }
+
+  .custom-tile-button .icon-container {
+    margin-right: 10px;
+    /* Space between icon and text */
+    justify-content: center;
+    /* Center icon in the container */
+  }
+
+  .custom-tile-button .text-container {
+    text-align: right;
+    /* Align text to the right */
+    flex: 10;
+  }
+
+  /* Reduce icon size for mobile */
+  .custom-tile-button .icon-container i {
+    font-size: 60px;
+    /* Icon size in mobile */
+  }
+
+  .custom-tile-button .energy-text {
+    font-size: 20px;
+    /* Reduce font size of the energy text */
+    padding-top: 0;
+    /* Adjust padding */
+  }
+
+  .custom-tile-button .value-text {
+    font-size: 18px;
+    /* Reduce font size of the value text */
+    padding-right: 20px;
+    /* Adjust padding */
+  }
+}
+
+/* Desktop View */
+@media (min-width: 761px) {
+
+  /* Ensure the icon is centered on the left side */
+  .custom-tile-button .icon-container {
+    justify-content: flex-start;
+    /* Align to the left in desktop */
+    margin-right: 15px;
+    /* Space between icon and text */
+  }
+
+  /* Increase icon size for desktop */
+  .custom-tile-button .icon-container i {
+    font-size: 80px;
+    /* Larger icon size in desktop */
+  }
+
+  .custom-tile-button .energy-text {
+    font-size: 40px;
+    /* Larger text size for desktop */
+    padding-top: 50px;
+  }
+
+  .custom-tile-button .value-text {
+    font-size: 30px;
+    /* Larger value text size for desktop */
+  }
+}
+
+
+
+@media (max-width: 767px) {
+
+  /* Position the menu at the bottom-right with margin from the bottom */
+  .myMenu {
+    position: fixed;
+    bottom: 40px;
+    /* Adjust margin from the bottom */
+    right: 20px;
+    /* Adjust margin from the right */
+    left: auto;
+    margin-left: 0;
+    padding-top: 0;
+    /* Remove extra padding */
+    padding-left: 0;
+    /* Remove extra padding */
+    width: 50px;
+    /* Button width */
+    height: 50px;
+    /* Button height */
+    box-sizing: border-box;
+    font-size: 20px;
+    text-align: center;
+    z-index: 1000;
+  }
+
+  /* Style for the menu open button */
+  .myMenu-open-button {
+    background-color: #009EF7;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 2;
+    cursor: pointer;
+    transition: transform 200ms ease-out;
+    /* Ensure smooth transition */
+  }
+
+  /* Hamburger icon */
+  .hamburger {
+    width: 25px;
+    height: 3px;
+    background: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -12.5px;
+    margin-top: -1.5px;
+    transition: transform 200ms ease-out;
+  }
+
+  /* Hamburger icon transforms when the menu is opened */
+  .myMenu-open:checked+.myMenu-open-button .hamburger-1 {
+    transform: translate3d(0, 0, 0) rotate(45deg);
+  }
+
+  .myMenu-open:checked+.myMenu-open-button .hamburger-2 {
+    transform: translate3d(0, 0, 0) scale(0.1, 1);
+  }
+
+  .myMenu-open:checked+.myMenu-open-button .hamburger-3 {
+    transform: translate3d(0, 0, 0) rotate(-45deg);
+  }
+
+  /* Menu items with transition for smooth opening and reduced spacing */
+  .myMenu-item {
+    display: none;
+    /* Initially hide all items */
+    background: #009EF7;
+    border-radius: 50%;
+    width: 50px;
+    height: 45px;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    line-height: 50px;
+    color: white;
+    transition: transform 300ms ease, opacity 300ms ease;
+    /* Smooth transition */
+    margin-bottom: 10px;
+    /* Add padding between items */
+    top: 122px;
+  }
+
+  .myMenu-item i {
+    display: flex;
+    justify-content: center;
+    /* Center horizontally */
+    align-items: center;
+    /* Center vertically */
+    height: 100%;
+    /* Ensure the icon takes full height of its container */
+    width: 100%;
+    /* Ensure the icon takes full width of its container */
+  }
+
+  .myMenu-item:hover {
+    background: black;
+    color: #009EF7;
+  }
+
+  /* Show items when the menu is open */
+  .myMenu-open:checked~.myMenu-item {
+    display: block;
+    /* Show the menu items */
+    opacity: 1;
+  }
+
+  /* Transition for each item when opening - position from bottom (starting 50px above) */
+  .myMenu-open:checked~.myMenu-item:nth-child(1) {
+    transition-duration: 200ms;
+    transform: translate3d(0, -50px, 0);
+    /* Move the first item 50px above the button */
+  }
+
+  .myMenu-open:checked~.myMenu-item:nth-child(2) {
+    transition-duration: 300ms;
+    transform: translate3d(0, -110px, 0);
+    /* Move the second item up */
+  }
+
+  .myMenu-open:checked~.myMenu-item:nth-child(3) {
+    transition-duration: 400ms;
+    transform: translate3d(0, -170px, 0);
+    /* Move the third item up */
+  }
+
+  .myMenu-open:checked~.myMenu-item:nth-child(4) {
+    transition-duration: 500ms;
+    transform: translate3d(0, -230px, 0);
+    /* Move the fourth item up */
+  }
+
+  .myMenu-open:checked~.myMenu-item:nth-child(5) {
+    transition-duration: 600ms;
+    transform: translate3d(0, -290px, 0);
+    /* Move the fifth item up */
+  }
+
+  .myMenu-open:checked~.myMenu-item:nth-child(6) {
+    transition-duration: 700ms;
+    transform: translate3d(0, -350px, 0);
+    /* Move the sixth item up */
+  }
+
+  .myMenu-open:checked~.myMenu-item:nth-child(7) {
+    transition-duration: 800ms;
+    transform: translate3d(0, -410px, 0);
+    /* Move the seventh item up */
+  }
+
+  .myMenu-open:checked~.myMenu-item:nth-child(8) {
+    transition-duration: 900ms;
+    transform: translate3d(0, -470px, 0);
+    /* Move the eighth item up */
+  }
+
+  .myMenu-open:checked~.myMenu-item:nth-child(9) {
+    transition-duration: 1000ms;
+    transform: translate3d(0, -530px, 0);
+    /* Move the ninth item up */
+  }
+
+  /* Reduce space between the button and first option */
+  .myMenu-open:checked~.myMenu-item:nth-child(1) {
+    margin-top: 0px;
+    /* Remove any extra space */
+  }
+
+  /* Smooth transition for menu expansion when opened */
+  .myMenu-open:checked+.myMenu-open-button {
+    transition: transform 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Smooth button opening */
+    transform: scale(0.8, 0.8) translate3d(0, 0, 0);
+  }
+
+
+  gridster-item {
+    user-select: auto !important;
+    -webkit-user-drag: auto !important;
+    touch-action: auto !important;
+    -webkit-tap-highlight-color: auto !important;
+  }
+
+
+
+}
+
 
 
 

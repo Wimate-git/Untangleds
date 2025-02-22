@@ -31,7 +31,9 @@ export class ChartUi1Component implements OnChanges {
   @Input() userdetails:any
   @Input () summaryDashboardView :any
   @Input() summaryDashboardUpdate:any;
-  
+  isMobile: boolean = false;
+  mobileChartWidth: number = window.innerWidth * 0.85;  // Custom mobile width
+  mobileChartHeight: number = window.innerWidth * 0.87; // Custom mobile height
   
   
   
@@ -272,6 +274,7 @@ this.formTableConfig = {
   }
   ngOnInit(){
     console.log('item chacke',this.item.grid_details)
+    this.detectScreenSize()
   }
 
   createPieChart() {
@@ -337,6 +340,11 @@ console.log('this.gridOptions checking from chart',this.gridOptions)
 
   closeModal() {
     this.modalService.dismissAll(); // Close the modal programmatically
+  }
+  detectScreenSize() {
+    this.isMobile = window.innerWidth <= 760; // Adjust breakpoint as needed
+    // if (this.isMobile)
+      // alert(`${this.mobileChartWidth}, 'X',${this.mobileChartHeight}`)
   }
   
 

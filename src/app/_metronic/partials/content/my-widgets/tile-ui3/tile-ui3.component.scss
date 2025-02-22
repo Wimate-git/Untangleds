@@ -27,3 +27,12 @@
     color: #333333;
     margin-bottom: 10px; /* Adds spacing between values */
   }
+  @media (max-width: 760px) {
+    .text_3d {
+      position:unset !important;
+      top: unset !important;       /* Reset top */
+      right: unset !important;     /* Reset right */
+      transform: unset !important; /* Reset transform */
+      font-size: 25px;  /* Optionally adjust font size for smaller screens */
+    }
+  }

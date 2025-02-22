@@ -904,7 +904,7 @@ makeTrueCheck:any = false
         permissionList: this.readFilterEquation || [],
         userName: this.userdetails,
         conditions: this.ConditionsFormat,
-        Message:'FilterRequest'
+        MsgType:'FilterRequest'
       }),
     };
   

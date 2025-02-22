@@ -79,6 +79,20 @@
                 *ngFor="let item of dashboard; let i = index;"
                 [item]="item"
                 [style.background]="item.themeColor"
+                [ngClass]="{
+                
+                    
+                         'chart1-style' : item.grid_type === 'chart',
+                      
+              
+                        
+                
+                         'mo-title-wid-style' : item.grid_type === 'title' || item.grid_type === 'filterTile' || item.grid_type === 'dynamicTile' ,
+                
+                         'tile-style' : item.grid_type ==='tile',
+                     
+                        
+                         }"
                 class="rounded"
                  [matTooltip]="getDimensions(item,i)"
                   [matTooltipPosition]="'below'"
