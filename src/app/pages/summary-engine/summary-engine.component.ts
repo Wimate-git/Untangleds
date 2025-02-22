@@ -748,7 +748,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   @ViewChild('modalContent') modalContent!: TemplateRef<any>;
   iframeUrl!: SafeResourceUrl;
 
-  reloadPage() {
+  reloadPage(key:any) {
     this.isLoading = true; // Set loading state to true
     console.log('this.routeId check', this.routeId);
     console.log('client id check', this.SK_clientID);
@@ -822,15 +822,17 @@ console.log('this.readFilterEquation checking',this.readFilterEquation)
     
         this.spinner.hide('dataProcess');
         this.isLoading = false; // Reset loading state
-    
+    if(key="html"){
+      this.route.paramMap.subscribe(params => {
+        this.routeId = params.get('id');
+        if (this.routeId) {
+          this.openModalHelpher(this.routeId);
+          this.editButtonCheck = true;
+        }
+      });
+    }
         // Proceed with route parameter handling
-        this.route.paramMap.subscribe(params => {
-          this.routeId = params.get('id');
-          if (this.routeId) {
-            this.openModalHelpher(this.routeId);
-            this.editButtonCheck = true;
-          }
-        });
+   
       },
       (error) => {
         console.error('Error triggering Lambda function:', error);
@@ -2036,7 +2038,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
       this.checkAndSetFullscreen();
       this.editButtonCheck = true
 
-      this.openModalHelpher(this.routeId)
+      // this.openModalHelpher(this.routeId)
     } else {
       this.editButtonCheck = false
     }
@@ -2481,7 +2483,7 @@ console.log('livedatacheck',livedatacheck)
 this.checkLiveDashboard = livedatacheck.LiveDashboard
 console.log('this.checkLiveDashboard check',this.checkLiveDashboard)
 if(this.checkLiveDashboard==true){
-this.reloadPage() 
+this.reloadPage("from_ts") 
     
 
 }else{
@@ -5256,14 +5258,14 @@ console.log('Serialized Query Params:', serializedQueryParams);
             if (actionKey === 'add_map' || actionKey === 'update_map') {
               window.location.reload(); // Reloads the current window
             } else if (actionKey === 'update_Dashboard' || actionKey === 'filter_add') {
-              this.reloadPage();  // Call the reloadPage function
+              this.reloadPage("html");  // Call the reloadPage function
             }
             else if (actionKey === 'add_table' || actionKey === 'update_table'){
               window.location.reload();
               // this.reloadPage(); 
             }
             else if(actionKey === 'add_multiTable' || actionKey === 'update_multiTable'){
-              this.reloadPage(); 
+              // this.reloadPage("html"); 
 
             }
           }

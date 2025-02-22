@@ -649,7 +649,7 @@
 
 
  
-    <a class="myMenu-item" *ngIf="!isSummaryEngine()" (click)="reloadPage()" style="cursor: pointer;" [attr.title]="'Refresh Data'">
+    <a class="myMenu-item" *ngIf="!isSummaryEngine()" (click)="reloadPage('html')" style="cursor: pointer;" [attr.title]="'Refresh Data'">
       <i style="color: white;" class="fa" [ngClass]="isFullView ? 'fa-refresh' : 'fa-refresh'"></i>
     </a>
     <a class="myMenu-item" *ngIf="!isSummaryEngine() && (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))" (click)="saveGridLayout()" style="cursor: pointer;" [attr.title]="'Save Dashboard'">
