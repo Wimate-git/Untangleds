@@ -752,7 +752,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     this.isLoading = true; // Set loading state to true
     console.log('this.routeId check', this.routeId);
     console.log('client id check', this.SK_clientID);
-  this.spinner.show('dataProcess')
+    this.spinner.show('dataProcess')
+
 console.log('this.readFilterEquation checking',this.readFilterEquation)
   console.log('this.parsedPermission',this.parsedPermission)
   console.log('this.userdetails from request',this.userdetails)
@@ -777,27 +778,51 @@ console.log('this.readFilterEquation checking',this.readFilterEquation)
   
     // Send a POST request to the Lambda function with the body
     this.http.post(apiUrl, requestBody).subscribe(
-      (response) => {
+      (response: any) => {
         console.log('Lambda function triggered successfully:', response);
-        
-        const constLiveData = JSON.parse((response as any)?.body);
-        console.log('constLiveData check',constLiveData)
-        const processedData = constLiveData.Processed_Data.metadata.grid_details
-
-        console.log('processedData check',processedData)
-        this.liveDashboardDataFormat(processedData)
-
-
-
-        this.spinner.hide('dataProcess')
-        // Display SweetAlert success message
-        // Swal.fire({
-        //   title: 'Success!',
-        //   text: 'Lambda function triggered successfully.',
-        //   icon: 'success',
-        //   confirmButtonText: 'OK'
-        // });
-  
+    
+        // Ensure response status is 200 before processing
+        if (response?.statusCode === 200) {
+          try {
+            const constLiveData = JSON.parse(response.body); // Parse the JSON body
+            console.log('constLiveData check', constLiveData);
+    
+            // Ensure Processed_Data exists in response
+            if (constLiveData?.Processed_Data?.metadata?.grid_details) {
+              const processedData = constLiveData.Processed_Data.metadata.grid_details;
+              console.log('processedData check', processedData);
+              this.liveDashboardDataFormat(processedData);
+            } else {
+              console.error('Processed_Data.metadata.grid_details not found in response');
+              Swal.fire({
+                title: 'Error!',
+                text: 'No data found in response. Please check the input.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+              });
+            }
+          } catch (error) {
+            console.error('Error parsing response body:', error);
+            Swal.fire({
+              title: 'Error!',
+              text: 'Invalid response format received.',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
+          }
+        } else {
+          console.error('Unexpected statusCode:', response?.statusCode);
+          Swal.fire({
+            title: 'Error!',
+            text: `Unexpected response received (Status Code: ${response?.statusCode}).`,
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+        }
+    
+        this.spinner.hide('dataProcess');
+        this.isLoading = false; // Reset loading state
+    
         // Proceed with route parameter handling
         this.route.paramMap.subscribe(params => {
           this.routeId = params.get('id');
@@ -806,23 +831,33 @@ console.log('this.readFilterEquation checking',this.readFilterEquation)
             this.editButtonCheck = true;
           }
         });
-  
-        this.isLoading = false; // Reset loading state
       },
       (error) => {
         console.error('Error triggering Lambda function:', error);
-  
-        // Display SweetAlert error message
-        Swal.fire({
-          title: 'Error!',
-          text: 'Failed to trigger the Lambda function. Please try again.',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
-  
-        this.isLoading = false; // Reset loading state
+    
+        // Handle different error codes
+        if (error.status === 404) {
+          console.log('Received 404 error - stopping loading and showing error message.');
+          Swal.fire({
+            title: 'Error!',
+            text: 'Data not found. Please check your inputs and try again.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+        } else {
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to trigger the Lambda function. Please try again.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+        }
+    
+        this.spinner.hide('dataProcess');
+        this.isLoading = false; // Ensure loading is stopped in all error cases
       }
     );
+    
   }
   
   setFullscreen(): void {
@@ -2138,6 +2173,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
 
 
   async ngOnInit() {
+    this.spinner.show('dataProcess')
     this.route.data.subscribe(data => {
       this.titleService.setTitle(data['title']); // Set tab title dynamically
     });
@@ -2434,9 +2470,28 @@ async fetchPermissionIdMain(clientID: number, p1Value: string) {
       console.log('Parsed permission metadata:', this.parsedPermission);
     this.readFilterEquation =this.parsedPermission 
     console.log('this.readFilterEquation check',this.readFilterEquation)
-    console.log('this.routeId permissions', this.routeId);
+    // console.log('this.routeId permissions', this.routeId);
+    
+    console.log('this.routeId permissions check', this.routeId);
+    this.openModalHelpher(this.routeId)
+.then((data) => {
+console.log('✅ this.all_Packet_store permissions:', data); // ✅ Now you will get the correct data
+const livedatacheck = data
+console.log('livedatacheck',livedatacheck)
+this.checkLiveDashboard = livedatacheck.LiveDashboard
+console.log('this.checkLiveDashboard check',this.checkLiveDashboard)
+if(this.checkLiveDashboard==true){
+this.reloadPage() 
     
 
+}else{
+  this.spinner.hide('dataProcess')
+}
+
+})
+.catch((error) => {
+console.error('❌ Error fetching data:', error);
+});
 
       this.summaryPermission = this.parsedPermission.summaryList;
       console.log('this.summaryPermission check', this.summaryPermission);
@@ -6741,25 +6796,8 @@ refreshFunction(){
             const readPermission_Id = this.permissionsMetaData.permission_ID
             console.log('readPermission_Id check',readPermission_Id)
      
-            console.log('this.routeId permissions', this.routeId);
-            this.openModalHelpher(this.routeId)
-  .then((data) => {
-    console.log('✅ this.all_Packet_store permissions:', data); // ✅ Now you will get the correct data
-    const livedatacheck = data
-    console.log('livedatacheck',livedatacheck)
-    this.checkLiveDashboard = livedatacheck.LiveDashboard
-    console.log('this.checkLiveDashboard check',this.checkLiveDashboard)
-    if(this.checkLiveDashboard==true){
-      this.reloadPage()      
- 
- }else{
- 
- }
+            this.fetchPermissionIdMain(1, readPermission_Id);
 
-  })
-  .catch((error) => {
-    console.error('❌ Error fetching data:', error);
-  });
 
          
 
@@ -6771,7 +6809,7 @@ refreshFunction(){
             if (readPermission_Id !== "All") {
               // this.permissionIdCheck = this.metadataObject.permission_ID; // Store the permission ID
               console.log('Stored permission ID:', readPermission_Id);
-              this.fetchPermissionIdMain(1, readPermission_Id);
+              // this.fetchPermissionIdMain(1, readPermission_Id);
               this.loadData();
             } else if(readPermission_Id=="All"){
              this.userPermission = readPermission_Id

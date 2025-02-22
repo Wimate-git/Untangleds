@@ -1,3 +1,18 @@
+
+<ngx-spinner 
+*ngIf="isLoading" 
+bdColor="rgba(0, 0, 0, 0.8)" 
+size="medium" 
+color="#fff" 
+
+name="dataProcess"
+type="square-jelly-box" 
+[fullScreen]="true">
+<p style="color: white">Data Processing, Please Wait....</p>
+</ngx-spinner>
+
+
+
 <div class="modal-header d-flex justify-content-between align-items-center">
   <!-- Title -->
   <h4 class=" col-md-4 modal-title mb-0">Filter </h4>
@@ -465,6 +480,10 @@
           <button type="button" class="btn btn-warning"  (click)="updateTile('filterTile');modal.dismiss() "
           *ngIf="isEditMode">
             Update
+          </button>
+          <button type="button" class="btn btn-primary"  (click)="reloadPage();modal.dismiss() "
+          >
+            Live Filter
           </button>
         </div>
       </div>

@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 import { AbstractControl, FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -9,6 +10,7 @@ import { catchError, from, map, Observable, of, shareReplay, Subject, take, take
 import { APIService } from 'src/app/API.service';
 import { LocationPermissionService } from 'src/app/location-permission.service';
 import { SharedService } from 'src/app/pages/shared.service';
+import Swal from 'sweetalert2';
 interface Field {
   name: string; // Add the 'name' property
   label: string;
@@ -118,6 +120,7 @@ makeTrueCheck:any = false
   userlistRead: any;
   userList: any;
   userlistCheck: any;
+  ConditionsFormat: any;
 
 
  
@@ -360,7 +363,7 @@ makeTrueCheck:any = false
 
   constructor(private summaryConfiguration: SharedService, private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector,
-    private spinner: NgxSpinnerService,private zone: NgZone
+    private spinner: NgxSpinnerService,private zone: NgZone,private http: HttpClient,
   ){
 
   }
@@ -706,17 +709,18 @@ makeTrueCheck:any = false
             fixedColWidth: true,
             fixedRowHeight: true,
             grid_type: 'filterTile',
-            dateType: this.createChart.value.dateType || '', // Ensure this value exists
-            filterTileConfig: this.conditionsFilter, // Include conditions with type and labels
-            addFieldsEnabled: this.createChart.value.add_fields,
+            // dateType: this.createChart.value.dateType || '', // Ensure this value exists
+            // filterTileConfig: this.conditionsFilter, // Include conditions with type and labels
+            // addFieldsEnabled: this.createChart.value.add_fields,
+            custom_Label: this.createChart.value.custom_Label,
+            // daysAgo: this.createChart.value.daysAgo,
+            // startDate: this.createChart.value.startDate,
+            // endDate: this.createChart.value.endDate,
+            // singleDate: this.createChart.value.singleDate,
             themeColor: this.createChart.value.themeColor,
             fontSize: `${this.createChart.value.fontSize}px`, // Added fontSize
             fontColor: this.createChart.value.fontColor,
-            custom_Label: this.createChart.value.custom_Label,
-            daysAgo: this.createChart.value.daysAgo,
-            startDate: this.createChart.value.startDate,
-            endDate: this.createChart.value.endDate,
-            singleDate: this.createChart.value.singleDate,
+
             noOfParams: this.noOfParams || 0, // Ensure noOfParams has a valid value
         };
 
@@ -797,15 +801,15 @@ makeTrueCheck:any = false
         fontSize: `${this.createChart.value.fontSize}px`,
         fontColor: this.createChart.value.fontColor,
         custom_Label: this.createChart.value.custom_Label,
-        daysAgo: this.createChart.value.daysAgo,
-        dateType: this.createChart.value.dateType || '',
-        filterTileConfig: conditionsFilter, // Updated filter configuration with all condition fields
-        addFieldsEnabled: this.createChart.value.add_fields || false, // Add fields toggle state
+        // daysAgo: this.createChart.value.daysAgo,
+        // dateType: this.createChart.value.dateType || '',
+        // filterTileConfig: conditionsFilter, // Updated filter configuration with all condition fields
+        // addFieldsEnabled: this.createChart.value.add_fields || false, // Add fields toggle state
         noOfParams: this.dashboard[this.editTileIndex].noOfParams, // Retain existing parameter count
         themeColor: this.createChart.value.themeColor,
-        startDate: this.createChart.value.startDate,
-        endDate: this.createChart.value.endDate,
-        singleDate: this.createChart.value.singleDate,
+        // startDate: this.createChart.value.startDate,
+        // endDate: this.createChart.value.endDate,
+        // singleDate: this.createChart.value.singleDate,
       };
   
       console.log('updatedTile checking', updatedTile);
@@ -847,7 +851,91 @@ makeTrueCheck:any = false
       console.error('Edit index is null. Unable to update the tile.');
     }
   }
+  @Input() isLoading:any
+  @Input() routeId:any
+  @Input() readFilterEquation:any
+  @Input() parsedPermission:any
+  @Input() userdetails:any
+  @Input() permissionIdRequest:any
   
+  reloadPage() {
+    const fields = this.createChart.value.all_fields || [];
+    
+    const conditionsFilter = fields.map((field: { conditions: any[]; parameterName: string }) => {
+      if (!field.conditions || !Array.isArray(field.conditions)) {
+        console.error('Invalid conditions in field:', field);
+        return [];
+      }
+  
+      return field.conditions.map((condition: any) => ({
+        formField: condition.formField || '',
+        operator: condition.operator || '',
+        filterValue: condition.filterValue || '', 
+        operatorBetween: condition.operatorBetween || '',
+        parameterName: condition.parameterName || '',
+        fieldLabel: condition.fieldLabel,
+        // Add date-related values conditionally
+        daysAgo: this.createChart.value.daysAgo || '',
+        startDate: this.createChart.value.startDate || '',
+        endDate: this.createChart.value.endDate || '',
+        singleDate: this.createChart.value.singleDate || '',
+                // daysAgo: this.createChart.value.daysAgo,
+        dateType: this.createChart.value.dateType || '',
+
+      }));
+    });
+  
+    console.log('conditionsFilter checking', conditionsFilter);
+  
+    this.ConditionsFormat = conditionsFilter;
+    this.isLoading = true;
+  
+    console.log('this.routeId check', this.routeId);
+    console.log('client id check', this.SK_clientID);
+    this.spinner.show('dataProcess');
+  
+    const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+  
+    const requestBody = {
+      body: JSON.stringify({
+        clientId: this.SK_clientID,
+        routeId: this.routeId,
+        permissionId: this.permissionIdRequest,
+        permissionList: this.readFilterEquation || [],
+        userName: this.userdetails,
+        conditions: this.ConditionsFormat,
+        Message:'FilterRequest'
+      }),
+    };
+  
+    console.log('requestBody checking', requestBody);
+  
+    this.http.post(apiUrl, requestBody).subscribe(
+      (response) => {
+        console.log('Lambda function triggered successfully:', response);
+        
+        const constLiveData = JSON.parse((response as any)?.body);
+        console.log('constLiveData check', constLiveData);
+        const processedData = constLiveData.Processed_Data.metadata.grid_details;
+  
+        console.log('processedData check', processedData);
+       
+        this.spinner.hide('dataProcess');
+        this.isLoading = false;
+      },
+      (error: any) => {
+        console.error('Error triggering Lambda function:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to trigger the Lambda function. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+  
+        this.isLoading = false;
+      }
+    );
+  }
   
   
   

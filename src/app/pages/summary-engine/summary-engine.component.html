@@ -1909,7 +1909,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   </ng-template>
   <ng-template #FilterModal let-modal >
   
-    <app-filter-tile-config (refreshData)="refreshHelper($event)" (dashboardChange)="getGridDetails2($event)" [dashboard]="dashboard" [modal]="modal" [all_Packet_store]="all_Packet_store" (update_PowerBoard_config)="updateSummaryHelper2($event)" (send_all_Packet_store1)="allPacketStoreReceiver2($event)"></app-filter-tile-config>
+    <app-filter-tile-config (refreshData)="refreshHelper($event)" (dashboardChange)="getGridDetails2($event)" [dashboard]="dashboard" [modal]="modal" [all_Packet_store]="all_Packet_store" (update_PowerBoard_config)="updateSummaryHelper2($event)" (send_all_Packet_store1)="allPacketStoreReceiver2($event)" [userdetails]="userdetails" [readFilterEquation]="readFilterEquation" [routeId]="routeId"  [permissionIdRequest]="permissionIdRequest" [isLoading]="isLoading"></app-filter-tile-config>
   
   </ng-template>
   <ng-template #tableModal let-modal >
