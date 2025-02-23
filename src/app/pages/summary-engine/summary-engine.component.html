@@ -79,6 +79,8 @@
                 *ngFor="let item of dashboard; let i = index;"
                 [item]="item"
                 [style.background]="item.themeColor"
+                [attr.data-bs-target]="item.grid_type === 'filterTile' ?'#filterDashModal':null"
+                [attr.data-bs-toggle]="'modal'"
                 [ngClass]="{
                 
                     
@@ -100,15 +102,15 @@
                 [style.height.px]="item.grid_type === 'chart' ? 300 : null" 
                 [style.width.px]="item.grid_type === 'chart' ? 400 : null" 
                 (click)="
-                  item.grid_type === 'filterTile' ? helperFilter(item, i, FilterModal) :
-                  item.grid_type === 'tile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,dataTableModalTile1) : null) :
-                item.grid_type === 'dynamicTile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,dataTableModalDynamicTile) : null) :
-                item.grid_type === 'title' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,TitleModal) : null) :
-                
-                  null
-                "
+                item.grid_type === 'filterTile' ? justReadStyles(item, i) :
+                item.grid_type === 'tile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,dataTableModalTile1) : null) :
+              item.grid_type === 'dynamicTile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,dataTableModalDynamicTile) : null) :
+              item.grid_type === 'title' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,TitleModal) : null) :
+              
+                null
+              "
               >
-                 
+          
          
                   <div *ngIf="item.grid_type === 'tile'">
                     <app-tile-ui1 
@@ -257,12 +259,13 @@
                       [summaryDashboardUpdate]="summaryDashboardUpdate" 
                       [summaryDashboardView]="summaryDashboardView"
                       [hidingLink]="hidingLink"
-                      (customEvent)="helperTile($event, FilterModal)" 
+                     
                       (customEvent1)="emitDuplicate($event)" 
                       (customEvent2)="emitDelete6($event)"
                       ></app-filter-tile-ui >
                  
                     </div>
+                    <!-- (customEvent)="helperTile($event, FilterModal)"  -->
                     <div  *ngIf="item.grid_type === 'Map'">
                 <h3 style="text-align: center;" class="mt-2"> {{item.chart_title}}</h3>
                       <app-map-ui    [item]="item" 
@@ -1258,7 +1261,9 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
                 <div
                   class="grid-item highlight"
                   tabindex="0"
-                  (click)="openFilterModal(FilterModal, modal)"
+                  [attr.data-bs-target]="'#filterDashModal'"
+                  [attr.data-bs-toggle]="'modal'"
+                  (click)="addModal();modal.dismiss();"
                   style="
                     width: 300px;
                     height: 200px;
@@ -1921,11 +1926,11 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
     <app-tile1-config [dashboard]="dashboard" (dashboardChange)="getGridDetails($event)" (update_PowerBoard_config)="updateSummaryHelper2($event)" [modal]="modal" [all_Packet_store]="all_Packet_store" (send_all_Packet_store)="allPacketStoreReceiver($event)"[isGirdMoved]="isGirdMoved"></app-tile1-config>
   
   </ng-template>
-  <ng-template #FilterModal let-modal >
+  <!-- <ng-template #FilterModal let-modal > -->
   
-    <app-filter-tile-config (refreshData)="refreshHelper($event)" (dashboardChange)="getGridDetails2($event)" [dashboard]="dashboard" [modal]="modal" [all_Packet_store]="all_Packet_store" (update_PowerBoard_config)="updateSummaryHelper2($event)" (send_all_Packet_store1)="allPacketStoreReceiver2($event)" [userdetails]="userdetails" [readFilterEquation]="readFilterEquation" [routeId]="routeId"  [permissionIdRequest]="permissionIdRequest" [isLoading]="isLoading"></app-filter-tile-config>
+    <app-filter-tile-config (refreshData)="refreshHelper($event)" (dashboardChange)="getGridDetails2($event)" [dashboard]="dashboard"  [all_Packet_store]="all_Packet_store" (update_PowerBoard_config)="updateSummaryHelper2($event)" (send_all_Packet_store1)="allPacketStoreReceiver2($event)" [userdetails]="userdetails" [readFilterEquation]="readFilterEquation" [routeId]="routeId"  [permissionIdRequest]="permissionIdRequest" [isLoading]="isLoading" (liveFilterData)="liveFilterDataProcess($event)"></app-filter-tile-config>
   
-  </ng-template>
+  <!-- </ng-template> -->
   <ng-template #tableModal let-modal >
   
     <app-table-widget-config (send_all_Packet_store)="allPacketStoreReceiver($event)"  [modal]="modal" [dashboard]="dashboard" (dashboardChange)="getGridDetails($event)" [all_Packet_store]="all_Packet_store" (update_PowerBoard_config)="updateSummaryHelper2($event)" [isGirdMoved]="isGirdMoved"></app-table-widget-config >

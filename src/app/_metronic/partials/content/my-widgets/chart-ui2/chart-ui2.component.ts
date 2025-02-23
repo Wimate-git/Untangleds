@@ -45,7 +45,8 @@ export class ChartUi2Component implements OnInit{
  
       console.log("DynamicLine chart",this.item)
 
-      if (this.all_Packet_store?.LiveDashboard === true) {
+      if (this.all_Packet_store?.LiveDashboard === true ||(this.all_Packet_store?.grid_details &&
+        this.all_Packet_store.grid_details.some((packet: { grid_type: string; }) => packet.grid_type === "filterTile"))) {
         console.log("✅ LiveDashboard is TRUE - Updating highchartsOptionsJson & chartConfig...");
     
         if (this.item && this.liveDataLineChart && Array.isArray(this.liveDataLineChart)) {

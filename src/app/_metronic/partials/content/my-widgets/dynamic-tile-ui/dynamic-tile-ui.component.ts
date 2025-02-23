@@ -52,7 +52,8 @@ export class DynamicTileUiComponent implements OnInit{
     console.log("tile data check from dynamic Title",this.liveDataDynamicTile)
 
     this.tileTiltle = this.item.chart_title
-    if (this.all_Packet_store?.LiveDashboard === true) {
+    if (this.all_Packet_store?.LiveDashboard === true ||(this.all_Packet_store?.grid_details &&
+      this.all_Packet_store.grid_details.some((packet: { grid_type: string; }) => packet.grid_type === "filterTile"))) {
       console.log("✅ LiveDashboard is TRUE - Updating multi_value...");
     
       if (this.item && this.liveDataDynamicTile && Array.isArray(this.liveDataDynamicTile)) {

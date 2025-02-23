@@ -97,6 +97,7 @@ makeTrueCheck:any = false
   showDaysAgoField: boolean;
   populateFormBuilder: any = [];
   enableParameterName :boolean = false
+  @Output() liveFilterData = new EventEmitter<any>();
 
   private optionsCache = new Map<string, Observable<any[]>>();
   private destroy$ = new Subject<void>();
@@ -121,6 +122,8 @@ makeTrueCheck:any = false
   userList: any;
   userlistCheck: any;
   ConditionsFormat: any;
+  storeliveFilterData: any;
+  localStorageKey = 'filterConditions';
 
 
  
@@ -131,6 +134,10 @@ makeTrueCheck:any = false
     this.username = this.getLoggedUser.username;
     console.log('this.SK_clientID check', this.SK_clientID)
     console.log('this.getLoggedUser check', this.getLoggedUser)
+ 
+
+    // Check if the page was reloaded
+
     // console.log('dashboardChange ngOnInit',this.all_Packet_store)
 
     // this.getWorkFlowDetails = this.summaryConfiguration.getLoggedUserDetails()
@@ -166,6 +173,9 @@ makeTrueCheck:any = false
 
 // this.fetchDynamic(this.formValueSave)
   }
+
+
+
 
   onDateTypeChange(value: string) {
 
@@ -486,6 +496,8 @@ makeTrueCheck:any = false
   //   this.noOfParams = noOfParams;
   // }
   async addControls(event: any, _type: string, count: number, formValue: any): Promise<void> {
+    const isChecked = event.target.checked;
+    this.createChart.get('add_fields')?.setValue(isChecked);
     console.log('event checking for filter',event)
     console.log('checking form value',this.formlistValues)
     console.log('formValue checking', formValue);
@@ -919,6 +931,9 @@ makeTrueCheck:any = false
         const processedData = constLiveData.Processed_Data.metadata.grid_details;
   
         console.log('processedData check', processedData);
+        this.storeliveFilterData = processedData
+        this.liveFilterData.emit(this.storeliveFilterData);
+
        
         this.spinner.hide('dataProcess');
         this.isLoading = false;
@@ -1027,123 +1042,43 @@ themes = [
 
 openFilterModal(tile: any, index: number) {
   console.log('Tile checking data from openFilterModal', tile);
-
   console.log('this.formlistValues check', this.formlistValues);
-// Ensure this fetches required data for dynamic fields
-
 
   const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14;
+  const storedToggle = localStorage.getItem('dashboardFilter');
+  const addFieldsEnabled = storedToggle ? JSON.parse(storedToggle) : tile.addFieldsEnabled;
 
   if (tile) {
-    console.log('tile object checking',tile)
+    console.log('tile object checking', tile);
     this.selectedTile = tile;
     this.editTileIndex = index !== undefined ? index : null;
-
     this.paramCount = tile.noOfParams || 1;
-
     this.parsedfilterTileConfig = JSON.parse(tile.filterTileConfig || '[]');
+
     console.log('this.parsedfilterTileConfig check', this.parsedfilterTileConfig);
 
-    // Initialize the form
-    this.createChart = this.fb.group({
-      fontSize: fontSizeValue,
-      selectType: tile.selectType,
-      daysAgo: tile.daysAgo,
-      fontColor: tile.fontColor || '#000000',
-      add_fields: [tile.addFieldsEnabled],
-      noOfParams: [{ value: tile.noOfParams, disabled: !tile.addFieldsEnabled }],
-      dateType: [tile.dateType],
-      toggleCheck: [tile.toggleCheck],
-      all_fields: this.fb.array([]),
-      custom_Label: tile.custom_Label,
-      themeColor: [tile.themeColor || ''],
-      startDate: tile.startDate,
-      endDate: tile.endDate,
-      singleDate: tile.singleDate,
-    });
-
-    const allFieldsArray = this.createChart.get('all_fields') as FormArray;
-
-    // Populate fields and conditions from the parsed configuration
-    this.parsedfilterTileConfig = JSON.parse(tile.filterTileConfig || '[]');
-    console.log('this.parsedfilterTileConfig check', this.parsedfilterTileConfig);
-    
-    this.parsedfilterTileConfig.forEach((packet: any[], fieldIndex: number) => {
-      if (!packet || !Array.isArray(packet)) {
-        console.warn(`Invalid packet structure at fieldIndex ${fieldIndex}:`, packet);
-        return;
-      }
-    
-      // Map conditions within the field
-      const conditionsArray = this.fb.array(
-        packet.map((condition: any, conditionIndex: number) => {
-          if (!condition) {
-            console.warn(`Invalid condition at fieldIndex ${fieldIndex}, conditionIndex ${conditionIndex}:`, condition);
-            return this.fb.group({
-              formField: ['', Validators.required],
-              operator: ['', Validators.required],
-              filterValue: ['', Validators.required],
-              operatorBetween: ['', Validators.required],
-              type: [''], // Default to text type
-              fieldLabel:['']
-            });
-          }
-    
-          // Safely access and dynamically assign type
-          const conditionType = condition.type ; // Default to 'text' if type is not defined
-          console.log('conditionType select',conditionType)
-          const formName = this.formlistValues[fieldIndex];
-          const formFieldControl = condition.formField || '';
-    
-          const newCondition = this.fb.group({
-            formField: [formFieldControl, Validators.required],
-            operator: [condition.operator || '', Validators.required],
-            filterValue: [condition.filterValue || '', Validators.required],
-            operatorBetween: [condition.operatorBetween || '', Validators.required],
-            type: [conditionType], // Dynamically set type
-            parameterName: [formName, Validators.required],
-            fieldLabel:[condition.fieldLabel]
-          });
-          this.fetchDynamic([],this.formlistValues,fieldIndex, conditionIndex, formFieldControl); 
-          // Dynamically fetch options and set globalFieldData
-       
-    
-          return newCondition;
-        })
-      );
-    
-      // Create a field group with conditions
-      const fieldGroup = this.fb.group({
-        parameterName: [packet[0]?.parameterName || `Parameter ${fieldIndex + 1}`, Validators.required],
-        conditions: conditionsArray,
-      });
-    
-      // Add the field group to all_fields
-      allFieldsArray.push(fieldGroup);
+    // Retrieve stored filter data from localStorage
+    const storedFilterData = localStorage.getItem(`filterData_${tile.id}`);
+    const filterValues = storedFilterData ? JSON.parse(storedFilterData) : {};
+    this.createChart.patchValue({
+      fontColor: filterValues.fontColor || tile.fontColor || '#000000',
+      add_fields: addFieldsEnabled,
+      noOfParams: tile.noOfParams, // Directly assign the value
+      toggleCheck: filterValues.toggleCheck ?? tile.toggleCheck,
+      custom_Label: filterValues.custom_Label || tile.custom_Label,
+      themeColor: filterValues.themeColor || tile.themeColor || '',
+      fontSize:fontSizeValue
     });
     
 
     // Update themes based on tile configuration
     this.themes.forEach((theme) => {
-      theme.selected = theme.color === tile.themeColor;
+      theme.selected = theme.color === (filterValues.themeColor || tile.themeColor);
     });
 
     console.log('Updated themes:', this.themes);
-
-    // Enable/disable parameter count based on add_fields toggle
-    this.createChart.get('add_fields')?.valueChanges.subscribe((isEnabled) => {
-      const noOfParamsControl = this.createChart.get('noOfParams');
-      if (isEnabled) {
-        noOfParamsControl?.enable();
-      } else {
-        noOfParamsControl?.disable();
-      }
-    });
-
-    // Mark edit mode as true
     this.isEditMode = true;
   } else {
-    // If no tile is selected, reset the form
     this.selectedTile = null;
     this.isEditMode = false;
     if (this.createChart) {
@@ -1152,6 +1087,15 @@ openFilterModal(tile: any, index: number) {
   }
 }
 
+
+
+closeFilterModal() {
+  if (this.createChart) {
+    const updatedFilterValues = this.createChart.value;
+    localStorage.setItem(`filterData_${this.selectedTile.id}`, JSON.stringify(updatedFilterValues));
+  }
+  this.isEditMode = false;
+}
 
 
 

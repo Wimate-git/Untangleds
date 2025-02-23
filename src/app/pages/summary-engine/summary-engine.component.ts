@@ -28,12 +28,12 @@ import bulletChart from 'highcharts/modules/bullet.src';
 import * as Highcharts from 'highcharts';
 import { NgxSpinnerService } from 'ngx-spinner';
 
-import { Tooltip } from 'bootstrap';
+
 import { Tile1ConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/tile1-config/tile1-config.component';
 
 
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Modal } from 'bootstrap';
+import { Modal, Tooltip } from 'bootstrap';
 import { Tile2ConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/tile2-config/tile2-config.component';
 import { Tile3ConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/tile3-config/tile3-config.component';
 import { Tile4ConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/tile4-config/tile4-config.component';
@@ -865,6 +865,11 @@ console.log('this.readFilterEquation checking',this.readFilterEquation)
   setFullscreen(): void {
     localStorage.setItem('fullscreen', 'true');
     console.log('Fullscreen enabled');
+}
+liveFilterDataProcess(liveFilterData:any){
+  console.log('liveFilterData',liveFilterData)
+  this.liveDashboardDataFormat(liveFilterData)
+
 }
 
 liveDashboardDataFormat(processedData: any) {
@@ -3200,7 +3205,9 @@ console.log('Formatted Date:', this.lastUpdatedTime);
       });
     });
   }
-
+justReadStyles(data:any,index:any){
+  this.FilterTileConfigComponent.openFilterModal(data, index);
+}
   helperFilter(data:any,index:any, KPIModal: TemplateRef<any>){
     if(data.grid_type=='filterTile'){
     this.modalService.open(KPIModal, { size: 'xl' });
@@ -5258,7 +5265,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
             if (actionKey === 'add_map' || actionKey === 'update_map') {
               window.location.reload(); // Reloads the current window
             } else if (actionKey === 'update_Dashboard' || actionKey === 'filter_add') {
-              this.reloadPage("html");  // Call the reloadPage function
+              // this.reloadPage("html");  // Call the reloadPage function
             }
             else if (actionKey === 'add_table' || actionKey === 'update_table'){
               window.location.reload();
@@ -6938,6 +6945,29 @@ refreshFunction(){
     return `width: ${width?.toFixed(2) ?? 'N/A'}px, height: ${height?.toFixed(2) ?? 'N/A'}px`;
   }
 
+  addModal() {
+   
 
+    // Get the modal element
+    const modalElement = document.getElementById('filterDashModal');
+    if (!modalElement) {
+      console.error('Modal element not found!');
+      return;
+    }
+
+    // Hide existing modal if open
+    const existingModal = Modal.getInstance(modalElement);
+    if (existingModal) {
+      existingModal.hide();
+    }
+
+  
+
+    // Open the modal programmatically
+    setTimeout(() => {
+      const modalInstance = new Modal(modalElement); // Corrected import usage
+      modalInstance.show();
+    }, 100);
+  }
 
 }

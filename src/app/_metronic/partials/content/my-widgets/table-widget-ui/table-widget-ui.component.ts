@@ -94,7 +94,8 @@ export class TableWidgetUiComponent implements OnInit{
   ngOnChanges(changes: SimpleChanges): void {
     console.log('liveDataTableTile checking',this.liveDataTableTile)
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
-    if (this.all_Packet_store?.LiveDashboard === true) {
+    if (this.all_Packet_store?.LiveDashboard === true ||(this.all_Packet_store?.grid_details &&
+      this.all_Packet_store.grid_details.some((packet: { grid_type: string; }) => packet.grid_type === "filterTile"))) {
       console.log("✅ LiveDashboard is TRUE - Updating highchartsOptionsJson & chartConfig...");
   
       if (this.item && this.liveDataTableTile && Array.isArray(this.liveDataTableTile)) {

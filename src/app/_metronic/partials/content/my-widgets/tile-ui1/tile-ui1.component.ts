@@ -53,7 +53,7 @@ export class TileUi1Component implements OnInit{
 
  
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('dashboardChange dynamic ui',this.all_Packet_store)
+    console.log('dashboardChange tile1 ui',this.all_Packet_store)
     console.log('this.liveDataTile check',this.liveDataTile)
  
     // console.log("tile data check from tile1 ",this.item)
@@ -69,7 +69,8 @@ export class TileUi1Component implements OnInit{
   // Debugging logs
 // console.log("Initial this.item:", this.item);
 // console.log("Initial this.liveDataTile:", this.liveDataTile);
-if (this.all_Packet_store?.LiveDashboard === true) {
+if (this.all_Packet_store?.LiveDashboard === true ||(this.all_Packet_store?.grid_details &&
+  this.all_Packet_store.grid_details.some((packet: { grid_type: string; }) => packet.grid_type === "filterTile")) ){
   console.log("✅ LiveDashboard is TRUE - Updating multi_value...");
 
   if (this.item && this.liveDataTile && Array.isArray(this.liveDataTile)) {

@@ -54,7 +54,8 @@ export class ChartUi1Component implements OnChanges {
       console.log('SK_clientID checking',this.SK_clientID)
 
 
-      if (this.all_Packet_store?.LiveDashboard === true) {
+      if (this.all_Packet_store?.LiveDashboard === true ||(this.all_Packet_store?.grid_details &&
+        this.all_Packet_store.grid_details.some((packet: { grid_type: string; }) => packet.grid_type === "filterTile"))) {
         console.log("✅ LiveDashboard is TRUE - Updating highchartsOptionsJson & chartConfig...");
     
         if (this.item && this.liveDataChart && Array.isArray(this.liveDataChart)) {
