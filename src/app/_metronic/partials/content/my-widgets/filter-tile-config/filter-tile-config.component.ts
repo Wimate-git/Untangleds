@@ -292,6 +292,24 @@ makeTrueCheck:any = false
             console.error('Error parsing mapConfig:', error);
           }
         }
+        if (packet.tileConfig && packet.tileConfig !== "[]") {
+          try {
+            const parsedDynamicTileConfig = JSON.parse(packet.tileConfig);
+            if (Array.isArray(parsedDynamicTileConfig)) {
+              const mapConfigFormlist = parsedDynamicTileConfig.map(
+                (config: { formlist: any }) => config.formlist
+              );
+              this.formlistValues = [...this.formlistValues, ...mapConfigFormlist];
+              console.log('this.formlistValues after dynamicTile extract', this.formlistValues);
+            } else {
+              console.warn('Parsed mapConfig is not an array:', parsedDynamicTileConfig);
+            }
+          } catch (error) {
+            console.error('Error parsing mapConfig:', error);
+          }
+        }
+
+
       });
   
       // Remove duplicates and undefined values from formlistValues

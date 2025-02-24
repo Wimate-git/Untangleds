@@ -469,10 +469,10 @@ this.initializeTileFields()
       const updatedConditions = this.conditions.controls.map(control => {
         const condition = control.value; // Access the value of each FormGroup in the FormArray
         return {
-          columnLabel: condition.columnLabel,
-          filterParameter: condition.filterParameter,
-          filterDescription: condition.filterDescription,
-          PredefinedScripts:condition.PredefinedScripts
+          columnLabel: condition.columnLabel ||'',
+          filterParameter: condition.filterParameter ||'',
+          filterDescription: condition.filterDescription ||'',
+          PredefinedScripts:condition.PredefinedScripts ||''
         };
       });
   
@@ -480,14 +480,14 @@ this.initializeTileFields()
   
       // Prepare the updated tile object
       const updatedTile = {
-        ...this.dashboard[this.editTileIndex], // Keep existing properties
-        formlist: this.createKPIWidget.value.formlist,
-        tableWidget_Config: this.createKPIWidget.value.form_data_selected,
-        groupByFormat: this.createKPIWidget.value.groupByFormat,
-        custom_Label: this.createKPIWidget.value.custom_Label,
-        conditions: updatedConditions, // Directly assign the array
-        filterParameter1: this.createKPIWidget.value.filterParameter1, // Parsed array
-        filterDescription1: this.createKPIWidget.value.filterDescription1,
+        ...this.dashboard[this.editTileIndex] ||'', // Keep existing properties
+        formlist: this.createKPIWidget.value.formlist ||'',
+        tableWidget_Config: this.createKPIWidget.value.form_data_selected ||'',
+        groupByFormat: this.createKPIWidget.value.groupByFormat ||'',
+        custom_Label: this.createKPIWidget.value.custom_Label ||'',
+        conditions: updatedConditions ||'', // Directly assign the array
+        filterParameter1: this.createKPIWidget.value.filterParameter1 ||'', // Parsed array
+        filterDescription1: this.createKPIWidget.value.filterDescription1 ||'',
         // custom_Label1: this.createKPIWidget.value.custom_Label1,
       };
   

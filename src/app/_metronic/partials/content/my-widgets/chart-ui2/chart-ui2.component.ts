@@ -4,6 +4,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import Highcharts from 'highcharts';
+import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engine.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -43,80 +44,80 @@ export class ChartUi2Component implements OnInit{
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
-      console.log("DynamicLine chart",this.item)
+      // console.log("DynamicLine chart",this.item)
 
-      if (this.all_Packet_store?.LiveDashboard === true ||(this.all_Packet_store?.grid_details &&
-        this.all_Packet_store.grid_details.some((packet: { grid_type: string; }) => packet.grid_type === "filterTile"))) {
-        console.log("✅ LiveDashboard is TRUE - Updating highchartsOptionsJson & chartConfig...");
+    //   if (this.all_Packet_store?.LiveDashboard === true ||(this.all_Packet_store?.grid_details &&
+    //     this.all_Packet_store.grid_details.some((packet: { grid_type: string; }) => packet.grid_type === "filterTile"))) {
+    //     console.log("✅ LiveDashboard is TRUE - Updating highchartsOptionsJson & chartConfig...");
     
-        if (this.item && this.liveDataLineChart && Array.isArray(this.liveDataLineChart)) {
-            // Find the matching packet from this.liveDataChart based on id
-            const matchingLiveChart = this.liveDataLineChart.find(liveChart => liveChart.id === this.item.id);
+    //     if (this.item && this.liveDataLineChart && Array.isArray(this.liveDataLineChart)) {
+    //         // Find the matching packet from this.liveDataChart based on id
+    //         const matchingLiveChart = this.liveDataLineChart.find(liveChart => liveChart.id === this.item.id);
     
-            console.log('🔍 Matching Live Chart for ID:', this.item.id, matchingLiveChart);
+    //         console.log('🔍 Matching Live Chart for ID:', this.item.id, matchingLiveChart);
     
-            // Update highchartsOptionsJson and chartConfig only if a match is found
-            if (matchingLiveChart) {
-                this.item.highchartsOptionsJson = matchingLiveChart.highchartsOptionsJson;
-                this.item.chartConfig = matchingLiveChart.chartConfig;
-            }
+    //         // Update highchartsOptionsJson and chartConfig only if a match is found
+    //         if (matchingLiveChart) {
+    //             this.item.highchartsOptionsJson = matchingLiveChart.highchartsOptionsJson;
+    //             this.item.chartConfig = matchingLiveChart.chartConfig;
+    //         }
     
-            console.log('✅ Updated this.item: after Live', this.item);
-            if (typeof this.item.highchartsOptionsJson === 'string') {
-              try {
-                this.chartOptions = JSON.parse(this.item.highchartsOptionsJson);
-                console.log('this.chartOptions for line chart', this.chartOptions);
-              } catch (error) {
-                console.error('Error parsing JSON:', error);
-              }
-            } else {
-              // If it's already an object, assign it directly
-              this.chartOptions = this.item.highchartsOptionsJson;
-              console.log('this.chartOptions', this.chartOptions);
-            }
+    //         console.log('✅ Updated this.item: after Live', this.item);
+    //         if (typeof this.item.highchartsOptionsJson === 'string') {
+    //           try {
+    //             this.chartOptions = JSON.parse(this.item.highchartsOptionsJson);
+    //             console.log('this.chartOptions for line chart', this.chartOptions);
+    //           } catch (error) {
+    //             console.error('Error parsing JSON:', error);
+    //           }
+    //         } else {
+    //           // If it's already an object, assign it directly
+    //           this.chartOptions = this.item.highchartsOptionsJson;
+    //           console.log('this.chartOptions', this.chartOptions);
+    //         }
             
       
-            if (typeof this.item.chartConfig === 'string') {
-              this.gridOptions = JSON.parse(this.item.chartConfig);
-            } else {
-              this.gridOptions = this.item.chartConfig; // Already an object
-            }
-        } else {
-            console.warn("⚠️ Either this.item is empty or this.liveDataChart is not an array.");
-        }
-    } else {
-        console.log("❌ LiveDashboard is FALSE - Keeping original item.");
-        if (typeof this.item.highchartsOptionsJson === 'string') {
-          try {
-            this.chartOptions = JSON.parse(this.item.highchartsOptionsJson);
-            console.log('this.chartOptions for line chart', this.chartOptions);
-          } catch (error) {
-            console.error('Error parsing JSON:', error);
-          }
-        } else {
-          // If it's already an object, assign it directly
-          this.chartOptions = this.item.highchartsOptionsJson;
-          console.log('this.chartOptions', this.chartOptions);
-        }
+    //         if (typeof this.item.chartConfig === 'string') {
+    //           this.gridOptions = JSON.parse(this.item.chartConfig);
+    //         } else {
+    //           this.gridOptions = this.item.chartConfig; // Already an object
+    //         }
+    //     } else {
+    //         console.warn("⚠️ Either this.item is empty or this.liveDataChart is not an array.");
+    //     }
+    // } else {
+    //     console.log("❌ LiveDashboard is FALSE - Keeping original item.");
+    //     if (typeof this.item.highchartsOptionsJson === 'string') {
+    //       try {
+    //         this.chartOptions = JSON.parse(this.item.highchartsOptionsJson);
+    //         console.log('this.chartOptions for line chart', this.chartOptions);
+    //       } catch (error) {
+    //         console.error('Error parsing JSON:', error);
+    //       }
+    //     } else {
+    //       // If it's already an object, assign it directly
+    //       this.chartOptions = this.item.highchartsOptionsJson;
+    //       console.log('this.chartOptions', this.chartOptions);
+    //     }
         
   
-        if (typeof this.item.chartConfig === 'string') {
-          this.gridOptions = JSON.parse(this.item.chartConfig);
-        } else {
-          this.gridOptions = this.item.chartConfig; // Already an object
-        }
-        // Do nothing, retain the existing this.item as is
-    }
+    //     if (typeof this.item.chartConfig === 'string') {
+    //       this.gridOptions = JSON.parse(this.item.chartConfig);
+    //     } else {
+    //       this.gridOptions = this.item.chartConfig; // Already an object
+    //     }
+    //     // Do nothing, retain the existing this.item as is
+    // }
 
 
       
-      console.log('this.gridOptions check', this.gridOptions);
+    //   console.log('this.gridOptions check', this.gridOptions);
      
-      this.createLineChart()
+    //   this.createLineChart()
     
   }
   constructor(
-    private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient
+    private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient,private summaryService:SummaryEngineService
     
    ){}
   ngAfterViewInit(){
@@ -169,6 +170,25 @@ export class ChartUi2Component implements OnInit{
   }
   ngOnInit(){
     console.log('item chacke',this.item.grid_details)
+    this.summaryService.lookUpData$.subscribe((data: any)=>{
+      console.log('data check>>>',data)
+ let tempCharts:any=[]
+data.forEach((packet: any,matchedIndex:number) => {
+  
+  if(packet.grid_type == 'Linechart'&& this.index==matchedIndex && packet.id === this.item.id){
+    tempCharts[matchedIndex] = packet
+    this.createLineChart(packet);
+  }
+});
+
+      
+      // console.log("✅ Matched Charts:", matchedCharts);
+      
+    
+      
+      
+    })
+
     this.detectScreenSize()
   }
 
@@ -267,26 +287,54 @@ this.formTableConfig = {
     this.sendCellInfo.emit(event);
   }
 
-  createLineChart() {
+  createLineChart(lichartData?:any) {
     console.log('this.chartOptions from line chart function',this.chartOptions)
+    if(lichartData){
+      const linachartDataFormat = JSON.parse(lichartData.highchartsOptionsJson)
+      linachartDataFormat.series = linachartDataFormat.series.map((series: any) => {
+        return {
+          ...series,
+          data: series.data.map((value: any, index: number) => ({
+            name: value.name, 
+            y: value,
+            customIndex: index,
+            events: {
+              click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event),
+            },
+          })),
+        };
+      });
+  
+  
+   
+      Highcharts.chart(`lineChart${this.index+1}`, linachartDataFormat);
 
-    this.chartOptions.series = this.chartOptions.series.map((series: any) => {
-      return {
-        ...series,
-        data: series.data.map((value: any, index: number) => ({
-          name: value.name, 
-          y: value,
-          customIndex: index,
-          events: {
-            click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event),
-          },
-        })),
-      };
-    });
+    }
+    else{
+    console.log('this.item in else chart2',this.item)
+
+      const linachartDataFormat = JSON.parse(this.item.highchartsOptionsJson)
+      linachartDataFormat.series = linachartDataFormat.series.map((series: any) => {
+        return {
+          ...series,
+          data: series.data.map((value: any, index: number) => ({
+            name: value.name, 
+            y: value,
+            customIndex: index,
+            events: {
+              click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event),
+            },
+          })),
+        };
+      });
+  
+  
+   
+      Highcharts.chart(`lineChart${this.index+1}`, linachartDataFormat);
+      
+    }
 
 
- 
-    Highcharts.chart(`lineChart${this.index+1}`, this.chartOptions);
   }
   
 

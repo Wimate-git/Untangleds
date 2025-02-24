@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engine.service';
 
 
 @Component({
@@ -40,59 +41,102 @@ export class DynamicTileUiComponent implements OnInit{
   tileTiltle: any;
   showTotalSumValue: any;
   equationProcessValue: any;
-  ngOnInit(): void {
+  ngOnInit(){
+    // console.log('item chacke',this.item.grid_details)
+    this.summaryService.lookUpData$.subscribe((data: any)=>{
+      console.log('data check>>>',data)
+ let tempCharts:any=[]
+data.forEach((packet: any,matchedIndex:number) => {
+  
+  if(packet.grid_type == 'dynamicTile'&& this.index==matchedIndex && packet.id === this.item.id){
+    tempCharts[matchedIndex] = packet
+    this.dynamicTileFormat(packet)
 
+  }
+});
+
+      
+      // console.log("✅ Matched Charts:", matchedCharts);
+      
     
+      
+      
+    })
+
+
   }
 
+  dynamicTileFormat(dinamicTileresponse?:any){
+
+    console.log('dinamicTileresponse check',dinamicTileresponse)
+    if(dinamicTileresponse){
+      this.parsedTileConfig = JSON.parse(dinamicTileresponse.tileConfig)
+      console.log('this.parsedTileConfig check',this.parsedTileConfig)
+      this.equationProcessValue = JSON.parse(dinamicTileresponse.equationProcess)
+      console.log('this.equationProcessValue checking',this.equationProcessValue)
+    }else
+    console.log('this.item checking dynamic',this.item )
+    this.parsedTileConfig = JSON.parse(this.item.tileConfig)
+    console.log('this.parsedTileConfig check',this.parsedTileConfig)
+    this.equationProcessValue = this.item.equationProcess
+    console.log('this.equationProcessValue checking',this.equationProcessValue)
+  }
+
+  ngAfterViewInit(){
+    setTimeout(() => {
+      this.dynamicTileFormat()
+    }, 500);
+  
+
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
     console.log("tile data check from dynamic Title",this.liveDataDynamicTile)
+    console.log('this ngonchanges',this.item )
 
-    this.tileTiltle = this.item.chart_title
-    if (this.all_Packet_store?.LiveDashboard === true ||(this.all_Packet_store?.grid_details &&
-      this.all_Packet_store.grid_details.some((packet: { grid_type: string; }) => packet.grid_type === "filterTile"))) {
-      console.log("✅ LiveDashboard is TRUE - Updating multi_value...");
+    // this.tileTiltle = this.item.chart_title
+    // if (this.item && this.liveDataDynamicTile !==undefined) {
+    //   console.log("✅ LiveDashboard is TRUE - Updating multi_value...");
     
-      if (this.item && this.liveDataDynamicTile && Array.isArray(this.liveDataDynamicTile)) {
-          // Find the matching packet from this.liveDataTile based on id
-          const matchingLiveTile = this.liveDataDynamicTile.find(liveTile => liveTile.id === this.item.id);
+    //   if (this.item && this.liveDataDynamicTile && Array.isArray(this.liveDataDynamicTile)) {
+    //       // Find the matching packet from this.liveDataTile based on id
+    //       const matchingLiveTile = this.liveDataDynamicTile.find(liveTile => liveTile.id === this.item.id);
     
-          console.log('🔍 Matching Live Tile:', matchingLiveTile);
+    //       console.log('🔍 Matching Live Tile:', matchingLiveTile);
     
-          // Update multi_value only if a match is found
-          if (matchingLiveTile && matchingLiveTile.tileConfig) {
-              if (Array.isArray(matchingLiveTile.tileConfig)) {
-                  this.item.tileConfig = matchingLiveTile.tileConfig; // Assign directly if already an array
-              } else if (typeof matchingLiveTile.tileConfig === "string") {
-                  try {
-                      this.item.tileConfig = JSON.parse(matchingLiveTile.tileConfig); // Parse if stringified JSON
-                  } catch (error) {
-                      console.error("⚠️ JSON Parsing Error for tileConfig:", matchingLiveTile.tileConfig, error);
-                  }
-              }
-          }
+    //       // Update multi_value only if a match is found
+    //       if (matchingLiveTile && matchingLiveTile.tileConfig) {
+    //           if (Array.isArray(matchingLiveTile.tileConfig)) {
+    //               this.item.tileConfig = matchingLiveTile.tileConfig; // Assign directly if already an array
+    //           } else if (typeof matchingLiveTile.tileConfig === "string") {
+    //               try {
+    //                   this.item.tileConfig = JSON.parse(matchingLiveTile.tileConfig); // Parse if stringified JSON
+    //               } catch (error) {
+    //                   console.error("⚠️ JSON Parsing Error for tileConfig:", matchingLiveTile.tileConfig, error);
+    //               }
+    //           }
+    //       }
     
-          console.log('✅ Updated this.item: after live', this.item);
-              this.parsedTileConfig = this.item.tileConfig
-    console.log('this.parsedTileConfig check',this.parsedTileConfig)
-    this.equationProcessValue = this.item.equationProcess
-    console.log('this.equationProcessValue checking',this.equationProcessValue)
-      } else {
-          console.warn("⚠️ Either this.item is empty or this.liveDataTile is not an array.");
-      }
-    } else {
-      console.log("❌ LiveDashboard is FALSE - Keeping original item.");
-      console.log('this.Item',this.item)
-      this.parsedTileConfig = JSON.parse(this.item.tileConfig)
-      console.log('this.parsedTileConfig check',this.parsedTileConfig)
-      this.equationProcessValue = this.item.equationProcess
-      console.log('this.equationProcessValue checking',this.equationProcessValue)
+    //       console.log('✅ Updated this.item: after live', this.item);
+    //           this.parsedTileConfig = this.item.tileConfig
+    // console.log('this.parsedTileConfig check',this.parsedTileConfig)
+    // this.equationProcessValue = this.item.equationProcess
+    // console.log('this.equationProcessValue checking',this.equationProcessValue)
+    //   } else {
+    //       console.warn("⚠️ Either this.item is empty or this.liveDataTile is not an array.");
+    //   }
+    // } else {
+    //   console.log("❌ LiveDashboard is FALSE - Keeping original item.");
+    //   console.log('this.Item',this.item)
+    //   this.parsedTileConfig = JSON.parse(this.item.tileConfig)
+    //   console.log('this.parsedTileConfig check',this.parsedTileConfig)
+    //   this.equationProcessValue = this.item.equationProcess
+    //   console.log('this.equationProcessValue checking',this.equationProcessValue)
     
-      // Do nothing, retain the existing this.item as is
-    }
+    //   // Do nothing, retain the existing this.item as is
+    // }
     // this.tileConfig = this.item.tileConfig
 
 
@@ -121,7 +165,7 @@ get shouldShowButton(): boolean {
 }
 
   constructor(
-   private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer
+   private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private summaryService:SummaryEngineService
    
   ){}
 

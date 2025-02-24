@@ -1,9 +1,9 @@
-<div class="map-container" *ngIf="item.grid_type === 'Map'">
+<div class="map-container" *ngIf="item.grid_type === 'Map'  ">
       <google-map
     [height]="mapHeight + 'px'"
     [width]="mapWidth + 'px'"
     [zoom]="5"
-    [center]="markers[0]?.position || defaultCenter"
+    [center]=" markers &&markers[0]?  markers[0]?.position : defaultCenter"
   >
     <!-- Dynamic Markers -->
     <map-marker

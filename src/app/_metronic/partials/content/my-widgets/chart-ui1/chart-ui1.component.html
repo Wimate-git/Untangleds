@@ -43,8 +43,12 @@ style="background: none; border: none; cursor: pointer;">
 </div>
 </div>
 
-<div *ngIf="item.grid_type === 'chart'" id="pieChart{{index + 1}}"  [style.width.px]="isMobile ? mobileChartWidth : chartWidth"
-[style.height.px]="isMobile ? mobileChartHeight : chartHeight"></div>
+<div *ngIf="item.grid_type === 'chart'" 
+     [id]="'pieChart' + (index + 1)"
+     [style.width.px]="isMobile ? mobileChartWidth : chartWidth"
+     [style.height.px]="isMobile ? mobileChartHeight : chartHeight">
+</div>
+
 
 
   <!-- <div class="custom-label" *ngIf="item.custom_Label">

@@ -5,6 +5,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Highcharts from 'highcharts';
 import Swal from 'sweetalert2';
 import { HttpClient } from '@angular/common/http';
+import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engine.service';
 
 @Component({
   selector: 'app-chart-ui1',
@@ -35,7 +36,7 @@ export class ChartUi1Component implements OnChanges {
   mobileChartWidth: number = window.innerWidth * 0.85;  // Custom mobile width
   mobileChartHeight: number = window.innerWidth * 0.87; // Custom mobile height
   
-  
+  allChartsData:any[] =[]
   
   checkResBody: any;
   parsedResBody: any;
@@ -44,92 +45,93 @@ export class ChartUi1Component implements OnChanges {
   @Output() emitChartConfigTable = new EventEmitter<any>();
   formTableConfig: {};
   
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log('dashboardChange dynamic ui',this.all_Packet_store)
- 
-      console.log("Dynamic data check fro chart1",this.item)
-      console.log('liveDataChart from child chart1',this.liveDataChart)
-   
-      console.log('routeId checking from ui',this.routeId)
-      console.log('SK_clientID checking',this.SK_clientID)
+ngOnChanges(changes: SimpleChanges): void {
+    console.log('dashboardChange dynamic ui', this.all_Packet_store);
+    console.log("Dynamic data check for chart1", this.item);
+    console.log('liveDataChart from child chart1', this.liveDataChart);
+    console.log('routeId checking from ui', this.routeId);
+    console.log('SK_clientID checking', this.SK_clientID);
 
+    // if (this.item && this.liveDataChart !== undefined) {
+    //     console.log("✅ LiveDashboard is TRUE - Updating highchartsOptionsJson & chartConfig...");
 
-      if (this.all_Packet_store?.LiveDashboard === true ||(this.all_Packet_store?.grid_details &&
-        this.all_Packet_store.grid_details.some((packet: { grid_type: string; }) => packet.grid_type === "filterTile"))) {
-        console.log("✅ LiveDashboard is TRUE - Updating highchartsOptionsJson & chartConfig...");
-    
-        if (this.item && this.liveDataChart && Array.isArray(this.liveDataChart)) {
-            // Find the matching packet from this.liveDataChart based on id
-            const matchingLiveChart = this.liveDataChart.find(liveChart => liveChart.id === this.item.id);
-    
-            console.log('🔍 Matching Live Chart for ID:', this.item.id, matchingLiveChart);
-    
-            // Update highchartsOptionsJson and chartConfig only if a match is found
-            if (matchingLiveChart) {
-                this.item.highchartsOptionsJson = matchingLiveChart.highchartsOptionsJson;
-                this.item.chartConfig = matchingLiveChart.chartConfig;
-            }
-    
-            console.log('✅ Updated this.item: after Live', this.item);
-            if (typeof this.item.highchartsOptionsJson === 'string') {
-              try {
-                this.chartOptions = JSON.parse(this.item.highchartsOptionsJson);
-                console.log('this.chartOptions', this.chartOptions);
-              } catch (error) {
-                console.error('Error parsing JSON:', error);
-              }
-            } else {
-              // If it's already an object, assign it directly
-              this.chartOptions = this.item.highchartsOptionsJson;
-              console.log('this.chartOptions', this.chartOptions);
-            }
-            
-      
-            if (typeof this.item.chartConfig === 'string') {
-              this.gridOptions = JSON.parse(this.item.chartConfig);
-            } else {
-              this.gridOptions = this.item.chartConfig; // Already an object
-            }
-        } else {
-            console.warn("⚠️ Either this.item is empty or this.liveDataChart is not an array.");
-        }
-    } else {
-        console.log("❌ LiveDashboard is FALSE - Keeping original item.");
-        if (typeof this.item.highchartsOptionsJson === 'string') {
-          try {
-            this.chartOptions = JSON.parse(this.item.highchartsOptionsJson);
-            console.log('this.chartOptions', this.chartOptions);
-          } catch (error) {
-            console.error('Error parsing JSON:', error);
-          }
-        } else {
-          // If it's already an object, assign it directly
-          this.chartOptions = this.item.highchartsOptionsJson;
-          console.log('this.chartOptions', this.chartOptions);
-        }
-        
-  
-        if (typeof this.item.chartConfig === 'string') {
-          this.gridOptions = JSON.parse(this.item.chartConfig);
-        } else {
-          this.gridOptions = this.item.chartConfig; // Already an object
-        }
-        // Do nothing, retain the existing this.item as is
-    }
-    
+    //     if (this.item && this.liveDataChart && Array.isArray(this.liveDataChart)) {
+    //         // Find the matching packet from this.liveDataChart based on id
+    //         const matchingLiveChart = this.liveDataChart.find(liveChart => liveChart.id === this.item.id);
+    //         console.log('🔍 Matching Live Chart for ID:', this.item.id, matchingLiveChart);
 
+    //         if (matchingLiveChart) {
+    //             console.log("✅ Chart Config Found for this.item.id:", this.item.id);
+    //             this.item.highchartsOptionsJson = matchingLiveChart.highchartsOptionsJson;
+    //             this.item.chartConfig = matchingLiveChart.chartConfig;
 
+    //             try {
+    //                 // Parse highchartsOptionsJson if it's a string
+    //                 this.chartOptions = typeof this.item.highchartsOptionsJson === 'string'
+    //                     ? JSON.parse(this.item.highchartsOptionsJson)
+    //                     : this.item.highchartsOptionsJson;
 
+    //                 console.log('this.chartOptions:', this.chartOptions);
 
+    //                 // Ensure allChartsData[this.index] exists
+    //                 if (!this.allChartsData[this.index]) {
+    //                     this.allChartsData[this.index] = { chartInstance: null, chartOptions: {} };
+    //                 }
 
-      console.log('this.chartOptions check before live', this.chartOptions);
-      console.log('this.gridOptions check', this.gridOptions);
+    //                 // If chartInstance exists, update it
+    //                 if (this.allChartsData[this.index].chartInstance) {
+    //                     console.log(`🔄 Updating chart instance for index ${this.index}`);
+    //                     this.allChartsData[this.index].chartInstance.update(this.chartOptions, true, true);
+    //                 } else {
+    //                     console.warn(`⚠️ No existing chart instance for index ${this.index}, waiting for initialization.`);
+    //                     this.allChartsData[this.index].chartOptions = this.chartOptions;
+    //                 }
+    //             } catch (error) {
+    //                 console.error('❌ Error parsing highchartsOptionsJson:', error);
+    //             }
 
-      
-   this.createPieChart()
-      this.tile1Config = this.item
-    
-  }
+    //             try {
+    //                 // Parse chartConfig if it's a string
+    //                 this.gridOptions = typeof this.item.chartConfig === 'string'
+    //                     ? JSON.parse(this.item.chartConfig)
+    //                     : this.item.chartConfig;
+
+    //                 console.log('this.gridOptions:', this.gridOptions);
+    //             } catch (error) {
+    //                 console.error('❌ Error parsing chartConfig:', error);
+    //             }
+    //         } else {
+    //             console.warn("⚠️ No matching chart configuration found for this.item.id:", this.item.id);
+    //         }
+    //     } else {
+    //         console.warn("⚠️ Either this.item is empty or this.liveDataChart is not an array.");
+    //     }
+    // } else {
+    //     console.log("❌ LiveDashboard is FALSE - Keeping original item.");
+    //     try {
+    //         this.chartOptions = typeof this.item.highchartsOptionsJson === 'string'
+    //             ? JSON.parse(this.item.highchartsOptionsJson)
+    //             : this.item.highchartsOptionsJson;
+    //         console.log('this.chartOptions else condition', this.chartOptions);
+    //     } catch (error) {
+    //         console.error('❌ Error parsing JSON:', error);
+    //     }
+
+    //     try {
+    //         this.gridOptions = typeof this.item.chartConfig === 'string'
+    //             ? JSON.parse(this.item.chartConfig)
+    //             : this.item.chartConfig;
+    //     } catch (error) {
+    //         console.error('❌ Error parsing JSON:', error);
+    //     }
+    // }
+
+    // console.log('this.chartOptions check before live', this.chartOptions);
+    // console.log('this.gridOptions check', this.gridOptions);
+
+    this.tile1Config = this.item;
+}
+
   onBarClick(event: Highcharts.PointClickEventObject): void {
     console.log('event checking from ui',event)
     console.log('Pie clicked:', {
@@ -231,6 +233,8 @@ this.formTableConfig = {
   }
   @Input() item:any
   @Input() index:any
+  @Input() chartIndex:any
+
   @Input() isEditModeView:any;
   @Output() customEvent = new EventEmitter<{ arg1: any; arg2: number }>();
   @Output() customEvent1 = new EventEmitter<{ data: { arg1: any; arg2: number }; all_Packet_store: any }>();
@@ -275,37 +279,86 @@ this.formTableConfig = {
   }
   ngOnInit(){
     console.log('item chacke',this.item.grid_details)
+    this.summaryService.lookUpData$.subscribe((data: any)=>{
+      console.log('data check>>>',data)
+ let tempCharts:any=[]
+data.forEach((packet: any,matchedIndex:number) => {
+  
+  if(packet.grid_type == 'chart'&& this.index==matchedIndex && packet.id === this.item.id){
+    tempCharts[matchedIndex] = packet
+    this.createPieChart(packet);
+  }
+});
+
+      
+      // console.log("✅ Matched Charts:", matchedCharts);
+      
+    
+      
+      
+    })
+
     this.detectScreenSize()
   }
 
-  createPieChart() {
-    console.log('this.chartOptions in initialization>>>>>', this.chartOptions);
   
-    // Fix the series data structure
-    this.chartOptions.series = this.chartOptions.series.map((series: any) => {
-      return {
-        ...series,
-        data: series.data.map((point: any, index: number) => ({
-          name: point[0], // First element as name
-          y: point[1],    // Second element as value
-          customIndex: index,
-          events: {
-            click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event),
-          },
-        })),
-      };
-    });
-  
-    // Initialize the Highcharts pie chart
-    Highcharts.chart(`pieChart${this.index + 1}`, this.chartOptions);
-  }
+  createPieChart(chartdata?:any) {
+
+    console.log(`🔄 Initializing Pie Chart for index ${this.index} >>>>>`, this.chartOptions);
+    if(chartdata){
+      const chartOptionsCopy = JSON.parse(chartdata.highchartsOptionsJson);
+      console.log('data check from initialiaze',chartOptionsCopy)
+      chartOptionsCopy.series = chartOptionsCopy.series.map((series: any) => {
+        return {
+          ...series,
+          data: series.data.map((point: any, index: number) => ({
+            name: point[0], // First element as name
+            y: point[1],    // Second element as value
+            customIndex: index,
+            events: {
+              click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event),
+            },
+          })),
+        };
+      });
+    
+      // Initialize the Highcharts pie chart
+      Highcharts.chart(`pieChart${this.index + 1}`, chartOptionsCopy);
+
+    }else{
+      const chartOptionsCopy = JSON.parse(this.item.highchartsOptionsJson);
+      console.log('chartOptionsCopy else condition',chartOptionsCopy)
+
+      chartOptionsCopy.series = chartOptionsCopy.series.map((series: any) => {
+        return {
+          ...series,
+          data: series.data.map((point: any, index: number) => ({
+            name: point[0], // First element as name
+            y: point[1],    // Second element as value
+            customIndex: index,
+            events: {
+              click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event),
+            },
+          })),
+        };
+      });
+    
+      // Initialize the Highcharts pie chart
+      Highcharts.chart(`pieChart${this.index + 1}`, chartOptionsCopy);
+
+    }
+
+    // Ensure that each chart gets a unique copy of the options
+
+}
+
   
   get shouldShowButton(): boolean {
     return this.item.dashboardIds !== "";
   }
   
     constructor(
-     private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient
+     private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient,private summaryService:SummaryEngineService
      
     ){}
 

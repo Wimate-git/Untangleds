@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
+import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engine.service';
 
 @Component({
   selector: 'app-chart-ui3',
@@ -43,100 +44,100 @@ export class ChartUi3Component implements OnInit{
  
       console.log("DynamicLine chart",this.item)
       console.log('liveDataColumnChart check',this.liveDataColumnChart)
-      this.parseChartOptions = this.item.highchartsOptionsJson;
+      // this.parseChartOptions = this.item.highchartsOptionsJson;
       // console.log('this.parseChartOptions checking',this.parseChartOptions)
       // const check = JSON.parse(this.parseChartOptions);
       // console.log('check parsed data',check)
       // this.extractSeries = check.series[0].name
       // console.log('this.extractSeries',this.extractSeries)
-      if (this.all_Packet_store?.LiveDashboard === true ||(this.all_Packet_store?.grid_details &&
-        this.all_Packet_store.grid_details.some((packet: { grid_type: string; }) => packet.grid_type === "filterTile"))) {
-        console.log("✅ LiveDashboard is TRUE - Updating highchartsOptionsJson & chartConfig...");
+    //   if (this.all_Packet_store?.LiveDashboard === true ||(this.all_Packet_store?.grid_details &&
+    //     this.all_Packet_store.grid_details.some((packet: { grid_type: string; }) => packet.grid_type === "filterTile"))) {
+    //     console.log("✅ LiveDashboard is TRUE - Updating highchartsOptionsJson & chartConfig...");
     
-        if (this.item && this.liveDataColumnChart && Array.isArray(this.liveDataColumnChart)) {
-            // Find the matching packet from this.liveDataChart based on id
-            const matchingLiveChart = this.liveDataColumnChart.find(liveChart => liveChart.id === this.item.id);
+    //     if (this.item && this.liveDataColumnChart && Array.isArray(this.liveDataColumnChart)) {
+    //         // Find the matching packet from this.liveDataChart based on id
+    //         const matchingLiveChart = this.liveDataColumnChart.find(liveChart => liveChart.id === this.item.id);
     
-            console.log('🔍 Matching Live Chart for ID:', this.item.id, matchingLiveChart);
+    //         console.log('🔍 Matching Live Chart for ID:', this.item.id, matchingLiveChart);
     
-            // Update highchartsOptionsJson and chartConfig only if a match is found
-            if (matchingLiveChart) {
-                this.item.highchartsOptionsJson = matchingLiveChart.highchartsOptionsJson;
-                this.item.chartConfig = matchingLiveChart.chartConfig;
-            }
+    //         // Update highchartsOptionsJson and chartConfig only if a match is found
+    //         if (matchingLiveChart) {
+    //             this.item.highchartsOptionsJson = matchingLiveChart.highchartsOptionsJson;
+    //             this.item.chartConfig = matchingLiveChart.chartConfig;
+    //         }
     
-            console.log('✅ Updated this.item: after Live', this.item);
-            if (typeof this.item.highchartsOptionsJson === 'string') {
-              try {
-                this.chartOptions = JSON.parse(this.item.highchartsOptionsJson);
+    //         console.log('✅ Updated this.item: after Live', this.item);
+    //         if (typeof this.item.highchartsOptionsJson === 'string') {
+    //           try {
+    //             this.chartOptions = JSON.parse(this.item.highchartsOptionsJson);
              
-              } catch (error) {
-                console.error('Error parsing JSON:', error);
-              }
-            } else {
-              // If it's already an object, assign it directly
-              this.chartOptions = this.item.highchartsOptionsJson;
-              console.log('this.chartOptions from column', this.chartOptions);
-            }
+    //           } catch (error) {
+    //             console.error('Error parsing JSON:', error);
+    //           }
+    //         } else {
+    //           // If it's already an object, assign it directly
+    //           this.chartOptions = this.item.highchartsOptionsJson;
+    //           console.log('this.chartOptions from column', this.chartOptions);
+    //         }
             
       
-            if (typeof this.item.chartConfig === 'string') {
-              this.gridOptions = JSON.parse(this.item.chartConfig);
-            } else {
-              this.gridOptions = this.item.chartConfig; // Already an object
-            }
-        } else {
-            console.warn("⚠️ Either this.item is empty or this.liveDataChart is not an array.");
-        }
-    } else {
-        console.log("❌ LiveDashboard is FALSE - Keeping original item.");
-        if (typeof this.item.highchartsOptionsJson === 'string') {
-          try {
-            this.chartOptions = JSON.parse(this.item.highchartsOptionsJson);
+    //         if (typeof this.item.chartConfig === 'string') {
+    //           this.gridOptions = JSON.parse(this.item.chartConfig);
+    //         } else {
+    //           this.gridOptions = this.item.chartConfig; // Already an object
+    //         }
+    //     } else {
+    //         console.warn("⚠️ Either this.item is empty or this.liveDataChart is not an array.");
+    //     }
+    // } else {
+    //     console.log("❌ LiveDashboard is FALSE - Keeping original item.");
+    //     if (typeof this.item.highchartsOptionsJson === 'string') {
+    //       try {
+    //         this.chartOptions = JSON.parse(this.item.highchartsOptionsJson);
          
-          } catch (error) {
-            console.error('Error parsing JSON:', error);
-          }
-        } else {
-          // If it's already an object, assign it directly
-          this.chartOptions = this.item.highchartsOptionsJson;
-          console.log('this.chartOptions from column', this.chartOptions);
-        }
+    //       } catch (error) {
+    //         console.error('Error parsing JSON:', error);
+    //       }
+    //     } else {
+    //       // If it's already an object, assign it directly
+    //       this.chartOptions = this.item.highchartsOptionsJson;
+    //       console.log('this.chartOptions from column', this.chartOptions);
+    //     }
         
   
-        if (typeof this.item.chartConfig === 'string') {
-          this.gridOptions = JSON.parse(this.item.chartConfig);
-        } else {
-          this.gridOptions = this.item.chartConfig; // Already an object
-        }
-        // Do nothing, retain the existing this.item as is
-    }
+    //     if (typeof this.item.chartConfig === 'string') {
+    //       this.gridOptions = JSON.parse(this.item.chartConfig);
+    //     } else {
+    //       this.gridOptions = this.item.chartConfig; // Already an object
+    //     }
+    //     // Do nothing, retain the existing this.item as is
+    // }
 
 
 
 
       
-      console.log('this.gridOptions check', this.gridOptions);
+      // console.log('this.gridOptions check', this.gridOptions);
      
-      this.chartOptions.series = this.chartOptions.series.map((series: any) => {
-        return {
-          ...series,
-          data: series.data.map((value: any, index: number) => ({
-            y: value, // Data value
-            name: series.name, // Series name (optional)
-            customIndex: index, // Custom property to track index
-            events: {
-              click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event),
-            },
-          })),
-        };
-      });
+      // this.chartOptions.series = this.chartOptions.series.map((series: any) => {
+      //   return {
+      //     ...series,
+      //     data: series.data.map((value: any, index: number) => ({
+      //       y: value, 
+      //       name: series.name, 
+      //       customIndex: index, 
+      //       events: {
+      //         click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event),
+      //       },
+      //     })),
+      //   };
+      // });
      
 
     
   }
   constructor(
-    private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient
+    private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient,private summaryService:SummaryEngineService
     
    ){}
 
@@ -231,7 +232,7 @@ const extractcolumnVisibility = chartConfig
   
   ngAfterViewInit(){
     setTimeout(() => {
-      this.createBarChart()
+      this.createColumnChart()
     }, 500);
   
 
@@ -283,10 +284,6 @@ const extractcolumnVisibility = chartConfig
   this.customEvent2.emit(payloadDelete); // Emitting an event with two arguments
 
   }
-  ngOnInit(){
-    console.log('item chacke',this.item.grid_details)
-    this.detectScreenSize()
-  }
 
   detectScreenSize() {
     this.isMobile = window.innerWidth <= 760; // Adjust breakpoint as needed
@@ -294,14 +291,82 @@ const extractcolumnVisibility = chartConfig
       // alert(`${this.mobileChartWidth}, 'X',${this.mobileChartHeight}`)
   }
 
-  createBarChart() {
+  // createBarChart() {
 
-    console.log('culomnchart dynamic data check', this.chartOptions);
+  //   console.log('culomnchart dynamic data check', this.chartOptions);
   
-    Highcharts.chart(`Columnchart${this.index+1}`, this.chartOptions);
-    // console.log()
 
+  //   // console.log()
+
+  // }
+
+
+  ngOnInit(){
+    console.log('item chacke',this.item.grid_details)
+    this.summaryService.lookUpData$.subscribe((data: any)=>{
+      console.log('data check>>>',data)
+ let tempCharts:any=[]
+data.forEach((packet: any,matchedIndex:number) => {
+  
+  if(packet.grid_type == 'Columnchart'&& this.index==matchedIndex && packet.id === this.item.id){
+    tempCharts[matchedIndex] = packet
+    this.createColumnChart(packet);
   }
+});
+
+      
+      // console.log("✅ Matched Charts:", matchedCharts);
+      
+    
+      
+      
+    })
+
+    this.detectScreenSize()
+  }
+createColumnChart(columnChartData?:any){
+  if(columnChartData){
+
+    const columnChartDataFormat = JSON.parse(columnChartData.highchartsOptionsJson)
+    columnChartDataFormat.series = columnChartDataFormat.series.map((series: any) => {
+      return {
+        ...series,
+        data: series.data.map((value: any, index: number) => ({
+          y: value, // Data value
+          name: series.name, // Series name (optional)
+          customIndex: index, // Custom property to track index
+          events: {
+            click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event),
+          },
+        })),
+      };
+    });
+    Highcharts.chart(`Columnchart${this.index+1}`, columnChartDataFormat);
+  }else{
+   
+    const columnChartDataFormat = JSON.parse(this.item.highchartsOptionsJson)
+    console.log('columnChartDataFormat from else',columnChartDataFormat)
+    columnChartDataFormat.series = columnChartDataFormat.series.map((series: any) => {
+      return {
+        ...series,
+        data: series.data.map((value: any, index: number) => ({
+          y: value, // Data value
+          name: series.name, // Series name (optional)
+          customIndex: index, // Custom property to track index
+          events: {
+            click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event),
+          },
+        })),
+      };
+    });
+
+    Highcharts.chart(`Columnchart${this.index+1}`, columnChartDataFormat);
+  }
+
+
+}
+
+
   
 
 }

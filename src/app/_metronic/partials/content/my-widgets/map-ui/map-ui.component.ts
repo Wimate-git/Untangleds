@@ -3,6 +3,7 @@ import { GoogleMap, MapInfoWindow } from '@angular/google-maps';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engine.service';
 
 @Component({
   selector: 'app-map-ui',
@@ -22,8 +23,8 @@ export class MapUiComponent implements OnInit{
   // @Output() customEvent2 = new EventEmitter<{ arg1: any; arg2: number }>();
   @Input()  all_Packet_store: any;
   @Input () hideButton:any
-  @Input() mapWidth:any
-  @Input() mapHeight:any
+  @Input() mapWidth:any[]=[]
+  @Input() mapHeight:any[]=[]
   @Input() liveDataMapTile:any
     //  [chartHeight]="chartHeight[i]"  
     //                   [chartWidth]="chartWidth[i]"
@@ -53,11 +54,160 @@ export class MapUiComponent implements OnInit{
   markers: any[];
   defaultCenter: { lat: number; lng: number; };
 
-  ngOnInit(): void {
+  ngOnInit(){
+    console.log('item chacke',this.item.grid_details)
+    this.summaryService.lookUpData$.subscribe((data: any)=>{
+      console.log('data check>>>',data)
+ let tempCharts:any=[]
+data.forEach((packet: any,matchedIndex:number) => {
+  
+  if(packet.grid_type == 'Map'&& this.index==matchedIndex && packet.id === this.item.id){
+    tempCharts[matchedIndex] = packet
+    this.createMapWidget(packet);
+  }
+});
+
+      
+      // console.log("✅ Matched Charts:", matchedCharts);
+      
+    
+      
+      
+    })
+
+  
+  }
+  createMapWidget(mapData:any){
+    if(mapData){
+
+      this.parsedData = JSON.parse(mapData.MapConfig);
+      console.log('Parsed data check:', this.parsedData);
+      
+      // Ensure parsedData is an array
+      if (Array.isArray(this.parsedData)) {
+        console.log('Parsed data check:', this.parsedData);
+      
+        // Extract markers dynamically
+        this.markers = this.parsedData
+          .filter((packet: any) => packet.add_Markers && Array.isArray(packet.add_Markers)) // Ensure add_Markers exists
+          .flatMap((packet: any) => {
+            return packet.add_Markers
+              .filter((marker: any) => marker.position && marker.position.lat && marker.position.lng) // Validate lat/lng
+              .map((marker: any) => {
+                const baseMarker = {
+                  position: {
+                    lat: parseFloat(marker.position.lat), // Convert latitude to number
+                    lng: parseFloat(marker.position.lng), // Convert longitude to number
+                  },
+                  title: marker.title || '', // Default to empty string if title is missing
+                  label: marker.label || '', // Default to empty string if label is missing
+                  mapType: packet.map_type || '', // Include map_type from parent packet
+                  marker_info:marker.marker_info
+                };
+      
+                // console.log('baseMarker checking',baseMarker)
+                // Include marker_info for "Track Location" and "Graphic Location"
+                if (
+                  packet.label === "Track Location" ||
+                  packet.label === "Graphic Location"
+                ) {
+                  const { label_id, label_name, ...cleanedMarkerInfo } = marker.marker_info || {};
+                  return { ...baseMarker, marker_info: cleanedMarkerInfo };
+                }
+      
+                return baseMarker;
+              });
+          });
+      
+        // Process markers to include mapType and scaled size
+        this.markers = this.markers.map(marker => ({
+          ...marker,
+          mapType: {
+            url: marker.mapType, // Use mapType as icon URL
+            scaledSize: { width: 30, height: 30 }, // Set custom dimensions
+          },
+        }));
+      
+        console.log('Formatted markers with map types and sizes:', this.markers);
+      
+        // Handle the case when markers array is empty
+        if (this.markers.length === 0) {
+          console.warn('No valid markers found. Displaying empty map.');
+        }
+      } else {
+        console.error('Parsed data is not an array.');
+      }
+    }else{
+      
+      this.parsedData = JSON.parse(this.item.MapConfig);
+      console.log('Parsed data check:', this.parsedData);
+      
+      // Ensure parsedData is an array
+      if (Array.isArray(this.parsedData)) {
+        console.log('Parsed data check:', this.parsedData);
+      
+        // Extract markers dynamically
+        this.markers = this.parsedData
+          .filter((packet: any) => packet.add_Markers && Array.isArray(packet.add_Markers)) // Ensure add_Markers exists
+          .flatMap((packet: any) => {
+            return packet.add_Markers
+              .filter((marker: any) => marker.position && marker.position.lat && marker.position.lng) // Validate lat/lng
+              .map((marker: any) => {
+                const baseMarker = {
+                  position: {
+                    lat: parseFloat(marker.position.lat), // Convert latitude to number
+                    lng: parseFloat(marker.position.lng), // Convert longitude to number
+                  },
+                  title: marker.title || '', // Default to empty string if title is missing
+                  label: marker.label || '', // Default to empty string if label is missing
+                  mapType: packet.map_type || '', // Include map_type from parent packet
+                  marker_info:marker.marker_info
+                };
+      
+                // console.log('baseMarker checking',baseMarker)
+                // Include marker_info for "Track Location" and "Graphic Location"
+                if (
+                  packet.label === "Track Location" ||
+                  packet.label === "Graphic Location"
+                ) {
+                  const { label_id, label_name, ...cleanedMarkerInfo } = marker.marker_info || {};
+                  return { ...baseMarker, marker_info: cleanedMarkerInfo };
+                }
+      
+                return baseMarker;
+              });
+          });
+      
+        // Process markers to include mapType and scaled size
+        this.markers = this.markers.map(marker => ({
+          ...marker,
+          mapType: {
+            url: marker.mapType, // Use mapType as icon URL
+            scaledSize: { width: 30, height: 30 }, // Set custom dimensions
+          },
+        }));
+      
+        console.log('Formatted markers with map types and sizes:', this.markers);
+      
+        // Handle the case when markers array is empty
+        if (this.markers.length === 0) {
+          console.warn('No valid markers found. Displaying empty map.');
+        }
+      } else {
+        console.error('Parsed data is not an array.');
+      }
+
+    }
 
     
-  }
+    
+    
+    // Add a fallback for map center
+    // this.defaultCenter = { lat: 0, lng: 0 };
+    this.defaultCenter = { lat: 0, lng: 0 };
 
+
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
@@ -65,107 +215,44 @@ export class MapUiComponent implements OnInit{
  
   
 
-      if (this.all_Packet_store?.LiveDashboard === true ||(this.all_Packet_store?.grid_details &&
-        this.all_Packet_store.grid_details.some((packet: { grid_type: string; }) => packet.grid_type === "filterTile"))) {
-    console.log("✅ LiveDashboard is TRUE - Updating multi_value...");
+  //     if (this.item && this.liveDataMapTile !==undefined) {
+  //   console.log("✅ LiveDashboard is TRUE - Updating multi_value...");
   
-    if (this.item && this.liveDataMapTile && Array.isArray(this.liveDataMapTile)) {
-        // Find the matching packet from this.liveDataTile based on id
-        const matchingLiveTile = this.liveDataMapTile.find(liveTile => liveTile.id === this.item.id);
+  //   if (this.item && this.liveDataMapTile && Array.isArray(this.liveDataMapTile)) {
+  //       // Find the matching packet from this.liveDataTile based on id
+  //       const matchingLiveTile = this.liveDataMapTile.find(liveTile => liveTile.id === this.item.id);
   
-        console.log('🔍 Matching Live Tile:', matchingLiveTile);
+  //       console.log('🔍 Matching Live Tile:', matchingLiveTile);
   
-        // Update multi_value only if a match is found
-        if (matchingLiveTile && matchingLiveTile.MapConfig) {
-            if (Array.isArray(matchingLiveTile.MapConfig)) {
-                this.item.MapConfig = matchingLiveTile.MapConfig; // Assign directly if already an array
-            } else if (typeof matchingLiveTile.MapConfig === "string") {
-                try {
-                    this.item.MapConfig = matchingLiveTile.MapConfig; // Parse if stringified JSON
-                } catch (error) {
-                    console.error("⚠️ JSON Parsing Error for multi_value:", matchingLiveTile.MapConfig, error);
-                }
-            }
-        }
-        console.log("map tile live check",this.item)
+  //       // Update multi_value only if a match is found
+  //       if (matchingLiveTile && matchingLiveTile.MapConfig) {
+  //           if (Array.isArray(matchingLiveTile.MapConfig)) {
+  //               this.item.MapConfig = matchingLiveTile.MapConfig; // Assign directly if already an array
+  //           } else if (typeof matchingLiveTile.MapConfig === "string") {
+  //               try {
+  //                   this.item.MapConfig = matchingLiveTile.MapConfig; // Parse if stringified JSON
+  //               } catch (error) {
+  //                   console.error("⚠️ JSON Parsing Error for multi_value:", matchingLiveTile.MapConfig, error);
+  //               }
+  //           }
+  //       }
+  //       console.log("map tile live check",this.item)
 
         
     
     
     
    
-    } else {
-        console.warn("⚠️ Either this.item is empty or this.liveDataTile is not an array.");
-    }
-  } else {
+  //   } else {
+  //       console.warn("⚠️ Either this.item is empty or this.liveDataTile is not an array.");
+  //   }
+  // } else {
 
   
-    // Do nothing, retain the existing this.item as is
-  }
+  //   // Do nothing, retain the existing this.item as is
+  // }
 // Parse the MapConfig and log parsed data
-this.parsedData = JSON.parse(this.item.MapConfig);
-console.log('Parsed data check:', this.parsedData);
 
-// Ensure parsedData is an array
-if (Array.isArray(this.parsedData)) {
-  console.log('Parsed data check:', this.parsedData);
-
-  // Extract markers dynamically
-  this.markers = this.parsedData
-    .filter((packet: any) => packet.add_Markers && Array.isArray(packet.add_Markers)) // Ensure add_Markers exists
-    .flatMap((packet: any) => {
-      return packet.add_Markers
-        .filter((marker: any) => marker.position && marker.position.lat && marker.position.lng) // Validate lat/lng
-        .map((marker: any) => {
-          const baseMarker = {
-            position: {
-              lat: parseFloat(marker.position.lat), // Convert latitude to number
-              lng: parseFloat(marker.position.lng), // Convert longitude to number
-            },
-            title: marker.title || '', // Default to empty string if title is missing
-            label: marker.label || '', // Default to empty string if label is missing
-            mapType: packet.map_type || '', // Include map_type from parent packet
-            marker_info:marker.marker_info
-          };
-
-          // console.log('baseMarker checking',baseMarker)
-          // Include marker_info for "Track Location" and "Graphic Location"
-          if (
-            packet.label === "Track Location" ||
-            packet.label === "Graphic Location"
-          ) {
-            const { label_id, label_name, ...cleanedMarkerInfo } = marker.marker_info || {};
-            return { ...baseMarker, marker_info: cleanedMarkerInfo };
-          }
-
-          return baseMarker;
-        });
-    });
-
-  // Process markers to include mapType and scaled size
-  this.markers = this.markers.map(marker => ({
-    ...marker,
-    mapType: {
-      url: marker.mapType, // Use mapType as icon URL
-      scaledSize: { width: 30, height: 30 }, // Set custom dimensions
-    },
-  }));
-
-  console.log('Formatted markers with map types and sizes:', this.markers);
-
-  // Handle the case when markers array is empty
-  if (this.markers.length === 0) {
-    console.warn('No valid markers found. Displaying empty map.');
-  }
-} else {
-  console.error('Parsed data is not an array.');
-}
-
-
-
-// Add a fallback for map center
-// this.defaultCenter = { lat: 0, lng: 0 };
-this.defaultCenter = { lat: 0, lng: 0 };
 
 
 
@@ -231,7 +318,7 @@ get shouldShowButton(): boolean {
 }
 
   constructor(
-   private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer
+   private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private summaryService:SummaryEngineService
    
   ){}
 

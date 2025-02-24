@@ -13,6 +13,7 @@ import { GridApi ,Column} from 'ag-grid-community';
 import * as XLSX from 'xlsx';  
 
 import { vfs } from 'pdfmake/build/vfs_fonts';
+import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engine.service';
 (pdfMake as any).vfs = vfs;
 
 // Configure pdfMake to use the fonts
@@ -69,10 +70,7 @@ export class TableWidgetUiComponent implements OnInit{
   finalColumns: any;
   customLabel: any;
   formName: any;
-  ngOnInit(): void {
 
-    
-  }
 
   defaultColDef = {
     resizable: true, // Allow columns to be resized
@@ -94,103 +92,330 @@ export class TableWidgetUiComponent implements OnInit{
   ngOnChanges(changes: SimpleChanges): void {
     console.log('liveDataTableTile checking',this.liveDataTableTile)
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
-    if (this.all_Packet_store?.LiveDashboard === true ||(this.all_Packet_store?.grid_details &&
-      this.all_Packet_store.grid_details.some((packet: { grid_type: string; }) => packet.grid_type === "filterTile"))) {
-      console.log("✅ LiveDashboard is TRUE - Updating highchartsOptionsJson & chartConfig...");
+  //   if (this.item && this.liveDataTableTile !== undefined) {
+  //     console.log("✅ LiveDashboard is TRUE - Updating highchartsOptionsJson & chartConfig...");
   
-      if (this.item && this.liveDataTableTile && Array.isArray(this.liveDataTableTile)) {
-          // Find the matching packet from this.liveDataChart based on id
-          const matchingLiveChart = this.liveDataTableTile.find(liveChart => liveChart.id === this.item.id);
+  //     if (this.item && this.liveDataTableTile && Array.isArray(this.liveDataTableTile)) {
+  //         // Find the matching packet from this.liveDataChart based on id
+  //         const matchingLiveChart = this.liveDataTableTile.find(liveChart => liveChart.id === this.item.id);
   
-          console.log('🔍 Matching Live Chart for ID:', this.item.id, matchingLiveChart);
+  //         console.log('🔍 Matching Live Chart for ID:', this.item.id, matchingLiveChart);
   
-          // Update highchartsOptionsJson and chartConfig only if a match is found
-          if (matchingLiveChart) {
-              this.item.tableWidget_Config = matchingLiveChart.tableWidget_Config;
-              this.item.rowData =matchingLiveChart.rowData
+  //         // Update highchartsOptionsJson and chartConfig only if a match is found
+  //         if (matchingLiveChart) {
+  //             this.item.tableWidget_Config = matchingLiveChart.tableWidget_Config;
+  //             this.item.rowData =matchingLiveChart.rowData
      
-          }
+  //         }
   
-          console.log('✅ Updated this.item: after Live', this.item);
-          this.formName = this.item.formlist
-          this.customLabel = this.item.custom_Label
-          console.log('this.customLabel checcking',this.customLabel)
-      // Parse the conditions
-      this.parsedColumns = JSON.parse(this.item.conditions);
-      console.log('this.parsedColumns checking', this.parsedColumns);
+  //         console.log('✅ Updated this.item: after Live', this.item);
+  //         this.formName = this.item.formlist
+  //         this.customLabel = this.item.custom_Label
+  //         console.log('this.customLabel checcking',this.customLabel)
+  //     // Parse the conditions
+  //     this.parsedColumns = JSON.parse(this.item.conditions);
+  //     console.log('this.parsedColumns checking', this.parsedColumns);
       
-      // Extract columnLabel values
-      const columnLabels = this.parsedColumns.map((column: { columnLabel: string }) => column.columnLabel);
+  //     // Extract columnLabel values
+  //     const columnLabels = this.parsedColumns.map((column: { columnLabel: string }) => column.columnLabel);
       
-      // Log or store the extracted column labels
-      console.log('Extracted column labels:', columnLabels);
+  //     // Log or store the extracted column labels
+  //     console.log('Extracted column labels:', columnLabels);
       
-      // Store in a variable
-      this.columnLabelsArray = columnLabels; // Example variable to hold the column labels
-      console.log('this.columnLabelsArray checking',this.columnLabelsArray)
+  //     // Store in a variable
+  //     this.columnLabelsArray = columnLabels; // Example variable to hold the column labels
+  //     console.log('this.columnLabelsArray checking',this.columnLabelsArray)
         
-      this.tabledata = this.item.tableWidget_Config; // This will contain your data
-      console.log('description check', this.tabledata);
+  //     this.tabledata = this.item.tableWidget_Config; // This will contain your data
+  //     console.log('description check', this.tabledata);
       
-      try {
-        this.tabledata = this.item.tableWidget_Config; // Source data for columns
-        console.log('description check', this.tabledata);
+  //     try {
+  //       this.tabledata = this.item.tableWidget_Config; // Source data for columns
+  //       console.log('description check', this.tabledata);
       
-        // Parse tableWidget_Config
-        this.parsedTableData = JSON.parse(this.tabledata);
-        console.log('this.parsedTableData checking', this.parsedTableData);
+  //       // Parse tableWidget_Config
+  //       this.parsedTableData = JSON.parse(this.tabledata);
+  //       console.log('this.parsedTableData checking', this.parsedTableData);
       
-        // Generate column definitions from tableWidget_Config
-        const tableWidgetColumns = this.parsedTableData.map((column: { text: string; value: string }) => ({
-          headerName: column.text || 'Default Header', // Use a default name if text is missing
-          field: column.value,
-          sortable: true,
-          filter: true,
-          resizable: true,
-        }));
+  //       // Generate column definitions from tableWidget_Config
+  //       const tableWidgetColumns = this.parsedTableData.map((column: { text: string; value: string }) => ({
+  //         headerName: column.text || 'Default Header', // Use a default name if text is missing
+  //         field: column.value,
+  //         sortable: true,
+  //         filter: true,
+  //         resizable: true,
+  //       }));
       
-        console.log('tableWidget column definitions:', tableWidgetColumns);
+  //       console.log('tableWidget column definitions:', tableWidgetColumns);
       
-        // Include additional columns from columnLabelsArray
-        const additionalColumns = this.columnLabelsArray
-          .filter((label: string) => label && label.trim() !== '') // Filter out empty labels
-          .map((label: string) => ({
-            headerName: label,
-            field: label,
-            sortable: true,
-            filter: true,
-            resizable: true,
-            cellRenderer: (params: { value: string; }) => {
-              // put the value in bold
-              return 'Value is <b>' + params.value + '</b>';
-          }
-          }));
+  //       // Include additional columns from columnLabelsArray
+  //       const additionalColumns = this.columnLabelsArray
+  //         .filter((label: string) => label && label.trim() !== '') // Filter out empty labels
+  //         .map((label: string) => ({
+  //           headerName: label,
+  //           field: label,
+  //           sortable: true,
+  //           filter: true,
+  //           resizable: true,
+  //           cellRenderer: (params: { value: string; }) => {
+  //             // put the value in bold
+  //             return 'Value is <b>' + params.value + '</b>';
+  //         }
+  //         }));
       
-        console.log('Filtered additional columns from columnLabelsArray:', additionalColumns);
+  //       console.log('Filtered additional columns from columnLabelsArray:', additionalColumns);
       
-        // Combine tableWidget columns and additional columns
-        this.columnDefs = [...tableWidgetColumns, ...additionalColumns];
-        console.log('Final column definitions:', this.columnDefs);
-        this.finalColumns = this.columnDefs
+  //       // Combine tableWidget columns and additional columns
+  //       this.columnDefs = [...tableWidgetColumns, ...additionalColumns];
+  //       console.log('Final column definitions:', this.columnDefs);
+  //       this.finalColumns = this.columnDefs
       
-        // Parse row data
-        this.rowData = JSON.parse(this.item.rowData);
-        console.log('this.rowData', this.rowData);
-      } catch (error) {
-        console.error('Error parsing table data:', error);
-      }
+  //       // Parse row data
+  //       this.rowData = JSON.parse(this.item.rowData);
+  //       console.log('this.rowData', this.rowData);
+  //     } catch (error) {
+  //       console.error('Error parsing table data:', error);
+  //     }
 
-      } else {
-          console.warn("⚠️ Either this.item is empty or this.liveDataChart is not an array.");
-      }
-  } else {
-      console.log("❌ LiveDashboard is FALSE - Keeping original item.");
+  //     } else {
+  //         console.warn("⚠️ Either this.item is empty or this.liveDataChart is not an array.");
+  //     }
+  // } else {
+  //     console.log("❌ LiveDashboard is FALSE - Keeping original item.");
+  //     this.formName = this.item.formlist
+  //     this.customLabel = this.item.custom_Label
+  //     console.log('this.customLabel checcking',this.customLabel)
+  // // Parse the conditions
+  // this.parsedColumns = JSON.parse(this.item.conditions);
+  // console.log('this.parsedColumns checking', this.parsedColumns);
+  
+  // // Extract columnLabel values
+  // const columnLabels = this.parsedColumns.map((column: { columnLabel: string }) => column.columnLabel);
+  
+  // // Log or store the extracted column labels
+  // console.log('Extracted column labels:', columnLabels);
+  
+  // // Store in a variable
+  // this.columnLabelsArray = columnLabels; // Example variable to hold the column labels
+  // console.log('this.columnLabelsArray checking',this.columnLabelsArray)
+    
+  // this.tabledata = this.item.tableWidget_Config; // This will contain your data
+  // console.log('description check', this.tabledata);
+  
+  // try {
+  //   this.tabledata = this.item.tableWidget_Config; // Source data for columns
+  //   console.log('description check', this.tabledata);
+  
+  //   // Parse tableWidget_Config
+  //   this.parsedTableData = JSON.parse(this.tabledata);
+  //   console.log('this.parsedTableData checking', this.parsedTableData);
+  
+  //   // Generate column definitions from tableWidget_Config
+  //   const tableWidgetColumns = this.parsedTableData.map((column: { text: string; value: string }) => ({
+  //     headerName: column.text || 'Default Header', // Use a default name if text is missing
+  //     field: column.value,
+  //     sortable: true,
+  //     filter: true,
+  //     resizable: true,
+  //   }));
+  
+  //   console.log('tableWidget column definitions:', tableWidgetColumns);
+  
+  //   // Include additional columns from columnLabelsArray
+  //   const additionalColumns = this.columnLabelsArray
+  //     .filter((label: string) => label && label.trim() !== '') // Filter out empty labels
+  //     .map((label: string) => ({
+  //       headerName: label,
+  //       field: label,
+  //       sortable: true,
+  //       filter: true,
+  //       resizable: true,
+  //       cellRenderer: (params: { value: string; }) => {
+  //         return params.value
+  //         // put the value in bold
+  //         // return 'Value is <b>' + params.value + '</b>';
+  //     }
+  //     }));
+  
+  //   console.log('Filtered additional columns from columnLabelsArray:', additionalColumns);
+  
+  //   // Combine tableWidget columns and additional columns
+  //   this.columnDefs = [...tableWidgetColumns, ...additionalColumns];
+  //   console.log('Final column definitions:', this.columnDefs);
+  //   this.finalColumns = this.columnDefs
+  
+  //   // Parse row data
+  //   this.rowData = JSON.parse(this.item.rowData);
+  //   console.log('this.rowData', this.rowData);
+  // } catch (error) {
+  //   console.error('Error parsing table data:', error);
+  // }
+
+  //     // Do nothing, retain the existing this.item as is
+  // }
+ 
+
+
+
+
+
+  
+    
+    // Split the description by '&&'
+    // let conditions = description.split('&&').map((cond: string) => cond.trim());
+    
+    // Iterate over each condition to extract values
+    // let extractedValues: any[] = [];
+    
+    // conditions.forEach((condition: string) => {
+    //   // Use regex to capture the value after "=="
+    //   let regex = /\$\{[^\}]+\}==(['"]?)(.+?)\1/;
+    //   let match = condition.match(regex);
+      
+    //   if (match) {
+    //     let value = match[2].trim(); // Extract the value after ==
+    //     extractedValues.push(value); // Store the extracted value
+    //   }
+    // });
+    
+    // // Assign the first extracted value to descriptionData
+    // if (extractedValues.length > 0) {
+    //   this.descriptionData = extractedValues[0];
+    //   console.log('this.descriptionData check', this.descriptionData);
+    // } else {
+    //   this.primaryValue = this.item.multi_value[0].value;
+    // }
+    
+    // // Log all extracted values
+    // console.log('Extracted Values:', extractedValues);
+    
+
+
+
+    // this.tile1Config = this.item
+
+  
+ 
+
+  
+}
+
+
+ngOnInit(){
+  console.log('item chacke',this.item.grid_details)
+  this.summaryService.lookUpData$.subscribe((data: any)=>{
+    console.log('data check>>>',data)
+let tempCharts:any=[]
+data.forEach((packet: any,matchedIndex:number) => {
+
+if(packet.grid_type == 'TableWidget'&& this.index==matchedIndex && packet.id === this.item.id){
+  tempCharts[matchedIndex] = packet
+  this.createtableWidget(packet)
+ 
+}
+});
+
+    
+    // console.log("✅ Matched Charts:", matchedCharts);
+    
+  
+    
+    
+  })
+
+
+}
+
+
+// exportToCSV(): void {
+//   this.gridApi.exportDataAsCsv();
+// }
+
+// exportToExcel(): void {
+//   this.gridApi.exportDataAsExcel();
+// }
+
+
+createtableWidget(mapWidgetData?:any){
+  if(mapWidgetData){
+    console.log('mapWidgetData check',mapWidgetData)
+    console.log("❌ LiveDashboard is FALSE - Keeping original item.");
+    this.formName = mapWidgetData.formlist
+    this.customLabel = mapWidgetData.custom_Label
+    console.log('this.customLabel checcking',this.customLabel)
+  // Parse the conditions
+  this.parsedColumns = JSON.parse(mapWidgetData.conditions);
+  console.log('this.parsedColumns checking', this.parsedColumns);
+  
+  // Extract columnLabel values
+  const columnLabels = this.parsedColumns.map((column: { columnLabel: string }) => column.columnLabel);
+  
+  // Log or store the extracted column labels
+  console.log('Extracted column labels:', columnLabels);
+  
+  // Store in a variable
+  this.columnLabelsArray = columnLabels; // Example variable to hold the column labels
+  console.log('this.columnLabelsArray checking',this.columnLabelsArray)
+  
+  this.tabledata = mapWidgetData.tableWidget_Config; // This will contain your data
+  console.log('description check', this.tabledata);
+  
+  try {
+  this.tabledata = mapWidgetData.tableWidget_Config; // Source data for columns
+  console.log('description check', this.tabledata);
+  
+  // Parse tableWidget_Config
+  this.parsedTableData = JSON.parse(this.tabledata);
+  console.log('this.parsedTableData checking', this.parsedTableData);
+  
+  // Generate column definitions from tableWidget_Config
+  const tableWidgetColumns = this.parsedTableData.map((column: { text: string; value: string }) => ({
+    headerName: column.text || 'Default Header', // Use a default name if text is missing
+    field: column.value,
+    sortable: true,
+    filter: true,
+    resizable: true,
+  }));
+  
+  console.log('tableWidget column definitions:', tableWidgetColumns);
+  
+  // Include additional columns from columnLabelsArray
+  const additionalColumns = this.columnLabelsArray
+    .filter((label: string) => label && label.trim() !== '') // Filter out empty labels
+    .map((label: string) => ({
+      headerName: label,
+      field: label,
+      sortable: true,
+      filter: true,
+      resizable: true,
+      cellRenderer: (params: { value: string; }) => {
+        return params.value
+        // put the value in bold
+        // return 'Value is <b>' + params.value + '</b>';
+    }
+    }));
+  
+  console.log('Filtered additional columns from columnLabelsArray:', additionalColumns);
+  
+  // Combine tableWidget columns and additional columns
+  this.columnDefs = [...tableWidgetColumns, ...additionalColumns];
+  console.log('Final column definitions:', this.columnDefs);
+  this.finalColumns = this.columnDefs
+  
+  // Parse row data
+  this.rowData = JSON.parse(mapWidgetData.rowData);
+  console.log('this.rowData', this.rowData);
+  } catch (error) {
+  console.error('Error parsing table data:', error);
+  }
+  }else{
+    console.log("❌ LiveDashboard is FALSE - Keeping original item.");
       this.formName = this.item.formlist
       this.customLabel = this.item.custom_Label
       console.log('this.customLabel checcking',this.customLabel)
   // Parse the conditions
   this.parsedColumns = JSON.parse(this.item.conditions);
-  console.log('this.parsedColumns checking', this.parsedColumns);
+  console.log('this.parsedColumns checking else', this.parsedColumns);
   
   // Extract columnLabel values
   const columnLabels = this.parsedColumns.map((column: { columnLabel: string }) => column.columnLabel);
@@ -254,64 +479,10 @@ export class TableWidgetUiComponent implements OnInit{
     console.error('Error parsing table data:', error);
   }
 
-      // Do nothing, retain the existing this.item as is
   }
- 
 
 
-
-
-
-  
-    
-    // Split the description by '&&'
-    // let conditions = description.split('&&').map((cond: string) => cond.trim());
-    
-    // Iterate over each condition to extract values
-    // let extractedValues: any[] = [];
-    
-    // conditions.forEach((condition: string) => {
-    //   // Use regex to capture the value after "=="
-    //   let regex = /\$\{[^\}]+\}==(['"]?)(.+?)\1/;
-    //   let match = condition.match(regex);
-      
-    //   if (match) {
-    //     let value = match[2].trim(); // Extract the value after ==
-    //     extractedValues.push(value); // Store the extracted value
-    //   }
-    // });
-    
-    // // Assign the first extracted value to descriptionData
-    // if (extractedValues.length > 0) {
-    //   this.descriptionData = extractedValues[0];
-    //   console.log('this.descriptionData check', this.descriptionData);
-    // } else {
-    //   this.primaryValue = this.item.multi_value[0].value;
-    // }
-    
-    // // Log all extracted values
-    // console.log('Extracted Values:', extractedValues);
-    
-
-
-
-    // this.tile1Config = this.item
-
-  
- 
-
-  
 }
-
-
-// exportToCSV(): void {
-//   this.gridApi.exportDataAsCsv();
-// }
-
-// exportToExcel(): void {
-//   this.gridApi.exportDataAsExcel();
-// }
-
 onGridReady(params: any): void {
   this.gridApi = params.api; // Initialize Grid API
   this.gridColumnApi = params.columnApi; // Initialize Column API
@@ -336,7 +507,7 @@ get shouldShowButton(): boolean {
 }
 
   constructor(
-   private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer
+   private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private summaryService:SummaryEngineService
    
   ){}
 
@@ -637,6 +808,15 @@ get shouldShowButton(): boolean {
   
     // Return the array of column names
     return columnDefs;
+  }
+
+
+  ngAfterViewInit(){
+    setTimeout(() => {
+      this.createtableWidget()
+    }, 500);
+  
+
   }
   
 

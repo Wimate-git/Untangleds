@@ -59,6 +59,7 @@ import { DomSanitizer, SafeResourceUrl, Title } from '@angular/platform-browser'
 import { MultiTableConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/multi-table-config/multi-table-config.component';
 import { AuditTrailService } from '../services/auditTrail.service';
 import { HtmlTileConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/html-tile-config/html-tile-config.component';
+import { SummaryEngineService } from './summary-engine.service';
 
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
@@ -257,7 +258,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   filterTileHeight:any []=[];
   filterTileWidth:any []=[];
 
-  userPermissions: boolean | undefined;
+  userPermissions: boolean ;
   permissionIdCheck: any;
   permissionsMetaData: any;
   userPermissionsRead: any;
@@ -791,7 +792,15 @@ console.log('this.readFilterEquation checking',this.readFilterEquation)
             if (constLiveData?.Processed_Data?.metadata?.grid_details) {
               const processedData = constLiveData.Processed_Data.metadata.grid_details;
               console.log('processedData check', processedData);
-              this.liveDashboardDataFormat(processedData);
+              if (this.all_Packet_store?.LiveDashboard === true ) {
+    
+                console.log('this.all_Packet_store?.LiveDashboard from lambda',this.all_Packet_store?.LiveDashboard)
+    this.liveDashboardDataFormat(processedData);
+}else{
+
+}
+
+              // this.liveDashboardDataFormat(processedData);
             } else {
               console.error('Processed_Data.metadata.grid_details not found in response');
               Swal.fire({
@@ -868,6 +877,7 @@ console.log('this.readFilterEquation checking',this.readFilterEquation)
 }
 liveFilterDataProcess(liveFilterData:any){
   console.log('liveFilterData',liveFilterData)
+  this.summaryService.updatelookUpData(liveFilterData)
   this.liveDashboardDataFormat(liveFilterData)
 
 }
@@ -1961,7 +1971,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
   constructor(private summaryConfiguration: SharedService, private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector, private auditTrail: AuditTrailService,
     private spinner: NgxSpinnerService, private zone: NgZone,private http: HttpClient,  private sanitizer: DomSanitizer, // Inject DomSanitizer
-    private titleService: Title
+    private titleService: Title, private summaryService: SummaryEngineService
   ) {
     this.resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
@@ -2048,6 +2058,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
       this.editButtonCheck = false
     }
     this.loadData()
+  
     this.addFromService()
 
     console.log("this.lookup_data_summary1", this.lookup_data_summary1)
@@ -2279,7 +2290,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     this.route.paramMap.subscribe(params => {
       this.routeId = params.get('id');
       if (this.routeId) {
-        // this.openModalHelpher(this.routeId);
+        this.openModalHelpher(this.routeId);
         this.editButtonCheck = true
 
       }
@@ -4581,6 +4592,7 @@ console.log('selectedTab checking',this.selectedTab)
         // Check the permission ID before applying the filter
         if (this.userPermission === "All") {
           console.log("Permission is 'All'. Displaying all dashboards...");
+
           // No filtering needed, show all data
         } else {
           // If permissionIdLocal is not 'All', then apply permissions-based filtering
@@ -6822,6 +6834,7 @@ refreshFunction(){
               this.loadData();
             } else if(readPermission_Id=="All"){
              this.userPermission = readPermission_Id
+             console.log('this.userPermission checking',this.userPermission)
     this.summaryDashboardUpdate= true
 
     // this.fetchPermissionIdMain(1, readPermission_Id);
