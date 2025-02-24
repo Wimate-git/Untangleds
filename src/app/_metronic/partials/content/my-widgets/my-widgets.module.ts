@@ -68,6 +68,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { DataTableDynamicTileComponent } from './data-table-dynamic-tile/data-table-dynamic-tile.component';
 import { HtmlTileConfigComponent } from './html-tile-config/html-tile-config.component';
 import { HtmlTileUiComponent } from './html-tile-ui/html-tile-ui.component';
+import { ImageConfigComponent } from './image-config/image-config.component';
+import { ImageUiComponent } from './image-ui/image-ui.component';
 
 
 
@@ -112,7 +114,9 @@ import { HtmlTileUiComponent } from './html-tile-ui/html-tile-ui.component';
     DataTableTile1Component,
     DataTableDynamicTileComponent,
     HtmlTileConfigComponent,
-    HtmlTileUiComponent
+    HtmlTileUiComponent,
+    ImageConfigComponent,
+    ImageUiComponent
 
 
 
@@ -196,7 +200,10 @@ import { HtmlTileUiComponent } from './html-tile-ui/html-tile-ui.component';
     DataTableTile1Component,
     DataTableDynamicTileComponent,
     HtmlTileConfigComponent,
-    HtmlTileUiComponent
+    HtmlTileUiComponent,
+    ImageConfigComponent,
+    ImageUiComponent
+    
   
 
     

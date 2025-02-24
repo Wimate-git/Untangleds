@@ -1080,8 +1080,8 @@ openFilterModal(tile: any, index: number) {
     const filterValues = storedFilterData ? JSON.parse(storedFilterData) : {};
     this.createChart.patchValue({
       fontColor: filterValues.fontColor || tile.fontColor || '#000000',
-      add_fields: addFieldsEnabled,
-      noOfParams: tile.noOfParams, // Directly assign the value
+      // add_fields: addFieldsEnabled,
+      // noOfParams: tile.noOfParams, // Directly assign the value
       toggleCheck: filterValues.toggleCheck ?? tile.toggleCheck,
       custom_Label: filterValues.custom_Label || tile.custom_Label,
       themeColor: filterValues.themeColor || tile.themeColor || '',

@@ -284,6 +284,17 @@
                       ></app-map-ui >
                  
                     </div>
+                    <div  *ngIf="item.grid_type === 'logo'">
+                      <h3 style="text-align: center;" class="mt-2"> {{item.chart_title}}</h3>
+                      <app-image-ui 
+                      [item]="item" 
+                      [item]="item" [index]="i" (customEvent)="helperTile($event,imageModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"   [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen">
+                    </app-image-ui>
+                       
+                          </div>
+
+            
                     <div *ngIf="item.grid_type === 'HTMLtile'">
                    
                       <app-html-tile-ui 
@@ -292,6 +303,17 @@
                         [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen">
                       </app-html-tile-ui>
                     </div>
+                    <!-- <div *ngIf="item.grid_type === 'HTMLtile'"> -->
+                   
+                      <!-- <app-html-tile-ui 
+                        [item]="item" 
+                        [item]="item" [index]="i" (customEvent)="helperTile($event,imageModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"   [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                        [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen">
+                      </app-html-tile-ui>
+                    </div>
+
+
+                    imageModal -->
   
              
                     <!-- <div class="grid-item" tabindex="0"  (click)="openKPIModal6(KPIModal6,'')" >
@@ -1066,7 +1088,7 @@
       </div>
       <!-- <button (click)="createChartGauge()">click me</button> -->
   
-      <div *ngIf="showGrid && selectedTile !== 'Title' &&  selectedTile !== 'Chart' &&  selectedTile !== 'DynamicTile' && selectedTile !== 'FilterTile' && selectedTile !== 'TableTile' && selectedTile !== 'MapWidget'&& selectedTile !== 'MultiTableWidget' &&  selectedTile !=='Html Tile' " class="grid-container">
+      <div *ngIf="showGrid && selectedTile !== 'Title' &&  selectedTile !== 'Chart' &&  selectedTile !== 'DynamicTile' && selectedTile !== 'FilterTile' && selectedTile !== 'TableTile' && selectedTile !== 'MapWidget'&& selectedTile !== 'MultiTableWidget' &&  selectedTile !=='Html Tile' && selectedTile !=='ImageTile' " class="grid-container">
         <div class="grid-item highlight" tabindex="0" (click)="openKPIModal(KPIModal,modal);modal.dismiss"  style="background: linear-gradient(to right, #ff7e5f, #feb47b); padding: 20px; border-radius: 8px; color: white;">
           <div>Label</div>
           <div class="value" tabindex="0">Value</div>
@@ -1437,6 +1459,50 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   
         </div>
       </div>
+
+
+      <div *ngIf="showGrid" class="container" style="margin-top: 10px;">
+        <div class="row">
+          <div class="col-md-12 d-flex justify-content-center align-items-center">
+          <!-- Grid item spanning full width -->
+      
+            <div  *ngIf="showimageGrid" 
+       >
+
+<button
+class="grid-item col bg-light-primary px-6 py-8 rounded-2 mb-7"
+style="width: 350px; height: 250px; display: flex; justify-content: center; align-items: center; border: 0;"
+>
+<div
+  class="grid-item highlight"
+  tabindex="0"
+  (click)="openimageModal(imageModal, modal)" 
+  style="
+    width: 300px;
+    height: 200px;
+    background: linear-gradient(to right, #373B44, #4286F4);
+    padding: 20px;
+    border-radius: 8px;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  "
+>
+  <div class="value fw-bold" tabindex="0">Image Widget</div>
+</div>
+</button>
+  
+</div>
+      
+      
+      
+          </div>
+  
+        </div>
+      </div>
+
+
 
 
 
@@ -2061,6 +2127,12 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
     [modal]="modal" [dashboard]="dashboard" 
     (dashboardChange)="getGridDetails($event)" (update_PowerBoard_config)="updateSummaryHelper2($event)" [modal]="modal" [all_Packet_store]="all_Packet_store" (send_all_Packet_store)="allPacketStoreReceiver($event)"[isGirdMoved]="isGirdMoved"
     ></app-html-tile-config>
+  </ng-template>
+  <ng-template #imageModal let-modal>
+    <app-image-config
+    [modal]="modal" [dashboard]="dashboard" 
+    (dashboardChange)="getGridDetails($event)" (update_PowerBoard_config)="updateSummaryHelper2($event)" [modal]="modal" [all_Packet_store]="all_Packet_store" (send_all_Packet_store)="allPacketStoreReceiver($event)"[isGirdMoved]="isGirdMoved"
+    ></app-image-config>
   </ng-template>
   </div>
 <!--   

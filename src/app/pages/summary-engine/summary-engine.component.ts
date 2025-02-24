@@ -280,6 +280,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   liveDataTableTile: any;
   helpherObjCalender: any;
   showHTMLtileGrid: boolean;
+  showimageGrid:boolean
   checkLiveDashboard: any;
   liveDataMapTile: any;
   summaryDashboardView: any;
@@ -2739,7 +2740,9 @@ processFetchedData(result: any): void {
     {value:'TableTile',label:'TableTile'},
     {value:'MapWidget',label:'MapWidget'},
     {value:'MultiTableWidget',label:'MultiTableWidget'},
-    {value:'Html Tile',label:'Html Tile'}
+    {value:'Html Tile',label:'Html Tile'},
+    {value:'ImageTile',label:'ImageTile'},
+    
     
     
 
@@ -2759,7 +2762,7 @@ processFetchedData(result: any): void {
 
 
       // Update visibility based on the selected tile
-      this.showGrid = this.selectedTile === 'Tiles' || this.selectedTile === 'Title' || this.selectedTile === 'Chart'|| this.selectedTile === 'DynamicTile' || this.selectedTile === 'FilterTile' || this.selectedTile === 'TableTile' || this.selectedTile === 'MapWidget' || this.selectedTile === 'MultiTableWidget' ||this.selectedTile ==='Html Tile';
+      this.showGrid = this.selectedTile === 'Tiles' || this.selectedTile === 'Title' || this.selectedTile === 'Chart'|| this.selectedTile === 'DynamicTile' || this.selectedTile === 'FilterTile' || this.selectedTile === 'TableTile' || this.selectedTile === 'MapWidget' || this.selectedTile === 'MultiTableWidget' ||this.selectedTile ==='Html Tile' ||this.selectedTile ==='ImageTile';
 
       
       this.showTitleGrid = this.selectedTile === 'Title'; // Show specific grid for Title
@@ -2770,7 +2773,8 @@ processFetchedData(result: any): void {
                     this.showMapGrid =  this.selectedTile === 'MapWidget'
                               this.showMapGrid =  this.selectedTile === 'MapWidget'
                               this.showMultiTableGrid = this.selectedTile === 'MultiTableWidget'
-                              this.showHTMLtileGrid = this.selectedTile === 'Html Tile'
+                              this.showHTMLtileGrid = this.selectedTile === 'Html Tile',
+                              this.showimageGrid = this.selectedTile === 'ImageTile'
 
 
             
@@ -6712,6 +6716,11 @@ refreshFunction(){
     modal.dismiss();
 
   }
+  openimageModal(htmlTileModal:TemplateRef<any>,modal:any){
+    this.modalService.open(htmlTileModal, {size: 'xl' });
+    modal.dismiss();
+
+  }
 
 
   
@@ -6959,7 +6968,10 @@ refreshFunction(){
   }
 
   addModal() {
-   
+   this.FilterTileConfigComponent.initializeTileFields()
+   this.FilterTileConfigComponent.isEditMode =false;
+  //  this.FilterTileConfigComponent.theme.selected
+   this.cdr.detectChanges()
 
     // Get the modal element
     const modalElement = document.getElementById('filterDashModal');

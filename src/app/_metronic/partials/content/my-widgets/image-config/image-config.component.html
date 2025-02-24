@@ -1,0 +1,82 @@
+<!-- <ng-template #KPIModal let-modal>
+
+    </ng-template> -->
+
+
+    <div class="modal-header">
+        <h4 class="modal-title">Logo Widget</h4>
+        <button type="button" class="btn-close" aria-label="Close"   (click)="modal.dismiss()"></button>
+      </div>
+      
+      <!-- Modal body with Tabs -->
+      <div class="fv-row" [formGroup]="ImageFormGroup" *ngIf="ImageFormGroup">
+        <div class="modal-body">
+          <div class="card-body pt-0">
+      
+            <!-- Tab Navigation -->
+            <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap" id="myTab_settings" role="tablist">
+              <div class="col-2" role="Data">
+                <li class="nav-item">
+                  <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab" aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Data</a>
+                </li>
+              </div>
+          
+            </ul>
+      
+            <!-- Tab Content -->
+            <div class="tab-content mt-3" id="modalTabsContent">
+              <!-- General Tab Content -->
+              <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'dataTab'}" id="dataTab" role="tabpanel" aria-labelledby="home-tab">
+                <div class="row g-3">
+                  <!-- Form Fields -->
+                  <div class="col-md-12 mb-3">
+                    <label for="description" class="col-createChart-label fw-bold fs-6">Image URL</label>
+                    <textarea
+                      id="description"
+                      formControlName="imageUrl"
+                      class="form-control"
+                      rows="15"
+                      placeholder="Enter description"
+                    
+                    >
+                   
+                    </textarea>
+                  </div>
+         
+
+
+                </div>
+              </div>
+        
+            </div>
+              
+  
+            
+      
+          </div>
+      
+          <div class="modal-footer" style="margin-top: 20px;">
+            <button type="button" class="btn btn-secondary" (click)="modal.dismiss()"  >Close</button>
+            <button 
+            type="button" 
+            class="btn btn-primary"  
+            (click)="validateAndSubmit()" 
+            *ngIf="!isEditMode"
+          >
+            Save
+          </button>
+          
+      <button 
+          type="button" 
+          class="btn btn-warning" 
+       
+          (click)="updateTile('logo');modal.dismiss() " 
+          *ngIf="isEditMode " 
+         
+          [disabled]="ImageFormGroup?.invalid">
+          Update
+        </button>
+          </div>
+        </div>
+      </div>
+ 
