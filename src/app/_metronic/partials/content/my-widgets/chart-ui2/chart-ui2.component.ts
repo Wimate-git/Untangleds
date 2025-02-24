@@ -112,7 +112,7 @@ export class ChartUi2Component implements OnInit{
       
       console.log('this.gridOptions check', this.gridOptions);
      
-
+      this.createLineChart()
     
   }
   constructor(

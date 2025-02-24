@@ -126,7 +126,7 @@ export class ChartUi1Component implements OnChanges {
       console.log('this.gridOptions check', this.gridOptions);
 
       
-   
+   this.createPieChart()
       this.tile1Config = this.item
     
   }
