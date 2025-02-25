@@ -1162,6 +1162,7 @@ showDrillDownData(dynamicDrill:any,modalref:any){
   }
   this.modalService.open(modalref, { size: 'xl' });
   console.log('pointData for Tile',pointData)
+  console.log('this.permissionIdRequest check drilldown',this.permissionIdRequest)
 
 
         // Define the API Gateway URL
@@ -1174,7 +1175,11 @@ showDrillDownData(dynamicDrill:any,modalref:any){
             routeId: this.routeId,
             widgetId:this.storeDrillDown.id,
             TileData:pointData,
-            MsgType:'DrillDown'
+            MsgType:'DrillDown',
+            permissionId:this.permissionIdRequest,
+            permissionList:this.readFilterEquation || [],
+            userName:this.userdetails
+
           }),
         };
       
@@ -6970,6 +6975,7 @@ refreshFunction(){
   addModal() {
    this.FilterTileConfigComponent.initializeTileFields()
    this.FilterTileConfigComponent.isEditMode =false;
+  //  this.FilterTileConfigComponent.isEditMode =false;
   //  this.FilterTileConfigComponent.theme.selected
    this.cdr.detectChanges()
 

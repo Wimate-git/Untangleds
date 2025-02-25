@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engine.service';
 
 @Component({
   selector: 'app-filter-tile-ui',
@@ -36,11 +37,40 @@ export class FilterTileUiComponent implements OnInit{
   @Input() hidingLink:any;
   parsedFilterTileConfig: any;
   combinedArray: any;
+  appliedFilter = false;
   formattedFilterConditions: string[];
-  ngOnInit(): void {
+  ngOnInit(){
+    console.log('item chacke',this.item.grid_details)
+    this.summaryService.lookUpData$.subscribe((data: any) => {
+      console.log('data check>>> filter ui', data);
+  
+      // If data is present, consider the filter applied
+      this.appliedFilter = data && data.length > 0;
+  
+      // Trigger change detection
+      // this.cdRef.detectChanges();
+    });
 
     
+
   }
+
+  getCustomLabel(): string {
+    let label = this.item.custom_Label || '';
+  
+    if (this.shouldApplyMessage()) {
+      label += ' - Applied';
+    } else {
+      label += ' - All';
+    }
+  
+    return label;
+  }
+  
+  shouldApplyMessage(): boolean {
+    return this.appliedFilter;
+  }
+  
 
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -103,23 +133,8 @@ console.log('this.formattedFilterConditions check',this.formattedFilterCondition
   
 }
 
-shouldApplyMessage(): boolean {
-  if (!this.parsedFilterTileConfig || !Array.isArray(this.parsedFilterTileConfig)) {
-    return false;
-  }
 
-  for (const subArray of this.parsedFilterTileConfig) {
-    if (Array.isArray(subArray)) {
-      for (const item of subArray) {
-        if (item.filterValue && item.filterValue.trim() !== '') {
-          return true; // At least one valid filter applied
-        }
-      }
-    }
-  }
 
-  return false;
-}
 
 shouldShowNotAppliedMessage(): boolean {
   if (this.item.dateType === 'any') {
@@ -151,7 +166,7 @@ get shouldShowButton(): boolean {
 }
 
   constructor(
-   private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer
+   private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private summaryService:SummaryEngineService
    
   ){}
 

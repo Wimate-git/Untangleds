@@ -77,7 +77,7 @@ data.forEach((packet: any,matchedIndex:number) => {
 
   
   }
-  createMapWidget(mapData:any){
+  createMapWidget(mapData?:any){
     if(mapData){
 
       this.parsedData = JSON.parse(mapData.MapConfig);
@@ -138,7 +138,7 @@ data.forEach((packet: any,matchedIndex:number) => {
         console.error('Parsed data is not an array.');
       }
     }else{
-      
+      console.log('this.item map widget data',this.item)
       this.parsedData = JSON.parse(this.item.MapConfig);
       console.log('Parsed data check:', this.parsedData);
       
@@ -212,6 +212,7 @@ data.forEach((packet: any,matchedIndex:number) => {
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
     console.log('liveDataMapTile checking',this.liveDataMapTile)
+    console.log('this.item',this.item)
  
   
 
@@ -273,6 +274,7 @@ data.forEach((packet: any,matchedIndex:number) => {
     }
   }
 ngAfterViewInit(): void {
+  this.createMapWidget()
   // this.initializeMapData();
 }
 

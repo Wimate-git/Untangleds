@@ -124,6 +124,7 @@ makeTrueCheck:any = false
   ConditionsFormat: any;
   storeliveFilterData: any;
   localStorageKey = 'filterConditions';
+  toggleCheck: boolean;
 
 
  
@@ -149,15 +150,15 @@ makeTrueCheck:any = false
 
     this.dynamicData()
     this.dashboardIds(1)
-    this.createChart.get('toggleCheck')?.valueChanges.subscribe((isChecked) => {
-      if (isChecked) {
-        this.createChart.get('dashboardIds')?.enable();
-        this.createChart.get('selectType')?.enable();
-      } else {
-        this.createChart.get('dashboardIds')?.disable();
-        this.createChart.get('selectType')?.disable();
-      }
-    });
+    // this.createChart.get('toggleCheck')?.valueChanges.subscribe((isChecked) => {
+    //   if (isChecked) {
+    //     this.createChart.get('dashboardIds')?.enable();
+    //     this.createChart.get('selectType')?.enable();
+    //   } else {
+    //     this.createChart.get('dashboardIds')?.disable();
+    //     this.createChart.get('selectType')?.disable();
+    //   }
+    // });
     this.checkData()
    
   
@@ -169,6 +170,16 @@ makeTrueCheck:any = false
     this.createChart.get('dateType')?.valueChanges.subscribe(value => {
       this.onDateTypeChange(value);
     });
+    this.createChart = this.fb.group({
+      add_fields: [this.isEditMode ? true : false], // Enabled by default in edit mode
+      noOfParams: [0],
+      all_fields: this.fb.array([]), // Initialize empty array
+    });
+  
+
+
+
+    
 
 
 // this.fetchDynamic(this.formValueSave)
@@ -413,7 +424,7 @@ makeTrueCheck:any = false
       startDate:[''],
       endDate:[''],
       singleDate:[''],
-      dateType:['', Validators.required],
+      dateType:['any', Validators.required],
     
       // themeColor: ['#000000', Validators.required],
   
@@ -514,8 +525,10 @@ makeTrueCheck:any = false
   //   this.noOfParams = noOfParams;
   // }
   async addControls(event: any, _type: string, count: number, formValue: any): Promise<void> {
-    const isChecked = event.target.checked;
-    this.createChart.get('add_fields')?.setValue(isChecked);
+
+    console.log('i am triggered',event)
+    // const isChecked = event.target.checked;
+    // this.createChart.get('add_fields')?.setValue(isChecked);
     console.log('event checking for filter',event)
     console.log('checking form value',this.formlistValues)
     console.log('formValue checking', formValue);
@@ -1059,12 +1072,40 @@ themes = [
 ];
 
 openFilterModal(tile: any, index: number) {
+
   console.log('Tile checking data from openFilterModal', tile);
   console.log('this.formlistValues check', this.formlistValues);
 
   const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14;
   const storedToggle = localStorage.getItem('dashboardFilter');
   const addFieldsEnabled = storedToggle ? JSON.parse(storedToggle) : tile.addFieldsEnabled;
+
+
+  // if (this.isEditMode) {
+  //   // 1. Trigger `addControls` immediately when entering edit mode
+  //   setTimeout(() => {
+  //     this.addControls(
+  //       { target: { checked: true } }, // Fake event to simulate a checkbox event
+  //       'html',
+  //       this.formlistValues.length,
+  //       this.formlistValues
+  //     );
+  //   });
+
+  //   // 2. Listen for checkbox value changes and trigger `addControls`
+  //   this.createChart.get('add_fields')?.valueChanges.subscribe((isChecked) => {
+  //     this.addControls(
+  //       { target: { checked: isChecked } }, // Fake event to simulate a real event
+  //       'html',
+  //       this.formlistValues.length,
+  //       this.formlistValues
+  //     );
+  //   });
+  // }
+  this.createChart.patchValue({
+    add_fields:true
+  });
+ this.addControls({ target: { checked: true } }, 'html', this.formlistValues.length, this.formlistValues)
 
   if (tile) {
     console.log('tile object checking', tile);
@@ -1080,7 +1121,7 @@ openFilterModal(tile: any, index: number) {
     const filterValues = storedFilterData ? JSON.parse(storedFilterData) : {};
     this.createChart.patchValue({
       fontColor: filterValues.fontColor || tile.fontColor || '#000000',
-      // add_fields: addFieldsEnabled,
+    
       // noOfParams: tile.noOfParams, // Directly assign the value
       toggleCheck: filterValues.toggleCheck ?? tile.toggleCheck,
       custom_Label: filterValues.custom_Label || tile.custom_Label,

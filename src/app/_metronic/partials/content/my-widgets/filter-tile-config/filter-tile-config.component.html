@@ -20,28 +20,36 @@ type="square-jelly-box"
   <h4 class=" col-md-4 modal-title mb-0">Filter </h4>
 
   <!-- Form Section -->
-  <div class="container-fluid p-0" *ngIf="createChart">
-    <div [formGroup]="createChart" class="row align-items-center">
-      <!-- Toggle Switch Section -->
-      <div class="col-lg-6 col-md-8 col-sm-12 mt-2">
-        <div class="d-flex align-items-center">
-          <label for="toggleCheck" class="fw-bold fs-6 required me-2">
-            Enable Dashboard Filter
-          </label>
-          <div class="form-check form-switch">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              name="add_fields"
-              formControlName="add_fields"
-              id="toggleCheck"
-              (change)="addControls($event, 'html', formlistValues.length, formlistValues)"
-            >
-          </div>
+<div class="container-fluid p-0" *ngIf="createChart && isEditMode">
+  <div [formGroup]="createChart" class="row align-items-center">
+    <!-- Toggle Switch Section -->
+    <div class="col-lg-6 col-md-8 col-sm-12 mt-2">
+      <div class="d-flex align-items-center">
+        <label for="toggleCheck" class="fw-bold fs-6 required me-2">
+          Enable Dashboard Filter
+        </label>
+        <div class="form-check form-switch">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            name="add_fields"
+            formControlName="add_fields"
+            id="toggleCheck"
+            [disabled]="!isEditMode"
+            (change)="addControls($event, 'html', formlistValues.length, formlistValues)"
+          >
         </div>
       </div>
     </div>
   </div>
+</div>
+
+  
+  
+  
+  
+  
+  
   
 
   <!-- Close Button -->
@@ -66,6 +74,7 @@ type="square-jelly-box"
                 class="form-select form-select-solid form-select-lg"
                 aria-label="Select Date Type">
                 <option [value]="null" [selected]="true" disabled>Select Date Type</option>
+                 <option value="any" [selected]="true">any</option>
                 <option value="is">is</option>
                 <option value=">=">&gt;=</option>
                 <option value="<=">&lt;=</option>
@@ -83,7 +92,7 @@ type="square-jelly-box"
                 <option value="this month">this month</option>
                 <option value="last month">last month</option>
                 <option value="this year">this year</option>
-                <option value="any">any</option>
+       
                 <option value="latest 10">latest 10</option>
               </select>
             </div>
