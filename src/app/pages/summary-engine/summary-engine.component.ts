@@ -2197,7 +2197,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
 
 
   async ngOnInit() {
-    this.spinner.show('dataProcess')
+   
     this.route.data.subscribe(data => {
       this.titleService.setTitle(data['title']); // Set tab title dynamically
     });
@@ -2305,10 +2305,42 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
    
 
     // Load saved layout
-    this.loadGridLayout();
+    // this.loadGridLayout();
     // this.addJsonValidation();
-    this.showTable()
+    // this.showTable()
     this.addFromService()
+
+    this.route.paramMap.subscribe(params => {
+      this.routeId = params.get('id');
+      if (this.routeId) {
+        this.openModalHelpher(this.routeId)
+    .then((data) => {
+    console.log('✅ this.all_Packet_store permissions:', data); // ✅ Now you will get the correct data
+    const livedatacheck = data
+    console.log('livedatacheck',livedatacheck)
+    this.checkLiveDashboard = livedatacheck.LiveDashboard
+    console.log('this.checkLiveDashboard check',this.checkLiveDashboard)
+    if(this.checkLiveDashboard==true){
+    this.reloadPage("from_ts") 
+        
+    
+    }else{
+      this.spinner.hide('dataProcess')
+    }
+    
+    })
+    .catch((error) => {
+    console.error('❌ Error fetching data:', error);
+    });
+        this.editButtonCheck = true
+    
+      }
+    
+      //console.log(this.routeId)
+      // Use this.itemId to fetch and display item details
+    });
+
+ 
 
 
     const savedMode = localStorage.getItem('editModeState');
@@ -2353,7 +2385,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     //   localStorage.removeItem('isGirdMoved'); // Clean up storage
     // }
 
-  
+
     const savedGridMoved = localStorage.getItem('isGirdMoved');
     this.isGirdMoved = savedGridMoved ? JSON.parse(savedGridMoved) : false;
   // Retrieve `lastSavedTime` if needed
@@ -2378,6 +2410,7 @@ document.removeEventListener('keydown', this.handleKeyDown);
 
 // console.log('check live',this.checkLiveDashboard )
 // this.reloadPage()
+
 
   }
   openQueryParams(paramsRead:any){
@@ -2487,25 +2520,25 @@ async fetchPermissionIdMain(clientID: number, p1Value: string) {
     // console.log('this.routeId permissions', this.routeId);
     
     console.log('this.routeId permissions check', this.routeId);
-    this.openModalHelpher(this.routeId)
-.then((data) => {
-console.log('✅ this.all_Packet_store permissions:', data); // ✅ Now you will get the correct data
-const livedatacheck = data
-console.log('livedatacheck',livedatacheck)
-this.checkLiveDashboard = livedatacheck.LiveDashboard
-console.log('this.checkLiveDashboard check',this.checkLiveDashboard)
-if(this.checkLiveDashboard==true){
-this.reloadPage("from_ts") 
+//     this.openModalHelpher(this.routeId)
+// .then((data) => {
+// console.log('✅ this.all_Packet_store permissions:', data); // ✅ Now you will get the correct data
+// const livedatacheck = data
+// console.log('livedatacheck',livedatacheck)
+// this.checkLiveDashboard = livedatacheck.LiveDashboard
+// console.log('this.checkLiveDashboard check',this.checkLiveDashboard)
+// if(this.checkLiveDashboard==true){
+// this.reloadPage("from_ts") 
     
 
-}else{
-  this.spinner.hide('dataProcess')
-}
+// }else{
+//   this.spinner.hide('dataProcess')
+// }
 
-})
-.catch((error) => {
-console.error('❌ Error fetching data:', error);
-});
+// })
+// .catch((error) => {
+// console.error('❌ Error fetching data:', error);
+// });
 
       this.summaryPermission = this.parsedPermission.summaryList;
       console.log('this.summaryPermission check', this.summaryPermission);
@@ -3033,7 +3066,7 @@ setTimeout(() => {
     { color: "linear-gradient(to right, #fc5c7d, #6a82fb)", selected: false }  // Pink to Blue
   ];
 
-  openModalHelpher(getValue: any) : Promise<any> {
+  async openModalHelpher(getValue: any) : Promise<any> {
     console.log("Data from lookup:", getValue);
     return new Promise((resolve, reject) => {
 
@@ -6834,35 +6867,12 @@ refreshFunction(){
             if (readPermission_Id !== "All") {
               // this.permissionIdCheck = this.metadataObject.permission_ID; // Store the permission ID
               console.log('Stored permission ID:', readPermission_Id);
-              this.route.paramMap.subscribe(params => {
-                this.routeId = params.get('id');
-                if (this.routeId) {
-                  this.openModalHelpher(this.routeId);
-                  this.editButtonCheck = true
-          
-                }
-          
-                //console.log(this.routeId)
-                // Use this.itemId to fetch and display item details
-              });
               // this.fetchPermissionIdMain(1, readPermission_Id);
               this.loadData();
             } else if(readPermission_Id=="All"){
-              this.route.paramMap.subscribe(params => {
-                this.routeId = params.get('id');
-                if (this.routeId) {
-                  this.openModalHelpher(this.routeId);
-                  this.editButtonCheck = true
-          
-                }
-          
-                //console.log(this.routeId)
-                // Use this.itemId to fetch and display item details
-              });
              this.userPermission = readPermission_Id
              console.log('this.userPermission checking',this.userPermission)
     this.summaryDashboardUpdate= true
-    
 
     // this.fetchPermissionIdMain(1, readPermission_Id);
              this.loadData();
