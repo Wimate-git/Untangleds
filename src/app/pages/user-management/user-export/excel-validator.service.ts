@@ -167,6 +167,14 @@ export class ExcelValidatorService {
         return { isValid: true };
       }
     },
+    'Average Labour Cost': {
+      required: false,
+      validate: (value: any) => {
+        if (!value) return { isValid: true };
+        if (this.isString(value)) return { isValid: false, error: 'Must be Number' };
+        return { isValid: true };
+      }
+    },
     'SMS': {
       required: false,
       validate: (value: any) => {

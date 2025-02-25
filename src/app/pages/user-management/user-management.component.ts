@@ -484,6 +484,7 @@ rdtListWorkAround :any =[{
       'key': [''],
       'location_object': [''],
       'default_module': [''],
+      'avg_labour_cost':[''],
       // 'admin': ['', Validators.required],
       // 'user_type': ['', Validators.required],
       'alert_email': ['', Validators.required],
@@ -1095,7 +1096,7 @@ rdtListWorkAround :any =[{
       this.allUserDetails = {
      
         userID: this.createUserField.get('userID')?.getRawValue(),
-        password: this.createUserField.value.name,
+        password: this.createUserField.get('name')?.value,
         clientID:clientTemp,
         allowOtherClient: this.createUserField.value.allowOtherClient,
         allowNewClient: this.createUserField.value.allowNewClient,
@@ -1136,6 +1137,7 @@ rdtListWorkAround :any =[{
         redirectionURL:this.redirectionURL,
         location_object:this.createUserField.value.location_object,
         default_module:this.createUserField.value.default_module,
+        avg_labour_cost:this.createUserField.value && this.createUserField.value.avg_labour_cost ? this.createUserField.value.avg_labour_cost : '',
         updated: new Date()
 
       }
@@ -1246,8 +1248,7 @@ rdtListWorkAround :any =[{
 
           await this.fetchAllusersData(1,this.tempUpdateUser,'update',masterUser)
 
-          this.spinner.hide()
-
+      
 
       
 
@@ -1360,7 +1361,7 @@ rdtListWorkAround :any =[{
 
           //___________________updating cutom attributes__________________________in aws cognito
 
- 
+          this.spinner.hide();
 
         }
         else {
@@ -1396,7 +1397,7 @@ rdtListWorkAround :any =[{
 
     let authenticationData = {
       Username: this.tempUpdateUser,
-      Password: this.createUserField.value.name,
+      Password: this.createUserField.get('name')?.value,
     };
 
     let poolData = {
@@ -1417,7 +1418,7 @@ rdtListWorkAround :any =[{
     let userData: any = {
       "email": this.createUserField.value.email,
       'custom:userID': this.createUserField.value.userID,
-      'custom:password': this.createUserField.value.name,
+      'custom:password': this.createUserField.get('name')?.value,
       'custom:clientID': this.allUserDetails.clientID,
       'custom:companyID': this.allUserDetails.companyID,
       'custom:username': this.tempUpdateUser,
@@ -1721,6 +1722,7 @@ rdtListWorkAround :any =[{
           telegramID: this.createUserField.value.telegramID,
           location_permission: this.createUserField.get('location_permission')?.value,
           default_module:this.createUserField.value.default_module,
+          avg_labour_cost:this.createUserField.value && this.createUserField.value.avg_labour_cost ? this.createUserField.value.avg_labour_cost : '',
           // device_type_permission: this.multiselectDeviceType_permission,
           form_permission: this.createUserField.get('form_permission')?.value,
           default_dev: this.multiselectDevice_dev,
@@ -1787,6 +1789,7 @@ rdtListWorkAround :any =[{
           location_permission:this.createUserField.get('location_permission')?.value,
           // device_type_permission: this.multiselectDeviceType_permission,
           default_module:this.createUserField.value.default_module,
+          avg_labour_cost:this.createUserField.value && this.createUserField.value.avg_labour_cost ? this.createUserField.value.avg_labour_cost : '',
           form_permission:this.createUserField.get('form_permission')?.value,
           default_dev: this.createUserField.value.default_dev,
           default_loc: this.createUserField.value.default_loc,
@@ -2209,6 +2212,7 @@ rdtListWorkAround :any =[{
           'mobile_privacy': getValues.mobile_privacy,
           'location_object': getValues.location_object,
           'default_module': getValues.default_module,
+          'avg_labour_cost':getValues && getValues.avg_labour_cost ? getValues.avg_labour_cost : '',
           // 'admin': getValues.admin,
           // 'user_type': getValues.user_type,
           'alert_email': getValues.alert_email,
@@ -2285,7 +2289,7 @@ rdtListWorkAround :any =[{
 
         this.createUserField = this.fb.group({
           'userID': getValues.userID,
-          'name': getValues.name,
+          'name':  {value:getValues.name,disabled:this.editOperation},
           'clientID': getValues.clientID,
           'disabled_CLientID': [{value:getValues.clientID,disabled:true}],
           'disabled_companyid':[{value:getValues.companyID,disabled:true}],
@@ -2310,6 +2314,7 @@ rdtListWorkAround :any =[{
           'escalation_telegram': getValues.escalation_telegram,
           'location_object': getValues.location_object,
           'default_module': getValues.default_module,
+          'avg_labour_cost':getValues && getValues.avg_labour_cost ? getValues.avg_labour_cost : '',
           'email': getValues.email,
           'telegramID': getValues.telegramID,
           'location_permission': [getValues.location_permission],
@@ -2339,11 +2344,11 @@ rdtListWorkAround :any =[{
         this.dynamicRedirectID(getValues.default_module)
 
 
-        console.log("Asad redirectionURL ",this.redirectionURL);
+        console.log(" redirectionURL ",this.redirectionURL);
         if(this.redirectionURL && this.redirectionURL.includes('/')){
           const redirectionID = this.redirectionURL.split('/')
 
-          console.log("Asad redirectionURL ",redirectionID);
+          console.log(" redirectionURL ",redirectionID);
           this.createUserField.get('location_object')?.setValue(`${this.redirectionURL.split('/')[redirectionID.length-1]}`)
         }
 
@@ -2831,6 +2836,7 @@ rdtListWorkAround :any =[{
                 let profile = this.data_temp [allData].profile_picture;
                 let location_object=this.data_temp [allData].location_object
                 let default_module=this.data_temp [allData].default_module
+                let avg_labour_cost = this.data_temp [allData].avg_labour_cost 
                 let others = this.data_temp [allData].others
                 let add_updateTime = new Date(this.data_temp [allData].updated).toLocaleString();
                 let redirectionURL = this.data_temp[allData].redirectionURL
@@ -2882,6 +2888,7 @@ rdtListWorkAround :any =[{
                   add_updateTime: add_updateTime,
                   location_object:location_object,
                   default_module:default_module,
+                  avg_labour_cost:avg_labour_cost,
                   others:others,
                   redirectionURL:redirectionURL
                 })

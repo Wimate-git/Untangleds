@@ -123,7 +123,7 @@
                                         <label class="required fw-semibold fs-6 mb-2"> Password
                                         </label>
         
-                                        <input type="text" class="
+                                        <input type="text" [ngbTooltip]="'To change the password, visit the Forgot Password page from the login screen.'" class="
                                         form-control form-control-lg form-control-solid
                                         mb-3 mb-lg-0
                                       " placeholder="Enter Password" name="name" formControlName="name" required
@@ -500,6 +500,7 @@
                                         </select>                   
                                     </div>
 
+
                                 </div>
                             </div>
 
@@ -507,6 +508,20 @@
         
                             <div class="container">
                                 <div class="row mb-7">
+
+
+
+                                    <div class="col-md-4">
+                                        <label class="fw-semibold fs-6 mb-2">Average Labour Cost</label>
+        
+                                        <input type="number" class="
+                                        form-control form-control-lg form-control-solid
+                                        mb-3 mb-lg-0
+                                      " placeholder="Enter Average Labour cost" name="avg_labour_cost" formControlName="avg_labour_cost"
+                                            >
+        
+                                    </div>
+
         
                                     
         
@@ -526,9 +541,8 @@
                                    
         
         
-                                    <div class="col-md-4">
+                                    <div class="col-md-4 mt-10">
                                        
-                                        
                                         <label class="fw-semibold fs-6 mb-2" style="margin-right: 10px;"><input
                                                 class="form-check-input" name="sms" type="checkbox"
                                                 formControlName="alert_sms" /><span class="fw-bold ps-2 fs-6">SMS
@@ -541,6 +555,7 @@
         
         
                                     </div>
+
 
 
                                     <div class="col-md-4">
@@ -570,7 +585,18 @@
 
 
 
-                                    <div class="col-md-4 form-check form-switch">
+                                
+                                    
+        
+                                   
+                                </div>
+                            </div>
+
+
+                            <div class="container">
+                                <div class="row mb-7">
+                                
+                                    <div class="col-md-4 form-check form-switch ms-4">
         
                                         <div class="col-lg-12" *ngIf="editOperation">
                                             <input class="col-lg-6 form-check-input" formControlName="enable_user"
@@ -580,11 +606,11 @@
                                             </label>
                                         
                                         </div>
-                                    
-        
-                                   
                                 </div>
                             </div>
+
+
+
         
                             <div class="container" style="margin-left: 10px;" > 
                                 <div class="row mb-7">

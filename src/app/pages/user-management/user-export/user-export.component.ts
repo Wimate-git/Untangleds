@@ -178,7 +178,7 @@ export class UserExportComponent {
       Heading = [
         ['UserName', 'Password', 'Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Mobile',
           'Mobile Privacy', 'Telegram Channel ID', 'Permission ID', 'Location Permission', 'FormID Permission', 'Start Node',  'Default Module',
-          'Redirection ID', 'SMS', 'Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram'
+          'Redirection ID','Average Labour Cost','SMS', 'Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram'
         ],
         ['', '', '', '', '', '', '',
           '', '', '', '', '', '', '',
@@ -188,6 +188,8 @@ export class UserExportComponent {
   
       filename = 'Users.xlsx';
     }
+
+    //avg_labour_cost
   
     // Create a new workbook
     const wb = XLSX.utils.book_new();
@@ -339,7 +341,7 @@ export class UserExportComponent {
       Heading = [
         ['UserName', 'Password', 'Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Mobile',
           'Mobile Privacy', 'Telegram Channel ID', 'Permission ID', 'Location Permission', 'FormID Permission', 'Start Node',  'Default Module',
-          'Redirection ID', 'SMS', 'Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram'
+          'Redirection ID','Average Labour Cost', 'SMS', 'Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram'
         ]
       ];
       filename = 'Users.xlsx';
@@ -364,6 +366,7 @@ export class UserExportComponent {
         user.start_node || '',
         user.default_module || '',
         user.redirectionURL || '',
+        user.avg_labour_cost || '',
         user.alert_sms || '',
         user.alert_telegram || '',
         user.escalation_email || '',
@@ -514,11 +517,12 @@ export class UserExportComponent {
             start_node: userFields[13],
             default_module:userFields[14],
             redirectionURL:userFields[15],
-            alert_sms: userFields[16] ,
-            alert_telegram: userFields[17] ,
-            escalation_email: userFields[18] ,
-            escalation_sms: userFields[19],
-            escalation_telegram: userFields[20] ,
+            avg_labour_cost:userFields[16],
+            alert_sms: userFields[17] ,
+            alert_telegram: userFields[18] ,
+            escalation_email: userFields[19] ,
+            escalation_sms: userFields[20],
+            escalation_telegram: userFields[21] ,
             // cognito_update:userFields[21] ,
             // enable_user: userFields[22],
             updated: new Date()
@@ -770,11 +774,12 @@ export class UserExportComponent {
             start_node: userFields[13],
             default_module:userFields[14],
             redirectionURL:userFields[15],
-            alert_sms: userFields[16] ,
-            alert_telegram: userFields[17] ,
-            escalation_email: userFields[18] ,
-            escalation_sms: userFields[19] ,
-            escalation_telegram: userFields[20] ,
+            avg_labour_cost:userFields[16],
+            alert_sms: userFields[17] ,
+            alert_telegram: userFields[18] ,
+            escalation_email: userFields[19] ,
+            escalation_sms: userFields[20] ,
+            escalation_telegram: userFields[21] ,
             // cognito_update:userFields[21] ,
             // enable_user: userFields[22] ,
             enable_user:true,
@@ -857,15 +862,18 @@ export class UserExportComponent {
           // Create the master user table entry
           await this.api.CreateMaster(tempObj);
 
-          // Send dynamic lambda request
-          const body = { type: "userVerify", username: masterUser.P1, name: this.allUserDetails.password, email: masterUser.P3 };
-          await this.DynamicApi.sendData(body).toPromise();  // Use toPromise for async/await
+      
 
 
           await this.createLookUpRdt(items,1,tempClient+"#user"+"#lookup")
           await this.createLookUpRdt(masterUser,1,"#user#All");
 
           await this.addtoCognitoTable(this.allUserDetails);
+
+
+          // Send dynamic lambda request
+          const body = { type: "userVerify", username: masterUser.P1, name: this.allUserDetails.password, email: masterUser.P3 };
+          await this.DynamicApi.sendData(body).toPromise();  // Use toPromise for async/await
 
 
           try{
