@@ -166,7 +166,7 @@ export class ImageConfigComponent implements OnInit{
       console.error('Edit index is null or invalid. Unable to update the tile.');
     }
   }
-  openKPIModal(tile: any, index: number) {
+  openImageModal(tile: any, index: number) {
     console.log('Index checking:', index); // Log the index
     if (tile) {
 
@@ -177,7 +177,7 @@ export class ImageConfigComponent implements OnInit{
       this.cdr.detectChanges();
   
   
-
+      this.isEditMode = true; 
 
       this.ImageFormGroup.patchValue({
         imageUrl: tile.imageUrl,

@@ -287,9 +287,10 @@ makeTrueCheck:any = false
         }
   
         // Parse and extract from mapConfig if it exists
-        if (packet.mapConfig && packet.mapConfig !== "[]") {
+        if (packet.MapConfig && packet.MapConfig !== "[]") {
           try {
-            const parsedMapConfig = JSON.parse(packet.mapConfig);
+            const parsedMapConfig = JSON.parse(packet.MapConfig);
+            console.log('parsedMapConfig check',parsedMapConfig)
             if (Array.isArray(parsedMapConfig)) {
               const mapConfigFormlist = parsedMapConfig.map(
                 (config: { formlist: any }) => config.formlist

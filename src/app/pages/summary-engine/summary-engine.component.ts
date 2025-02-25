@@ -60,6 +60,7 @@ import { MultiTableConfigComponent } from 'src/app/_metronic/partials/content/my
 import { AuditTrailService } from '../services/auditTrail.service';
 import { HtmlTileConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/html-tile-config/html-tile-config.component';
 import { SummaryEngineService } from './summary-engine.service';
+import { ImageConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/image-config/image-config.component';
 
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
@@ -162,6 +163,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   @ViewChild(MapConfigComponent, { static: false }) MapConfigComponent: MapConfigComponent;
   @ViewChild(MultiTableConfigComponent, { static: false }) MultiTableConfigComponent: MultiTableConfigComponent;
   @ViewChild(HtmlTileConfigComponent, { static: false }) HtmlTileConfigComponent: HtmlTileConfigComponent;
+  @ViewChild(ImageConfigComponent, { static: false }) ImageConfigComponent: ImageConfigComponent;
+  
   
   
  
@@ -756,7 +759,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     console.log('client id check', this.SK_clientID);
     this.spinner.show('dataProcess')
 
-console.log('this.readFilterEquation checking',this.readFilterEquation)
+console.log('this.readFilterEquation checking',this.permissionIdRequest)
   console.log('this.parsedPermission',this.parsedPermission)
   console.log('this.userdetails from request',this.userdetails)
     // Define the API Gateway URL
@@ -2211,8 +2214,9 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
 
 
     
-     this.fetchUserPermissions(1)
+
     // console.log('readPermission_Id checking initialize',readPermission_Id)
+  
     
     this.initializeCompanyFields();
 
@@ -2309,12 +2313,15 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     // this.addJsonValidation();
     // this.showTable()
     this.addFromService()
-
-    this.route.paramMap.subscribe(params => {
+    this.fetchUserPermissions(1)
+    .then(async () => {
+    this.route.paramMap.subscribe(async params => {
       this.routeId = params.get('id');
       if (this.routeId) {
-        this.openModalHelpher(this.routeId)
+
+    await this.openModalHelpher(this.routeId)
     .then((data) => {
+      this.checkAndSetFullscreen()
     console.log('✅ this.all_Packet_store permissions:', data); // ✅ Now you will get the correct data
     const livedatacheck = data
     console.log('livedatacheck',livedatacheck)
@@ -2332,6 +2339,9 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     .catch((error) => {
     console.error('❌ Error fetching data:', error);
     });
+
+
+ 
         this.editButtonCheck = true
     
       }
@@ -2339,8 +2349,11 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
       //console.log(this.routeId)
       // Use this.itemId to fetch and display item details
     });
+  })
+  .catch(error => {
+    console.error("❌ Error in fetchUserPermissions:", error);
+  });
 
- 
 
 
     const savedMode = localStorage.getItem('editModeState');
@@ -2497,112 +2510,78 @@ document.removeEventListener('keydown', this.handleKeyDown);
 }
 
 
-async fetchPermissionIdMain(clientID: number, p1Value: string) {
-  console.log('p1Value checking', p1Value);
-  console.log('clientID checking', clientID);
-  console.log('this.SK_clientID checking from permission', this.SK_clientID);
+fetchPermissionIdMain(clientID: number, p1Value: string): Promise<void> {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log("p1Value checking", p1Value);
+      console.log("clientID checking", clientID);
+      console.log("this.SK_clientID checking from permission", this.SK_clientID);
 
-  try {
-    // Construct the primary key (PK) for the main table
-    const pk = `${this.SK_clientID}#permission#${p1Value}#main`;
-    console.log(`Fetching main table data for PK: ${pk}`);
+      const pk = `${this.SK_clientID}#permission#${p1Value}#main`;
+      console.log(`Fetching main table data for PK: ${pk}`);
 
-    // Fetch data from the main table (API call or service call)
-    const result: any = await this.api.GetMaster(pk, clientID);
-    console.log('Result fetched for the permission:', result);
+      const result: any = await this.api.GetMaster(pk, clientID);
 
-    // Parse and process the metadata
-    if (result && result.metadata) {
-      this.parsedPermission = JSON.parse(result.metadata);
-      console.log('Parsed permission metadata:', this.parsedPermission);
-    this.readFilterEquation =this.parsedPermission 
-    console.log('this.readFilterEquation check',this.readFilterEquation)
-    // console.log('this.routeId permissions', this.routeId);
-    
-    console.log('this.routeId permissions check', this.routeId);
-//     this.openModalHelpher(this.routeId)
-// .then((data) => {
-// console.log('✅ this.all_Packet_store permissions:', data); // ✅ Now you will get the correct data
-// const livedatacheck = data
-// console.log('livedatacheck',livedatacheck)
-// this.checkLiveDashboard = livedatacheck.LiveDashboard
-// console.log('this.checkLiveDashboard check',this.checkLiveDashboard)
-// if(this.checkLiveDashboard==true){
-// this.reloadPage("from_ts") 
-    
-
-// }else{
-//   this.spinner.hide('dataProcess')
-// }
-
-// })
-// .catch((error) => {
-// console.error('❌ Error fetching data:', error);
-// });
-
-      this.summaryPermission = this.parsedPermission.summaryList;
-      console.log('this.summaryPermission check', this.summaryPermission);
-
-      // Determine if "All" permission is included
-      if (this.summaryPermission.includes("All")) {
-        // If "All", fetch and display all dashboard data
-        console.log("Permission is 'All'. Fetching all dashboards...");
-        this.fetchCompanyLookupdata(0).then((allData: any) => {
-          console.log('All Dashboards Data:', allData);
-          this.dashboardData = allData; // Store all dashboard data
-        });
-      } else {
-        // If not "All", fetch specific dashboard data
-        console.log("Permission is restricted. Fetching specific dashboards...");
-        this.fetchCompanyLookupdata(0).then((allData: any[]) => {
-          console.log('All Dashboards Data:', allData);
-          this.dashboardData = allData.filter((dashboard: any) =>
-  
-       
-            this.summaryPermission.includes(dashboard.P1)
-            
-
-          ); // Filter dashboards based on summaryPermission
-          console.log('Filtered Dashboards Data:', this.dashboardData);
-          console.log('this.summaryPermission',this.summaryPermission)
-        });
+      if (!result || !result.metadata) {
+        console.warn("Result metadata is null or undefined.");
+        resolve(); // Resolve even if no data is found
+        return;
       }
 
-      // Handle specific permissions
-      this.permissionIdsListList = this.parsedPermission.permissionsList;
-      console.log('Parsed permission list:', this.permissionIdsListList);
+      // Parse metadata
+      this.parsedPermission = JSON.parse(result.metadata);
+      console.log("Parsed permission metadata:", this.parsedPermission);
 
-      // Find specific permission
+      this.readFilterEquation = this.parsedPermission;
+      console.log("this.readFilterEquation check", this.readFilterEquation);
+
+      // Handling Dashboard Permissions
+      this.summaryPermission = this.parsedPermission.summaryList || [];
+      console.log("this.summaryPermission check", this.summaryPermission);
+
+      if (this.summaryPermission.includes("All")) {
+        console.log("Permission is 'All'. Fetching all dashboards...");
+        this.dashboardData = await this.fetchCompanyLookupdata(0);
+      } else {
+        console.log("Fetching specific dashboards...");
+        const allData = await this.fetchCompanyLookupdata(0);
+        this.dashboardData = allData.filter((dashboard: any) =>
+          this.summaryPermission.includes(dashboard.P1)
+        );
+        console.log("Filtered Dashboards Data:", this.dashboardData);
+      }
+
+      // Extract Permission List
+      this.permissionIdsListList = this.parsedPermission.permissionsList || [];
+      console.log("Parsed permission list:", this.permissionIdsListList);
+
+      // Check 'Summary Dashboard' Permission
       const summaryDashboardItem = this.permissionIdsListList.find(
         (item: { name: string; update: boolean; view: boolean }) =>
-          item.name === 'Summary Dashboard'
+          item.name === "Summary Dashboard"
       );
-      console.log('Summary Dashboard Item:', summaryDashboardItem);
+      console.log("Summary Dashboard Item:", summaryDashboardItem);
 
       if (summaryDashboardItem) {
         this.summaryDashboardUpdate = summaryDashboardItem.update;
-        this.summaryDashboardView = summaryDashboardItem.view
+        this.summaryDashboardView = summaryDashboardItem.view;
+        console.log("this.summaryDashboardUpdate check", this.summaryDashboardUpdate);
 
-        console.log('this.summaryDashboardUpdate check',this.summaryDashboardUpdate)
-        // (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)) 
-        // Set default mode based on `update` permission
-        this.isEditModeView = this.summaryDashboardUpdate ||this.summaryDashboardUpdate && !this.summaryDashboardView; // Default to view mode if update is false
-        // this.hideButton = 
-        // const savedMode = localStorage.getItem('editModeState');
-        // console.log('savedMode checking',savedMode)
-        // this.isEditModeView = savedMode ? JSON.parse(savedMode) : false;
-        this.updateOptions(); // Ensure options reflect the correct mode
+        this.isEditModeView = this.summaryDashboardUpdate || 
+                              (this.summaryDashboardUpdate && !this.summaryDashboardView);
+        this.updateOptions();
       }
 
       this.processFetchedData(result);
-    } else {
-      console.warn('Result metadata is null or undefined.');
+      
+      resolve(); // Resolve the Promise after all operations are complete
+    } catch (error) {
+      console.error(`Error fetching data for PK (${p1Value}):`, error);
+      reject(error); // Reject in case of API failure
     }
-  } catch (error) {
-    // Handle any errors during the fetch
-    console.error(`Error fetching data for PK (${p1Value}):`, error);
-  }
+  });
 }
+
 
 
 fetchCompanyLookupdata(sk:any):any {
@@ -3295,6 +3274,16 @@ justReadStyles(data:any,index:any){
         this.MultiTableConfigComponent.openMultiTableModal(event.arg1, event.arg2);
       }, 500);
     }
+    if(event.arg1.grid_type=='logo'){
+      this.modalService.open(KPIModal, { size: 'xl' });
+
+    
+      // Access the component instance and trigger `openKPIModal`
+      setTimeout(() => {
+       
+        this.ImageConfigComponent.openImageModal(event.arg1, event.arg2);
+      }, 500);
+    }
     if(event.arg1.grid_type=='HTMLtile'){
       this.modalService.open(KPIModal, { size: 'xl' });
 
@@ -3489,6 +3478,12 @@ justReadStyles(data:any,index:any){
  
     }
 
+    else if(event.data.arg1.grid_type=='logo'){
+      console.log('event check', event)
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push(event.data.arg1)
+ 
+    }
     else if(event.data.arg1.grid_type=='MultiTableWidget'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
@@ -5327,7 +5322,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
           this.route.paramMap.subscribe(params => {
             this.routeId = params.get('id');
             if (this.routeId) {
-              // this.openModalHelpher(this.routeId);
+            this.openModalHelpher(this.routeId);
               this.editButtonCheck = false;
               console.log('Route ID found, opening modal:', this.routeId);
             }
@@ -6744,8 +6739,8 @@ refreshFunction(){
     modal.dismiss();
 
   }
-  openimageModal(htmlTileModal:TemplateRef<any>,modal:any){
-    this.modalService.open(htmlTileModal, {size: 'xl' });
+  openimageModal(imageModal:TemplateRef<any>,modal:any){
+    this.modalService.open(imageModal, {size: 'xl' });
     modal.dismiss();
 
   }
@@ -6832,69 +6827,66 @@ refreshFunction(){
     this.chartDataConfigExport = configChartTable
 
   }
-  async fetchUserPermissions(sk: any) {
-    this.userdetails = this.getLoggedUser.username;
-    this.userClient = this.userdetails + "#user" + "#main";
-    console.log('this.tempClient from form service check', this.userClient);
+  fetchUserPermissions(sk: any): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        this.userdetails = this.getLoggedUser.username;
+        this.userClient = `${this.userdetails}#user#main`;
+        console.log("this.tempClient from form service check", this.userClient);
   
-    this.userPermissions = await this.api.GetMaster(this.userClient, sk).then(permission => {
-      if (permission) {
-        console.log('data checking from add form', permission);
-        const metadataString: string | null | undefined = permission.metadata;
-  
-        // Check if metadataString is a valid string before parsing
-        if (typeof metadataString === 'string') {
-          try {
-            // Parse the JSON string into a JavaScript object
-            this.permissionsMetaData = JSON.parse(metadataString);
-            console.log('Parsed Metadata Object from location', this.permissionsMetaData);
-            const permissionId = this.permissionsMetaData.permission_ID
-            console.log('this.permissionIdRequest check from function',permissionId)
-            this.permissionIdRequest = permissionId
-            const readPermission_Id = this.permissionsMetaData.permission_ID
-            console.log('readPermission_Id check',readPermission_Id)
-     
-            this.fetchPermissionIdMain(1, readPermission_Id);
-
-
-         
-
-    console.log('checkLiveDashboard check from permission',this.checkLiveDashboard)
- 
-
-  
-            // Check if permission_ID is 'All'
-            if (readPermission_Id !== "All") {
-              // this.permissionIdCheck = this.metadataObject.permission_ID; // Store the permission ID
-              console.log('Stored permission ID:', readPermission_Id);
-              // this.fetchPermissionIdMain(1, readPermission_Id);
-              this.loadData();
-            } else if(readPermission_Id=="All"){
-             this.userPermission = readPermission_Id
-             console.log('this.userPermission checking',this.userPermission)
-    this.summaryDashboardUpdate= true
-
-    // this.fetchPermissionIdMain(1, readPermission_Id);
-             this.loadData();
-          
-              console.log('this.userPermissionsRead',this.userPermission)
-              console.log('Permission ID is "All", skipping action.');
-            }
-  
-          return readPermission_Id
-  
-          } catch (error) {
-            console.error('Error parsing JSON:', error);
-          }
-        } else {
-          console.log('Metadata is not a valid string:', this.metadataObject);
+        // Fetch user permissions
+        const permission = await this.api.GetMaster(this.userClient, sk);
+        
+        if (!permission) {
+          console.warn("No permission data received.");
+          resolve();
+          return;
         }
   
-        // Return based on location_permission and form_permission
-        return this.modifyList(this.metadataObject.location_permission, this.metadataObject.form_permission) === "All-All" ? false : true;
+        console.log("Data checking from add form", permission);
+  
+        // Parse metadata
+        const metadataString: string | null | undefined = permission.metadata;
+        if (typeof metadataString !== "string") {
+          console.error("Invalid metadata format:", metadataString);
+          resolve();
+          return;
+        }
+  
+        try {
+          this.permissionsMetaData = JSON.parse(metadataString);
+          console.log("Parsed Metadata Object from location", this.permissionsMetaData);
+  
+          const permissionId = this.permissionsMetaData.permission_ID;
+          console.log("this.permissionIdRequest check from function", permissionId);
+          this.permissionIdRequest = permissionId;
+  
+          // **Now properly waits for fetchPermissionIdMain to complete**
+          await this.fetchPermissionIdMain(1, permissionId);
+  
+          if (permissionId !== "All") {
+            console.log("Stored permission ID:", permissionId);
+         this.loadData();
+          } else {
+            this.userPermission = permissionId;
+            console.log("this.userPermission checking", this.userPermission);
+            this.summaryDashboardUpdate = true;
+         this.loadData();
+            console.log("Permission ID is 'All', skipping action.");
+          }
+  
+          resolve();
+        } catch (error) {
+          console.error("Error parsing JSON:", error);
+          reject(error);
+        }
+      } catch (error) {
+        console.error("Error fetching user permissions:", error);
+        reject(error);
       }
     });
   }
+  
   
 
 
