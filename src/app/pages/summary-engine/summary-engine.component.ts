@@ -2293,17 +2293,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
 
   
 
-    this.route.paramMap.subscribe(params => {
-      this.routeId = params.get('id');
-      if (this.routeId) {
-        this.openModalHelpher(this.routeId);
-        this.editButtonCheck = true
 
-      }
-
-      //console.log(this.routeId)
-      // Use this.itemId to fetch and display item details
-    });
 
 
     
@@ -6844,12 +6834,35 @@ refreshFunction(){
             if (readPermission_Id !== "All") {
               // this.permissionIdCheck = this.metadataObject.permission_ID; // Store the permission ID
               console.log('Stored permission ID:', readPermission_Id);
+              this.route.paramMap.subscribe(params => {
+                this.routeId = params.get('id');
+                if (this.routeId) {
+                  this.openModalHelpher(this.routeId);
+                  this.editButtonCheck = true
+          
+                }
+          
+                //console.log(this.routeId)
+                // Use this.itemId to fetch and display item details
+              });
               // this.fetchPermissionIdMain(1, readPermission_Id);
               this.loadData();
             } else if(readPermission_Id=="All"){
+              this.route.paramMap.subscribe(params => {
+                this.routeId = params.get('id');
+                if (this.routeId) {
+                  this.openModalHelpher(this.routeId);
+                  this.editButtonCheck = true
+          
+                }
+          
+                //console.log(this.routeId)
+                // Use this.itemId to fetch and display item details
+              });
              this.userPermission = readPermission_Id
              console.log('this.userPermission checking',this.userPermission)
     this.summaryDashboardUpdate= true
+    
 
     // this.fetchPermissionIdMain(1, readPermission_Id);
              this.loadData();
