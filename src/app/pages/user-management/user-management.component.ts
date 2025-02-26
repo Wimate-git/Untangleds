@@ -3244,66 +3244,8 @@ rdtListWorkAround :any =[{
   deleteCognitoUser = async (getValues: any) => {
     console.log('current user', getValues);
   
-    // Create a new CognitoIdentityProvider object for your Cognito User Pool Region
-    const cognitoIdentityProvider = new CognitoIdentityProvider({ region: 'ap-south-1' });
-  
-    // Authentication data and user pool setup
-    let authenticationData = {
-      Username: getValues.username,
-      Password: getValues.password, // Ensure this is the correct field for the password
-    };
-  
-    let poolData = {
-      UserPoolId:'ap-south-1_aaPSwPS14',
-      ClientId:  '42pb85v3sv84jdrfi1rub7a4e5'
-    };
-  
-    let userPool = new CognitoUserPool(poolData);
-    console.log("userPool", userPool);
-  
-    let poolDetails: any = {
-      Username: getValues.username,
-      Pool: userPool
-    };
-    console.log("poolDetails", poolDetails);
-  
-    let cognitoUser = new CognitoUser(poolDetails);
-    console.log("cognitoUser", cognitoUser);
-  
-    let authenticationDetails = new AuthenticationDetails(authenticationData);
-    console.log("authenticationDetails", authenticationDetails);
-  
+    
     try {
-      // Authenticate user
-      const authResult = await new Promise<CognitoUserSession>((resolve, reject) => {
-        cognitoUser.authenticateUser(authenticationDetails, {
-          onSuccess: function (result) {
-            resolve(result);
-          },
-          onFailure: function (err) {
-            reject(err);
-          },
-        });
-      });
-  
-      console.log("User authenticated successfully");
-      console.log("AccessToken", authResult.getAccessToken().getJwtToken());
-  
-      // Delete the user
-      const deleteParams = {
-        AccessToken: authResult.getAccessToken().getJwtToken()
-      };
-  
-      await new Promise<void>((resolve, reject) => {
-        cognitoIdentityProvider.deleteUser(deleteParams, function (err: any, data: any) {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        });
-      });
-  
       console.log("User deleted successfully in Cognito");
   
       const date = Math.ceil(((new Date()).getTime()) / 1000);
@@ -3321,6 +3263,35 @@ rdtListWorkAround :any =[{
         await this.fetchTimeMachineById(1, items.P1, 'delete', items);
 
         await this.fetchAllusersData(1, deletedUser.P1, 'delete', items)
+
+
+        //Create request body for deleling the cognito user        
+        const body = { "type": "cognitoServices",
+          "event":{
+            "path": "/deleteUser",
+            "queryStringParameters": {
+            "username":getValues.username,
+          }
+          }
+        }
+  
+        try {
+
+          const response = await this.DynamicApi.getData(body);
+          console.log("Response is here ",JSON.parse(response.body).message);
+
+          this.toast.open(`${JSON.parse(response.body).message}`, " ", {
+
+            duration: 2000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+            //   //panelClass: ['blue-snackbar']
+          })
+
+        } catch (error) {
+          console.error('Error calling dynamic lambda:', error);
+          this.spinner.hide();
+        }
 
 
         try{
@@ -3342,12 +3313,6 @@ rdtListWorkAround :any =[{
           console.log("Error while creating audit trails ",error);
         }
     
-
-
-
-
-
-
         this.spinner.hide()
 
         this.datatableConfig = {}
@@ -3363,50 +3328,12 @@ rdtListWorkAround :any =[{
         );
       }
     } catch (error:any) {
-
       this.spinner.hide()
       console.log('Error during deletion', error);
-
-      if (error.message === 'User does not exist.') {
-        const date = Math.ceil(((new Date()).getTime()) / 1000);
-        const items = {
-          P1: getValues.username,
-        };
-  
-        const deletedUser = {
-          P1:getValues.username,
-          P2:getValues.clientID
-        }
-    
-        const value = await this.api.DeleteMaster(this.allUserDetails);
-        if (value) {
-          await this.fetchTimeMachineById(1, items.P1, 'delete', items);
-  
-          await this.fetchAllusersData(1, deletedUser.P1, 'delete', items)
-
-
-          this.reloadEvent.next(true)
-  
-          Swal.fire(
-            'Removed!',
-            'User configuration successfully.',
-            'success'
-          );
-
-        }
-      }
-      else{
-        alert(error)
-      }
-
-
-
-
+      alert(error)
       // Swal.fire('User not confirmed' + '' + 'and User configuration not removed');
     }
   };
-
-
 
 
 
