@@ -104,6 +104,8 @@
                 (click)="
                 item.grid_type === 'filterTile' ? justReadStyles(item, i) :
                 item.grid_type === 'tile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,dataTableModalTile1) : null) :
+                item.grid_type === 'tile2' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,dataTableModalTile2) : null) :
+
               item.grid_type === 'dynamicTile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,dataTableModalDynamicTile) : null) :
               item.grid_type === 'title' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,TitleModal) : null) :
               
@@ -133,6 +135,24 @@
                
                    >
                     </app-tile-ui1>
+                  </div>
+
+                  <div *ngIf="item.grid_type === 'tile2'" >
+                    <app-tile-ui2 [item]="item" 
+                    [index]="i"
+                     (customEvent)="helperTile($event,KPIModal1)"
+                      (customEvent1)="emitDuplicate($event)"
+                       (customEvent2)="emitDelete6($event)"
+                        [isEditModeView]="isEditModeView"
+                         [hideButton]="hideButton" 
+                         [all_Packet_store]="all_Packet_store"   
+                
+                         [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                         [summaryDashboardUpdate]="summaryDashboardUpdate"
+                    [hidingLink]="hidingLink" 
+                       [isFullscreen]="isFullscreen"
+                       [tile2Width]="tile2Width[i]" 
+                       [tile2Height]="tile2Height[i]" ></app-tile-ui2>
                   </div>
                   <div *ngIf="item.grid_type === 'MultiTableWidget'">
                     <app-multi-table-ui 
@@ -169,10 +189,7 @@
                     [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" [liveDataTableTile]="liveDataTableTile"></app-table-widget-ui>
                   </div>
                   
-                                <div *ngIf="item.grid_type === 'tile2'" >
-                      <app-tile-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal1)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"   [summaryDashboardUpdate]="summaryDashboardUpdate" 
-                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" ></app-tile-ui2>
-                    </div>
+
                     
                     <div *ngIf="item.grid_type === 'tile3'" >
                       <app-tile-ui3 [item]="item" [index]="i" (customEvent)="helperTile($event,KPIModal2)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate" 
@@ -262,6 +279,8 @@
                      
                       (customEvent1)="emitDuplicate($event)" 
                       (customEvent2)="emitDelete6($event)"
+                        [filterTileHeight]="filterTileHeight[i]"
+  [filterTileWidth]="filterTileWidth[i]"
                       ></app-filter-tile-ui >
                  
                     </div>
@@ -2113,6 +2132,14 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   [storeDrillDown]="storeDrillDown"
 
     ></app-data-table-tile1>
+  </ng-template>
+  <ng-template #dataTableModalTile2 let-modal>
+    <app-data-table-tile2
+  [responseRowData]="responseRowData"
+  [all_Packet_store]="all_Packet_store"
+  [storeDrillDown]="storeDrillDown"
+
+    ></app-data-table-tile2>
   </ng-template>
 
   <ng-template #dataTableModalDynamicTile let-modal>

@@ -243,7 +243,7 @@ export class Tile1ConfigComponent implements OnInit {
       widgetid: [this.generateUniqueId()],
       processed_value: [''],
       selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
-      selectedRangeLabelWithDates: [''],
+    
 
       themeColor: [this.selectedColor, Validators.required],
       fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
@@ -512,8 +512,7 @@ export class Tile1ConfigComponent implements OnInit {
         fixedColWidth: true,
         fixedRowHeight: true,
         grid_type: 'tile',
-        selectFromTime: this.createKPIWidget.value.selectFromTime,
-        selectToTime: this.createKPIWidget.value.selectToTime,
+
         formlist: this.createKPIWidget.value.formlist,
         parameterName: this.createKPIWidget.value.parameterName,
         groupByFormat: this.createKPIWidget.value.groupByFormat,
@@ -526,7 +525,7 @@ export class Tile1ConfigComponent implements OnInit {
         themeColor: this.createKPIWidget.value.themeColor,
         fontSize: `${this.createKPIWidget.value.fontSize}px`,
         fontColor: this.createKPIWidget.value.fontColor,
-        formatType: this.createKPIWidget.value.formatType,
+ 
         custom_Label:this.createKPIWidget.value.custom_Label,
         // EquationFormList:this.createKPIWidget.value.EquationFormList,
         // EquationParam:this.createKPIWidget.value.EquationParam,
@@ -534,14 +533,20 @@ export class Tile1ConfigComponent implements OnInit {
         equation: this.createKPIWidget.value.all_fields || [], 
         EquationDesc:this.createKPIWidget.value.EquationDesc,
         columnVisibility:this.createKPIWidget.value.columnVisibility,
+
         rowData:this.createKPIWidget.value.rowData || '',
+        ModuleNames:this.createKPIWidget.value.ModuleNames,
+        selectFromTime: this.createKPIWidget.value.selectFromTime,
+        selectToTime: this.createKPIWidget.value.selectToTime,
+        formatType: this.createKPIWidget.value.formatType,
+ 
         noOfParams: this.noOfParams || 0,
         miniForm:this.createKPIWidget.value.miniForm || '',
         MiniTableNames:this.createKPIWidget.value.MiniTableNames ||'',
         MiniTableFields:this.createKPIWidget.value.MiniTableFields ,
         minitableEquation:this.createKPIWidget.value.minitableEquation,
         EquationOperationMini:this.createKPIWidget.value.EquationOperationMini,
-        ModuleNames:this.createKPIWidget.value.ModuleNames,
+   
 
 
 
@@ -1043,6 +1048,7 @@ themes = [
   { color: "linear-gradient(to right, #ff9a9e, #fad0c4)", selected: false }, // Pink Pastel
   { color: "linear-gradient(to right, #fc5c7d, #6a82fb)", selected: false } , // Pink to Blue
   { color: "linear-gradient(to right, #1D2671, #C33764)", selected: false }, // Deep Purple to Reddish Pink
+
   { color: "linear-gradient(to right, #5433FF, #20BDFF, #A5FECB)", selected: false }, // Multicolor Cool Spectrum
   { color: "linear-gradient(to right, #FF5F6D, #FFC371)", selected: false }, // Soft Pink to Orange
   { color: "linear-gradient(to right, #C6FFDD, #FBD786, #f7797d)", selected: false }, // Pastel Multicolor
@@ -1218,6 +1224,8 @@ openKPIModal(tile: any, index: number) {
       selectToTime: tile.selectToTime,
       dashboardIds: tile.dashboardIds,
       selectType: tile.selectType,
+      ModuleNames:tile.ModuleNames,
+      columnVisibility: parsedColumnVisibility,
       filterParameter: parsedFilterParam,
       filterDescription: tile.filterDescription,
       custom_Label: tile.custom_Label,
@@ -1232,8 +1240,7 @@ openKPIModal(tile: any, index: number) {
       MiniTableFields:parsedMiniTableFields ,
       minitableEquation:tile.minitableEquation,
       EquationOperationMini:tile.EquationOperationMini, // Set parsed columnVisibility
-      ModuleNames:tile.ModuleNames,
-      columnVisibility: parsedColumnVisibility,
+   
       all_fields: this.repopulate_fields(tile),
     });
 

@@ -70,6 +70,7 @@ import { HtmlTileConfigComponent } from './html-tile-config/html-tile-config.com
 import { HtmlTileUiComponent } from './html-tile-ui/html-tile-ui.component';
 import { ImageConfigComponent } from './image-config/image-config.component';
 import { ImageUiComponent } from './image-ui/image-ui.component';
+import { DataTableTile2Component } from './data-table-tile2/data-table-tile2.component';
 
 
 
@@ -116,7 +117,8 @@ import { ImageUiComponent } from './image-ui/image-ui.component';
     HtmlTileConfigComponent,
     HtmlTileUiComponent,
     ImageConfigComponent,
-    ImageUiComponent
+    ImageUiComponent,
+    DataTableTile2Component
 
 
 
@@ -202,7 +204,8 @@ import { ImageUiComponent } from './image-ui/image-ui.component';
     HtmlTileConfigComponent,
     HtmlTileUiComponent,
     ImageConfigComponent,
-    ImageUiComponent
+    ImageUiComponent,
+    DataTableTile2Component
     
   
 

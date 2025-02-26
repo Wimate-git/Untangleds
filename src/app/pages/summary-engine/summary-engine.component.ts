@@ -111,6 +111,7 @@ interface TreeNode {
 
 
 
+
   // Optional property for node type
 }
 interface DashboardItem extends GridsterItem {
@@ -260,7 +261,9 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
 
   filterTileHeight:any []=[];
   filterTileWidth:any []=[];
-
+  tile2Height:any []=[];
+  tile2Width:any []=[];
+ 
   userPermissions: boolean ;
   permissionIdCheck: any;
   permissionsMetaData: any;
@@ -287,6 +290,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   checkLiveDashboard: any;
   liveDataMapTile: any;
   summaryDashboardView: any;
+  preventModalOpening: any;
 
 
   createPieChart() {
@@ -753,125 +757,253 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   @ViewChild('modalContent') modalContent!: TemplateRef<any>;
   iframeUrl!: SafeResourceUrl;
 
-  reloadPage(key:any) {
-    this.isLoading = true; // Set loading state to true
-    console.log('this.routeId check', this.routeId);
-    console.log('client id check', this.SK_clientID);
-    this.spinner.show('dataProcess')
+  async reloadPage(key:any,permissionfromOnInit?:any) {
+    if (key === "from_ts") {
+      this.isLoading = true; 
+      try {
+          // ✅ Ensure we await the resolved value of permissionfromOnInit
+          const resolvedPermission = await permissionfromOnInit;
+          
+          console.log("✅ Resolved permissionfromOnInit check:", resolvedPermission);
 
-console.log('this.readFilterEquation checking',this.permissionIdRequest)
-  console.log('this.parsedPermission',this.parsedPermission)
-  console.log('this.userdetails from request',this.userdetails)
-    // Define the API Gateway URL
-    const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+          // ✅ Extract values safely after resolving the Promise
+          const permissionId = resolvedPermission?.permissionId || "";
+          const permissionList = resolvedPermission?.readFilterEquationawait || [];
+          console.log('permissionList check',permissionList)
+          const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+
+          // ✅ Construct the request body
+          const requestBody = {
+              body: JSON.stringify({
+                  clientId: this.SK_clientID,
+                  routeId: this.routeId,
+                  permissionId: permissionId,  // Extracted from resolved data
+                  permissionList: permissionList, // Extracted from advance_report
+                  userName: this.userdetails
+              }),
+          };
+
+          console.log("🚀 Final requestBody:", requestBody);
+          this.http.post(apiUrl, requestBody).subscribe(
+            (response: any) => {
+              console.log('Lambda function triggered successfully:', response);
+          
+              // Ensure response status is 200 before processing
+              if (response?.statusCode === 200) {
+                try {
+                  const constLiveData = JSON.parse(response.body); // Parse the JSON body
+                  console.log('constLiveData check', constLiveData);
+          
+                  // Ensure Processed_Data exists in response
+                  if (constLiveData?.Processed_Data?.metadata?.grid_details) {
+                    const processedData = constLiveData.Processed_Data.metadata.grid_details;
+                    console.log('processedData check', processedData);
+                    this.summaryService.updatelookUpData(processedData)
+      //               if (this.all_Packet_store?.LiveDashboard === true ) {
+          
+      //                 console.log('this.all_Packet_store?.LiveDashboard from lambda',this.all_Packet_store?.LiveDashboard)
+      //     this.liveDashboardDataFormat(processedData);
+      // }else{
+      
+      // }
+      
+                    // this.liveDashboardDataFormat(processedData);
+                  } else {
+                    console.error('Processed_Data.metadata.grid_details not found in response');
+                    Swal.fire({
+                      title: 'Error!',
+                      text: 'No data found in response. Please check the input.',
+                      icon: 'error',
+                      confirmButtonText: 'OK'
+                    });
+                  }
+                } catch (error) {
+                  console.error('Error parsing response body:', error);
+                  Swal.fire({
+                    title: 'Error!',
+                    text: 'Invalid response format received.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                  });
+                }
+              } else {
+                console.error('Unexpected statusCode:', response?.statusCode);
+                Swal.fire({
+                  title: 'Error!',
+                  text: `Unexpected response received (Status Code: ${response?.statusCode}).`,
+                  icon: 'error',
+                  confirmButtonText: 'OK'
+                });
+              }
+          
+              this.spinner.hide('dataProcess');
+              this.isLoading = false; // Reset loading state
+          if(key="html"){
+            this.route.paramMap.subscribe(params => {
+              this.routeId = params.get('id');
+              if (this.routeId) {
+                this.openModalHelpher(this.routeId);
+                this.editButtonCheck = true;
+              }
+            });
+          }
+              // Proceed with route parameter handling
+         
+            },
+            (error) => {
+              console.error('Error triggering Lambda function:', error);
+          
+              // Handle different error codes
+              if (error.status === 404) {
+                console.log('Received 404 error - stopping loading and showing error message.');
+                Swal.fire({
+                  title: 'Error!',
+                  text: 'Data not found. Please check your inputs and try again.',
+                  icon: 'error',
+                  confirmButtonText: 'OK'
+                });
+              } else {
+                Swal.fire({
+                  title: 'Error!',
+                  text: 'Failed to trigger the Lambda function. Please try again.',
+                  icon: 'error',
+                  confirmButtonText: 'OK'
+                });
+              }
+          
+              this.spinner.hide('dataProcess');
+              this.isLoading = false; // Ensure loading is stopped in all error cases
+            }
+          );
+        
+
+      } catch (error) {
+          console.error("❌ Error resolving permissionfromOnInit:", error);
+          return null; // Return null in case of failure
+      }
+  }else if(key=='html'){
+      this.isLoading = true; // Set loading state to true
+      console.log('this.routeId check', this.routeId);
+      console.log('client id check', this.SK_clientID);
+      this.spinner.show('dataProcess')
   
-    // Prepare the request body
-    const requestBody = {
-      body: JSON.stringify({
-        clientId: this.SK_clientID,
-        routeId: this.routeId,
-        permissionId:this.permissionIdRequest,
-        permissionList:this.readFilterEquation || [],
-        userName:this.userdetails
-
-
-
-      }),
-    };
+  console.log('this.readFilterEquation checking',this.readFilterEquation)
+    console.log('this.parsedPermission',this.parsedPermission)
+    console.log('this.userdetails from request',this.userdetails)
+      // Define the API Gateway URL
+      const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+    
+      // Prepare the request body
+      const requestBody = {
+        body: JSON.stringify({
+          clientId: this.SK_clientID,
+          routeId: this.routeId,
+          permissionId:this.permissionIdRequest,
+          permissionList:this.readFilterEquation || [],
+          userName:this.userdetails
   
-    console.log('requestBody checking', requestBody);
   
-    // Send a POST request to the Lambda function with the body
-    this.http.post(apiUrl, requestBody).subscribe(
-      (response: any) => {
-        console.log('Lambda function triggered successfully:', response);
+  
+        }),
+      };
     
-        // Ensure response status is 200 before processing
-        if (response?.statusCode === 200) {
-          try {
-            const constLiveData = JSON.parse(response.body); // Parse the JSON body
-            console.log('constLiveData check', constLiveData);
+      console.log('requestBody checking', requestBody);
     
-            // Ensure Processed_Data exists in response
-            if (constLiveData?.Processed_Data?.metadata?.grid_details) {
-              const processedData = constLiveData.Processed_Data.metadata.grid_details;
-              console.log('processedData check', processedData);
-              if (this.all_Packet_store?.LiveDashboard === true ) {
-    
-                console.log('this.all_Packet_store?.LiveDashboard from lambda',this.all_Packet_store?.LiveDashboard)
-    this.liveDashboardDataFormat(processedData);
-}else{
-
-}
-
-              // this.liveDashboardDataFormat(processedData);
-            } else {
-              console.error('Processed_Data.metadata.grid_details not found in response');
+      // Send a POST request to the Lambda function with the body
+      this.http.post(apiUrl, requestBody).subscribe(
+        (response: any) => {
+          console.log('Lambda function triggered successfully:', response);
+      
+          // Ensure response status is 200 before processing
+          if (response?.statusCode === 200) {
+            try {
+              const constLiveData = JSON.parse(response.body); // Parse the JSON body
+              console.log('constLiveData check', constLiveData);
+      
+              // Ensure Processed_Data exists in response
+              if (constLiveData?.Processed_Data?.metadata?.grid_details) {
+                const processedData = constLiveData.Processed_Data.metadata.grid_details;
+                console.log('processedData check', processedData);
+                if (this.all_Packet_store?.LiveDashboard === true ) {
+      
+                  console.log('this.all_Packet_store?.LiveDashboard from lambda',this.all_Packet_store?.LiveDashboard)
+      this.liveDashboardDataFormat(processedData);
+  }else{
+  
+  }
+  
+                // this.liveDashboardDataFormat(processedData);
+              } else {
+                console.error('Processed_Data.metadata.grid_details not found in response');
+                Swal.fire({
+                  title: 'Error!',
+                  text: 'No data found in response. Please check the input.',
+                  icon: 'error',
+                  confirmButtonText: 'OK'
+                });
+              }
+            } catch (error) {
+              console.error('Error parsing response body:', error);
               Swal.fire({
                 title: 'Error!',
-                text: 'No data found in response. Please check the input.',
+                text: 'Invalid response format received.',
                 icon: 'error',
                 confirmButtonText: 'OK'
               });
             }
-          } catch (error) {
-            console.error('Error parsing response body:', error);
+          } else {
+            console.error('Unexpected statusCode:', response?.statusCode);
             Swal.fire({
               title: 'Error!',
-              text: 'Invalid response format received.',
+              text: `Unexpected response received (Status Code: ${response?.statusCode}).`,
               icon: 'error',
               confirmButtonText: 'OK'
             });
           }
-        } else {
-          console.error('Unexpected statusCode:', response?.statusCode);
-          Swal.fire({
-            title: 'Error!',
-            text: `Unexpected response received (Status Code: ${response?.statusCode}).`,
-            icon: 'error',
-            confirmButtonText: 'OK'
-          });
-        }
-    
-        this.spinner.hide('dataProcess');
-        this.isLoading = false; // Reset loading state
-    if(key="html"){
-      this.route.paramMap.subscribe(params => {
-        this.routeId = params.get('id');
-        if (this.routeId) {
-          this.openModalHelpher(this.routeId);
-          this.editButtonCheck = true;
-        }
-      });
-    }
-        // Proceed with route parameter handling
-   
-      },
-      (error) => {
-        console.error('Error triggering Lambda function:', error);
-    
-        // Handle different error codes
-        if (error.status === 404) {
-          console.log('Received 404 error - stopping loading and showing error message.');
-          Swal.fire({
-            title: 'Error!',
-            text: 'Data not found. Please check your inputs and try again.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-          });
-        } else {
-          Swal.fire({
-            title: 'Error!',
-            text: 'Failed to trigger the Lambda function. Please try again.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-          });
-        }
-    
-        this.spinner.hide('dataProcess');
-        this.isLoading = false; // Ensure loading is stopped in all error cases
+      
+          this.spinner.hide('dataProcess');
+          this.isLoading = false; // Reset loading state
+      if(key="html"){
+        this.route.paramMap.subscribe(params => {
+          this.routeId = params.get('id');
+          if (this.routeId) {
+            this.openModalHelpher(this.routeId);
+            this.editButtonCheck = true;
+          }
+        });
       }
-    );
+          // Proceed with route parameter handling
+     
+        },
+        (error) => {
+          console.error('Error triggering Lambda function:', error);
+      
+          // Handle different error codes
+          if (error.status === 404) {
+            console.log('Received 404 error - stopping loading and showing error message.');
+            Swal.fire({
+              title: 'Error!',
+              text: 'Data not found. Please check your inputs and try again.',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
+          } else {
+            Swal.fire({
+              title: 'Error!',
+              text: 'Failed to trigger the Lambda function. Please try again.',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
+          }
+      
+          this.spinner.hide('dataProcess');
+          this.isLoading = false; // Ensure loading is stopped in all error cases
+        }
+      );
+
+    }
+
+
     
   }
   
@@ -1158,12 +1290,24 @@ fetchCalender(){
 showDrillDownData(dynamicDrill:any,modalref:any){
   console.log('dynamicDrill checking',dynamicDrill)
   this.storeDrillDown = dynamicDrill
+  console.log('this.storeDrillDown checking',this.storeDrillDown)
+  const drilldownColumnVisibility =JSON.parse(this.storeDrillDown.columnVisibility)
+  console.log('drilldownColumnVisibility checking',drilldownColumnVisibility)
+
+  if (!Array.isArray(drilldownColumnVisibility) || drilldownColumnVisibility.length === 0) {
+      console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
+      return;
+  }else{
+    this.modalService.open(modalref, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+  }
+
+
   console.log('this.storeDrillDown',this.storeDrillDown.id)
   const pointData ={
     name:this.storeDrillDown.multi_value[0].value,
     value:this.storeDrillDown.multi_value[0].processed_value
   }
-  this.modalService.open(modalref, { size: 'xl' });
+
   console.log('pointData for Tile',pointData)
   console.log('this.permissionIdRequest check drilldown',this.permissionIdRequest)
 
@@ -1833,7 +1977,18 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
           `Height: ${this.filterTileHeight[index]}, Width: ${this.filterTileWidth[index]}, Top Margin: }`
         );
     }
-
+    else if (item.grid_type === 'tile2') {
+      // const topMargin = 20; // Define the top margin value
+    
+      // Adjust height and width with the top margin
+      this.tile2Height[index] = itemComponentHeight ; // Subtract additional top margin
+      this.tile2Width[index] = itemComponentWidth ; // Subtract margin/padding for width
+    
+      console.log(
+        `Resized ${item.grid_type} at index ${index}:`,
+        `Height: ${this.tile2Height[index]}, Width: ${this.tile2Width[index]}, Top Margin: }`
+      );
+  }
       
       
 
@@ -2214,9 +2369,8 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
 
 
     
-
+     this.fetchUserPermissions(1)
     // console.log('readPermission_Id checking initialize',readPermission_Id)
-  
     
     this.initializeCompanyFields();
 
@@ -2313,22 +2467,21 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     // this.addJsonValidation();
     // this.showTable()
     this.addFromService()
-    this.fetchUserPermissions(1)
-    .then(async () => {
-    this.route.paramMap.subscribe(async params => {
+
+    this.route.paramMap.subscribe(params => {
       this.routeId = params.get('id');
       if (this.routeId) {
-
-    await this.openModalHelpher(this.routeId)
+        const permissionId =this.fetchUserPermissions(1)
+        console.log('permissionId onInit',permissionId)
+        this.openModalHelpher(this.routeId)
     .then((data) => {
-      this.checkAndSetFullscreen()
     console.log('✅ this.all_Packet_store permissions:', data); // ✅ Now you will get the correct data
     const livedatacheck = data
     console.log('livedatacheck',livedatacheck)
     this.checkLiveDashboard = livedatacheck.LiveDashboard
     console.log('this.checkLiveDashboard check',this.checkLiveDashboard)
     if(this.checkLiveDashboard==true){
-    this.reloadPage("from_ts") 
+    this.reloadPage("from_ts",permissionId) 
         
     
     }else{
@@ -2339,9 +2492,6 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     .catch((error) => {
     console.error('❌ Error fetching data:', error);
     });
-
-
- 
         this.editButtonCheck = true
     
       }
@@ -2349,11 +2499,8 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
       //console.log(this.routeId)
       // Use this.itemId to fetch and display item details
     });
-  })
-  .catch(error => {
-    console.error("❌ Error in fetchUserPermissions:", error);
-  });
 
+ 
 
 
     const savedMode = localStorage.getItem('editModeState');
@@ -2367,7 +2514,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     this.fetchContractOrderMasterlookup(1)
     this.permissionIds(1)
     this.fetchCompanyLookupdata(1)
-    // this.reloadPage();
+ 
     // this.fetchCalender()
    
          this.rowData = [
@@ -2422,7 +2569,7 @@ document.removeEventListener('keydown', this.handleKeyDown);
 // console.log('this.permissionsMetaData',this.permissionIdRequest)
 
 // console.log('check live',this.checkLiveDashboard )
-// this.reloadPage()
+
 
 
   }
@@ -2510,8 +2657,8 @@ document.removeEventListener('keydown', this.handleKeyDown);
 }
 
 
-fetchPermissionIdMain(clientID: number, p1Value: string): Promise<void> {
-  return new Promise(async (resolve, reject) => {
+  async fetchPermissionIdMain(clientID: number, p1Value: string): Promise<void> {
+
     try {
       console.log("p1Value checking", p1Value);
       console.log("clientID checking", clientID);
@@ -2524,7 +2671,7 @@ fetchPermissionIdMain(clientID: number, p1Value: string): Promise<void> {
 
       if (!result || !result.metadata) {
         console.warn("Result metadata is null or undefined.");
-        resolve(); // Resolve even if no data is found
+// Resolve even if no data is found
         return;
       }
 
@@ -2573,13 +2720,14 @@ fetchPermissionIdMain(clientID: number, p1Value: string): Promise<void> {
       }
 
       this.processFetchedData(result);
+      return this.readFilterEquation
       
-      resolve(); // Resolve the Promise after all operations are complete
+ // Resolve the Promise after all operations are complete
     } catch (error) {
       console.error(`Error fetching data for PK (${p1Value}):`, error);
-      reject(error); // Reject in case of API failure
+ // Reject in case of API failure
     }
-  });
+
 }
 
 
@@ -5304,14 +5452,14 @@ console.log('Serialized Query Params:', serializedQueryParams);
             if (actionKey === 'add_map' || actionKey === 'update_map') {
               window.location.reload(); // Reloads the current window
             } else if (actionKey === 'update_Dashboard' || actionKey === 'filter_add') {
-              // this.reloadPage("html");  // Call the reloadPage function
+     
             }
             else if (actionKey === 'add_table' || actionKey === 'update_table'){
               window.location.reload();
-              // this.reloadPage(); 
+        
             }
             else if(actionKey === 'add_multiTable' || actionKey === 'update_multiTable'){
-              // this.reloadPage("html"); 
+          
 
             }
           }
@@ -6773,7 +6921,7 @@ refreshFunction(){
     if(data){
       // setTimeout(() => {
         
-      // this.reloadPage()
+   
       // }, 1000);
 
     }
@@ -6804,17 +6952,140 @@ refreshFunction(){
   }
 
   helperChartClick(event:any,modalChart:any){
-    console.log('event checking',event)
-    this.modalService.open(modalChart, { size: 'xl' });
+    console.log('event checking:', event);
+    console.log('modalChart reference:', modalChart);
+    console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
+  
+    // ✅ Step 1: Check if modal opening is manually stopped
+    if (this.preventModalOpening) {
+        console.log("🚫 Modal opening is manually disabled. Not opening modal.");
+        return;
+    }
+  
+    // ✅ Step 2: Ensure this.chartDataConfigExport exists and is an object
+    if (!this.chartDataConfigExport || typeof this.chartDataConfigExport !== 'object') {
+        console.log("❌ chartDataConfigExport is undefined or not an object, not opening the modal.");
+        return;
+    }
+  
+    // ✅ Step 3: Extract columnVisibility safely
+    const columnVisibility = this.chartDataConfigExport.columnVisibility;
+    console.log('columnVisibility checking',columnVisibility)
+    const columnVisibilityRead = columnVisibility[0].columnVisibility
+    console.log('columnVisibilityRead checki',columnVisibilityRead)
+  
+    // ✅ Step 4: Ensure columnVisibility exists and has values
+    if (!Array.isArray(columnVisibilityRead) || columnVisibilityRead.length === 0) {
+        console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
+        return;
+    }else{
+      this.modalService.open(modalChart, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+    }
+  
+    console.log("✅ columnVisibility has data, opening modal...");
+  
+    // ✅ Step 5: Try to open the modal
+    try {
+  
+    } catch (error) {
+        console.error("❌ Error opening modal:", error);
+    }
   }
-  helperChartClickChart1(event:any,modalChart:any){
-    console.log('event checking',event)
-    this.modalService.open(modalChart, { size: 'xl' });
+// Class-level variable to store chart data
+
+
+// Function to capture the emitted chart data
+emitchartDatatable(configChartTable: any) {
+    console.log('configChartTable', configChartTable);
+    this.chartDataConfigExport = configChartTable;
+}
+
+// Function to open the modal if columnVisibility is not empty
+helperChartClickChart1(event: any, modalChart: any) {
+  console.log('event checking:', event);
+  console.log('modalChart reference:', modalChart);
+  console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
+
+  // ✅ Step 1: Check if modal opening is manually stopped
+  if (this.preventModalOpening) {
+      console.log("🚫 Modal opening is manually disabled. Not opening modal.");
+      return;
   }
 
+  // ✅ Step 2: Ensure this.chartDataConfigExport exists and is an object
+  if (!this.chartDataConfigExport || typeof this.chartDataConfigExport !== 'object') {
+      console.log("❌ chartDataConfigExport is undefined or not an object, not opening the modal.");
+      return;
+  }
+
+  // ✅ Step 3: Extract columnVisibility safely
+  const columnVisibility = this.chartDataConfigExport.columnVisibility;
+  console.log('columnVisibility checking',columnVisibility)
+  const columnVisibilityRead = columnVisibility[0].columnVisibility
+  console.log('columnVisibilityRead checki',columnVisibilityRead)
+
+  // ✅ Step 4: Ensure columnVisibility exists and has values
+  if (!Array.isArray(columnVisibilityRead) || columnVisibilityRead.length === 0) {
+      console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
+      return;
+  }else{
+    this.modalService.open(modalChart, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+  }
+
+  console.log("✅ columnVisibility has data, opening modal...");
+
+  // ✅ Step 5: Try to open the modal
+  try {
+
+  } catch (error) {
+      console.error("❌ Error opening modal:", error);
+  }
+}
+
+
+
+
+
+
   helperChartClickChart2(event:any,modalChart:any){
-    console.log('event checking',event)
-    this.modalService.open(modalChart, { size: 'xl' });
+    console.log('event checking:', event);
+    console.log('modalChart reference:', modalChart);
+    console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
+  
+    // ✅ Step 1: Check if modal opening is manually stopped
+    if (this.preventModalOpening) {
+        console.log("🚫 Modal opening is manually disabled. Not opening modal.");
+        return;
+    }
+  
+    // ✅ Step 2: Ensure this.chartDataConfigExport exists and is an object
+    if (!this.chartDataConfigExport || typeof this.chartDataConfigExport !== 'object') {
+        console.log("❌ chartDataConfigExport is undefined or not an object, not opening the modal.");
+        return;
+    }
+  
+    // ✅ Step 3: Extract columnVisibility safely
+    const columnVisibility = this.chartDataConfigExport.columnVisibility;
+    console.log('columnVisibility checking',columnVisibility)
+    const columnVisibilityRead = columnVisibility[0].columnVisibility
+    console.log('columnVisibilityRead checki',columnVisibilityRead)
+  
+    // ✅ Step 4: Ensure columnVisibility exists and has values
+    if (!Array.isArray(columnVisibilityRead) || columnVisibilityRead.length === 0) {
+        console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
+        return;
+    }else{
+      this.modalService.open(modalChart, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+    }
+  
+    console.log("✅ columnVisibility has data, opening modal...");
+  
+    // ✅ Step 5: Try to open the modal
+    try {
+  
+    } catch (error) {
+        console.error("❌ Error opening modal:", error);
+    }
   }
   helperRow(rowDynamic:any){
     console.log('rowDynamic checking',rowDynamic)
@@ -6822,70 +7093,66 @@ refreshFunction(){
     console.log('this.sendRowDynamic',this.sendRowDynamic)
 
   }
-  emitchartDatatable(configChartTable:any){
-    console.log('configChartTable',configChartTable)
-    this.chartDataConfigExport = configChartTable
 
-  }
-  fetchUserPermissions(sk: any): Promise<void> {
-    return new Promise(async (resolve, reject) => {
-      try {
+  async fetchUserPermissions(sk: any): Promise<{ permissionId: any; readFilterEquationawait: any } | null> {
+    try {
         this.userdetails = this.getLoggedUser.username;
         this.userClient = `${this.userdetails}#user#main`;
         console.log("this.tempClient from form service check", this.userClient);
-  
+
         // Fetch user permissions
         const permission = await this.api.GetMaster(this.userClient, sk);
         
         if (!permission) {
-          console.warn("No permission data received.");
-          resolve();
-          return;
+            console.warn("No permission data received.");
+            return null; // Fix: Returning null instead of undefined
         }
-  
+
         console.log("Data checking from add form", permission);
-  
+
         // Parse metadata
         const metadataString: string | null | undefined = permission.metadata;
         if (typeof metadataString !== "string") {
-          console.error("Invalid metadata format:", metadataString);
-          resolve();
-          return;
+            console.error("Invalid metadata format:", metadataString);
+            return null; // Fix: Ensuring the function returns a value
         }
-  
+        console.log('metadataString checking for',metadataString)
+
         try {
-          this.permissionsMetaData = JSON.parse(metadataString);
-          console.log("Parsed Metadata Object from location", this.permissionsMetaData);
-  
-          const permissionId = this.permissionsMetaData.permission_ID;
-          console.log("this.permissionIdRequest check from function", permissionId);
-          this.permissionIdRequest = permissionId;
-  
-          // **Now properly waits for fetchPermissionIdMain to complete**
-          await this.fetchPermissionIdMain(1, permissionId);
-  
-          if (permissionId !== "All") {
-            console.log("Stored permission ID:", permissionId);
-         this.loadData();
-          } else {
-            this.userPermission = permissionId;
-            console.log("this.userPermission checking", this.userPermission);
-            this.summaryDashboardUpdate = true;
-         this.loadData();
-            console.log("Permission ID is 'All', skipping action.");
-          }
-  
-          resolve();
+            this.permissionsMetaData = JSON.parse(metadataString);
+            console.log("Parsed Metadata Object from location", this.permissionsMetaData);
+
+            const permissionId = this.permissionsMetaData.permission_ID;
+            console.log("this.permissionIdRequest check from function", permissionId);
+            this.permissionIdRequest = permissionId;
+
+            // **Fix: Ensure fetchPermissionIdMain is awaited**
+            const readFilterEquationawait = await this.fetchPermissionIdMain(1, permissionId);
+
+            if (permissionId !== "All") {
+                console.log("Stored permission ID:", permissionId);
+                this.loadData();
+            } else {
+                this.userPermission = permissionId;
+                console.log("this.userPermission checking", this.userPermission);
+                this.summaryDashboardUpdate = true;
+                this.loadData();
+                console.log("Permission ID is 'All', skipping action.");
+            }
+
+            // ✅ Fix: Always returning a valid object
+            return { permissionId, readFilterEquationawait };
+
         } catch (error) {
-          console.error("Error parsing JSON:", error);
-          reject(error);
+            console.error("Error parsing JSON:", error);
+            return null; // Fix: Ensuring return on JSON parsing failure
         }
-      } catch (error) {
+    } catch (error) {
         console.error("Error fetching user permissions:", error);
-        reject(error);
-      }
-    });
-  }
+        return null; // Fix: Ensuring return on outer try-catch failure
+    }
+}
+
   
   
 
@@ -6960,6 +7227,7 @@ refreshFunction(){
   
     const widthHeightMap: { [key: string]: { width?: number[], height?: number[] ,heightOffset:number,widthOffset:number} } = {
       tile: { width: this.tileWidth, height: this.tileHeight, heightOffset: 80, widthOffset: 30},
+      tile2: { width: this.tile2Width, height: this.tile2Height, heightOffset: 80, widthOffset: 30},
    
       chart: { width: this.chartWidth, height: this.chartHeight, heightOffset: 10, widthOffset: 30  },
       map: { width: this.mapWidth, height: this.mapHeight, heightOffset: 80, widthOffset: 30  },

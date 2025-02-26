@@ -35,6 +35,9 @@ export class FilterTileUiComponent implements OnInit{
   @Input () summaryDashboardView :any
   @Input() summaryDashboardUpdate:any;
   @Input() hidingLink:any;
+  @Input() filterTileWidth:any;
+  @Input() filterTileHeight:any;
+
   parsedFilterTileConfig: any;
   combinedArray: any;
   appliedFilter = false;

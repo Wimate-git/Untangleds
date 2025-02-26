@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -59,7 +59,7 @@ export class Tile2ConfigComponent implements OnInit{
   parsedParam: any;
   FormNames: any;
   IdsFetch: any;
-  summaryIds: void;
+  summaryIds: any;
   dynamicIDArray: any;
   dashboardListRead: any[];
   dashboardList: any[];
@@ -74,6 +74,7 @@ export class Tile2ConfigComponent implements OnInit{
   projectList: any[];
   columnVisisbilityFields: any;
   shoRowData:boolean = false
+  selectedText: any;
 
 ngOnInit(): void {
   this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
@@ -93,8 +94,9 @@ ngOnChanges(changes: SimpleChanges): void {
   console.log('dashboardChange tile2',this.all_Packet_store)
 }
 
-async dashboardIds(sk: any) {
-  console.log("Iam called Bro");
+async dashboardIds(sk: any): Promise<string[]> {
+  console.log("I am called Bro");
+  
   try {
     const response = await this.api.GetMaster(this.SK_clientID + "#summary#lookup", sk);
 
@@ -112,17 +114,12 @@ async dashboardIds(sk: any) {
               const { P1, P2, P3, P4, P5, P6, P7, P8, P9 } = element[key];
 
               // Ensure dashboardIdsList is initialized
-              if (!this.dashboardIdsList) {
-                this.dashboardIdsList = [];
-              }
+              this.dashboardIdsList = this.dashboardIdsList || [];
 
               // Check if P1 exists before pushing
               if (P1 !== undefined && P1 !== null) {
                 this.dashboardIdsList.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9 });
                 console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5, P6, P7, P8, P9 });
-                console.log('this.dashboardIdsList check',this.dashboardIdsList)
-                this.p1ValuesSummary = this.dashboardIdsList.map((item: { P1: any; }) => item.P1);
-console.log('P1 values: dashboard', this.p1ValuesSummary);
               } else {
                 console.warn("Skipping element because P1 is not defined or null");
               }
@@ -131,19 +128,35 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
             }
           }
 
-          // Continue fetching recursively
-          await this.dashboardIds(sk + 1);
+          // Store P1 values
+          this.p1ValuesSummary = this.dashboardIdsList.map((item: { P1: any }) => item.P1);
+          console.log('P1 values: dashboard', this.p1ValuesSummary);
+
+          // Continue fetching recursively and wait for completion
+          const nextBatch = await this.dashboardIds(sk + 1);
+
+          // Merge new values with previous values
+          this.p1ValuesSummary = [...this.p1ValuesSummary, ...nextBatch];
+
+          // Remove duplicates if needed
+          this.p1ValuesSummary = Array.from(new Set(this.p1ValuesSummary));
+
+          return this.p1ValuesSummary; // Return the final collected values
         } else {
           console.error('Invalid data format - not an array.');
+          return [];
         }
       } else {
         console.error('response.options is not a string.');
+        return [];
       }
     } else {
       console.log("Lookup to be displayed", this.dashboardIdsList);
+      return this.p1ValuesSummary; // Return collected values when no more data is available
     }
   } catch (error) {
     console.error('Error:', error);
+    return [];
   }
 }
   SK_clientID(arg0: string, SK_clientID: any) {
@@ -192,27 +205,33 @@ generateUniqueId(): number {
 }
 
   initializeTileFields1() {
+    const defaultTheme = { color: "linear-gradient(to right, #A1045A, #A1045A)", selected: true };
+    this.selectedColor = defaultTheme.color;
     this.createKPIWidget1 = this.fb.group({
-      'formlist': ['', Validators.required],
-      'parameterName': ['', Validators.required],
+      formlist: ['', Validators.required],
+      parameterName: ['', Validators.required],
   
-      'primaryValue': ['', Validators.required],
-      'groupByFormat': ['', Validators.required],
-      'constantValue': [''],
-      'secondaryValue': ['', Validators.required],
+      primaryValue: ['', Validators.required],
+      groupByFormat: ['', Validators.required],
+      constantValue: [''],
+      secondaryValue: ['', Validators.required],
       widgetid: [this.generateUniqueId()],
-      'processed_value': [''],
+      processed_value: [''],
       // selectedColor: [this.selectedColor],
-      'themeColor': ['', Validators.required],
-      'processed_value1':[''],
+      themeColor: [this.selectedColor, Validators.required],
+      processed_value1:[''],
       fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['#000000', Validators.required], 
       dashboardIds:[''],
       selectType:[''],
       filterParameter: [[]], 
       filterDescription:[''],
-      selectedRangeType:['',Validators.required],
-      custom_Label:['',Validators.required]
+
+      custom_Label:['',Validators.required],
+      columnVisibility:[[]],
+      ModuleNames:[''],
+      formatType:['',Validators.required],
+ 
 
     })
   }
@@ -259,10 +278,15 @@ generateUniqueId(): number {
          selectType:this.createKPIWidget1.value.selectType,
          filterParameter:this.createKPIWidget1.value.filterParameter,
          filterDescription:this.createKPIWidget1.value.filterDescription,
-         selectedRangeType:this.createKPIWidget1.value.selectedRangeType,
-         parameterNameRead: this.parameterNameRead, 
+         selectedRangeType:this.createKPIWidget1.value.selectedRangeType ||'',
+         parameterNameRead: this.parameterNameRead ||'', 
          custom_Label:this.createKPIWidget1.value.custom_Label,
-
+         ModuleNames:this.createKPIWidget1.value.ModuleNames,
+         selectFromTime: this.createKPIWidget1.value.selectFromTime ||'',
+         selectToTime: this.createKPIWidget1.value.selectToTime ||'',
+         formatType: this.createKPIWidget1.value.formatType,
+         columnVisibility:this.createKPIWidget1.value.columnVisibility,
+     
 
 
          multi_value: [
@@ -349,94 +373,168 @@ generateUniqueId(): number {
       { color: "linear-gradient(to right, #000428, #004e92)", selected: false }, // Midnight Blue
       { color: "linear-gradient(to right, #FF8008, #FFC837)", selected: false }, // Bright Orange to Yellow
       { color: "linear-gradient(to right, #3A1C71, #D76D77, #FFAF7B)", selected: false }, // Purple to Peach
-      { color: "linear-gradient(to right, #4568DC, #B06AB3)", selected: false }  // Soft Blue to Purple
+      { color: "linear-gradient(to right, #4568DC, #B06AB3)", selected: false } , // Soft Blue to Purple
+
+
+
+
+      { color: "linear-gradient(to right, #3A1C71, #D76D77, #FFAF7B)", selected: false }, // Purple to Peach
+      { color: "linear-gradient(to right, #4568DC, #B06AB3)", selected: false },
+      { color: "linear-gradient(to right, #32cd32, #adff2f)", selected: false }, // Soft Blue to Purple
+      { color: "linear-gradient(to right, #6a0dad, #e6e6fa)", selected: false },
+      { color: "linear-gradient(to right, #4b0082, #9370db)", selected: false },
+      { color: "linear-gradient(to right, #008000, #00ff00)", selected: false },
+      { color: "linear-gradient(to right, #9400d3, #fff0f5)", selected: false },
+      { color: "linear-gradient(to right, #9b30ff, #8a2be2)", selected: false },
+    
+    
+      { color: "linear-gradient(to right, #228b22, #98fb98)", selected: false },
+      { color: "linear-gradient(to right, #8B4513, #A52A2A)", selected: false },
+      { color: "linear-gradient(to right, #D2691E, #CD853F)", selected: false },
+      { color: "linear-gradient(to right, #6B4226, #C2B280)", selected: false },
+      { color: "linear-gradient(to right, #8B4513, #F4A300)", selected: false },
+      { color: "linear-gradient(to right, #004d40, #00bcd4)", selected: false },
+      { color: "linear-gradient(to right, #A52A2A, #F5DEB3)", selected: false },
+      { color: "linear-gradient(to right, #800000, #b03060)", selected: false },
+      { color: "linear-gradient(to right, #008080, #20b2aa)", selected: false },
+     
+    
+      { color: "linear-gradient(to right, #006666, #48c9b0)", selected: false },
+      { color: "linear-gradient(to right, #2b5876, #4e4376)", selected: false },
+      { color: "linear-gradient(to right, #800080, #800080)", selected: false },
+      { color: "linear-gradient(to right, #808000, #808000)", selected: false },
+      { color: "linear-gradient(to right, #BC8F8F, #BC8F8F)", selected: false },
+      { color: "linear-gradient(to right, #696969, #696969)", selected: false },
+      { color: "linear-gradient(to right, #4E0707, #4E0707)", selected: false },
+      { color: "linear-gradient(to right, #FF4500, #FF4500)", selected: false },
+      { color: "linear-gradient(to right, #3A5311, #3A5311)", selected: false },
+      { color: "linear-gradient(to right, #1338BE, #1338BE)", selected: false },
+      { color: "linear-gradient(to right, #004F98, #004F98)", selected: false },
+      { color: "linear-gradient(to right, #A1045A, #A1045A)", selected: true },
+      { color: "linear-gradient(to right, #563C5C, #563C5C)", selected: false },
+      { color: "linear-gradient(to right, #655967, #655967)", selected: false },
+      { color: "linear-gradient(to right, #ff7e5f, #feb47b)", selected: false }, // Warm Sunset
+      { color: "linear-gradient(to right, #6a11cb, #2575fc)", selected: false }, // Cool Blue-Purple
+      { color: "linear-gradient(to right, #ff6a00, #ee0979)", selected: false }, // Fiery Red-Orange
+      { color: "linear-gradient(to right, #36d1dc, #5b86e5)", selected: false }, // Aqua Blue
+      { color: "linear-gradient(to right, #56ab2f, #a8e063)", selected: false }, // Fresh Green
+      { color: "linear-gradient(to right, #ff9966, #ff5e62)", selected: false }, // Orange-Red Glow
+    
+      { color: "linear-gradient(to right, #8e44ad, #3498db)", selected: false }, // Vibrant Purple-Blue
+      { color: "linear-gradient(to right, #fdc830, #f37335)", selected: false }, // Golden Sunburst
+      { color: "linear-gradient(to right, #16a085, #f4d03f)", selected: false }, // Teal to Yellow
+      { color: "linear-gradient(to right, #9cecfb, #65c7f7, #0052d4)", selected: false }, // Light to Deep Blue
+      { color: "linear-gradient(to right, #00c6ff, #0072ff)", selected: false }, // Bright Blue
+      { color: "linear-gradient(to right, #11998e, #38ef7d)", selected: false }, // Mint Green
+      { color: "linear-gradient(to right, #ff9a9e, #fad0c4)", selected: false }, // Pink Pastel
+      { color: "linear-gradient(to right, #fc5c7d, #6a82fb)", selected: false } , // Pink to Blue
+      { color: "linear-gradient(to right, #1D2671, #C33764)", selected: false }, 
     ];
     
   
   
   
     selectedColor: string = '#66C7B7';
-  openKPIModal1( tile?: any, index?: number) {
-    console.log('tile checking from tile2',tile)
+    openKPIModal1(tile?: any, index?: number) {
+      console.log('Tile checking from tile2:', tile);
     
-    if (tile) {
-      this.selectedTile = tile;
-      this.editTileIndex1 = index !== undefined ? index : null; // Store the index, default to null if undefined
-      console.log('Tile Object:', tile); // Log the tile object
-
-      // Parse multi_value if it's a string
-      let parsedMultiValue = [];
-      if (typeof tile.multi_value === 'string') {
-        try {
-          parsedMultiValue = JSON.parse(tile.multi_value);
-          console.log('Parsed multi_value:', parsedMultiValue); // Log parsed multi_value to verify structure
-        } catch (error) {
-          console.error('Error parsing multi_value:', error);
-        }
-      } else {
-        parsedMultiValue = tile.multi_value || [];
-      }
-
-      // Extract primaryValue and secondaryValue from parsed multi_value
-      const primaryValue = parsedMultiValue[0]?.value || ''; // Assuming value corresponds to primaryValue
-      const secondaryValue = parsedMultiValue[1]?.value || ''; // Assuming value corresponds to secondaryValue
-      const parsedValue = parsedMultiValue[2]?.processed_value !== undefined ? parsedMultiValue[2].processed_value : 0;
-      const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14; 
-      this.parsedParam = JSON.parse(tile.filterParameter)
-      console.log('this.parsedParam checking',this.parsedParam)
-      tile.filterParameter = this.parsedParam;
-      // Initialize form fields and pre-select values
+      // Ensure the form is initialized before patching values
       this.initializeTileFields1();
-      
-      this.createKPIWidget1.patchValue({
-        formlist: tile.formlist,
-        parameterName: tile.parameterName,
-   
-        primaryValue: primaryValue, // Set the primaryValue
-        groupByFormat: tile.groupByFormat,
-        constantValue: parsedMultiValue[0]?.constantValue || 0, // Assuming constantValue is in the first item
-        secondaryValue: secondaryValue, // Set the secondaryValue
-        processed_value: parsedValue,
-        themeColor: tile.themeColor,
-        fontSize: fontSizeValue, // Preprocessed fontSize value
-        fontColor: tile.fontColor,
-        dashboardIds: tile.dashboardIds,
-        selectType:tile.selectType,
-        filterParameter:tile.filterParameter,
-        filterDescription:tile.filterDescription,
-        selectedRangeType:tile.selectedRangeType,
-        custom_Label:tile.custom_Label
-
+    
+      if (tile) {
+        this.selectedTile = tile;
+        this.editTileIndex1 = index !== undefined ? index : null;
+        console.log('Tile Object:', tile);
+    
+        // Parse multi_value if it's a string
+        let parsedMultiValue = [];
+        if (typeof tile.multi_value === 'string') {
+          try {
+            parsedMultiValue = JSON.parse(tile.multi_value);
+            console.log('Parsed multi_value:', parsedMultiValue);
+          } catch (error) {
+            console.error('Error parsing multi_value:', error);
+          }
+        } else {
+          parsedMultiValue = tile.multi_value || [];
+        }
+    
+        let parsedColumnVisibility = [];
+        if (typeof tile.columnVisibility === 'string') {
+          try {
+            parsedColumnVisibility = JSON.parse(tile.columnVisibility);
+          } catch (error) {
+            console.error('Error parsing columnVisibility:', error);
+          }
+        } else if (Array.isArray(tile.columnVisibility)) {
+          parsedColumnVisibility = tile.columnVisibility;
+        }
+    
+        // Extract values safely
+        const primaryValue = parsedMultiValue[0]?.value || '';
+        const secondaryValue = parsedMultiValue[1]?.value || '';
+        const parsedValue = parsedMultiValue[2]?.processed_value !== undefined ? parsedMultiValue[2].processed_value : 0;
+        const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14;
+    
+        try {
+          this.parsedParam = typeof tile.filterParameter === 'string' ? JSON.parse(tile.filterParameter) : tile.filterParameter;
+          console.log('Parsed filterParameter:', this.parsedParam);
+          tile.filterParameter = this.parsedParam;
+        } catch (error) {
+          console.error('Error parsing filterParameter:', error);
+        }
+    
+        this.isEditMode = true;
+    
+        // ✅ Use `setTimeout` to ensure patching happens after form initialization
+        setTimeout(() => {
+          this.createKPIWidget1.patchValue({
+            formlist: tile.formlist || '',
+            parameterName: tile.parameterName || '',
+            primaryValue: primaryValue,
+            groupByFormat: tile.groupByFormat || '',
+            constantValue: parsedMultiValue[0]?.constantValue || 0,
+            secondaryValue: secondaryValue,
+            processed_value: parsedValue,
+            themeColor: tile.themeColor || '',
+            fontSize: fontSizeValue,
+            fontColor: tile.fontColor || '#000000',
+            dashboardIds: tile.dashboardIds || '',
+            selectType: tile.selectType || '',
+            filterParameter: tile.filterParameter || [],
+            filterDescription: tile.filterDescription || '',
+            selectedRangeType: tile.selectedRangeType || '',
+            custom_Label: tile.custom_Label || '',
+            selectFromTime: tile.selectFromTime || '',
+            selectToTime: tile.selectToTime || '',
+            ModuleNames: tile.ModuleNames || '',
+            columnVisibility: parsedColumnVisibility,
+            formatType: tile.formatType || '',
+          });
+        }, 0);
+    
+      } else {
+        // Handle case when no tile is provided (New Entry)
+        this.selectedTile = null;
+        this.isEditMode = false;
+        this.createKPIWidget1.reset();
+      }
+    
+      // Clear the 'selected' state for all themes
+      this.themes.forEach(theme => {
+        theme.selected = false;
       });
-
-      this.isEditMode = true; // Set to edit mode
-    } else {
-      this.selectedTile = null; // No tile selected for adding
-      this.isEditMode = false; // Set to add mode
-      this.createKPIWidget1.reset(); // Reset the form for new entry
+    
+      // Find and set the matching theme
+      const matchingTheme = this.themes.find(theme => theme.color === tile?.themeColor);
+      if (matchingTheme) {
+        matchingTheme.selected = true;
+        console.log('Matching theme found and selected:', matchingTheme);
+      }
+    
+      this.reloadEvent.next(true);
     }
-
-    // Clear the 'selected' state for all themes
-    this.themes.forEach(theme => {
-      theme.selected = false; // Deselect all themes
-    });
-
-    // Find the theme that matches the tile's themeColor
-    const matchingTheme = this.themes.find(theme => theme.color === tile?.themeColor);
-
-    // If a matching theme is found, set it as selected
-    if (matchingTheme) {
-      matchingTheme.selected = true;
-      console.log('Matching theme found and selected:', matchingTheme);
-    }
-
-    // Open the modal
-  
-
-    // Any additional setup if needed
-    // this.showTable();
-    this.reloadEvent.next(true);
-  }
+    
 
   dynamicparameterValue(event: any): void {
     console.log('Event check for dynamic param:', event);
@@ -544,7 +642,7 @@ generateUniqueId(): number {
   hideTooltip() {
     this.tooltip = null;
   }
-  toggleCheckbox1(themeOrEvent: any): void {
+  toggleCheckbox(themeOrEvent: any): void {
     // If it's a color picker input (e.g., from a custom input field)
     if (themeOrEvent.target) {
       this.selectedColor = themeOrEvent.target.value;  // Get the color from the input field
@@ -633,13 +731,19 @@ generateUniqueId(): number {
         // processed_value: processedValue,
         secondaryValue: secondaryValue,
         fontSize: fontSizeValue,
-        fontColor: this.createKPIWidget1.value.fontColor,
-        dashboardIds:this.createKPIWidget1.value.dashboardIds,
-        selectType:this.createKPIWidget1.value.selectType,
-        filterParameter:this.createKPIWidget1.value.filterParameter,
-        filterDescription:this.createKPIWidget1.value.filterDescription,
-        selectedRangeType:this.createKPIWidget1.value.selectedRangeType,
-        custom_Label:this.createKPIWidget1.value.custom_Label
+        fontColor: this.createKPIWidget1.value.fontColor ||'',
+        dashboardIds:this.createKPIWidget1.value.dashboardIds ||'',
+        selectType:this.createKPIWidget1.value.selectType ||'',
+        filterParameter:this.createKPIWidget1.value.filterParameter ||'',
+        filterDescription:this.createKPIWidget1.value.filterDescription ||'',
+        selectedRangeType:this.createKPIWidget1.value.selectedRangeType ||'',
+        custom_Label:this.createKPIWidget1.value.custom_Label ||'',
+        selectFromTime: this.createKPIWidget1.value.selectFromTime ||'',
+        selectToTime: this.createKPIWidget1.value.selectToTime ||'',
+
+        ModuleNames:this.createKPIWidget1.value.ModuleNames ||'',
+        columnVisibility:this.createKPIWidget1.value.columnVisibility ||'',
+        formatType: this.createKPIWidget1.value.formatType ||'',
       };
 
       // Log the updated details of the tile
@@ -760,7 +864,9 @@ generateUniqueId(): number {
   SelectTypeSummary =[
     { value: 'NewTab', text: 'New Tab' },
     { value: 'Modal', text: 'Modal(Pop Up)' },
+    { value: 'Same page Redirect', text: 'Same page Redirect' },
 
+    { value: 'drill down', text: 'drill down' },
   ]
   fetchDynamicFormData(value: any) {
     console.log("Data from lookup:", value);
@@ -809,15 +915,23 @@ generateUniqueId(): number {
   }
   selectFormParams(event: any) {
     if (event && event[0] && event[0].data) {
-      const selectedText = event[0].data.text;  // Adjust based on the actual structure
-      console.log('Selected Form Text:', selectedText);
+      this.selectedText = event[0].data.text;  // Adjust based on the actual structure
+      console.log('Selected Form Text:', this.selectedText);
+      this.getFormControlValue(this.selectedText); 
 
-      if (selectedText) {
-        this.fetchDynamicFormData(selectedText);
+      if (this.selectedText) {
+        this.fetchDynamicFormData(this.selectedText);
       }
     } else {
       console.error('Event data is not in the expected format:', event);
     }
+  }
+
+
+  getFormControlValue(selectedTextConfi:any): void {
+    // const formlistControl = this.createChart.get('formlist');
+    console.log('Formlist Control Value:', selectedTextConfi);
+    this.fetchDynamicFormDataConfig(selectedTextConfi);
   }
   duplicateTile1(tile: any, index: number): void {
     if (!tile || index < 0 || index >= this.dashboard.length) {
@@ -1367,4 +1481,34 @@ generateUniqueId(): number {
         console.log("Can't fetch", err);
       });
   }
+
+
+  validateAndSubmit() {
+    if (this.createKPIWidget1.invalid) {
+      this.markFormGroupTouched(this.createKPIWidget1);
+      return; // 🚨 Stop execution if the form is invalid
+    }
+  
+    // ✅ Proceed with saving only if form is valid
+    this.addTile('tile');
+    this.modal.dismiss();
+  }
+  
+  /**
+   * Recursively marks all form controls, groups, and arrays as touched
+   */
+  private markFormGroupTouched(formGroup: FormGroup | FormArray) {
+    Object.keys(formGroup.controls).forEach(field => {
+      const control = formGroup.get(field);
+      
+      if (control instanceof FormControl) {
+        control.markAsTouched();
+        control.updateValueAndValidity();
+      } else if (control instanceof FormGroup || control instanceof FormArray) {
+        this.markFormGroupTouched(control); // ✅ Recursively mark nested groups/arrays
+      }
+    });
+  }
+  
+  
 }
