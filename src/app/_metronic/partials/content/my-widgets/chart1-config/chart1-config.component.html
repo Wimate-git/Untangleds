@@ -12,6 +12,9 @@
                         form-control form-control-lg form-control-solid
                         mb-3 mb-lg-0" name="add_fields" formControlName="add_fields"
         (keyup)="addControls($event,'html')" required>
+        <div *ngIf="createChart.get('add_fields')?.touched && createChart.get('add_fields')?.invalid" class="text-danger">
+          <div *ngIf="createChart.get('add_fields')?.errors?.required">Parameters is required.</div>
+        </div>
     </div>
     <div class="col-md-6" [formGroup]="createChart">
       <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Title </label>
@@ -20,12 +23,11 @@
                   form-control form-control-lg form-control-solid
                   mb-3 mb-lg-0
                 " placeholder="Enter title" formControlName="chart_title" required>
+                <div *ngIf="createChart.get('chart_title')?.touched && createChart.get('chart_title')?.invalid" class="text-danger">
+                  <div *ngIf="createChart.get('chart_title')?.errors?.required">Title is required.</div>
+                </div>
 
-      <div *ngIf="
-                      
-                                  " class="fv-plugins-message-container invalid-feedback">
-        Title is required
-      </div>
+ 
 
 
 
@@ -152,6 +154,9 @@
                         [options]="listofDynamicParam"       optionLabel="text"
                         placeholder="Select Parameter" (onChange)="parameterValueCheck($event,fieldIndex)" >
                       </p-multiSelect>
+                      <div *ngIf="field.get('parameterName')?.touched && field.get('parameterName')?.invalid" class="text-danger">
+                        <div *ngIf="field.get('parameterName')?.errors?.required">Form Fields are required.</div>
+                      </div>
                     </div>
 
 
@@ -166,6 +171,9 @@
                       <ngx-select id="primaryValue" [allowClear]="true" formControlName="primaryValue"
                         [items]="showValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
                         (selectionChanges)="onValueChange($event)" class="w-100"></ngx-select>
+                        <div *ngIf="field.get('primaryValue')?.touched && field.get('primaryValue')?.invalid" class="text-danger">
+                          <div *ngIf="field.get('primaryValue')?.errors?.required">Primary Value is required.</div>
+                        </div>
                     </div>
                     <div class="col-md-4 mb-3" *ngIf="all_fields.value[fieldIndex].primaryValue === 'Count'">
                       <label for="constant" class="col-form-label fw-bold fs-6 required">Parameter Value</label>
@@ -194,6 +202,9 @@
                       <input id="groupByFormat" type="text" class="form-control form-control-solid"
                       placeholder="Select GroupByFormat" [formControlName]="'groupByFormat'"
                       (click)="openModalCalender(fieldIndex)" readonly>
+                      <div *ngIf="field.get('groupByFormat')?.touched && field.get('groupByFormat')?.invalid" class="text-danger">
+                        <div *ngIf="field.get('groupByFormat')?.errors?.required">Group By Format is required.</div>
+                      </div>
                
                     </div>
 
@@ -224,6 +235,9 @@
                       <ngx-select id="primaryValue" [allowClear]="true" formControlName="selectedRangeType"
                       [items]="showCustomValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
                       (selectionChanges)="onValueSelect($event)" class="w-100"   ></ngx-select>
+                      <div *ngIf="field.get('selectedRangeType')?.touched && field.get('selectedRangeType')?.invalid" class="text-danger">
+                        <div *ngIf="field.get('selectedRangeType')?.errors?.required">Date Range Label is required.</div>
+                      </div>
                    
                     </div>
                     <div class="col-md-4 mb-3">
@@ -250,7 +264,7 @@
                     </div>
 
                   <div class="col-md-4 mb-3">
-                    <label for="parameterName" class="col-form-label fw-bold fs-6 ">Format Type</label>
+                    <label for="parameterName" class="col-form-label fw-bold fs-6 required">Format Type</label>
                     <ngx-select
                       id="parameterName"
                       [allowClear]="true"
@@ -262,11 +276,17 @@
                   
                       style="width: 100%;">
                     </ngx-select>
+                    <div *ngIf="field.get('formatType')?.touched && field.get('formatType')?.invalid" class="text-danger">
+                      <div *ngIf="field.get('formatType')?.errors?.required">Format Type is required.</div>
+                    </div>
                   </div>
                   <div class="col-md-4 mb-3">
                     <label for="custom_Label" class="col-form-label fw-bold fs-6  required">Custom Label</label>
                     <input type="text" class="form-control form-control-solid"  name="custom_Label"
                       formControlName="custom_Label">
+                      <div *ngIf="field.get('custom_Label')?.touched && field.get('custom_Label')?.invalid" class="text-danger">
+                        <div *ngIf="field.get('custom_Label')?.errors?.required">Custom Label is required.</div>
+                      </div>
                   </div>
                     <div class="col-md-4 mb-3" *ngIf = "shoRowData" >
                       <label for="constant" class="col-form-label fw-bold fs-6 required"></label>

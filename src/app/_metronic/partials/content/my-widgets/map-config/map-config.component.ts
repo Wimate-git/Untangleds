@@ -370,15 +370,38 @@ console.log('Cleaned-up formlist values:', this.formlistValues);
       // ... add other ranges as needed
     };
   }
+
+
+  validateAndSubmit() {
+    if (this.createChart.invalid) {
+      // ✅ Mark all fields as touched to trigger validation messages
+      Object.values(this.createChart.controls).forEach(control => {
+        if (control instanceof FormControl) {
+          control.markAsTouched();
+          control.updateValueAndValidity();
+        } else if (control instanceof FormArray) {
+          control.controls.forEach((group) => {
+            (group as FormGroup).markAllAsTouched();
+          });
+        }
+      });
+  
+      return; // 🚨 Stop execution if the form is invalid
+    }
+  
+    // ✅ Proceed with saving only if form is valid
+    this.addTile('Map');
+    this.modal.dismiss();
+  }
   initializeTileFields(): void {
     console.log('i am initialize')
     // Initialize the form group
     this.createChart = this.fb.group({
-      add_fields:[''],
+      add_fields:['',Validators.required],
       all_fields:new FormArray([]),
   
       widgetid: [this.generateUniqueId()],
-      chart_title:[''],
+      chart_title:['',Validators.required],
 
     });
 
@@ -466,7 +489,7 @@ console.log('Cleaned-up formlist values:', this.formlistValues);
             filterForm: [''],
             filterParameter: [''],
             filterDescription: [''],
-            custom_Label: ['', Validators.required],
+            custom_Label: [''],
             add_Markers:[[]],
             filterParameter1:[''],
             filterDescription1:[''],

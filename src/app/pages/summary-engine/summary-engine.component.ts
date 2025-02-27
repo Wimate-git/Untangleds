@@ -5468,7 +5468,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
             }
           }
         });
-  
+        this.cdr.detectChanges()
         // Additional logic for 'update'
         if (actionKey === 'update') {
           this.route.paramMap.subscribe(params => {

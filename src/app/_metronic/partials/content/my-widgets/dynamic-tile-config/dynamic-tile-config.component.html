@@ -18,6 +18,9 @@
                             form-control form-control-lg form-control-solid
                             mb-3 mb-lg-0" name="add_fields" formControlName="add_fields"
             (keyup)="addControls($event,'html')" required>
+            <div *ngIf="createChart.get('add_fields')?.touched && createChart.get('add_fields')?.invalid" class="text-danger">
+              <div *ngIf="createChart.get('add_fields')?.errors?.required">Parameters is required.</div>
+            </div>
         </div>
         <div class="col-md-6" [formGroup]="createChart">
           <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Title </label>
@@ -27,11 +30,9 @@
                       mb-3 mb-lg-0
                     " placeholder="Enter title" formControlName="chart_title" required>
     
-          <div *ngIf="
-                          
-                                      " class="fv-plugins-message-container invalid-feedback">
-            Title is required
-          </div>
+                    <div *ngIf="createChart.get('chart_title')?.touched && createChart.get('chart_title')?.invalid" class="text-danger">
+                      <div *ngIf="createChart.get('chart_title')?.errors?.required">Title is required.</div>
+                    </div>
     
         </div>
         <!-- <div class="col-md-2" >
@@ -206,13 +207,13 @@
                   aria-controls="filter-tab" aria-selected="false" (click)="selectedSettingsTab('filter-tab')">Filter</a>
               </li>
             </div>
-            <div class="col-2" role="Settings">
+            <!-- <div class="col-2" role="Settings">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="settings-tabpane" data-bs-toggle="tab" role="tab"
                   aria-controls="settings-tab" aria-selected="false"
-                  (click)="selectedSettingsTab('settings-tab')">Settings/Label</a>
+                  (click)="selectedSettingsTab('settings-tab')">Label</a>
               </li>
-            </div>
+            </div> -->
             <div class="col-2" role="Theme">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="theme-tabpane" data-bs-toggle="tab" role="tab" aria-controls="theme-tab" aria-selected="false" (click)="selectedSettingsTab('theme-tab')">Theme</a>
@@ -257,6 +258,9 @@
                           (selectionChanges)="selectFormParams($event, fieldIndex)"
                           placeholder="Select Form">
                         </ngx-select>
+                        <div *ngIf="field.get('formlist')?.touched && field.get('formlist')?.invalid" class="text-danger">
+                          <div *ngIf="field.get('formlist')?.errors?.required">Form is required.</div>
+                        </div>
                       </div>
                     
                       <!-- Dynamic Parameters Dropdown -->
@@ -272,6 +276,10 @@
                           (selectionChanges)="dynamicparameterLabel($event,fieldIndex)"
                           placeholder="Select Parameter">
                         </ngx-select>
+                        <div *ngIf="field.get('parameterName')?.touched && field.get('parameterName')?.invalid" class="text-danger">
+                          <div *ngIf="field.get('parameterName')?.errors?.required">Form Fields are required.</div>
+                        </div>
+
                       </div>
                     
   
@@ -299,6 +307,9 @@
                           (selectionChanges)="onValueChange($event, fieldIndex)" 
                           class="w-100">
                         </ngx-select>
+                        <div *ngIf="field.get('primaryValue')?.touched && field.get('primaryValue')?.invalid" class="text-danger">
+                          <div *ngIf="field.get('primaryValue')?.errors?.required">Primary Value is required.</div>
+                        </div>
                       </div>
                       
                       <!-- Show only when primaryValue is 'Equation' -->
@@ -320,6 +331,9 @@
                         <input id="groupByFormat" type="text" class="form-control form-control-solid"
                         placeholder="Select GroupByFormat" [formControlName]="'groupByFormat'"
                         (click)="openModalCalender(fieldIndex)" readonly>
+                        <div *ngIf="field.get('groupByFormat')?.touched && field.get('groupByFormat')?.invalid" class="text-danger">
+                          <div *ngIf="field.get('groupByFormat')?.errors?.required">Group By Format is required.</div>
+                        </div>
                  
                       </div>
   
@@ -350,6 +364,10 @@
                         <ngx-select id="primaryValue" [allowClear]="true" formControlName="selectedRangeType"
                         [items]="showCustomValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
                         (selectionChanges)="onValueSelect($event)" class="w-100"   ></ngx-select>
+                        <div *ngIf="field.get('selectedRangeType')?.touched && field.get('selectedRangeType')?.invalid" class="text-danger">
+                          <div *ngIf="field.get('selectedRangeType')?.errors?.required">Date Range Label is required.</div>
+                        </div>
+
                      
                       </div>
                       <div class="col-md-4 mb-3">
@@ -373,37 +391,17 @@
                           [disabled]="all_fields.at(fieldIndex).get('staticEquation')?.disabled ?? false">
                         </textarea>
                       </div>
-  
-
-  
-  
-  
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-  
-            <!-- Settings Tab Content -->
-             <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab"
-              role="tabpanel" aria-labelledby="settings-tabpane">
-              <div formArrayName="all_fields">
-                <div *ngFor="let field of all_fields.controls; let fieldIndex=index">
-                  <div [formGroupName]="fieldIndex"
-                    style="border: 2px solid rgb(201, 228, 239); padding: 10px; margin: 5px;border-radius: 5px;">
-  
-                    <div class="row">
-  
-  
-  
-                      <div class="col-md-6 mb-3">
+                      <div class="col-md-4 mb-3">
                         <label for="custom_Label" class="col-form-label fw-bold fs-6  required">Custom Label</label>
                         <input type="text" class="form-control form-control-solid"  name="custom_Label"
                           formControlName="custom_Label">
+                          <div *ngIf="field.get('custom_Label')?.touched && field.get('custom_Label')?.invalid" class="text-danger">
+                            <div *ngIf="field.get('custom_Label')?.errors?.required">Custom Label is required.</div>
+                          </div>
                       </div>
     
     
-                      <div class="col-md-6 mb-3">
+                      <div class="col-md-4 mb-3">
                         <label for="fontSize" class="col-form-label fw-bold fs-6 required">Font Size</label>
                         <input
                           id="fontSize"
@@ -416,7 +414,34 @@
                           <div *ngIf="createChart.get('fontSize')?.errors?.min || createChart.get('fontSize')?.errors?.max" class="text-danger mt-1">
                             Font size must be between 8 and 72.
                           </div>
+                          <div *ngIf="field.get('fontSize')?.touched && field.get('fontSize')?.invalid" class="text-danger">
+                            <div *ngIf="field.get('fontSize')?.errors?.required">Font Size is required.</div>
+                          </div>
                       </div>
+  
+
+  
+  
+  
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Settings Tab Content -->
+             <!-- <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab"
+              role="tabpanel" aria-labelledby="settings-tabpane">
+              <div formArrayName="all_fields">
+                <div *ngFor="let field of all_fields.controls; let fieldIndex=index">
+                  <div [formGroupName]="fieldIndex"
+                    style="border: 2px solid rgb(201, 228, 239); padding: 10px; margin: 5px;border-radius: 5px;">
+  
+                    <div class="row">
+  
+  
+  
+
                     </div>
                   </div>
                 </div>
@@ -424,7 +449,7 @@
   
   
   
-            </div> 
+            </div>  -->
   
 
             <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'filter-tab'}" id="filter-tab"
@@ -487,7 +512,7 @@
                     *ngFor="let theme of themes"
                     class="color-box"
                     [ngStyle]="{ 'background-image': theme.color }"
-                    (click)="toggleCheckbox1(theme)"
+                    (click)="toggleCheckbox(theme)"
                     [class.checked]="theme.selected"
                   >
                     <div *ngIf="theme.selected" class="checkmark">✔</div>
@@ -767,7 +792,7 @@
         <div class="modal-footer" style="margin-top: 20px;">
           <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
           <button type="button" class="btn btn-primary" *ngIf="!isEditMode"
-            (click)="addTile('dynamicTile');modal.dismiss()">Save</button>
+            (click)="validateAndSubmit()">Save</button>
           <button type="button" class="btn btn-warning" (click)="updateTile('dynamicTile');modal.dismiss() " *ngIf="isEditMode"
             [disabled]="createChart?.invalid">
             Update

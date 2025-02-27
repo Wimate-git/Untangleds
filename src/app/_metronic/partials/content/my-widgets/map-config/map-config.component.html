@@ -13,6 +13,9 @@
                             form-control form-control-lg form-control-solid
                             mb-3 mb-lg-0" name="add_fields" formControlName="add_fields"
             (keyup)="addControls($event,'html')" required>
+            <div *ngIf="createChart.get('add_fields')?.touched && createChart.get('add_fields')?.invalid" class="text-danger">
+              <div *ngIf="createChart.get('add_fields')?.errors?.required">Parameters is required.</div>
+            </div>
         </div>
         <div class="col-md-6" [formGroup]="createChart">
           <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Title </label>
@@ -22,11 +25,9 @@
                       mb-3 mb-lg-0
                     " placeholder="Enter title" formControlName="chart_title" required>
     
-          <div *ngIf="
-                          
-                                      " class="fv-plugins-message-container invalid-feedback">
-            Title is required
-          </div>
+                    <div *ngIf="createChart.get('chart_title')?.touched && createChart.get('chart_title')?.invalid" class="text-danger">
+                      <div *ngIf="createChart.get('chart_title')?.errors?.required">Title is required.</div>
+                    </div>
     
         </div>
         <!-- <div class="col-md-2" >
@@ -147,6 +148,9 @@
                           (selectionChanges)="selectFormParams($event, fieldIndex)"
                           placeholder="Select Form">
                         </ngx-select>
+                        <div *ngIf="field.get('formlist')?.touched && field.get('formlist')?.invalid" class="text-danger">
+                          <div *ngIf="field.get('formlist')?.errors?.required">Form is required.</div>
+                        </div>
                       </div>
                     
                       <!-- Form Fields Dropdown -->
@@ -161,6 +165,9 @@
                           (selectionChanges)="dynamicparameterLabel($event, fieldIndex)"
                           placeholder="Select Parameter">
                         </ngx-select>
+                        <div *ngIf="field.get('parameterName')?.touched && field.get('parameterName')?.invalid" class="text-danger">
+                          <div *ngIf="field.get('parameterName')?.errors?.required">Form Fields are required.</div>
+                        </div>
                       </div>
                       
                     
@@ -178,6 +185,9 @@
                             {{ marker.label }}
                           </option>
                         </select>
+                        <div *ngIf="field.get('map_type')?.touched && field.get('map_type')?.invalid" class="text-danger">
+                          <div *ngIf="field.get('map_type')?.errors?.required">Marker is required.</div>
+                        </div>
                       </div>
                     </div>
                     
@@ -221,6 +231,9 @@
                               <option value="any">any</option>
                               <option value="latest 10">latest 10</option>
                             </select>
+                            <div *ngIf="field.get('dateType')?.touched && field.get('dateType')?.invalid" class="text-danger">
+                              <div *ngIf="field.get('dateType')?.errors?.required">DateType is required.</div>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -424,7 +437,7 @@
         <div class="modal-footer" style="margin-top: 20px;">
           <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
           <button type="button" class="btn btn-primary" *ngIf="!isEditMode"
-            (click)="addTile('Map');modal.dismiss()">Save</button>
+          (click)="validateAndSubmit()" >Save</button>
           <button type="button" class="btn btn-warning" (click)="updateTile('Map');modal.dismiss() " *ngIf="isEditMode"
             [disabled]="createChart?.invalid">
             Update

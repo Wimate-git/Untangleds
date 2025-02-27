@@ -163,6 +163,8 @@ export class DynamicTileConfigComponent implements OnInit{
         this.createChart.get('columnVisibility')?.disable();
       }
     });
+
+
   
   
 
@@ -233,6 +235,8 @@ export class DynamicTileConfigComponent implements OnInit{
     };
   }
   initializeTileFields(): void {
+    const defaultTheme = { color: "linear-gradient(to right, #A1045A, #A1045A)", selected: true };
+    this.selectedColor = defaultTheme.color;
     console.log('i am initialize')
     // Initialize the form group
     this.createChart = this.fb.group({
@@ -244,9 +248,9 @@ export class DynamicTileConfigComponent implements OnInit{
   
       widgetid: [this.generateUniqueId()],
       chart_title:[''],
-      themeColor: ['', Validators.required],
+      themeColor: [this.selectedColor, Validators.required],
       fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
-      fontColor: ['', Validators.required], 
+      fontColor: ['#000000', Validators.required], 
       toggleCheck: [false], // Default toggle state
 // Default unchecked
       dashboardIds: [''],
@@ -306,6 +310,28 @@ export class DynamicTileConfigComponent implements OnInit{
     }
   }
 
+  validateAndSubmit() {
+    if (this.createChart.invalid) {
+      // ✅ Mark all fields as touched to trigger validation messages
+      Object.values(this.createChart.controls).forEach(control => {
+        if (control instanceof FormControl) {
+          control.markAsTouched();
+          control.updateValueAndValidity();
+        } else if (control instanceof FormArray) {
+          control.controls.forEach((group) => {
+            (group as FormGroup).markAllAsTouched();
+          });
+        }
+      });
+  
+      return; // 🚨 Stop execution if the form is invalid
+    }
+  
+    // ✅ Proceed with saving only if form is valid
+    this.addTile('dynamicTile');
+    this.modal.dismiss();
+  }
+
   addControls(event: any, _type: string) {
     // console.log('this.dynamicparameterLabMap before adding controls:', this.dynamicparameterLabMap);
     console.log('Event received in addControls:', event);
@@ -345,7 +371,7 @@ export class DynamicTileConfigComponent implements OnInit{
             constantValue: [''],
             processed_value: [''],
             selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
-            selectedRangeType: [''],
+            selectedRangeType: ['',Validators.required],
             selectFromTime: [''],
             selectToTime: [''],
             // parameterValue: [''],
@@ -706,7 +732,7 @@ export class DynamicTileConfigComponent implements OnInit{
     { color: "linear-gradient(to right, #3A5311, #3A5311)", selected: false },
     { color: "linear-gradient(to right, #1338BE, #1338BE)", selected: false },
     { color: "linear-gradient(to right, #004F98, #004F98)", selected: false },
-    { color: "linear-gradient(to right, #A1045A, #A1045A)", selected: false },
+    { color: "linear-gradient(to right, #A1045A, #A1045A)", selected: true},
     { color: "linear-gradient(to right, #563C5C, #563C5C)", selected: false },
     { color: "linear-gradient(to right, #655967, #655967)", selected: false },
   
@@ -1672,7 +1698,7 @@ datesUpdatedRange($event: any,index:any): void {
 
 
 
-toggleCheckbox1(themeOrEvent: any): void {
+toggleCheckbox(themeOrEvent: any): void {
   // If it's a color picker input (e.g., from a custom input field)
   if (themeOrEvent.target) {
     this.selectedColor = themeOrEvent.target.value;  // Get the color from the input field

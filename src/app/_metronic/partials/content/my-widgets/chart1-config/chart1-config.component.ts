@@ -200,7 +200,7 @@ export class Chart1ConfigComponent implements OnInit {
       // fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       // fontColor: ['#000000', Validators.required], // Default to black
    
-      chart_title:[''],
+      chart_title:['',Validators.required],
       highchartsOptionsJson:[JSON.stringify(this.defaultHighchartsOptionsJson,null,4)],
       filterForm:[''],
       filterParameter:[[]],
@@ -342,15 +342,15 @@ export class Chart1ConfigComponent implements OnInit {
             processed_value: ['234567'],
             selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
      
-            selectedRangeType: [''],
+            selectedRangeType: ['',Validators.required],
             selectFromTime: [''],
             selectToTime: [''],
             parameterValue:[''],
             columnVisibility:[[]],
             rowData:[''],
-            formatType:[''],
+            formatType:['',Validators.required],
             undefinedCheckLabel:[''],
-            custom_Label:['']
+            custom_Label:['',Validators.required]
             
 
        
@@ -576,6 +576,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
       if (this.grid_details) {
         this.updateSummary(this.all_Packet_store,'update_tile');
       }
+      this.cdr.detectChanges()
   
       console.log('this.dashboard check from updateTile', this.dashboard);
       console.log('Updated all_Packet_store.grid_details:', this.all_Packet_store.grid_details);

@@ -743,5 +743,26 @@ this.initializeTileFields()
     {value:'None',text:'None'},
 
   ]
+  validateAndSubmit() {
+    if (this.createKPIWidget.invalid) {
+      // ✅ Mark all fields as touched to trigger validation messages
+      Object.values(this.createKPIWidget.controls).forEach(control => {
+        if (control instanceof FormControl) {
+          control.markAsTouched();
+          control.updateValueAndValidity();
+        } else if (control instanceof FormArray) {
+          control.controls.forEach((group) => {
+            (group as FormGroup).markAllAsTouched();
+          });
+        }
+      });
+  
+      return; // 🚨 Stop execution if the form is invalid
+    }
+  
+    // ✅ Proceed with saving only if form is valid
+    this.addTile('TableWidget');
+    this.modal.dismiss();
+  }
   
 }

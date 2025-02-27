@@ -61,6 +61,9 @@
                   (selectionChanges)="selectFormParams($event)"
                   placeholder="Select Form">
                 </ngx-select>
+                <div *ngIf="createKPIWidget.get('formlist')?.touched && createKPIWidget.get('formlist')?.invalid" class="text-danger">
+                  <div *ngIf="createKPIWidget.get('formlist')?.errors?.required">Form Fields is required.</div>
+                </div>
               </div>
         
         
@@ -76,6 +79,9 @@
                     placeholder="Select Columns"
                     (onChange)="parameterValue($event)">
                   </p-multiSelect>
+                  <div *ngIf="createKPIWidget.get('form_data_selected')?.touched && createKPIWidget.get('form_data_selected')?.invalid" class="text-danger">
+                    <div *ngIf="createKPIWidget.get('form_data_selected')?.errors?.required">Form Fields is required.</div>
+                  </div>
                 </div>
               </div>
 
@@ -83,6 +89,9 @@
                 <label for="custom_Label" class="col-form-label fw-bold fs-6  required">Custom Label</label>
                 <input type="text" class="form-control form-control-solid"  name="custom_Label"
                   formControlName="custom_Label">
+                  <div *ngIf="createKPIWidget.get('custom_Label')?.touched && createKPIWidget.get('custom_Label')?.invalid" class="text-danger">
+                    <div *ngIf="createKPIWidget.get('custom_Label')?.errors?.required"> Custom Label is required.</div>
+                  </div>
               </div>
               <div class="col-md-4 mb-3" *ngIf="!hideRowDataField">
                 <label for="custom_Label" class="col-form-label fw-bold fs-6 required">Row Data</label>
@@ -99,6 +108,9 @@
                   [formControl]="groupByFormatControl"
                   (click)="openModalCalender()"
                   readonly>
+                  <div *ngIf="createKPIWidget.get('groupByFormat')?.touched && createKPIWidget.get('groupByFormat')?.invalid" class="text-danger">
+                    <div *ngIf="createKPIWidget.get('groupByFormat')?.errors?.required"> Group By Format is required.</div>
+                  </div>
               </div>
 
 
@@ -286,7 +298,7 @@
   
       <div class="modal-footer" style="margin-top: 20px;">
         <button type="button" class="btn btn-secondary" (click)="modal.dismiss()"  >Close</button>
-  <button type="button" class="btn btn-primary"      *ngIf="!isEditMode"     (click)="addTile('TableWidget');modal.dismiss()" [disabled]="createKPIWidget?.invalid" >Save</button>
+  <button type="button" class="btn btn-primary"      *ngIf="!isEditMode"        (click)="validateAndSubmit()"   >Save</button>
   <button 
       type="button" 
       class="btn btn-warning" 

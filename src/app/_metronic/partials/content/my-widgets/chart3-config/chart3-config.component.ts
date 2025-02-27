@@ -114,7 +114,27 @@ export class Chart3ConfigComponent implements OnInit{
 
 
   }
-
+  validateAndSubmit() {
+    if (this.createChart.invalid) {
+      // ✅ Mark all fields as touched to trigger validation messages
+      Object.values(this.createChart.controls).forEach(control => {
+        if (control instanceof FormControl) {
+          control.markAsTouched();
+          control.updateValueAndValidity();
+        } else if (control instanceof FormArray) {
+          control.controls.forEach((group) => {
+            (group as FormGroup).markAllAsTouched();
+          });
+        }
+      });
+  
+      return; // 🚨 Stop execution if the form is invalid
+    }
+  
+    // ✅ Proceed with saving only if form is valid
+    this.addTile('chart');
+    this.modal.dismiss();
+  }
   handleSeriesClick(seriesName: string): void {
     console.log('Series clicked:', seriesName);
     // Perform the desired action
@@ -183,7 +203,7 @@ export class Chart3ConfigComponent implements OnInit{
     console.log('i am initialize')
     // Initialize the form group
     this.createChart = this.fb.group({
-      add_fields:[''],
+      add_fields:['',Validators.required],
       all_fields:new FormArray([]),
   
       widgetid: [this.generateUniqueId()],
@@ -193,7 +213,7 @@ export class Chart3ConfigComponent implements OnInit{
       // fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       // fontColor: ['#000000', Validators.required], // Default to black
    
-      chart_title:[''],
+      chart_title:['',Validators.required],
       highchartsOptionsJson:[JSON.stringify(this.defaultHighchartsOptionsJson,null,4)],
       filterForm:[''],
    
@@ -279,15 +299,15 @@ export class Chart3ConfigComponent implements OnInit{
             processed_value: ['234567'],
             selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
      
-            selectedRangeType: [''],
+            selectedRangeType: ['',Validators.required],
             selectFromTime: [''],
             selectToTime: [''],
             parameterValue:[''],
             columnVisibility:[[]],
             rowData:[''],
-            formatType:[''],
+            formatType:['',Validators.required],
             undefinedCheckLabel:[''],
-            custom_Label:['']
+            custom_Label:['',Validators.required]
           })
         );
         console.log('this.all_fields check', this.all_fields);

@@ -100,6 +100,29 @@ export class Chart2ConfigComponent implements OnInit{
 
   }
 
+
+validateAndSubmit() {
+  if (this.createChart.invalid) {
+    // ✅ Mark all fields as touched to trigger validation messages
+    Object.values(this.createChart.controls).forEach(control => {
+      if (control instanceof FormControl) {
+        control.markAsTouched();
+        control.updateValueAndValidity();
+      } else if (control instanceof FormArray) {
+        control.controls.forEach((group) => {
+          (group as FormGroup).markAllAsTouched();
+        });
+      }
+    });
+
+    return; // 🚨 Stop execution if the form is invalid
+  }
+
+  // ✅ Proceed with saving only if form is valid
+  this.addTile('chart');
+  this.modal.dismiss();
+}
+
   selectfilterFormList(filterFormValue:any){
     console.log('filterFormValue check',filterFormValue)
     const filterValue = filterFormValue[0].value
@@ -171,7 +194,7 @@ export class Chart2ConfigComponent implements OnInit{
     console.log('i am initialize')
     // Initialize the form group
     this.createChart = this.fb.group({
-      add_fields:[''],
+      add_fields:['',Validators.required],
       all_fields:new FormArray([]),
   
       widgetid: [this.generateUniqueId()],
@@ -181,7 +204,7 @@ export class Chart2ConfigComponent implements OnInit{
       // fontSize: [14, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       // fontColor: ['#000000', Validators.required], // Default to black
    
-      chart_title:[''],
+      chart_title:['',Validators.required],
       highchartsOptionsJson:[JSON.stringify(this.defaultHighchartsOptionsJson,null,4)],
       filterForm:[''],
    
@@ -266,14 +289,15 @@ export class Chart2ConfigComponent implements OnInit{
             processed_value: ['234567'],
             selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
      
-            selectedRangeType: [''],
+            selectedRangeType: ['',Validators.required],
             selectFromTime: [''],
             selectToTime: [''],
             parameterValue:[''],
             columnVisibility:[[]],
             rowData:[''],
             undefinedCheckLabel:[''],
-            custom_Label:['']
+            custom_Label:['',Validators.required],
+            formatType:['',Validators.required]
           })
         );
         console.log('this.all_fields check', this.all_fields);
@@ -774,7 +798,8 @@ repopulate_fields(getValues: any): FormArray {
           parameterValue: configItem.parameterValue || '',
           undefinedCheckLabel:configItem.undefinedCheckLabel || '',
           columnVisibility: this.fb.control(columnVisibility), // Initialize columnVisibility as a control
-          custom_Label:configItem.custom_Label || ''
+          custom_Label:configItem.custom_Label || '',
+          formatType:configItem.formatType || ''
         })
       );
 
@@ -1412,5 +1437,17 @@ initializeChart(): void {
     console.error('Highcharts options are empty or undefined');
   }
 }
+FormatTypeValues = [
+  { value: 'Default', text: 'Default' },
+  { value: 'Rupee', text: 'Rupee' },
+  { value: 'Distance', text: 'Distance' },
+  { value: 'Days & Hours', text: 'Days & Hours' },
+  { value: 'Hours', text: 'Hours' },
+  { value: 'Minutes', text: 'Minutes' },
+  { value: 'Days', text: 'Days' },
+  {value:'Label With Value',text:'Label With Value'}
+  // { value: 'max', text: 'Maximum' },
+]
+
 
 }

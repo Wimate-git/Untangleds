@@ -55,7 +55,7 @@ export class MapUiComponent implements OnInit{
   defaultCenter: { lat: number; lng: number; };
 
   ngOnInit(){
-    this.createMapWidget();
+  
     console.log('item chacke',this.item.grid_details)
     this.summaryService.lookUpData$.subscribe((data: any)=>{
       console.log('data check>>>',data)
@@ -275,6 +275,7 @@ data.forEach((packet: any,matchedIndex:number) => {
     }
   }
 ngAfterViewInit(): void {
+  this.createMapWidget();
   // this.createMapWidget()
   // this.initializeMapData();
 }
