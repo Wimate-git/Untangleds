@@ -291,6 +291,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   liveDataMapTile: any;
   summaryDashboardView: any;
   preventModalOpening: any;
+  eventFilterConditions: any;
 
 
   createPieChart() {
@@ -760,7 +761,9 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   async reloadPage(key:any,permissionfromOnInit?:any) {
     if (key === "from_ts") {
       this.isLoading = true; 
+
       try {
+        this.spinner.show('dataProcess')
           // ✅ Ensure we await the resolved value of permissionfromOnInit
           const resolvedPermission = await permissionfromOnInit;
           
@@ -797,7 +800,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
                   // Ensure Processed_Data exists in response
                   if (constLiveData?.Processed_Data?.metadata?.grid_details) {
                     const processedData = constLiveData.Processed_Data.metadata.grid_details;
-                    console.log('processedData check', processedData);
+                    console.log('processedData check liveData', processedData);
                     this.summaryService.updatelookUpData(processedData)
       //               if (this.all_Packet_store?.LiveDashboard === true ) {
           
@@ -838,7 +841,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
           
               this.spinner.hide('dataProcess');
               this.isLoading = false; // Reset loading state
-          if(key="html"){
+          if(key="from_ts"){
             this.route.paramMap.subscribe(params => {
               this.routeId = params.get('id');
               if (this.routeId) {
@@ -1325,7 +1328,8 @@ showDrillDownData(dynamicDrill:any,modalref:any){
             MsgType:'DrillDown',
             permissionId:this.permissionIdRequest,
             permissionList:this.readFilterEquation || [],
-            userName:this.userdetails
+            userName:this.userdetails,
+            conditions:this.eventFilterConditions
 
           }),
         };
@@ -7283,5 +7287,10 @@ helperChartClickChart1(event: any, modalChart: any) {
       modalInstance.show();
     }, 100);
   }
+  liveFilterConditions(eventFilterCon:any){
+    console.log('eventFilterCon check',eventFilterCon)
+    this.eventFilterConditions = eventFilterCon
 
+
+  }
 }

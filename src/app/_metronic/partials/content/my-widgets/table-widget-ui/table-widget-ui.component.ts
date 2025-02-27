@@ -310,7 +310,11 @@ data.forEach((packet: any,matchedIndex:number) => {
 
 if(packet.grid_type == 'TableWidget'&& this.index==matchedIndex && packet.id === this.item.id){
   tempCharts[matchedIndex] = packet
-  this.createtableWidget(packet)
+  setTimeout(() => {
+    this.createtableWidget(packet)
+    
+  }, 500);
+
  
 }
 });
@@ -812,9 +816,9 @@ get shouldShowButton(): boolean {
 
 
   ngAfterViewInit(){
-    setTimeout(() => {
+
       this.createtableWidget()
-    }, 500);
+
   
 
   }

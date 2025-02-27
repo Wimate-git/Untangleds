@@ -43,6 +43,8 @@ export class ChartUi1Component implements OnChanges {
   processedData: any;
   @Output() paresdDataEmit = new EventEmitter<any>();
   @Output() emitChartConfigTable = new EventEmitter<any>();
+  @Input() eventFilterConditions : any
+  
   formTableConfig: {};
   
 ngOnChanges(changes: SimpleChanges): void {
@@ -51,6 +53,7 @@ ngOnChanges(changes: SimpleChanges): void {
     console.log('liveDataChart from child chart1', this.liveDataChart);
     console.log('routeId checking from ui', this.routeId);
     console.log('SK_clientID checking', this.SK_clientID);
+    console.log('eventFilterConditions chart ui1',this.eventFilterConditions)
 
     // if (this.item && this.liveDataChart !== undefined) {
     //     console.log("✅ LiveDashboard is TRUE - Updating highchartsOptionsJson & chartConfig...");
@@ -171,7 +174,9 @@ this.formTableConfig = {
           MsgType:'DrillDown',
           permissionId:this.permissionIdRequest,
           permissionList:this.readFilterEquation,
-          userName:this.userdetails
+          userName:this.userdetails,
+          conditions:this.eventFilterConditions ||[]
+
 
          
 
@@ -225,9 +230,7 @@ this.formTableConfig = {
     this.sendCellInfo.emit(event);
   }
   ngAfterViewInit(){
-    setTimeout(() => {
-      this.createPieChart()
-    }, 500);
+    this.createPieChart()
   
 
   }
@@ -278,15 +281,20 @@ this.formTableConfig = {
 
   }
   ngOnInit(){
+
     console.log('item chacke',this.item.grid_details)
     this.summaryService.lookUpData$.subscribe((data: any)=>{
-      console.log('data check>>>',data)
+      console.log('data check>>> chart ui1',data)
  let tempCharts:any=[]
 data.forEach((packet: any,matchedIndex:number) => {
   
   if(packet.grid_type == 'chart'&& this.index==matchedIndex && packet.id === this.item.id){
     tempCharts[matchedIndex] = packet
-    this.createPieChart(packet);
+    console.log('packet checking from chart ui',packet)
+    setTimeout(() => {
+      this.createPieChart(packet);
+    }, 500);
+
   }
 });
 
@@ -304,7 +312,7 @@ data.forEach((packet: any,matchedIndex:number) => {
   
   createPieChart(chartdata?:any) {
 
-    console.log(`🔄 Initializing Pie Chart for index ${this.index} >>>>>`, this.chartOptions);
+    console.log(' Initializing Pie Chart for ', chartdata);
     if(chartdata){
       const chartOptionsCopy = JSON.parse(chartdata.highchartsOptionsJson);
       console.log('data check from initialiaze',chartOptionsCopy)

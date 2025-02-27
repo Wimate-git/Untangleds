@@ -254,10 +254,11 @@ export class Tile1ConfigComponent implements OnInit {
   
       filterParameter: [[]], // Initialize as an array to handle multiple or single values
       filterDescription: [''],
-      formatType:['',Validators.required],
+    
       custom_Label:['',Validators.required],
    
       EquationDesc:[''],
+      formatType:['',Validators.required],
       columnVisibility:[[]],
       ModuleNames:[''],
       selectType: [''],

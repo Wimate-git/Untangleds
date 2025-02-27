@@ -29,6 +29,7 @@ export class ChartUi3Component implements OnInit{
   @Input() userdetails:any
   @Input () summaryDashboardView :any
   @Input() summaryDashboardUpdate:any;
+  @Input() eventFilterConditions : any
   
   checkResBody: any;
   parsedResBody: any;
@@ -44,6 +45,7 @@ export class ChartUi3Component implements OnInit{
  
       console.log("DynamicLine chart",this.item)
       console.log('liveDataColumnChart check',this.liveDataColumnChart)
+      console.log('eventFilterConditions chart ui1',this.eventFilterConditions)
       // this.parseChartOptions = this.item.highchartsOptionsJson;
       // console.log('this.parseChartOptions checking',this.parseChartOptions)
       // const check = JSON.parse(this.parseChartOptions);
@@ -178,7 +180,8 @@ const extractcolumnVisibility = chartConfig
           MsgType:'DrillDown',
           permissionId:this.permissionIdRequest,
           permissionList:this.readFilterEquation,
-          userName:this.userdetails
+          userName:this.userdetails,
+          conditions:this.eventFilterConditions ||[]
         }),
       };
     
@@ -231,9 +234,9 @@ const extractcolumnVisibility = chartConfig
   }
   
   ngAfterViewInit(){
-    setTimeout(() => {
+
       this.createColumnChart()
-    }, 500);
+    
   
 
   }
@@ -310,7 +313,9 @@ data.forEach((packet: any,matchedIndex:number) => {
   
   if(packet.grid_type == 'Columnchart'&& this.index==matchedIndex && packet.id === this.item.id){
     tempCharts[matchedIndex] = packet
-    this.createColumnChart(packet);
+    setTimeout(() => {
+      this.createColumnChart(packet)
+    }, 500);
   }
 });
 
@@ -325,6 +330,7 @@ data.forEach((packet: any,matchedIndex:number) => {
     this.detectScreenSize()
   }
 createColumnChart(columnChartData?:any){
+  console.log('columnChartData check chartui3',columnChartData)
   if(columnChartData){
 
     const columnChartDataFormat = JSON.parse(columnChartData.highchartsOptionsJson)

@@ -98,6 +98,7 @@ makeTrueCheck:any = false
   populateFormBuilder: any = [];
   enableParameterName :boolean = false
   @Output() liveFilterData = new EventEmitter<any>();
+  @Output() liveFilterConditions = new EventEmitter<any>();
 
   private optionsCache = new Map<string, Observable<any[]>>();
   private destroy$ = new Subject<void>();
@@ -932,6 +933,8 @@ makeTrueCheck:any = false
     console.log('conditionsFilter checking', conditionsFilter);
   
     this.ConditionsFormat = conditionsFilter;
+    this.liveFilterConditions.emit(this.ConditionsFormat);
+
     this.isLoading = true;
   
     console.log('this.routeId check', this.routeId);

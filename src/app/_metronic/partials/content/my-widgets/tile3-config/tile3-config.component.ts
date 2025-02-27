@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -62,6 +62,24 @@ export class Tile3ConfigComponent implements OnInit{
   selectedParameterValue: any;
   parameterNameRead: any;
   parsedParam: any;
+  FormNames: any;
+  dynamicIDArray: any;
+  IdsFetch: string[];
+  summaryIds: any;
+  dashboardListRead: any[];
+  dashboardList: any[];
+  dashboardIdList: string[] | PromiseLike<string[]>;
+  projectDetailListRead: any;
+  projectDetailList: any;
+  reportStudioListRead: any[];
+  reportStudioDetailList: any[];
+  projectListRead: any[];
+  projectList: any[];
+  helpherObjCalender: any;
+  formListTitles: any;
+  shoRowData:boolean = false
+  selectedText: any;
+  columnVisisbilityFields: any;
 
   ngOnInit(){
     this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
@@ -77,8 +95,9 @@ export class Tile3ConfigComponent implements OnInit{
     this.dashboardIds(1)
   }
 
-  async dashboardIds(sk: any) {
-    console.log("Iam called Bro");
+  async dashboardIds(sk: any): Promise<string[]> {
+    console.log("I am called Bro");
+    
     try {
       const response = await this.api.GetMaster(this.SK_clientID + "#summary#lookup", sk);
   
@@ -96,17 +115,12 @@ export class Tile3ConfigComponent implements OnInit{
                 const { P1, P2, P3, P4, P5, P6, P7, P8, P9 } = element[key];
   
                 // Ensure dashboardIdsList is initialized
-                if (!this.dashboardIdsList) {
-                  this.dashboardIdsList = [];
-                }
+                this.dashboardIdsList = this.dashboardIdsList || [];
   
                 // Check if P1 exists before pushing
                 if (P1 !== undefined && P1 !== null) {
                   this.dashboardIdsList.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9 });
                   console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5, P6, P7, P8, P9 });
-                  console.log('this.dashboardIdsList check',this.dashboardIdsList)
-                  this.p1ValuesSummary = this.dashboardIdsList.map((item: { P1: any; }) => item.P1);
-  console.log('P1 values: dashboard', this.p1ValuesSummary);
                 } else {
                   console.warn("Skipping element because P1 is not defined or null");
                 }
@@ -115,25 +129,44 @@ export class Tile3ConfigComponent implements OnInit{
               }
             }
   
-            // Continue fetching recursively
-            await this.dashboardIds(sk + 1);
+            // Store P1 values
+            this.p1ValuesSummary = this.dashboardIdsList.map((item: { P1: any }) => item.P1);
+            console.log('P1 values: dashboard', this.p1ValuesSummary);
+  
+            // Continue fetching recursively and wait for completion
+            const nextBatch = await this.dashboardIds(sk + 1);
+  
+            // Merge new values with previous values
+            this.p1ValuesSummary = [...this.p1ValuesSummary, ...nextBatch];
+  
+            // Remove duplicates if needed
+            this.p1ValuesSummary = Array.from(new Set(this.p1ValuesSummary));
+  
+            return this.p1ValuesSummary; // Return the final collected values
           } else {
             console.error('Invalid data format - not an array.');
+            return [];
           }
         } else {
           console.error('response.options is not a string.');
+          return [];
         }
       } else {
         console.log("Lookup to be displayed", this.dashboardIdsList);
+        return this.p1ValuesSummary; // Return collected values when no more data is available
       }
     } catch (error) {
       console.error('Error:', error);
+      return [];
     }
   }
 
   SelectTypeSummary =[
     { value: 'NewTab', text: 'New Tab' },
     { value: 'Modal', text: 'Modal(Pop Up)' },
+    { value: 'Same page Redirect', text: 'Same page Redirect' },
+
+    { value: 'drill down', text: 'drill down' },
   ]
 
   constructor(private summaryConfiguration: SharedService,private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
@@ -174,21 +207,23 @@ export class Tile3ConfigComponent implements OnInit{
   }
 
   initializeTileFields2() {
+    const defaultTheme = { color: "linear-gradient(to right, #A1045A, #A1045A)", selected: true };
+    this.selectedColor = defaultTheme.color;
     this.createKPIWidget2 = this.fb.group({
       'formlist': ['', Validators.required],
       'parameterName': ['', Validators.required],
-      'groupBy': ['', Validators.required],
+ 
       'primaryValue': ['', Validators.required],
       'groupByFormat': ['', Validators.required],
       'constantValue': [''],
       'secondaryValue': ['', Validators.required],
-      'secondaryValueNested': [''],
+      'secondaryValueNested': ['', Validators.required],
       widgetid: [this.generateUniqueId()],
       'processed_value': [''],
       'processed_value1': [''],
       'processed_value2': [''],
       // selectedColor: [this.selectedColor]'
-      'themeColor': ['', Validators.required],
+      'themeColor': [this.selectedColor, Validators.required],
       fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
       fontColor: ['#000000', Validators.required], 
       dashboardIds:[''],
@@ -196,7 +231,14 @@ export class Tile3ConfigComponent implements OnInit{
       filterParameter:[''],
       filterDescription:[''],
       selectedRangeType:[''],
-      custom_Label:['',Validators.required]
+      custom_Label:['',Validators.required],
+      formatType:['',Validators.required],
+      columnVisibility:[[]],
+      ModuleNames:[''],
+      selectFromTime:[''],
+      selectToTime:['']
+
+  
 
     })
   }
@@ -246,6 +288,14 @@ if (key === 'tile3') {
        selectedRangeType:this.createKPIWidget2.value.selectedRangeType,
        parameterNameRead: this.parameterNameRead, 
        custom_Label:this.createKPIWidget2.value.custom_Label,
+       columnVisibility:this.createKPIWidget2.value.columnVisibility,
+
+       rowData:this.createKPIWidget2.value.rowData || '',
+       ModuleNames:this.createKPIWidget2.value.ModuleNames,
+       selectFromTime: this.createKPIWidget2.value.selectFromTime,
+       selectToTime: this.createKPIWidget2.value.selectToTime,
+       formatType: this.createKPIWidget2.value.formatType,
+  
        // Default value, change this to whatever you prefer
        // You can also handle default value for this if needed
 
@@ -354,14 +404,20 @@ if (key === 'tile3') {
         themeColor: this.createKPIWidget2.value.themeColor,
         fontSize: fontSizeValue,
         fontColor: this.createKPIWidget2.value.fontColor,
-        selectFromTime: this.createKPIWidget2.value.selectFromTime,
-        selectToTime: this.createKPIWidget2.value.selectToTime,
-        dashboardIds: this.createKPIWidget2.value.dashboardIds,
-        selectType: this.createKPIWidget2.value.selectType,
-        filterParameter: this.createKPIWidget2.value.filterParameter,
-        filterDescription: this.createKPIWidget2.value.filterDescription,
-        parameterNameRead: this.parameterNameRead,
-        custom_Label:this.createKPIWidget2.value.custom_Label
+        selectFromTime: this.createKPIWidget2.value.selectFromTime ||'',
+        selectToTime: this.createKPIWidget2.value.selectToTime ||'',
+        dashboardIds: this.createKPIWidget2.value.dashboardIds ||'',
+        selectType: this.createKPIWidget2.value.selectType ||'',
+        filterParameter: this.createKPIWidget2.value.filterParameter ||'',
+        filterDescription: this.createKPIWidget2.value.filterDescription ||'',
+        parameterNameRead: this.parameterNameRead ||'',
+        custom_Label:this.createKPIWidget2.value.custom_Label ||'',
+        ModuleNames:this.createKPIWidget2.value.ModuleNames||'',
+        columnVisibility:this.createKPIWidget2.value.columnVisibility ||'',
+        formatType: this.createKPIWidget2.value.formatType,
+  
+
+
       };
   
       console.log('Updated tile:', updatedTile);
@@ -491,18 +547,7 @@ if (key === 'tile3') {
         console.log("Can't fetch", err);
       });
   }
-  selectFormParams(event: any) {
-    if (event && event[0] && event[0].data) {
-      const selectedText = event[0].data.text;  // Adjust based on the actual structure
-      console.log('Selected Form Text:', selectedText);
 
-      if (selectedText) {
-        this.fetchDynamicFormData(selectedText);
-      }
-    } else {
-      console.error('Event data is not in the expected format:', event);
-    }
-  }
 
 
 
@@ -516,7 +561,7 @@ if (key === 'tile3') {
     // Handle any logic here if needed when the value changes
     console.log(selectedValue); // Optional: log the selected value
   }
-  toggleCheckbox2(theme: any): void {
+  toggleCheckbox(theme: any): void {
     // Clear the 'selected' state for all themes
     this.themes.forEach(t => t.selected = false);  // Reset selection for all themes
 
@@ -544,7 +589,54 @@ if (key === 'tile3') {
     { color: "linear-gradient(to right, #FC466B, #3F5EFB)", selected: false }, // Red-Pink to Blue
     { color: "linear-gradient(to right, #24C6DC, #514A9D)", selected: false }, // Aqua to Purple
     { color: "linear-gradient(to right, #FFEFBA, #FFFFFF)", selected: false }, // Subtle Yellow to White
-    { color: "linear-gradient(to right, #EECDA3, #EF629F)", selected: false }  // Warm Orange to Yellow
+    { color: "linear-gradient(to right, #EECDA3, #EF629F)", selected: false } , // Warm Orange to Yellow
+    { color: "linear-gradient(to right, #5433FF, #20BDFF, #A5FECB)", selected: false }, // Multicolor Cool Spectrum
+  { color: "linear-gradient(to right, #FF5F6D, #FFC371)", selected: false }, // Soft Pink to Orange
+  { color: "linear-gradient(to right, #C6FFDD, #FBD786, #f7797d)", selected: false }, // Pastel Multicolor
+  { color: "linear-gradient(to right, #B24592, #F15F79)", selected: false }, // Purple-Pink Gradient
+  { color: "linear-gradient(to right, #7F7FD5, #86A8E7, #91EAE4)", selected: false }, // Light Purple-Blue
+  { color: "linear-gradient(to right, #FF512F, #F09819)", selected: false }, // Vivid Orange to Yellow
+  { color: "linear-gradient(to right, #00B4DB, #0083B0)", selected: false }, // Aqua to Deep Blue
+  { color: "linear-gradient(to right, #70E1F5, #FFD194)", selected: false }, // Sky Blue to Soft Yellow
+  { color: "linear-gradient(to right, #373B44, #4286F4)", selected: false }, // Dark Blue to Grey
+  { color: "linear-gradient(to right, #614385, #516395)", selected: false }, // Moody Purple to Blue
+  { color: "linear-gradient(to right, #000428, #004e92)", selected: false }, // Midnight Blue
+
+  { color: "linear-gradient(to right, #3A1C71, #D76D77, #FFAF7B)", selected: false }, // Purple to Peach
+  { color: "linear-gradient(to right, #4568DC, #B06AB3)", selected: false },
+  { color: "linear-gradient(to right, #32cd32, #adff2f)", selected: false }, // Soft Blue to Purple
+  { color: "linear-gradient(to right, #6a0dad, #e6e6fa)", selected: false },
+  { color: "linear-gradient(to right, #4b0082, #9370db)", selected: false },
+  { color: "linear-gradient(to right, #008000, #00ff00)", selected: false },
+  { color: "linear-gradient(to right, #9400d3, #fff0f5)", selected: false },
+  { color: "linear-gradient(to right, #9b30ff, #8a2be2)", selected: false },
+
+
+  { color: "linear-gradient(to right, #228b22, #98fb98)", selected: false },
+  { color: "linear-gradient(to right, #8B4513, #A52A2A)", selected: false },
+  { color: "linear-gradient(to right, #D2691E, #CD853F)", selected: false },
+  { color: "linear-gradient(to right, #6B4226, #C2B280)", selected: false },
+  { color: "linear-gradient(to right, #8B4513, #F4A300)", selected: false },
+  { color: "linear-gradient(to right, #004d40, #00bcd4)", selected: false },
+  { color: "linear-gradient(to right, #A52A2A, #F5DEB3)", selected: false },
+  { color: "linear-gradient(to right, #800000, #b03060)", selected: false },
+  { color: "linear-gradient(to right, #008080, #20b2aa)", selected: false },
+ 
+
+  { color: "linear-gradient(to right, #006666, #48c9b0)", selected: false },
+  { color: "linear-gradient(to right, #2b5876, #4e4376)", selected: false },
+  { color: "linear-gradient(to right, #800080, #800080)", selected: false },
+  { color: "linear-gradient(to right, #808000, #808000)", selected: false },
+  { color: "linear-gradient(to right, #BC8F8F, #BC8F8F)", selected: false },
+  { color: "linear-gradient(to right, #696969, #696969)", selected: false },
+  { color: "linear-gradient(to right, #4E0707, #4E0707)", selected: false },
+  { color: "linear-gradient(to right, #FF4500, #FF4500)", selected: false },
+  { color: "linear-gradient(to right, #3A5311, #3A5311)", selected: false },
+  { color: "linear-gradient(to right, #1338BE, #1338BE)", selected: false },
+  { color: "linear-gradient(to right, #004F98, #004F98)", selected: false },
+  { color: "linear-gradient(to right, #A1045A, #A1045A)", selected: true },
+  { color: "linear-gradient(to right, #563C5C, #563C5C)", selected: false },
+  { color: "linear-gradient(to right, #655967, #655967)", selected: false },
   ];
   
 
@@ -557,6 +649,7 @@ edit_Tile3(tile?: any, index?: number) {
 
       // Parse multi_value if it's a string
       let parsedMultiValue = [];
+      this.cd.detectChanges();
       if (typeof tile.multi_value === 'string') {
         try {
           parsedMultiValue = JSON.parse(tile.multi_value);
@@ -566,6 +659,16 @@ edit_Tile3(tile?: any, index?: number) {
         }
       } else {
         parsedMultiValue = tile.multi_value || [];
+      }
+      let parsedColumnVisibility = [];
+      if (typeof tile.columnVisibility === 'string') {
+        try {
+          parsedColumnVisibility = JSON.parse(tile.columnVisibility);
+        } catch (error) {
+          console.error('Error parsing columnVisibility:', error);
+        }
+      } else if (Array.isArray(tile.columnVisibility)) {
+        parsedColumnVisibility = tile.columnVisibility;
       }
  
 
@@ -580,7 +683,7 @@ edit_Tile3(tile?: any, index?: number) {
       console.log('this.parsedParam checking',this.parsedParam)
       tile.filterParameter = this.parsedParam;
       // Initialize form fields and pre-select values
-      this.initializeTileFields2();
+      this.isEditMode = true;
       this.createKPIWidget2.patchValue({
         formlist: tile.formlist,
         parameterName: tile.parameterName,
@@ -599,11 +702,16 @@ edit_Tile3(tile?: any, index?: number) {
         filterParameter: tile.filterParameter,
         filterDescription:tile.filterDescription,
         selectedRangeType:tile.selectedRangeType,
-        custom_Label:tile.custom_Label
+        custom_Label:tile.custom_Label,
+        ModuleNames:tile.ModuleNames,
+        columnVisibility: parsedColumnVisibility,
+        formatType: tile.formatType,      
+        selectFromTime: tile.selectFromTime,
+        selectToTime: tile.selectToTime,
 
       });
 
-      this.isEditMode = true; // Set to edit mode
+   // Set to edit mode
     } else {
       this.selectedTile = null; // No tile selected for adding
       this.isEditMode = false; // Set to add mode
@@ -709,7 +817,7 @@ edit_Tile3(tile?: any, index?: number) {
   selectedSettingsTab(tab: string) {
     this.selectedTabset = tab;
   }
-  openModalCalender2() {
+  openModalCalender() {
     const modalRef = this.modalService.open(this.calendarModal2);
     modalRef.result.then(
       (result) => {
@@ -722,17 +830,17 @@ edit_Tile3(tile?: any, index?: number) {
     );
   }
 
-  selectValue2(value: string, modal: any) {
+  selectValue(value: string, modal: any) {
     console.log('Selected value:', value);
 
     // Set the value to the form control
-    this.groupByFormatControl2.setValue(value);
+    this.groupByFormatControl.setValue(value);
 
     // Close the modal after selection
     this.closeModal(modal);
   }
 
-  get groupByFormatControl2(): FormControl {
+  get groupByFormatControl(): FormControl {
     return this.createKPIWidget2?.get('groupByFormat') as FormControl; // Cast to FormControl
   }
   closeModal(modal: any) {
@@ -814,5 +922,542 @@ edit_Tile3(tile?: any, index?: number) {
     const color = (event.target as HTMLInputElement).value;
     this.createKPIWidget2.patchValue({ fontColor: color });
   }
+  FormatTypeValues = [
+    { value: 'Default', text: 'Default' },
+    { value: 'Rupee', text: 'Rupee' },
+    { value: 'Distance', text: 'Distance' },
+    { value: 'Minutes', text: 'Minutes' },
+    { value: 'Hours', text: 'Hours' },
+    { value: 'Days', text: 'Days' },
+    { value: 'Days & Hours', text: 'Days & Hours' },
+ 
+  
+    { value: 'Months', text: 'Months' },
+    { value: 'Years', text: 'Years' },
+    {value:'Label With Value',text:'Label With Value'},
+    { value: 'Percentage', text: 'Percentage' },
+
+    // { value: 'max', text: 'Maximum' },
+]
+
+showModuleNames = [
+  { value: 'None', text: 'None' },
+  { value: 'Forms', text: 'Forms' },
+  { value: 'Dashboard', text: 'Dashboard' },
+  { value: 'Dashboard - Group', text: 'Dashboard - Group' },
+  { value: 'Summary Dashboard', text: 'Summary Dashboard' },
+  { value: 'Projects', text: 'Projects' },
+  { value: 'Project - Detail', text: 'Project - Detail' },
+  { value: 'Project - Group', text: 'Project - Group' },
+  {value: 'Report Studio', text: 'Report Studio'},
+  {value:'Calender', text:'Calender'}
+
+]
+async moduleSelection(event: any): Promise<void> {
+  const selectedValue = event[0].value; // Get selected value
+  console.log('selectedValue checking',selectedValue)
+  switch (selectedValue) {
+    case 'None':
+      console.log('No module selected');
+      // Add specific logic here
+      break;
+
+    case 'Forms':
+      console.log('Forms module selected');
+      this.FormNames=this.listofDeviceIds
+      console.log('this.FormNames checking',this.FormNames)
+      this.dynamicIDArray = []
+      this.dynamicIDArray = this.FormNames
+      // Add specific logic for Forms
+      break;
+
+    case 'Dashboard':
+      console.log('Dashboard module selected');
+      this.IdsFetch = await this.dashboardIdsFetching(1)
+  
+      console.log('IdsFetch checking',this.IdsFetch)
+      this.dynamicIDArray = []
+      this.dynamicIDArray = this.IdsFetch
+    
+      break;
+      // Add specific logic for Dashboard
+
+
+    case 'Dashboard - Group':
+      console.log('Dashboard - Group module selected');
+      this.dynamicIDArray = []
+      // Add specific logic for Dashboard - Group
+      break;
+
+    case 'Summary Dashboard':
+      this.summaryIds = await this.dashboardIds(1); // Await and get P1 values
+      console.log('Fetched P1 values:', this.summaryIds);
+      this.dynamicIDArray = [];
+      this.dynamicIDArray = this.summaryIds
+      
+      console.log('Summary Dashboard module selected');
+      // Add specific logic for Summary Dashboard
+      break;
+
+    case 'Projects':
+      console.log('Projects module selected');
+      const projectList = await this.fetchDynamicLookupData(1)
+      console.log('projectList checking',projectList)
+      
+      this.dynamicIDArray = []
+      this.dynamicIDArray = projectList
+      break;
+      // Add specific logic for Projects
+      break;
+
+    case 'Project - Detail':
+      console.log('Project - Detail module selected');
+      const projectDetailList = await this.ProjectDetailLookupData(1)
+
+      this.dynamicIDArray = []
+      this.dynamicIDArray = projectDetailList
+
+      // Add specific logic for Project - Detail
+      break;
+
+    case 'Project - Group':
+      console.log('Project - Group module selected');
+      this.dynamicIDArray = []
+      // Add specific logic for Project - Group
+      break;
+      case 'Report Studio':
+        console.log('Project - Group module selected');
+        this.dynamicIDArray = []
+        const ReportStudioLookup = await this.reportStudioLookupData(1)
+
+    
+        this.dynamicIDArray = ReportStudioLookup
+        // Add specific logic for Project - Group
+        break;
+        case 'Calender':
+          console.log('Project - Group module selected');
+     
+          this.dynamicIDArray = []
+          const CalenderLookup = await this.fetchCalender()
+          console.log('CalenderLookup check',CalenderLookup)
+  
+      
+          this.dynamicIDArray = CalenderLookup
+          // Add specific logic for Project - Group
+          break;
+
+    default:
+      console.log('Invalid selection');
+      break;
+  }
+}
+
+async dashboardIdsFetching(sk: any): Promise<string[]> {
+  console.log("I am called Bro");
+  try {
+    const response = await this.api.GetMaster(this.SK_clientID + "#formgroup#lookup", sk);
+
+    if (response && response.options) {
+      if (typeof response.options === 'string') {
+        let data = JSON.parse(response.options);
+        console.log("dashboard data checking", data);
+
+        if (Array.isArray(data)) {
+          for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+
+            if (element !== null && element !== undefined) {
+              const key = Object.keys(element)[0]; // Extract L1, L2, etc.
+              if (key && element[key]) {
+                const { P1, P2, P3, P4, P5 } = element[key];
+
+                // Ensure dashboardIdsList is initialized
+                if (!this.dashboardListRead) {
+                  this.dashboardListRead = [];
+                }
+
+                // Check if P1 exists before pushing
+                if (P1 !== undefined && P1 !== null) {
+                  this.dashboardListRead.push({ P1, P2, P3, P4, P5 });
+                  console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5 });
+                } else {
+                  console.warn("Skipping element because P1 is not defined or null");
+                }
+              } else {
+                console.warn("Skipping malformed element", element);
+              }
+            }
+          }
+
+          // Store only P1 values
+          this.dashboardList = this.dashboardListRead.map((item: { P1: any }) => item.P1);
+          console.log('dashboardIdList', this.dashboardList);
+
+          // Continue fetching recursively if needed
+          await this.dashboardIdsFetching(sk + 1);
+          return this.dashboardList; // Return collected values
+        } else {
+          console.error('Invalid data format - not an array.');
+          return [];
+        }
+      } else {
+        console.error('response.options is not a string.');
+        return [];
+      }
+    } else {
+      console.log("Lookup to be displayed", this.dashboardIdsList);
+      return this.dashboardIdList; // Return collected values
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+}
+
+async ProjectDetailLookupData(sk: any): Promise<string[]> {
+  console.log("I am called Bro");
+  try {
+    const response = await this.api.GetMaster(this.SK_clientID + "#project#lookup", sk);
+
+    if (response && response.options) {
+      if (typeof response.options === 'string') {
+        let data = JSON.parse(response.options);
+        console.log("dashboard data checking", data);
+
+        if (Array.isArray(data)) {
+          for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+
+            if (element !== null && element !== undefined) {
+              const key = Object.keys(element)[0]; // Extract L1, L2, etc.
+              if (key && element[key]) {
+                const { P1, P2, P3, P4, P5 } = element[key];
+
+                // Ensure dashboardIdsList is initialized
+                if (!this.projectDetailListRead) {
+                  this.projectDetailListRead = [];
+                }
+
+                // Check if P1 exists before pushing
+                if (P1 !== undefined && P1 !== null) {
+                  this.projectDetailListRead.push({ P1, P2, P3, P4, P5 });
+                  console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5 });
+                } else {
+                  console.warn("Skipping element because P1 is not defined or null");
+                }
+              } else {
+                console.warn("Skipping malformed element", element);
+              }
+            }
+          }
+
+          // Store only P1 values
+          this.projectDetailList = this.projectDetailListRead.map((item: { P1: any }) => item.P1);
+          console.log('dashboardIdList', this.projectDetailList);
+
+          // Continue fetching recursively if needed
+          await this.ProjectDetailLookupData(sk + 1);
+          return this.projectDetailList; // Return collected values
+        } else {
+          console.error('Invalid data format - not an array.');
+          return [];
+        }
+      } else {
+        console.error('response.options is not a string.');
+        return [];
+      }
+    } else {
+      console.log("Lookup to be displayed", this.dashboardIdsList);
+      return this.dashboardIdList; // Return collected values
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+}
+
+async reportStudioLookupData(sk: any): Promise<string[]> {
+  console.log("I am called Bro");
+  try {
+    const response = await this.api.GetMaster(this.SK_clientID + "#savedquery#lookup", sk);
+    console.log('saved query response',response)
+
+    if (response && response.options) {
+      if (typeof response.options === 'string') {
+        let data = JSON.parse(response.options);
+        console.log("dashboard data checking", data);
+
+        if (Array.isArray(data)) {
+          for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+
+            if (element !== null && element !== undefined) {
+              const key = Object.keys(element)[0]; // Extract L1, L2, etc.
+              if (key && element[key]) {
+                const { P1, P2, P3 } = element[key];
+
+                // Ensure dashboardIdsList is initialized
+                if (!this.reportStudioListRead) {
+                  this.reportStudioListRead = [];
+                }
+
+                // Check if P1 exists before pushing
+                if (P1 !== undefined && P1 !== null) {
+                  this.reportStudioListRead.push({ P1, P2, P3});
+                  console.log("Pushed to dashboardIdsList: ", { P1, P2, P3 });
+                } else {
+                  console.warn("Skipping element because P1 is not defined or null");
+                }
+              } else {
+                console.warn("Skipping malformed element", element);
+              }
+            }
+          }
+
+          // Store only P1 values
+          this.reportStudioDetailList = this.reportStudioListRead.map((item: { P1: any }) => item.P1);
+          console.log('dashboardIdList', this.reportStudioDetailList);
+
+          // Continue fetching recursively if needed
+          await this.reportStudioLookupData(sk + 1);
+          return this.reportStudioDetailList; // Return collected values
+        } else {
+          console.error('Invalid data format - not an array.');
+          return [];
+        }
+      } else {
+        console.error('response.options is not a string.');
+        return [];
+      }
+    } else {
+      console.log("Lookup to be displayed", this.dashboardIdsList);
+      return this.dashboardIdList; // Return collected values
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+}
+
+
+
+dynamicRedirectChanged(event:any){
+
+  let eventData;
+  if(event && event.target && event.target.value){
+    eventData = event.target.value
+  }
+  else{
+    eventData = event
+  }
+
+   let dashUrl = '/dashboard'
+  let projecturl = '/project-dashboard'
+
+  const selectedModule = this.createKPIWidget2.get('ModuleNames')?.value
+
+  console.log("selected module name read",selectedModule);
+
+
+//   switch(selectedModule){
+//     case 'Dashboard - Group':
+//       this.redirectionURL =  dashUrl
+//       this.dynamicIDArray = []
+//       break;
+//     case 'Project - Group':
+//       this.redirectionURL = projecturl
+//       this.dynamicIDArray = []
+//       break
+//     case 'Forms':
+//       this.redirectionURL =  '/view-dreamboard/Forms/'+eventData
+//       break;
+//     case 'Summary Dashboard':
+//       this.redirectionURL =  '/summary-engine/'+eventData
+//       break;
+//     case 'Dashboard':
+//       this.redirectionURL =  '/dashboard/dashboardFrom/'+eventData
+//       break;
+//     case 'Projects':
+//       this.redirectionURL =  '/project-dashboard/project-template-dashboard/'+eventData
+//       break;
+//     case 'Project - Detail':
+//       this.redirectionURL =  '/view-dreamboard/Project%20Detail/'+eventData
+//       break;
+// }
+
+}
+
+async fetchDynamicLookupData(sk: any): Promise<string[]> {
+  console.log("I am called Bro");
+  try {
+    const response = await this.api.GetMaster(this.SK_clientID + "#folder#lookup", sk);
+
+    if (response && response.options) {
+      if (typeof response.options === 'string') {
+        let data = JSON.parse(response.options);
+        console.log("dashboard data checking", data);
+
+        if (Array.isArray(data)) {
+          for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+
+            if (element !== null && element !== undefined) {
+              const key = Object.keys(element)[0]; // Extract L1, L2, etc.
+              if (key && element[key]) {
+                const { P1, P2, P3, P4, P5 } = element[key];
+
+                // Ensure dashboardIdsList is initialized
+                if (!this.projectListRead) {
+                  this.projectListRead = [];
+                }
+
+                // Check if P1 exists before pushing
+                if (P1 !== undefined && P1 !== null) {
+                  this.projectListRead.push({ P1, P2, P3, P4, P5 });
+                  console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5 });
+                } else {
+                  console.warn("Skipping element because P1 is not defined or null");
+                }
+              } else {
+                console.warn("Skipping malformed element", element);
+              }
+            }
+          }
+
+          // Store only P1 values
+          this.projectList = this.projectListRead.map((item: { P1: any }) => item.P1);
+          console.log('dashboardIdList', this.projectList);
+
+          // Continue fetching recursively if needed
+          await this.fetchDynamicLookupData(sk + 1);
+          return this.projectList; // Return collected values
+        } else {
+          console.error('Invalid data format - not an array.');
+          return [];
+        }
+      } else {
+        console.error('response.options is not a string.');
+        return [];
+      }
+    } else {
+      console.log("Lookup to be displayed", this.dashboardIdsList);
+      return this.dashboardIdList; // Return collected values
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+}
+async fetchCalender(): Promise<string[]> {
+  try {
+    const result: any = await this.api.GetMaster(this.SK_clientID + "#systemCalendarQuery#lookup", 1);
+
+    if (result) {
+      this.helpherObjCalender = JSON.parse(result.options);
+      console.log('this.helpherObjCalender check', this.helpherObjCalender);
+
+      this.formList = this.helpherObjCalender.map((item: any) => item);
+      console.log("DYNAMIC FORMLIST:", this.formList);
+
+      // Extract the first element (0th index) from each record in formList
+      this.formListTitles = this.formList.map((item: any[]) => item[0]);
+      console.log("Extracted Titles:", this.formListTitles);
+
+      return this.formListTitles; // ✅ Return extracted titles
+    }
+
+    return []; // Return empty array if no result
+  } catch (error) {
+    console.error("Error:", error);
+    return []; // Return empty array in case of error
+  }
+}
+selectFormParams(event: any) {
+  if (event && event[0] && event[0].data) {
+    this.selectedText = event[0].data.text;  // Adjust based on the actual structure
+    console.log('Selected Form Text:', this.selectedText);
+    this.getFormControlValue(this.selectedText); 
+
+    if (this.selectedText) {
+      this.fetchDynamicFormData(this.selectedText);
+    }
+  } else {
+    console.error('Event data is not in the expected format:', event);
+  }
+}
+
+getFormControlValue(selectedTextConfi:any): void {
+  // const formlistControl = this.createChart.get('formlist');
+  console.log('Formlist Control Value:', selectedTextConfi);
+  this.fetchDynamicFormDataConfig(selectedTextConfi);
+}
+
+fetchDynamicFormDataConfig(value: any) {
+  console.log("Data from lookup:", value);
+
+  this.api
+    .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
+    .then((result: any) => {
+      if (result && result.metadata) {
+        const parsedMetadata = JSON.parse(result.metadata);
+        console.log('parsedMetadata check dynamic',parsedMetadata)
+        const formFields = parsedMetadata.formFields;
+        console.log('formFields check',formFields)
+
+        // Initialize the list with formFields labels
+        this.columnVisisbilityFields = formFields.map((field: any) => {
+          console.log('field check',field)
+          return {
+            value: field.name,
+            text: field.label
+          };
+        });
+
+        // Include created_time and updated_time
+        if (parsedMetadata.created_time) {
+          this.columnVisisbilityFields.push({
+            value: parsedMetadata.created_time.toString(),
+            text: 'Created Time' // You can customize the label here if needed
+          });
+        }
+
+        if (parsedMetadata.updated_time) {
+          this.columnVisisbilityFields.push({
+            value: parsedMetadata.updated_time.toString(),
+            text: 'Updated Time' // You can customize the label here if needed
+          });
+        }
+
+        console.log('Transformed dynamic parameters config', this.columnVisisbilityFields);
+
+        // Trigger change detection to update the view
+        this.cdr.detectChanges();
+      }
+    })
+    .catch((err) => {
+      console.log("Can't fetch", err);
+    });
+}
+validateAndSubmit() {
+  if (this.createKPIWidget2.invalid) {
+    // ✅ Mark all fields as touched to trigger validation messages
+    Object.values(this.createKPIWidget2.controls).forEach(control => {
+      if (control instanceof FormControl) {
+        control.markAsTouched();
+        control.updateValueAndValidity();
+      } else if (control instanceof FormArray) {
+        control.controls.forEach((group) => {
+          (group as FormGroup).markAllAsTouched();
+        });
+      }
+    });
+
+    return; // 🚨 Stop execution if the form is invalid
+  }
+
+  // ✅ Proceed with saving only if form is valid
+  this.addTile('tile3');
+  this.modal.dismiss();
+}
 
 }

@@ -40,9 +40,11 @@ export class ChartUi2Component implements OnInit{
   isMobile: boolean = false;
   mobileChartWidth: number = window.innerWidth * 0.85;  // Custom mobile width
   mobileChartHeight: number = window.innerWidth * 0.87; // Custom mobile height
+  @Input() eventFilterConditions : any
   
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
+    console.log('eventFilterConditions chart ui1',this.eventFilterConditions)
  
       // console.log("DynamicLine chart",this.item)
 
@@ -121,9 +123,9 @@ export class ChartUi2Component implements OnInit{
     
    ){}
   ngAfterViewInit(){
-    setTimeout(() => {
+  
       this.createLineChart()
-    }, 500);
+
   
 
   }
@@ -177,7 +179,9 @@ data.forEach((packet: any,matchedIndex:number) => {
   
   if(packet.grid_type == 'Linechart'&& this.index==matchedIndex && packet.id === this.item.id){
     tempCharts[matchedIndex] = packet
-    this.createLineChart(packet);
+    setTimeout(() => {
+      this.createLineChart(packet)
+    }, 500);
   }
 });
 
@@ -234,7 +238,8 @@ this.formTableConfig = {
           MsgType:'DrillDown',
           permissionId:this.permissionIdRequest,
           permissionList:this.readFilterEquation,
-          userName:this.userdetails
+          userName:this.userdetails,
+          conditions:this.eventFilterConditions ||[]
          
 
         }),

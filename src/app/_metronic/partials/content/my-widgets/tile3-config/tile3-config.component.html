@@ -42,6 +42,9 @@
                 (selectionChanges)="selectFormParams($event)"
             > <!-- Ensures dropdown takes full width of column -->
               </ngx-select>
+              <div *ngIf="createKPIWidget2.get('formlist')?.touched && createKPIWidget2.get('formlist')?.invalid" class="text-danger">
+                <div *ngIf="createKPIWidget2.get('formlist')?.errors?.required">Form is required.</div>
+              </div>
             </div>
             <div class="col-md-4">
               <label for="parameterName" class="col-form-label fw-bold fs-6 required">Form Fields</label>
@@ -56,22 +59,31 @@
                 (selectionChanges)="parameterValue($event)"
                 style="width: 100%;">
               </ngx-select>
+              <div *ngIf="createKPIWidget2.get('parameterName')?.touched && createKPIWidget2.get('parameterName')?.invalid" class="text-danger">
+                <div *ngIf="createKPIWidget2.get('parameterName')?.errors?.required">Form Fields are required.</div>
+              </div>
+              
             </div>
-      
-            <div class="col-md-4"> <!-- Column for the second dropdown -->
-              <label class="col-form-label fw-bold fs-6 required">Group By</label>
+            <div class="col-md-4 mb-3">
+              <label  class="col-form-label fw-bold fs-6 required">Format Type</label>
               <ngx-select
+                id="formatType"
                 [allowClear]="true"
-                name="icon"
-                formControlName="groupBy"
-                [items]="groupByOptions"
+                formControlName="formatType"
+                [items]="FormatTypeValues"
                 optionValueField="value"
                 optionTextField="text"
-                placeholder="Select Group"
-         
-                class="w-100"> <!-- Ensures dropdown takes full width of column -->
+                placeholder="Select Parameter"
+            
+                style="width: 100%;">
               </ngx-select>
+              <div *ngIf="createKPIWidget2.get('formatType')?.touched && createKPIWidget2.get('formatType')?.invalid" class="text-danger">
+                <div *ngIf="createKPIWidget2.get('formatType')?.errors?.required">FormatType is required.</div>
+              </div>
+            
             </div>
+      
+
             <div class="fv-row">
               <div class="row">
                   <div class="col-md-4"> <!-- Column for the first dropdown -->
@@ -93,6 +105,9 @@
                           placeholder="Select Group"
                           class="w-100"> <!-- Ensures dropdown takes full width of column -->
                       </ngx-select>
+                      <div *ngIf="createKPIWidget2.get('primaryValue')?.touched && createKPIWidget2.get('primaryValue')?.invalid" class="text-danger">
+                        <div *ngIf="createKPIWidget2.get('primaryValue')?.errors?.required">Primary Value is required.</div>
+                      </div>
                   </div>
     
                   <div class="col-md-4" *ngIf="primaryValue2?.value === 'Constant'">
@@ -105,6 +120,20 @@
                       formControlName="constantValue"
                       (change)="onValueChange2($event)" 
                     />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="groupByFormat" class="col-form-label fw-bold fs-6 required">Group By Format</label>
+                    <input
+                      id="groupByFormat"
+                      type="text"
+                      class="form-control form-control-solid"
+                      placeholder="Select GroupByFormat"
+                      [formControl]="groupByFormatControl"
+                      (click)="openModalCalender()"
+                      readonly>
+                      <div *ngIf="createKPIWidget2.get('groupByFormat')?.touched && createKPIWidget2.get('groupByFormat')?.invalid" class="text-danger">
+                        <div *ngIf="createKPIWidget2.get('groupByFormat')?.errors?.required"> Group By Format is required.</div>
+                      </div>
                   </div>
                   <div class="col-md-4"> <!-- Column for the second dropdown -->
                       <label class="col-form-label fw-bold fs-6 required">Secondary Value
@@ -125,6 +154,9 @@
                           placeholder="Select Secondary Value"
                           class="w-100"> <!-- Ensures dropdown takes full width of column -->
                       </ngx-select>
+                      <div *ngIf="createKPIWidget2.get('secondaryValue')?.touched && createKPIWidget2.get('secondaryValue')?.invalid" class="text-danger">
+                        <div *ngIf="createKPIWidget2.get('secondaryValue')?.errors?.required"> Secondary Value is required.</div>
+                      </div>
                   </div>
     
                   <div class="col-md-4"> <!-- Column for the second dropdown -->
@@ -146,25 +178,16 @@
                         placeholder="Select Tertiary Value"
                         class="w-100"> <!-- Ensures dropdown takes full width of column -->
                     </ngx-select>
+                    <div *ngIf="createKPIWidget2.get('secondaryValueNested')?.touched && createKPIWidget2.get('secondaryValueNested')?.invalid" class="text-danger">
+                      <div *ngIf="createKPIWidget2.get('secondaryValueNested')?.errors?.required"> Tertiary Value is required.</div>
+                    </div>
                 </div>
     
     
     
         
         
-                  <div class="col-md-4">
-                    <label for="groupByFormat" class="col-form-label fw-bold fs-6 required">Group By Format</label>
-                    <input
-                      id="groupByFormat"
-                      type="text"
-                      class="form-control form-control-solid"
-                      placeholder="Select GroupByFormat"
-                      [formControl]="groupByFormatControl2" 
-                      (click)="openModalCalender2()"
-                      readonly /> <!-- Make it readonly to prevent manual input -->
-                  
-        
-                  </div>
+
     
     
                   <div class="col-md-4" *ngIf="showIdField">
@@ -206,51 +229,107 @@
                     />
                   </div>
 
-                  <div class="col-md-4 mb-3">
-                    <label  class="col-form-label fw-bold fs-6 required">Date Range Label</label>
-                    <ngx-select
-                    id="selectedRangeType"
-                    [allowClear]="true"
-                    formControlName="selectedRangeType"
-                    [items]="dateRangeLabel"
-                    optionValueField="value"
-                    optionTextField="text"
-                    placeholder="Select Group"
-            
-                    class="w-100"
-             
-                  ></ngx-select>
-                  </div>
 
                   <div class="col-md-4 mb-3">
-                    <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Redirect To</label>
-                    <ngx-select
-                      id="parameterName"
-                      [allowClear]="true"
-                      formControlName="dashboardIds"
-                      [items]="p1ValuesSummary"
-                      optionValueField="value"
-                      optionTextField="text"
-                      placeholder="Select Parameter"
-                   
-                      style="width: 100%;">
-                    </ngx-select>
-                  </div>
-
-                  <div class="col-md-4 mb-3">
-                    <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Select Type</label>
-                    <ngx-select
-                      id="selectType"
-                      [allowClear]="true"
-                      formControlName="selectType"
-                      [items]="SelectTypeSummary"
-                      optionValueField="value"
-                      optionTextField="text"
-                      placeholder="Select Parameter"
-                     
-                      style="width: 100%;">
-                    </ngx-select>
-                  </div>
+                    <label for="timeInput" class="col-form-label fw-bold fs-6 ">From Time</label>
+  <input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"     formControlName="selectFromTime">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label for="timeInput" class="col-form-label fw-bold fs-6 ">To Time</label>
+    <input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"     formControlName="selectToTime">
+                      </div>
+  
+  
+                      <div class="col-md-4 mb-3">
+                        <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Module Names</label>
+                        <ngx-select
+                      
+                          [allowClear]="true"
+                          formControlName="ModuleNames"
+                          [items]="showModuleNames"
+                          optionValueField="value"
+                          optionTextField="text"
+                          placeholder="Select Parameter"
+                          (selectionChanges)="moduleSelection($event)"
+                      
+                          style="width: 100%;">
+                        </ngx-select>
+                      </div>
+  
+  
+  
+                      <div class="col-md-4 mb-3">
+                        <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Redirect To</label>
+                        <ngx-select
+                       
+                          [allowClear]="true"
+                          formControlName="dashboardIds"
+                          [items]="dynamicIDArray"
+                          optionValueField="value"
+                          optionTextField="text"
+                          placeholder="Select Parameter"
+                          (selectionChanges)="dynamicRedirectChanged($event)"
+                      
+                          style="width: 100%;">
+                        </ngx-select>
+                      </div>
+                      <div class="row g-3 align-items-center">
+                        <!-- Select Type -->
+                        <div class="col-md-4">
+                          <div class="d-flex flex-column">
+                            <label for="dashboardIds" class="col-form-label fw-bold fs-6">Select Type</label>
+                            <ngx-select
+                              id="selectType"
+                              [allowClear]="true"
+                              formControlName="selectType"
+                              [items]="SelectTypeSummary"
+                              optionValueField="value"
+                              optionTextField="text"
+                              placeholder="Select Parameter"
+                            >
+                            </ngx-select>
+                          </div>
+                        </div>
+                      
+                        <!-- Column Visibility -->
+                        <div class="col-md-4" style="margin-top:30px;">
+                          <div class="d-flex flex-column">
+                            <label for="columnVisibility" class="fw-bold fs-6">Column Visibility</label>
+                            <p-multiSelect
+                              id="columnVisibility"
+                              formControlName="columnVisibility"
+                              [options]="columnVisisbilityFields"
+                              optionLabel="text"
+                              placeholder="Select Parameter"
+                              >
+                            </p-multiSelect>
+                          </div>
+                        </div>
+                      
+                        <!-- Custom Label -->
+                        <div class="col-md-4">
+                          <div class="d-flex flex-column">
+                            <label for="custom_Label" class="col-form-label fw-bold fs-6 required">Custom Label</label>
+                            <input
+                              type="text"
+                              class="form-control form-control-solid"
+                              id="custom_Label"
+                              name="custom_Label"
+                              formControlName="custom_Label"
+                            />
+                            <div *ngIf="createKPIWidget2.get('custom_Label')?.touched && createKPIWidget2.get('custom_Label')?.invalid" class="text-danger">
+                              <div *ngIf="createKPIWidget2.get('custom_Label')?.errors?.required"> Custom Label is required.</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="col-md-4 mb-3" *ngIf = "shoRowData" >
+                        <label for="constant" class="col-form-label fw-bold fs-6 "></label>
+                        <input id="constant" type="number" class="form-control form-control-solid"
+                          placeholder="Select constant" formControlName="rowData"
+                         />
+                      </div>
               </div>
           </div>
           
@@ -281,16 +360,7 @@
               </div>
             
               <!-- Custom Label -->
-              <div class="col-md-5">
-                <label for="custom_Label" class="col-form-label fw-bold fs-6 required">Custom Label</label>
-                <input
-                  type="text"
-                  class="form-control form-control-solid"
-                  id="custom_Label"
-                  name="custom_Label"
-                  formControlName="custom_Label"
-                />
-              </div>
+
             </div>
           
             <div class="col-md-12 mb-3">
@@ -313,21 +383,20 @@
             <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab" role="tabpanel" aria-labelledby="settings-tabpane">
               <!-- Themes Section -->
               <div class="row g-3">
-              <div class="col-md-12">
-                <label class="col-form-label fw-bold fs-6 required">Themes:</label>
-                <div class="color-boxes">
-                  <div
-                  *ngFor="let theme of themes"
-                  class="color-box"
-                  [ngStyle]="{ 'background-image': theme.color }"
-                  (click)="toggleCheckbox2(theme)"  
-                  [class.checked]="theme.selected"
-                >
-                  <div *ngIf="theme.selected" class="checkmark">✔</div>
+                <div class="col-md-12 mb-3">
+                  <label class="col-form-label fw-bold fs-6 required">Themes:</label>
+                  <div class="color-boxes">
+                    <div
+                      *ngFor="let theme of themes"
+                      class="color-box"
+                      [ngStyle]="{ 'background-image': theme.color }"
+                      (click)="toggleCheckbox(theme)"
+                      [class.checked]="theme.selected"
+                    >
+                      <div *ngIf="theme.selected" class="checkmark">✔</div>
+                    </div>
+                  </div>
                 </div>
-                
-                </div>
-              </div>
               <div class="col-md-6 mb-3">
                 <label for="fontSize" class="col-form-label fw-bold fs-6 required">Font Size</label>
                 <input
@@ -402,7 +471,7 @@
     
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" (click)="modal.dismiss()" >Close</button>
-      <button type="button" class="btn btn-primary" (click)="addTile('tile3'); modal.dismiss()" [disabled]="createKPIWidget2.invalid" *ngIf="!isEditMode">Save</button> <!-- Save button shown only in add mode -->
+      <button type="button" class="btn btn-primary"        (click)="validateAndSubmit()"   *ngIf="!isEditMode">Save</button> <!-- Save button shown only in add mode -->
       <button type="button" class="btn btn-warning" (click)="updateTile2('tile'); modal.dismiss()" [disabled]="createKPIWidget2.invalid" *ngIf="isEditMode">Update</button> <!-- Update button shown only in edit mode -->
     </div>
     </div>
@@ -417,60 +486,101 @@
           <div class="container1">
             <div class="list-row">
               <div class="list-column">
-                <div class="list-item active" (click)="selectValue2('Year', modal)" (mouseenter)="showTooltip('Year')" (mouseleave)="hideTooltip()">
-                  <div class="title">Year</div>
-                  <div class="example">E.g., 2003, 2004</div>
+                <div class="list-item active" (click)="selectValue('Last 24 Hours', modal)" (mouseenter)="showTooltip('Last 24 Hours')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last 24 Hours</div>
+                  <div class="example">E.g., Last 24 hours of data</div>
                 </div>
-                <div class="list-item" (click)="selectValue2('QuarterYear', modal)" (mouseenter)="showTooltip('QuarterYear')" (mouseleave)="hideTooltip()">
-                  <div class="title">Quarter & Year</div>
-                  <div class="example">E.g., Q1 2004</div>
+                <div class="list-item " (click)="selectValue('Today', modal)" (mouseenter)="showTooltip('Today')"
+                  (mouseleave)="hideTooltip()" >
+                  <div class="title">Today</div>
+                  <div class="example">E.g., Data from 00:00 hrs to now</div>
                 </div>
-                <div class="list-item" (click)="selectValue2('MonthYear', modal)" (mouseenter)="showTooltip('MonthYear')" (mouseleave)="hideTooltip()">
-                  <div class="title">Month & Year</div>
-                  <div class="example">E.g., March 2004</div>
+                <div class="list-item " (click)="selectValue('Yesterday', modal)" (mouseenter)="showTooltip('Yesterday')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Yesterday</div>
+                  <div class="example">E.g., Data from previous day</div>
                 </div>
-                <div class="list-item" (click)="selectValue2('WeekYear', modal)" (mouseenter)="showTooltip('WeekYear')" (mouseleave)="hideTooltip()">
-                  <div class="title">Week & Year</div>
-                  <div class="example">E.g., W1 2004</div>
+                <div class="list-item" (click)="selectValue('Last 7 days', modal)" (mouseenter)="showTooltip('Last 7 days')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last 7 days</div>
+                  <div class="example">E.g., Data for past 7 days</div>
                 </div>
-                <div class="list-item" (click)="selectValue2('FullDate', modal)" (mouseenter)="showTooltip('FullDate')" (mouseleave)="hideTooltip()">
-                  <div class="title">Full Date</div>
-                  <div class="example">E.g., 1/1/2000</div>
+                <div class="list-item" (click)="selectValue('Last 30 days', modal)" (mouseenter)="showTooltip('Last 30 days')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last 30 days</div>
+                  <div class="example">E.g., Data for the past 30 days</div>
                 </div>
-                <div class="list-item" (click)="selectValue2('DateTime', modal)" (mouseenter)="showTooltip('DateTime')" (mouseleave)="hideTooltip()">
-                  <div class="title">Date & Time</div>
-                  <div class="example">E.g., 01 Jan, 2000 00:00:07 hrs</div>
+                <div class="list-item" (click)="selectValue('This Week', modal)" (mouseenter)="showTooltip('This Week')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">This Week</div>
+                  <div class="example">E.g., Current week (Monday to Sunday)</div>
                 </div>
+                <div class="list-item" (click)="selectValue('Last 5 Weeks', modal)" (mouseenter)="showTooltip('Last 5 Weeks')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last 5 Weeks</div>
+                  <div class="example">E.g., Data for past 5 weeks</div>
+                </div>
+                <div class="list-item" (click)="selectValue('This Month', modal)" (mouseenter)="showTooltip('This Month')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">This Month</div>
+                  <div class="example">E.g., Data for current month</div>
+                </div>
+                <div class="list-item" (click)="selectValue('any', modal)" (mouseenter)="showTooltip('any')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Any</div>
+                <div class="example">E.g., Any</div>
               </div>
+              </div>
+            
               <div class="list-column">
-                <div class="list-item" (click)="selectValue2('Quarter', modal)">
-                  <div class="title">Quarter</div>
-                  <div class="example">E.g., Q1, Q2</div>
+                <div class="list-item" (click)="selectValue('Last Month', modal)" (mouseenter)="showTooltip('Last Month')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last Month</div>
+                  <div class="example">E.g., Data for previous month</div>
                 </div>
-                <div class="list-item" (click)="selectValue2('Month', modal)">
-                  <div class="title">Month</div>
-                  <div class="example">E.g., January, February</div>
+                <div class="list-item" (click)="selectValue('This Quarter', modal)" (mouseenter)="showTooltip('This Quarter')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">This Quarter</div>
+                  <div class="example">E.g., Current quarter (Q1/Q2/Q3/Q4)</div>
                 </div>
-                <div class="list-item" (click)="selectValue2('Week', modal)">
-                  <div class="title">Week</div>
-                  <div class="example">E.g., Week 1, Week 2</div>
+                <div class="list-item" (click)="selectValue('Last Quarter', modal)" (mouseenter)="showTooltip('Last Quarter')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last Quarter</div>
+                  <div class="example">E.g., Data from the previous quarter</div>
                 </div>
-                <div class="list-item" (click)="selectValue2('WeekDay', modal)">
-                  <div class="title">Week Day</div>
-                  <div class="example">E.g., Sunday, Monday</div>
+                <div class="list-item" (click)="selectValue('This BiAnnual', modal)" (mouseenter)="showTooltip('This BiAnnual')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">This BiAnnual</div>
+                  <div class="example">E.g., Current half-year period</div>
                 </div>
-                <div class="list-item" (click)="selectValue2('DayOfMonth', modal)">
-                  <div class="title">Day of Month</div>
-                  <div class="example">E.g., 1 to 31</div>
+                <div class="list-item" (click)="selectValue('Last BiAnnual', modal)" (mouseenter)="showTooltip('Last BiAnnual')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last BiAnnual</div>
+                  <div class="example">E.g., Previous half-year period</div>
                 </div>
-                <div class="list-item" (click)="selectValue2('HourOfDay', modal)">
-                  <div class="title">Hour of Day</div>
-                  <div class="example">E.g., 0 to 23 hrs</div>
+                <div class="list-item" (click)="selectValue('This Year', modal)" (mouseenter)="showTooltip('This Year')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">This Year</div>
+                  <div class="example">E.g., Data for the current year</div>
                 </div>
+                <div class="list-item" (click)="selectValue('Last Year', modal)" (mouseenter)="showTooltip('Last Year')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last Year</div>
+                  <div class="example">E.g., Data from the previous year</div>
+                </div>
+                <div class="list-item" (click)="selectValue('Last 5 Years', modal)" (mouseenter)="showTooltip('Last 5 Years')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last 5 Years</div>
+                  <div class="example">E.g., Data for the past 5 years</div>
+                </div>
+
               </div>
             </div>
+            
+            
           </div>
         </div>
       </div>
-      </ng-template>
+    </ng-template>
  
