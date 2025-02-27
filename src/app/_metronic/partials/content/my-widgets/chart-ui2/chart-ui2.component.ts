@@ -124,7 +124,10 @@ export class ChartUi2Component implements OnInit{
    ){}
   ngAfterViewInit(){
   
+    setTimeout(() => {
       this.createLineChart()
+    }, 500);
+
 
   
 

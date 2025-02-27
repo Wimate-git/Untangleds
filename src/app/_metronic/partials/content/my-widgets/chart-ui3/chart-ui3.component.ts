@@ -234,8 +234,11 @@ const extractcolumnVisibility = chartConfig
   }
   
   ngAfterViewInit(){
-
+    setTimeout(() => {
       this.createColumnChart()
+    }, 500);
+
+
     
   
 

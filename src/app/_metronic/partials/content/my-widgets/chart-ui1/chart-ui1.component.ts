@@ -230,7 +230,10 @@ this.formTableConfig = {
     this.sendCellInfo.emit(event);
   }
   ngAfterViewInit(){
-    this.createPieChart()
+    setTimeout(() => {
+      this.createPieChart()
+    }, 500);
+
   
 
   }
@@ -335,6 +338,7 @@ data.forEach((packet: any,matchedIndex:number) => {
 
     }else{
       const chartOptionsCopy = JSON.parse(this.item.highchartsOptionsJson);
+
       console.log('chartOptionsCopy else condition',chartOptionsCopy)
 
       chartOptionsCopy.series = chartOptionsCopy.series.map((series: any) => {

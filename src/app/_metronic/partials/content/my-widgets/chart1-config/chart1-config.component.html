@@ -140,6 +140,10 @@
                         [items]="listofDeviceIds" optionValueField="value" optionTextField="text"
                         (selectionChanges)="selectFormParams($event)" placeholder="Select createChart">
                       </ngx-select>
+                      <div *ngIf="field.get('formlist')?.touched && field.get('formlist')?.invalid" class="text-danger">
+                        <div *ngIf="field.get('formlist')?.errors?.required">Form is required.</div>
+                      </div>
+                      
                     </div>
 
                     <div class="col-md-4 mb-3">
@@ -497,7 +501,7 @@
       <div class="modal-footer" style="margin-top: 20px;">
         <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
         <button type="button" class="btn btn-primary" *ngIf="!isEditMode"
-          (click)="addTile('chart');modal.dismiss()" [disabled]="createChart?.invalid">Save</button>
+        (click)="validateAndSubmit()"  >Save</button>
         <button type="button" class="btn btn-warning" (click)="updateTile('chart');modal.dismiss() " *ngIf="isEditMode"
           [disabled]="createChart?.invalid">
           Update
