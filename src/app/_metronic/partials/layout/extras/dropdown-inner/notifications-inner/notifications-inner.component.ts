@@ -29,6 +29,8 @@ export class NotificationsInnerComponent implements OnInit {
   check: number;
   main_table_data: any[] = [];
   id: string;
+  notification: any[];
+  count =0
   // logs: Array<LogModel> = defaultLogs;
   constructor(
     private api: APIService,
@@ -37,6 +39,9 @@ export class NotificationsInnerComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
+
+
+    this.count = 0
 
     this.reloadComponentEveryMinute();
 
@@ -111,15 +116,22 @@ reloadComponentEveryMinute() {
   setTimeout(async () => {
     console.log("AFTER ! MIN")
 
+    this.count = 1
+
     // window.location.reload();
+
+    this.notification = this.main_table_data
+
+    console.log("length Notification main_Table_data:",this.notification.length,this.main_table_data.length)
+    // if(this.main_table_data.length > this.notification.length){
+
+    //   this.playNotificationSound();
+    // }
        this.main_table_data =[]
     await this.fetchNotification();
 
     this.reloadComponentEveryMinute();
 
-    // this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-    //   this.router.navigate([this.router.url]); // Reload the current component
-    // });
   }, 60000); // 60,000 ms = 1 minute
 }
 
@@ -169,7 +181,6 @@ formatDate(timestamp: number): string {
         const main_data = JSON.parse(data.body);
         console.log("MAIN DATA:", main_data);
 
-
         this.main_table_data = [...this.main_table_data, ...main_data.body.items]; // Append new data to the existing data
 
         console.log("MAIN TABLE DATA:", this.main_table_data);
@@ -181,8 +192,11 @@ formatDate(timestamp: number): string {
           requestBody.lastEvaluatedKey = main_data.body.lastEvaluatedKey;
           this.fetchAllData(requestBody); // Recursive call with updated lastEvaluatedKey
         } else {
+
+
           // All data has been fetched, process or display it
           this.processData(this.main_table_data); // A function to process/display the data
+
         }
 
       })
@@ -190,9 +204,25 @@ formatDate(timestamp: number): string {
         console.error('Error:', error);
       });
   }
+
+  playNotificationSound() {
+    const audio = new Audio('assets/media/mixkit-software-interface-start-2574.wav'); // Ensure the correct path
+    audio.play().catch(error => console.error("Error playing notification sound:", error));
+  }
+
+  
   processData(notification_data: any[]) {
 
     console.log("DATA:", notification_data)
+
+    if(this.count > 0){
+
+    if(this.notification.length < notification_data.length){
+
+      this.playNotificationSound()
+
+    }
+  }
 
     this.app_notification = notification_data
 
