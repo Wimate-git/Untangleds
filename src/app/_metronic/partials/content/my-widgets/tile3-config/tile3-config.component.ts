@@ -471,6 +471,7 @@ if (key === 'tile3') {
     { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
     { value: 'sumArray', text: 'SumArray' },
     { value: 'Advance Equation', text: 'Advance Equation' },
+    {value:'Avg_Utilization_wise_multiple',text:'Avg_Utilization_wise_multiple'}
 
   ]
 

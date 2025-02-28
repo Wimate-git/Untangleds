@@ -2238,11 +2238,12 @@ console.log('tempMetadata',tempMetadata)
   
 
 
-  async fetchLookupFormData(lookupKey: any, sk: any, readField: any): Promise<any[]> {
+  async fetchLookupFormData(lookupKey: any, sk: number, readField: any, accumulatedData: any[] = []): Promise<any[]> {
+    console.log('Fetching data for sk:', sk);
     console.log('readField checking', readField);
-    console.log("Iam called Bro");
-    
+  
     try {
+      // Fetch data for the current sk
       const response = await this.api.GetMaster(lookupKey, sk);
   
       if (response && response.options) {
@@ -2250,10 +2251,9 @@ console.log('tempMetadata',tempMetadata)
           let data = JSON.parse(response.options);
           console.log("form data check", data);
   
-          // Declare extractedValues inside the function
           let extractedValues: any[] = [];
-          
-          // Loop through data to find the matching value
+  
+          // Extract IDs based on readField
           data.forEach((entry: any) => {
             entry.forEach((item: any) => {
               if (item.includes(readField)) {
@@ -2266,9 +2266,17 @@ console.log('tempMetadata',tempMetadata)
   
           console.log('Extracted IDs:', extractedValues);
   
-          // Return the extracted IDs
-          return extractedValues;
-          
+          // Append extracted values to the accumulated data
+          accumulatedData = accumulatedData.concat(extractedValues);
+  
+          // Check if more data is available (assuming an empty array means no more data)
+          if (data.length > 0) {
+            console.log(`Fetching next batch for sk: ${sk + 1}`);
+            return await this.fetchLookupFormData(lookupKey, sk + 1, readField, accumulatedData);
+          }
+          console.log('accumulatedData checking',accumulatedData)
+  
+          return accumulatedData; // Return all accumulated records
         } else {
           console.error('response.options is not a string.');
         }
@@ -2278,10 +2286,11 @@ console.log('tempMetadata',tempMetadata)
     } catch (error) {
       console.error('Error:', error);
     }
-    
-    // Return an empty array if no data is found
-    return [];
+  
+    // Return the accumulated data or an empty array if no data is found
+    return accumulatedData;
   }
+  
 
   async fetchLookupIsDerivedUser(lookupKey: any, sk: any, readField: any): Promise<any[]> {
     console.log('readField checking', readField);

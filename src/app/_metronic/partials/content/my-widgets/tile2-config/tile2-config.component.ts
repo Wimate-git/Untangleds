@@ -957,6 +957,7 @@ generateUniqueId(): number {
     { value: 'sum_difference', text: 'Sum Difference' },
     { value: 'sum_difference', text: 'Sum Difference' },
     { value: 'distance_sum', text: 'Distance Sum' },
+    {value:'Avg_Utilization_wise_multiple',text:'Avg_Utilization_wise_multiple'}
     
     
 

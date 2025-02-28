@@ -2244,6 +2244,14 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     tooltipTriggerList.forEach((tooltipTriggerEl) => {
       new Tooltip(tooltipTriggerEl);
     });
+
+    $(document).on('click', '[data-action="view"]', (event) => {
+      const id = $(event.target).closest('[data-id]').attr('data-id');
+      console.log('id checking',id)
+      if (id) {
+        this.viewItem(id);
+      }
+    });
     // this.createBulletChart();
 
     // this.createPieChart()
@@ -5175,16 +5183,18 @@ console.log('selectedTab checking',this.selectedTab)
             `;
   
             return `
-              <div class="d-flex align-items-center">
-                <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
-                  <a href="javascript:;">
-                    ${symbolLabel}
-                  </a>
-                </div>
-                <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
-                  <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
-                </div>
-              </div>
+  <div class="d-flex align-items-center">
+          <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" 
+               data-action="view" data-id="${full.id}">
+            <a href="javascript:;" data-action="view" data-id="${full.id}">
+              ${symbolLabel}
+            </a>
+          </div>
+          <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
+            <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1" 
+               data-action="view" data-id="${full.id}">${data}</a>
+          </div>
+        </div>
             `;
           },
         },

@@ -1503,6 +1503,7 @@ addEquationControls(event: any, _type: string) {
     { value: 'Advance Equation', text: 'Advance Equation' },
     { value: 'sum_difference', text: 'Sum Difference' },
     { value: 'distance_sum', text: 'Distance Sum' },
+    {value:'Avg_Utilization_wise_multiple',text:'Avg_Utilization_wise_multiple'}
 
 
   ]

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { GoogleMap, MapInfoWindow } from '@angular/google-maps';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
@@ -55,29 +55,32 @@ export class MapUiComponent implements OnInit{
   defaultCenter: { lat: number; lng: number; };
 
   ngOnInit(){
+
+  //     setTimeout(() => {
+  //   this.createMapWidget();
+  // }, 500);
   
     console.log('item chacke',this.item.grid_details)
-    this.summaryService.lookUpData$.subscribe((data: any)=>{
-      console.log('data check>>>',data)
- let tempCharts:any=[]
-data.forEach((packet: any,matchedIndex:number) => {
-  
-  if(packet.grid_type == 'Map'&& this.index==matchedIndex && packet.id === this.item.id){
-    tempCharts[matchedIndex] = packet
-    setTimeout(() => {
-      this.createMapWidget(packet);
-    }, 1000);
-
-  }
-});
-
-      
-      // console.log("✅ Matched Charts:", matchedCharts);
-      
+    this.summaryService.lookUpData$.subscribe((data: any) => {
+      console.log('data check>>>', data);
+      let tempCharts: any[] = [];
+      let foundMatch = false; // Flag to track if a match was found
     
-      
-      
-    })
+      data.forEach((packet: any, matchedIndex: number) => {
+        if (packet.grid_type === 'Map' && this.index === matchedIndex && packet.id === this.item.id) {
+          tempCharts[matchedIndex] = packet;
+          this.createMapWidget(packet);
+          foundMatch = true; // Mark that a match was found
+        }
+      });
+    
+      // If no match was found, call this.createMapWidget() without parameters
+      if (!foundMatch) {
+        console.log("No matching data found, calling createMapWidget without parameters.");
+        this.createMapWidget();
+      }
+    });
+    
 
   
   }
@@ -191,6 +194,7 @@ data.forEach((packet: any,matchedIndex:number) => {
           },
         }));
       
+        this.cdr.detectChanges()
         console.log('Formatted markers with map types and sizes:', this.markers);
       
         // Handle the case when markers array is empty
@@ -277,14 +281,13 @@ data.forEach((packet: any,matchedIndex:number) => {
       console.error('InfoWindow is not initialized.');
     }
   }
-ngAfterViewInit(): void {
-  setTimeout(() => {
-    this.createMapWidget();
-  }, 500);
+// ngAfterViewInit(): void {
+//   setTimeout(() => {
+//     this.createMapWidget();
+//   }, 500);
 
-  // this.createMapWidget()
-  // this.initializeMapData();
-}
+
+// }
 
 
 // private initializeMapData(): void {
@@ -328,7 +331,7 @@ get shouldShowButton(): boolean {
 }
 
   constructor(
-   private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private summaryService:SummaryEngineService
+   private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private summaryService:SummaryEngineService,private cdr: ChangeDetectorRef,
    
   ){}
 

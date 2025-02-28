@@ -1540,11 +1540,18 @@ FormatTypeValues = [
   { value: 'Default', text: 'Default' },
   { value: 'Rupee', text: 'Rupee' },
   { value: 'Distance', text: 'Distance' },
-  { value: 'Days & Hours', text: 'Days & Hours' },
-  { value: 'Hours', text: 'Hours' },
   { value: 'Minutes', text: 'Minutes' },
+  { value: 'Hours', text: 'Hours' },
   { value: 'Days', text: 'Days' },
-  {value:'Label With Value',text:'Label With Value'}
+  { value: 'Days & Hours', text: 'Days & Hours' },
+
+
+  { value: 'Months', text: 'Months' },
+  { value: 'Years', text: 'Years' },
+  {value:'Label With Value',text:'Label With Value'},
+  { value: 'Percentage', text: 'Percentage' },
+
+
 ]
 
 setUserSatus(){
