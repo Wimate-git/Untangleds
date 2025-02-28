@@ -1187,6 +1187,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     { value: 'sum_difference', text: 'Sum Difference' },
     { value: 'distance_sum', text: 'Distance Sum' },
     { value: 'Count Multiple Minitable', text: 'Count Multiple Minitable' },
+    {value:'Avg_Utilization_wise_multiple',text:'Avg_Utilization_wise_multiple'}
     
     
 

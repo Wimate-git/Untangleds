@@ -64,7 +64,10 @@ data.forEach((packet: any,matchedIndex:number) => {
   
   if(packet.grid_type == 'Map'&& this.index==matchedIndex && packet.id === this.item.id){
     tempCharts[matchedIndex] = packet
-    this.createMapWidget(packet);
+    setTimeout(() => {
+      this.createMapWidget(packet);
+    }, 1000);
+
   }
 });
 
@@ -275,7 +278,10 @@ data.forEach((packet: any,matchedIndex:number) => {
     }
   }
 ngAfterViewInit(): void {
-  this.createMapWidget();
+  setTimeout(() => {
+    this.createMapWidget();
+  }, 500);
+
   // this.createMapWidget()
   // this.initializeMapData();
 }

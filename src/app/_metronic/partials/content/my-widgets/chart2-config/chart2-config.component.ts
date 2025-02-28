@@ -1110,6 +1110,7 @@ repopulate_fields(getValues: any): FormArray {
     { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
     { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
     { value: 'sumArray', text: 'SumArray' },
+    {value:'Avg_Utilization_wise_multiple',text:'Avg_Utilization_wise_multiple'}
 
 
   ]

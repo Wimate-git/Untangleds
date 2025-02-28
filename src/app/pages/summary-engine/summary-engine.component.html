@@ -664,7 +664,7 @@
    (click)="openModal('edit', all_Packet_store, summaryModal)">
     <i style="color: white;" class="fa fa-edit"></i>
 </a>
-    <a class="myMenu-item" (click)="openSummaryTable(content)" title="Search dashboard">
+    <a class="myMenu-item" *ngIf="summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)" (click)="openSummaryTable(content)" title="Search dashboard">
       <i style="color: white;" class="fa fa-search"></i>
     </a>
     <a *ngIf="!isSummaryEngine() && (summaryDashboardUpdate || userPermission === 'All' || !summaryDashboardView)"

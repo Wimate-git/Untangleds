@@ -184,7 +184,7 @@ data.forEach((packet: any,matchedIndex:number) => {
     tempCharts[matchedIndex] = packet
     setTimeout(() => {
       this.createLineChart(packet)
-    }, 500);
+    }, 1000);
   }
 });
 
