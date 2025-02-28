@@ -296,7 +296,7 @@ data.forEach((packet: any,matchedIndex:number) => {
     console.log('packet checking from chart ui',packet)
     setTimeout(() => {
       this.createPieChart(packet);
-    }, 500);
+    }, 1000);
 
   }
 });

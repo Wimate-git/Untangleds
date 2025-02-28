@@ -318,7 +318,7 @@ data.forEach((packet: any,matchedIndex:number) => {
     tempCharts[matchedIndex] = packet
     setTimeout(() => {
       this.createColumnChart(packet)
-    }, 500);
+    }, 1000);
   }
 });
 
