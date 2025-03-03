@@ -348,23 +348,32 @@ makeTrueCheck:any = false
   }
   fetchDynamicFormData(value: string, index: number) {
     console.log("Fetching data for:", value);
- 
+
     const apiUrl = `${this.SK_clientID}#dynamic_form#${value}#main`;
     this.api.GetMaster(apiUrl, 1)
       .then((result: any) => {
 
         if (result && result.metadata) {
-          // this.resultCheck = JSON.parse(result)
-          // console.log('this.resultCheck checking',this.resultCheck)
           const parsedMetadata = JSON.parse(result.metadata);
           const formFields = parsedMetadata.formFields;
-          console.log('formFields checking',formFields)
-  
-          const dynamicParamList = formFields.map((field: any) => ({
+          console.log('formFields checking from filter', formFields);
+
+          // Define the unwanted types to filter out
+          const unwantedTypes = [
+            "Empty Placeholder", "heading", "hidden", "file", "table", "button", "html code"
+          ];
+
+          // Filter out the unwanted types
+          const filteredFormFields = formFields.filter((field: any) => 
+            !unwantedTypes.includes(field.type)
+          );
+
+          // Map the filtered fields
+          const dynamicParamList = filteredFormFields.map((field: any) => ({
             value: field.name,
             text: field.label,
           }));
-  
+
           // Add created_time and updated_time if present
           if (parsedMetadata.created_time) {
             dynamicParamList.push({
@@ -378,9 +387,9 @@ makeTrueCheck:any = false
               text: 'Updated Time',
             });
           }
-  
-          // Store the dynamicParamList in a map by index
-          console.log('dynamicParamList chgecking',dynamicParamList)
+
+          // Store the filtered dynamicParamList in a map by index
+          console.log('dynamicParamList checking', dynamicParamList);
           this.dynamicParamMap.set(index, dynamicParamList);
           this.cdr.detectChanges();
         } else {
@@ -391,6 +400,7 @@ makeTrueCheck:any = false
         console.error(`Error fetching data for ${value}:`, err);
       });
   }
+
   
   
 

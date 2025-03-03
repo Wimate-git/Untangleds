@@ -310,6 +310,7 @@ data.forEach((packet: any,matchedIndex:number) => {
 
 if(packet.grid_type == 'TableWidget'&& this.index==matchedIndex && packet.id === this.item.id){
   tempCharts[matchedIndex] = packet
+  console.log('packet checking from table widget',packet)
   setTimeout(() => {
     this.createtableWidget(packet)
     

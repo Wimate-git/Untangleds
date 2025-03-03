@@ -64,21 +64,21 @@ export class MapUiComponent implements OnInit{
     this.summaryService.lookUpData$.subscribe((data: any) => {
       console.log('data check>>>', data);
       let tempCharts: any[] = [];
-      let foundMatch = false; // Flag to track if a match was found
+   // Flag to track if a match was found
     
       data.forEach((packet: any, matchedIndex: number) => {
         if (packet.grid_type === 'Map' && this.index === matchedIndex && packet.id === this.item.id) {
           tempCharts[matchedIndex] = packet;
-          this.createMapWidget(packet);
-          foundMatch = true; // Mark that a match was found
+          setTimeout(() => {
+            this.createMapWidget(packet);
+          }, 500);
+ 
+       // Mark that a match was found
         }
       });
     
       // If no match was found, call this.createMapWidget() without parameters
-      if (!foundMatch) {
-        console.log("No matching data found, calling createMapWidget without parameters.");
-        this.createMapWidget();
-      }
+   
     });
     
 
@@ -281,13 +281,13 @@ export class MapUiComponent implements OnInit{
       console.error('InfoWindow is not initialized.');
     }
   }
-// ngAfterViewInit(): void {
-//   setTimeout(() => {
-//     this.createMapWidget();
-//   }, 500);
+ngAfterViewInit(): void {
+
+    this.createMapWidget();
 
 
-// }
+
+}
 
 
 // private initializeMapData(): void {

@@ -1382,82 +1382,7 @@ helperTileClick(event:any,modalChart:any){
   this.modalService.open(modalChart, { size: 'xl' });
 
 }
-// setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): void {
-//   console.log('modaref checking:', modaref);
-//   console.log('packet checking:', packet);
-//   console.log('dashboard filterCheck',this.dashboard)
-//   if (Array.isArray(this.dashboard) && this.dashboard.length > 0) {
-//     this.dashboard.forEach((packet, index) => {
-//       console.log(`Processing packet at index ${index}:`, packet);
 
-//       // Check if grid_type is "filterTile"
-//       if (packet.grid_type === "filterTile") {
-//         try {
-//           // Parse filterTileConfig if it's a string
-//           const parsedFilterTileConfig = packet.filterTileConfig
-//             ? JSON.parse(packet.filterTileConfig)
-//             : [];
-          
-//           console.log(`Parsed filterTileConfig for packet ${index}:`, parsedFilterTileConfig);
-
-//           // Store parsed filterTileConfig in a variable or process further
-//           this.storeFilterTileConfig(parsedFilterTileConfig, index);
-//         } catch (error) {
-//           console.error(`Error parsing filterTileConfig for packet ${index}:`, error);
-//         }
-//       }
-//     });
-//   } else {
-//     console.warn('Dashboard data is empty or not an array.');
-//   }
-
-
-
-//   const viewMode = true;
-//   const disableMenu = true;
-//   const modulePath = packet.dashboardIds;
-//   console.log('modulePath checking:', modulePath);
-
-//   localStorage.setItem('isFullScreen', JSON.stringify(true));
-//   const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}`;
-
-//   this.currentItem = packet;
-//   this.currentModalIndex = selectedMarkerIndex;
-
-//   if (packet.selectType === 'NewTab') {
-//     const safeUrl = `${window.location.origin}/summary-engine/${modulePath}`;
-//     console.log('Opening new tab with URL:', safeUrl);
-//     window.open(safeUrl, '_blank');
-//   }
-//   else if (packet.selectType === 'Modal') {
-//     if (this.modalContent) {
-//       this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-//         `${window.location.origin}/summary-engine/${modulePath}${queryParams}${parsedFilterTileConfig}`
-//       );
-//       console.log('Opening modal with iframe URL:', this.currentiframeUrl);
-//       this.modalService.open(this.modalContent, { size: 'xl' });
-//     } else {
-//       console.error('Modal content is undefined');
-//     }
-  
-//   } else if (packet.selectType === 'Same page Redirect') {
-//     const navigationPath = `/summary-engine/${modulePath}`;
-//     console.log('Redirecting to:', navigationPath);
-//     this.modalService.dismissAll();
-//     this.router.navigate([navigationPath]).then(() => {
-//       window.location.reload();
-//     }).catch(err => console.error('Navigation error:', err));
-//   } else   if (packet.selectType === 'drill down') {
-//     console.log('packet.selectType matches drill down');
-//     if (modaref && modaref instanceof TemplateRef) {
-//       console.log('Opening modal with modaref:', modaref);
-//       // this.modalService.dismissAll(); // Dismiss existing modals
-//       this.modalService.open(modaref, { size: 'lg', backdrop: 'static', centered: true });
-//     } else {
-//       console.error('Invalid TemplateRef passed for modal:', modaref);
-//     }
-//   }
-// }
 
 setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): void {
   console.log('modaref checking:', modaref);
@@ -1466,41 +1391,45 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
 
   let filterTileQueryParam = '';
 
-  if (Array.isArray(this.dashboard) && this.dashboard.length > 0) {
-    this.dashboard.forEach((dashboardPacket, index) => {
-      if (dashboardPacket.grid_type === 'filterTile') {
-        try {
-          // Parse the filterTileConfig
-          const parsedFilterTileConfig = dashboardPacket.filterTileConfig
-            ? JSON.parse(dashboardPacket.filterTileConfig)
-            : [];
+  // if (Array.isArray(this.dashboard) && this.dashboard.length > 0) {
+  //   this.dashboard.forEach((dashboardPacket, index) => {
+  //     if (dashboardPacket.grid_type === 'filterTile') {
+  //       try {
+  //         // Parse the filterTileConfig
+  //         const parsedFilterTileConfig = dashboardPacket.filterTileConfig
+  //           ? JSON.parse(dashboardPacket.filterTileConfig)
+  //           : [];
   
-          console.log(`Parsed filterTileConfig for packet ${index}:`, parsedFilterTileConfig);
+  //         console.log(`Parsed filterTileConfig for packet ${index}:`, parsedFilterTileConfig);
   
-          // Ensure the 'operator' field is preserved
-          const validatedFilterConfig = parsedFilterTileConfig.map((filterGroup: any[]) =>
-            filterGroup.map((filter: any) => ({
-              ...filter,
-              operator: filter.operator, // Ensure operator is preserved
-            }))
-          );
+  //         // Ensure the 'operator' field is preserved
+  //         const validatedFilterConfig = parsedFilterTileConfig.map((filterGroup: any[]) =>
+  //           filterGroup.map((filter: any) => ({
+  //             ...filter,
+  //             operator: filter.operator, // Ensure operator is preserved
+  //           }))
+  //         );
   
-          console.log(`Validated filterTileConfig for packet ${index}:`, validatedFilterConfig);
+  //         console.log(`Validated filterTileConfig for packet ${index}:`, validatedFilterConfig);
   
-          // Convert to a JSON string without encoding
-          filterTileQueryParam = `&filterTileConfig=${JSON.stringify(validatedFilterConfig)}`;
+  //         // Convert to a JSON string without encoding
+     
   
-          console.log('filterTileQueryParam:', filterTileQueryParam);
-        } catch (error) {
-          console.error(`Error parsing filterTileConfig for packet ${index}:`, error);
-        }
-      }
-    });
-  } else {
-    console.warn('Dashboard data is empty or not an array.');
-  }
+  //         console.log('filterTileQueryParam:', filterTileQueryParam);
+  //       } catch (error) {
+  //         console.error(`Error parsing filterTileConfig for packet ${index}:`, error);
+  //       }
+  //     }
+  //   });
+  // } else {
+  //   console.warn('Dashboard data is empty or not an array.');
+  // }
+  const validatedFilterConfig = this.eventFilterConditions
+
   
-  
+  filterTileQueryParam = `&filterTileConfig=${JSON.stringify(validatedFilterConfig)}`;
+  console.log('filterTileQueryParam checking after stringify',filterTileQueryParam)
+
 
   const viewMode = true;
   const disableMenu = true;
@@ -1524,12 +1453,76 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
     window.open(safeUrl, '_blank');
   } else if (packet.selectType === 'Modal') {
     if (this.modalContent) {
+      console.log('modalContent checking',this.modalContent)
+      this.modalService.open(this.modalContent, { size: 'xl' });
       this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        `${window.location.origin}/summary-engine/${modulePath}${queryParams}`
+        `${window.location.origin}/summary-engine/${modulePath}`
+      );
+      const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+    
+      // Prepare the request body
+      const requestBody = {
+        body: JSON.stringify({
+          clientId: this.SK_clientID,
+          from_route_id: this.fromRouterID,
+  
+          to_route_id:this.routeId,
+          // widgetId:this.storeDrillDown.id,
+      
+          MsgType:'Query_Params',
+          queryParams:this.eventFilterConditions,
+          permissionId:this.permissionIdRequest,
+          permissionList:this.readFilterEquation,
+          userName:this.userdetails
+        }),
+      };
+    
+      console.log('requestBody for dashboardFilter', requestBody);
+    
+      // Send a POST request to the Lambda function with the body
+      console.log('this.all_Packet_store clearing',this.all_Packet_store)
+      this.http.post(apiUrl, requestBody).subscribe(
+        
+        (response: any) => {
+          console.log('Lambda function triggered successfully:', response);
+          this.responseBody = JSON.parse(response.body)
+          console.log('this.responseBody checking',this.responseBody )
+          this.responseRowData = JSON.parse(this.responseBody.Processed_Data
+          )
+          console.log('this.responseRowData checking',this.responseRowData)
+      
+          
+          
+      
+          // Display SweetAlert success message
+          // Swal.fire({
+          //   title: 'Success!',
+          //   text: 'Lambda function triggered successfully.',
+          //   icon: 'success',
+          //   confirmButtonText: 'OK'
+          // });
+    
+          // Proceed with route parameter handling
+  
+    
+   // Reset loading state
+        },
+        (error: any) => {
+          console.error('Error triggering Lambda function:', error);
+    
+          // Display SweetAlert error message
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to trigger the Lambda function. Please try again.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+   // Reset loading state
+        }
       );
       console.log('Opening modal with iframe URL:', this.currentiframeUrl);
       console.log('QueryParams check', this.queryParams);
-      this.modalService.open(this.modalContent, { size: 'xl' });
+
       console.log('this.paramsReadExport',this.paramsReadExport)
     
 
@@ -2247,7 +2240,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
 
     $(document).on('click', '[data-action="view"]', (event) => {
       const id = $(event.target).closest('[data-id]').attr('data-id');
-      console.log('id checking',id)
+      console.log('id checking summary',id)
       if (id) {
         this.viewItem(id);
       }
@@ -2425,7 +2418,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
           // Check if flattenedConfig is an array and has elements
           if (Array.isArray(flattenedConfig) && flattenedConfig.length > 0) {
             console.log('Triggering updateSummary with add_tile');
-            alert('I am triggered');
+            // alert('I am triggered');
             console.log('all_Packet_store checking',this.all_Packet_store)
           this.isFilterdetail=true
           this.storeFilterDetail = flattenedConfig
@@ -3280,76 +3273,77 @@ console.log('Formatted Date:', this.lastUpdatedTime);
 
           // Iterate through the dashboard and themes to find a matching 
           console.log('checkdta for filter',this.all_Packet_store)
-          if(this.isFilterdetail){
+
             console.log('this.isFilterdetail',this.isFilterdetail)
             console.log('this.storeFilterDetail',this.storeFilterDetail)
             console.log('this.routeId',this.routeId)
             console.log('this.toRouteId',this.toRouteId)
+            console.log('this.readFilterEquation checking from modal ',this.readFilterEquation)
             
-            const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+        //     const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
     
-            // Prepare the request body
-            const requestBody = {
-              body: JSON.stringify({
-                clientId: this.SK_clientID,
-                from_route_id: this.fromRouterID,
+        //     // Prepare the request body
+        //     const requestBody = {
+        //       body: JSON.stringify({
+        //         clientId: this.SK_clientID,
+        //         from_route_id: this.fromRouterID,
 
-                to_route_id:this.routeId,
-                // widgetId:this.storeDrillDown.id,
+        //         to_route_id:this.routeId,
+        //         // widgetId:this.storeDrillDown.id,
             
-                MsgType:'Query_Params',
-                queryParams:this.storeFilterDetail,
-                permissionId:this.permissionIdRequest,
-                permissionList:this.readFilterEquation,
-                userName:this.userdetails
-              }),
-            };
+        //         MsgType:'Query_Params',
+        //         queryParams:this.eventFilterConditions,
+        //         permissionId:this.permissionIdRequest,
+        //         permissionList:this.readFilterEquation,
+        //         userName:this.userdetails
+        //       }),
+        //     };
           
-            console.log('requestBody for dashboardFilter', requestBody);
+        //     console.log('requestBody for dashboardFilter', requestBody);
           
-            // Send a POST request to the Lambda function with the body
-            console.log('this.all_Packet_store clearing',this.all_Packet_store)
-            this.http.post(apiUrl, requestBody).subscribe(
+        //     // Send a POST request to the Lambda function with the body
+        //     console.log('this.all_Packet_store clearing',this.all_Packet_store)
+        //     this.http.post(apiUrl, requestBody).subscribe(
               
-              (response: any) => {
-                console.log('Lambda function triggered successfully:', response);
-                this.responseBody = JSON.parse(response.body)
-                console.log('this.responseBody checking',this.responseBody )
-                this.responseRowData = JSON.parse(this.responseBody.Processed_Data
-                )
-                console.log('this.responseRowData checking',this.responseRowData)
+        //       (response: any) => {
+        //         console.log('Lambda function triggered successfully:', response);
+        //         this.responseBody = JSON.parse(response.body)
+        //         console.log('this.responseBody checking',this.responseBody )
+        //         this.responseRowData = JSON.parse(this.responseBody.Processed_Data
+        //         )
+        //         console.log('this.responseRowData checking',this.responseRowData)
             
                 
                 
             
-                // Display SweetAlert success message
-                // Swal.fire({
-                //   title: 'Success!',
-                //   text: 'Lambda function triggered successfully.',
-                //   icon: 'success',
-                //   confirmButtonText: 'OK'
-                // });
+        //         // Display SweetAlert success message
+        //         // Swal.fire({
+        //         //   title: 'Success!',
+        //         //   text: 'Lambda function triggered successfully.',
+        //         //   icon: 'success',
+        //         //   confirmButtonText: 'OK'
+        //         // });
           
-                // Proceed with route parameter handling
+        //         // Proceed with route parameter handling
       
           
-         // Reset loading state
-              },
-              (error: any) => {
-                console.error('Error triggering Lambda function:', error);
+        //  // Reset loading state
+        //       },
+        //       (error: any) => {
+        //         console.error('Error triggering Lambda function:', error);
           
-                // Display SweetAlert error message
-                Swal.fire({
-                  title: 'Error!',
-                  text: 'Failed to trigger the Lambda function. Please try again.',
-                  icon: 'error',
-                  confirmButtonText: 'OK'
-                });
-         // Reset loading state
-              }
-            );
+        //         // Display SweetAlert error message
+        //         Swal.fire({
+        //           title: 'Error!',
+        //           text: 'Failed to trigger the Lambda function. Please try again.',
+        //           icon: 'error',
+        //           confirmButtonText: 'OK'
+        //         });
+        //  // Reset loading state
+        //       }
+        //     );
             // this.updateSummary(this.storeFilterDetail, 'query_applied');
-          }
+
 
           this.dashboard.forEach((gridItem: any) => {
             // Find the theme that matches the current grid item
@@ -5171,33 +5165,34 @@ console.log('selectedTab checking',this.selectedTab)
         {
           title: '<span style="color: black;">Dashboard ID</span>',
           data: 'P1',
-          render: function (data, type, full) {
+          render: (data, type, full) => {
             const colorClasses = ['success', 'info', 'warning', 'danger'];
             const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
             const initials = data[0].toUpperCase();
-  
+        
             const symbolLabel = `
               <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
                 ${initials}
               </div>
             `;
-  
+        
             return `
-  <div class="d-flex align-items-center">
-          <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" 
-               data-action="view" data-id="${full.id}">
-            <a href="javascript:;" data-action="view" data-id="${full.id}">
-              ${symbolLabel}
-            </a>
-          </div>
-          <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
-            <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1" 
-               data-action="view" data-id="${full.id}">${data}</a>
-          </div>
-        </div>
+              <div class="d-flex align-items-center">
+                <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
+                  <a href="javascript:;" class="view-item" data-id="${full.P1}">
+                    ${symbolLabel}
+                  </a>
+                </div>
+                <div class="d-flex flex-column">
+                  <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1 view-item" data-id="${full.P1}">
+                    ${data}
+                  </a>
+                </div>
+              </div>
             `;
-          },
+          }
         },
+        
         {
           title: '<span style="color: black;">Name</span>',
           data: 'P2',
@@ -5251,14 +5246,39 @@ console.log('selectedTab checking',this.selectedTab)
           data: 'P7',
         },
       ],
-      createdRow: (row: Node, data: any, dataIndex: number) => {
-        console.log('Data from columns', data);
+      createdRow: (row: Node, data: any) => {
+        $(row).find('.view-item').on('click', () => {
+          this.SummaryIdRedirect(data.P1); // Call the function with P1 value
+        });
+        
       },
-      pageLength: 10, // Set default page size to 10
+      
+      pageLength: 10,
+     // Set default page size to 10
     };
   }
   
   
+  SummaryIdRedirect(id: string): void {
+    console.log('this.all_Packet_store check viewItem',this.lookup_data_summaryCopy)
+    // Toggle the full-screen state
+    // this.isFullScreen = !this.isFullScreen;
+    // this.isFullView = !this.isFullView;
+
+    // // Save the state to localStorage
+    // localStorage.setItem('isFullScreen', JSON.stringify(this.isFullScreen));
+
+    // Navigate to the desired route
+    this.setFullscreen()
+    this.router.navigate([`/summary-engine/${id}`]);
+    this.cdr.detectChanges();
+
+    // Set the state to Edit Mode
+    this.modalService.dismissAll();
+
+
+ 
+  }
   
   
 
@@ -7244,14 +7264,15 @@ helperChartClickChart1(event: any, modalChart: any) {
       tile2: { width: this.tile2Width, height: this.tile2Height, heightOffset: 80, widthOffset: 30},
    
       chart: { width: this.chartWidth, height: this.chartHeight, heightOffset: 10, widthOffset: 30  },
-      map: { width: this.mapWidth, height: this.mapHeight, heightOffset: 80, widthOffset: 30  },
+      Map: { width: this.mapWidth, height: this.mapHeight, heightOffset: 80, widthOffset: 30  },
       Linechart:{ width: this.chartWidth, height: this.chartHeight, heightOffset: 80, widthOffset: 30  },
       Columnchart:{ width: this.chartWidth, height: this.chartHeight, heightOffset: 80, widthOffset: 30  },
       dynamicTile:{ width: this.DynamicTileWidth, height: this.DynamicTileHeight, heightOffset: 80, widthOffset: 30  },
       TableWidget:{ width: this.tableWidth, height: this.tableHeight, heightOffset: 80, widthOffset: 30  },
       title:{ width: this.titleWidth, height: this.titleHeight, heightOffset: 80, widthOffset: 30  },
       HTMLtile:{width:this.HTMLtileWidth,  height:this.HTMLtileHeight, heightOffset: 80, widthOffset: 30  },
-      // filterTile{width:this.filterTileWidth,  height:this.filterTileHeight, heightOffset: 80, widthOffset: 30 },
+      filterTile:{width:this.filterTileWidth,height:this.filterTileHeight ,heightOffset: 80, widthOffset: 30 }
+ 
       // filterTileHeight:any []=[];
       // filterTileWidth:any []=[];
      
