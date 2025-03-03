@@ -212,7 +212,7 @@ export class HtmlTileConfigComponent implements OnInit{
     this.createKPIWidget = this.fb.group({
 
       formlist: ['', Validators.required],
-      parameterName: [[], Validators.required],
+      parameterNameHTML: [[], Validators.required],
       widgetid: [this.generateUniqueId()],
       htmlTextArea: [],
       OperationValue:[''],
@@ -249,7 +249,7 @@ export class HtmlTileConfigComponent implements OnInit{
         grid_type: 'HTMLtile',
 
         formlist: this.createKPIWidget.value.formlist,
-        parameterName: this.createKPIWidget.value.parameterName,
+        parameterNameHTML: this.createKPIWidget.value.parameterNameHTML,
         htmlTextArea:this.createKPIWidget.value.htmlTextArea ||'',
         groupByFormat: this.createKPIWidget.value.groupByFormat,
         OperationValue:this.createKPIWidget.value.OperationValue,
@@ -313,20 +313,20 @@ export class HtmlTileConfigComponent implements OnInit{
  // ✅ Ensure preview updates properly
   
       let parsedParameter = [];
-      if (typeof tile.parameterName === 'string') {
+      if (typeof tile.parameterNameHTML === 'string') {
         try {
-          parsedParameter = JSON.parse(tile.parameterName);
+          parsedParameter = JSON.parse(tile.parameterNameHTML);
         } catch (error) {
           console.error('Error parsing parameterName:', error);
         }
       } else {
-        parsedParameter = tile.parameterName;
+        parsedParameter = tile.parameterNameHTML;
       }
   
       // ✅ Update Form Controls with readback values
       this.createKPIWidget.patchValue({
         formlist: tile.formlist,
-        parameterName: parsedParameter,
+        parameterNameHTML: parsedParameter,
         OperationValue: tile.OperationValue,
         groupByFormat: tile.groupByFormat,
         htmlTextArea: gethtmlTextArea, // ✅ Ensure this updates the textarea
@@ -362,7 +362,7 @@ export class HtmlTileConfigComponent implements OnInit{
       const updatedTile = {
         ...this.dashboard[this.editTileIndex],
         formlist: this.createKPIWidget.value.formlist,
-        parameterName: this.createKPIWidget.value.parameterName,
+        parameterNameHTML: this.createKPIWidget.value.parameterNameHTML,
         OperationValue:this.createKPIWidget.value.OperationValue,
         groupByFormat:this.createKPIWidget.value.groupByFormat,
         htmlTextArea:this.createKPIWidget.value.htmlTextArea

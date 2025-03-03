@@ -21,6 +21,8 @@ export class TileUi1Component implements OnInit{
   @Input() tileWidth:any
   @Input() tileHeight:any
   @Input() liveDataTile:any
+  @Input() disableMenuQP:any
+  @Input() viewModeQP:any
   
   
 
@@ -46,6 +48,7 @@ export class TileUi1Component implements OnInit{
   primaryValue: any;
   @Input () summaryDashboardView :any
   @Input() summaryDashboardUpdate:any;
+  @Input() queryParamsSend:any
 
 
 
@@ -53,6 +56,7 @@ export class TileUi1Component implements OnInit{
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange tile1 ui',this.all_Packet_store)
     console.log('this.liveDataTile check',this.liveDataTile)
+    console.log('this.queryParamsSend checking',this.queryParamsSend)
  
     // console.log("tile data check from tile1 ",this.item)
     // console.log('this.liveDataTile from child',this.liveDataTile)
@@ -204,28 +208,37 @@ get shouldShowButton(): boolean {
 
   ngOnInit(){
     console.log('item chacke',this.item.grid_details)
-    this.summaryService.lookUpData$.subscribe((data: any)=>{
-      console.log('data check>>> tileui1',data)
- let tempCharts:any=[]
-data.forEach((packet: any,matchedIndex:number) => {
-  
-  if(packet.grid_type == 'tile'&& this.index==matchedIndex && packet.id === this.item.id){
-    tempCharts[matchedIndex] = packet
-    console.log('packet checking response data',packet)
-    this.formatTile(packet)
-
-  }
-});
+    console.log('disableMenuQP check from ngOnint',this.disableMenuQP)
+    console.log('this.queryParamsSend check ngOnInit',)
 
 
 
-      
-      // console.log("✅ Matched Charts:", matchedCharts);
-      
+      this.summaryService.lookUpData$.subscribe((data: any)=>{
+        console.log('data check>>> tileui1',data)
+   let tempCharts:any=[]
+  data.forEach((packet: any,matchedIndex:number) => {
     
+    if(packet.grid_type == 'tile'&& this.index==matchedIndex && packet.id === this.item.id){
+      tempCharts[matchedIndex] = packet
+      console.log('packet checking response data',packet)
+      this.formatTile(packet)
+  
+    }
+  });
+  
+  
+  
+        
+        // console.log("✅ Matched Charts:", matchedCharts);
+        
       
-      
-    })
+        
+        
+      })
+    
+
+
+
 
   
   }

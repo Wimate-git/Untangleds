@@ -293,6 +293,10 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   preventModalOpening: any;
   eventFilterConditions: any;
   assignGridMode: boolean;
+  queryParamsSend: any;
+  modalCheck: any;
+  toRouterID: any;
+  filterConditions: any;
 
 
   createPieChart() {
@@ -1454,83 +1458,39 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
     window.open(safeUrl, '_blank');
   } else if (packet.selectType === 'Modal') {
     console.log('packet checking from queryparams',packet)
+    this.modalCheck = packet.selectType
     if (this.modalContent) {
       console.log('modalContent checking',this.modalContent)
       this.modalService.open(this.modalContent, { size: 'xl' });
+      const queryParams = new URLSearchParams();
+
+      // Add eventFilterConditions if it exists
+      console.log('this.eventFilterConditions checking',this.eventFilterConditions)
+      // const queryParams = new URLSearchParams();
+
+      // Convert eventFilterConditions into a JSON string and encode it
+      if (this.eventFilterConditions && this.eventFilterConditions.length > 0) {
+        queryParams.append('filters', encodeURIComponent(JSON.stringify(this.eventFilterConditions)));
+      }
+      
+      // Add packet.dashboardIds if it exists
+      if (packet.dashboardIds) {
+        queryParams.append('dashboardId', packet.dashboardIds);
+      }
+      
+      // Add routeId if it exists
+      if (this.routeId) {
+        queryParams.append('routeId', this.routeId);
+      }
+      
+      // Construct the final URL
       this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        `${window.location.origin}/summary-engine/${modulePath}`
+        `${window.location.origin}/summary-engine/${modulePath}?${queryParams.toString()}`
       );
-      const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
-      console.log('this.fromRouterID checking',this.fromRouterID)
-      console.log('this.routeId checking',this.all_Packet_store)
-    console.log('this.eventFilterConditions checking',this.eventFilterConditions)
-    const toRouterId = packet.dashboardIds
-      // Prepare the request body
-      const requestBody = {
-        body: JSON.stringify({
-          clientId: this.SK_clientID,
-          from_route_id: this.routeId,
-  
-          to_route_id:toRouterId,
-          // widgetId:this.storeDrillDown.id,
       
-          MsgType:'Query_Params',
-          queryParams:this.eventFilterConditions,
-          permissionId:this.permissionIdRequest,
-          permissionList:this.readFilterEquation,
-          userName:this.userdetails
-        }),
-      };
-    
-      console.log('requestBody for dashboardFilter', requestBody);
-    
-      // Send a POST request to the Lambda function with the body
-      console.log('this.all_Packet_store clearing',this.all_Packet_store)
-      this.http.post(apiUrl, requestBody).subscribe(
-        
-        (response: any) => {
-          console.log('Lambda function triggered successfully:', response);
-          this.responseBody = JSON.parse(response.body)
-          console.log('this.responseBody checking',this.responseBody )
-          const processedDataFilter = this.responseBody.Processed_Data.metadata.grid_details
+      
+      
 
-          console.log('processedData checking from queryParams',processedDataFilter)
-          
-
-          this.summaryService.updatelookUpData(processedDataFilter)
-          this.responseRowData = JSON.parse(this.responseBody.Processed_Data
-          )
-          console.log('this.responseRowData checking',this.responseRowData)
-      
-          
-          
-      
-          // Display SweetAlert success message
-          // Swal.fire({
-          //   title: 'Success!',
-          //   text: 'Lambda function triggered successfully.',
-          //   icon: 'success',
-          //   confirmButtonText: 'OK'
-          // });
-    
-          // Proceed with route parameter handling
-  
-    
-   // Reset loading state
-        },
-        (error: any) => {
-          console.error('Error triggering Lambda function:', error);
-    
-          // Display SweetAlert error message
-          Swal.fire({
-            title: 'Error!',
-            text: 'Failed to trigger the Lambda function. Please try again.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-          });
-   // Reset loading state
-        }
-      );
       console.log('Opening modal with iframe URL:', this.currentiframeUrl);
       console.log('QueryParams check', this.queryParams);
 
@@ -2390,61 +2350,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     
     this.initializeCompanyFields();
 
-    this.route.queryParams.subscribe((params) => {
-      console.log('params check', params);
-      this.queryParams = params;
-    
-      console.log('this.queryParams checking', this.queryParams);
-      // this.openQueryParams(this.queryParams)
-      this.isEditModeView = false;
-    
-      if (params['viewMode']) {
-        this.viewModeQP = params['viewMode'] === 'true';
-        this.hideButton = true;
-        sessionStorage.setItem('viewMode', this.viewModeQP.toString());
-      }
-    
-      if (params['disableMenu']) {
-        this.disableMenuQP = params['disableMenu'] === 'true';
-        console.log('this.disableMenuQP check',this.disableMenuQP)
-        sessionStorage.setItem('disableMenu', this.disableMenuQP.toString());
-      }
-    if(params['from_routerID']){
-      console.log(params['from_routerID'])
-      this.fromRouterID = params['from_routerID']
-    }
-      console.log('params', params['filterTileConfig']);
-      if (params['filterTileConfig']) {
-        console.log('Raw filterTileConfig:', params['filterTileConfig']);
-    
-        try {
-          // Ensure the value is a valid JSON string
-          const parsedFilterTileConfig = JSON.parse(params['filterTileConfig'].trim());
-          console.log('Parsed filterTileConfig:', parsedFilterTileConfig);
-    
-          // Flatten the nested array structure if necessary
-          const flattenedConfig = parsedFilterTileConfig.flat();
-          console.log('Flattened filterTileConfig:', flattenedConfig);
-    
-          // Check if flattenedConfig is an array and has elements
-          if (Array.isArray(flattenedConfig) && flattenedConfig.length > 0) {
-            console.log('Triggering updateSummary with add_tile');
-            // alert('I am triggered');
-            console.log('all_Packet_store checking',this.all_Packet_store)
-          this.isFilterdetail=true
-          this.storeFilterDetail = flattenedConfig
-          // this.updateSummary(flattenedConfig, 'add_tile');
-          } else {
-            console.warn('Flattened filterTileConfig is empty or not valid:', flattenedConfig);
-          }
-        } catch (error) {
-          console.error('Error parsing filterTileConfig:', error);
-        }
-      } else {
-        console.warn('filterTileConfig is not present in params.');
-        this.isFilterdetail= false
-      }
-    });
+
     
     // this.dropdownSettings = this.devicesList.getMultiSelectSettings();
 
@@ -2488,8 +2394,82 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
       this.routeId = params.get('id');
       if (this.routeId) {
         const permissionId =this.fetchUserPermissions(1)
+        this.route.queryParams.subscribe((params) => {
+          console.log('params check', params);
+          this.queryParams = params;
+        
+          console.log('this.queryParams checking', this.queryParams);
+          // this.openQueryParams(this.queryParams)
+          this.isEditModeView = false;
+        
+          if (params['viewMode']) {
+            this.viewModeQP = params['viewMode'] === 'true';
+            this.hideButton = true;
+            sessionStorage.setItem('viewMode', this.viewModeQP.toString());
+          }
+        
+          if (params['disableMenu']) {
+            this.disableMenuQP = params['disableMenu'] === 'true';
+            console.log('this.disableMenuQP check',this.disableMenuQP)
+            sessionStorage.setItem('disableMenu', this.disableMenuQP.toString());
+          }
+        if(params['routeId']){
+          console.log(params['routeId'])
+          this.fromRouterID = params['routeId']
+        }
+        if(params['dashboardId']){
+          console.log(params['dashboardId'])
+          this.toRouterID = params['dashboardId']
+          console.log('this.toRouterID checking',this.toRouterID)
+        }
+        if (params['filters']) {
+          try {
+            // Decode and parse the filters parameter
+            const decodedFilters = JSON.parse(decodeURIComponent(params['filters']));
+            console.log('Decoded Filters:', decodedFilters);
+        
+            this.filterConditions = decodedFilters;
+            this.QueryParamsRead(this.fromRouterID, this.toRouterID, this.filterConditions,permissionId);
+          } catch (error) {
+            console.error('Error decoding filters:', error);
+          }
+        }
+        
+          console.log('params', params['filterTileConfig']);
+          if (params['filterTileConfig']) {
+            console.log('Raw filterTileConfig:', params['filterTileConfig']);
+        
+            try {
+              // Ensure the value is a valid JSON string
+              const parsedFilterTileConfig = JSON.parse(params['filterTileConfig'].trim());
+              console.log('Parsed filterTileConfig:', parsedFilterTileConfig);
+        
+              // Flatten the nested array structure if necessary
+              const flattenedConfig = parsedFilterTileConfig.flat();
+              console.log('Flattened filterTileConfig:', flattenedConfig);
+        
+              // Check if flattenedConfig is an array and has elements
+              if (Array.isArray(flattenedConfig) && flattenedConfig.length > 0) {
+                console.log('Triggering updateSummary with add_tile');
+                // alert('I am triggered');
+                console.log('all_Packet_store checking',this.all_Packet_store)
+              this.isFilterdetail=true
+              this.storeFilterDetail = flattenedConfig
+              // this.updateSummary(flattenedConfig, 'add_tile');
+              } else {
+                console.warn('Flattened filterTileConfig is empty or not valid:', flattenedConfig);
+              }
+            } catch (error) {
+              console.error('Error parsing filterTileConfig:', error);
+            }
+          } else {
+            console.warn('filterTileConfig is not present in params.');
+            this.isFilterdetail= false
+          }
+        });
         console.log('permissionId onInit',permissionId)
         this.openModalHelpher(this.routeId)
+
     .then((data) => {
     console.log('✅ this.all_Packet_store permissions:', data); // ✅ Now you will get the correct data
     const livedatacheck = data
@@ -2584,6 +2564,19 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
 this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
 document.removeEventListener('keydown', this.handleKeyDown);
 
+// if(params['routeId']){
+//   console.log(params['routeId'])
+//   this.fromRouterID = params['routeId']
+// }
+// if(params['dashboardId']){
+//   console.log(params['dashboardId'])
+//   this.toRouterID = params['dashboardId']
+// }
+// if(params['filters']){
+//   console.log(params['filters'])
+//   this.filterConditions = params['filters']
+
+
 // console.log('this.permissionsMetaData from initialize',this.permissionIdRequest)
 // console.log('permissionList',this.readFilterEquation)
 // console.log('this.permissionsMetaData',this.permissionIdRequest)
@@ -2593,6 +2586,108 @@ document.removeEventListener('keydown', this.handleKeyDown);
 
 
   }
+  async QueryParamsRead(routeId:any,toRouterId:any,eventFilterConditions:any,permissionId:any){
+
+
+  const resolvedPermission = await permissionId;
+          
+  console.log("✅ Resolved permissionfromOnInit check:", resolvedPermission);
+
+  // ✅ Extract values safely after resolving the Promise
+  const permissionIdRead = resolvedPermission?.permissionId || "";
+  const permissionList = resolvedPermission?.readFilterEquationawait || [];
+  console.log('permissionList check',permissionList)
+  const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+console.log('this.fromRouterID checking',routeId)
+console.log('this.routeId checking',toRouterId)
+console.log('this.eventFilterConditions checking',this.eventFilterConditions)
+const queryParamsCheck = this.eventFilterConditions
+this.queryParamsSend = this.eventFilterConditions
+console.log(' this.queryParamsSend', this.queryParamsSend)
+// const queryparams = JSON.parse(eventFilterConditions)
+// const toRouterId = packet.dashboardIds
+// Prepare the request body
+const requestBody = {
+  body: JSON.stringify({
+    clientId: this.SK_clientID,
+    from_route_id: routeId,
+
+    to_route_id:toRouterId,
+    // widgetId:this.storeDrillDown.id,
+
+    MsgType:'Query_Params',
+    queryParams:eventFilterConditions,
+    permissionId:permissionIdRead,
+    permissionList:permissionList,
+    userName:this.userdetails
+  }),
+};
+
+console.log('requestBody for dashboardFilter', requestBody);
+
+// Send a POST request to the Lambda function with the body
+console.log('this.all_Packet_store clearing',this.all_Packet_store)
+this.http.post(apiUrl, requestBody).subscribe(
+  
+  (response: any) => {
+    console.log('Lambda function triggered successfully:', response);
+    this.responseBody = JSON.parse(response.body)
+    console.log('this.responseBody checking',this.responseBody )
+    const processedDataFilter = this.responseBody.Processed_Data.metadata.grid_details
+
+    console.log('processedData checking from queryParams',processedDataFilter)
+    this.summaryService.updatelookUpData(processedDataFilter)
+    // const viewModeQP = true;
+    // const disableMenuQP = true;
+    console.log('disableMenuQP check from modal',this.disableMenuQP)
+    console.log('viewModeQP checking from modal',this.viewModeQP)
+  
+
+// if(this.disableMenuQP==false && this.viewModeQP==false ){
+
+// // console.log('queryParamsCheck checking',packet.selectType)
+// this.summaryService.queryPramsFunction(processedDataFilter)
+
+// }
+
+
+    // this.summaryService.updatelookUpData(processedDataFilter)
+    this.responseRowData = JSON.parse(this.responseBody.Processed_Data
+    )
+    console.log('this.responseRowData checking',this.responseRowData)
+
+    
+    
+
+    // Display SweetAlert success message
+    // Swal.fire({
+    //   title: 'Success!',
+    //   text: 'Lambda function triggered successfully.',
+    //   icon: 'success',
+    //   confirmButtonText: 'OK'
+    // });
+
+    // Proceed with route parameter handling
+
+
+// Reset loading state
+  },
+  (error: any) => {
+    console.error('Error triggering Lambda function:', error);
+
+    // Display SweetAlert error message
+    Swal.fire({
+      title: 'Error!',
+      text: 'Failed to trigger the Lambda function. Please try again.',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+// Reset loading state
+  }
+);
+
+}
+
   openQueryParams(paramsRead:any){
     console.log('paramsRead',paramsRead)
     this.paramsReadExport = paramsRead
@@ -5614,6 +5709,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
       equation:this.formatField(tile.equation),
       MiniTableFields:this.formatField(tile.MiniTableFields),
       filterParameterLine:this.formatField(tile.filterParameterLine),
+      parameterNameHTML:this.formatField(tile.parameterNameHTML)
   
       // parameterName:this.formatField(tile.parameterName)
 
@@ -7054,47 +7150,60 @@ emitchartDatatable(configChartTable: any) {
 
 // Function to open the modal if columnVisibility is not empty
 helperChartClickChart1(event: any, modalChart: any) {
-  console.log('this.assignGridMode from chartDrill',this.assignGridMode)
-  console.log('this.isEditModeView checking',this.isEditModeView)
+  console.log('this.assignGridMode from chartDrill', this.assignGridMode);
+  console.log('this.isEditModeView checking', this.isEditModeView);
   console.log('event checking:', event);
   console.log('modalChart reference:', modalChart);
   console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
 
   // ✅ Step 1: Check if modal opening is manually stopped
   if (this.preventModalOpening) {
-      console.log("🚫 Modal opening is manually disabled. Not opening modal.");
-      return;
+    console.log("🚫 Modal opening is manually disabled. Not opening modal.");
+    return;
   }
 
-  // ✅ Step 2: Ensure this.chartDataConfigExport exists and is an object
+  // ✅ Step 2: Ensure chartDataConfigExport exists and is an object
   if (!this.chartDataConfigExport || typeof this.chartDataConfigExport !== 'object') {
-      console.log("❌ chartDataConfigExport is undefined or not an object, not opening the modal.");
-      return;
+    console.log("❌ chartDataConfigExport is undefined or not an object, not opening the modal.");
+    return;
   }
 
   // ✅ Step 3: Extract columnVisibility safely
   const columnVisibility = this.chartDataConfigExport.columnVisibility;
-  console.log('columnVisibility checking',columnVisibility)
-  const columnVisibilityRead = columnVisibility[0].columnVisibility
-  console.log('columnVisibilityRead checki',columnVisibilityRead)
-
-  // ✅ Step 4: Ensure columnVisibility exists and has values
-  if (!Array.isArray(columnVisibilityRead) || columnVisibilityRead.length === 0) {
-      console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
-      return;
-  }else if(this.assignGridMode ==false && this.isEditModeView == true){
-    this.modalService.open(modalChart, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+  console.log('columnVisibility checking', columnVisibility);
+  
+  if (!Array.isArray(columnVisibility) || columnVisibility.length === 0) {
+    console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
+    return;
   }
 
-  console.log("✅ columnVisibility has data, opening modal...");
+  const columnVisibilityRead = columnVisibility[0]?.columnVisibility;
+  console.log('columnVisibilityRead check:', columnVisibilityRead);
 
-  // ✅ Step 5: Try to open the modal
-  try {
+  if (!Array.isArray(columnVisibilityRead) || columnVisibilityRead.length === 0) {
+    console.log("❌ columnVisibilityRead is empty or not an array, modal will NOT open.");
+    return;
+  }
 
-  } catch (error) {
+  // ✅ Step 4: Ensure modalChart is not undefined before opening modal
+  if (!modalChart) {
+    console.log("❌ Modal reference is undefined, cannot open modal.");
+    return;
+  }
+
+  if (this.isEditModeView === true) {
+    console.log('this.assignGridMode checking',this.assignGridMode)
+    console.log('this.isEditModeView checking',this.isEditModeView)
+    console.log("✅ columnVisibility has data, opening modal...");
+
+    try {
+      this.modalService.open(modalChart, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+    } catch (error) {
       console.error("❌ Error opening modal:", error);
+    }
   }
 }
+
 
 
 
