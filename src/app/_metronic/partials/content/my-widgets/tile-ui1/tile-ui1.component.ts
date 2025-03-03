@@ -205,13 +205,13 @@ get shouldShowButton(): boolean {
   ngOnInit(){
     console.log('item chacke',this.item.grid_details)
     this.summaryService.lookUpData$.subscribe((data: any)=>{
-      console.log('data check>>>',data)
+      console.log('data check>>> tileui1',data)
  let tempCharts:any=[]
 data.forEach((packet: any,matchedIndex:number) => {
   
   if(packet.grid_type == 'tile'&& this.index==matchedIndex && packet.id === this.item.id){
     tempCharts[matchedIndex] = packet
-    console.log('packet checking',packet)
+    console.log('packet checking response data',packet)
     this.formatTile(packet)
 
   }

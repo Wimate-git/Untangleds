@@ -292,6 +292,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   summaryDashboardView: any;
   preventModalOpening: any;
   eventFilterConditions: any;
+  assignGridMode: boolean;
 
 
   createPieChart() {
@@ -1300,7 +1301,7 @@ showDrillDownData(dynamicDrill:any,modalref:any){
   if (!Array.isArray(drilldownColumnVisibility) || drilldownColumnVisibility.length === 0) {
       console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
       return;
-  }else{
+  }else if(this.assignGridMode ==false && this.isEditModeView == true){
     this.modalService.open(modalref, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
   }
 
@@ -1452,6 +1453,7 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
     console.log('Opening new tab with URL:', safeUrl);
     window.open(safeUrl, '_blank');
   } else if (packet.selectType === 'Modal') {
+    console.log('packet checking from queryparams',packet)
     if (this.modalContent) {
       console.log('modalContent checking',this.modalContent)
       this.modalService.open(this.modalContent, { size: 'xl' });
@@ -1459,14 +1461,17 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
         `${window.location.origin}/summary-engine/${modulePath}`
       );
       const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
-    
+      console.log('this.fromRouterID checking',this.fromRouterID)
+      console.log('this.routeId checking',this.all_Packet_store)
+    console.log('this.eventFilterConditions checking',this.eventFilterConditions)
+    const toRouterId = packet.dashboardIds
       // Prepare the request body
       const requestBody = {
         body: JSON.stringify({
           clientId: this.SK_clientID,
-          from_route_id: this.fromRouterID,
+          from_route_id: this.routeId,
   
-          to_route_id:this.routeId,
+          to_route_id:toRouterId,
           // widgetId:this.storeDrillDown.id,
       
           MsgType:'Query_Params',
@@ -1487,6 +1492,12 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
           console.log('Lambda function triggered successfully:', response);
           this.responseBody = JSON.parse(response.body)
           console.log('this.responseBody checking',this.responseBody )
+          const processedDataFilter = this.responseBody.Processed_Data.metadata.grid_details
+
+          console.log('processedData checking from queryParams',processedDataFilter)
+          
+
+          this.summaryService.updatelookUpData(processedDataFilter)
           this.responseRowData = JSON.parse(this.responseBody.Processed_Data
           )
           console.log('this.responseRowData checking',this.responseRowData)
@@ -2509,7 +2520,11 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
 
 
     const savedMode = localStorage.getItem('editModeState');
+    console.log('savedMode from ngOnInit',savedMode)
     this.isEditModeView = savedMode ? JSON.parse(savedMode) : false;
+    console.log('this.isEditModeView from ngOnInit',this.isEditModeView )
+    this.assignGridMode = this.isEditModeView 
+    console.log('this.assignGridMode',this.assignGridMode)
     // Update options based on the retrieved mode
     this.updateOptions();
 
@@ -6986,9 +7001,12 @@ refreshFunction(){
   }
 
   helperChartClick(event:any,modalChart:any){
+  
+ 
     console.log('event checking:', event);
     console.log('modalChart reference:', modalChart);
     console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
+  
   
     // ✅ Step 1: Check if modal opening is manually stopped
     if (this.preventModalOpening) {
@@ -7012,7 +7030,7 @@ refreshFunction(){
     if (!Array.isArray(columnVisibilityRead) || columnVisibilityRead.length === 0) {
         console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
         return;
-    }else{
+    }else if(this.assignGridMode ==false && this.isEditModeView == true){
       this.modalService.open(modalChart, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
     }
   
@@ -7036,6 +7054,8 @@ emitchartDatatable(configChartTable: any) {
 
 // Function to open the modal if columnVisibility is not empty
 helperChartClickChart1(event: any, modalChart: any) {
+  console.log('this.assignGridMode from chartDrill',this.assignGridMode)
+  console.log('this.isEditModeView checking',this.isEditModeView)
   console.log('event checking:', event);
   console.log('modalChart reference:', modalChart);
   console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
@@ -7062,7 +7082,7 @@ helperChartClickChart1(event: any, modalChart: any) {
   if (!Array.isArray(columnVisibilityRead) || columnVisibilityRead.length === 0) {
       console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
       return;
-  }else{
+  }else if(this.assignGridMode ==false && this.isEditModeView == true){
     this.modalService.open(modalChart, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
   }
 
@@ -7108,7 +7128,7 @@ helperChartClickChart1(event: any, modalChart: any) {
     if (!Array.isArray(columnVisibilityRead) || columnVisibilityRead.length === 0) {
         console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
         return;
-    }else{
+    }else if(this.assignGridMode ==false && this.isEditModeView == true){
       this.modalService.open(modalChart, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
     }
   
