@@ -943,6 +943,8 @@ async onColumnChange(event: any, getValue: string): Promise<void> {
           
 
           tempMetadata[item].push({ name: "approval_history", label: "approval_history", formName: formName })
+          tempMetadata[item].push({ name: "approval_status", label: "approval_status", formName: formName })
+          tempMetadata[item].push({ name: "current_Status", label: "current_Status", formName: formName })
 
           if(trackFlag){
             tempMetadata[item].push({ name: "track-3274927276", label: "trackLocation", formName: formName })
@@ -1086,6 +1088,8 @@ async onFilterChange(event: any,getValue:any,key:any) {
             return { name: item.name, label: item.label,  formName:formName ,options:item.options , type:item.type , validation:item.validation};  
           });
 
+          tempMetadata[item].push({name: 'current_Status', label: 'Current Status',  formName:formName, type:'select'})
+
           tempMetadata[item] = tempMetadata[item].filter((field:any)=>field && field.name && field.type != 'heading' && field && field.name && (!field.name.startsWith("Empty-Placeholder-")))
         }
         this.populateFormBuilder.push(tempMetadata)
@@ -1167,8 +1171,12 @@ async onFilterChange(event: any,getValue:any,key:any) {
           observer.complete();
           return;
         }
-    
-        if (field.validation && field.validation?.user === true) {
+        
+        if(field.name == "current_Status"){
+          observer.next(['Approved','Pending','Rejected']);
+          observer.complete();
+        }
+        else if (field.validation && field.validation?.user === true) {
           const lookupKey = `${this.SK_clientID}#user#lookup`;
     
           // console.log("User list dropdown is here ");
@@ -1649,11 +1657,37 @@ async onFilterChange(event: any,getValue:any,key:any) {
     
         // Add approval_history from options to metadata
         if (item.options && item.options.approval_history) {
-            metadata.approval_history = item.options.approval_history;
+            metadata.approval_status = item.options.approval_history;
+            const tempHolder = item.options.approval_history
+            let result = ''
+            if(Array.isArray(tempHolder)){
+           
+              for(let index = 0;index<tempHolder.length;index++){
+                  if (tempHolder[index] && index == tempHolder.length - 1) {
+                      result = tempHolder[index][0].split(' ')[0];
+                      break
+                  }
+                  else if (tempHolder[index] && tempHolder[index][0].startsWith("Rejected")) {
+                      result = 'Rejected';
+                      break
+                  }
+              }
+            }
+            metadata.current_Status = result
+        }
+        else{
+          metadata.approval_status = []
+          metadata.current_Status = ''
+        }
+
+        // Add approval_history from options to metadata
+        if (item.options && item.options.approvalHistoryNew) {
+          metadata.approval_history = item.options.approvalHistoryNew;
         }
         else{
           metadata.approval_history = []
         }
+
     
         return metadata;
       });
@@ -1998,7 +2032,7 @@ isBase64(value: string): boolean {
 
 
   isApprovalHistory(key:any,value: any): boolean {
-    return key == 'approval_history' &&  value.length > 0;
+    return (key == 'approval_history' || key == 'approval_status') &&  value.length > 0;
   }
 
 
@@ -3346,7 +3380,7 @@ mergeAndAddLocation(mappedResponse: any) {
         if(data && data[0]){
           let headers = data && data[0] && data[0].map((header: string) => header.replace(/[\r\n]+/g, '').replace(/^"|"$/g, '').trim());
     
-          const headersToRemove = ['Dynamic Table Values', 'TrackLocation', 'Approval History'];
+          const headersToRemove = ['Dynamic Table Values', 'TrackLocation', 'Approval History','Approval Status'];
           const removeIndices = headers
             .map((header: string, index: any) => headersToRemove.includes(header) || header.includes('Signature') ? index : -1)
             .filter((index: number) => index !== -1);
@@ -3419,6 +3453,35 @@ mergeAndAddLocation(mappedResponse: any) {
   
             
             }
+
+
+
+            try{
+              const approvalColumnIndex = headers.indexOf('Approval Status');
+              if (approvalColumnIndex !== -1) {
+                const approvalData = this.extractApprovalHistoryData(data, approvalColumnIndex, index);
+                const approvalSheet = XLSX.utils.aoa_to_sheet(approvalData);
+                let sheetName1 = `Approval Status ${this.tableDataWithFormFilters[index].formFilter}`;
+                sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
+    
+    
+                if(excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0 ){
+                  if(excelSheets.includes('approvalStatus')){
+                    XLSX.utils.book_append_sheet(wb, approvalSheet, sheetName1);
+                  }
+                }
+                else{
+                  XLSX.utils.book_append_sheet(wb, approvalSheet, sheetName1);
+                }
+              }
+    
+            }
+            catch(error){
+              console.log("Error in Approval Status ",error);
+            }
+
+
+
     
             console.log("HEaders are here ",headers);
       
@@ -3855,6 +3918,66 @@ async extractMiniTableData(data: any[], tableColumnIndex: number, index: number)
   console.log('After adding Labels Table data is here ', tableData);
 
   return tableData;
+}
+
+extractApprovalHistoryData = (data: any, trackLocationColumnIndex: any,index:any)=> {
+
+  console.log("Approval History rows are here ", this.tableDataWithFormFilters);
+
+  let tempHolder =  this.tableDataWithFormFilters[index]["rows"].map((item: { approval_status: any[]; id: any; }) => {
+      if (item?.approval_status && Array.isArray(item?.approval_status) && item?.approval_status.length > 0) {
+          item?.approval_status.forEach((dynamicRow: any[]) => {
+              dynamicRow.unshift(item.id)
+        });
+      }
+      return item?.approval_status;
+    });
+
+  tempHolder = tempHolder.filter((item: string | any[])=>item && Array.isArray(item) && item.length > 0)
+
+   console.log("Approval Status is here ",tempHolder);
+
+  const trackLocationRows = [];
+
+  const headers = [
+      "id", "Status", "Comments", "Date and Time"
+  ];
+
+  // Check if the first entry in tempHolder has the data we need (ensure it's an array and not empty)
+  const trackLocationArray = Array.isArray(tempHolder) && tempHolder.length > 0 ? tempHolder : [];
+
+  if (Array.isArray(trackLocationArray) && trackLocationArray.length > 0) {
+      // Add headers as the first row
+      trackLocationRows.push(headers);
+
+      // Iterate over each row in tempHolder and extract "TrackLocation" data
+      tempHolder.forEach(function(row: any) {
+          // If the trackLocation is a valid array
+          const trackLocationObjects = row;
+
+          if (Array.isArray(trackLocationObjects) && trackLocationObjects.length > 0) {
+              // For each object in the trackLocation array, extract the relevant fields
+              
+              trackLocationObjects.forEach((ele)=>{
+                  const rowValues = [
+                      ele[0] || '',              
+                      ele[1].split('-')[0] || ele[1] ||'',   
+                      ele[1].split('-')[1] || '',        
+                      new Date(Number(ele[2]*1000)).toLocaleString() || ''
+                  ]
+
+                  // Push the extracted values to the rows
+                  trackLocationRows.push(rowValues);
+              })
+                 
+          }
+      });
+  }
+
+  console.log("Track Location rows extracted: ", trackLocationRows);
+
+  // Return the rows to be used in the new sheet
+  return trackLocationRows;
 }
 
   
