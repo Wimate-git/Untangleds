@@ -155,6 +155,7 @@ columns: any;
   formsToDisplay: any = [];
   filterType: string = '';
   totalRecordsViewed: number = 0;
+  lookup_data_Options: any = [];
 
    constructor(private fb:FormBuilder,private api:APIService,private configService:SharedService,private scheduleAPI:scheduleApiService,
     private toast:MatSnackBar,private spinner:NgxSpinnerService,private cd:ChangeDetectorRef,private modalService: NgbModal,private moduleDisplayService: ModuleDisplayService,
@@ -232,6 +233,9 @@ columns: any;
     this.companyID = this.getLoggedUser.companyID
 
     this.addFromService()
+
+
+    // this.fetchOptionsLookupdata(1,'Climaveneta#Work Order#lookup')
 
 
 
@@ -1213,11 +1217,10 @@ async onFilterChange(event: any,getValue:any,key:any) {
           const lookupKey = `${this.SK_clientID}#${field.validation.form}#lookup`;
     
           // Make API call and transform result
-          from(this.api.GetMaster(lookupKey, 1)).pipe(
+          from(this.fetchOptionsLookupdata(1,lookupKey)).pipe(
             map(result => {
-              if (result?.options) {
-                const options = JSON.parse(result.options);
-                return this.extractDerivedUsersList(options, field.validation.field).sort()
+              if (Array.isArray(result)) {
+                return this.extractDerivedUsersList(result, field.validation.field).sort()
                 // return this.extractSpecificSingleSelectValue(options, field.validation.field).sort();
               }
               return [];
@@ -1245,11 +1248,10 @@ async onFilterChange(event: any,getValue:any,key:any) {
           const lookupKey = `${this.SK_clientID}#${field.validation.form}#lookup`;
     
           // Make API call and transform result
-          from(this.api.GetMaster(lookupKey, 1)).pipe(
+          from(this.fetchOptionsLookupdata(1,lookupKey)).pipe(
             map(result => {
-              if (result?.options) {
-                const options = JSON.parse(result.options);
-                return this.extractSpecificSingleSelectValue(options, field.validation.field).sort();
+              if (Array.isArray(result)) {
+                return this.extractSpecificSingleSelectValue(result, field.validation.field).sort();
               }
               return [];
             }),
@@ -1284,6 +1286,59 @@ async onFilterChange(event: any,getValue:any,key:any) {
       
       return options$;
     }
+
+
+
+
+
+    fetchOptionsLookupdata(sk: any, pkValue: any): any {
+      return new Promise((resolve, reject) => {
+        this.api.GetMaster(pkValue, sk)
+          .then(response => {
+            console.log("SK are here", sk);
+    
+            if (response && response.options) {
+              // Check if response.options is a string and parse it
+              if (typeof response.options === 'string') {
+                let data = JSON.parse(response.options);
+    
+                // Check if the data is an array
+                if (Array.isArray(data)) {
+                  // If data is valid, accumulate it to lookup_data_Options
+                  // this.lookup_data_Options = this.lookup_data_Options || []; // Ensure lookup_data_Options is initialized
+                  this.lookup_data_Options.push(...data);
+    
+                  // If the response contains more options, continue fetching with incremented SK
+                  if (data.length > 0) {
+                    this.fetchOptionsLookupdata(sk + 1, pkValue)
+                      .then(() => resolve(this.lookup_data_Options)) // Resolve after accumulating all options
+                      .catch(reject); // Handle error from recursive call
+                  } else {
+
+                    console.log("All the options are here ",this.lookup_data_Options);
+
+                    resolve(this.lookup_data_Options); // No more data, resolve with the current options
+                  }
+                } else {
+                  console.error('Invalid data format - not an array.');
+                  reject(new Error('Invalid data format - not an array.'));
+                }
+              } else {
+                console.error('response.options is not a string.');
+                reject(new Error('response.options is not a string.'));
+              }
+            } else {
+              console.log("No more options found, resolving:", this.lookup_data_Options);
+              resolve(this.lookup_data_Options); // If no options in the response, resolve with the current data
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            reject(error); // Reject the promise on error
+          });
+      });
+    }
+    
     
     // Clear cache when form field changes
     onFieldChange(formIndex: number, condIndex: number) {
@@ -3298,12 +3353,6 @@ mergeAndAddLocation(mappedResponse: any) {
         });
     });
   }
-  
-
-
-
-
-
 
   //Export option is here 
   @ViewChildren(AgGridAngular) agGrids!: QueryList<AgGridAngular>;
