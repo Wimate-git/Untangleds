@@ -196,6 +196,19 @@ data.forEach((packet: any,matchedIndex:number) => {
       
     })
 
+    this.summaryService.queryParamsData$.subscribe((data: any)=>{
+      console.log('data check filterConditions',data)
+
+if(data){
+  this.eventFilterConditions = data
+}
+      
+      
+    
+      
+      
+    })
+
     this.detectScreenSize()
   }
 

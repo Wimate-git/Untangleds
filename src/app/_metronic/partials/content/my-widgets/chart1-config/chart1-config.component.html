@@ -140,7 +140,7 @@
                       <label for="formlist" class="col-createChart-label fw-bold fs-6 required">Forms</label>
                       <ngx-select id="formlist" [allowClear]="true" name="icon" formControlName="formlist"
                         [items]="listofDeviceIds" optionValueField="value" optionTextField="text"
-                        (selectionChanges)="selectFormParams($event)" placeholder="Select createChart">
+                        (selectionChanges)="selectFormParams($event, fieldIndex)" placeholder="Select createChart">
                       </ngx-select>
                       <div *ngIf="field.get('formlist')?.touched && field.get('formlist')?.invalid" class="text-danger">
                         <div *ngIf="field.get('formlist')?.errors?.required">Form is required.</div>
@@ -151,7 +151,7 @@
                     <div class="col-md-4 mb-3">
                       <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields</label>
                       <p-multiSelect id="parameterName" formControlName="parameterName"
-                        [options]="listofDynamicParam"       optionLabel="text"
+                      [options]="getDynamicParams(fieldIndex)"     optionLabel="text"
                         placeholder="Select Parameter" (onChange)="parameterValueCheck($event,fieldIndex)" >
                       </p-multiSelect>
                       <div *ngIf="field.get('parameterName')?.touched && field.get('parameterName')?.invalid" class="text-danger">
@@ -255,7 +255,7 @@
                       <p-multiSelect
                         id="columnVisibility"
                         formControlName="columnVisibility"
-                        [options]="columnVisisbilityFields"
+                        [options]="getDynamicParams(fieldIndex)" 
                         optionLabel="text"
                         placeholder="Select Parameter"
                       
@@ -523,7 +523,7 @@
         <button type="button" class="btn btn-primary" *ngIf="!isEditMode"
         (click)="validateAndSubmit()"  >Save</button>
         <button type="button" class="btn btn-warning" (click)="updateTile('chart');modal.dismiss() " *ngIf="isEditMode"
-          [disabled]="createChart?.invalid">
+         >
           Update
         </button>
       </div>

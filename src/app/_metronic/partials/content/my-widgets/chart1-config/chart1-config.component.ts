@@ -93,6 +93,7 @@ export class Chart1ConfigComponent implements OnInit {
   }[];
   selectedMiniTableFields: any;
   listofFormValues: any;
+  dynamicParamMap = new Map<number, any[]>();
 
 
  
@@ -928,51 +929,52 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   onMouseLeave(): void {
     this.isHovered = false;
   }
-  fetchDynamicFormData(value: any) {
-    console.log("Data from lookup:", value);
+  fetchDynamicFormData(value: any, index: number) {
+    console.log("Fetching data for:", value);
 
+    // Simulating API call
     this.api
       .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
       .then((result: any) => {
         if (result && result.metadata) {
           const parsedMetadata = JSON.parse(result.metadata);
-          console.log('parsedMetadata check dynamic',parsedMetadata)
           const formFields = parsedMetadata.formFields;
-          console.log('formFields check',formFields)
 
-          // Initialize the list with formFields labels
-          this.listofDynamicParam = formFields.map((field: any) => {
-            console.log('field check',field)
-            return {
-              value: field.name,
-              text: field.label
-            };
-          });
+          // Prepare parameter list
+          const dynamicParamList = formFields.map((field: any) => ({
+            value: field.name,
+            text: field.label,
+          }));
 
-          // Include created_time and updated_time
+          // Add created_time and updated_time
           if (parsedMetadata.created_time) {
-            this.listofDynamicParam.push({
+            dynamicParamList.push({
               value: parsedMetadata.created_time.toString(),
-              text: 'Created Time' // You can customize the label here if needed
+              text: 'Created Time',
             });
           }
-
           if (parsedMetadata.updated_time) {
-            this.listofDynamicParam.push({
+            dynamicParamList.push({
               value: parsedMetadata.updated_time.toString(),
-              text: 'Updated Time' // You can customize the label here if needed
+              text: 'Updated Time',
             });
           }
 
-          console.log('Transformed dynamic parameters:', this.listofDynamicParam);
+          // Store parameters in the map
+          this.dynamicParamMap.set(index, dynamicParamList);
 
-          // Trigger change detection to update the view
+          // Trigger change detection
           this.cdr.detectChanges();
         }
       })
       .catch((err) => {
-        console.log("Can't fetch", err);
+        console.error("Error fetching data:", err);
       });
+  }
+
+
+  getDynamicParams(index: number): any[] {
+    return this.dynamicParamMap.get(index) || [];
   }
 
   fetchDynamicFormDataFilter(value: any) {
@@ -1125,14 +1127,14 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
 
 
   }
-  selectFormParams(event: any) {
+  selectFormParams(event: any, index: number) {
     if (event && event[0] && event[0].data) {
       this.selectedText = event[0].data.text;  // Adjust based on the actual structure
       console.log('Selected Form Text:', this.selectedText);
       this.getFormControlValue(this.selectedText); 
 
       if (this.selectedText) {
-        this.fetchDynamicFormData(this.selectedText);
+        this.fetchDynamicFormData(this.selectedText, index);
       }
     } else {
       console.error('Event data is not in the expected format:', event);

@@ -1305,8 +1305,11 @@ showDrillDownData(dynamicDrill:any,modalref:any){
   if (!Array.isArray(drilldownColumnVisibility) || drilldownColumnVisibility.length === 0) {
       console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
       return;
-  }else if(this.assignGridMode ==false && this.isEditModeView == true){
-    this.modalService.open(modalref, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+  }else {
+    setTimeout(() => {
+      this.modalService.open(modalref, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+    }, 500);
+
   }
 
 
@@ -1456,51 +1459,54 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
     const safeUrl = `${window.location.origin}/summary-engine/${modulePath}`;
     console.log('Opening new tab with URL:', safeUrl);
     window.open(safeUrl, '_blank');
-  } else if (packet.selectType === 'Modal') {
-    console.log('packet checking from queryparams',packet)
-    this.modalCheck = packet.selectType
-    if (this.modalContent) {
-      console.log('modalContent checking',this.modalContent)
-      this.modalService.open(this.modalContent, { size: 'xl' });
-      const queryParams = new URLSearchParams();
-
-      // Add eventFilterConditions if it exists
-      console.log('this.eventFilterConditions checking',this.eventFilterConditions)
-      // const queryParams = new URLSearchParams();
-
-      // Convert eventFilterConditions into a JSON string and encode it
-      if (this.eventFilterConditions && this.eventFilterConditions.length > 0) {
-        queryParams.append('filters', encodeURIComponent(JSON.stringify(this.eventFilterConditions)));
-      }
-      
-      // Add packet.dashboardIds if it exists
-      if (packet.dashboardIds) {
-        queryParams.append('dashboardId', packet.dashboardIds);
-      }
-      
-      // Add routeId if it exists
-      if (this.routeId) {
-        queryParams.append('routeId', this.routeId);
-      }
-      
-      // Construct the final URL
-      this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        `${window.location.origin}/summary-engine/${modulePath}?${queryParams.toString()}`
-      );
-      
-      
-      
-
-      console.log('Opening modal with iframe URL:', this.currentiframeUrl);
-      console.log('QueryParams check', this.queryParams);
-
-      console.log('this.paramsReadExport',this.paramsReadExport)
+  }if (packet.selectType === 'Modal') {
+    console.log('packet checking from queryparams', packet);
+    this.modalCheck = packet.selectType;
     
+    // Hide the navigation menu
+    this.hideNavMenu = true;  
 
+    if (this.modalContent) {
+        console.log('modalContent checking', this.modalContent);
+        this.modalService.open(this.modalContent, { size: 'xl' });
+
+        const queryParams = new URLSearchParams();
+
+        console.log('this.eventFilterConditions checking', this.eventFilterConditions);
+        
+        if (this.eventFilterConditions && this.eventFilterConditions.length > 0) {
+            queryParams.append('filters', encodeURIComponent(JSON.stringify(this.eventFilterConditions)));
+        }
+        
+        if (packet.dashboardIds) {
+            queryParams.append('dashboardId', packet.dashboardIds);
+        }
+        
+        if (this.routeId) {
+            queryParams.append('routeId', this.routeId);
+        }
+        
+        // Add viewMode and disableMenu to query params
+        const viewMode = true;
+        const disableMenu = true;
+        queryParams.append('viewMode', String(viewMode));
+        queryParams.append('disableMenu', String(disableMenu));
+        
+        this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+            `${window.location.origin}/summary-engine/${modulePath}?${queryParams.toString()}`
+        );
+        
+
+        localStorage.setItem('viewMode', 'true');
+        localStorage.setItem('disableMenu', 'true');
+
+        this.cdr.detectChanges();
+        console.log('Opening modal with iframe URL:', this.currentiframeUrl);
     } else {
-      console.error('Modal content is undefined');
+        console.error('Modal content is undefined');
     }
-  } else if (packet.selectType === 'Same page Redirect') {
+}
+ else if (packet.selectType === 'Same page Redirect') {
     const navigationPath = `/summary-engine/${modulePath}`;
     console.log('Redirecting to:', navigationPath);
     this.modalService.dismissAll();
@@ -2600,9 +2606,9 @@ document.removeEventListener('keydown', this.handleKeyDown);
   const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
 console.log('this.fromRouterID checking',routeId)
 console.log('this.routeId checking',toRouterId)
-console.log('this.eventFilterConditions checking',this.eventFilterConditions)
-const queryParamsCheck = this.eventFilterConditions
-this.queryParamsSend = this.eventFilterConditions
+console.log('this.eventFilterConditions checking',eventFilterConditions)
+const queryParamsCheck = eventFilterConditions
+this.queryParamsSend = eventFilterConditions
 console.log(' this.queryParamsSend', this.queryParamsSend)
 // const queryparams = JSON.parse(eventFilterConditions)
 // const toRouterId = packet.dashboardIds
@@ -2636,7 +2642,9 @@ this.http.post(apiUrl, requestBody).subscribe(
     const processedDataFilter = this.responseBody.Processed_Data.metadata.grid_details
 
     console.log('processedData checking from queryParams',processedDataFilter)
+    this.eventFilterConditions= eventFilterConditions
     this.summaryService.updatelookUpData(processedDataFilter)
+    this.summaryService.queryPramsFunction(eventFilterConditions)
     // const viewModeQP = true;
     // const disableMenuQP = true;
     console.log('disableMenuQP check from modal',this.disableMenuQP)
@@ -7126,8 +7134,12 @@ refreshFunction(){
     if (!Array.isArray(columnVisibilityRead) || columnVisibilityRead.length === 0) {
         console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
         return;
-    }else if(this.assignGridMode ==false && this.isEditModeView == true){
-      this.modalService.open(modalChart, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+    }else if(this.isEditModeView == true){
+      console.log('this.isEditModeView checking chart3', this.isEditModeView);
+      setTimeout(() => {
+        this.modalService.open(modalChart, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+      }, 500);
+   
     }
   
     console.log("✅ columnVisibility has data, opening modal...");
@@ -7151,7 +7163,7 @@ emitchartDatatable(configChartTable: any) {
 // Function to open the modal if columnVisibility is not empty
 helperChartClickChart1(event: any, modalChart: any) {
   console.log('this.assignGridMode from chartDrill', this.assignGridMode);
-  console.log('this.isEditModeView checking', this.isEditModeView);
+  console.log('this.isEditModeView checking chart1', this.isEditModeView);
   console.log('event checking:', event);
   console.log('modalChart reference:', modalChart);
   console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
@@ -7192,15 +7204,16 @@ helperChartClickChart1(event: any, modalChart: any) {
   }
 
   if (this.isEditModeView === true) {
+
     console.log('this.assignGridMode checking',this.assignGridMode)
     console.log('this.isEditModeView checking',this.isEditModeView)
     console.log("✅ columnVisibility has data, opening modal...");
-
-    try {
+    setTimeout(() => {
       this.modalService.open(modalChart, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
-    } catch (error) {
-      console.error("❌ Error opening modal:", error);
-    }
+    }, 500);
+    
+
+
   }
 }
 
@@ -7237,8 +7250,11 @@ helperChartClickChart1(event: any, modalChart: any) {
     if (!Array.isArray(columnVisibilityRead) || columnVisibilityRead.length === 0) {
         console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
         return;
-    }else if(this.assignGridMode ==false && this.isEditModeView == true){
-      this.modalService.open(modalChart, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+    }else if(this.isEditModeView == true){
+      setTimeout(() => {
+        this.modalService.open(modalChart, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+      }, 500);
+
     }
   
     console.log("✅ columnVisibility has data, opening modal...");

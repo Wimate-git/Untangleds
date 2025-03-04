@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -13,7 +13,7 @@ import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engin
   templateUrl: './chart-ui1.component.html',
   styleUrl: './chart-ui1.component.scss'
 })
-export class ChartUi1Component implements OnChanges {
+export class ChartUi1Component implements OnChanges,OnInit {
   chartOptions: any;
   gridOptions: any;
   @Input() chartWidth:any
@@ -303,6 +303,21 @@ data.forEach((packet: any,matchedIndex:number) => {
 
       
       // console.log("✅ Matched Charts:", matchedCharts);
+      
+    
+      
+      
+    })
+
+
+
+    this.summaryService.queryParamsData$.subscribe((data: any)=>{
+      console.log('data check filterConditions',data)
+
+if(data){
+  this.eventFilterConditions = data
+}
+      
       
     
       

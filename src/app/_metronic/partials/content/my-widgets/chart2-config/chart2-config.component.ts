@@ -78,6 +78,7 @@ export class Chart2ConfigComponent implements OnInit{
   selectedText: any;
   shoRowData:boolean = false
   listFormFields: void;
+  dynamicParamMap = new Map<number, any[]>();
 
 
  
@@ -751,11 +752,11 @@ repopulate_fields(getValues: any): FormArray {
       parsedChartConfig = JSON.parse(getValues.chartConfig || '[]');
       console.log('parsedChartConfig check',parsedChartConfig[0].formlist)
 
-      this.fetchDynamicFormData(parsedChartConfig[0].formlist).then((data: any[]) => {
-        console.log('Updated listFormFields:', data);
-        this.listofDynamicParam = [...data]; // Ensure reference update for change detection
-        this.cdr.detectChanges(); // Manually trigger change detection
-      });
+      // this.fetchDynamicFormData(parsedChartConfig[0].formlist).then((data: any[]) => {
+      //   console.log('Updated listFormFields:', data);
+      //   this.listofDynamicParam = [...data]; // Ensure reference update for change detection
+      //   this.cdr.detectChanges(); // Manually trigger change detection
+      // });
       
       
       
@@ -845,58 +846,53 @@ repopulate_fields(getValues: any): FormArray {
   onMouseLeave(): void {
     this.isHovered = false;
   }
-  fetchDynamicFormData(value: any): Promise<any[]> {
-    console.log("Data from lookup:", value);
-  
-    return this.api
+  fetchDynamicFormData(value: any, index: number) {
+    console.log("Fetching data for:", value);
+
+    // Simulating API call
+    this.api
       .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
       .then((result: any) => {
         if (result && result.metadata) {
           const parsedMetadata = JSON.parse(result.metadata);
-          console.log('parsedMetadata check dynamic', parsedMetadata);
           const formFields = parsedMetadata.formFields;
-          console.log('formFields check', formFields);
-  
-          // Initialize the list with formFields labels
-          this.listofDynamicParam = formFields.map((field: any) => {
-            console.log('field check', field);
-            return {
-              value: field.name,
-              text: field.label
-            };
-          });
-  
-          // Include created_time and updated_time
+
+          // Prepare parameter list
+          const dynamicParamList = formFields.map((field: any) => ({
+            value: field.name,
+            text: field.label,
+          }));
+
+          // Add created_time and updated_time
           if (parsedMetadata.created_time) {
-            this.listofDynamicParam.push({
+            dynamicParamList.push({
               value: parsedMetadata.created_time.toString(),
-              text: 'Created Time' // Customize the label here if needed
+              text: 'Created Time',
             });
           }
-  
           if (parsedMetadata.updated_time) {
-            this.listofDynamicParam.push({
+            dynamicParamList.push({
               value: parsedMetadata.updated_time.toString(),
-              text: 'Updated Time' // Customize the label here if needed
+              text: 'Updated Time',
             });
           }
-  
-          console.log('Transformed dynamic parameters:', this.listofDynamicParam);
-          
-          // Trigger change detection to update the view
+
+          // Store parameters in the map
+          this.dynamicParamMap.set(index, dynamicParamList);
+
+          // Trigger change detection
           this.cdr.detectChanges();
-  
-          return this.listofDynamicParam; // Ensure the promise resolves with data
-        } else {
-          return [];
         }
       })
       .catch((err) => {
-        console.log("Can't fetch", err);
-        return []; // Handle errors gracefully
+        console.error("Error fetching data:", err);
       });
   }
   
+  getDynamicParams(index: number): any[] {
+    return this.dynamicParamMap.get(index) || [];
+  }
+
 
   fetchDynamicFormDataFilter(value: any) {
     console.log("Data from lookup:", value);
@@ -1052,14 +1048,14 @@ repopulate_fields(getValues: any): FormArray {
 
 
   }
-  selectFormParams(event: any) {
+  selectFormParams(event: any, index: number)  {
     if (event && event[0] && event[0].data) {
       this.selectedText = event[0].data.text;  // Adjust based on the actual structure
       console.log('Selected Form Text:', this.selectedText);
       this.getFormControlValue(this.selectedText); 
 
       if (this.selectedText) {
-        this.fetchDynamicFormData(this.selectedText);
+        this.fetchDynamicFormData(this.selectedText, index);
       }
     } else {
       console.error('Event data is not in the expected format:', event);
