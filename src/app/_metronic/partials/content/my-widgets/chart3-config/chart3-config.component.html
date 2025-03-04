@@ -359,35 +359,37 @@
             <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'filter-tab'}" id="filter-tab"
             role="tabpanel" aria-labelledby="filter-tabpane">
             <form [formGroup]="createChart">
+              <div formArrayName="all_fields">
+                <div *ngFor="let field of all_fields.controls; let fieldIndex=index">
+                  <div [formGroupName]="fieldIndex"
+                    style="border: 2px solid rgb(201, 228, 239); padding: 10px; margin: 5px;border-radius: 5px;">
             
 
               <div class="row g-3 align-items-end mb-4">
-                <div class="col-md-4 mb-3">
+                <!-- <div class="col-md-4 mb-3">
                   <label for="formlist" class="col-createChart-label fw-bold fs-6 ">Forms</label>
                   <ngx-select id="filterFormList" [allowClear]="true" name="icon" formControlName="filterFormList"
                     [items]="listofDeviceIds" optionValueField="value" optionTextField="text"
                     (selectionChanges)="selectfilterFormList($event)" placeholder="Select createChart">
                   </ngx-select>
-                </div>
+                </div> -->
                 <!-- Form Fields -->
                 <div class="col-md-4">
                   <label for="parameterName" class="fw-bold fs-6">Form Fields</label>
                   <p-multiSelect
-                  id="parameterName"
-                  formControlName="filterParameterLine"
-                  [options]="listofDynamicParamFilter"
-                  optionLabel="text"
-                  optionValue="value" 
-                  placeholder="Select Parameter"
-                  (onChange)="selectfilterFields($event)"
-                  >
-                </p-multiSelect>
+                    id="parameterName"
+                    formControlName="filterParameter"
+                    [options]="getDynamicParams(fieldIndex)"
+                    optionLabel="text"
+                    placeholder="Select Parameter"
+                    (onChange)="dynamicparameterValue($event,fieldIndex)"
                 
+                  ></p-multiSelect>
                 </div>
               
                 <!-- Add Button -->
                 <div class="col-md-3">
-                  <button type="button" class="btn btn-primary w-100 mt-4" (click)="onAdd()">Add</button>
+                  <button type="button" class="btn btn-primary w-100 mt-4" (click)="onAdd(fieldIndex)">Add</button>
                 </div>
               
                 <!-- Custom Label -->
@@ -402,16 +404,19 @@
                   />
                 </div> -->
               </div>
-            <div class="col-md-12 mb-3">
-              <label for="description" class="col-createChart-label fw-bold fs-6">Equation</label>
-              <textarea
-              id="description"
-              formControlName="filterDescription"  
-              class="form-control"
-              rows="3"
-              placeholder="Enter description"
-            >{{ selectedParameterValue }}</textarea>
-            </div>
+              <div class="col-md-12 mb-3">
+                <label for="description" class="col-createChart-label fw-bold fs-6">Equation</label>
+                <textarea
+                id="description"
+                formControlName="filterDescription"  
+                class="form-control"
+                rows="3"
+                placeholder="Enter description"
+              >{{ selectedParameterValue }}</textarea>
+              </div>
+                  </div>
+                </div>
+              </div>
   
   
             </form>

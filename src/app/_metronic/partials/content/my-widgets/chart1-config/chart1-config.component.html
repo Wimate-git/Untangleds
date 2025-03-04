@@ -10,7 +10,7 @@
       </label>
       <input type="number" class="
                         form-control form-control-lg form-control-solid
-                        mb-3 mb-lg-0" name="add_fields" formControlName="add_fields"
+                        mb-3 mb-lg-0" name="add_fields" formControlName="add_fields" (change)="onValue()"
         (keyup)="addControls($event,'html')" required>
         <div *ngIf="createChart.get('add_fields')?.touched && createChart.get('add_fields')?.invalid" class="text-danger">
           <div *ngIf="createChart.get('add_fields')?.errors?.required">Parameters is required.</div>
@@ -357,6 +357,10 @@
           <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'filter-tab'}" id="filter-tab"
           role="tabpanel" aria-labelledby="filter-tabpane">
           <form [formGroup]="createChart">
+            <div formArrayName="all_fields">
+              <div *ngFor="let field of all_fields.controls; let fieldIndex=index">
+                <div [formGroupName]="fieldIndex"
+                  style="border: 2px solid rgb(201, 228, 239); padding: 10px; margin: 5px;border-radius: 5px;">
           
             <div class="row g-3 align-items-end mb-4">
               <!-- Form Fields -->
@@ -365,17 +369,17 @@
                 <p-multiSelect
                   id="parameterName"
                   formControlName="filterParameter"
-                  [options]="listofDynamicParam"
+                  [options]="getDynamicParams(fieldIndex)"
                   optionLabel="text"
                   placeholder="Select Parameter"
-                  (onChange)="dynamicparameterValue($event)"
+                  (onChange)="dynamicparameterValue($event,fieldIndex)"
               
                 ></p-multiSelect>
               </div>
             
               <!-- Add Button -->
               <div class="col-md-3">
-                <button type="button" class="btn btn-primary w-100 mt-4" (click)="onAdd()">Add</button>
+                <button type="button" class="btn btn-primary w-100 mt-4" (click)="onAdd(fieldIndex)">Add</button>
               </div>
             
               <!-- Custom Label -->
@@ -401,6 +405,9 @@
             placeholder="Enter description"
           >{{ selectedParameterValue }}</textarea>
           </div>
+                </div>
+              </div>
+            </div>
 
 
           </form>

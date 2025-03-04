@@ -471,10 +471,11 @@ type="square-jelly-box"
           *ngIf="isEditMode" >
             Update
           </button>
-          <button type="button" class="btn btn-primary"  (click)="reloadPage() "
+          <button type="button" class="btn btn-success"  (click)="reloadPage() "
           data-bs-dismiss="modal">
             Live Filter
           </button>
+          <button data-bs-dismiss="modal"  type="button" class="btn btn-info" (click)="clearForm()">Clear Filter</button>
         </div>
       </div>
   

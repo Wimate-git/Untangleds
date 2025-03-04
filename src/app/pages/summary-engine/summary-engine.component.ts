@@ -1926,17 +1926,14 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
           `Height: ${this.DynamicTileHeight[index]}, Width: ${this.DynamicTileWidth[index]}, Top Margin: }`
         );
       }
-        else if (item.grid_type === 'HTMLtile') {
-          // const topMargin = 20; // Define the top margin value
-        
-          // Adjust height and width with the top margin
-          this.HTMLtileHeight[index] = itemComponentHeight ; // Subtract additional top margin
-          this.HTMLtileWidth[index] = itemComponentWidth ; // Subtract margin/padding for width
-        
-          console.log(
-            `Resized ${item.grid_type} at index ${index}:`,
-            `Height: ${this.HTMLtileHeight[index]}, Width: ${this.HTMLtileWidth[index]}, Top Margin: }`
-          );
+      else if (item.grid_type === 'HTMLtile') {
+        this.HTMLtileHeight[index] = item.itemComponentHeight;
+        this.HTMLtileWidth[index] = item.itemComponentWidth;
+    
+        console.log(
+          `Resized ${item.grid_type} at index ${index}:`,
+          `Height: ${this.HTMLtileHeight[index]}, Width: ${this.HTMLtileWidth[index]}`
+        );
       }
   
       else if (item.grid_type === 'filterTile') {
@@ -1963,6 +1960,8 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
         `Height: ${this.tile2Height[index]}, Width: ${this.tile2Width[index]}, Top Margin: }`
       );
   }
+
+
       
       
 

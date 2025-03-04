@@ -2377,7 +2377,10 @@ console.log('tempMetadata',tempMetadata)
     }
   }
   
-  
+  clearForm() {
+    window.location.reload();
+  }
+
   
   
   

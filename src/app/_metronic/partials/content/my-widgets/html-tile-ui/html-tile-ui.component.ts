@@ -30,6 +30,8 @@ export class HtmlTileUiComponent implements OnInit{
   descriptionData: any;
   primaryValue: any;
   tile1Config: any;
+  @Input() HTMLtileWidth:any
+  @Input() HTMLtileHeight:any
 
   constructor(
     private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer

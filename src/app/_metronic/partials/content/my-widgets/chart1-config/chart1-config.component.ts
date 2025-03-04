@@ -204,8 +204,8 @@ export class Chart1ConfigComponent implements OnInit {
       chart_title:['',Validators.required],
       highchartsOptionsJson:[JSON.stringify(this.defaultHighchartsOptionsJson,null,4)],
       filterForm:[''],
-      filterParameter:[[]],
-      filterDescription:[''],
+      // filterParameter:[[]],
+      // filterDescription:[''],
       toggleCheck: [], // Default toggle state
       dashboardIds: [''],
       selectType: [''],
@@ -308,6 +308,8 @@ export class Chart1ConfigComponent implements OnInit {
   }
 
   addControls(event: any, _type: string) {
+    const getConfigCount =this.createChart.get('add_fields')?.value
+    console.log('getConfigCount checking',getConfigCount)
     console.log('event check', event);
   
     let noOfParams: any = '';
@@ -351,7 +353,10 @@ export class Chart1ConfigComponent implements OnInit {
             rowData:[''],
             formatType:['',Validators.required],
             undefinedCheckLabel:[''],
-            custom_Label:['',Validators.required]
+            custom_Label:['',Validators.required],
+            filterParameter:[[]],
+            filterDescription:['']
+
             
 
        
@@ -371,6 +376,12 @@ export class Chart1ConfigComponent implements OnInit {
     // Update noOfParams for use in addTile
     this.noOfParams = noOfParams;
   }
+
+  onValue() {
+  const getConfigCount = this.createChart.get('add_fields')?.value;
+  console.log('getConfigCount checking from oncHange', getConfigCount);
+}
+
   get all_fields() {
     return this.createChart.get('all_fields') as FormArray;
   }
@@ -431,8 +442,8 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         themeColor: 'var(--bs-body-bg)',  // Default theme color
         chartConfig: this.createChart.value.all_fields || [],  // Default to empty array if missing
         filterForm: this.createChart.value.filterForm || {},
-        filterParameter: this.createChart.value.filterParameter || {},
-        filterDescription: this.createChart.value.filterDescription || '',
+        // filterParameter: this.createChart.value.filterParameter || {},
+        // filterDescription: this.createChart.value.filterDescription || '',
         custom_Label: this.createChart.value.custom_Label || '',
         toggleCheck: this.createChart.value.toggleCheck ||'',
         dashboardIds: this.createChart.value.dashboardIds||'',
@@ -442,6 +453,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         MiniTableFields:this.createChart.value.MiniTableFields ,
         minitableEquation:this.createChart.value.minitableEquation,
         EquationOperationMini:this.createChart.value.EquationOperationMini,
+        add_fields:this.createChart.value.add_fields,
     
       
 
@@ -541,6 +553,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     MiniTableFields:this.createChart.value.MiniTableFields ||'',
     minitableEquation:this.createChart.value.minitableEquation ||'',
     EquationOperationMini:this.createChart.value.EquationOperationMini ||'',
+    add_fields:this.createChart.value.add_fields,
 
     // filterForm:this.createChart.value.filterForm,
     // filterParameter:this.createChart.value.filterParameter,
@@ -710,7 +723,7 @@ this.cd.detectChanges()
 
     // Initialize form fields and pre-select values
     this.createChart = this.fb.group({
-      add_fields: this.paramCount,
+      add_fields: tile.add_fields,
       chart_title: tile.chart_title,
       all_fields: this.repopulate_fields(tile),
       highchartsOptionsJson: JSON.stringify(this.highchartsOptionsJson, null, 4),
@@ -796,6 +809,7 @@ repopulate_fields(getValues: any): FormArray {
         const arrayParameter = Array.isArray(configItem.parameterName)
         ? configItem.parameterName
         : [];
+   
 
       // Create and push FormGroup into FormArray
       this.all_fields.push(
@@ -814,7 +828,9 @@ repopulate_fields(getValues: any): FormArray {
           filterParameter1: this.fb.control(filterParameter1Value), // Same for filterParameter1
           formatType:configItem.formatType ||'',
           undefinedCheckLabel:configItem.undefinedCheckLabel ||'',
-          custom_Label:configItem.custom_Label ||''
+          custom_Label:configItem.custom_Label ||'',
+          filterDescription:configItem.filterDescription ||''
+
         })
       );
 
@@ -1029,8 +1045,21 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     { value: 'Modal', text: 'Modal(Pop Up)' },
   ]
 
-  dynamicparameterValue(event: any): void {
+  dynamicparameterValue(event: any, index: any): void {
     console.log('Event check for dynamic param:', event);
+    console.log('Index check:', index);
+  
+    // Access the specific FormGroup from the FormArray
+    const formDynamicParam = this.all_fields.at(index) as FormGroup;
+  
+    if (!formDynamicParam) {
+      console.warn(`FormGroup not found for index ${index}`);
+      return;
+    }
+  
+    // Access the filterParameter FormControl
+    const filterParameter = formDynamicParam.get('filterParameter');
+    console.log('filterParameter check:', filterParameter);
   
     if (event && event.value && Array.isArray(event.value)) {
       const valuesArray = event.value;
@@ -1041,11 +1070,12 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         const { value, text } = singleItem; // Destructure value and text
         console.log('Single Selected Item:', { value, text });
   
-        // Update the form control with the single value (object)
-        const filterParameter = this.createChart.get('filterParameter');
         if (filterParameter) {
+          // Update the form control with the single value (object)
           filterParameter.setValue([{ value, text }]); // Store as an array of objects
           this.cdr.detectChanges(); // Trigger change detection
+        } else {
+          console.warn(`filterParameter control not found in FormGroup for index ${index}`);
         }
   
         // Store the single selected parameter
@@ -1059,47 +1089,66 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   
         console.log('Formatted Multiple Items:', formattedValues);
   
-        // Update the form control with the concatenated values (array of objects)
-        const filterParameter = this.createChart.get('filterParameter');
         if (filterParameter) {
+          // Update the form control with the concatenated values (array of objects)
           filterParameter.setValue(formattedValues);
           this.cdr.detectChanges(); // Trigger change detection
+        } else {
+          console.warn(`filterParameter control not found in FormGroup for index ${index}`);
         }
   
         // Store the multiple selected parameters
         this.selectedParameterValue = formattedValues;
       }
     } else {
-      console.warn('Invalid event structure:', event);
+      console.warn('Invalid event structure or missing value array:', event);
     }
   }
   
   
   
 
-  onAdd(): void {
+  onAdd(index: any): void {
+    console.log('Index checking from onAdd:', index);
+  
+    // Access the specific form group from the form array
+    const formDescParam = this.all_fields.at(index) as FormGroup;
+  
+    // Retrieve the `filterDescription` control from the group
+    const groupByFormatControl = formDescParam.get('filterDescription');
+  
     // Capture the selected parameters (which will be an array of objects with text and value)
-    const selectedParameters =  this.selectedParameterValue;
-    console.log('selectedParameters checking', selectedParameters);
+    const selectedParameters = this.selectedParameterValue;
+    console.log('Selected parameters checking:', selectedParameters);
+  
+    let formattedDescription = '';
   
     if (Array.isArray(selectedParameters)) {
       // Format the selected parameters to include both text and value
-      this.selectedParameterValue = selectedParameters
+      formattedDescription = selectedParameters
         .map(param => `${param.text}-\${${param.value}}`) // Include both text and value
         .join(' '); // Join them with a comma and space
     } else if (selectedParameters) {
       // If only one parameter is selected, format it directly
-      this.selectedParameterValue = `${selectedParameters.text}-\${${selectedParameters.value}}`;
+      formattedDescription = `${selectedParameters.text}-\${${selectedParameters.value}}`;
     } else {
       console.warn('No parameters selected or invalid format:', selectedParameters);
-      this.selectedParameterValue = ''; // Fallback in case of no selection
+      formattedDescription = ''; // Fallback in case of no selection
     }
   
-    console.log('this.selectedParameterValue check', this.selectedParameterValue);
+    console.log('Formatted Description:', formattedDescription);
   
-    // Update the form control value for filterDescription with the formatted string
+    // Update the specific form control value for `filterDescription`
+    if (groupByFormatControl) {
+      groupByFormatControl.patchValue(formattedDescription);
+      console.log(`Patched value for index ${index}:`, formattedDescription);
+    } else {
+      console.warn(`filterDescription control not found for index ${index}.`);
+    }
+  
+    // Optionally patch at the top-level form if needed
     this.createChart.patchValue({
-      filterDescription: `${this.selectedParameterValue}`,
+      filterDescription: formattedDescription,
     });
   
     // Manually trigger change detection to ensure the UI reflects the changes
@@ -1469,7 +1518,7 @@ toggleCheckbox(theme: any): void {
       itemStyle: {
         color: 'var(--bs-body-color)',
       },
-      name: 'Count',
+      name: '',
       colorByPoint: true,
       data: [],
     }],

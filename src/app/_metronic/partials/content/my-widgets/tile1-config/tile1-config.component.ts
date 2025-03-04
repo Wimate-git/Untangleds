@@ -1097,6 +1097,84 @@ themes = [
   { color: "linear-gradient(to right, #A1045A, #A1045A)", selected: true },
   { color: "linear-gradient(to right, #563C5C, #563C5C)", selected: false },
   { color: "linear-gradient(to right, #655967, #655967)", selected: false },
+  {color:"linear-gradient(45deg, #FC466B 0%, #3F5EFB 100%)",selected:false},
+  {color:"linear-gradient(45deg, #833ab4 0%, #fd1d1d 100%)",selected:false},
+  {color:"linear-gradient(45deg, #16BFFD 0%, #CB3066 100%)",selected:false},
+  {color:"linear-gradient(45deg, #48c6ef 0%, #6f86d6 100%)",selected:false},
+  {color:"linear-gradient(45deg, #ff758c 0%, #ff7eb3 100%)",selected:false},
+  {color:"linear-gradient(45deg, #a80077 0%, #66ff00 100%)",selected:false},
+  {color:"linear-gradient(45deg, #6441a5 0%, #2a0845 100%)",selected:false},
+  {color:"linear-gradient(45deg, #fc5c7d 0%, #6a82fb 100%)",selected:false},
+  {color:"linear-gradient(45deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)",selected:false},
+  {color:"linear-gradient(45deg, #2C3E50 0%, #FD746C 100%)",selected:false},
+  {color:"linear-gradient(45deg, #abbaab 0%, #ffffff 100%)",selected:false},
+  { color: "linear-gradient(45deg, #283c86 0%, #45a247 100%)", selected: false }, // Deep Sea
+  { color: "linear-gradient(45deg, #16222a 0%, #3a6073 100%)", selected: false }, // Dark Ocean
+  { color: "linear-gradient(45deg, #3D3393 0%, #2D2560 100%)", selected: false }, // Royal Blue
+  { color: "linear-gradient(45deg, #000000 0%, #0d324d 100%)", selected: false }, // Midnight Black
+  { color: "linear-gradient(45deg, #0575E6 0%, #021B79 100%)", selected: false }, // Deep Blue
+  { color: "linear-gradient(45deg, #2C5364 0%, #203A43 100%)", selected: false }, // Emerald Green
+  { color: "linear-gradient(45deg, #833ab4 0%, #fd1d1d 100%)", selected: false }, // Purple Red
+  { color: "linear-gradient(45deg, #000000 0%, #434343 100%)", selected: false }, // Dark Grey
+  { color: "linear-gradient(45deg, #004e92 0%, #000000 100%)", selected: false },
+  { color: "linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%)", selected: false }, // Blue Purple Yellow
+  { color: "linear-gradient(132deg, #F4D03F 0%, #16A085 100%)", selected: false }, // Golden Green
+  { color: "linear-gradient(0deg, #08AEEA 0%, #2AF598 100%)", selected: false }, // Ocean Green
+  { color: "linear-gradient(147deg, #FFE53B 0%, #FF2525 74%)", selected: false }, // Sunset Red
+  { color: "linear-gradient(180deg, #52ACFF 25%, #FFE32C 100%)", selected: false }, // Sky Blue Yellow
+  { color: "linear-gradient(45deg, #EE7752 0%, #E73C7E 100%)", selected: false }, // Sunset Orange
+  { color: "linear-gradient(45deg, #FFA7A7 0%, #FFD4A2 100%)", selected: false }, // Peachy Pink
+  { color: "linear-gradient(45deg, #fc00ff 0%, #00dbde 100%)", selected: false }, // Electric Purple
+  { color: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", selected: false }, // Twilight Purple
+  { color: "linear-gradient(45deg, #d4145a 0%, #fbb03b 100%)", selected: false }, // Cherry Peach
+  { color: "linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%)", selected: false }, // Cotton Candy
+  { color: "linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)", selected: false }, // Blue Sky
+  { color: "linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%)", selected: false }, // Ice White
+  { color: "linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)", selected: false }, // Lavender Blue
+  { color: "linear-gradient(120deg, #f6d365 0%, #fda085 100%)", selected: false }, // Peachy Yellow
+  { color: "linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%)", selected: false }, // Azure Blue
+  { color: "linear-gradient(120deg, #abecd6 0%, #fbed96 100%)", selected: false }, // Pastel Green Yellow
+  { color: "linear-gradient(120deg, #f6d365 0%, #fda085 100%)", selected: false }, // Sunrise Yellow
+  { color: "linear-gradient(120deg, #fccb90 0%, #d57eeb 100%)", selected: false }, // Apricot Purple
+  { color: "linear-gradient(120deg, #f093fb 0%, #f5576c 100%)", selected: false }, 
+  { color: "transparent", selected: false }, // Transparent
+  { color: "linear-gradient(315deg, #990000 0%, #ff0000 74%)", selected: false }, // Red
+  { color: "linear-gradient(315deg, #378b29 0%, #74d680 74%)", selected: false }, // Green
+  { color: "linear-gradient(316deg, #3e187a 0%, #994ecc 74%)", selected: false }, // Purple
+  { color: "linear-gradient(315deg, #f9ff60 0%, #e0c300 74%)", selected: false }, // Yellow
+  { color: "linear-gradient(315deg, #182b3a 0%, #20a4f3 74%)", selected: false },
+  { color: "linear-gradient(315deg, #ff8000 0%, #ffcc00 74%)", selected: false }, // Orange
+  { color: "linear-gradient(315deg, #550022 0%, #aa0044 74%)", selected: false }, // Magenta
+  { color: "linear-gradient(315deg, #0073e6 0%, #00d8e6 74%)", selected: false }, // Cyan
+  { color: "linear-gradient(315deg, #660066 0%, #cc00cc 74%)", selected: false }, // Violet
+  { color: "linear-gradient(315deg, #cc0033 0%, #ff0066 74%)", selected: false }, // Pink
+  { color: "linear-gradient(315deg, #663300 0%, #996633 74%)", selected: false }, // Brown
+  { color: "linear-gradient(315deg, #006600 0%, #00cc00 74%)", selected: false }, // Lime
+  { color: "linear-gradient(315deg, #003366 0%, #0066cc 74%)", selected: false }, // Indigo
+  { color: "linear-gradient(315deg, #666600 0%, #cccc00 74%)", selected: false }, // Olive
+  { color: "linear-gradient(315deg, #660000 0%, #cc0000 74%)", selected: false }, // Maroon
+  { color: "linear-gradient(315deg, #ff0080 0%, #ff80bf 74%)", selected: false }, // Fuchsia
+  { color: "linear-gradient(315deg, #004080 0%, #007acc 74%)", selected: false }, // Sapphire
+  { color: "linear-gradient(315deg, #800040 0%, #cc0073 74%)", selected: false }, // Ruby
+  { color: "linear-gradient(315deg, #ffcc99 0%, #ff9966 74%)", selected: false }, // Apricot
+  { color: "linear-gradient(315deg, #00cc99 0%, #33ffcc 74%)", selected: false }, // Turquoise
+  { color: "linear-gradient(315deg, #ff6600 0%, #ff9933 74%)", selected: false }, // Tangerine
+  { color: "linear-gradient(315deg, #333300 0%, #666600 74%)", selected: false }, // Olive Green
+  { color: "linear-gradient(315deg, #800000 0%, #cc3333 74%)", selected: false }, // Brick Red
+  { color: "linear-gradient(315deg, #330033 0%, #660066 74%)", selected: false }, // Plum
+  { color: "linear-gradient(315deg, #006666 0%, #00cccc 74%)", selected: false }, // Teal
+                
+                     
+                    
+                  
+                
+                    
+                 
+                   
+         
+                 
+
+
   // { color: "linear-gradient(to right, #707070, #707070)", selected: false },
 
 

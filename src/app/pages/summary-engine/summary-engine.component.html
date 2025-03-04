@@ -323,7 +323,8 @@
                       <app-html-tile-ui 
                         [item]="item" 
                         [item]="item" [index]="i" (customEvent)="helperTile($event,htmlTileModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"   [summaryDashboardUpdate]="summaryDashboardUpdate" 
-                        [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen">
+                        [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"     [HTMLtileWidth]="HTMLtileWidth[i]" 
+                        [HTMLtileHeight]="HTMLtileHeight[i]">
                       </app-html-tile-ui>
                     </div>
                     <!-- <div *ngIf="item.grid_type === 'HTMLtile'"> -->
