@@ -3730,60 +3730,113 @@ justReadStyles(data:any,index:any){
   emitDuplicate(event: { data: { arg1: any; arg2: number }; all_Packet_store: any }) {
     const { arg1, arg2 } = event.data;
     const { all_Packet_store } = event;
-    if(arg1.grid_type=='tile'){
-      console.log('event check', event)
+    if(event.data.arg1.grid_type=='tile'){
+      // console.log('event check', event)
       this.isGirdMoved = false; 
-  this.dashboard.push(arg1)
+  // this.dashboard.push(arg1)
+
+  // console.log('event check chart1', event);
+    
+  // Store all company details
+  this.allCompanyDetails = event.all_Packet_store;
+
+  // Directly update the id and push the object into the dashboard in one line
+  this.dashboard.push({
+    ...event.data.arg1,
+    id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+  });
+
+  console.log('event.data.arg1', event.data.arg1);
  
 
     }
     else if(event.data.arg1.grid_type=='TableWidget'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
-      this.dashboard.push(event.data.arg1)
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
  
     }
     else if(event.data.arg1.grid_type=='HTMLtile'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
-      this.dashboard.push(event.data.arg1)
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
  
     }
 
     else if(event.data.arg1.grid_type=='logo'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
-      this.dashboard.push(event.data.arg1)
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
  
     }
     else if(event.data.arg1.grid_type=='MultiTableWidget'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
-      this.dashboard.push(event.data.arg1)
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
  
     }
     else if(event.data.arg1.grid_type=='Map'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
-      this.dashboard.push(event.data.arg1)
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
      
     }
     else if(event.data.arg1.grid_type=='tile2'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
-      this.dashboard.push(event.data.arg1)
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
 
     }
     else if(event.data.arg1.grid_type=='filterTile'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
-      this.dashboard.push(event.data.arg1)
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
    
     }
     else if(event.data.arg1.grid_type=='tile3'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
-      this.dashboard.push(event.data.arg1)
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
 
     }
     else if(event.data.arg1.grid_type=='tile4'){
@@ -3828,14 +3881,24 @@ justReadStyles(data:any,index:any){
     else if(event.data.arg1.grid_type=='Linechart'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
-      this.dashboard.push(event.data.arg1)
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
     
 
     }
         else if(event.data.arg1.grid_type=='Columnchart'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
-      this.dashboard.push(event.data.arg1)
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
 
 
     }
@@ -3858,7 +3921,12 @@ justReadStyles(data:any,index:any){
     else if(event.data.arg1.grid_type=='dynamicTile'){
       console.log('event check from dynamic', event.data.arg1)
       this.allCompanyDetails = event.all_Packet_store;
-      this.dashboard.push(event.data.arg1)
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
       console.log('this.dashboard from dynamic',event.all_Packet_store)
 
 
@@ -3866,7 +3934,12 @@ justReadStyles(data:any,index:any){
     else if(event.data.arg1.grid_type=='title'){
       console.log('event check from dynamic', event.data.arg1)
       this.allCompanyDetails = event.all_Packet_store;
-      this.dashboard.push(event.data.arg1)
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
       console.log('this.dashboard from dynamic',event.all_Packet_store)
 
 
