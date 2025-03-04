@@ -174,6 +174,9 @@ rdtListWorkAround :any =[{
   combinationOfUser: any = [];
   tempUpdateUser: any;
   username: any;
+  avgLabourHistory: any = [];
+  getRefAvgLabour: any;
+  avgRefLabourHistory: any = [];
 
   constructor(private apiService: UserService,private configService:SharedService,private fb:FormBuilder
     ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal,private DynamicApi:DynamicApiService,
@@ -1037,6 +1040,22 @@ rdtListWorkAround :any =[{
     //   this.allDeviceValues.push(device[allValues].value);
     // }
   }
+
+  toggleAdvancedOptions() {
+    const advancedOptions = document.getElementById('advancedOptions');
+  
+    if (advancedOptions) {
+      const isCollapsed = advancedOptions.classList.contains('show');
+      if (isCollapsed) {
+        advancedOptions.classList.remove('show');
+      } else {
+        advancedOptions.classList.add('show');
+      }
+    }
+      this.cd.detectChanges()
+  }
+
+
   
   updateUser(value: any, key: any) {
     console.log("value",value)
@@ -1091,6 +1110,20 @@ rdtListWorkAround :any =[{
 
     if (key == "editUser") {
 
+        if(this.createUserField.value && this.createUserField.value.avg_labour_cost && this.createUserField.value.avg_labour_cost != ''){
+          if(this.getRefAvgLabour != this.createUserField.value.avg_labour_cost){
+            const avgCost = this.createUserField.value.avg_labour_cost
+            if(!Array.isArray(this.avgLabourHistory)){
+              this.avgLabourHistory = []
+            }
+            this.avgLabourHistory.push([
+              avgCost,new Date().getTime()
+            ])
+          }
+        }
+
+        console.log("this.avgLabourHistory ",this.avgLabourHistory);
+
       this.dynamicRedirectChanged(this.createUserField.value.location_object)
 
       this.allUserDetails = {
@@ -1115,7 +1148,7 @@ rdtListWorkAround :any =[{
         escalation_email: this.createUserField.value.escalation_email == null ? false : this.createUserField.value.escalation_email,
         escalation_sms: this.createUserField.value.escalation_sms == null ? false : this.createUserField.value.escalation_sms,
         escalation_telegram: this.createUserField.value.escalation_telegram == null ? false : this.createUserField.value.escalation_telegram,
-        email: this.createUserField.value.email,
+        email:this.createUserField.get('email')?.value,
         telegramID: this.createUserField.value.telegramID,
         location_permission: this.createUserField.get('location_permission')?.value,
         form_permission:this.createUserField.get('form_permission')?.value,
@@ -1138,8 +1171,8 @@ rdtListWorkAround :any =[{
         location_object:this.createUserField.value.location_object,
         default_module:this.createUserField.value.default_module,
         avg_labour_cost:this.createUserField.value && this.createUserField.value.avg_labour_cost ? this.createUserField.value.avg_labour_cost : '',
-        updated: new Date()
-
+        updated: new Date(),
+        avg_labour_history: JSON.stringify(this.avgLabourHistory || []) || []
       }
 
       tempObj = {
@@ -1196,7 +1229,7 @@ rdtListWorkAround :any =[{
   const items ={
   P1: this.tempUpdateUser,
   P2: this.allUserDetails.mobile || 'N/A',
-  P3: this.allUserDetails.email,
+  P3: this.createUserField.get('email')?.value,
   P4: this.allUserDetails.permission_ID,
   P5:temp4,
   P6:temp2,
@@ -1209,7 +1242,7 @@ rdtListWorkAround :any =[{
   const masterUser = {
     P1:this.tempUpdateUser,
     P2:this.allUserDetails.clientID,
-    P3:this.allUserDetails.email,
+    P3:this.createUserField.get('email')?.value,
     P5:this.createUserField.value.userID,
     P4:this.allUserDetails.mobile || 'N/A'
   }
@@ -1416,7 +1449,7 @@ rdtListWorkAround :any =[{
 
 
     let userData: any = {
-      "email": this.createUserField.value.email,
+      "email": this.createUserField.get('email')?.value,
       'custom:userID': this.createUserField.value.userID,
       'custom:password': this.createUserField.get('name')?.value,
       'custom:clientID': this.allUserDetails.clientID,
@@ -1696,6 +1729,16 @@ rdtListWorkAround :any =[{
       if (this.createUserField.value.allowOtherClient == null || this.createUserField.value.allowOtherClient == false) {
 
 
+        //Create avg_labour_history packet
+        this.avgLabourHistory = []
+        if(this.createUserField.value && this.createUserField.value.avg_labour_cost && this.createUserField.value.avg_labour_cost != ''){
+          const avgCost = this.createUserField.value.avg_labour_cost
+          this.avgLabourHistory.push([
+            avgCost,new Date().getTime()
+          ])
+        }
+
+
         this.allUserDetails = {
           key: token,
           userID: (this.createUserField.value.userID).toLowerCase(),
@@ -1723,6 +1766,7 @@ rdtListWorkAround :any =[{
           location_permission: this.createUserField.get('location_permission')?.value,
           default_module:this.createUserField.value.default_module,
           avg_labour_cost:this.createUserField.value && this.createUserField.value.avg_labour_cost ? this.createUserField.value.avg_labour_cost : '',
+          avg_labour_history:this.avgLabourHistory,
           // device_type_permission: this.multiselectDeviceType_permission,
           form_permission: this.createUserField.get('form_permission')?.value,
           default_dev: this.multiselectDevice_dev,
@@ -2038,6 +2082,8 @@ rdtListWorkAround :any =[{
         // })
       })
     }
+
+ 
   }
 
 
@@ -2287,6 +2333,35 @@ rdtListWorkAround :any =[{
 
        this.tempUpdateUser = getValues.username
 
+
+       this.avgLabourHistory = getValues.avg_labour_history
+
+       try {
+        // Ensure avg_labour_cost is an array and map through it
+        if (Array.isArray(getValues.avg_labour_history)) {
+          this.avgRefLabourHistory = getValues.avg_labour_history.map((item: any) => {
+            // Check if item[1] is a valid date
+            let formattedDate = '';
+            if (item[1] && !isNaN(new Date(item[1]).getTime())) {
+              const date = new Date(item[1]);
+              formattedDate = date.toDateString() + " " + date.toLocaleTimeString();
+            } else {
+              formattedDate = 'Invalid Date'; 
+            }
+      
+            return [item[0], formattedDate]; 
+          });
+      
+          console.log("this.avgLabourHistory ", this.avgRefLabourHistory);
+        } else {
+          console.error("avg_labour_cost is not an array or is undefined");
+        }
+      } catch (error) {
+        console.log("Error populating the table for Labour history", error);
+      }
+      
+        this.getRefAvgLabour = getValues.avg_labour_cost
+
         this.createUserField = this.fb.group({
           'userID': getValues.userID,
           'name':  {value:getValues.name,disabled:this.editOperation},
@@ -2315,7 +2390,7 @@ rdtListWorkAround :any =[{
           'location_object': getValues.location_object,
           'default_module': getValues.default_module,
           'avg_labour_cost':getValues && getValues.avg_labour_cost ? getValues.avg_labour_cost : '',
-          'email': getValues.email,
+          'email': {value:getValues.email,disabled:this.editOperation},
           'telegramID': getValues.telegramID,
           'location_permission': [getValues.location_permission],
           'device_type_permission': [getValues.device_type_permission],
@@ -2768,6 +2843,9 @@ rdtListWorkAround :any =[{
   
 
   openModalHelpher(getData:any){
+
+    this.avgLabourHistory = []
+    this.getRefAvgLabour = []
     console.log("Data from llokup :",getData);
     this.data_temp = []
 
@@ -2840,6 +2918,7 @@ rdtListWorkAround :any =[{
                 let others = this.data_temp [allData].others
                 let add_updateTime = new Date(this.data_temp [allData].updated).toLocaleString();
                 let redirectionURL = this.data_temp[allData].redirectionURL
+                let avg_labour_history = typeof this.data_temp[allData].avg_labour_history == 'string' ? JSON.parse(this.data_temp[allData].avg_labour_history) : this.data_temp[allData].avg_labour_history
                 
         
                 userTable.push({
@@ -2890,7 +2969,8 @@ rdtListWorkAround :any =[{
                   default_module:default_module,
                   avg_labour_cost:avg_labour_cost,
                   others:others,
-                  redirectionURL:redirectionURL
+                  redirectionURL:redirectionURL,
+                  avg_labour_history:avg_labour_history
                 })
               }
             }

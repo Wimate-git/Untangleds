@@ -322,7 +322,7 @@
                                     <div class="col-md-4">
                                         <label class="fw-semibold fs-6 mb-2"> Mobile</label>
         
-                                        <input type="text" class="
+                                        <input type="number" class="
                                             form-control form-control-lg form-control-solid
                                             mb-3 mb-lg-0
                                           " placeholder="Enter mobile number" name="number" formControlName="mobile" >
@@ -507,7 +507,7 @@
                          
         
                             <div class="container">
-                                <div class="row mb-7">
+                                <div class="row">
 
 
 
@@ -593,22 +593,78 @@
                             </div>
 
 
-                            <div class="container">
-                                <div class="row mb-7">
+                            <div class="container" >
+                                <div class="row mb-7" style="display: flex;flex-direction: row;align-items: baseline;">
                                 
-                                    <div class="col-md-4 form-check form-switch ms-4">
+                                  
+
+
+                                <div class="col-md-4" *ngIf="this.avgLabourHistory && this.avgLabourHistory.length > 0">
+                                    <!-- Advanced Options Section -->
+                                  <div class="advanced-options mt-4">
+                                      <button class="btn btn-sm btn-dark btn-advanced" type="button"
+                                          (click)="toggleAdvancedOptions()">
+                                          Avg Labour Cost History<i class="fas fa-chevron-down"></i>
+                                      </button>
+                                     
+                                  </div>
+                              </div>
+    
+
+
+
+
+                              <div class="col-md-4 form-check form-switch ms-4">
         
-                                        <div class="col-lg-12" *ngIf="editOperation">
-                                            <input class="col-lg-6 form-check-input" formControlName="enable_user"
-                                                type="checkbox">
-                                            <label class=" fw-semibold fs-6 mb-2" style="padding-top: 0px;">
-                                                <b>Enable User</b>
-                                            </label>
-                                        
-                                        </div>
+                                <div class="col-lg-12" *ngIf="editOperation">
+                                    <input class="col-lg-6 form-check-input" formControlName="enable_user"
+                                        type="checkbox">
+                                    <label class=" fw-semibold fs-6 mb-2" style="padding-top: 0px;">
+                                        <b>Enable User</b>
+                                    </label>
+                                
                                 </div>
                             </div>
 
+
+
+
+
+
+
+
+
+
+
+
+                            </div>
+
+
+                            <div class="container">
+                                <div class="collapse" id="advancedOptions">
+                             
+                        
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <table
+                                                    class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Average Cost</th>
+                                                                <th>Updated Date and Time</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody *ngFor="let item of this.avgRefLabourHistory">
+                                                            <td class="ps-2">{{item[0]}}</td>
+                                                            <td class="ps-2">{{item[1]}}</td>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                       
+                                
+                                </div>
+                            </div>
 
 
         

@@ -990,7 +990,7 @@ export class CompanyComponent implements OnInit{
   };
     const errorAlert: SweetAlertOptions = {
         icon: 'error',
-        title: 'Error!',
+        title: 'Company ID already Exist!',
         text: '',
     };
 
