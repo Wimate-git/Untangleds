@@ -11,6 +11,7 @@ import { DynamicApiService } from '../../dynamic-api.service';
 import { AuthenticationDetails, CognitoUser, CognitoUserAttribute, CognitoUserPool } from 'amazon-cognito-identity-js';
 import Swal from 'sweetalert2';
 import { AuditTrailService } from '../../services/auditTrail.service';
+import { UserFormsService } from '../../services/user-forms.service';
 
 interface ListItem {
   [key: string]: {
@@ -44,9 +45,10 @@ export class UserExportComponent {
   maxlength: number = 500;
   userPool: any;
   username: any;
+  avgLabourHistory: any = [];
 
   constructor(private modalService: NgbModal, private excelValidator: ExcelValidatorService,private api:APIService,private sharedAPi:SharedService,private spinner:NgxSpinnerService,
-    private DynamicApi:DynamicApiService,private loggedInUser:SharedService,private auditTrail:AuditTrailService
+    private DynamicApi:DynamicApiService,private loggedInUser:SharedService,private auditTrail:AuditTrailService,private userForm:UserFormsService
   ){}
 
   @Input() listofSK:any;
@@ -166,7 +168,7 @@ export class UserExportComponent {
   }
 
 
- 
+
 
 
  exportTemplate(getType: any) {
@@ -178,7 +180,7 @@ export class UserExportComponent {
       Heading = [
         ['UserName', 'Password', 'Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Mobile',
           'Mobile Privacy', 'Telegram Channel ID', 'Permission ID', 'Location Permission', 'FormID Permission', 'Start Node',  'Default Module',
-          'Redirection ID','Average Labour Cost','SMS', 'Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram'
+          'Redirection ID','Average Labour Cost','SMS', 'Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram','Created Time'
         ],
         ['', '', '', '', '', '', '',
           '', '', '', '', '', '', '',
@@ -331,8 +333,7 @@ export class UserExportComponent {
     }
   }
 
-
-  downloadExcell(fetchedData: any,getType:any) {
+  downloadExcell(fetchedData: any, getType: any) {
     let Heading: any;
     let filename: any;
   
@@ -340,8 +341,8 @@ export class UserExportComponent {
     if (getType == 'users_xlsx') {
       Heading = [
         ['UserName', 'Password', 'Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Mobile',
-          'Mobile Privacy', 'Telegram Channel ID', 'Permission ID', 'Location Permission', 'FormID Permission', 'Start Node',  'Default Module',
-          'Redirection ID','Average Labour Cost', 'SMS', 'Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram'
+          'Mobile Privacy', 'Telegram Channel ID', 'Permission ID', 'Location Permission', 'FormID Permission', 'Start Node', 'Default Module',
+          'Redirection ID', 'Average Labour Cost', 'SMS', 'Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram', 'Created Time'
         ]
       ];
       filename = 'Users.xlsx';
@@ -371,7 +372,8 @@ export class UserExportComponent {
         user.alert_telegram || '',
         user.escalation_email || '',
         user.escalation_sms || '',
-        user.escalation_telegram || ''
+        user.escalation_telegram || '',
+        user.created || ''
       ];
     });
   
@@ -417,8 +419,97 @@ export class UserExportComponent {
     // Export the file as Users.xlsx
     XLSX.writeFile(wb, filename);
 
-    this.spinner.hide()
-  }
+    this.spinner.hide();
+}
+
+
+  // downloadExcell(fetchedData: any,getType:any) {
+  //   let Heading: any;
+  //   let filename: any;
+  
+  //   // SELECTED is parameters xlsx
+  //   if (getType == 'users_xlsx') {
+  //     Heading = [
+  //       ['UserName', 'Password', 'Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Mobile',
+  //         'Mobile Privacy', 'Telegram Channel ID', 'Permission ID', 'Location Permission', 'FormID Permission', 'Start Node',  'Default Module',
+  //         'Redirection ID','Average Labour Cost', 'SMS', 'Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram','Created Time'
+  //       ]
+  //     ];
+  //     filename = 'Users.xlsx';
+  //   }
+  
+  //   // Prepare the data for insertion into the worksheet
+  //   const formattedData = fetchedData.flat().map((user: any) => {
+  //     return [
+  //       user.username || '',
+  //       user.password || '',
+  //       user.clientID || '',
+  //       user.companyID || '',
+  //       user.email || '',
+  //       user.userID || '',
+  //       user.description || '',
+  //       user.mobile || '',
+  //       user.mobile_privacy || '',
+  //       user.telegramID || '',
+  //       user.permission_ID || '',
+  //       user.location_permission && user.location_permission.toString() || '',
+  //       user.form_permission && user.form_permission.toString() || '',
+  //       user.start_node || '',
+  //       user.default_module || '',
+  //       user.redirectionURL || '',
+  //       user.avg_labour_cost || '',
+  //       user.alert_sms || '',
+  //       user.alert_telegram || '',
+  //       user.escalation_email || '',
+  //       user.escalation_sms || '',
+  //       user.escalation_telegram || ''
+  //     ];
+  //   });
+  
+  //   // Create a new workbook
+  //   const wb = XLSX.utils.book_new();
+  //   const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet([]);
+  
+  //   // Add headings to the sheet
+  //   let onlyHeading = XLSX.utils.sheet_add_aoa(ws, Heading, { origin: 'A1' });
+  
+  //   // Add data to the sheet
+  //   XLSX.utils.sheet_add_aoa(ws, formattedData, { origin: 'A2' });
+  
+  //   // Define column width for all columns (Set width to 50 for all columns)
+  //   let modifiedColumnWidth: any = [];
+  //   for (let allCells = 0; allCells < Heading[0].length; allCells++) {
+  //     modifiedColumnWidth[allCells] = { wch: 50 }; // Set width to 50 for all columns
+  //   }
+  //   ws['!cols'] = modifiedColumnWidth;
+  
+  //   // Apply styles to the first row (headers)
+  //   for (let colIndex = 0; colIndex < Heading[0].length; colIndex++) {
+  //     const cellAddress = XLSX.utils.encode_cell({ r: 0, c: colIndex });
+  //     const cell = ws[cellAddress];
+  
+  //     if (cell) {
+  //       const isRequired = ['UserName', 'Password','Client ID', 'Company ID', 'Email', 'User ID', 'Description','Permission ID','Location Permission', 'FormID Permission'].includes(Heading[0][colIndex]);
+  //       cell.s = {
+  //         fill: {
+  //           fgColor: { rgb: isRequired ? "FF0000" : "FFA500" }, // Red for required, orange for optional
+  //         },
+  //         font: {
+  //           color: { rgb: "FFFFFF" }, // White font color
+  //           bold: true, // Bold font
+  //         }
+  //       };
+  //     }
+  //   }
+  
+  //   // Append the worksheet to the workbook
+  //   XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+  
+  //   // Export the file as Users.xlsx
+  //   XLSX.writeFile(wb, filename);
+
+  //   this.spinner.hide()
+  // }
 
 
   
@@ -523,10 +614,14 @@ export class UserExportComponent {
             escalation_email: userFields[19] ,
             escalation_sms: userFields[20],
             escalation_telegram: userFields[21] ,
+            created:userFields[22] == '' || userFields[22] == undefined ? Date.now() : userFields[22],
             // cognito_update:userFields[21] ,
             // enable_user: userFields[22],
             updated: new Date()
           }
+
+
+          const userCreatedTime = userFields[22] == '' || userFields[22] == undefined || userFields[22] == null? Date.now() : userFields[22]
   
   
           tempObj = {
@@ -608,6 +703,15 @@ export class UserExportComponent {
           await this.fetchAllusersData(1,masterUser.P1,'update',masterUser)
 
           await this.updateCognitoAttributes(this.allUserDetails);
+
+
+          try{
+            await this.recordUserDetails(this.allUserDetails,'update',userCreatedTime)
+          }
+          catch(error){
+            console.log("Error in configuration ",error);
+          }
+  
 
 
 
@@ -754,6 +858,15 @@ export class UserExportComponent {
   
   
         this.allUserDetails = {}
+
+          //Create avg_labour_history packet
+          this.avgLabourHistory = []
+          if(userFields && userFields[16] && userFields[16] != ''){
+            const avgCost = userFields[16]
+            this.avgLabourHistory.push([
+              avgCost,new Date().getTime()
+            ])
+          }
   
         
           this.allUserDetails = {
@@ -780,10 +893,12 @@ export class UserExportComponent {
             escalation_email: userFields[19] ,
             escalation_sms: userFields[20] ,
             escalation_telegram: userFields[21] ,
+            avg_labour_history: this.avgLabourHistory,
             // cognito_update:userFields[21] ,
             // enable_user: userFields[22] ,
             enable_user:true,
-            updated: new Date()
+            updated: new Date(),
+            created:new Date().getTime()
           }
   
   
@@ -870,6 +985,15 @@ export class UserExportComponent {
 
           await this.addtoCognitoTable(this.allUserDetails);
 
+            try{
+              //Creating User Management Forms Data here similar to the Audit trails
+              await this.recordUserDetails(this.allUserDetails,'add',this.allUserDetails.created)
+            }
+            catch(error){
+              console.log("Error in configuration ",error);
+            }
+          
+
 
           // Send dynamic lambda request
           const body = { type: "userVerify", username: masterUser.P1, name: this.allUserDetails.password, email: masterUser.P3 };
@@ -902,6 +1026,63 @@ export class UserExportComponent {
       console.log("Error in object Creation ",error);
     }
 
+  }
+
+
+  async recordUserDetails(getValues:any,key:any,createdTime:any){
+    if(key == 'add' || key == 'update'){
+
+      try{
+        const UserDetails = {
+          "User Name": getValues.username,
+          "Password": getValues.password,
+          "Client ID": getValues.clientID,
+          "Company ID": getValues.companyID,
+          "Email": getValues.email,
+          "User ID": getValues.userID,
+          "Description": getValues.description,
+          "Mobile": getValues.mobile,
+          "Mobile Privacy": getValues.mobile_privacy,
+          "Telegram Channel ID": getValues.telegramID,
+          "Permission ID": getValues.permission_ID,
+          "Location Permission":getValues.location_permission,
+          "FormID Permission":getValues.form_permission,
+          "Start Node":getValues.start_node,
+          "Default Module": getValues.default_module,
+          "Redirection ID": getValues.location_object,
+          "Average Labour Cost": getValues.avg_labour_cost,
+          "SMS": getValues.alert_sms,
+          "Telegram":getValues.alert_telegram,
+          "Escalation Email": getValues.escalation_email,
+          "Escalation SMS": getValues.escalation_sms,
+          "Escalation Telegram": getValues.escalation_telegram,
+          "Enable User": getValues.enable_user,
+          "Average Labour Cost History":getValues.avg_labour_history && typeof getValues.avg_labour_history == 'string' ? JSON.parse(getValues.avg_labour_history) :getValues.avg_labour_history,
+
+          "Notification":[
+            (getValues.alert_sms && typeof getValues.alert_sms == 'boolean') ? getValues.alert_sms : false,
+            (getValues.alert_telegram && typeof getValues.alert_telegram == 'boolean') ? getValues.alert_telegram : false
+          ],
+          "Escalation Enable:":[
+            (getValues.escalation_email && typeof getValues.escalation_email == 'boolean') ? getValues.escalation_email : false,
+            (getValues.escalation_sms && typeof getValues.escalation_sms == 'boolean') ? getValues.escalation_sms : false,
+            (getValues.escalation_telegram && typeof getValues.escalation_telegram == 'boolean') ? getValues.escalation_telegram : false
+          ],
+          "created":createdTime
+        }
+
+        console.log('Data to be added in User forms are here ',UserDetails);
+    
+        this.userForm.mappingAuditTrailData(UserDetails,this.SK_clientID,this.username)
+      }
+      catch(error){
+        console.log("Error while creating audit trails ",error);
+      }
+
+    }
+    else{
+      await this.userForm.delete_request_look_up_main_audit_trail(createdTime,this.SK_clientID,'SYSTEM_USER_CONFIGURATION')
+    }
   }
 
 

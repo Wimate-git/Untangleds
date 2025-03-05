@@ -43,6 +43,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
+    this.modeService.init();
 
     try{
       console.log("Navigator connection", (navigator as any).connection);
@@ -101,7 +102,7 @@ export class AppComponent implements OnInit, OnDestroy {
       console.log("Error in checking internet status ",error);
     }
 
-    this.modeService.init();
+
   }
 
   // ngOnInit() {

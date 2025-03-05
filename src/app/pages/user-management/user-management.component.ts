@@ -23,6 +23,7 @@ import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { LocationPermissionService } from 'src/app/location-permission.service';
 import { UserVerifiedTableComponent } from './user-verified-table/user-verified-table.component';
 import { AuditTrailService } from '../services/auditTrail.service';
+import { UserFormsService } from '../services/user-forms.service';
 
 interface TreeNode {
   id: string;         // Assuming 'id' is a string
@@ -177,10 +178,11 @@ rdtListWorkAround :any =[{
   avgLabourHistory: any = [];
   getRefAvgLabour: any;
   avgRefLabourHistory: any = [];
+  userCreatedTime: any;
 
   constructor(private apiService: UserService,private configService:SharedService,private fb:FormBuilder
     ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal,private DynamicApi:DynamicApiService,
-    private locationPermissionService:LocationPermissionService,private auditTrail:AuditTrailService){}
+    private locationPermissionService:LocationPermissionService,private auditTrail:AuditTrailService,private userForm:UserFormsService){}
 
 
     reloadTable(){
@@ -191,24 +193,26 @@ rdtListWorkAround :any =[{
 
 
 
-  async ngOnInit(){
+  async ngOnInit() {
 
     this.getLoggedUser = this.configService.getLoggedUserDetails()
 
     this.SK_clientID = this.getLoggedUser.clientID;
 
-    this.Allpermission = this.getLoggedUser.permission_ID == 'All'?true:false;
+    this.Allpermission = this.getLoggedUser.permission_ID == 'All' ? true : false;
 
     this.username = this.getLoggedUser.username
 
 
     this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
 
-    console.log("All the permissions are here ",this.Allpermission);
- 
-    this.adminLogin = this.SK_clientID == 'WIMATE_ADMIN'?true:false 
+    // this.userForm.getFormInputData('SYSTEM_USER_CONFIGURATION', this.SK_clientID)
+
+    console.log("All the permissions are here ", this.Allpermission);
+
+    this.adminLogin = this.SK_clientID == 'WIMATE_ADMIN' ? true : false
     this.user_companyID = this.getLoggedUser.companyID
- 
+
     this.dropdownSettings = this.configService.getSettings();
     this.addFromService();
     this.initializeUserFields()
@@ -217,7 +221,46 @@ rdtListWorkAround :any =[{
 
     this.getTreeInputData()
 
-    
+
+
+    //Testing UserForms Data
+    // const userDetails = {
+    //   "User Name": "asadullaturkangori",
+    //   "Password": "Asad1234454!",
+    //   "Client ID": "TestClientClimaveneta",
+    //   "Company ID": "Testing_Climaveneta",
+    //   "Email": "viranandhu@gmail.com",
+    //   "User ID": "wdwa",
+    //   "Description": "Updating Asad",
+    //   "Mobile": 13242341231,
+    //   "Mobile Privacy": "Invisible",
+    //   "Telegram Channel ID": 1,
+    //   "Permission ID": "Technician",
+    //   "Location Permission": [
+    //     "All"
+    //   ],
+    //   "FormID Permission": [
+    //     "All"
+    //   ],
+    //   "Start Node": "Asia",
+    //   "Default Module": "Forms",
+    //   "Redirection ID": "sabrina",
+    //   "Average Labour Cost": 1000,
+    //   "Notification":[true,false],
+    //   "Escalation Enable:":[true,false,false],
+    //   "Enable User": true,
+    //   "Average Labour Cost History": [
+    //     [
+    //       1,
+    //       1741156204979
+    //     ]
+    //   ],
+    //   "created":1740816125000
+    // }
+
+
+    // await this.recordUserDetails(userDetails,'add',Date.now())
+
   }
 
 
@@ -702,6 +745,7 @@ rdtListWorkAround :any =[{
 
 
   edit(P1: any) {
+    this.userCreatedTime = undefined
     console.log("Edit is clicked ");
     this.openModalHelpher(P1)
 
@@ -1172,7 +1216,8 @@ rdtListWorkAround :any =[{
         default_module:this.createUserField.value.default_module,
         avg_labour_cost:this.createUserField.value && this.createUserField.value.avg_labour_cost ? this.createUserField.value.avg_labour_cost : '',
         updated: new Date(),
-        avg_labour_history: JSON.stringify(this.avgLabourHistory || []) || []
+        avg_labour_history: JSON.stringify(this.avgLabourHistory || []) || [],
+        created:this.userCreatedTime
       }
 
       tempObj = {
@@ -1337,11 +1382,12 @@ rdtListWorkAround :any =[{
 
 
 
-
-
-
-
-
+        try{
+          await this.recordUserDetails(this.allUserDetails,'update',this.userCreatedTime)
+        }
+        catch(error){
+          console.log("Error in configuration ",error);
+        }
 
 
 
@@ -1776,6 +1822,7 @@ rdtListWorkAround :any =[{
           alert_levels: this.createUserField.value.alert_levels,
           permission_ID: this.createUserField.value.permission_ID,
           report_to: this.createUserField.value.report_to,
+          location_object:this.createUserField.value.location_object,
           enable_user: true,
           disable_user: this.createUserField.value.disable_user == null ? false : this.createUserField.value.disable_user,
           // health_check: this.createUserField.value.health_check == null ? false : this.createUserField.value.health_check,
@@ -1783,7 +1830,8 @@ rdtListWorkAround :any =[{
           // alert_timeout: this.createUserField.value.alert_timeout == null ? false : this.createUserField.value.alert_timeout,
           profile_picture: this.base64textString_temp,
           cognito_update: this.createUserField.value.cognito_update == null ? false : this.createUserField.value.cognito_update,
-          updated: new Date()
+          updated: new Date(),
+          created:new Date().getTime()
         }
 
         tempObj = {
@@ -1850,7 +1898,8 @@ rdtListWorkAround :any =[{
           profile_picture: this.base64textString_temp,
           cognito_update: this.createUserField.value.cognito_update == null ? false : this.createUserField.value.cognito_update,
           // others:JSON.stringify(tempPermission),
-          updated: new Date()
+          updated: new Date(),
+          created:new Date().getTime()
         }
 
 
@@ -1965,6 +2014,7 @@ rdtListWorkAround :any =[{
 
       console.log("Items are here ",items);
 
+
       this.spinner.show()
 
       this.api.CreateMaster(tempObj).then(async value => {
@@ -2002,6 +2052,15 @@ rdtListWorkAround :any =[{
 
           await this.createLookUpRdt(masterUser,1,"#user#All");
 
+          try{
+            //Creating User Management Forms Data here similar to the Audit trails
+            await this.recordUserDetails(this.allUserDetails,'add',this.allUserDetails.created)
+          }
+          catch(error){
+            console.log("Error in configuration ",error);
+          }
+
+
 
           try{
             const UserDetails = {
@@ -2021,7 +2080,6 @@ rdtListWorkAround :any =[{
           catch(error){
             console.log("Error while creating audit trails ",error);
           }
-      
 
 
           this.datatableConfig = {}
@@ -2085,6 +2143,67 @@ rdtListWorkAround :any =[{
 
  
   }
+
+
+
+
+  async recordUserDetails(getValues:any,key:any,createdTime:any){
+    if(key == 'add' || key == 'update'){
+
+      try{
+        const UserDetails = {
+          "User Name": getValues.username,
+          "Password": getValues.password,
+          "Client ID": getValues.clientID,
+          "Company ID": getValues.companyID,
+          "Email": getValues.email,
+          "User ID": getValues.userID,
+          "Description": getValues.description,
+          "Mobile": getValues.mobile,
+          "Mobile Privacy": getValues.mobile_privacy,
+          "Telegram Channel ID": getValues.telegramID,
+          "Permission ID": getValues.permission_ID,
+          "Location Permission":getValues.location_permission,
+          "FormID Permission":getValues.form_permission,
+          "Start Node":getValues.start_node,
+          "Default Module": getValues.default_module,
+          "Redirection ID": getValues.location_object,
+          "Average Labour Cost": getValues.avg_labour_cost,
+          "SMS": getValues.alert_sms,
+          "Telegram":getValues.alert_telegram,
+          "Escalation Email": getValues.escalation_email,
+          "Escalation SMS": getValues.escalation_sms,
+          "Escalation Telegram": getValues.escalation_telegram,
+          "Enable User": getValues.enable_user,
+          "Average Labour Cost History":getValues.avg_labour_history && typeof getValues.avg_labour_history == 'string' ? JSON.parse(getValues.avg_labour_history) :getValues.avg_labour_history,
+
+          "Notification":[
+            (getValues.alert_sms && typeof getValues.alert_sms == 'boolean') ? getValues.alert_sms : false,
+            (getValues.alert_telegram && typeof getValues.alert_telegram == 'boolean') ? getValues.alert_telegram : false
+          ],
+          "Escalation Enable:":[
+            (getValues.escalation_email && typeof getValues.escalation_email == 'boolean') ? getValues.escalation_email : false,
+            (getValues.escalation_sms && typeof getValues.escalation_sms == 'boolean') ? getValues.escalation_sms : false,
+            (getValues.escalation_telegram && typeof getValues.escalation_telegram == 'boolean') ? getValues.escalation_telegram : false
+          ],
+          "created":createdTime
+        }
+
+        console.log('Data to be added in User forms are here ',UserDetails);
+    
+        this.userForm.mappingAuditTrailData(UserDetails,this.SK_clientID,this.username)
+      }
+      catch(error){
+        console.log("Error while creating audit trails ",error);
+      }
+
+    }
+    else{
+      await this.userForm.delete_request_look_up_main_audit_trail(createdTime,this.SK_clientID,'SYSTEM_USER_CONFIGURATION')
+    }
+  }
+
+
 
 
   addtoCognitoTable(getValues: any) {
@@ -2919,7 +3038,11 @@ rdtListWorkAround :any =[{
                 let add_updateTime = new Date(this.data_temp [allData].updated).toLocaleString();
                 let redirectionURL = this.data_temp[allData].redirectionURL
                 let avg_labour_history = typeof this.data_temp[allData].avg_labour_history == 'string' ? JSON.parse(this.data_temp[allData].avg_labour_history) : this.data_temp[allData].avg_labour_history
-                
+                this.userCreatedTime = this.data_temp[allData].created || Date.now()
+
+
+                console.log("this.userCreatedTime ",this.userCreatedTime);
+                 
         
                 userTable.push({
                   userid: userID,
@@ -3373,7 +3496,18 @@ rdtListWorkAround :any =[{
           this.spinner.hide();
         }
 
+        if(getValues && getValues.created){
+     
 
+          try{
+            await this.recordUserDetails(getValues,'delete',getValues.created)
+          }
+          catch(error){
+            console.log("Error in configuration ",error);
+          }
+
+        }
+    
         try{
           const UserDetails = {
             "User Name": this.username,
