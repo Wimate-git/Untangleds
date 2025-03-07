@@ -8,6 +8,7 @@ import {
   OnInit,
   Output,
   Renderer2,
+  SimpleChanges,
   TemplateRef,
   ViewChild
 } from '@angular/core';
@@ -42,6 +43,9 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output() deleteEvent = new EventEmitter<number>();
   @Output() editEvent = new EventEmitter<number>();
   @Output() createEvent = new EventEmitter<boolean>();
+  @Input() summaryDashboardUpdate:any
+  @Input() summaryDashboardView:any
+  @Input() userPermission:any
   
 
   dtOptions: Config = {};
@@ -98,31 +102,62 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('summaryDashboardUpdate check from crudSummary',this.summaryDashboardUpdate)
+    console.log('summaryDashboardView check from crudSummary',this.summaryDashboardView)
+  }
+
   renderActionColumn(): void {
     const actionColumn = {
       sortable: false,
-    sorting:false,
+      sorting: false,
       title: '<span style="color: black;">Actions</span>',
       render: (data: any, type: any, full: any) => {
+        // Convert values to booleans if they are strings
+        const summaryDashboardUpdate = this.summaryDashboardUpdate === 'true' || this.summaryDashboardUpdate === true;
+        const summaryDashboardView = this.summaryDashboardView === 'true' || this.summaryDashboardView === true;
+        const userPermission = this.userPermission; // Assuming userPermission is a string
+  
+        // Debugging logs
+        console.log('summaryDashboardUpdate:', summaryDashboardUpdate);
+        console.log('summaryDashboardView:', summaryDashboardView);
+        console.log('userPermission:', userPermission);
+  
         const editButton = `
           <button class="btn btn-icon btn-active-light-primary" data-action="edit" data-id="${full.P1}">
-  <i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i>
+            <i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i>
           </button>`;
-        const deleteButton = `
-          <button class="btn btn-icon btn-active-light-primary" data-action="delete" data-id="${full.P1}">
-         <i class="ki-duotone ki-trash fs-3">
-              <span class="path1"></span><span class="path2"></span>
-              <span class="path3"></span><span class="path4"></span><span class="path5"></span>
-            </i>
-          </button>`;
+  
+        let deleteButton = ''; // Default to hidden
+  
+        // Condition to show delete button if:
+        // 1. summaryDashboardUpdate === true AND summaryDashboardView === true
+        // 2. OR userPermission === 'all'
+        if ((summaryDashboardUpdate === true && summaryDashboardView === true) || userPermission === 'All') {
+          deleteButton = `
+            <button class="btn btn-icon btn-active-light-primary" data-action="delete" data-id="${full.P1}">
+              <i class="ki-duotone ki-trash fs-3">
+                <span class="path1"></span><span class="path2"></span>
+                <span class="path3"></span><span class="path4"></span><span class="path5"></span>
+              </i>
+            </button>`;
+        }
+  
+        console.log('Delete Button:', deleteButton); // Check if it’s being created correctly
+  
         return `${editButton} ${deleteButton}`;
-      },
+      }
     };
-
+  
     if (this.dtOptions.columns) {
       this.dtOptions.columns.push(actionColumn);
     }
   }
+  
+  
+  
+  
 
   ngAfterViewInit(): void {
     this.clickListener = this.renderer.listen(document, 'click', (event) => {

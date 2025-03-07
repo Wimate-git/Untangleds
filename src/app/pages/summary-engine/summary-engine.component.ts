@@ -97,6 +97,14 @@ interface UpdateMasterInput {
   SK: number;
   metadata: string; // Or whatever structure it should have
 }
+declare global {
+  interface Window {
+    pk: string;
+    sk: number;
+  }
+}
+
+
 interface TreeNode {
   id: string;         // Assuming 'id' is a string
   text: string;       // Assuming 'text' is a string
@@ -176,6 +184,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
 
 
   @ViewChild('tileModal', { static: true }) tileModal!: ElementRef<HTMLDivElement>;
+
+  modalOpened: boolean = false;
   modalData: any[] = [
     { id: 1, name: 'John Doe', age: 25, profession: 'Engineer' },
     { id: 2, name: 'Jane Smith', age: 30, profession: 'Designer' },
@@ -1282,6 +1292,19 @@ redirectModule(recieveItem: any) {
   // console.log("Redirecting to:", this.redirectionURL);
   // this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
 }
+
+handleDelete(event: any) {
+  this.delete(event); 
+  this.hideModal();
+}
+
+hideModal() {
+  if (this.modalService) {
+    this.modalService.dismissAll();
+  }
+}
+
+
 
 
 
@@ -3181,6 +3204,7 @@ setTimeout(() => {
     // }));
   
     // Navigate to the new URL and reload the page
+    console.log('i am redirect to dashboardopen')
     this.router.navigate([`/summary-engine/${id}`]).then(() => {
       location.reload(); // Reload the window after navigation
     });
@@ -3214,6 +3238,7 @@ setTimeout(() => {
 
   
   redirectDashboard(id: string): void {
+    console.log('i am redirect to dashboard')
     this.isLoading = true;
   
     // Dismiss all modals
@@ -3355,9 +3380,10 @@ console.log('Formatted Date:', this.lastUpdatedTime);
     
           // alert("hiii")
           console.log('this.all_Packet_store.grid_details.length check',this.all_Packet_store.grid_details.length)
-   if(this.all_Packet_store.grid_details.length==0){
-    this.openModal('edit_ts', this.all_Packet_store, this.summaryModal);
-   }
+          if (this.all_Packet_store.grid_details.length === 0 && !this.modalOpened) {
+            this.modalOpened = true; // Prevent multiple openings
+            this.openModal('edit_ts', this.all_Packet_store, this.summaryModal);
+          }
             // setTimeout(() => {
      
             // }, 2000);
@@ -3402,70 +3428,7 @@ console.log('Formatted Date:', this.lastUpdatedTime);
             console.log('this.toRouteId',this.toRouteId)
             console.log('this.readFilterEquation checking from modal ',this.readFilterEquation)
             
-        //     const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
-    
-        //     // Prepare the request body
-        //     const requestBody = {
-        //       body: JSON.stringify({
-        //         clientId: this.SK_clientID,
-        //         from_route_id: this.fromRouterID,
-
-        //         to_route_id:this.routeId,
-        //         // widgetId:this.storeDrillDown.id,
-            
-        //         MsgType:'Query_Params',
-        //         queryParams:this.eventFilterConditions,
-        //         permissionId:this.permissionIdRequest,
-        //         permissionList:this.readFilterEquation,
-        //         userName:this.userdetails
-        //       }),
-        //     };
-          
-        //     console.log('requestBody for dashboardFilter', requestBody);
-          
-        //     // Send a POST request to the Lambda function with the body
-        //     console.log('this.all_Packet_store clearing',this.all_Packet_store)
-        //     this.http.post(apiUrl, requestBody).subscribe(
-              
-        //       (response: any) => {
-        //         console.log('Lambda function triggered successfully:', response);
-        //         this.responseBody = JSON.parse(response.body)
-        //         console.log('this.responseBody checking',this.responseBody )
-        //         this.responseRowData = JSON.parse(this.responseBody.Processed_Data
-        //         )
-        //         console.log('this.responseRowData checking',this.responseRowData)
-            
-                
-                
-            
-        //         // Display SweetAlert success message
-        //         // Swal.fire({
-        //         //   title: 'Success!',
-        //         //   text: 'Lambda function triggered successfully.',
-        //         //   icon: 'success',
-        //         //   confirmButtonText: 'OK'
-        //         // });
-          
-        //         // Proceed with route parameter handling
-      
-          
-        //  // Reset loading state
-        //       },
-        //       (error: any) => {
-        //         console.error('Error triggering Lambda function:', error);
-          
-        //         // Display SweetAlert error message
-        //         Swal.fire({
-        //           title: 'Error!',
-        //           text: 'Failed to trigger the Lambda function. Please try again.',
-        //           icon: 'error',
-        //           confirmButtonText: 'OK'
-        //         });
-        //  // Reset loading state
-        //       }
-        //     );
-            // this.updateSummary(this.storeFilterDetail, 'query_applied');
-
+       
 
           this.dashboard.forEach((gridItem: any) => {
             // Find the theme that matches the current grid item
@@ -6840,7 +6803,7 @@ refreshFunction(){
         ...this.all_Packet_store.grid_details[this.editTileIndex6], // Keep existing properties
         ...this.dashboard[this.editTileIndex6], // Update with new values
       };
-      this.openModal('Edit_ts', this.all_Packet_store)
+      // this.openModal('Edit_ts', this.all_Packet_store)
 
       this.updateSummary('', 'update_tile');
       console.log('his.dashboard check from updateTile', this.dashboard)
@@ -7554,90 +7517,49 @@ helperChartClickChart1(event: any, modalChart: any) {
     'Content-Type': 'application/json',
     'x-api-key': 'p2FIIEi4cA2unoJhRIA137vRdGEuJCCi5hV6Vc11'
   });
-  async readdataTableCellInfo(readData: any,modalref:any) {
+  async readdataTableCellInfo(readData: any, modalref: any) {
     console.log('readData from parent:', readData);
-  
+
     if (!readData?.data) {
       console.error('Invalid readData object:', readData);
       return;
     }
-  
+
     this.blobUrl = await this.blobService.createBlobUrl();
+    
+    // ✅ Store PK & SK in `window` (for main app)
+    let formId = readData.data.PK ? readData.data.PK.split("#")[1] || "" : "";
+    let SK = readData.data.SK;
+    
+    window.pk = `${this.SK_clientID}#${formId}#main`;
+    window.sk = typeof SK === 'number' ? SK : Number(SK);
+
+    console.log('✅ Stored PK in window:', window.pk);
+    console.log('✅ Stored SK in window:', window.sk);
+
+    // ✅ Pass PK & SK to the Blob iframe
+    setTimeout(() => {
+      let iframe = document.querySelector("iframe");
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({
+          pk: window.pk,
+          sk: window.sk,
+          clientId:this.SK_clientID
+        }, "*");
+        console.log("✅ Sent PK & SK to iframe via postMessage");
+      } else {
+        console.warn("⚠️ No iframe found to send PK & SK");
+      }
+    }, 1000);
+
     setTimeout(() => {
       this.modalService.open(modalref, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
     }, 500);
-   
-  
-    const read = readData.data;
-    console.log('Extracted read:', read);
-  
-    let formId = read.PK ? read.PK.split("#")[1] || "" : "";
-    let SK = read.SK;
-  
-    console.log('Extracted PK:', read.PK);
-    console.log('Extracted SK:', SK, 'Type:', typeof SK);
-    console.log('Extracted formId:', formId);
-  
-    // **Do not convert SK to a string if it's already a number**
-    const SK_value = typeof SK === 'number' ? SK : Number(SK);
-    
-    if (isNaN(SK_value)) {
-      console.error("Invalid SK_value:", SK);
-      return;
-    }
-  
-    console.log('API Call with:', `${this.SK_clientID}#${formId}#main`, SK_value);
-    const table_name = 'master';
-  
-    const requestBody = {
-      table_name: table_name,
-      PK_key: 'PK',
-      PK_value: `${this.SK_clientID}#${formId}#main`,
-      SK_key: 'SK',
-      SK_value: SK_value, // Ensure this matches the expected type in DynamoDB
-      type: 'query_request_v2'
-    };
-  
-    console.log('Sending API Request:', requestBody);
-  
-    this.http.post(this.apiUrl, requestBody, { headers: this.headers })
-    .pipe(
-      catchError(error => {
-        console.error('API Call Failed:', error);
-        return throwError(() => new Error(error.message || 'Server error'));
-      })
-    )
-    .subscribe({
-      next: (response: any) => {
-        console.log('Full API Response:', response);
-  
-        if (response?.statusCode === 200 && Array.isArray(response.body) && response.body.length > 0) {
-          const metadata = response.body[0]?.metadata;  // Extract metadata from body[0]
-          console.log('Extracted Metadata:', metadata);
-          this.fetchFormBuilderData(formId)
-  
-          if (metadata) {
-            // Example: Access specific fields from metadata
-            console.log('Created Time:', metadata.created_time);
-            console.log('Email:', metadata["email-1732770980040"]);
-            console.log('City:', metadata["text-1732770379239"]);
-            console.log('Equipment:', metadata["single-select-1732773087727"]);
-          }
-        } else {
-          console.warn('Invalid API response structure or empty body');
-        }
-      },
-      error: (error) => {
-        console.error('Error fetching data:', error);
-      }
-    });
+}
 
 
 
 
-    
-  
-  }
   
   fetchFormBuilderData(receiveValue:any){
     console.log('receiveValue checking',receiveValue)

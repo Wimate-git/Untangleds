@@ -20,6 +20,7 @@ export class DataTableChart1Component {
   @Input() all_Packet_store :any
   @Input() chartDataConfigExport :any
   
+  @Output() dataTableCellInfo = new EventEmitter<any>();
   columnDefs: any[]; 
   private gridApi!: GridApi;
   pageSizeOptions = [10, 25, 50, 100];
@@ -322,6 +323,15 @@ this.parseChartConfig(this.chartDataConfigExport)
       console.error('Error generating PDF:', error);
       alert('Failed to generate PDF. Please try again.');
     }
+  }
+
+  onCellClick(eventData:any){
+    console.log('eventData check for',eventData)
+    this.dataTableCellInfo.emit(eventData)
+
+
+
+
   }
 
 

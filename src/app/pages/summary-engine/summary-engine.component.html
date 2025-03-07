@@ -751,10 +751,32 @@
   </div>
   <div class="modal-body">
     <div class="card-body pt-0">
-  
-      <app-crud-summary [datatableConfig]="datatableConfig" route="/summary-engine"
-        (deleteEvent)="delete($event);modal.dismiss()" (editEvent)="edit($event);modal.dismiss"
-        (createEvent)="create()" [reload]="reloadEvent"></app-crud-summary>
+  <!-- <app-crud-summary 
+  *ngIf="summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)"
+  [datatableConfig]="datatableConfig" 
+  route="/summary-engine"
+  (deleteEvent)="delete($event); hideModal()"
+  (editEvent)="edit($event); hideModal()"
+  (createEvent)="create()" 
+  [reload]="reloadEvent">
+</app-crud-summary> -->
+
+<app-crud-summary 
+
+  [datatableConfig]="datatableConfig" 
+  route="/summary-engine"
+  (deleteEvent)="handleDelete($event)"
+  (editEvent)="edit($event)" 
+  (createEvent)="create()" 
+  [reload]="reloadEvent"
+  [summaryDashboardUpdate]="summaryDashboardUpdate"
+  [summaryDashboardView]="summaryDashboardView"
+  [userPermission]="userPermission"
+
+  >
+</app-crud-summary>
+
+
         <table #dataTable class="table table-striped table-bordered"></table>
     </div>
   
@@ -2114,20 +2136,20 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
 
   <ng-template #dataTableModal let-modal>
     <app-data-table-show
-    [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"
+    [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"  (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
     ></app-data-table-show>
   </ng-template>
   <ng-template #dataTableModalChart1 let-modal>
     <app-data-table-chart1
    
-       [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"
+       [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
     ></app-data-table-chart1>
   </ng-template>
   <ng-template #dataTableModalChart2 let-modal>
     <app-data-table-chart2
     [modalData]="modalData"
       [columnDefs]="nestedColumnDefs"
-      [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"
+      [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
     ></app-data-table-chart2>
   </ng-template>
   <ng-template #dataTableModalTile1 let-modal>
@@ -2152,6 +2174,8 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
     <app-data-table-dynamic-tile
   [responseRowData]="responseRowData"
   [all_Packet_store]="all_Packet_store"
+  (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
+  [storeDrillDown]="storeDrillDown"
     ></app-data-table-dynamic-tile>
   </ng-template>
 

@@ -52,6 +52,7 @@
           [paginationPageSizeSelector]="pageSizeOptions"
           style="width: 100%; height: 100%;"
           (gridReady)="onGridReady($event)"
+          (cellClicked)="onCellClick($event)"
         ></ag-grid-angular>
         </div>
       </div>

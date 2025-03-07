@@ -64,33 +64,65 @@ export class BlobService {
         }
       }
 
-      // 🔹 Ensure Metronic functions initialize properly
-      const reinitializeMetronicScripts = `
-        <script>
-          document.addEventListener('DOMContentLoaded', function () {
-            console.log('🚀 Page Loaded inside Blob');
-
-            setTimeout(() => {
-              try {
-                if (typeof KTMenu !== 'undefined') {
-                  KTMenu.init(); 
+      // 🔹 Force JavaScript execution after Blob DOM is loaded
+      const reinitializeDynamicFormScript = `
+      <script>${jsContent}</script>
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          console.log('🚀 Page Loaded inside Blob');
+    
+          setTimeout(() => {
+            try {
+              console.log('🔄 Reinitializing Metronic and Dynamic Form');
+    
+              // ✅ Ensure the dynamic form container is present
+              let formContainer = document.getElementById('dynamic-form');
+              console.log('formContainer checking', formContainer);
+    
+              if (formContainer) {
+                console.log('✅ Found #dynamic-form:', formContainer);
+    
+                // 🔹 Wait until the modal is fully shown before updating the form
+                let modal = document.getElementById('kt_modal_add_customer');
+                if (modal) {
+                  modal.addEventListener('shown.bs.modal', function () {
+                    console.log('✅ Modal Opened - Now updating #dynamic-form');
+    
+                    // ✅ Manually call the function that updates dynamic-form
+                    if (typeof renderDynamicForm !== 'undefined') {
+                      renderDynamicForm(formContainer);
+                    } else {
+                      console.warn('⚠️ renderDynamicForm() function is not defined!');
+                    }
+                  });
+                } else {
+                  console.warn('⚠️ Modal #kt_modal_add_customer not found!');
                 }
-                if (typeof KTApp !== 'undefined') {
-                  KTApp.init(); 
-                }
-                if (typeof KTWidgets !== 'undefined') {
-                  KTWidgets.init();
-                }
-                if (typeof KTDatatables !== 'undefined') {
-                  KTDatatables.init();
-                }
-              } catch (e) {
-                console.error('❌ Error initializing Metronic:', e);
+              } else {
+                console.error('❌ #dynamic-form not found!');
               }
-            }, 500);
-          });
-        </script>
-      `;
+    
+              // ✅ Ensure Metronic initializes properly
+              if (typeof KTMenu !== 'undefined') {
+                KTMenu.init(); 
+              }
+              if (typeof KTApp !== 'undefined') {
+                KTApp.init(); 
+              }
+              if (typeof KTWidgets !== 'undefined') {
+                KTWidgets.init();
+              }
+              if (typeof KTDatatables !== 'undefined') {
+                KTDatatables.init();
+              }
+            } catch (e) {
+              console.error('❌ Error initializing scripts:', e);
+            }
+          }, 500); // Delay execution to allow full rendering
+        });
+      </script>
+    `;
+    
 
       // 🔹 Construct full HTML
       const completeHtml = `
@@ -103,12 +135,6 @@ export class BlobService {
           <meta name="description" content="The most advanced Bootstrap 5 Admin Theme..." />
           <meta name="keywords" content="metronic, bootstrap, angular, vue, react, flask, node.js" />
 
-          <meta property="og:locale" content="en_US" />
-          <meta property="og:type" content="article" />
-          <meta property="og:title" content="Metronic - Bootstrap Admin Template" />
-          <meta property="og:url" content="https://keenthemes.com/metronic" />
-          <meta property="og:site_name" content="Keenthemes | Metronic" />
-          
           <link rel="canonical" href="https://preview.keenthemes.com/metronic8" />
           <link rel="shortcut icon" href="/assets/formbuilder/assets/media/logos/wimate-logo-210px.png" />
           
@@ -118,15 +144,9 @@ export class BlobService {
           <!-- ✅ Inline CSS -->
           ${cssContent}
 
-          <!-- ✅ Ensure Metronic scripts execute -->
-          ${reinitializeMetronicScripts}
+          <!-- ✅ Ensure Metronic and Dynamic Form scripts execute -->
+          ${reinitializeDynamicFormScript}
 
-          <style>
-            /* Your inline styles */
-            .btn:hover { transform: translateY(-2px); transition: .5s; }
-            .error-border { border: 1px solid red !important; }
-            .workflow-details-container.card { border: 1px solid #ddd; padding: 15px; }
-          </style>
         </head>
         <body>
           ${htmlContent}

@@ -1,5 +1,5 @@
 
-async function getDynamicFormDetails(formName){
+async function getDynamicFormDetails(formName,clientid_){
   const requestBody = {
     "table_name": "master",
     "PK_value": clientid_ + "#dynamic_form#" + formName + "#main",
@@ -9,9 +9,10 @@ async function getDynamicFormDetails(formName){
     "type": "get_request"
   };
 
-    console.log('Request Body:', requestBody);
+    console.log('Request Body: from js', requestBody);
+    const apiUrl = 'https://iy5kihshy9.execute-api.ap-south-1.amazonaws.com/s1/crud';
 
-    const response = await fetch(crudURL, {
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -28,6 +29,7 @@ async function getDynamicFormDetails(formName){
 
     if (data && data.body) {
       const responseData = JSON.parse(data.body);
+      console.log('responseData check from dynamicForm data',responseData)
       // console.log('response Data = '+ JSON.stringify(responseData,null,2));
 
       const FormData_FromDB = responseData;
@@ -40,8 +42,9 @@ async function getDynamicFormDetails(formName){
         // console.log('extract_table_configuration :', extract_table_configuration);
        
         let formNames = extract_table_configuration.map(item => item.form_name);
+        console.log('formNames checking from js dynamic form',formNames)
        
-        await getAllDynamicFormData(formNames).then(results => {
+        await getAllDynamicFormData(formNames,clientid_).then(results => {
         // console.log('Fetched_all_data:', results);
         all_form_data_table = results
         console.log('all_form_data_table :', all_form_data_table);
@@ -124,6 +127,7 @@ Edit_first_load_flag = true
 
 //if (formFlag == true) {
 formContainer = document.getElementById('dynamic-form');
+
 formContainer.innerHTML = '';
 // }
 
@@ -158,7 +162,7 @@ dynamic_input.forEach((input, index) => {
 
     let inputField = '';
     let inputValidation = input.validation || {};
-    let isDisabled = inputValidation.disabled === true ? 'disabled' : '';
+    let isDisabled = inputValidation.disabled === false ? 'disabled' : '';
     // let hideClass = inputValidation.hide ? 'd-none' : ''; // Use Bootstrap's d-none class to hide elements
     const canvasStyle = isDisabled ? 'pointer-events: none; opacity: 0.6;' : ''; // Disable canvas interaction if disabled
 
@@ -168,210 +172,6 @@ dynamic_input.forEach((input, index) => {
 
     if (input.type === 'nikhil') {
 
-        // optionConfiguration = false
-        // let options = input.options;
-        // options.sort()
-        // console.log('options_static :', options)
-        // if (inputValidation.user) {
-        //     // if (array_user_info) {
-        //     // optionConfiguration = true
-        //     // options = array_user_info.map(user => user[0]); // Assuming user name is at index 0
-        //     // console.log('options :', options)
-        //     // options.sort()
-        //     // options = options.map((city, index) => ({
-        //     // key: `key_${index + 1}`,
-        //     // value: [city]
-        //     // }));
-        //     // }
-        // }
-        // if (inputValidation.lookup) {
-        //     options = check_table_configuration(input)
-        //     console.log('options_check_table_configuration :', options)
-        //     optionConfiguration = true
-
-        //     // options.sort((a, b) => {
-        //     // const nameA = Object.values(a)[0].toLowerCase(); // Extracting company name
-        //     // const nameB = Object.values(b)[0].toLowerCase(); // Extracting company name
-        //     // return nameA.localeCompare(nameB); // Compare names alphabetically
-        //     // });
-
-        //     options.sort((a, b) => {
-        //         // Get the first value of the objects, which may be undefined or not a string
-        //         const valueA = Object.values(a)[0];
-        //         const valueB = Object.values(b)[0];
-
-        //         // Ensure the values are strings and fall back to an empty string if undefined or not a string
-        //         const nameA = valueA && typeof valueA === 'string' ? valueA.toLowerCase() : '';
-        //         const nameB = valueB && typeof valueB === 'string' ? valueB.toLowerCase() : '';
-
-        //         return nameA.localeCompare(nameB); // Compare names alphabetically
-        //     });
-
-        //     options = options.map(obj => {
-        //         let key = Object.keys(obj)[0]
-        //         let value = obj[key]
-        //         return {
-        //             key,
-        //             value
-        //         };
-
-        //     });
-        // }
-
-        // const isMultiSelect = input.name.startsWith('multi-select');
-
-        // new_options = []
-        // operation_type_option = ''
-
-        // if (inputValidation.isUniqueOption) {
-        //     if (options.some(item => typeof item === 'object' && item !== null)) {
-
-        //         const seenValues = new Set();
-
-        //         options = options.map(option => {
-        //             const filteredValues = option.value.filter(value => {
-        //                 if (!seenValues.has(value)) {
-        //                     seenValues.add(value);
-        //                     return true;
-        //                 }
-        //                 return false;
-        //             });
-        //             return {
-        //                 ...option,
-        //                 value: filteredValues
-        //             };
-        //         }).filter(option => option.value.length > 0);
-
-                
-        //     }
-
-        // }
-
-
-
-        // if (isMultiSelect == false) {
-        //     // check_option_validation_disable_hide(input.name)
-        // }
-        // options.sort()
-        // console.log("options_configuration :", options);
-        // if (new_options.length > 0) {
-
-        //     if (optionConfiguration) {
-
-        //         inputField = `
-        //             <select id="${input.name}" name="${input.name}"
-        //             class="form-select form-select-solid dynamic-select"
-        //             data-control="select2" data-placeholder="Select an option..." data-allow-clear="true"
-        //             ${isMultiSelect ? 'multiple' : ''} ${isDisabled}>
-        //             ${!isMultiSelect ? '<option value="" selected disabled>Select an option</option>' : ''}
-
-        //             ${options.map(option => {
-        //             // Check if the option should be disabled or hidden
-        //             let isOptionDisabled = options.includes(option.value) && !new_options.includes(option.value);
-        //             let optionTag = `<option value="${option.value}" data-secondary="${option.key}" ${option.value === valueFromDB ? 'selected' : ''}>${option.value}</option>`;
-
-        //             if (operation_type_option === 'disable' && isOptionDisabled) {
-        //             // Disable the option if "disable" condition is met
-        //             return `<option value="${option.value}" data-secondary="${option.key}" ${option.value === valueFromDB ? 'selected' : ''} disabled>${option.value}</option>`;
-        //             }
-        //             else if (operation_type_option === 'hide' && isOptionDisabled) {
-        //             // Hide the option if "hide" condition is met
-        //             return ''; // Return empty string to effectively remove the option
-        //             }
-        //             return optionTag;
-        //             }).join('')}
-
-        //             </select>
-        //             <div class="error-message" id="${input.name}-error"></div>
-        //             `;
-        //                         } else {
-        //                             inputField = `
-        //             <select id="${input.name}" name="${input.name}"
-        //             class="form-select form-select-solid dynamic-select"
-        //             data-control="select2" data-placeholder="Select an option..." data-allow-clear="true"
-        //             ${isMultiSelect ? 'multiple' : ''} ${isDisabled}>
-        //             ${!isMultiSelect ? '<option value="" selected disabled>Select an option</option>' : ''}
-
-        //             ${options.map(option => {
-        //             // Check if the option should be disabled or hidden
-        //             let isOptionDisabled = options.includes(option) && !new_options.includes(option);
-        //             let optionTag = `<option value="${option}" ${option === valueFromDB ? 'selected' : ''}>${option}</option>`;
-
-        //             if (operation_type_option === 'disable' && isOptionDisabled) {
-        //             // Disable the option if "disable" condition is met
-        //             return `<option value="${option}" ${option === valueFromDB ? 'selected' : ''} disabled>${option}</option>`;
-        //             }
-        //             else if (operation_type_option === 'hide' && isOptionDisabled) {
-        //             // Hide the option if "hide" condition is met
-        //             return ''; // Return empty string to effectively remove the option
-        //             }
-
-        //             return optionTag;
-        //             }).join('')}
-
-        //             </select>
-        //             <div class="error-message" id="${input.name}-error"></div>
-        //             `;
-        //     }
-        // } else {
-
-        //     // if (optionConfiguration) {
-
-        //     // inputField = `
-        //     // <select id="${input.name}" name="${input.name}"
-        //     // class="form-select form-select-solid dynamic-select"
-        //     // data-control="select2" data-placeholder="Select an option..." data-allow-clear="true"
-        //     // ${isMultiSelect ? 'multiple' : ''} ${isDisabled}>
-
-        //     // ${!isMultiSelect ? '<option value="" selected disabled>Select an option</option>' : ''}
-
-        //     // ${options.map(option => `<option value="${option.value}" data-secondary="${option.key}" ${option.value === valueFromDB ? 'selected' : ''}>${option.value}</option>`).join('')}
-
-        //     // </select>
-        //     // <div class="error-message" id="${input.name}-error"></div>
-        //     // `;
-        //     // }
-        //     if (optionConfiguration) {
-        //         console.log('data-secondary_options_2nd :', options);
-        //         inputField = `
-        //           <select id="${input.name}" name="${input.name}" class="form-select form-select-solid dynamic-select"
-        //           data-control="select2" data-placeholder="Select an option..." data-allow-clear="true"
-        //           ${isMultiSelect ? 'multiple' : ''} ${isDisabled}>
-        //           ${!isMultiSelect ? '<option value="" selected disabled>Select an option</option>' : ''}
-
-        //           ${options.map(optionObject => {
-        //           // Get the key dynamically
-        //           const key = Object.keys(optionObject).find(k => k !== "value");
-        //           const keyValue = optionObject[key];
-
-        //           // Extract values (flatten the array if nested)
-        //           const values = optionObject.value.flat();
-
-        //           console.log('key:', keyValue); // Debugging: log the dynamic key
-        //           console.log('values:', values); // Debugging: log the flattened values
-
-        //           // Generate <option> tags
-        //           return values.map(value => `<option value="${value}" data-secondary="${keyValue}" ${value === valueFromDB ? 'selected' : ''}>${value}</option>`).join('');
-        //           }).join('')}
-        //           </select>
-        //           <div class="error-message" id="${input.name}-error"></div>
-        //           `;
-        //                       } else {
-        //                           inputField = `
-        //           <select id="${input.name}" name="${input.name}"
-        //           class="form-select form-select-solid dynamic-select"
-        //           data-control="select2" data-placeholder="Select an option..." data-allow-clear="true"
-        //           ${isMultiSelect ? 'multiple' : ''} ${isDisabled}>
-
-        //           ${!isMultiSelect ? '<option value="" selected disabled>Select an option</option>' : ''}
-
-        //           ${options.map(option => `<option value="${option}" ${option === valueFromDB ? 'selected' : ''}>${option}</option>`).join('')}
-
-        //           </select>
-        //           <div class="error-message" id="${input.name}-error"></div>
-        //           `;
-        //     }
-        // }
     } else if (input.type === 'checkbox') {
         const optionElements = input.options.map(option => {
             const optionKey = Object.keys(option)[0];
@@ -421,25 +221,7 @@ dynamic_input.forEach((input, index) => {
           <div class="error-message" id="${input.name}-error"></div>
           `;
     } 
-    // else if (input.type === 'file') {
-    //     inputField = `
-    //       <input type="${input.type}" class="input-field form-control file-upload"
-    //       placeholder="${input.placeholder}" name="${input.name}" value="${valueFromDB}"
-    //       id="${input.name}" data-visit="${input.name}" ${isDisabled} />
-    //       <div class="row g-9 mb-7">
-    //       <div class="col-md-12 fv-row">
-    //       <button type="button" class="btn btn-light-primary me-3 file-download mt-5"
-    //       data-visit="${input.name}" name="file_${input.name}">
-    //       <i class="ki-duotone ki-arrows-circle fs-2">
-    //       <span class="path1"></span><span class="path2"></span>
-    //       </i> Files
-    //       </button>
-    //       <div id="downloadLink${input.name}"></div>
-    //       </div>
-    //       </div>
-    //       <div class="error-message" id="${input.name}-error"></div>
-    //       `;
-    // }
+
      else if (input.type == 'Empty Placeholder') {
         inputField = `
           <input type="${input.type}" class="input-field form-control"
@@ -478,43 +260,7 @@ ${input.label}
     } else if (input.type === 'table') {
         column.innerHTML = creatTableInForm(input) // form_table.js
     }
-    //  else if (input.type == 'password') {
-    //     inputField = `
-    //       <div class="position-relative">
-    //       <input type="${input.type}" class="input-field form-control pr-5"
-    //       placeholder="${input.placeholder}" name="${input.name}"
-    //       value="${valueFromDB}" id="${input.name}" ${isDisabled}
-    //       style="padding-right: 40px;" />
-    //       <i id="${input.name}-icon"
-    //       class="bi bi-eye position-absolute"
-    //       style="top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer;"
-    //       onclick="togglePasswordVisibility('${input.name}')"></i>
-    //       </div>
-    //       <div class="error-message" id="${input.name}-error"></div>
-    //       `;
-    // } else if (input.type === 'map') {
-    //     const latName = `${input.name}-latitude`;
-    //     const lonName = `${input.name}-longitude`;
-
-    //     valueFromDB = data_form_db[lonName] || '';
-
-    //     inputField = `
-    //       <div class="d-flex align-items-center gap-2">
-    //       <input type="text" class="form-control" id="${latName}" placeholder="Latitude" name="${latName}" value="${data_form_db[latName] || ''}"/>
-    //       <input type="text" class="form-control" id="${lonName}" placeholder="Longitude" name="${lonName}" value="${data_form_db[lonName] || ''}"/>
-    //       <button type="button" class="btn btn-info btn-lg d-flex align-items-center justify-content-center"
-    //       style="height: 43px;" onclick="openMapModal('${latName}', '${lonName}')">
-    //       <i class="fas fa-map-marker-alt"></i>
-    //       </button>
-    //       </div>
-    //       <div class="error-message" id="${input.name}-error"></div>
-    //       `;
-    // } else if (input.type === 'button') {
-    //     inputField = `
-    //       <button type="button" class="btn btn-${input.validation.btnColor} w-100" id='${input.name}' name='${input.name}' ${isDisabled}>${input.label}</button>
-    //       <div class="error-message" id="${input.name}-error"></div>
-    //       `;
-    // } 
+    
     else if (input.type !== 'table' && input.type !== 'map' && input.type !== 'button' && input.type !== 'file') {
         inputField = `
           <input type="text" class="input-field form-control"
@@ -575,93 +321,7 @@ setTimeout(() => {
         const element = document.getElementById(input.name);
         const selectElement = $(`#${input.name}`);
 
-        // if (selectElement.length && input.type === 'select') {
-        //     const isMultiSelect = input.name.startsWith('multi-select');
-        //     selectElement.select2({
-        //         placeholder: isMultiSelect ? 'Select options...' : 'Select an option...',
-        //         allowClear: true,
-        //         multiple: isMultiSelect,
-        //         minimumResultsForSearch: Infinity
-        //     });
-
-        //     $(`select[name='${input.name}']`).select2({
-        //         width: '100%',
-        //         dropdownParent: $('#kt_modal_add_customer_form')
-        //     });
-
-        //     if (isMultiSelect && data_form_db[input.name]) {
-        //         const selectedValues = Array.isArray(data_form_db[input.name]) ?
-        //             data_form_db[input.name] :
-        //             data_form_db[input.name].split(',');
-        //         selectElement.val(selectedValues).trigger('change');
-        //     } else if (!isMultiSelect && data_form_db[input.name]) {
-        //         selectElement.val(data_form_db[input.name]).trigger('change');
-        //         // targetAutoFillOption(input, data_form_db[input.name], editedFieldRules)
-
-        //     }
-        // }
-
-        // if (input.type === 'select') {
-        //     const element = $(`#${input.name}`);
-        //     if (element.length) {
-        //         let data = all_data_db[input.name] || '';
-        //         document.getElementsByName(input.name)[0].setAttribute("data-previous-status", data);
-        //         element.on('change', function(event) {
-        //             const name = element.attr('name');
-        //             const value = element.val();
-
-        //             console.log('view_changeed_value :', value);
-
-        //             if (value) {
-        //                 check_option_validation(name, value);
-        //             }
-        //             all_data_db[name] = value;
-
-        //             if (input.work_flow_validation) {
-        //                 if (createdFieldRules.length > 0 && createdFieldRules[0].actionsList && isAutoFillSelect) {
-        //                     applyFieldRulesOnchange(createdFieldRules);
-        //                 }
-        //             }
-
-        //             if (isAutoFillSelect) {
-        //                 auto_fill(name);
-        //             }
-
-        //             // if (input.validation && extractTargetValues.length > 0 && isAutoFillSelect) {
-
-        //             // }
-
-        //             targetAutoFillOption(input, value, editedFieldRules)
-        //             isAutoFillSelect = true;
-        //             validateInput(input, element[0]);
-        //         });
-        //     }
-        // }
-
-        // if (input.type === 'button') {
-        //     element.addEventListener('click', function() {
-        //         handleButtonClick(input);
-        //     });
-        // }
-
-        // if (input.name.split("-")[0] === 'signature') {
-        //     initializeSignaturePad(input);
-        // }
-
-        // if (element && input.type === 'email') {
-        //     element.addEventListener('input', function() {
-        //         const name = element.name;
-        //         const value = element.value;
-        //         all_data_db[name] = value;
-        //         validateInput(input, element);
-
-        //         if (input.work_flow_validation) {
-        //             if (createdFieldRules.length > 0 && createdFieldRules[0].actionsList) {
-        //                 applyFieldRulesOnchange(createdFieldRules);
-        //             }
-        //         }
-        //     });
-        // }
+        
 
         if (element && input.type !== 'checkbox' && input.type !== 'email') {
             element.addEventListener('input', function() {
@@ -673,46 +333,7 @@ setTimeout(() => {
             });
         }
 
-        // const element_textarea = document.getElementById(input.name);
-        // if (input.type === 'textarea') {
-        //     element_textarea.addEventListener('textarea', function() {
-        //         const name = element.name;
-        //         const value = element.value;
-        //         all_data_db[name] = value;
-
-        //         if (input.work_flow_validation) {
-        //             if (editedFieldRules.length > 0 && editedFieldRules[0].actionsList) {
-        //                 applyFieldRulesOnchange(editedFieldRules);
-        //             }
-        //         }
-        //         validateInput(input, element_textarea);
-        //     });
-        // }
-
-        // if (input.type === 'checkbox') {
-        //     if (input.options && input.options.length) {
-        //         input.options.forEach(option => {
-        //             const checkboxName = Object.keys(option)[0];
-        //             const checkboxElement = document.getElementById(checkboxName);
-
-        //             if (checkboxElement) {
-        //                 checkboxElement.addEventListener('input', function() {
-        //                     const name = element.name;
-        //                     const value = element.value;
-        //                     all_data_db[name] = value;
-
-        //                     if (input.work_flow_validation) {
-        //                         if (editedFieldRules.length > 0 && editedFieldRules[0].actionsList) {
-        //                             applyFieldRulesOnchange(editedFieldRules);
-        //                         }
-        //                     }
-        //                     validateInput(input, checkboxElement);
-        //                 });
-        //             }
-        //         });
-        //     }
-        // }
-
+       
         if (input.type === 'table') {
             if (Object.keys(data_form_add.dynamic_table_values).length !== 0) {
                 const tableData = all_form_data_table.find(
@@ -729,36 +350,7 @@ setTimeout(() => {
             }
         }
 
-        // if (allow_unique_input.includes(input.type)) {
-        //     element.addEventListener('input', function() {
-        //         const name = element.name;
-        //         const value = element.value;
-        //     });
-        // }
-
-        // if (allow_unique_input.includes(input.type) && input.validation && input.validation.unique) {
-        //     element.addEventListener('blur', function() {
-        //         const name = element.name;
-        //         const value = element.value.trim();
-
-        //         if (value) {
-        //             function checkIdAndValue(id, value) {
-        //                 return extract_lookup_key_value.some((obj) => obj[id] === value);
-        //             }
-
-        //             const isDuplicate = checkIdAndValue(name, value);
-
-        //             if (isDuplicate) {
-        //                 element.value = '';
-        //                 Swal.fire({
-        //                     icon: 'warning',
-        //                     title: 'Warning',
-        //                     text: 'Duplicate Data Found',
-        //                 });
-        //             }
-        //         }
-        //     });
-        // }
+       
     }
 
     $('.file-upload').each(function(i, element) {
@@ -788,7 +380,7 @@ setTimeout(() => {
 // generateApprovelHistoryTable(approvalHistory)
 // }
 
-hideLoadingSpinner();
+// hideLoadingSpinner();
 disableAllInputs();
 // populateTargetOption()
 }
@@ -796,10 +388,12 @@ disableAllInputs();
 function disableAllInputs() {
   // Get all input, textarea, and button elements inside the #dynamic-form div
   const elements = document.querySelectorAll('#dynamic-form input, #dynamic-form textarea, #dynamic-form button');
+  console.log('elements checking',elements)
+  renderDynamicForm(elements);
 
   // Loop through each element and disable it
   elements.forEach(element => {
-    element.disabled = true;
+    element.disabled = false;
     element.style.color = 'black';  // Set text color to black
     // element.style.backgroundColor = '#f0f0f0'; // Optional: set background color
   });
@@ -1256,7 +850,7 @@ var extractTargetValues = []
 
 
 function get_data_main_dynamic_form(formHeading) {
- showLoadingSpinner()
+//  showLoadingSpinner()
 
  const requestBody = {
  "table_name": 'master',
@@ -1314,7 +908,7 @@ function get_data_main_dynamic_form(formHeading) {
 
  }
  if (!input_structure) {
- hideLoadingSpinner()
+//  hideLoadingSpinner()
  }
 
  // if (input_structure.length > 0) {
@@ -1401,6 +995,7 @@ function get_data_main_dynamic_form(formHeading) {
  }
  else {
  const formContainer = document.getElementById('dynamic-form');
+
  formContainer.innerHTML = '';
 
  form_inputs_generating_forms = []
@@ -1417,12 +1012,12 @@ function get_data_main_dynamic_form(formHeading) {
  }
  else {
  // Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to Get Form Details' });
- hideLoadingSpinner()
+//  hideLoadingSpinner()
  }
  })
  .catch(error => {
  console.error('Error loading form:', error);
- hideLoadingSpinner()
+//  hideLoadingSpinner()
  Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to Get Form Details' });
  });
 }
@@ -1437,8 +1032,8 @@ function checkTableConfiguration(formFields) {
  return result
 }
 
-async function getAllDynamicFormData(formHeadings) {
- showLoadingSpinner()
+async function getAllDynamicFormData(formHeadings,clientid_) {
+//  showLoadingSpinner()
  // Function to fetch form data for a single form heading
  const fetchFormData = async (formHeading) => {
  const requestBody = {
@@ -1449,9 +1044,9 @@ async function getAllDynamicFormData(formHeadings) {
  SK_value: 1,
  type: 'query_request_v2'
  };
-
+ const apiUrl = 'https://iy5kihshy9.execute-api.ap-south-1.amazonaws.com/s1/crud';
  try {
- const response = await fetch(crudURL, {
+ const response = await fetch(apiUrl, {
  method: 'POST',
  headers: {
  'Content-Type': 'application/json',
@@ -1461,18 +1056,19 @@ async function getAllDynamicFormData(formHeadings) {
  });
 
  const data = await response.json();
+ console.log('data checking from getAllDynamicFormData',data)
 
  if (data && data.body && data.body[0] && data.body[0].metadata) {
  return data.body[0].metadata; // Return only metadata
  }
  else {
- hideLoadingSpinner()
+//  hideLoadingSpinner()
  console.error(`Failed to get data for ${formHeading}`);
  return null;
  }
  }
  catch (error) {
- hideLoadingSpinner()
+//  hideLoadingSpinner()
  console.error(`Error fetching data for ${formHeading}:`, error);
  return null;
  }
@@ -1499,7 +1095,7 @@ async function getAllDynamicFormData(formHeadings) {
  }
  catch (error) {
  console.error('Error fetching form data:', error);
- hideLoadingSpinner();
+//  hideLoadingSpinner();
  Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to Get All Form Details' });
  }
 }
@@ -1510,8 +1106,6 @@ function check_table_configuration(input) {
   let result = all_configuration_table_data.find(obj => obj[input.name])?.[input.name] || [];
   return result
 }
-
-
 
 
 async function generate_configuration_table(table_heading_data) {
@@ -1525,7 +1119,7 @@ async function generate_configuration_table(table_heading_data) {
   // // console.log('checking_form_name_for_configuration:', checking_form_name_for_configuration);
   console.log('all_configuration_table_data:', all_configuration_table_data);
 
-  hideLoadingSpinner()
+//   hideLoadingSpinner()
 
 }
 var table_list_lookup_configuration = [];
@@ -1534,7 +1128,9 @@ var all_lookup_configuration_validate = []
 //var form_label_id_obj = [];
 
 async function get_lookup_configuration(page_no, form_name, form_label_id, current_form_id) {
-  if (page_no === 1) showLoadingSpinner()
+  if (page_no === 1) {
+    // showLoadingSpinner()
+  }
 
   const requestBody = {
       "table_name": 'master',
@@ -1558,7 +1154,7 @@ async function get_lookup_configuration(page_no, form_name, form_label_id, curre
       });
 
       if (!response.ok) {
-          hideLoadingSpinner();
+        //   hideLoadingSpinner();
           throw new Error('Network response was not ok');
       }
 
@@ -1639,9 +1235,249 @@ async function get_lookup_configuration(page_no, form_name, form_label_id, curre
 
   }
   catch (error) {
-      hideLoadingSpinner()
+    //   hideLoadingSpinner()
       console.error('Error:', error);
       // Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load Items. Please try again.' });
   }
+
+
+
+  window.renderDynamicForm = function(container) {
+    container.innerHTML = '<h1>Dynamic Form Loaded</h1>';
+    console.log('✅ renderDynamicForm executed successfully!');
+  };
+  
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("🚀 DOM Loaded - Adding event listeners to cards");
+    // handleCardClick();
+  
+    // Select all elements that need a click event
+    const cards = document.querySelectorAll(".dynamic-card");
+
+  
+    // // Attach event listener to each card
+    // cards.forEach((card) => {
+    //   const option = card.getAttribute("data-option"); // Ensure data is available
+    //   card.addEventListener("click", function () {
+    //     console.log("🔹 Card Clicked - Calling handleCardClick");
+    //     if (typeof handleCardClick !== "undefined") {
+     
+    //     } else {
+    //       console.warn("⚠️ handleCardClick is not defined!");
+    //     }
+    //   });
+    // });
+  });
+  
+// ✅ Listen for PK & SK from Angular via postMessage
+window.addEventListener("message", (event) => {
+    if (event.data.pk && event.data.sk) {
+        window.pk = event.data.pk;
+        window.sk = event.data.sk;
+        console.log("✅ Received PK from Angular:", window.pk);
+        console.log("✅ Received SK from Angular:", window.sk);
+        handleCardClick(event)
+    } else {
+        console.warn("⚠️ Received message but PK or SK is missing:", event.data);
+    }
+});
+
+// ✅ Ensure `handleCardClick()` Waits for PK & SK
+  async function handleCardClick(eventData) {
+    console.log('eventData checking',eventData)
+
+ 
+     
+        console.log('window.sk checking',window.sk)
+        console.log('eventData checking inside try',eventData)
+     
+        let pkFromAngular =eventData.data.pk
+        let skFromAngular = eventData.data.sk
+        console.log('pk checking',pk)
+
+    
+
+        // ✅ Wait until PK & SK are set in the Blob
+        let retryCount = 0;
+        while (!window.pk || !window.sk) {
+            console.warn(`⏳ Waiting for PK & SK... Attempt ${retryCount + 1}`);
+            await new Promise(resolve => setTimeout(resolve, 300)); // Wait 300ms
+            retryCount++;
+            if (retryCount > 10) {  // Stop after 3 seconds
+                console.error("❌ PK & SK are not available in the Blob iframe!");
+                // hideLoadingSpinner();
+                return;
+            }
+        }
+
+        // ✅ Fetch PK & SK from the Blob window
+        let pkDetails = eventData.data.pk;
+        console.log('window.sk checking',pkDetails)
+        
+        let skDetails = eventData.data.sk;
+
+        console.log("✅ Retrieved PK from Blob iframe: " + pkDetails);
+        console.log("✅ Retrieved SK from Blob iframe: " + skDetails);
+
+        var splittedPk = pkFromAngular.split('#');
+        console.log('splittedPk checking',splittedPk)
+        var formName = splittedPk[1];
+
+        console.log("✅ Extracted formName from PK: " + formName);
+
+        let ClientId= eventData.data.clientId
+        // ✅ Fetch Form & Approval Data
+        await getDynamicFormDetails(formName,ClientId);
+        await getApprovalMainPkDetails(pkFromAngular, skFromAngular);
+        
+  
+};
+
+
+
+
+async function getApprovalMainPkDetails(pkDetails,skDetails){
+
+    const skValue = Number(skDetails); // Convert skDetails to a number
+    console.log('skValue checking',skValue)
+  
+    const requestBody = {
+      "table_name": "master",
+      "PK_value": pkDetails,
+      "SK_value": skValue,
+      "PK_key": "PK",
+      "SK_key": "SK",
+      "type": "get_request"
+    };
+
+  
+    console.log('Request Body: approval', requestBody);
+    const apiUrl = 'https://iy5kihshy9.execute-api.ap-south-1.amazonaws.com/s1/crud';
+  
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': 'kzUreDYgmB8jUwsniUREa6ggTxIg8bi82zmfjuvZ',
+      },
+      body: JSON.stringify(requestBody),
+    });
+  
+    if (!response.ok) {
+      throw new Error(`Failed to fetch options for SK=${skValue}`);
+    }
+  
+    const data = await response.json();
+  
+    if (data && data.body) {
+      const responseData = JSON.parse(data.body);
+      currentSelectedPendingTask = responseData; // pending task from the pk
+      // console.log('response Data = '+ JSON.stringify(responseData,null,2));
+  
+      console.log('response of getApprovalMainPkDetails', JSON.stringify(responseData,null,2));
+  
+      const metadata = responseData.metadata;  // Get the metadata from the response
+      data_form_add = metadata;
+      const labels = {};  // Object to store the matched labels and values
+  
+      // Iterate through formDynamicFields to match the name with metadata keys
+      // formDynamicFields.forEach(field => {
+      //   const fieldName = field.name; // Get the 'name' from formDynamicFields
+        
+      //   // Check if the field name matches any key in metadata
+      //   if (metadata.hasOwnProperty(fieldName)) {
+      //     const label = field.label; // Get the label for the matched field
+      //     const value = metadata[fieldName] || ''; // Get the value from metadata (empty if undefined)
+          
+      //     // Store in the format 'name: value'
+      //     labels[label] = value; 
+      //   }
+      // });
+  
+      // // Log the labels of matched fields
+      // console.log('Matched Labels:', labels);
+  
+      //  // Populate the table in the modal with the matched labels and values
+      //  const tableBody = document.querySelector('#kt_pendingTask_table tbody');
+      //  tableBody.innerHTML = ''; // Clear previous rows if any
+   
+      //  // Create a row for each matched field and append it to the table
+      // for (let label in labels) {
+      //   const row = document.createElement('tr');
+  
+      //   // Create label and value columns
+      //   const labelCell = document.createElement('td');
+      //   labelCell.innerText = label;
+  
+      //   const valueCell = document.createElement('td');
+      //   valueCell.innerText = labels[label];
+  
+      //   // Append the label and value cells to the row
+      //   row.appendChild(labelCell);
+      //   row.appendChild(valueCell);
+  
+      //   // Append the row to the table body
+      //   // tableBody.appendChild(row);
+      // }
+  
+      await generateFormView(formDynamicFields,data_form_add);
+      
+    } else {
+      console.log("No body in the response : getApprovalMainPkDetails" );
+      Swal.fire('Error!', 'Record Not Found.', 'error').then(() => {
+        // After SweetAlert closes, hide the modal
+        document.getElementById('kt_modal_add_customer').setAttribute('data-bs-dismiss', 'modal');
+          document.getElementById('kt_modal_add_customer').click();
+          document.getElementById('kt_modal_add_customer').removeAttribute('data-bs-dismiss'); 
+  
+          const deleteRequest = {
+            "table_name": "master",
+            "deleteItem_lookup": {
+              "PK":  clientid_ + "#pendingapprovals#lookup",
+              "options": lookupOption
+            },
+            "PK_key": "PK",
+            "SK_key": "SK",
+            "type": "delete_request_lookup_duplicate"
+          }
+          console.log("data = " + JSON.stringify(deleteRequest));
+        
+          // Sending the POST request using fetch
+          fetch(crudURL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': 'kzUreDYgmB8jUwsniUREa6ggTxIg8bi82zmfjuvZ'
+            },
+            body: JSON.stringify(deleteRequest)
+          })
+          .then(response => {
+            // Check if the response is OK (status code 200-299)
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json(); // Parse the response as JSON
+          })
+          .then(responseData => {
+            console.log("Response Data:", responseData);
+            location.reload();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            // Swal.fire('Error!', error.message, 'error'); // Show an error message
+          });
+      });
+  
+      
+  
+  
+      
+      
+    }
+  
+  
+  }
+
 

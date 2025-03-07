@@ -185,7 +185,7 @@ const extractcolumnVisibility = chartConfig
         }),
       };
     
-      console.log('requestBody checking', requestBody);
+      console.log('requestBody checking chart1Drilldown', requestBody);
     
       // Send a POST request to the Lambda function with the body
       this.http.post(apiUrl, requestBody).subscribe(
