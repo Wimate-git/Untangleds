@@ -2135,6 +2135,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   [responseRowData]="responseRowData"
   [all_Packet_store]="all_Packet_store"
   [storeDrillDown]="storeDrillDown"
+  (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
 
     ></app-data-table-tile1>
   </ng-template>
@@ -2165,6 +2166,12 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
     [modal]="modal" [dashboard]="dashboard" 
     (dashboardChange)="getGridDetails($event)" (update_PowerBoard_config)="updateSummaryHelper2($event)" [modal]="modal" [all_Packet_store]="all_Packet_store" (send_all_Packet_store)="allPacketStoreReceiver($event)"[isGirdMoved]="isGirdMoved"
     ></app-image-config>
+  </ng-template>
+
+  <ng-template #htmlModal let-modal>
+    <app-html-modal
+    [modal]="modal" [blobUrl]="blobUrl"
+    ></app-html-modal>
   </ng-template>
   </div>
 <!--   

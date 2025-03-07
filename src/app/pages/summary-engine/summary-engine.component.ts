@@ -48,7 +48,7 @@ import Funnel from 'highcharts/modules/funnel';
 import { Chart5ConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/chart5-config/chart5-config.component';
 import { CloneDashboardComponent } from 'src/app/_metronic/partials/content/my-widgets/clone-dashboard/clone-dashboard.component';
 import { DynamicTileConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/dynamic-tile-config/dynamic-tile-config.component';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FilterTileConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/filter-tile-config/filter-tile-config.component';
 import { TableWidgetConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/table-widget-config/table-widget-config.component';
 
@@ -61,6 +61,8 @@ import { AuditTrailService } from '../services/auditTrail.service';
 import { HtmlTileConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/html-tile-config/html-tile-config.component';
 import { SummaryEngineService } from './summary-engine.service';
 import { ImageConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/image-config/image-config.component';
+import { catchError, throwError } from 'rxjs';
+import { BlobService } from './blob.service';
 
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
@@ -108,6 +110,7 @@ interface TreeNode {
   powerboard_view_device: any,
   icon: any;
   chartIdsFromChild1: string[];
+  
 
 
 
@@ -297,6 +300,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   modalCheck: any;
   toRouterID: any;
   filterConditions: any;
+  blobUrl: string = '';
 
 
   createPieChart() {
@@ -2108,7 +2112,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
   constructor(private summaryConfiguration: SharedService, private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector, private auditTrail: AuditTrailService,
     private spinner: NgxSpinnerService, private zone: NgZone,private http: HttpClient,  private sanitizer: DomSanitizer, // Inject DomSanitizer
-    private titleService: Title, private summaryService: SummaryEngineService
+    private titleService: Title, private summaryService: SummaryEngineService,private blobService: BlobService
   ) {
     this.resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
@@ -2342,6 +2346,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     });
 
     this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
+    console.log('this.getLoggedUser read for redirect',this.getLoggedUser)
 
     this.SK_clientID = this.getLoggedUser.clientID;
     console.log('this.SK_clientID check', this.SK_clientID)
@@ -7540,5 +7545,125 @@ helperChartClickChart1(event: any, modalChart: any) {
     this.eventFilterConditions = eventFilterCon
 
 
+
+
+    
   }
+  private apiUrl = 'https://iy5kihshy9.execute-api.ap-south-1.amazonaws.com/s1/crud';
+  private headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    'x-api-key': 'p2FIIEi4cA2unoJhRIA137vRdGEuJCCi5hV6Vc11'
+  });
+  async readdataTableCellInfo(readData: any,modalref:any) {
+    console.log('readData from parent:', readData);
+  
+    if (!readData?.data) {
+      console.error('Invalid readData object:', readData);
+      return;
+    }
+  
+    this.blobUrl = await this.blobService.createBlobUrl();
+    setTimeout(() => {
+      this.modalService.open(modalref, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+    }, 500);
+   
+  
+    const read = readData.data;
+    console.log('Extracted read:', read);
+  
+    let formId = read.PK ? read.PK.split("#")[1] || "" : "";
+    let SK = read.SK;
+  
+    console.log('Extracted PK:', read.PK);
+    console.log('Extracted SK:', SK, 'Type:', typeof SK);
+    console.log('Extracted formId:', formId);
+  
+    // **Do not convert SK to a string if it's already a number**
+    const SK_value = typeof SK === 'number' ? SK : Number(SK);
+    
+    if (isNaN(SK_value)) {
+      console.error("Invalid SK_value:", SK);
+      return;
+    }
+  
+    console.log('API Call with:', `${this.SK_clientID}#${formId}#main`, SK_value);
+    const table_name = 'master';
+  
+    const requestBody = {
+      table_name: table_name,
+      PK_key: 'PK',
+      PK_value: `${this.SK_clientID}#${formId}#main`,
+      SK_key: 'SK',
+      SK_value: SK_value, // Ensure this matches the expected type in DynamoDB
+      type: 'query_request_v2'
+    };
+  
+    console.log('Sending API Request:', requestBody);
+  
+    this.http.post(this.apiUrl, requestBody, { headers: this.headers })
+    .pipe(
+      catchError(error => {
+        console.error('API Call Failed:', error);
+        return throwError(() => new Error(error.message || 'Server error'));
+      })
+    )
+    .subscribe({
+      next: (response: any) => {
+        console.log('Full API Response:', response);
+  
+        if (response?.statusCode === 200 && Array.isArray(response.body) && response.body.length > 0) {
+          const metadata = response.body[0]?.metadata;  // Extract metadata from body[0]
+          console.log('Extracted Metadata:', metadata);
+          this.fetchFormBuilderData(formId)
+  
+          if (metadata) {
+            // Example: Access specific fields from metadata
+            console.log('Created Time:', metadata.created_time);
+            console.log('Email:', metadata["email-1732770980040"]);
+            console.log('City:', metadata["text-1732770379239"]);
+            console.log('Equipment:', metadata["single-select-1732773087727"]);
+          }
+        } else {
+          console.warn('Invalid API response structure or empty body');
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+      }
+    });
+
+
+
+
+    
+  
+  }
+  
+  fetchFormBuilderData(receiveValue:any){
+    console.log('receiveValue checking',receiveValue)
+
+    this.api
+    .GetMaster(`${this.SK_clientID}#dynamic_form#${receiveValue}#main`, 1)
+    .then((result: any) => {
+      if (result && result.metadata) {
+        const parsedMetadata = JSON.parse(result.metadata);
+       
+
+
+
+        console.log('Transformed dynamic parameters:', parsedMetadata);
+
+        // Trigger change detection to update the view
+        this.cdr.detectChanges();
+      }
+    })
+    .catch((err) => {
+      console.log("Can't fetch", err);
+    });
+
+  }
+
 }
+
+
+

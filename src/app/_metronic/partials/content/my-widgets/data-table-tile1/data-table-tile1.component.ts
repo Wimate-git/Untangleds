@@ -20,6 +20,8 @@ export class DataTableTile1Component {
 
   private gridApi!: GridApi;
   pageSizeOptions = [10, 25, 50, 100];
+
+  @Output() dataTableCellInfo = new EventEmitter<any>();
   
 
   //   [responseRowData]="responseRowData"
@@ -310,4 +312,13 @@ this.parseChartConfig(this.storeDrillDown)
         this.gridColumnApi = params.columnApi;
       }
 
+
+      onCellClick(eventData:any){
+        console.log('eventData check for',eventData)
+        this.dataTableCellInfo.emit(eventData)
+
+
+
+
+      }
 }

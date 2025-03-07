@@ -247,7 +247,7 @@ export class Tile1ConfigComponent implements OnInit {
 
       themeColor: [this.selectedColor, Validators.required],
       fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
-      fontColor: ['#000000', Validators.required], // Default to black
+      fontColor: ['#ebeaea', Validators.required], // Default to black
       selectFromTime: [''],
       selectToTime: [''],
       dashboardIds: [''],

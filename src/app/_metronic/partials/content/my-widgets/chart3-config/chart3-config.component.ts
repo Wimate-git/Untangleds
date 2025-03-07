@@ -485,7 +485,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     // fontSize: this.createChart.value.fontSize,
     // themeColor: this.createChart.value.themeColor,
     // fontColor: this.createChart.value.fontColor,
-    chartConfig: this.createChart.value.all_fields,
+    chartConfig: this.createChart.value.all_fields ||'',
     highchartsOptionsJson: this.chartFinalOptions ||'',
     miniForm:this.createChart.value.miniForm || '',
     MiniTableNames:this.createChart.value.MiniTableNames ||'',
@@ -494,7 +494,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     EquationOperationMini:this.createChart.value.EquationOperationMini ||'',
     filterParameterLine:this.createChart.value.filterParameterLine ||'',
     filterFormList:this.createChart.value.filterFormList ||'',
-    add_fields:this.createChart.value.add_fields,
+    add_fields:this.createChart.value.add_fields ||'',
     // filterForm:this.createChart.value.filterForm,
     // filterParameter:this.createChart.value.filterParameter,
     // filterDescription:this.createChart.value.filterDescription,
@@ -1457,7 +1457,7 @@ toggleCheckbox(theme: any): void {
       },
       headerFormat: `
         <div style="padding: 5px 10px; text-align: center;">
-          <span style="font-size: 16px; font-weight: bold; color: #2c3e50;">{point.key}</span>
+          <span style="font-size: 16px; font-weight: bold; color: #2c3e50;">{point.x}</span>
         </div>
         <hr style="margin: 5px 0; border-color: #2c3e50;">
       `,

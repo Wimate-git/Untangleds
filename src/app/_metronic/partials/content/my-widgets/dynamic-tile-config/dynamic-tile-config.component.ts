@@ -250,7 +250,7 @@ export class DynamicTileConfigComponent implements OnInit{
       chart_title:[''],
       themeColor: [this.selectedColor, Validators.required],
       fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
-      fontColor: ['#000000', Validators.required], 
+      fontColor: ['#ebeaea', Validators.required], 
       toggleCheck: [false], // Default toggle state
 // Default unchecked
       dashboardIds: [''],

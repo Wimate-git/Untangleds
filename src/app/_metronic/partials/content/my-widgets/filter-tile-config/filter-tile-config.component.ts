@@ -420,23 +420,25 @@ makeTrueCheck:any = false
   }
 
   initializeTileFields(): void {
+    const defaultTheme = { color: "linear-gradient(to right, #A1045A, #A1045A)", selected: true };
+    this.selectedColor = defaultTheme.color;
     console.log('i am initialize')
     // Initialize the form group
     this.createChart = this.fb.group({
-      add_fields:['',Validators.required],
+      add_fields:[''],
       all_fields:new FormArray([]),
   
       widgetid: [this.generateUniqueId()],
   
-      themeColor: ['', Validators.required],
-      fontSize: [, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
-      fontColor: ['', Validators.required], 
+      themeColor: [this.selectedColor, Validators.required],
+      fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
+      fontColor: ['#ebeaea', Validators.required], 
       custom_Label:['', Validators.required],
       daysAgo:[''],
       startDate:[''],
       endDate:[''],
       singleDate:[''],
-      dateType:['any', Validators.required],
+      dateType:['any'],
     
       // themeColor: ['#000000', Validators.required],
   
@@ -480,6 +482,28 @@ makeTrueCheck:any = false
     } catch (err) {
       console.log("Error fetching the dynamic form data", err);
     }
+  }
+
+  validateAndSubmit() {
+    if (this.createChart.invalid) {
+      // ✅ Mark all fields as touched to trigger validation messages
+      Object.values(this.createChart.controls).forEach(control => {
+        if (control instanceof FormControl) {
+          control.markAsTouched();
+          control.updateValueAndValidity();
+        } else if (control instanceof FormArray) {
+          control.controls.forEach((group) => {
+            (group as FormGroup).markAllAsTouched();
+          });
+        }
+      });
+  
+      return; // 🚨 Stop execution if the form is invalid
+    }
+  
+    // ✅ Proceed with saving only if form is valid
+    this.addTile('filterTile');
+    this.modal.dismiss();
   }
 
   // addControls(event: any, _type: string,count:any) {
@@ -1067,23 +1091,173 @@ makeTrueCheck:any = false
   
 
 
-themes = [
-  { color: "linear-gradient(to right, #ff7e5f, #feb47b)", selected: false }, // Warm Sunset
-  { color: "linear-gradient(to right, #6a11cb, #2575fc)", selected: false }, // Cool Blue-Purple
-  { color: "linear-gradient(to right, #ff6a00, #ee0979)", selected: false }, // Fiery Red-Orange
-  { color: "linear-gradient(to right, #36d1dc, #5b86e5)", selected: false }, // Aqua Blue
-  { color: "linear-gradient(to right, #56ab2f, #a8e063)", selected: false }, // Fresh Green
-  { color: "linear-gradient(to right, #ff9966, #ff5e62)", selected: false }, // Orange-Red Glow
-  { color: "linear-gradient(to right, #373b44, #4286f4)", selected: false }, // Subtle Blue-Grey
-  { color: "linear-gradient(to right, #8e44ad, #3498db)", selected: false }, // Vibrant Purple-Blue
-  { color: "linear-gradient(to right, #fdc830, #f37335)", selected: false }, // Golden Sunburst
-  { color: "linear-gradient(to right, #16a085, #f4d03f)", selected: false }, // Teal to Yellow
-  { color: "linear-gradient(to right, #9cecfb, #65c7f7, #0052d4)", selected: false }, // Light to Deep Blue
-  { color: "linear-gradient(to right, #00c6ff, #0072ff)", selected: false }, // Bright Blue
-  { color: "linear-gradient(to right, #11998e, #38ef7d)", selected: false }, // Mint Green
-  { color: "linear-gradient(to right, #ff9a9e, #fad0c4)", selected: false }, // Pink Pastel
-  { color: "linear-gradient(to right, #fc5c7d, #6a82fb)", selected: false }  // Pink to Blue
-];
+  themes = [
+    { color: "linear-gradient(to right, #ff7e5f, #feb47b)", selected: false }, // Warm Sunset
+    { color: "linear-gradient(to right, #6a11cb, #2575fc)", selected: false }, // Cool Blue-Purple
+    { color: "linear-gradient(to right, #ff6a00, #ee0979)", selected: false }, // Fiery Red-Orange
+    { color: "linear-gradient(to right, #36d1dc, #5b86e5)", selected: false }, // Aqua Blue
+    { color: "linear-gradient(to right, #56ab2f, #a8e063)", selected: false }, // Fresh Green
+    { color: "linear-gradient(to right, #ff9966, #ff5e62)", selected: false }, // Orange-Red Glow
+  
+    { color: "linear-gradient(to right, #8e44ad, #3498db)", selected: false }, // Vibrant Purple-Blue
+    { color: "linear-gradient(to right, #fdc830, #f37335)", selected: false }, // Golden Sunburst
+    { color: "linear-gradient(to right, #16a085, #f4d03f)", selected: false }, // Teal to Yellow
+    { color: "linear-gradient(to right, #9cecfb, #65c7f7, #0052d4)", selected: false }, // Light to Deep Blue
+    { color: "linear-gradient(to right, #00c6ff, #0072ff)", selected: false }, // Bright Blue
+    { color: "linear-gradient(to right, #11998e, #38ef7d)", selected: false }, // Mint Green
+    { color: "linear-gradient(to right, #ff9a9e, #fad0c4)", selected: false }, // Pink Pastel
+    { color: "linear-gradient(to right, #fc5c7d, #6a82fb)", selected: false } , // Pink to Blue
+    { color: "linear-gradient(to right, #1D2671, #C33764)", selected: false }, // Deep Purple to Reddish Pink
+  
+    { color: "linear-gradient(to right, #5433FF, #20BDFF, #A5FECB)", selected: false }, // Multicolor Cool Spectrum
+    { color: "linear-gradient(to right, #FF5F6D, #FFC371)", selected: false }, // Soft Pink to Orange
+    { color: "linear-gradient(to right, #C6FFDD, #FBD786, #f7797d)", selected: false }, // Pastel Multicolor
+    { color: "linear-gradient(to right, #B24592, #F15F79)", selected: false }, // Purple-Pink Gradient
+    { color: "linear-gradient(to right, #7F7FD5, #86A8E7, #91EAE4)", selected: false }, // Light Purple-Blue
+    { color: "linear-gradient(to right, #FF512F, #F09819)", selected: false }, // Vivid Orange to Yellow
+    { color: "linear-gradient(to right, #00B4DB, #0083B0)", selected: false }, // Aqua to Deep Blue
+    { color: "linear-gradient(to right, #70E1F5, #FFD194)", selected: false }, // Sky Blue to Soft Yellow
+    { color: "linear-gradient(to right, #373B44, #4286F4)", selected: false }, // Dark Blue to Grey
+    { color: "linear-gradient(to right, #614385, #516395)", selected: false }, // Moody Purple to Blue
+    { color: "linear-gradient(to right, #000428, #004e92)", selected: false }, // Midnight Blue
+  
+    { color: "linear-gradient(to right, #3A1C71, #D76D77, #FFAF7B)", selected: false }, // Purple to Peach
+    { color: "linear-gradient(to right, #4568DC, #B06AB3)", selected: false },
+    { color: "linear-gradient(to right, #32cd32, #adff2f)", selected: false }, // Soft Blue to Purple
+    { color: "linear-gradient(to right, #6a0dad, #e6e6fa)", selected: false },
+    { color: "linear-gradient(to right, #4b0082, #9370db)", selected: false },
+    { color: "linear-gradient(to right, #008000, #00ff00)", selected: false },
+    { color: "linear-gradient(to right, #9400d3, #fff0f5)", selected: false },
+    { color: "linear-gradient(to right, #9b30ff, #8a2be2)", selected: false },
+  
+  
+    { color: "linear-gradient(to right, #228b22, #98fb98)", selected: false },
+    { color: "linear-gradient(to right, #8B4513, #A52A2A)", selected: false },
+    { color: "linear-gradient(to right, #D2691E, #CD853F)", selected: false },
+    { color: "linear-gradient(to right, #6B4226, #C2B280)", selected: false },
+    { color: "linear-gradient(to right, #8B4513, #F4A300)", selected: false },
+    { color: "linear-gradient(to right, #004d40, #00bcd4)", selected: false },
+    { color: "linear-gradient(to right, #A52A2A, #F5DEB3)", selected: false },
+    { color: "linear-gradient(to right, #800000, #b03060)", selected: false },
+    { color: "linear-gradient(to right, #008080, #20b2aa)", selected: false },
+   
+  
+    { color: "linear-gradient(to right, #006666, #48c9b0)", selected: false },
+    { color: "linear-gradient(to right, #2b5876, #4e4376)", selected: false },
+    { color: "linear-gradient(to right, #800080, #800080)", selected: false },
+    { color: "linear-gradient(to right, #808000, #808000)", selected: false },
+    { color: "linear-gradient(to right, #BC8F8F, #BC8F8F)", selected: false },
+    { color: "linear-gradient(to right, #696969, #696969)", selected: false },
+    { color: "linear-gradient(to right, #4E0707, #4E0707)", selected: false },
+    { color: "linear-gradient(to right, #FF4500, #FF4500)", selected: false },
+    { color: "linear-gradient(to right, #3A5311, #3A5311)", selected: false },
+    { color: "linear-gradient(to right, #1338BE, #1338BE)", selected: false },
+    { color: "linear-gradient(to right, #004F98, #004F98)", selected: false },
+    { color: "linear-gradient(to right, #A1045A, #A1045A)", selected: true },
+    { color: "linear-gradient(to right, #563C5C, #563C5C)", selected: false },
+    { color: "linear-gradient(to right, #655967, #655967)", selected: false },
+    {color:"linear-gradient(45deg, #FC466B 0%, #3F5EFB 100%)",selected:false},
+    {color:"linear-gradient(45deg, #833ab4 0%, #fd1d1d 100%)",selected:false},
+    {color:"linear-gradient(45deg, #16BFFD 0%, #CB3066 100%)",selected:false},
+    {color:"linear-gradient(45deg, #48c6ef 0%, #6f86d6 100%)",selected:false},
+    {color:"linear-gradient(45deg, #ff758c 0%, #ff7eb3 100%)",selected:false},
+    {color:"linear-gradient(45deg, #a80077 0%, #66ff00 100%)",selected:false},
+    {color:"linear-gradient(45deg, #6441a5 0%, #2a0845 100%)",selected:false},
+    {color:"linear-gradient(45deg, #fc5c7d 0%, #6a82fb 100%)",selected:false},
+    {color:"linear-gradient(45deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)",selected:false},
+    {color:"linear-gradient(45deg, #2C3E50 0%, #FD746C 100%)",selected:false},
+    {color:"linear-gradient(45deg, #abbaab 0%, #ffffff 100%)",selected:false},
+    { color: "linear-gradient(45deg, #283c86 0%, #45a247 100%)", selected: false }, // Deep Sea
+    { color: "linear-gradient(45deg, #16222a 0%, #3a6073 100%)", selected: false }, // Dark Ocean
+    { color: "linear-gradient(45deg, #3D3393 0%, #2D2560 100%)", selected: false }, // Royal Blue
+    { color: "linear-gradient(45deg, #000000 0%, #0d324d 100%)", selected: false }, // Midnight Black
+    { color: "linear-gradient(45deg, #0575E6 0%, #021B79 100%)", selected: false }, // Deep Blue
+    { color: "linear-gradient(45deg, #2C5364 0%, #203A43 100%)", selected: false }, // Emerald Green
+    { color: "linear-gradient(45deg, #833ab4 0%, #fd1d1d 100%)", selected: false }, // Purple Red
+    { color: "linear-gradient(45deg, #000000 0%, #434343 100%)", selected: false }, // Dark Grey
+    { color: "linear-gradient(45deg, #004e92 0%, #000000 100%)", selected: false },
+    { color: "linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%)", selected: false }, // Blue Purple Yellow
+    { color: "linear-gradient(132deg, #F4D03F 0%, #16A085 100%)", selected: false }, // Golden Green
+    { color: "linear-gradient(0deg, #08AEEA 0%, #2AF598 100%)", selected: false }, // Ocean Green
+    { color: "linear-gradient(147deg, #FFE53B 0%, #FF2525 74%)", selected: false }, // Sunset Red
+    { color: "linear-gradient(180deg, #52ACFF 25%, #FFE32C 100%)", selected: false }, // Sky Blue Yellow
+    { color: "linear-gradient(45deg, #EE7752 0%, #E73C7E 100%)", selected: false }, // Sunset Orange
+    { color: "linear-gradient(45deg, #FFA7A7 0%, #FFD4A2 100%)", selected: false }, // Peachy Pink
+    { color: "linear-gradient(45deg, #fc00ff 0%, #00dbde 100%)", selected: false }, // Electric Purple
+    { color: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", selected: false }, // Twilight Purple
+    { color: "linear-gradient(45deg, #d4145a 0%, #fbb03b 100%)", selected: false }, // Cherry Peach
+    { color: "linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%)", selected: false }, // Cotton Candy
+    { color: "linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)", selected: false }, // Blue Sky
+    { color: "linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%)", selected: false }, // Ice White
+    { color: "linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)", selected: false }, // Lavender Blue
+    { color: "linear-gradient(120deg, #f6d365 0%, #fda085 100%)", selected: false }, // Peachy Yellow
+    { color: "linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%)", selected: false }, // Azure Blue
+    { color: "linear-gradient(120deg, #abecd6 0%, #fbed96 100%)", selected: false }, // Pastel Green Yellow
+    { color: "linear-gradient(120deg, #f6d365 0%, #fda085 100%)", selected: false }, // Sunrise Yellow
+    { color: "linear-gradient(120deg, #fccb90 0%, #d57eeb 100%)", selected: false }, // Apricot Purple
+    { color: "linear-gradient(120deg, #f093fb 0%, #f5576c 100%)", selected: false }, 
+    { color: "transparent", selected: false }, // Transparent
+    { color: "linear-gradient(315deg, #990000 0%, #ff0000 74%)", selected: false }, // Red
+    { color: "linear-gradient(315deg, #378b29 0%, #74d680 74%)", selected: false }, // Green
+    { color: "linear-gradient(316deg, #3e187a 0%, #994ecc 74%)", selected: false }, // Purple
+    { color: "linear-gradient(315deg, #f9ff60 0%, #e0c300 74%)", selected: false }, // Yellow
+    { color: "linear-gradient(315deg, #182b3a 0%, #20a4f3 74%)", selected: false },
+    { color: "linear-gradient(315deg, #ff8000 0%, #ffcc00 74%)", selected: false }, // Orange
+    { color: "linear-gradient(315deg, #550022 0%, #aa0044 74%)", selected: false }, // Magenta
+    { color: "linear-gradient(315deg, #0073e6 0%, #00d8e6 74%)", selected: false }, // Cyan
+    { color: "linear-gradient(315deg, #660066 0%, #cc00cc 74%)", selected: false }, // Violet
+    { color: "linear-gradient(315deg, #cc0033 0%, #ff0066 74%)", selected: false }, // Pink
+    { color: "linear-gradient(315deg, #663300 0%, #996633 74%)", selected: false }, // Brown
+    { color: "linear-gradient(315deg, #006600 0%, #00cc00 74%)", selected: false }, // Lime
+    { color: "linear-gradient(315deg, #003366 0%, #0066cc 74%)", selected: false }, // Indigo
+    { color: "linear-gradient(315deg, #666600 0%, #cccc00 74%)", selected: false }, // Olive
+    { color: "linear-gradient(315deg, #660000 0%, #cc0000 74%)", selected: false }, // Maroon
+    { color: "linear-gradient(315deg, #ff0080 0%, #ff80bf 74%)", selected: false }, // Fuchsia
+    { color: "linear-gradient(315deg, #004080 0%, #007acc 74%)", selected: false }, // Sapphire
+    { color: "linear-gradient(315deg, #800040 0%, #cc0073 74%)", selected: false }, // Ruby
+    { color: "linear-gradient(315deg, #ffcc99 0%, #ff9966 74%)", selected: false }, // Apricot
+    { color: "linear-gradient(315deg, #00cc99 0%, #33ffcc 74%)", selected: false }, // Turquoise
+    { color: "linear-gradient(315deg, #ff6600 0%, #ff9933 74%)", selected: false }, // Tangerine
+    { color: "linear-gradient(315deg, #333300 0%, #666600 74%)", selected: false }, // Olive Green
+    { color: "linear-gradient(315deg, #800000 0%, #cc3333 74%)", selected: false }, // Brick Red
+    { color: "linear-gradient(315deg, #330033 0%, #660066 74%)", selected: false }, // Plum
+    { color: "linear-gradient(315deg, #006666 0%, #00cccc 74%)", selected: false }, // Teal
+                  
+                       
+                      
+                    
+                  
+                      
+                   
+                     
+           
+                   
+  
+  
+    // { color: "linear-gradient(to right, #707070, #707070)", selected: false },
+  
+  
+  
+    
+  
+  
+    
+  
+  
+  
+  
+    
+  
+  
+    
+    
+  
+  
+    
+    
+  
+    
+  ];
 
 openFilterModal(tile: any, index: number) {
 
@@ -1710,7 +1884,7 @@ datesUpdatedRange($event: any,index:any): void {
 
 
 
-toggleCheckbox1(theme: any) {
+toggleCheckbox(theme: any) {
   // Deselect all themes
   this.themes.forEach(t => (t.selected = false));
 

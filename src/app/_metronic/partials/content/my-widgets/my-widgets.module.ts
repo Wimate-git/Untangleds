@@ -71,6 +71,7 @@ import { HtmlTileUiComponent } from './html-tile-ui/html-tile-ui.component';
 import { ImageConfigComponent } from './image-config/image-config.component';
 import { ImageUiComponent } from './image-ui/image-ui.component';
 import { DataTableTile2Component } from './data-table-tile2/data-table-tile2.component';
+import { HtmlModalComponent } from './html-modal/html-modal.component';
 
 
 
@@ -118,7 +119,8 @@ import { DataTableTile2Component } from './data-table-tile2/data-table-tile2.com
     HtmlTileUiComponent,
     ImageConfigComponent,
     ImageUiComponent,
-    DataTableTile2Component
+    DataTableTile2Component,
+    HtmlModalComponent
 
 
 
@@ -205,7 +207,8 @@ import { DataTableTile2Component } from './data-table-tile2/data-table-tile2.com
     HtmlTileUiComponent,
     ImageConfigComponent,
     ImageUiComponent,
-    DataTableTile2Component
+    DataTableTile2Component,
+    HtmlModalComponent
     
   
 

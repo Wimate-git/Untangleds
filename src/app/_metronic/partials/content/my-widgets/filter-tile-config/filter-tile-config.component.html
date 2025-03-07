@@ -64,7 +64,7 @@ type="square-jelly-box"
           <div class="form-group row align-items-center">
             <label 
               for="dateTypeSelect" 
-              class="col-lg-4 col-md-4 col-sm-4 col-form-label text-lg-end text-md-start text-sm-start fw-bold required">
+              class="col-lg-4 col-md-4 col-sm-4 col-form-label text-lg-end text-md-start text-sm-start fw-bold ">
               Date Filter
             </label>
             <div class="col-lg-8 col-md-8 col-sm-8">
@@ -107,6 +107,9 @@ type="square-jelly-box"
             </label>
             <div class="col-lg-8 col-md-8 col-sm-8">
               <input type="text" class="form-control form-control-solid" name="custom_Label" formControlName="custom_Label">
+              <div *ngIf="createChart.get('custom_Label')?.touched && createChart.get('custom_Label')?.invalid" class="text-danger">
+                <div *ngIf="createChart.get('custom_Label')?.errors?.required"> Custom Label is required.</div>
+              </div>
             </div>
           </div>
         </div>
@@ -385,9 +388,9 @@ type="square-jelly-box"
                         *ngFor="let theme of themes"
                         class="color-box"
                         [ngStyle]="{ 'background-image': theme.color }"
-                        (click)="toggleCheckbox1(theme)"
-                        [class.checked]="theme.selected">
-                        <!-- Tick Mark -->
+                        (click)="toggleCheckbox(theme)"
+                        [class.checked]="theme.selected"
+                      >
                         <div *ngIf="theme.selected" class="checkmark">✔</div>
                       </div>
                     </div>
@@ -465,17 +468,24 @@ type="square-jelly-box"
   
         <div class="modal-footer" style="margin-top: 20px;">
           <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
-          <button type="button" class="btn btn-primary"  (click)="addTile('filterTile');modal.dismiss()" *ngIf="!isEditMode"  
-        data-bs-dismiss="modal">Save</button>
+          <button 
+            type="button" 
+            class="btn btn-primary"  
+            (click)="validateAndSubmit();modal.dismiss()" 
+            *ngIf="!isEditMode"
+            data-bs-dismiss="modal"
+          >
+            Save
+          </button>
           <button type="button" class="btn btn-warning"  (click)="updateTile('filterTile');modal.dismiss() "
           *ngIf="isEditMode" >
             Update
           </button>
           <button type="button" class="btn btn-success"  (click)="reloadPage() "
-          data-bs-dismiss="modal">
+          data-bs-dismiss="modal" *ngIf="isEditMode">
             Live Filter
           </button>
-          <button data-bs-dismiss="modal"  type="button" class="btn btn-info" (click)="clearForm()">Clear Filter</button>
+          <button data-bs-dismiss="modal"  type="button" class="btn btn-info" (click)="clearForm()" *ngIf="isEditMode">Clear Filter</button>
         </div>
       </div>
   
