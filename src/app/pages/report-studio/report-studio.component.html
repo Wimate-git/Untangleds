@@ -380,7 +380,12 @@
                     <select formControlName="predefined" class="form-control"  [ngbTooltip]="'Select a predefined script to polpulate in equation field'" (change)="onPredefinedChange(formIndex, condIndex)">
                       <option value="time_difference">Time Difference</option>
                       <option value="days_difference">Days Difference</option>
-                      <option value="none">None</option>
+                      <option value="response_time">Response Time</option>
+                      <option value="turn_around_time">Turn Around Time</option>
+                      <option value="planned_duration">Planned Duration</option>
+                      <option value="total_time_spent">Total Time Spent</option>
+                      <option value="sla_status">SLA Status</option>
+                      <option value="none">Clear</option>
                     </select>                  
                   </div>
 
