@@ -78,7 +78,13 @@ export class BlobService {
               // ✅ Ensure the dynamic form container is present
               let formContainer = document.getElementById('dynamic-form');
               console.log('formContainer checking', formContainer);
-    
+       if (!formContainer) {
+      console.warn('⛔ #dynamic-form NOT found in Cloud! Retrying in 1 sec...');
+      setTimeout(() => {
+        formContainer = document.getElementById('dynamic-form');
+        console.log('🔄 Retried: formContainer:', formContainer);
+      }, 1000);
+    }
               if (formContainer) {
                 console.log('✅ Found #dynamic-form:', formContainer);
     
