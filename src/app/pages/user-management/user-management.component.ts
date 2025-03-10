@@ -1326,9 +1326,15 @@ rdtListWorkAround :any =[{
 
           await this.fetchAllusersData(1,this.tempUpdateUser,'update',masterUser)
 
-      
 
-      
+
+          try{
+            await this.recordUserDetails(JSON.parse(JSON.stringify(this.allUserDetails)),'update',this.userCreatedTime)
+          }
+          catch(error){
+            console.log("Error in configuration ",error);
+          }
+  
 
           // await this.loading()
           // await this.showTable()
@@ -1382,13 +1388,7 @@ rdtListWorkAround :any =[{
 
 
 
-        try{
-          await this.recordUserDetails(this.allUserDetails,'update',this.userCreatedTime)
-        }
-        catch(error){
-          console.log("Error in configuration ",error);
-        }
-
+     
 
 
 
@@ -2191,7 +2191,7 @@ rdtListWorkAround :any =[{
 
         console.log('Data to be added in User forms are here ',UserDetails);
     
-        this.userForm.mappingAuditTrailData(UserDetails,this.SK_clientID,this.username)
+        await this.userForm.mappingAuditTrailData(UserDetails,this.SK_clientID,this.username)
       }
       catch(error){
         console.log("Error while creating audit trails ",error);
