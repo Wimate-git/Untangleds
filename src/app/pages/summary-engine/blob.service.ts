@@ -155,7 +155,7 @@ export class BlobService {
 
         </head>
         <body>
-          ${htmlContent}
+  	<div id="dynamic-form" class="ms-10 me-10">
 
           <!-- ✅ Inject JavaScript -->
           ${scriptContents}
