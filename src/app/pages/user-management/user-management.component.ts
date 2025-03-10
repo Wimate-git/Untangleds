@@ -612,7 +612,7 @@ rdtListWorkAround :any =[{
                 const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
                 const { P1, P2, P3,P4 ,P5,P6} = element[key]; // Extract values from the nested object
                 this.company_data.push({P1, P2, P3,P4,P5,P6 }); // Push an array containing P1, P2, and P3 values
-                console.log("d2 =",this.company_data)
+                // console.log("d2 =",this.company_data)
               } else {
                 break;
               }
@@ -665,7 +665,7 @@ rdtListWorkAround :any =[{
                 const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
                 const { P1, P2, P3,P4 ,P5,P6} = element[key]; // Extract values from the nested object
                 this.permission_data.push({P1, P2, P3,P4,P5,P6 }); // Push an array containing P1, P2, and P3 values
-                console.log("d2 =",this.permission_data)
+                // console.log("d2 =",this.permission_data)
               } else {
                 break;
               }
@@ -1326,7 +1326,7 @@ rdtListWorkAround :any =[{
 
           await this.fetchAllusersData(1,this.tempUpdateUser,'update',masterUser)
 
-
+          // alert(JSON.stringify(this.allUserDetails));
 
           try{
             await this.recordUserDetails(JSON.parse(JSON.stringify(this.allUserDetails)),'update',this.userCreatedTime)
@@ -1334,6 +1334,17 @@ rdtListWorkAround :any =[{
           catch(error){
             console.log("Error in configuration ",error);
           }
+
+
+    
+            // try{
+            //   //Creating User Management Forms Data here similar to the Audit trails
+            //   this.recordUserDetails(this.allUserDetails,'add',this.allUserDetails.created)
+            // }
+            // catch(error){
+            //   console.log("Error in configuration ",error);
+            // }
+   
   
 
           // await this.loading()
@@ -2052,6 +2063,8 @@ rdtListWorkAround :any =[{
 
           await this.createLookUpRdt(masterUser,1,"#user#All");
 
+
+      
           try{
             //Creating User Management Forms Data here similar to the Audit trails
             await this.recordUserDetails(this.allUserDetails,'add',this.allUserDetails.created)
@@ -2188,6 +2201,10 @@ rdtListWorkAround :any =[{
           ],
           "created":createdTime
         }
+
+
+        // alert(JSON.stringify(UserDetails))
+
 
         console.log('Data to be added in User forms are here ',UserDetails);
     
@@ -2601,7 +2618,7 @@ rdtListWorkAround :any =[{
                     const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
                     const { P1, P2, P3, P4, P5, P6,P7 } = element[key]; // Extract values from the nested object
                     this.lookup_data_user.push({ P1, P2, P3, P4, P5, P6,P7 }); // Push an array containing P1, P2, P3, P4, P5, P6
-                    console.log("d2 =", this.lookup_data_user);
+                    // console.log("d2 =", this.lookup_data_user);
                   } else {
                     break;
                   }
@@ -2661,7 +2678,7 @@ rdtListWorkAround :any =[{
                     const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
                     const { P1, P2, P3, P4, P5 } = element[key]; // Extract values from the nested object
                     this.lookup_All_User.push({ P1, P2, P3, P4, P5}); // Push an array containing P1, P2, P3, P4, P5, P6
-                    console.log("d2 =", this.lookup_All_User);
+                    // console.log("d2 =", this.lookup_All_User);
                   } else {
                     break;
                   }
@@ -2722,7 +2739,7 @@ rdtListWorkAround :any =[{
                 const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
                 const { P1, P2, P3,P4 ,P5,P6} = element[key]; // Extract values from the nested object
                 this.lookup_data_client.push({P1, P2, P3,P4,P5,P6 }); // Push an array containing P1, P2, and P3 values
-                console.log("d2 =",this.lookup_data_client)
+                // console.log("d2 =",this.lookup_data_client)
               } else {
                 break;
               }
@@ -3672,7 +3689,7 @@ fetchDynamicLookupData(pk:any,sk:any):any {
                   const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
                   const { P1, P2, P3, P4, P5 } = element[key]; // Extract values from the nested object
                   this.lookup_All_temp.push({ P1, P2, P3, P4, P5}); // Push an array containing P1, P2, P3, P4, P5, P6
-                  console.log("d2 =", this.lookup_All_temp);
+                  // console.log("d2 =", this.lookup_All_temp);
                 } else {
                   break;
                 }
