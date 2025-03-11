@@ -246,6 +246,24 @@
                             <div *ngIf="field.get('custom_Label')?.errors?.required">Custom Label is required.</div>
                           </div>
                       </div>
+
+
+
+                      <div class="col-md-4 mb-3">
+                        <label for="parameterName" class="col-form-label fw-bold fs-6 ">Date Reference X axis</label>
+                        <ngx-select
+                          id="parameterName"
+                          [allowClear]="true"
+                          formControlName="XaxisFormat"
+                          [items]="FormatXaxisValues"
+                          optionValueField="value"
+                          optionTextField="text"
+                          placeholder="Select Parameter"
+                      
+                          style="width: 100%;">
+                        </ngx-select>
+            
+                      </div>
                       
                       <div class="col-md-4 mb-3" *ngIf = "shoRowData" >
                         <label for="constant" class="col-form-label fw-bold fs-6 "></label>

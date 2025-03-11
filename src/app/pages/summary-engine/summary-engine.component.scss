@@ -1118,6 +1118,25 @@ gridster-item {
 
 }
 
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+.pin-icon {
+  position: absolute;
+  top: -12px; /* Move pin icon above the main icon */
+  /* Center the pin horizontally */
+ /* Adjust for perfect centering */
+  font-size: 24px; /* Make the pin icon bigger */
+  color: #6c757d; /* Grey color (adjust as needed) */
+}
+
+
+
+
 
 
 

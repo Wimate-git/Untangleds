@@ -238,62 +238,173 @@ type="square-jelly-box"
                             </ngx-select>
                           </div>
                 
-                            <div class="mb-3" style="width: 30%;">
-                              <label class="col-form-label fw-bold fs-6 required">Operator</label>
-                              <select formControlName="operator" placeholder="Select operator" class="form-control">
-                                <option value="" disabled selected>Select operator</option>
-                                <option value="All">All</option>
-                                <option value="==">Equals</option>
-                                <option value="!=">Not equals</option>
-                                <option value=">">Greater than</option>
-                                <option value="<">Less than</option>
-                                <option value="<=">Less than equals to</option>
-                                <option value=">=">Greater than equals to</option>
-                              </select>
-                            </div>
-                
+<!-- Hide these fields if foundField.type is 'date' -->
+<ng-container *ngIf="!conditionfilter[fieldIndex]?.[conditionIndex]?.fieldTypeCheck">
+  <div class="mb-3" style="width: 30%;">
+    <label class="col-form-label fw-bold fs-6 required">Operator</label>
+    <select formControlName="operator" placeholder="Select operator" class="form-control">
+      <option value="" disabled selected>Select operator</option>
+      <option value="All">All</option>
+      <option value="==">Equals</option>
+      <option value="!=">Not equals</option>
+      <option value=">">Greater than</option>
+      <option value="<">Less than</option>
+      <option value="<=">Less than equals to</option>
+      <option value=">=">Greater than equals to</option>
+    </select>
+  </div>
 
-                            
-                            
-                            
-                            <div class="mb-3" style="width: 30%;">
-                              <label class="col-form-label fw-bold fs-6 required">Value</label>
-                            
-                              <!-- Check if data exists -->
-                              <ng-container *ngIf="globalFieldData[fieldIndex] && globalFieldData[fieldIndex][conditionIndex];">
-                                
-                                <!-- Check if type is 'select' -->
-                                <ng-container *ngIf="globalFieldData[fieldIndex][conditionIndex]?.type === 'select'; else textInput">
-                                  
-                                  <!-- Check if options exist -->
-                                  <ng-container *ngIf="globalFieldData[fieldIndex][conditionIndex]?.options?.length > 0; else noOptions">
-                                    
-                                    <!-- ngx-select Implementation -->
-                                    <ngx-select 
-                                      formControlName="filterValue"
-                                      [items]="globalFieldData[fieldIndex][conditionIndex].options"
-                                      optionValueField="value"
-                                      optionTextField="text"
-                                      [allowClear]="true"
-                                      placeholder="Select Value"
-                                      style="width: 100%;">
-                                    </ngx-select>
-                                    
-                                  </ng-container>
-                            
-                                  <!-- If no options, show text input -->
-                                  <ng-template #noOptions>
-                                    <input type="text" formControlName="filterValue" placeholder="Enter value" class="form-control" />
-                                  </ng-template>
-                            
-                                </ng-container>
-                              </ng-container>
-                            
-                              <!-- Default text input when type is not 'select' -->
-                              <ng-template #textInput>
-                                <input type="text" formControlName="filterValue" placeholder="Enter value" class="form-control" />
-                              </ng-template>
-                            </div>
+  <div class="mb-3" style="width: 30%;">
+    <label class="col-form-label fw-bold fs-6 required">Value</label>
+
+    <!-- Check if data exists -->
+    <ng-container *ngIf="globalFieldData[fieldIndex] && globalFieldData[fieldIndex][conditionIndex];">
+      
+      <!-- Check if type is 'select' -->
+      <ng-container *ngIf="globalFieldData[fieldIndex][conditionIndex]?.type === 'select'; else textInput">
+        
+        <!-- Check if options exist -->
+        <ng-container *ngIf="globalFieldData[fieldIndex][conditionIndex]?.options?.length > 0; else noOptions">
+          
+          <!-- ngx-select Implementation -->
+          <p-multiSelect 
+            formControlName="filterValue"
+            [options]="globalFieldData[fieldIndex][conditionIndex].options"
+            optionLabel="label"
+  placeholder="Select Value" 
+         >
+          </p-multiSelect>
+          
+        </ng-container>
+
+        <!-- If no options, show text input -->
+        <ng-template #noOptions>
+          <input type="text" formControlName="filterValue" placeholder="Enter value" class="form-control" />
+        </ng-template>
+
+      </ng-container>
+    </ng-container>
+
+    <!-- Default text input when type is not 'select' -->
+    <ng-template #textInput>
+      <input type="text" formControlName="filterValue" placeholder="Enter value" class="form-control" />
+    </ng-template>
+  </div>
+</ng-container>
+
+
+
+<!-- Date Filter Section -->
+<div class="col-lg-6 col-md-6 col-sm-12" 
+     *ngIf="conditionfilter[fieldIndex]?.[conditionIndex]?.fieldTypeCheck">
+  <div class="form-group row align-items-center">
+    <label for="dateTypeSelect" class="col-form-label fw-bold fs-6 required">Date Filter</label>
+
+    <div class="col-lg-8 col-md-8 col-sm-8">
+      <select 
+        *ngIf="getDateTypeControl(fieldIndex, conditionIndex) as control"
+        [formControl]="control" 
+        id="dateTypeSelect" 
+        class="form-select form-select-solid form-select-lg"
+        aria-label="Select Date Type">
+        
+        <option [value]="null" disabled>Select Date Type</option>
+        <option value="any">any</option>
+        <option value="is">is</option>
+        <option value=">=">&gt;=</option>
+        <option value="<=">&lt;=</option>
+        <option value="between">between</option>
+        <option value="between time">between time</option>
+        <option value="less than days ago">less than days ago</option>
+        <option value="more than days ago">more than days ago</option>
+        <option value="in the past">in the past</option> 
+        <option value="days ago">days ago</option>
+        <option value="today">today</option>
+        <option value="yesterday">yesterday</option>
+        <option value="this week">this week</option>
+        <option value="last week">last week</option>
+        <option value="last 2 weeks">last 2 weeks</option>
+        <option value="this month">this month</option>
+        <option value="last month">last month</option>
+        <option value="this year">this year</option>
+        <option value="latest 10">latest 10</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+<div class="row" *ngIf="conditionfilter[fieldIndex]?.[conditionIndex]?.fieldTypeCheck">
+
+  <!-- Section for 'days ago' conditions -->
+  <div *ngIf="getDateType(fieldIndex, conditionIndex) === 'days ago' || 
+              getDateType(fieldIndex, conditionIndex) === 'less than days ago' || 
+              getDateType(fieldIndex, conditionIndex) === 'more than days ago' || 
+              getDateType(fieldIndex, conditionIndex) === 'in the past'" 
+       class="mb-7">
+    <div class="form-group row ps-4 mb-2">
+      <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">
+        Number of Days
+      </label>
+      <div class="col-3">
+        <input type="number" [formControlName]="'daysAgo'" class="form-control" placeholder="Enter number of days">
+      </div>
+    </div>
+  </div>
+
+  <!-- Section for 'between' and 'between time' -->
+  <div *ngIf="getDateType(fieldIndex, conditionIndex) === 'between time' || 
+              getDateType(fieldIndex, conditionIndex) === 'between'" 
+       class="mb-7">
+    
+    <div class="form-group row ps-4 mb-2">
+      <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">
+        Start Date
+      </label>
+      <div class="col-3">
+        <input [type]="getInputType(getDateType(fieldIndex, conditionIndex))" 
+               [formControlName]="'startDate'" 
+               class="form-control">
+      </div>
+    </div>
+
+    <div class="form-group row ps-4">
+      <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">
+        End Date
+      </label>
+      <div class="col-3">
+        <input [type]="getInputType(getDateType(fieldIndex, conditionIndex))" 
+               [formControlName]="'endDate'" 
+               class="form-control">
+      </div>
+    </div>
+  </div>
+
+  <!-- Section for selecting a single date -->
+  <div *ngIf="getDateType(fieldIndex, conditionIndex) === '<=' || 
+              getDateType(fieldIndex, conditionIndex) === '>=' || 
+              getDateType(fieldIndex, conditionIndex) === 'is'"  
+       class="mb-7">
+    
+    <div class="form-group row ps-4 mb-2">
+      <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">
+        Select Date
+      </label>
+      <div class="col-3">
+        <input type="date" [formControlName]="'singleDate'" class="form-control">
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+
                             
                             
                             

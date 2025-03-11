@@ -313,6 +313,7 @@ export class Chart3ConfigComponent implements OnInit{
             custom_Label:['',Validators.required],
             filterParameter:[[]],
             filterDescription:[''],
+            XaxisFormat:['']
           })
         );
         console.log('this.all_fields check', this.all_fields);
@@ -790,7 +791,8 @@ repopulate_fields(getValues: any): FormArray {
           undefinedCheckLabel:configItem.undefinedCheckLabel||'',
           custom_Label: configItem.custom_Label||'',
             filterParameter: this.fb.control(filterParameterValue),
-               filterDescription:configItem.filterDescription ||''
+               filterDescription:configItem.filterDescription ||'',
+               XaxisFormat:configItem.XaxisFormat ||''
         })
       );
 
@@ -1827,5 +1829,10 @@ selectfilterFormList(filterFormValue:any){
   this.fetchDynamicFormDataFilter(filterValue)
 
 }
+FormatXaxisValues = [
+
+  { value: 'Default', text: 'Default' },
+  // { value: 'Default', text: 'Default' },
+]
 
 }

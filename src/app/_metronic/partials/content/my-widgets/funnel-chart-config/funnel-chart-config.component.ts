@@ -5,19 +5,18 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import dayjs, { Dayjs } from 'dayjs';
 import Highcharts from 'highcharts';
-import moment from 'moment';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { APIService } from 'src/app/API.service';
 import { LocationPermissionService } from 'src/app/location-permission.service';
 import { SharedService } from 'src/app/pages/shared.service';
 
 @Component({
-  selector: 'app-chart5-config',
+  selector: 'app-funnel-chart-config',
 
-  templateUrl: './chart5-config.component.html',
-  styleUrl: './chart5-config.component.scss'
+  templateUrl: './funnel-chart-config.component.html',
+  styleUrl: './funnel-chart-config.component.scss'
 })
-export class Chart5ConfigComponent implements OnInit{
+export class FunnelChartConfigComponent implements OnInit{
 
   createChart:FormGroup
 
@@ -108,7 +107,7 @@ export class Chart5ConfigComponent implements OnInit{
     this.SK_clientID = this.getLoggedUser.clientID;
     console.log('this.SK_clientID check', this.SK_clientID)
     this.initializeTileFields()
-    this.setupRanges();
+
     this.dynamicData()
     this.dashboardIds(1)
     this.dynamicDataEquation()
@@ -174,19 +173,7 @@ export class Chart5ConfigComponent implements OnInit{
       endDate: dayjs().endOf('day'),
     };
   }
-  setupRanges(): void {
-    this.ranges = {
-      Today: [moment().startOf('day'), moment().endOf('day')],
-      Yesterday: [moment().subtract(1, 'day').startOf('day'), moment().subtract(1, 'day').endOf('day')],
-      'Last 7 Days': [moment().subtract(6, 'days').startOf('day'), moment().endOf('day')],
-      'Last 30 Days': [moment().subtract(29, 'days').startOf('day'), moment().endOf('day')],
-      'This Month': [moment().startOf('month'), moment().endOf('month')],
-      'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-      'This Year': [moment().startOf('year'), moment().endOf('year')],
-      'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')],
-      // ... add other ranges as needed
-    };
-  }
+
   initializeTileFields(): void {
     console.log('i am initialize')
     // Initialize the form group
@@ -357,6 +344,7 @@ export class Chart5ConfigComponent implements OnInit{
             filterParameter:[[]],
             filterDescription:[''],
             XaxisFormat:['']
+            
 
             
 
@@ -436,7 +424,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         colWidth: 100,
         fixedColWidth: true,
         fixedRowHeight: true,
-        grid_type: 'Barchart',
+        grid_type: 'Funnelchart',
   
         chart_title: this.createChart.value.chart_title || '',  // Ensure this value exists
         fontSize: `${this.createChart.value.fontSize || 16}px`,  // Provide a fallback font size
@@ -682,7 +670,7 @@ themes = [
 ];
 
 
-openChartModal5(tile: any, index: number) {
+openFunnelChartModal(tile: any, index: number) {
   console.log('Index checking:', index); // Log the index
 
   if (tile) {
@@ -831,7 +819,7 @@ repopulate_fields(getValues: any): FormArray {
           undefinedCheckLabel:configItem.undefinedCheckLabel ||'',
           custom_Label:configItem.custom_Label ||'',
           filterDescription:configItem.filterDescription ||'',
-                    XaxisFormat:configItem.XaxisFormat ||''
+          XaxisFormat:configItem.XaxisFormat
 
         })
       );
@@ -1457,169 +1445,48 @@ toggleCheckbox(theme: any): void {
   };
 
 
-  defaultHighchartsOptionsJson = {
-   
-
+  defaultHighchartsOptionsJson: any = {
     chart: {
-      backgroundColor: 'var(--bs-body-bg)',
-      renderTo: 'scatter',
-      type: 'bar',
-      //zoomType: 'xy',
-    },
-    exporting: {
-      enabled: false
+      type: 'funnel',
     },
     title: {
-      style: {
-        color: 'var(--bs-body-color)'
-       },
-      text: ''
+      text: 'Sales Funnel',
     },
-    subTitle: {
-      text: ''
+    credits: {
+      enabled: false,
     },
-    xAxis: {
-      // categories: graph_data1, 
-      labels:{
-        style: {
-          color: 'var(--bs-body-color)'
-         }
-      },
-      type: 'datetime',
-      title: {
-        style: {
-          color: 'var(--bs-body-color)'
-         },
-        text: null
-      }
-    },
-    yAxis: {
-      labels:{
-        style: {
-          color: 'var(--bs-body-color)'
-         }
-      },
-      title: {
-        style: {
-          color: 'var(--bs-body-color)'
-         },
-        text: null
-      }
-    },
-
-    tooltip: {
-      shared: true, // Ensure this is true for multiple points
-      useHTML: true,
-      backgroundColor: 'rgba(255, 255, 255, 0.85)',
-      borderColor: '#2c3e50',
-      borderRadius: 10,
-      borderWidth: 2,
-      shadow: true,
-      style: {
-          color: '#333',
-          fontSize: '14px',
-          fontFamily: 'Arial, sans-serif'
-      },
-      headerFormat: `
-          <div style="padding: 5px 10px; text-align: center;">
-              <span style="font-size: 16px; font-weight: bold; color: #2c3e50;">
-                  {point.key}
-              </span>
-          </div>
-          <hr style="margin: 5px 0; border-color: #2c3e50;">
-      `,
-      pointFormat: `
-          <div style="padding: 5px 10px;">
-              <span style="color:{series.color}; font-weight: bold;">
-                  ● {series.name}:
-              </span>
-              <span style="font-weight: bold;">
-                  {point.y}
-              </span>
-          </div>
-      `,
-      formatter: function (this: Highcharts.TooltipFormatterContextObject) {
-          if (this.points) { // For shared tooltips
-              let total = 0;
-              const pointsHtml = this.points.reduce((s, point) => {
-                  const yValue = point.y !== null && point.y !== undefined ? point.y : 0;
-                  total += yValue;
-                  return s + '<div style="color:' + point.series.color + '">● ' + 
-                             point.series.name + ': <strong>' + yValue + '</strong></div>';
-              }, '<div style="text-align: center; font-weight: bold; color: #2c3e50;">' + this.x + '</div>');
-              return pointsHtml + 
-                     '<hr style="margin: 5px 0; border-color: #2c3e50;">' + 
-                     '<div style="text-align: right; color: #888;">Total: <strong>' + total + '</strong></div>';
-          } else { // For single series tooltips
-              const yValue = this.y !== null && this.y !== undefined ? this.y : 'N/A';
-              return '<div style="text-align: center; font-weight: bold; color: #2c3e50;">' + this.x + '</div>' +
-                     '<div style="color:' + this.series.color + '">● ' + 
-                     this.series.name + ': <strong>' + yValue + '</strong></div>';
-          }
-      }
-  },
-
     plotOptions: {
       series: {
-        turboThreshold: 0, // Comment out this code to display error
-        marker: {
+        dataLabels: {
           enabled: true,
-          radius: 7
-        }
-      }
-    },
-    // colors: [   '#6993FF', '#1BC5BD', '#8950FC', '#FFA800', '#F64E60', '#212121', '#F3F6F9',
-    //   '#3A3B3C', '#D4E157', '#FF7043', '#AB47BC', '#29B6F6', '#66BB6A', '#EF5350',
-    //   '#8D6E63', '#FFCA28', '#8E44AD', '#3498DB', '#2ECC71', '#E74C3C', '#F39C12',
-    //   '#D35400', '#2C3E50', '#16A085', '#27AE60', '#2980B9', '#8E44AD', '#2C3E50',
-    //   '#E67E22', '#ECF0F1', '#95A5A6', '#34495E', '#F1C40F', '#E74C3C', '#9B59B6',
-    //   '#1ABC9C', '#2ECC71'],
-    series: [
-   
-    ],
-    lineWidth:  2,
-
-
-    credits: {
-      enabled: false
-    },
-    responsive: {
-      rules: [{
-        condition: {
-          maxWidth: 10000//maxWidth: 800
+          format: '<b>{point.name}</b> ({point.y:,.0f})',
+          softConnector: true,
         },
-        chartOptions: {
-          legend: {
-
-            itemStyle: {
-              color: 'var(--bs-body-color)'
-             },
-          
-            layout: 'horizontal',
-            align: 'center',
-            verticalAlign: 'bottom'
-          }
-        }
-      }]
-    }
-
-
-    // {
-    //   name: 'Data Series 1',
-    //   data: [1, 3, 2, 4]
-    // }, {
-    //   name: 'Data Series 2',
-    //   data: [2, 4, 3, 5]
-    // }, {
-    //   name: 'Data Series 3',
-    //   data: [3, 2, 4, 6]
-    // }
- 
-  
+        center: ['40%', '50%'],
+        neckWidth: '30%',
+        neckHeight: '25%',
+        width: '80%',
+      },
+    },
+    legend: {
+      enabled: false,
+    },
+    series: [
+      {
+        name: 'Unique Users',
+        data: [
+         
+        ],
+      },
+    ],
 
 
-}
-
+  };
+  // ['Website visits', 15654],
+  // ['Downloads', 4064],
+  // ['Requested price list', 1987],
+  // ['Invoice sent', 976],
+  // ['Finalized', 846],
   
 
 
@@ -1911,6 +1778,8 @@ miniTableFieldsRead(readFields:any){
 
 
 }
+
+
 FormatXaxisValues = [
 
   { value: 'Default', text: 'Default' },

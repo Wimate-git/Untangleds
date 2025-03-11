@@ -72,6 +72,9 @@ import { ImageConfigComponent } from './image-config/image-config.component';
 import { ImageUiComponent } from './image-ui/image-ui.component';
 import { DataTableTile2Component } from './data-table-tile2/data-table-tile2.component';
 import { HtmlModalComponent } from './html-modal/html-modal.component';
+import { FunnelChartConfigComponent } from './funnel-chart-config/funnel-chart-config.component';
+import { FunnelChartUiComponent } from './funnel-chart-ui/funnel-chart-ui.component';
+import { DataTableFunnelChartComponent } from './data-table-funnel-chart/data-table-funnel-chart.component';
 
 
 
@@ -120,7 +123,10 @@ import { HtmlModalComponent } from './html-modal/html-modal.component';
     ImageConfigComponent,
     ImageUiComponent,
     DataTableTile2Component,
-    HtmlModalComponent
+    HtmlModalComponent,
+    FunnelChartConfigComponent,
+    FunnelChartUiComponent,
+    DataTableFunnelChartComponent
 
 
 
@@ -208,7 +214,10 @@ import { HtmlModalComponent } from './html-modal/html-modal.component';
     ImageConfigComponent,
     ImageUiComponent,
     DataTableTile2Component,
-    HtmlModalComponent
+    HtmlModalComponent,   
+     FunnelChartConfigComponent,
+    FunnelChartUiComponent,
+    DataTableFunnelChartComponent
     
   
 

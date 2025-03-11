@@ -63,6 +63,8 @@ import { SummaryEngineService } from './summary-engine.service';
 import { ImageConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/image-config/image-config.component';
 import { catchError, throwError } from 'rxjs';
 import { BlobService } from './blob.service';
+import funnel from 'highcharts/modules/funnel';
+import { FunnelChartConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/funnel-chart-config/funnel-chart-config.component';
 
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
@@ -80,6 +82,7 @@ interface ListItem {
     P7: any;
     P8: any;
     P9: any;
+    P10:any
   };
 }
 interface RowData {
@@ -139,6 +142,7 @@ interface NgxSelectEvent {
 
 HighchartsMore(Highcharts);
 HighchartsSolidGauge(Highcharts);
+funnel(Highcharts);
 @Component({
   selector: 'app-summary-engine',
   templateUrl: './summary-engine.component.html',
@@ -176,10 +180,12 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   @ViewChild(MultiTableConfigComponent, { static: false }) MultiTableConfigComponent: MultiTableConfigComponent;
   @ViewChild(HtmlTileConfigComponent, { static: false }) HtmlTileConfigComponent: HtmlTileConfigComponent;
   @ViewChild(ImageConfigComponent, { static: false }) ImageConfigComponent: ImageConfigComponent;
+
+  @ViewChild(FunnelChartConfigComponent, { static: false }) FunnelChartConfigComponent: FunnelChartConfigComponent;
   
   
-  
- 
+  @ViewChild('container', { read: ElementRef }) container: ElementRef;
+
   
 
 
@@ -311,6 +317,9 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   toRouterID: any;
   filterConditions: any;
   blobUrl: string = '';
+  isFullscreen: boolean;
+  PinValue: number;
+  PinCheck: any;
 
 
   createPieChart() {
@@ -378,6 +387,50 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     };
   
     Highcharts.chart('pieChart', chartOptions);
+  }
+
+
+  createFunnelChart() {
+    const chartOptions: any = {
+      chart: {
+        type: 'funnel',
+      },
+      title: {
+        text: 'Sales Funnel',
+      },
+      plotOptions: {
+        series: {
+          dataLabels: {
+            enabled: true,
+            format: '<b>{point.name}</b> ({point.y:,.0f})',
+            softConnector: true,
+          },
+          center: ['40%', '50%'],
+          neckWidth: '30%',
+          neckHeight: '25%',
+          width: '80%',
+        },
+      },
+      legend: {
+        enabled: false,
+      },
+      series: [
+        {
+          name: 'Unique Users',
+          data: [
+            ['Website visits', 15654],
+            ['Downloads', 4064],
+            ['Requested price list', 1987],
+            ['Invoice sent', 976],
+            ['Finalized', 846],
+          ],
+        },
+      ],
+    };
+
+
+      Highcharts.chart('funnelChart', chartOptions);
+  // Delay to ensure the DOM is ready
   }
   
   
@@ -764,16 +817,26 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   isGridDuplicated: boolean = true; 
   summaryDashboardUpdate = false;
  hidingLink = false
- isFullscreen: boolean = false;
+
  isValidID: boolean = true;
  isDashboardConfigured: boolean = true;
 
-
-  isFullScreen = false; // Track the fullscreen state
+ isFullScreen:boolean =false;
+//  // Track the fullscreen state
 
   isFullView = false;   // Track if the icon is in full view mode
 
   isLoading = false; // Add loading state
+
+
+  isPinned = false;
+
+
+  showToolbar = false; // Initially hidden
+
+  toggleToolbar() {
+    this.showToolbar = !this.showToolbar; // Toggle visibility
+  }
   @ViewChild('modalContent') modalContent!: TemplateRef<any>;
   iframeUrl!: SafeResourceUrl;
 
@@ -1565,51 +1628,80 @@ storeFilterTileConfig(config: any, index: number): void {
 }
 
 
-exitFullScreen(): void {
-    localStorage.removeItem('fullscreen');
-    this.isFullscreen = false;
-    this.hidingLink = false;
-    console.log('Exited fullscreen mode');
-    this.updateOptions();
-}
+
 
 closeModal1() {
   this.modalService.dismissAll(); // Close the modal programmatically
 }
-handleKeyDown = (event: KeyboardEvent): void => {
-  if (event.key === 'Escape' && this.isFullScreen) {
-      this.toggleFullScreenFullView(false); // Exit fullscreen
-  }
-};
+// handleKeyDown = (event: KeyboardEvent): void => {
+//   if (event.key === 'Escape' && this.isFullScreen) {
+//       this.toggleFullScreenFullView(false); // Exit fullscreen
+//   }
+// };
 
 toggleFullScreenFullView(enterFullscreen?: boolean): void {
   if (enterFullscreen !== undefined) {
-      this.isFullScreen = enterFullscreen;
+    this.isFullScreen = enterFullscreen;
   } else {
-      this.isFullScreen = !this.isFullScreen; // Toggle fullscreen
+    this.isFullScreen = !this.isFullScreen; // Toggle fullscreen
   }
 
   console.log('Fullscreen state updated:', this.isFullScreen);
-  this.updateOptions(); // Update any dependent options
+  this.updateOptions();
 
   if (this.isFullScreen) {
-      console.log('Entered fullscreen mode');
-      // Additional logic for entering fullscreen
+    console.log('Entered fullscreen mode');
+    this.enterFullScreen();
   } else {
-      console.log('Exited fullscreen mode');
-      // Additional logic for exiting fullscreen
+    this.exitFullScreen(); // Call existing exit function
   }
 }
 
+enterFullScreen(): void {
+  const elem = document.documentElement as HTMLElement;
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if ((elem as any).webkitRequestFullscreen) { /* Safari */
+    (elem as any).webkitRequestFullscreen();
+  } else if ((elem as any).msRequestFullscreen) { /* IE11 */
+    (elem as any).msRequestFullscreen();
+  }
+  localStorage.setItem('fullscreen', 'true');
+}
 
-  // toggleFullView() {
-  //   this.isFullScreen = !this.isFullScreen;  // Toggle the full-screen state
-  //   this.isFullView = !this.isFullView;      // Toggle the icon state (expand/compress)
-  
-  //   // Save the state to localStorage
-  //   localStorage.setItem('isFullScreen', JSON.stringify(true));
-  //   this.cdr.detectChanges(); 
-  // }
+exitFullScreen(): void {
+  localStorage.removeItem('fullscreen');
+  this.isFullScreen = false;
+  this.hidingLink = false;
+  console.log('Exited fullscreen mode');
+  this.updateOptions();
+
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if ((document as any).webkitExitFullscreen) { /* Safari */
+    (document as any).webkitExitFullscreen();
+  } else if ((document as any).msExitFullscreen) { /* IE11 */
+    (document as any).msExitFullscreen();
+  }
+}
+
+// Listen for 'Escape' or 'F11' key presses to exit fullscreen
+@HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    console.log('Event checking from fullscreen:', event);
+
+    // Check for Ctrl + Shift + F
+    if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'f') {
+      event.preventDefault();  // Prevent any default browser action
+      this.toggleFullScreenFullView(true);
+    } else if (event.key === 'Escape') {
+      this.toggleFullScreenFullView(false);
+    }
+  }
+
+
+
+
 
 
 
@@ -1843,7 +1935,33 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
           `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
         );
       }
+      if (item.grid_type === 'Barchart') {
+        const baseHeight = 400; // Base height for the chart
+        const extraHeight = 40; // Additional height for labels, etc.
+  
+        this.chartHeight[index] = Math.max(0, itemComponentHeight + extraHeight); // Adjust height
+        this.chartWidth[index] = Math.max(0, itemComponentWidth);
+  
+        console.log(
+          `Updated chart dimensions at index ${index}:`,
+          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        );
+      }
+
+      
       else if (item.grid_type === 'chart') {
+        const baseHeight = 400; // Base height for the chart
+        // const extraHeight = 40; // Additional height for labels, etc.
+  
+        this.chartHeight[index] = Math.max(0, itemComponentHeight); // Adjust height
+        this.chartWidth[index] = Math.max(0, itemComponentWidth);
+  
+        console.log(
+          `Updated chart dimensions at index ${index}:`,
+          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        );
+      }
+      else if (item.grid_type === 'Funnelchart') {
         const baseHeight = 400; // Base height for the chart
         // const extraHeight = 40; // Additional height for labels, etc.
   
@@ -1986,6 +2104,10 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
         `Resized ${item.grid_type} at index ${index}:`,
         `Height: ${this.tile2Height[index]}, Width: ${this.tile2Width[index]}, Top Margin: }`
       );
+
+
+
+      
   }
 
 
@@ -2147,7 +2269,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
 
     this.resetInactivityTimer()
 
-
+    this.loadPinnedItems();
 
   }
 
@@ -2209,7 +2331,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
   @HostListener('unloaded')
   ngOnDestroy(): void {
     console.log('SummaryEngineComponent destroyed.');
-    document.removeEventListener('keydown', this.handleKeyDown);
+    // document.removeEventListener('keydown', this.handleKeyDown);
   }
   ngAfterViewInit(): void {
     console.log('this.allCompanyDetails',this.createSummaryField.value)
@@ -2224,6 +2346,8 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     this.loadData()
   
     this.addFromService()
+
+  
 
     console.log("this.lookup_data_summary1", this.lookup_data_summary1)
     console.log('create summary fields',this.createSummaryField.value)
@@ -2382,6 +2506,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
     // console.log('readPermission_Id checking initialize',readPermission_Id)
     
     this.initializeCompanyFields();
+   
 
 
     
@@ -2562,21 +2687,7 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
           '1732683476': '2023-12-30'
         }
       ];
-    // const savedFullScreen = localStorage.getItem('isFullScreen');
-    // // this.isFullScreen = savedState ? JSON.parse(savedState) : false;
 
-    // this.cdr.detectChanges(); 
-    // if (savedFullScreen) {
-    //   this.isFullScreen = JSON.parse(savedFullScreen);
-    // } else {
-    //   this.isFullScreen = true;  // Default to full screen if not in localStorage
-    // }
-
-    // const savedState = localStorage.getItem('isGirdMoved');
-    // if (savedState) {
-    //   this.isGirdMoved = JSON.parse(savedState);
-    //   localStorage.removeItem('isGirdMoved'); // Clean up storage
-    // }
 
 
     const savedGridMoved = localStorage.getItem('isGirdMoved');
@@ -2595,7 +2706,9 @@ toggleFullScreenFullView(enterFullscreen?: boolean): void {
 });
   
 this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
-document.removeEventListener('keydown', this.handleKeyDown);
+
+// this.handlePin()
+// document.removeEventListener('keydown', this.handleKeyDown);
 
 // if(params['routeId']){
 //   console.log(params['routeId'])
@@ -2903,8 +3016,8 @@ fetchCompanyLookupdata(sk:any):any {
                 if (element !== null && element !== undefined) {
                   // Extract values from each element and push them to lookup_data_user
                   const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
-                  const { P1, P2, P3, P4, P5, P6,P7 ,P8} = element[key]; // Extract values from the nested object
-                 this.lookup_data_summary.push({ P1, P2, P3, P4, P5, P6,P7,P8 }); // Push an array containing P1, P2, P3, P4, P5, P6
+                  const { P1, P2, P3, P4, P5, P6,P7 ,P8,P9,P10} = element[key]; // Extract values from the nested object
+                 this.lookup_data_summary.push({ P1, P2, P3, P4, P5, P6,P7,P8,P9,P10 }); // Push an array containing P1, P2, P3, P4, P5, P6
                   console.log("d2 =", this.lookup_data_summary);
                 } else {
                   break;
@@ -3103,7 +3216,10 @@ setTimeout(() => {
 setTimeout(() => {
   this.createAreaChart()
 }, 500);
-
+setTimeout(() => {
+  this.createFunnelChart()
+  
+}, 500);
 
 
 
@@ -3161,14 +3277,7 @@ setTimeout(() => {
 
   viewItem(id: string): void {
     console.log('this.all_Packet_store check viewItem',this.lookup_data_summaryCopy)
-    // Toggle the full-screen state
-    // this.isFullScreen = !this.isFullScreen;
-    // this.isFullView = !this.isFullView;
-
-    // // Save the state to localStorage
-    // localStorage.setItem('isFullScreen', JSON.stringify(this.isFullScreen));
-
-    // Navigate to the desired route
+   
     this.setFullscreen()
     this.router.navigate([`/summary-engine/${id}`]);
     this.cdr.detectChanges();
@@ -3217,24 +3326,7 @@ setTimeout(() => {
   
   
   
-  // toggleFullScreen() {
-  //   this.isFullScreen = !this.isFullScreen;
-  //   localStorage.setItem('isFullScreen', JSON.stringify(true));
-  //   this.cdr.detectChanges(); 
-  // }
-  
-  // setFullScreen(): void {
-  //   document.body.style.overflow = 'hidden'; // Hide overflow to simulate fullscreen
-  //   document.body.requestFullscreen?.(); // Optional: Fullscreen API to enter fullscreen mode (browser-specific)
-  //   // Add any other fullscreen-related styles or classes
-  // }
-  
-  // Method to exit fullscreen
-  // exitFullScreen(): void {
-  //   document.body.style.overflow = 'auto'; // Restore overflow
-  //   document.exitFullscreen?.(); // Optional: Fullscreen API to exit fullscreen mode (browser-specific)
-  //   // Remove fullscreen-related styles or classes
-  // }
+
 
   
   redirectDashboard(id: string): void {
@@ -3622,6 +3714,15 @@ justReadStyles(data:any,index:any){
 
     }
 
+    else if(event.arg1.grid_type=='Funnelchart'){
+      this.modalService.open(KPIModal, { size: 'xl' });
+      console.log('event check', event)
+      setTimeout(() => {
+        this.FunnelChartConfigComponent.openFunnelChartModal(event.arg1, event.arg2)
+      }, 500);
+
+    }
+
     else if(event.arg1.grid_type=='Columnchart'){
       this.modalService.open(KPIModal, { size: 'xl' });
       console.log('event check', event)
@@ -3828,6 +3929,21 @@ justReadStyles(data:any,index:any){
 
     }
     else if (event.data.arg1.grid_type === 'chart') {
+      console.log('event check chart1', event);
+    
+      // Store all company details
+      this.allCompanyDetails = event.all_Packet_store;
+    
+      // Directly update the id and push the object into the dashboard in one line
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
+    }
+
+    else if (event.data.arg1.grid_type === 'Funnelchart') {
       console.log('event check chart1', event);
     
       // Store all company details
@@ -4246,6 +4362,7 @@ console.log('selectedTab checking',this.selectedTab)
       'iconSelect': [[], Validators.required],
       'tilesList':['Tiles'],
       LiveDashboard: [false], // Default toggle state
+      PinCheck:[]
 
      
 
@@ -4482,6 +4599,7 @@ console.log('selectedTab checking',this.selectedTab)
       P7: this.getLoggedUser.username,
       P8: JSON.stringify(this.allCompanyDetails.iconObject),
       P9: this.allCompanyDetails.summaryIcon,
+      P10:''
     };
   
     // API call to create the summary
@@ -4687,139 +4805,7 @@ console.log('selectedTab checking',this.selectedTab)
   }
 
 
-//   createNewSummary() {
-//     this.defaultValue = 'Tiles'
-//     if (this.isDuplicateID || this.isDuplicateName || this.createSummaryField.invalid) {
-//       return; // Prevent saving if there are errors
-//     }
 
-
-
-//     let tempClient = this.SK_clientID + "#summary" + "#lookup";
-//     console.log('tempClient checking', tempClient);
-
-
-//     const createdDate = Math.ceil((new Date()).getTime() / 1000); // Created date
-//     const updatedDate = Math.ceil((new Date()).getTime() / 1000); // Updated date
-
-//     // Prepare summary details
-//     this.allCompanyDetails = {
-//       summaryID: this.createSummaryField.value.summaryID,
-//       summaryName: this.createSummaryField.value.summaryName,
-//       summaryDesc: this.createSummaryField.value.summarydesc,
-
-//       // jsonData: parsedJsonData,
-//       summaryIcon: this.createSummaryField.value.iconSelect,
-//       iconObject: this.previewObjDisplay,
-
-//       // Add the selected icon
-//       crDate: createdDate, // Created date
-//       upDate: updatedDate,  // Updated date
-//       createdUser: this.getLoggedUser.username // Set the creator's username
-//     };
-
-//     console.log("summary data ", this.allCompanyDetails);
-
-//     // Prepare ISO date strings
-//     const createdDateISO = new Date(this.allCompanyDetails.crDate * 1000).toISOString();
-//     const updatedDateISO = new Date(this.allCompanyDetails.upDate * 1000).toISOString();
-
-//     // Prepare tempObj for API call
-//     const tempObj = {
-//       PK: this.SK_clientID + "#" + this.allCompanyDetails.summaryID + "#summary" + "#main",
-//       SK: 1,
-//       metadata: JSON.stringify({
-//         summaryID: this.allCompanyDetails.summaryID,
-//         summaryName: this.allCompanyDetails.summaryName,
-//         summaryDesc: this.allCompanyDetails.summaryDesc,
-//         // jsonData: this.allCompanyDetails.jsonData,
-//         summaryIcon: this.createSummaryField.value.iconSelect,
-//         // Include selected icon in the metadata
-//         created: createdDateISO, // Created date in ISO format
-//         updated: updatedDateISO,   // Updated date in ISO format
-//         createdUser: this.allCompanyDetails.createdUser, // Use the persisted createdUser
-//         iconObject: this.allCompanyDetails.iconObject,
-//         tilesList:this.defaultValue 
-
-//       })
-//     };
-//     // Now, patch the 'tilesList' form control after creating the summary
-// this.createSummaryField.patchValue({
-//   tilesList: this.defaultValue // Set the value to 'Widget'
-// });
-
-//     console.log("TempObj is here ", tempObj);
-//     const temobj1: any = JSON.stringify(this.createSummaryField.value.iconSelect)
-//     // Prepare items for further processing
-//     console.log("this.createSummaryField.value.iconSelec", this.createSummaryField.value.iconSelect)
-//     console.log("temobj1", temobj1)
-//     const items = {
-//       P1: this.createSummaryField.value.summaryID,
-//       P2: this.createSummaryField.value.summaryName,
-//       P3: this.createSummaryField.value.summarydesc,
-//       P4: updatedDate,  // Updated date
-//       P5: createdDate,   // Created date
-//       P6: this.allCompanyDetails.createdUser,  // Created by user
-//       P7: this.getLoggedUser.username,          // Updated by user
-//       P8: JSON.stringify(this.previewObjDisplay),
-//       P9: this.createSummaryField.value.iconSelect // Add selected icon
-//     };
-
-//     // API call to create the summary
-//     this.api.CreateMaster(tempObj).then(async (value: any) => {
-//       await this.createLookUpSummary(items, 1, tempClient);
-
-//       this.datatableConfig = {};
-//       this.lookup_data_summary = [];
-
-//       console.log('value check from create master', value);
-//       if (items || value) {
-//         console.log('items check from create master', items);
-
-//         // Call the loadData function
-//         this.loadData();
-
-//         // Show a success alert and handle the "OK" button click
-//         Swal.fire({
-//           position: 'center', // Center the alert
-//           icon: 'success', // Alert type
-//           title: 'New summary successfully created', // Title text
-//           showConfirmButton: true, // Display the OK button
-//           confirmButtonText: 'OK', // Customize the OK button text
-//           allowOutsideClick: false, // Prevent closing the alert by clicking outside
-//         }).then((result) => {
-//           if (result.isConfirmed) {
-//             // This block is executed when the "OK" button is clicked
-//             if (items && items.P1) {
-//               this.dashboardOpen(items.P1);
-//           // Pass item.P1 to viewItem
-//             }
-//             if (this.modalRef) {
-//               this.modalRef.close(); // Close the modal
-//             }
-//           }
-//         });
-//       }
-
-//       else {
-//         Swal.fire({
-//           position: 'top-end',
-//           icon: 'error',
-//           title: 'Failed to create summary',
-//           showConfirmButton: false,
-//           timer: 1500
-//         });
-//       }
-
-//     }).catch(err => {
-//       console.log('err for creation', err);
-//       this.toast.open("Error in adding new Summary Configuration ", "Check again", {
-//         duration: 5000,
-//         horizontalPosition: 'right',
-//         verticalPosition: 'top',
-//       });
-//     });
-//   }
 
 
 
@@ -4924,40 +4910,48 @@ console.log('selectedTab checking',this.selectedTab)
         this.lookup_data_summaryCopy = data; // Assign fetched data to the component property
         console.log('this.lookup_data_summaryCopy check', this.lookup_data_summaryCopy);
   
-        // Sort the records based on P4 (or another timestamp field) in descending order
-        this.lookup_data_summaryCopy.sort((a, b) => b.P4 - a.P4);
-        console.log('Sorted Data:', this.lookup_data_summaryCopy);
+        // Multi-level sorting: First by P10 (latest first), then by P4
+        this.lookup_data_summaryCopy.sort((a, b) => {
+          const p10A = a.P10 ? Number(a.P10) : 0;
+          const p10B = b.P10 ? Number(b.P10) : 0;
+  
+          // Primary sorting: Sort by P10 in descending order
+          if (p10B - p10A !== 0) {
+            return p10B - p10A;
+          }
+  
+          // Secondary sorting: Sort by P4 in descending order
+          return b.P4 - a.P4;
+        });
+  
+        console.log('Sorted Data (P10 first, then P4):', this.lookup_data_summaryCopy);
   
         // Check the permission ID before applying the filter
         if (this.userPermission === "All") {
           console.log("Permission is 'All'. Displaying all dashboards...");
-
           // No filtering needed, show all data
         } else {
-          // If permissionIdLocal is not 'All', then apply permissions-based filtering
-
-          console.log('Restricted permissions. Filtering dashboards...',this.summaryPermission);
+          console.log('Restricted permissions. Filtering dashboards...', this.summaryPermission);
+          
           if (this.summaryPermission.includes('None')) {
             this.lookup_data_summaryCopy = []; 
-            this.isNone =true
+            this.isNone = true;
             console.log("Permission includes 'None'. No dashboards will be displayed.");
-        // Set the data to an empty array
           } else if (this.summaryPermission.includes('All')) {
             console.log("Permission is 'All'. Displaying all dashboards...");
             // No filtering needed, show all data
-          }else {
+          } else {
             console.log("Restricted permissions. Filtering dashboards...");
             this.lookup_data_summaryCopy = this.lookup_data_summaryCopy
-              .filter((item: any) => this.summaryPermission.includes(item.P1)) // Apply permission filter
+              .filter((item: any) => this.summaryPermission.includes(item.P1))
               .reduce((uniqueItems: any[], currentItem: any) => {
                 // Check if the current item's P1 is already in the uniqueItems array
                 if (!uniqueItems.some(item => item.P1 === currentItem.P1)) {
-                  uniqueItems.push(currentItem); // If not, add it to the array
+                  uniqueItems.push(currentItem);
                 }
                 return uniqueItems;
               }, []); // Initialize with an empty array
           }
-          
         }
   
         // Process each item in the data for parsed icons
@@ -4991,6 +4985,7 @@ console.log('selectedTab checking',this.selectedTab)
         this.cdr.detectChanges(); // Ensure UI updates
       });
   }
+  
   
   
 
@@ -5096,8 +5091,8 @@ console.log('selectedTab checking',this.selectedTab)
 
                   if (element !== null && element !== undefined) {
                     const key = Object.keys(element)[0];
-                    const { P1, P2, P3, P4, P5, P6, P7, P8, P9 } = element[key];
-                    this.lookup_data_summary1.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9 });
+                    const { P1, P2, P3, P4, P5, P6, P7, P8, P9 ,P10} = element[key];
+                    this.lookup_data_summary1.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9,P10 });
                     console.log("d2 =", this.lookup_data_summary1);
                   } else {
                     break; // This may need refinement based on your data structure
@@ -5419,14 +5414,7 @@ console.log('selectedTab checking',this.selectedTab)
   
   SummaryIdRedirect(id: string): void {
     console.log('this.all_Packet_store check viewItem',this.lookup_data_summaryCopy)
-    // Toggle the full-screen state
-    // this.isFullScreen = !this.isFullScreen;
-    // this.isFullView = !this.isFullView;
-
-    // // Save the state to localStorage
-    // localStorage.setItem('isFullScreen', JSON.stringify(this.isFullScreen));
-
-    // Navigate to the desired route
+   
     this.setFullscreen()
     this.router.navigate([`/summary-engine/${id}`]);
     this.cdr.detectChanges();
@@ -5465,22 +5453,14 @@ console.log('selectedTab checking',this.selectedTab)
   
   //   this.validateAndSubmit(tempObj, key);
   // }
-  updateSummary(value: any, key: any) {
+  updateSummary(value: any,key: any,pinValue?:any) {
+    if(key=='editSummary'){
+      this.PinCheck =pinValue
+      console.log('PinCheck from updateSummary',this.PinCheck)
+    }
+console.log('value checking summary',value)
 
-    // try {
-    //   if (typeof this.queryParams.filterTileConfig === 'string') {
-    //     this.updatedQueryPramas = JSON.parse(this.queryParams.filterTileConfig);
-    //   } else {
-    //     console.error('Invalid or undefined filterTileConfig:', this.queryParams.filterTileConfig);
-    //     this.updatedQueryPramas = {}; // default to an empty object or handle as needed
-    //   }
-    // } catch (e) {
-    //   console.error('Error parsing filterTileConfig:', e);
-    //   this.updatedQueryPramas = {}; // default to an empty object or handle as needed
-    // }
-
-    // console.log('this.updatedQueryPramas', this.updatedQueryPramas);
-
+  
     console.log('this.getLoggedUser check update', this.getLoggedUser);
   
     // Extract username for later use
@@ -5551,16 +5531,18 @@ console.log('Serialized Query Params:', serializedQueryParams);
   
     // Prepare items for fetchTimeMachineById
     const items = {
-      P1: this.allCompanyDetails.summaryID,
-      P2: this.allCompanyDetails.summaryName,
-      P3: this.allCompanyDetails.summaryDesc,
-      P4: updatedDate,
-      P5: originalCreatedDate,
-      P6: originalCreatedUser,
-      P7: this.extractUserName,
-      P8: JSON.stringify(this.previewObjDisplay),
-      P9: this.allCompanyDetails.iconSelect,
+      P1: this.allCompanyDetails.summaryID || value.P1,
+      P2: this.allCompanyDetails.summaryName || value.P2,
+      P3: this.allCompanyDetails.summaryDesc || value.P3,
+      P4: updatedDate || value.P4,
+      P5: originalCreatedDate || value.P5,
+      P6: originalCreatedUser || value.P6,
+      P7: this.extractUserName || value.P7,
+      P8: this.previewObjDisplay ? JSON.stringify(this.previewObjDisplay) : value.P8,
+      P9: this.allCompanyDetails.iconSelect || value.P9,
+      P10: this.allCompanyDetails.PinCheck || this.PinCheck
     };
+    
   
     console.log('Items prepared for fetchTimeMachineById:', items);
     const UserDetails = {
@@ -5579,6 +5561,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
   
     // Trigger fetchTimeMachineById
     if (items.P1) {
+      console.log('check items inupdate',items)
       this.fetchTimeMachineById(1, items.P1, 'update', items);
     } else {
       console.warn('fetchTimeMachineById skipped: Missing summaryID (P1).');
@@ -5589,6 +5572,39 @@ console.log('Serialized Query Params:', serializedQueryParams);
   }
   
   
+  handlePin(receiveItem: any) {
+    console.log('receiveItem check:', receiveItem);
+    console.log("Pin clicked!"); // Debugging output
+  
+    // Get latest epoch timestamp
+    this.PinValue = Date.now(); // This will store the current epoch time
+  
+    console.log("Latest Epoch Timestamp:", this.PinValue);
+  
+    // Read summary ID from formGroup
+    const readSummaryId = this.createSummaryField.get('summaryID')?.value;
+    console.log('readSummaryId checking from the form:', readSummaryId);
+    console.log('this.createSummaryField.value checking:', this.createSummaryField.value);
+  
+    // Call update function with latest epoch timestamp
+    this.updateSummary(receiveItem, 'editSummary', this.PinValue);
+  
+    // Your logic for pin action
+  }
+  
+
+  handleUnpin(receive: any) {
+    console.log('receive checking', receive);
+    console.log("Unpin clicked!"); // Debugging output
+  
+    // Manually clear P10
+    receive.P10 = ''; // Or use undefined if required
+  
+    console.log('Updated receive object after unpin:', receive);
+  
+    // Call update function with the modified object
+    this.updateSummary(receive, 'editSummary');
+  }
   
   
   
@@ -5865,8 +5881,9 @@ this.createSummaryField.patchValue({
       P5: createdDate,   // Created date
       P6: this.allCompanyDetails.createdUser,  // Created by user
       P7: this.getLoggedUser.username,          // Updated by user
-      P8: JSON.stringify(this.previewObjDisplay),
-      P9: this.createSummaryField.value.iconSelect // Add selected icon
+      P8: JSON.stringify(this.previewObjDisplay) ||'',
+      P9: this.createSummaryField.value.iconSelect, // Add selected icon
+      P10:this.createSummaryField.value.PinCheck ||'',
     };
     console.log('items checking from create Summary',items)
 
@@ -6006,6 +6023,7 @@ this.createSummaryField.patchValue({
 
 
   async fetchTimeMachineById(sk: any, id: any, type: any, item: any) {
+    console.log('item check from update',item)
     const tempClient = this.SK_clientID + '#summary' + '#lookup';
     console.log("Temp client is ", tempClient);
     console.log("Type of client", typeof tempClient);
@@ -6140,8 +6158,8 @@ refreshFunction(){
 
               if (element !== null && element !== undefined) {
                 const key = Object.keys(element)[0];
-                const { P1, P2, P3, P4, P5, P6, P7, P8, P9 } = element[key];
-                this.lookup_data_client.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9 });
+                const { P1, P2, P3, P4, P5, P6, P7, P8, P9,P10 } = element[key];
+                this.lookup_data_client.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9,P10 });
                 console.log("d2 =", this.lookup_data_client);
               } else {
                 break;
@@ -7047,6 +7065,14 @@ refreshFunction(){
     this.modalService.open(ChartModal1, { size: 'xl' });
     modal.dismiss();
   }
+
+
+  openFunnelChartModal1(FunnelChartModal: TemplateRef<any>,modal:any) {
+    this.modalService.open(FunnelChartModal, { size: 'xl' });
+    modal.dismiss();
+  }
+
+
   openChartModal2(ChartModal2: TemplateRef<any>,modal:any) {
     this.modalService.open(ChartModal2, { size: 'xl' });
     modal.dismiss();
@@ -7456,7 +7482,10 @@ helperChartClickChart1(event: any, modalChart: any) {
       TableWidget:{ width: this.tableWidth, height: this.tableHeight, heightOffset: 80, widthOffset: 30  },
       title:{ width: this.titleWidth, height: this.titleHeight, heightOffset: 80, widthOffset: 30  },
       HTMLtile:{width:this.HTMLtileWidth,  height:this.HTMLtileHeight, heightOffset: 80, widthOffset: 30  },
-      filterTile:{width:this.filterTileWidth,height:this.filterTileHeight ,heightOffset: 80, widthOffset: 30 }
+      filterTile:{width:this.filterTileWidth,height:this.filterTileHeight ,heightOffset: 80, widthOffset: 30 },
+      Funnelchart:{width:this.chartWidth, height:this.chartHeight, heightOffset: 10, widthOffset: 30 },
+      Barchart:{width:this.chartWidth, height:this.chartHeight, heightOffset: 10, widthOffset: 30 },
+      Areachart:{width:this.chartWidth, height:this.chartHeight, heightOffset: 10, widthOffset: 30 }
  
       // filterTileHeight:any []=[];
       // filterTileWidth:any []=[];
@@ -7584,6 +7613,43 @@ helperChartClickChart1(event: any, modalChart: any) {
     });
 
   }
+  pinnedItems: Map<string, boolean> = new Map(); // Use Map instead of Set
+
+  togglePin(item: any): void {
+    console.log('item checking togglePin', item);
+  
+    const itemId = item.P1; // Using P1 as the unique identifier
+    if (!itemId) {
+      console.error('No valid ID found for item:', item);
+      return;
+    }
+  
+    if (this.pinnedItems.has(itemId) && this.pinnedItems.get(itemId)) {
+      this.pinnedItems.set(itemId, false);
+      this.handleUnpin(item);
+    } else {
+      this.pinnedItems.set(itemId, true);
+      this.handlePin(item);
+    }
+  
+    this.savePinnedItems(); // Save to localStorage
+  }
+  
+  // Load pinned items from localStorage
+  loadPinnedItems(): void {
+    const storedPinnedItems = localStorage.getItem('pinnedItems');
+    if (storedPinnedItems) {
+      this.pinnedItems = new Map(JSON.parse(storedPinnedItems));
+    }
+  }
+  
+  // Save pinned items to localStorage
+  savePinnedItems(): void {
+    localStorage.setItem('pinnedItems', JSON.stringify(Array.from(this.pinnedItems.entries())));
+  }
+  
+  
+  
 
 }
 

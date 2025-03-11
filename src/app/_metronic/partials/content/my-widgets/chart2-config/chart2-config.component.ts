@@ -301,6 +301,7 @@ validateAndSubmit() {
             formatType:['',Validators.required],
             filterDescription:[''],
             filterParameter:[[]],
+            XaxisFormat:['']
           })
         );
         console.log('this.all_fields check', this.all_fields);
@@ -486,6 +487,9 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
   if (typeof tempParsed === 'string') {
     tempParsed = JSON.parse(tempParsed);
 }
+
+
+
 
 // Update the chart options dynamically
 const updatedHighchartsOptionsJson = {
@@ -809,7 +813,8 @@ repopulate_fields(getValues: any): FormArray {
           custom_Label:configItem.custom_Label || '',
           formatType:configItem.formatType || '',
           filterParameter: this.fb.control(filterParameterValue),
-               filterDescription:configItem.filterDescription ||''
+               filterDescription:configItem.filterDescription ||'',
+                   XaxisFormat:configItem.XaxisFormat ||''
         })
       );
 
@@ -1487,5 +1492,10 @@ FormatTypeValues = [
 
 ]
 
+FormatXaxisValues = [
+
+  { value: 'Default', text: 'Default' },
+  // { value: 'Default', text: 'Default' },
+]
 
 }

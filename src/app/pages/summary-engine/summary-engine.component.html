@@ -84,7 +84,7 @@
                 [ngClass]="{
                 
                     
-                         'chart1-style' : item.grid_type === 'chart' || item.grid_type === 'Linechart' ||item.grid_type === 'Columnchart' ,
+                         'chart1-style' : item.grid_type === 'chart' || item.grid_type === 'Linechart' ||item.grid_type === 'Columnchart' ||item.grid_type === 'Funnelchart',
                       
               
                         
@@ -213,6 +213,13 @@
                       <app-chart-ui1 [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,ChartModal1)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
                  
                       [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalChart1)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-chart-ui1>
+                    </div>
+
+                    <div *ngIf="item.grid_type === 'Funnelchart'"  >
+                      <app-funnel-chart-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,FunnelChartModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
+                 
+                      [hidingLink]="hidingLink"   (sendCellInfo) = "helperChartClickChart1($event,dataTableModalFunnelChart)" [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-funnel-chart-ui>
+                      
                     </div>
                     <div *ngIf="item.grid_type === 'Linechart'"  >
                       <app-chart-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal2)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" (sendCellInfo) = "helperChartClickChart2($event,dataTableModalChart2)" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView" [hideButton]="hideButton" [routeId]="routeId" [SK_clientID]="SK_clientID"
@@ -515,6 +522,7 @@
                 <th class="text-start fw-bold text-dark fs-4">Updated</th>
                 <th class="text-start fw-bold text-dark fs-4">Created</th>
                 <th class="text-start fw-bold text-dark fs-4">View</th>
+                <th class="text-start fw-bold text-dark fs-4">Pin</th>
               </tr>
             </thead>
             <!--end::Table head-->
@@ -525,16 +533,50 @@
                 <td>
                   <div class="d-flex align-items-center">
                     <span class="text-gray-500 fw-semibold d-block fs-7 me-2">
-                      <div class="symbol symbol-50px me-5">
+                      <!-- <div class="symbol symbol-50px me-5">
                         <span [class]="item.parsedIcon?.class2">
                           <app-keenicon [name]="item.parsedIcon?.value" [class]="item.parsedIcon?.class1"
                             style="display: contents;"></app-keenicon>
                         </span>
+                      </div> -->
+                    
+                      <div class="symbol symbol-50px me-5 position-relative">
+                        <span [class]="item.parsedIcon?.class2" class="position-relative">
+                          <!-- Pin Icon (Overlayed at the Top) -->
+                     
+                  
+                          <!-- Main Keen Icon -->
+                          <app-keenicon 
+                            [name]="item.parsedIcon?.value" 
+                            [class]="item.parsedIcon?.class1"
+                            style="display: contents;">
+                          </app-keenicon>
+
+                          <span>
+
+                       
+                          </span>
+
+
+                      
+                        </span>
                       </div>
+                      
+                      
+                      
+                      
+                    
                     </span>
                     <div class="d-flex justify-content-start flex-column">
                       <a class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6"
-                        (click)="viewItem(item.P1); $event.preventDefault()">{{ item.P1 }}</a>
+                        (click)="viewItem(item.P1); $event.preventDefault()">{{ item.P1 }}
+
+                        <app-keenicon 
+                        *ngIf="item.P10" 
+                        name="pin" 
+                        class="pin-icon fs-2">
+                      </app-keenicon>
+                      </a>
                     </div>
                   </div>
                 </td>
@@ -560,6 +602,47 @@
                     <i class="ki-duotone ki-black-right fs-2 text-gray-500"></i>
                   </a>
                 </td>
+                  <td class="text-start">
+                 
+                    <button 
+                    class="btn btn-icon w-25px h-25px w-md-20px h-md-20px"
+                    (click)="togglePin(item)">
+                    <i [ngClass]="pinnedItems.get(item.P1) ? 'bi bi-pin-fill fs-2 text-primary' : 'bi bi-pin fs-2 text-muted'"></i>
+                  </button>
+                  
+                  
+                  
+             
+                    
+              
+                    
+         
+
+                    <!-- <div class="dropdown">
+                      <button 
+                        [matMenuTriggerFor]="menu"
+                        class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px">
+                        <i class="fa fa-chevron-down" style="color: var(--bs-body-color);"></i>
+                      </button>
+                    
+                      <mat-menu #menu="matMenu" class="mat-elevation-z4">
+                        <button mat-menu-item (click)="handlePin(item)">
+                          <i class="bi bi-pin fs-4"></i>
+                          <span>Pin</span>
+                        </button>
+                        <button mat-menu-item (click)="handleUnpin(item)">
+                          <i class="bi bi-pin-angle fs-4"></i> 
+                          <span>UnPin</span>
+                        </button>
+                      </mat-menu>
+                    </div> -->
+                    
+                    
+             
+                  </td>
+                  
+                  
+
               </tr>
             </tbody>
             <!--end::Table body-->
@@ -1232,6 +1315,9 @@
                 </div>
               </button>
             </div>
+
+
+            
             <div class="col-md-6">
               <!-- Line Chart Button -->
               <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7" style="border: 0px;">
@@ -1251,14 +1337,17 @@
                 </div>
               </button>
             </div>
+
+
             <div class="col-md-6">
-              <!-- Area Chart Button -->
-              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7" style="border: 0px; display: block; width: 100%;">
-                <div id="areaChart" style="width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;" 
-                  (click)="openChartModal4(ChartModal4, modal)">
+              <!-- Pie Chart Button -->
+              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7" style="border: 0px;">
+                <div id="funnelChart" style="width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;" 
+                  (click)="openFunnelChartModal1(FunnelChartModal, modal)">
                 </div>
               </button>
             </div>
+       
           </div>
   
   
@@ -1271,6 +1360,16 @@
                 </div>
               </button>
             </div>
+            <div class="col-md-6">
+              <!-- Area Chart Button -->
+              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7" style="border: 0px; display: block; width: 100%;">
+                <div id="areaChart" style="width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;" 
+                  (click)="openChartModal4(ChartModal4, modal)">
+                </div>
+              </button>
+            </div>
+
+
   
           </div>
         </div>
@@ -2196,6 +2295,23 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
     <app-html-modal
     [modal]="modal" [blobUrl]="blobUrl"
     ></app-html-modal>
+  </ng-template>
+
+
+
+
+  <ng-template #FunnelChartModal let-modal >
+  
+    <app-funnel-chart-config  [dashboard]="dashboard" (dashboardChange)="getGridDetails2($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver2($event)"></app-funnel-chart-config>
+  
+  </ng-template>
+
+
+  <ng-template #dataTableModalFunnelChart let-modal>
+    <app-data-table-funnel-chart
+   
+       [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
+    ></app-data-table-funnel-chart>
   </ng-template>
   </div>
 <!--   

@@ -355,7 +355,8 @@ export class Chart1ConfigComponent implements OnInit {
             undefinedCheckLabel:[''],
             custom_Label:['',Validators.required],
             filterParameter:[[]],
-            filterDescription:['']
+            filterDescription:[''],
+            XaxisFormat:['']
 
             
 
@@ -829,7 +830,8 @@ repopulate_fields(getValues: any): FormArray {
           formatType:configItem.formatType ||'',
           undefinedCheckLabel:configItem.undefinedCheckLabel ||'',
           custom_Label:configItem.custom_Label ||'',
-          filterDescription:configItem.filterDescription ||''
+          filterDescription:configItem.filterDescription ||'',
+          XaxisFormat:configItem.XaxisFormat ||''
 
         })
       );
@@ -1566,6 +1568,15 @@ FormatTypeValues = [
   { value: 'Percentage', text: 'Percentage' },
 
 
+]
+
+
+
+
+FormatXaxisValues = [
+
+  { value: 'Default', text: 'Default' },
+  // { value: 'Default', text: 'Default' },
 ]
 
 validateAndSubmit() {

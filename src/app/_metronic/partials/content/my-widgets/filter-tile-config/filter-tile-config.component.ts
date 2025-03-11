@@ -126,6 +126,9 @@ makeTrueCheck:any = false
   storeliveFilterData: any;
   localStorageKey = 'filterConditions';
   toggleCheck: boolean;
+  fieldTypeCheck: boolean = false;
+  conditionFilterRead: any;
+  conditionfilter: any[]=[];
 
 
  
@@ -176,6 +179,9 @@ makeTrueCheck:any = false
       noOfParams: [0],
       all_fields: this.fb.array([]), // Initialize empty array
     });
+
+    const allFieldsArray = this.createChart.get('all_fields') as FormArray;
+    console.log("allFieldsArray from Filter",allFieldsArray.value)
   
 
 
@@ -375,18 +381,18 @@ makeTrueCheck:any = false
           }));
 
           // Add created_time and updated_time if present
-          if (parsedMetadata.created_time) {
-            dynamicParamList.push({
-              value: parsedMetadata.created_time.toString(),
-              text: 'Created Time',
-            });
-          }
-          if (parsedMetadata.updated_time) {
-            dynamicParamList.push({
-              value: parsedMetadata.updated_time.toString(),
-              text: 'Updated Time',
-            });
-          }
+          // if (parsedMetadata.created_time) {
+          //   dynamicParamList.push({
+          //     value: parsedMetadata.created_time.toString(),
+          //     text: 'Created Time',
+          //   });
+          // }
+          // if (parsedMetadata.updated_time) {
+          //   dynamicParamList.push({
+          //     value: parsedMetadata.updated_time.toString(),
+          //     text: 'Updated Time',
+          //   });
+          // }
 
           // Store the filtered dynamicParamList in a map by index
           console.log('dynamicParamList checking', dynamicParamList);
@@ -616,12 +622,17 @@ makeTrueCheck:any = false
           conditions: this.fb.array([
             this.fb.group({
               formField: ['', Validators.required],
-              operator: ['==', Validators.required],
+              operator: ['', Validators.required],
               filterValue: ['', Validators.required],
               operatorBetween: ['', Validators.required],
               parameterName: [formValue[index] || '', Validators.required],
               type:['text'], // Add `parameterName` inside `conditions`
-              fieldLabel:['']
+              fieldLabel:[''],
+              daysAgo:[''],
+              startDate:[''],
+              endDate:[''],
+              singleDate:[''],
+              dateType:[''],
             }),
           ]),
         })
@@ -661,12 +672,18 @@ makeTrueCheck:any = false
   
     const newConditionPush = this.fb.group({
       formField: ['', Validators.required],
-      operator: ['==', Validators.required],
+      operator: ['', Validators.required],
       filterValue: ['', Validators.required],
       operatorBetween: ['', Validators.required],
       type: ['text'],
       parameterName: [formName, Validators.required],
-      fieldLabel:['']
+      fieldLabel:[''],
+      daysAgo:[''],
+      startDate:[''],
+      endDate:[''],
+      singleDate:[''],
+      dateType:[''],
+
 
     });
   
@@ -946,27 +963,78 @@ makeTrueCheck:any = false
         return [];
       }
   
-      return field.conditions.map((condition: any) => ({
-        formField: condition.formField || '',
-        operator: condition.operator || '',
-        filterValue: condition.filterValue || '', 
-        operatorBetween: condition.operatorBetween || '',
-        parameterName: condition.parameterName || '',
-        fieldLabel: condition.fieldLabel,
-        // Add date-related values conditionally
-        daysAgo: this.createChart.value.daysAgo || '',
-        startDate: this.createChart.value.startDate || '',
-        endDate: this.createChart.value.endDate || '',
-        singleDate: this.createChart.value.singleDate || '',
-                // daysAgo: this.createChart.value.daysAgo,
-        dateType: this.createChart.value.dateType || '',
-
-      }));
+      return field.conditions.map((condition: any) => {
+        if (condition.formField.startsWith("date-")) {
+            return {
+                formField: condition.formField || '',
+                operator: condition.operator || '',
+                filterValue: condition.filterValue || '',
+                operatorBetween: condition.operatorBetween || '',
+                parameterName: condition.parameterName || '',
+                fieldLabel: condition.fieldLabel,
+    
+                // Use values from `condition` when it's a date field
+                daysAgo: condition.daysAgo || '',
+                startDate: condition.startDate || '',
+                endDate: condition.endDate || '',
+                singleDate: condition.singleDate || '',
+                dateType: condition.dateType || '',
+            };
+        } else {
+            return {
+                formField: condition.formField || '',
+                operator: condition.operator || '',
+                filterValue: condition.filterValue || '',
+                operatorBetween: condition.operatorBetween || '',
+                parameterName: condition.parameterName || '',
+                fieldLabel: condition.fieldLabel,
+    
+                // Use default values from `this.createChart.value`
+                daysAgo: this.createChart.value.daysAgo || '',
+                startDate: this.createChart.value.startDate || '',
+                endDate: this.createChart.value.endDate || '',
+                singleDate: this.createChart.value.singleDate || '',
+                dateType: this.createChart.value.dateType || '',
+            };
+        }
     });
+    
+    });
+
+    console.log('conditionsFilter check inside the requestbody',conditionsFilter)
+
+
+    // const TypeFilter = fields.map((field: { conditions: any[]; parameterName: string }) => {
+    //   if (!field.conditions || !Array.isArray(field.conditions)) {
+    //     console.error('Invalid conditions in field:', field);
+    //     return [];
+    //   }
+  
+    //   return field.conditions.map((condition: any) => ({
+    //     formField: condition.formField || '',
+  
+    //     parameterName: condition.parameterName || '',
+    //     daysAgo: condition.daysAgo || '',
+    //     startDate: condition.startDate || '',
+    //     endDate: condition.endDate || '',
+    //     singleDate: condition.singleDate || '',
+    //             // daysAgo: this.createChart.value.daysAgo,
+    //     dateType: condition.dateType || '',
+
+
+    //     // Add date-related values conditionally
+       
+
+    //   }));
+    // });
+
+    // console.log('TypeFilter checking',TypeFilter)
+    // this.conditionFilterRead = TypeFilter
   
     console.log('conditionsFilter checking', conditionsFilter);
   
     this.ConditionsFormat = conditionsFilter;
+    console.log('this.ConditionsFormat checking',this.ConditionsFormat)
     this.liveFilterConditions.emit(this.ConditionsFormat);
 
     this.isLoading = true;
@@ -985,11 +1053,13 @@ makeTrueCheck:any = false
         permissionList: this.readFilterEquation || [],
         userName: this.userdetails,
         conditions: this.ConditionsFormat,
-        MsgType:'FilterRequest'
+        MsgType:'FilterRequest',
+      
+
       }),
     };
   
-    console.log('requestBody checking', requestBody);
+    console.log('requestBody checking from filter', requestBody);
   
     this.http.post(apiUrl, requestBody).subscribe(
       (response) => {
@@ -2108,96 +2178,7 @@ console.log('tempMetadata',tempMetadata)
   
   
   
-  // getOptionsForField(
-  //   fieldIndex: number,
-  //   conditionIndex: number,
-  //   formFieldValue: string
-  // ): void {
-  //   console.log('fieldIndex check:', fieldIndex);
-  //   console.log('conditionIndex check:', conditionIndex);
-  //   console.log('formFieldValue check:', formFieldValue);
-  //   console.log('Final populateFormBuilder dynamic:', this.populateFormBuilder);
-  //   console.log('globalFieldData checking from option',this.globalFieldData)
-    
-  
-  //   try {
-  //     if (!this.globalFieldData[fieldIndex]) {
-  //       this.globalFieldData[fieldIndex] = {}; // Or however you need it structured
-  //   }
-  //   if (!this.globalFieldData[fieldIndex][conditionIndex]) {
-  //       this.globalFieldData[fieldIndex][conditionIndex] = {};
-  //   }
-  //     const fieldGroup = this.all_fields.at(fieldIndex) as FormGroup;
-  //     if (!fieldGroup) {
-  //       console.warn(`Field group is undefined for fieldIndex ${fieldIndex}`);
-  //       return;
-  //     }
-  
-  //     const conditions = fieldGroup.get('conditions') as FormArray;
-  //     if (!conditions || !conditions.controls[conditionIndex]) {
-  //       console.warn(`Conditions array or condition at index ${conditionIndex} is not defined for fieldIndex ${fieldIndex}`);
-  //       return;
-  //     }
-  
-  //     if (!formFieldValue) {
-  //       console.warn('formFieldValue is empty or invalid');
-  //       conditions.controls[conditionIndex].get('type')?.setValue('text');
-  //       this.globalFieldData[fieldIndex][conditionIndex] = { type: 'text', options: null };
-  //       return;
-  //     }
-  
-  //     // Use formlistValues to retrieve the form name by index
-  //     const formName = this.formlistValues[fieldIndex];
-  //     console.log('formName from formlistValues:', formName);
-  
-  //     if (!formName) {
-  //       console.warn(`Form name is missing for fieldIndex ${fieldIndex} in formlistValues`);
-  //       conditions.controls[conditionIndex].get('type')?.setValue('text');
-  //       this.globalFieldData[fieldIndex][conditionIndex] = { type: 'text', options: null };
-  //       return;
-  //     }
-  
-  //     const metadataAtFieldIndex = this.populateFormBuilder[fieldIndex];
-  //     console.log('metadataAtFieldIndex check:', metadataAtFieldIndex);
-  
-  //     if (!metadataAtFieldIndex || !metadataAtFieldIndex[formName]) {
-  //       console.error(`Form name '${formName}' not found in metadataAtFieldIndex. Available forms:`, Object.keys(metadataAtFieldIndex || {}));
-  //       conditions.controls[conditionIndex].get('type')?.setValue('text');
-  //       this.globalFieldData[fieldIndex][conditionIndex] = { type: 'text', options: null };
-  //       return;
-  //     }
-  
-  //     const matchingMetadata = metadataAtFieldIndex[formName];
-  //     console.log('matchingMetadata check:', matchingMetadata);
-  
-  //     const foundField = matchingMetadata.find((field: Field) => field.name === formFieldValue);
-  //     if (foundField) {
-  //       console.log(`Found field for ${formFieldValue}:`, foundField);
-  
-  //       // Handle case where type is 'select' but options are empty or invalid
-  //       if (
-  //         foundField.type === 'select' &&
-  //         (!foundField.options || foundField.options.length === 0 || foundField.options.every((option: string) => !option.trim()))
-  //       ) {
-  //         console.warn(`Field ${formFieldValue} has type 'select' but options are empty. Defaulting to type 'text'.`);
-  //         conditions.controls[conditionIndex].get('type')?.setValue('text');
-  //         this.globalFieldData[fieldIndex][conditionIndex] = { type: 'text', options: null };
-  //         return;
-  //       }
-  
-  //       // Set the type and options in the global variable
-  //       conditions.controls[conditionIndex].get('type')?.setValue(foundField.type || 'text');
-  //       this.globalFieldData[fieldIndex][conditionIndex] = { type: foundField.type, options: foundField.options || null };
-  //     } else {
-  //       console.warn(`Field with name ${formFieldValue} not found in metadata for index ${fieldIndex}`);
-  //       console.log('Available field names:', matchingMetadata.map((field: Field) => field.name));
-  //       conditions.controls[conditionIndex].get('type')?.setValue('text');
-  //       this.globalFieldData[fieldIndex][conditionIndex] = { type: 'text', options: null };
-  //     }
-  //   } catch (error) {
-  //     console.error('Error in getOptionsForField:', error);
-  //   }
-  // }
+
   
 
 
@@ -2262,23 +2243,49 @@ console.log('tempMetadata',tempMetadata)
   
         // Set the type and options in the global variable
         if (foundField.type === 'select') {
+          if (!this.conditionfilter[fieldIndex]) {
+            this.conditionfilter[fieldIndex] = {}; // Initialize object if undefined
+        }
+    
+        // Ensure conditionIndex exists as an object inside fieldIndex
+        if (!this.conditionfilter[fieldIndex][conditionIndex]) {
+            this.conditionfilter[fieldIndex][conditionIndex] = {}; // Initialize object if undefined
+        }
+    
+        // Set fieldTypeCheck property
+        this.conditionfilter[fieldIndex][conditionIndex].fieldTypeCheck = false;
           // Check if options are empty or contain only empty strings/spaces
           const optionsIsEmpty = !foundField.options || foundField.options.every((option: string) => option.trim() === '');
         
           if (!optionsIsEmpty) {
             // If options are not empty, proceed with appending 'All' to options
-            const optionsWithAll = ['All', ...foundField.options];
+            const transformedOptions = foundField.options.map((option: any) => ({ label: option, value: option }));
+
+            const optionsWithAll = [{label:'All',value:'All'}, ...transformedOptions];
             conditions.controls[conditionIndex].get('type')?.setValue(foundField.type);
             this.globalFieldData[fieldIndex][conditionIndex] = { type: foundField.type, options: optionsWithAll };
           } else {
             // If options are considered empty, check if validation.user is true
             if (foundField.validation && foundField.validation?.user === true) {
+              if (!this.conditionfilter[fieldIndex]) {
+                this.conditionfilter[fieldIndex] = {}; // Initialize object if undefined
+            }
+        
+            // Ensure conditionIndex exists as an object inside fieldIndex
+            if (!this.conditionfilter[fieldIndex][conditionIndex]) {
+                this.conditionfilter[fieldIndex][conditionIndex] = {}; // Initialize object if undefined
+            }
+        
+            // Set fieldTypeCheck property
+            this.conditionfilter[fieldIndex][conditionIndex].fieldTypeCheck = false;
               const lookupKey = `${this.SK_clientID}#user#lookup`;
               console.log('lookupKey',lookupKey)
 
      
                 // Ensure that you are awaiting the async function to get the resolved value
                 const optionsSet = await this.fetchLookupUser(lookupKey, 1); // Await the async function
+                const transformedOptions = optionsSet.map((option: any) => ({ label: option, value: option }));
+
               
                 console.log('this.userlistCheck check', optionsSet); // Log the resolved value
               
@@ -2291,7 +2298,7 @@ console.log('tempMetadata',tempMetadata)
                   // Now set the options once the 'type' is set
                   this.globalFieldData[fieldIndex][conditionIndex] = {
                     type: foundField.type,
-                    options: optionsSet // Assign the resolved options here
+                    options: transformedOptions // Assign the resolved options here
                   };
                 } else {
                   console.error('Type control not found at index', conditionIndex);
@@ -2301,9 +2308,21 @@ console.log('tempMetadata',tempMetadata)
               // Handle the logic for the user dropdown here
               console.log("User list dropdown is here");
             }else if(foundField.validation?.lookup === true && foundField.validation?.form){
+              if (!this.conditionfilter[fieldIndex]) {
+                this.conditionfilter[fieldIndex] = {}; // Initialize object if undefined
+            }
+        
+            // Ensure conditionIndex exists as an object inside fieldIndex
+            if (!this.conditionfilter[fieldIndex][conditionIndex]) {
+                this.conditionfilter[fieldIndex][conditionIndex] = {}; // Initialize object if undefined
+            }
+        
+            // Set fieldTypeCheck property
+            this.conditionfilter[fieldIndex][conditionIndex].fieldTypeCheck = false;
               const lookupKey = `${this.SK_clientID}#${foundField.validation.form}#lookup`;
 
               const extractedIds = await this.fetchLookupFormData(lookupKey, 1, foundField.validation?.field);
+              const transformedOptions = extractedIds.map((option: any) => ({ label: option, value: option }));
               console.log('Received Extracted IDs:', extractedIds);
               const typeControl = conditions.controls[conditionIndex].get('type');
               if (typeControl) {
@@ -2312,7 +2331,7 @@ console.log('tempMetadata',tempMetadata)
                 // Now set the options once the 'type' is set
                 this.globalFieldData[fieldIndex][conditionIndex] = {
                   type: foundField.type,
-                  options: extractedIds // Assign the resolved options here
+                  options: transformedOptions // Assign the resolved options here
                 };
               } else {
                 console.error('Type control not found at index', conditionIndex);
@@ -2324,10 +2343,22 @@ console.log('tempMetadata',tempMetadata)
             }
 
             else if(foundField.validation?.isDerivedUser === true && foundField.validation?.form){
+              if (!this.conditionfilter[fieldIndex]) {
+                this.conditionfilter[fieldIndex] = {}; // Initialize object if undefined
+            }
+        
+            // Ensure conditionIndex exists as an object inside fieldIndex
+            if (!this.conditionfilter[fieldIndex][conditionIndex]) {
+                this.conditionfilter[fieldIndex][conditionIndex] = {}; // Initialize object if undefined
+            }
+        
+            // Set fieldTypeCheck property
+            this.conditionfilter[fieldIndex][conditionIndex].fieldTypeCheck = false;
          
               const lookupKey = `${this.SK_clientID}#${foundField.validation.form}#lookup`;
               
              const extractedDerivedUser = await this.fetchLookupIsDerivedUser(lookupKey,1,foundField.validation?.field)
+             const transformedOptions = extractedDerivedUser.map((option: any) => ({ label: option, value: option }));
              const typeControl = conditions.controls[conditionIndex].get('type');
              if (typeControl) {
                typeControl.setValue(foundField.type); // Set the 'type' value
@@ -2335,7 +2366,7 @@ console.log('tempMetadata',tempMetadata)
                // Now set the options once the 'type' is set
                this.globalFieldData[fieldIndex][conditionIndex] = {
                  type: foundField.type,
-                 options: extractedDerivedUser // Assign the resolved options here
+                 options: transformedOptions // Assign the resolved options here
                };
              } else {
                console.error('Type control not found at index', conditionIndex);
@@ -2343,10 +2374,35 @@ console.log('tempMetadata',tempMetadata)
 
 
             }
+ 
             // else if()
           }
-        } else {
+        }else if (foundField.type === 'date') {
+          console.log('my type is date', foundField.type);
+      
+          // Ensure fieldIndex exists in conditionfilter array
+          if (!this.conditionfilter[fieldIndex]) {
+              this.conditionfilter[fieldIndex] = {}; // Initialize object if undefined
+          }
+      
+          // Ensure conditionIndex exists as an object inside fieldIndex
+          if (!this.conditionfilter[fieldIndex][conditionIndex]) {
+              this.conditionfilter[fieldIndex][conditionIndex] = {}; // Initialize object if undefined
+          }
+      
+          // Set fieldTypeCheck property
+          this.conditionfilter[fieldIndex][conditionIndex].fieldTypeCheck = true;
+      
+          console.log(
+              'this.conditionfilter[fieldIndex][conditionIndex].fieldTypeCheck:',
+              this.conditionfilter[fieldIndex][conditionIndex].fieldTypeCheck
+          );
+          console.log('conditionIndex from filter', conditionIndex);
+          console.log('fieldIndex check from filter', fieldIndex);
+      }
+      else {
           conditions.controls[conditionIndex].get('type')?.setValue('text');
+   
           this.globalFieldData[fieldIndex][conditionIndex] = { type: 'text', options: null };
           // Handle other types if needed
         }
@@ -2557,6 +2613,78 @@ console.log('tempMetadata',tempMetadata)
 
   
   
+  isDateType(field: AbstractControl, type: string): boolean {
+    return field.get('dateType')?.value === type;
+  }
+  getDateType(fieldIndex: number, conditionIndex: number): string | null {
+    // console.log('fieldIndex from dataType:', fieldIndex);
+    // console.log('conditionIndex from dataType:', conditionIndex);
+
+    if (
+        this.all_fields &&
+        this.all_fields.controls[fieldIndex] &&
+        this.all_fields.controls[fieldIndex] instanceof FormGroup
+    ) {
+        const conditionGroup = (this.all_fields.controls[fieldIndex] as FormGroup).get('conditions') as FormArray;
+        
+        if (!conditionGroup || conditionIndex >= conditionGroup.length) {
+            console.warn(`No condition found at index ${conditionIndex} for fieldIndex ${fieldIndex}`);
+            return null;
+        }
+
+        return conditionGroup.at(conditionIndex).get('dateType')?.value || null;
+    }
+    return null;
+}
+
+
+  
+  getInputType(dateType: string | null): string {
+    if (!dateType) return 'date'; // Default type
+    return dateType === 'between time' ? 'datetime-local' : 'date';
+  }
+  
+  isSingleDateCondition(dateType: string | null): boolean {
+    return dateType === '<=' || dateType === '>=' || dateType === 'is';
+  }
+  
+  getDateTypeControl(fieldIndex: number, conditionIndex: number): FormControl {
+    if (!this.all_fields || !this.all_fields.at(fieldIndex)) {
+        console.warn(`No fieldGroup found for fieldIndex ${fieldIndex}`);
+        return new FormControl(null); // Return a fallback FormControl to prevent errors
+    }
+
+    const fieldGroup = this.all_fields.at(fieldIndex) as FormGroup;
+    const conditionsArray = fieldGroup.get('conditions') as FormArray;
+
+    if (!conditionsArray || conditionsArray.length <= conditionIndex) {
+        console.warn(`No dateType control found for fieldIndex ${fieldIndex}, conditionIndex ${conditionIndex}`);
+        return new FormControl(null); // Return fallback FormControl
+    }
+
+    const control = conditionsArray.at(conditionIndex).get('dateType') as FormControl;
+    if (!control) {
+        console.warn(`dateType control is missing for fieldIndex ${fieldIndex}, conditionIndex ${conditionIndex}`);
+        return new FormControl(null);
+    }
+
+    return control;
+}
+
+
+  
+  
+  isFieldTypeCheck(fieldIndex: number, conditionIndex: number): boolean {
+    const fieldGroup = this.all_fields.at(fieldIndex) as FormGroup;
+    const conditionsArray = fieldGroup.get('conditions') as FormArray;
+  
+    if (conditionsArray && conditionsArray.at(conditionIndex)) {
+      const condition = conditionsArray.at(conditionIndex) as FormGroup;
+      return condition.get('fieldTypeCheck')?.value || false;
+    }
+  
+    return false;
+  }
   
   
 
