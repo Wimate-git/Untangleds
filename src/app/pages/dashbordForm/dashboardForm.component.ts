@@ -68,7 +68,7 @@ export class DashboardFormComponent implements OnInit {
     async ngOnInit(): Promise<void> {
 
         this.spinner.show()
-       
+
 
         this.route.paramMap.subscribe(params => {
             console.log(this.route)
@@ -86,7 +86,7 @@ export class DashboardFormComponent implements OnInit {
         this.client = this.loginDetail_string.clientID
         this.user = this.loginDetail_string.username
 
-     this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.client)
+        this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.client)
 
 
         console.log("FORM ID PERMISSION:", this.formIDPermission)
@@ -189,21 +189,24 @@ export class DashboardFormComponent implements OnInit {
             })
 
             // permission dynamic Entries
+            // const allowedForms = this.permissionForm.reduce((acc: string[], permission: any) => {
+            //     return acc.concat(permission.dynamicForm);
+            // }, []);
             const allowedForms = this.permissionForm.reduce((acc: string[], permission: any) => {
                 return acc.concat(permission.dynamicForm);
             }, []);
 
             console.log("ALLOW FORMS:", allowedForms)
 
-           
+
             setTimeout(async () => {
                 if (this.id == 'Calendar') {
                     await this.api.GetMaster(this.client + "#systemCalendarQuery#lookup", 1).then((result: any) => {
                         if (result) {
                             this.helpherObj = JSON.parse(result.options)
-    
+
                             this.formList = this.helpherObj.map((item: any) => item)
-    
+
                             console.log("DYNAMIC FORMLIST:", this.formList)
                         }
                     }).catch((error) => {
@@ -211,13 +214,13 @@ export class DashboardFormComponent implements OnInit {
                     })
                 }
                 else {
-    
+
                     await this.api.GetMaster(this.client + "#dynamic_form#lookup", 1).then((result: any) => {
                         if (result) {
                             this.helpherObj = JSON.parse(result.options)
-    
+
                             this.formList = this.helpherObj.map((item: any) => item)
-    
+
                             console.log("DYNAMIC FORMLIST:", this.formList)
                         }
                     }).catch((error) => {
@@ -227,12 +230,20 @@ export class DashboardFormComponent implements OnInit {
 
                 let matchingItems = []
                 if (allowedForms.includes('All')) {      //dynamicEntrie selected all 
+
+                    console.log(this.filtermatchedData, this.groupFormResponse.formList)
                     matchingItems = this.filtermatchedData.filter((item: any) => this.groupFormResponse.formList.includes(item));
+
+                    console.log("if condition:",matchingItems)
                 }
                 else {
                     // matchingItems = allowedForms.filter((item: any) => this.groupFormResponse.formList.includes(item));
 
-                    matchingItems = this.filtermatchedData.filter((item: any) => allowedForms.includes(item));
+                    console.log(this.filtermatchedData, this.groupFormResponse.formList)
+
+                    matchingItems = this.filtermatchedData.filter((item: any) => this.groupFormResponse.formList.includes(item));
+
+                    console.log("else condtion:",matchingItems)
                 }
 
 
@@ -291,9 +302,9 @@ export class DashboardFormComponent implements OnInit {
                 "Client Id": this.client,
                 "created_time": Date.now(),
                 "updated_time": Date.now()
-              }
-        
-              this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+            }
+
+            this.auditTrail.mappingAuditTrailData(UserDetails, this.client)
 
         }
         else {
@@ -374,18 +385,18 @@ export class DashboardFormComponent implements OnInit {
                 console.log("FormGroup Error:", error)
             })
 
-            
 
-           
+
+
             setTimeout(async () => {
 
                 if (this.id == 'Calendar') {
                     await this.api.GetMaster(this.client + "#systemCalendarQuery#lookup", 1).then((result: any) => {
                         if (result) {
                             this.helpherObj = JSON.parse(result.options)
-    
+
                             this.formList = this.helpherObj.map((item: any) => item)
-    
+
                             console.log("DYNAMIC FORMLIST:", this.formList)
                         }
                     }).catch((error) => {
@@ -393,14 +404,14 @@ export class DashboardFormComponent implements OnInit {
                     })
                 }
                 else {
-    
-    
+
+
                     await this.api.GetMaster(this.client + "#dynamic_form#lookup", 1).then((result: any) => {
                         if (result) {
                             this.helpherObj = JSON.parse(result.options)
-    
+
                             this.formList = this.helpherObj.map((item: any) => item)
-    
+
                             console.log("DYNAMIC FORMLIST:", this.formList)
                         }
                     }).catch((error) => {
@@ -456,9 +467,9 @@ export class DashboardFormComponent implements OnInit {
             "Client Id": this.client,
             "created_time": Date.now(),
             "updated_time": Date.now()
-          }
-    
-          this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+        }
+
+        this.auditTrail.mappingAuditTrailData(UserDetails, this.client)
         console.log("CARDS ON FORMLIST:", this.cards.length)
 
         // if (this.cards.length == 0) {
