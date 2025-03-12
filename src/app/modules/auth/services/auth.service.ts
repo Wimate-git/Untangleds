@@ -35,7 +35,7 @@ export class AuthService implements OnDestroy {
   });
 
 
-  getSession(username: string, password: string){
+  getSessionCustom(username: string, password: string){
     const authenticationData = {
       Username: username.toLowerCase(),
       Password: password,
@@ -85,21 +85,34 @@ export class AuthService implements OnDestroy {
   }
 
 
-
-
   checkSession() {
     console.log("Session is triggered ");
 
     const cognitoUser = this.userPool.getCurrentUser();
+    console.log("cognitoUser session details are here ",cognitoUser);
     if (cognitoUser != null) {
         cognitoUser.getSession((err:any, session:any) =>{
             if (err) {
                 console.log("Error logging session ",err);
                 // alert(err.message || JSON.stringify(err));
+                this.logout()
+                cognitoUser.signOut();
+               
+                document.location.reload()
+                this.router.navigate(['auth/login'])
                 return;
             }
             if (session.isValid()) {
                 console.log("Session is valid",session);
+
+                // if(session.clockDrift != 0){
+                //   this.logout()
+                //   cognitoUser.signOut();
+                 
+                //   document.location.reload()
+                //   this.router.navigate(['auth/login'])
+             
+                // }
  
             } else {
                 console.log("Session is invalid");

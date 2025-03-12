@@ -80,15 +80,17 @@ export class SidebarMenuComponent implements OnInit {
       this.generatedreamboard()
 
 
-      this.router.events
-        .pipe(filter((event: any) => event instanceof NavigationEnd))
-        .subscribe(() => {
-
-          console.log("Session is called from Init ");
-
-          this.authService.checkSession(); // Call your session check method
-        });
+   
     }, 1000);
+
+    this.router.events
+    .pipe(filter((event: any) => event instanceof NavigationEnd))
+    .subscribe(() => {
+
+      console.log("Session is called from Init ");
+
+      this.authService.checkSession(); // Call your session check method
+    });
   }
 
   dreamboardLookupData(sk: number): Promise<[string, string, string, number][]> {
