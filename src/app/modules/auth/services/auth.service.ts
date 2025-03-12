@@ -85,53 +85,53 @@ export class AuthService implements OnDestroy {
   }
 
 
-  // checkSession() {
-  //   console.log("Session is triggered ");
+  checkSession() {
+    console.log("Session is triggered ");
 
-  //   const cognitoUser = this.userPool.getCurrentUser();
-  //   console.log("cognitoUser session details are here ",cognitoUser);
-  //   if (cognitoUser != null) {
-  //       cognitoUser.getSession((err:any, session:any) =>{
-  //           if (err) {
-  //               console.log("Error logging session ",err);
-  //               // alert(err.message || JSON.stringify(err));
-  //               this.logout()
-  //               cognitoUser.signOut();
+    const cognitoUser = this.userPool.getCurrentUser();
+    console.log("cognitoUser session details are here ",cognitoUser);
+    if (cognitoUser != null) {
+        cognitoUser.getSession((err:any, session:any) =>{
+            if (err) {
+                console.log("Error logging session ",err);
+                // alert(err.message || JSON.stringify(err));
+                this.logout()
+                cognitoUser.signOut();
                
-  //               document.location.reload()
-  //               this.router.navigate(['auth/login'])
-  //               return;
-  //           }
-  //           if (session.isValid()) {
-  //               console.log("Session is valid",session);
+                document.location.reload()
+                this.router.navigate(['auth/login'])
+                return;
+            }
+            if (session.isValid()) {
+                console.log("Session is valid",session);
 
-  //               // if(session.clockDrift != 0){
-  //               //   this.logout()
-  //               //   cognitoUser.signOut();
+                // if(session.clockDrift != 0){
+                //   this.logout()
+                //   cognitoUser.signOut();
                  
-  //               //   document.location.reload()
-  //               //   this.router.navigate(['auth/login'])
+                //   document.location.reload()
+                //   this.router.navigate(['auth/login'])
              
-  //               // }
+                // }
  
-  //           } else {
-  //               console.log("Session is invalid");
+            } else {
+                console.log("Session is invalid");
               
-  //               this.logout()
-  //               cognitoUser.signOut();
+                this.logout()
+                cognitoUser.signOut();
                
-  //               document.location.reload()
-  //               this.router.navigate(['auth/login'])
+                document.location.reload()
+                this.router.navigate(['auth/login'])
            
-  //           }
-  //       });
-  //   }
-  //   else{
-  //     this.logout()
-  //     this.router.navigate(['auth/login'])
-  //     document.location.reload()
-  //   }
-  // }
+            }
+        });
+    }
+    else{
+      this.logout()
+      this.router.navigate(['auth/login'])
+      document.location.reload()
+    }
+  }
 
 
   // private startSessionTimer() {
@@ -159,96 +159,96 @@ export class AuthService implements OnDestroy {
   // }
 
 
-  checkSession() {
-    console.log("Session is triggered ");
+  // checkSession() {
+  //   console.log("Session is triggered ");
   
-    const cognitoUser = this.userPool.getCurrentUser();
-    console.log("cognitoUser session details are here ", cognitoUser);
+  //   const cognitoUser = this.userPool.getCurrentUser();
+  //   console.log("cognitoUser session details are here ", cognitoUser);
     
-    if (cognitoUser != null) {
-      cognitoUser.getSession((err: any, session: any) => {
-        if (err) {
-          console.log("Error logging session ", err);
-          this.logout();
-          cognitoUser.signOut();
-          document.location.reload();
-          this.router.navigate(['auth/login']);
-          return;
-        }
+  //   if (cognitoUser != null) {
+  //     cognitoUser.getSession((err: any, session: any) => {
+  //       if (err) {
+  //         console.log("Error logging session ", err);
+  //         this.logout();
+  //         cognitoUser.signOut();
+  //         document.location.reload();
+  //         this.router.navigate(['auth/login']);
+  //         return;
+  //       }
         
-        // Check if session is valid
-        if (session.isValid()) {
-          console.log("Session is valid", session);
+  //       // Check if session is valid
+  //       if (session.isValid()) {
+  //         console.log("Session is valid", session);
           
-          // Add check for refresh token expiration
-          const refreshToken = sessionStorage.getItem('refreshToken');
-          if (!refreshToken) {
-            console.log("No refresh token found");
-            this.logout();
-            cognitoUser.signOut();
-            document.location.reload();
-            this.router.navigate(['auth/login']);
-            return;
-          }
+  //         // Add check for refresh token expiration
+  //         const refreshToken = sessionStorage.getItem('refreshToken');
+  //         if (!refreshToken) {
+  //           console.log("No refresh token found");
+  //           this.logout();
+  //           cognitoUser.signOut();
+  //           document.location.reload();
+  //           this.router.navigate(['auth/login']);
+  //           return;
+  //         }
           
-          // Check token expiration time
-          const currentTime = Math.floor(Date.now() / 1000);
-          const expirationTime = session.getAccessToken().getExpiration();
-          console.log("Token expires at: ", expirationTime, "Current time: ", currentTime);
+  //         // Check token expiration time
+  //         const currentTime = Math.floor(Date.now() / 1000);
+  //         const expirationTime = session.getAccessToken().getExpiration();
+  //         console.log("Token expires at: ", expirationTime, "Current time: ", currentTime);
           
-          // If token is close to expiring, try to refresh it
-          if (expirationTime - currentTime < 300) { // 5 minutes buffer
-            this.refreshSession(cognitoUser);
-          }
-        } else {
-          console.log("Session is invalid");
-          this.logout();
-          cognitoUser.signOut();
-          document.location.reload();
-          this.router.navigate(['auth/login']);
-        }
-      });
-    } else {
-      this.logout();
-      this.router.navigate(['auth/login']);
-      document.location.reload();
-    }
-  }
+  //         // If token is close to expiring, try to refresh it
+  //         if (expirationTime - currentTime < 300) { // 5 minutes buffer
+  //           this.refreshSession(cognitoUser);
+  //         }
+  //       } else {
+  //         console.log("Session is invalid");
+  //         this.logout();
+  //         cognitoUser.signOut();
+  //         document.location.reload();
+  //         this.router.navigate(['auth/login']);
+  //       }
+  //     });
+  //   } else {
+  //     this.logout();
+  //     this.router.navigate(['auth/login']);
+  //     document.location.reload();
+  //   }
+  // }
   
-  refreshSession(cognitoUser: any) {
-    const refreshTokenValue = sessionStorage.getItem('refreshToken');
+  // refreshSession(cognitoUser: any) {
+  //   const refreshTokenValue = sessionStorage.getItem('refreshToken');
     
-    if (!refreshTokenValue) {
-      console.log("No refresh token found");
-      this.logout();
-      cognitoUser.signOut();
-      document.location.reload();
-      this.router.navigate(['auth/login']);
-      return;
-    }
+  //   if (!refreshTokenValue) {
+  //     console.log("No refresh token found");
+  //     this.logout();
+  //     cognitoUser.signOut();
+  //     document.location.reload();
+  //     this.router.navigate(['auth/login']);
+  //     return;
+  //   }
     
-    const refreshToken = new CognitoRefreshToken({RefreshToken: refreshTokenValue});
+  //   const refreshToken = new CognitoRefreshToken({RefreshToken: refreshTokenValue});
     
-    cognitoUser.refreshSession(refreshToken, (err: any, session: any) => {
-      if (err) {
-        console.log("Error refreshing token: ", err);
-        this.logout();
-        cognitoUser.signOut();
-        document.location.reload();
-        this.router.navigate(['auth/login']);
-        return;
-      }
+  //   cognitoUser.refreshSession(refreshToken, (err: any, session: any) => {
+  //     if (err) {
+  //       console.log("Error refreshing token: ", err);
+  //       this.logout();
+  //       cognitoUser.signOut();
+  //       document.location.reload();
+  //       this.router.navigate(['auth/login']);
+  //       return;
+  //     }
       
-      // Update tokens in session storage
-      const accessToken = session.getAccessToken().getJwtToken();
-      const idToken = session.getIdToken().getJwtToken();
+  //     // Update tokens in session storage
+  //     const accessToken = session.getAccessToken().getJwtToken();
+  //     const idToken = session.getIdToken().getJwtToken();
       
-      sessionStorage.setItem('accessToken', accessToken);
-      sessionStorage.setItem('idToken', idToken);
+  //     sessionStorage.setItem('accessToken', accessToken);
+  //     sessionStorage.setItem('idToken', idToken);
       
-      console.log("Token refreshed successfully");
-    });
-  }
+  //     console.log("Token refreshed successfully");
+  //   });
+  // }
 
   // startSessionTimer(expirationTime: number) {
 
