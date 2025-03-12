@@ -149,7 +149,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.spinner.show()
       const user = await this.authService.signIn((this.f.email.value).toLowerCase(), this.f.password.value);
 
-      this.authService.getSession((this.f.email.value).toLowerCase(), this.f.password.value)
+      this.authService.getSessionCustom((this.f.email.value).toLowerCase(), this.f.password.value)
 
       if(user.isSignedIn == false){
         this.spinner.hide()
