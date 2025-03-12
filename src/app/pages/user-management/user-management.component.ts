@@ -179,6 +179,8 @@ rdtListWorkAround :any =[{
   getRefAvgLabour: any;
   avgRefLabourHistory: any = [];
   userCreatedTime: any;
+  lookup_data_Options: any = [];
+  permissionIDRef: any = [];
 
   constructor(private apiService: UserService,private configService:SharedService,private fb:FormBuilder
     ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal,private DynamicApi:DynamicApiService,
@@ -574,21 +576,86 @@ rdtListWorkAround :any =[{
     await this.getTreeData();
 
 
-    try {
-      await this.api.GetMaster(this.SK_clientID + "#dynamic_form#lookup", 1).then((result: any) => {
-        if (result) {
-          const helpherObj = JSON.parse(result.options);
-    
-          // Corrected the map function
-          this.formList = helpherObj.map((item: any) => (item[0]));
+    this.lookup_data_Options = []
+    this.formList = []
+    await this.fetchDynamicLookups(1,this.SK_clientID + "#dynamic_form#lookup")
 
-          this.formList.unshift('All')
-        }
-      });
-    } catch (err) {
-      console.log("Error fetching the dynamic form data ", err);
-    }
+    this.formList = [...this.formList,...this.lookup_data_Options.map((item: any) => (item[0]))]
+    await this.fetchDynamicLookups(1,this.SK_clientID + "#systemCalendarQuery#lookup")
+    this.formList = [...this.formList,...this.lookup_data_Options.map((item: any) => (item[0]))]
+    this.formList.unshift('All')
+    console.log('All the form Data to be displayed is here ',this.formList);
   }
+
+
+
+
+
+
+  fetchDynamicLookups(sk: any, pkValue: any): any {
+    return new Promise((resolve, reject) => {
+      this.api.GetMaster(pkValue, sk)
+        .then(response => {
+          console.log("SK are here", sk);
+
+          if (response && response.options) {
+            // Check if response.options is a string and parse it
+            if (typeof response.options === 'string') {
+              let data = JSON.parse(response.options);
+
+              // Check if the data is an array
+              if (Array.isArray(data)) {
+                // If data is valid, accumulate it to lookup_data_Options
+                // this.lookup_data_Options = this.lookup_data_Options || []; // Ensure lookup_data_Options is initialized
+                this.lookup_data_Options.push(...data);
+
+                // If the response contains more options, continue fetching with incremented SK
+                if (data.length > 0) {
+                  this.fetchDynamicLookups(sk + 1, pkValue)
+                    .then(() => resolve(this.lookup_data_Options)) // Resolve after accumulating all options
+                    .catch(reject); // Handle error from recursive call
+                } else {
+                  resolve(this.lookup_data_Options); // No more data, resolve with the current options
+                }
+              } else {
+                console.error('Invalid data format - not an array.');
+                reject(new Error('Invalid data format - not an array.'));
+              }
+            } else {
+              console.error('response.options is not a string.');
+              reject(new Error('response.options is not a string.'));
+            }
+          } else {
+            console.log("No more options found, resolving:", this.lookup_data_Options);
+            resolve(this.lookup_data_Options); // If no options in the response, resolve with the current data
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          reject(error); // Reject the promise on error
+        });
+    });
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1396,7 +1463,28 @@ rdtListWorkAround :any =[{
           }
 
 
+          //Call the Dynamic Admin Service to revoke the User Refresh key only if the permission is being changed 
+          if(this.permissionIDRef != this.allUserDetails.permission_ID){
 
+            const Cognitobody = { "type": "cognitoServices",
+              "event": {
+                "path": "/timeoutUserSession",
+                "queryStringParameters": {
+                "username":this.allUserDetails.username
+                }
+              }
+              }
+
+
+            try {
+              const response = await this.DynamicApi.getData(Cognitobody);
+              console.log("Cognito Revoke successfull  ",JSON.parse(response.body));
+  
+            } catch (error) {
+              console.error('Error calling dynamic lambda:', error);
+              this.spinner.hide();
+            }
+          }
 
 
      
@@ -2333,6 +2421,7 @@ rdtListWorkAround :any =[{
 
   openModal(getValues: any, getKey: any) {
 
+    this.permissionIDRef = ''
 
     this.redirectionURL = ''
 
@@ -2547,6 +2636,9 @@ rdtListWorkAround :any =[{
           'device_timeout': getValues.device_timeout,
           'alert_timeout': getValues.alert_timeout,
         })
+
+
+        this.permissionIDRef = getValues.permission_ID
 
 
         this.redirectionURL = getValues.redirectionURL
