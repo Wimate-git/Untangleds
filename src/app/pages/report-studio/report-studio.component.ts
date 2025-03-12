@@ -27,6 +27,7 @@ import { FullscreenService } from './services/fullscreen.service';
 import { AdvancedFilterComponent } from './components/advanced-filter/advanced-filter.component';
 import { AuditTrailService } from '../services/auditTrail.service';
 import { Title } from '@angular/platform-browser';
+import { BlobService } from '../summary-engine/blob.service';
 
 interface ListItem {
   [key: string]: {
@@ -49,6 +50,8 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
   @ViewChild('SavedQuery') SavedQuery: TemplateRef<any>;
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
   modalRef: any;
+
+  @ViewChild('htmlModal') htmlModal:TemplateRef<any>;
 
   pageSizeOptions = [10, 25, 50, 100];
 
@@ -129,6 +132,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
   private isminiTableClickListenerAdded = false;
   private isapprovalClickListenerAdded = false;
   private isMarkerClickListenerAdded = false;
+  private isOverviewClickListenerAdded = false;
   dyanmicFormDataArray: any = [];
   tableFormName: any = [];
   gridColumnApi: any;
@@ -156,10 +160,12 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
   filterType: string = '';
   totalRecordsViewed: number = 0;
   lookup_data_Options: any = [];
+  blobUrl: string = '';
+
 
   constructor(private fb: FormBuilder, private api: APIService, private configService: SharedService, private scheduleAPI: scheduleApiService,
     private toast: MatSnackBar, private spinner: NgxSpinnerService, private cd: ChangeDetectorRef, private modalService: NgbModal, private moduleDisplayService: ModuleDisplayService,
-    private route: ActivatedRoute, private router: Router, public fullscreenService: FullscreenService, public auditTrail: AuditTrailService, private titleService: Title
+    private route: ActivatedRoute, private router: Router, public fullscreenService: FullscreenService, public auditTrail: AuditTrailService, private titleService: Title,private blobService:BlobService
   ) {
 
 
@@ -211,6 +217,14 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     if (!this.isapprovalClickListenerAdded) {
       window.addEventListener('approve-click', (event: Event) => this.handleApprovalClick(event as CustomEvent));
       this.isapprovalClickListenerAdded = true;
+    }
+  }
+
+
+  addOverviewClickListener() {
+    if (!this.isOverviewClickListenerAdded) {
+      window.addEventListener('showOverview', (event: Event) => this.handleShowOverviewClick(event as CustomEvent));
+      this.isOverviewClickListenerAdded = true;
     }
   }
 
@@ -318,6 +332,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     this.addMarkerClickListener();
     this.addMiniTableClickListener()
     this.addApprovalClickListener()
+    this.addOverviewClickListener()
 
     window.addEventListener('image-click', (event: any) => {
       const imageBase64 = event.detail;
@@ -949,6 +964,8 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
             tempMetadata[item].push({ name: "approval_history", label: "approval_history", formName: formName })
             tempMetadata[item].push({ name: "approval_status", label: "approval_status", formName: formName })
             tempMetadata[item].push({ name: "current_Status", label: "current_Status", formName: formName })
+            tempMetadata[item].push({ name: "Form View", label: "Form View", formName: formName })
+            
 
             if (trackFlag) {
               tempMetadata[item].push({ name: "track-3274927276", label: "trackLocation", formName: formName })
@@ -1703,12 +1720,14 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
       let responses = groupedData[formFilter];
 
+      console.log("responses are here ",responses);
+
 
       // let tempMetaArray = responses[0].map((item:any)=>item.metadata)
 
 
       let tempMetaArray = responses[0].map((item: any) => {
-        let metadata = { ...item.metadata };
+        let metadata = { ...item.metadata, PK:item.PK, SK:item.SK };
 
         // Add approval_history from options to metadata
         if (item.options && item.options.approval_history) {
@@ -1858,6 +1877,13 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
               }
             }
 
+            if(key === "Form View"){
+              if (item.hasOwnProperty("PK")) {
+                filteredItem["PK"] = item["PK"]; // Preserve "id"
+                filteredItem["SK"] = item["SK"];
+              }
+            }
+
             // Check if the row item has the field key and add it to filteredItem
             if (item.hasOwnProperty(key)) {
               filteredItem[key] = item[key];
@@ -1986,6 +2012,8 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
       // Check columns based on actual data across all rows
       const sampleRow = rowData[0];
 
+      console.log("rowData is here ",rowData);
+
       // Add 'formFilter' column manually
       columns.push({
         headerName: 'Form Filter',
@@ -2000,10 +2028,12 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
       // Iterate through all rows to identify potential dynamic columns (e.g., Base64 images or locations)
       const dynamicColumns = this.getDynamicColumns(rowData);
 
+      console.log("dynamicColumns are check PK and SK",dynamicColumns);
+
       // Merge static columns with dynamic columns
       for (let key in dynamicColumns) {
         if (key !== 'formFilter' && key !== 'PK' && key !== 'SK' && key != 'Updated Date' && key != 'id') {
-          const { isBase64Image, isLocation, isTrackLocation, isMiniTable, isApprovalHistory } = dynamicColumns[key];
+          const { isBase64Image, isLocation, isTrackLocation, isMiniTable, isApprovalHistory, isOverview } = dynamicColumns[key];
 
           // Choose renderer based on conditions
           let cellRenderer = null;
@@ -2012,14 +2042,16 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
           } else if (isLocation) {
             cellRenderer = this.locationCellRenderer;
           } else if (isTrackLocation) {
-
             cellRenderer = this.trackLocationCellRenderer;
           } else if (isMiniTable) {
             cellRenderer = (params: any) => this.miniTableCellRenderer(params, formName);
-          }
-          else if (isApprovalHistory) {
+          }else if (isApprovalHistory) {
             cellRenderer = this.dynamicModalRenderer;
+          }else if (isOverview){
+            cellRenderer = this.showOverview;
           }
+          
+          
 
           columns.push({
             headerName: this.formatHeaderName(key),
@@ -2060,6 +2092,10 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
     // Iterate through all rows and identify dynamic columns based on data presence
     rowData.forEach(row => {
+      row['Form View'] = {
+        PK:row.PK,
+        SK:row.SK
+      }
       for (let key in row) {
         // Check if the column is Base64 image, location, or TrackLocation
         const isBase64Image = this.isBase64(row[key]);
@@ -2067,9 +2103,10 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
         const isTrackLocation = this.isTrackLocation(key, row[key]);
         const isMiniTable = this.isMiniTable(key, row[key]);
         const isApprovalHistory = this.isApprovalHistory(key, row[key]);
+        const isOverview = this.isOverview(key)
 
         if (!dynamicColumns[key]) {
-          dynamicColumns[key] = { isBase64Image, isLocation, isTrackLocation, isMiniTable, isApprovalHistory };
+          dynamicColumns[key] = { isBase64Image, isLocation, isTrackLocation, isMiniTable, isApprovalHistory,isOverview };
         } else {
           // If the column already exists, just update the state (no need to overwrite)
           dynamicColumns[key].isBase64Image = dynamicColumns[key].isBase64Image || isBase64Image;
@@ -2077,6 +2114,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
           dynamicColumns[key].isTrackLocation = dynamicColumns[key].isTrackLocation || isTrackLocation;
           dynamicColumns[key].isMiniTable = dynamicColumns[key].isMiniTable || isMiniTable;
           dynamicColumns[key].isApprovalHistory = dynamicColumns[key].isApprovalHistory || isApprovalHistory;
+          dynamicColumns[key].isOverview = dynamicColumns[key].isOverview || isOverview;
         }
       }
     });
@@ -2092,6 +2130,11 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
   isMiniTable(key: any, value: any): boolean {
     return key == 'dynamic_table_values' && Object.keys(value).length > 0;
+  }
+
+
+  isOverview(key: any): boolean {
+    return key == 'Form View';
   }
 
 
@@ -2191,7 +2234,47 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     return null;
   }
 
+  showOverview(params: any) {
+    if (params && params.value) {
+      const coordinates = params.value;
 
+      if (coordinates && Array.isArray(coordinates) && coordinates.length <= 0) {
+        return null
+      }
+
+      // Create a container for the icon
+      const container = document.createElement('div');
+      container.style.display = 'flex';
+      container.style.alignItems = 'center';
+      container.style.justifyContent = 'center';
+
+      // Create the Bootstrap location icon (location pin)
+      const locationIcon = document.createElement('i');
+      locationIcon.className = 'bi bi-textarea-resize';  // Bootstrap icon class for location pin
+      locationIcon.style.fontSize = '24px';  // Adjust font size for better visibility
+      locationIcon.style.cursor = 'pointer'; // Change cursor to pointer to indicate clickability
+      locationIcon.style.color = '#1F509A';
+
+      // Add click event listener to dispatch a custom event with location data
+      locationIcon.addEventListener('click', () => {
+        // Dispatch a custom event with location data
+        const event = new CustomEvent('showOverview', {
+          detail: { PK: coordinates.PK,
+                    SK: coordinates.SK
+           }
+        });
+        window.dispatchEvent(event);
+      });
+
+      // Append the icon to the container
+      container.appendChild(locationIcon);
+
+      return container;
+    }
+
+    // Return null if params or params.value is missing
+    return null;
+  }
 
 
   dynamicModalRenderer(params: any) {
@@ -2357,12 +2440,65 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
   }
 
 
+  handleShowOverviewClick(event: CustomEvent){
+    console.log("Overview PK and SK is here ",event.detail);
+    this.spinner.show()
+    this.readdataTableCellInfo(event.detail,this.htmlModal)
+  }
+
+
 
 
   handleTrackLocationClick(event: CustomEvent) {
     const { coordinates } = event.detail;
     this.openTrackLocationModal(coordinates);
   }
+
+
+
+  async readdataTableCellInfo(readData: any, modalref: any) {
+    console.log('readData from parent:', readData);
+
+    if (!readData) {
+      this.spinner.hide()
+      console.error('Invalid readData object:', readData);
+      return;
+    }
+
+    this.blobUrl = await this.blobService.createBlobUrl();
+    
+    // ✅ Store PK & SK in `window` (for main app)
+    let formId = readData.PK ? readData.PK.split("#")[1] || "" : "";
+    let SK = readData.SK;
+    
+    window.pk = `${this.SK_clientID}#${formId}#main`;
+    window.sk = typeof SK === 'number' ? SK : Number(SK);
+
+    console.log('✅ Stored PK in window:', window.pk);
+    console.log('✅ Stored SK in window:', window.sk);
+
+    // ✅ Pass PK & SK to the Blob iframe
+    setTimeout(() => {
+      let iframe = document.querySelector("iframe");
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({
+          pk: window.pk,
+          sk: window.sk,
+          clientId:this.SK_clientID
+        }, "*");
+        console.log("✅ Sent PK & SK to iframe via postMessage");
+      } else {
+        console.warn("⚠️ No iframe found to send PK & SK");
+      }
+    }, 1000);
+
+    setTimeout(() => {
+      this.modalService.open(modalref, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+      this.spinner.hide()
+    }, 500);
+}
+
+
 
 
   openTrackLocationModal(lat: string) {
@@ -3330,13 +3466,17 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
       window.removeEventListener('location-click', (event: Event) => this.handleLocationClick(event as CustomEvent));
     }
     if (this.isminiTableClickListenerAdded) {
-      window.removeEventListener('miniTable-click', (event: Event) => this.handleLocationClick(event as CustomEvent));
+      window.removeEventListener('miniTable-click', (event: Event) => this.handleminiTableClick(event as CustomEvent));
     }
     if (this.isMarkerClickListenerAdded) {
       window.removeEventListener('marker-click', (event: Event) => this.handleLocationClick(event as CustomEvent));
     }
     if (this.isapprovalClickListenerAdded) {
-      window.removeEventListener('approve-click', (event: Event) => this.handleLocationClick(event as CustomEvent));
+      window.removeEventListener('approve-click', (event: Event) => this.handleApprovalClick(event as CustomEvent));
+    }
+
+    if (this.isOverviewClickListenerAdded) {
+      window.removeEventListener('showOverview', (event: Event) => this.handleLocationClick(event as CustomEvent));
     }
 
     this.destroy$.next();
@@ -3522,10 +3662,12 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
         if (data && data[0]) {
           let headers = data && data[0] && data[0].map((header: string) => header.replace(/[\r\n]+/g, '').replace(/^"|"$/g, '').trim());
 
-          const headersToRemove = ['Dynamic Table Values', 'TrackLocation', 'Approval History', 'Approval Status'];
+          const headersToRemove = ['Dynamic Table Values', 'TrackLocation', 'Approval History', 'Approval Status','Form View'];
           const removeIndices = headers
             .map((header: string, index: any) => headersToRemove.includes(header) || header.includes('Signature') ? index : -1)
             .filter((index: number) => index !== -1);
+
+          console.log("Removing indexes is here ",removeIndices);
 
           const xlsxheaders = headers.filter((header: any, index: any) => !removeIndices.includes(index));
 
@@ -5869,14 +6011,6 @@ generateTimeDifferenceScript()`
       );
     });
   }
-
-
-
-
-
-
-
-
 }
 
 

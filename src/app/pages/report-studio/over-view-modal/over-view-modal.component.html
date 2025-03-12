@@ -1,0 +1,18 @@
+
+<div class="modal-header">
+    <!-- <h4 class="modal-title">HTML Tile</h4> -->
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+
+  </div>
+
+  <div class="fv-row" >
+    <div class="modal-body">
+      <div class="card-body pt-0">
+        <iframe *ngIf="sanitizedBlobUrl" [src]="sanitizedBlobUrl" width="100%" height="600px"></iframe>
+
+
+      </div>
+    </div>
+  </div>
+
+

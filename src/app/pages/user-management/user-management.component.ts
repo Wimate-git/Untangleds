@@ -3576,8 +3576,10 @@ rdtListWorkAround :any =[{
       this.createUserField.get('username')?.reset()
       this.createUserField.get('username')?.enable()
       this.createUserField.get('name')?.reset()
+      this.createUserField.get('name')?.enable()
       this.createUserField.get('userID')?.reset()
       this.createUserField.get('email')?.reset()
+      this.createUserField.get('email')?.enable()
       this.createUserField.get('mobile')?.reset()
 
       this.editOperation = false

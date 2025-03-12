@@ -19,6 +19,8 @@ import { MatTooltipModule } from "@angular/material/tooltip";
 import { GoogleMapsModule } from '@angular/google-maps';
 import { DropdownModule } from "primeng/dropdown";
 import { AdvancedFilterComponent } from "./components/advanced-filter/advanced-filter.component";
+import { OverViewModalComponent } from "./over-view-modal/over-view-modal.component";
+
 
 
 const routes: Routes = [
@@ -30,7 +32,7 @@ const routes: Routes = [
 
 
 @NgModule({
-  declarations: [ReportStudioComponent,SavedQueryComponent,AdvancedFilterComponent],
+  declarations: [ReportStudioComponent,SavedQueryComponent,AdvancedFilterComponent,OverViewModalComponent],
   imports: [
     AgGridAngular,
     RouterModule.forChild(routes),
@@ -53,7 +55,7 @@ const routes: Routes = [
     MatIconModule,
     MatMenuModule,
     MatTooltipModule,
-    GoogleMapsModule
+    GoogleMapsModule,
 ]
 })
 export class ReportStudioModule { }

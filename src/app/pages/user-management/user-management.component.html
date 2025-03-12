@@ -322,10 +322,10 @@
                                     <div class="col-md-4">
                                         <label class="fw-semibold fs-6 mb-2"> Mobile</label>
         
-                                        <input type="number" class="
+                                        <input type="text" class="
                                             form-control form-control-lg form-control-solid
                                             mb-3 mb-lg-0
-                                          " placeholder="Enter mobile number" name="number" formControlName="mobile" >
+                                          " placeholder="Enter mobile number" (keypress)="keyPress($event)" maxlength="10" min="0" max="9" pattern="^\d{10}$" name="mobile" formControlName="mobile" >
         
                                     </div>
         

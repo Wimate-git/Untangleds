@@ -50,8 +50,8 @@ export class ExcelValidatorService {
       validate: (value: any) => {
         if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
         if (value.length < 8) return { isValid: false, error: 'Must be at least 8 characters long' };
-        if (!/(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])/.test(value)) {
-          return { isValid: false, error: 'Must contain letters, numbers, and special characters' };
+        if (!/(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])(?=.*[A-Z])/.test(value)) {
+          return { isValid: false, error: 'Must contain letters, numbers, special characters, and at least one uppercase letter' };
         }
         return { isValid: true };
       }
