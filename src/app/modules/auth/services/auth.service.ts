@@ -63,9 +63,9 @@ export class AuthService implements OnDestroy {
         // localStorage.setItem('username', username.toLowerCase());
 
           // Store the session tokens if needed for later use
-          sessionStorage.setItem('accessToken', accessToken);
-          sessionStorage.setItem('idToken', idToken);
-          sessionStorage.setItem('refreshToken', refreshToken);
+          localStorage.setItem('accessToken', accessToken);
+          localStorage.setItem('idToken', idToken);
+          localStorage.setItem('refreshToken', refreshToken);
 
 
          // Start session timer
@@ -179,7 +179,7 @@ export class AuthService implements OnDestroy {
           console.log("Session is valid", session);
           
           // Add check for refresh token expiration
-          const refreshToken = sessionStorage.getItem('refreshToken');
+          const refreshToken = localStorage.getItem('refreshToken');
           if (!refreshToken) {
             console.log("No refresh token found");
             this.logout();
@@ -214,7 +214,7 @@ export class AuthService implements OnDestroy {
   }
   
   refreshSession(cognitoUser: any) {
-    const refreshTokenValue = sessionStorage.getItem('refreshToken');
+    const refreshTokenValue = localStorage.getItem('refreshToken');
     
     if (!refreshTokenValue) {
       console.log("No refresh token found");
@@ -241,8 +241,8 @@ export class AuthService implements OnDestroy {
       const accessToken = session.getAccessToken().getJwtToken();
       const idToken = session.getIdToken().getJwtToken();
       
-      sessionStorage.setItem('accessToken', accessToken);
-      sessionStorage.setItem('idToken', idToken);
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('idToken', idToken);
       
       console.log("Token refreshed successfully");
     });

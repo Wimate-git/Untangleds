@@ -2012,7 +2012,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
       // Check columns based on actual data across all rows
       const sampleRow = rowData[0];
 
-      console.log("rowData is here ",rowData);
+      // console.log("rowData is here ",rowData);
 
       // Add 'formFilter' column manually
       columns.push({
@@ -2028,7 +2028,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
       // Iterate through all rows to identify potential dynamic columns (e.g., Base64 images or locations)
       const dynamicColumns = this.getDynamicColumns(rowData);
 
-      console.log("dynamicColumns are check PK and SK",dynamicColumns);
+      // console.log("dynamicColumns are check PK and SK",dynamicColumns);
 
       // Merge static columns with dynamic columns
       for (let key in dynamicColumns) {

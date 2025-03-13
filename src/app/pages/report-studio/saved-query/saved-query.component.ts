@@ -203,13 +203,13 @@ export class SavedQueryComponent implements OnInit {
 
         const item={
           P1:savedQueryTemp.queryName,
-          P2:JSON.stringify({username:username,userList:this.allUsers}),
+          P2:JSON.stringify({username:username,userList:JSON.parse(JSON.stringify(this.allUsers))}),
           P3:Math.ceil(((new Date()).getTime())/1000)
       }
 
       console.log("Item is here ",item);
 
-        await this.fetchTimeMachineById(1,this.SK_clientID+"#savedquery"+"#lookup", 'update', item);
+        await this.fetchTimeMachineById(1,item.P1, 'update', item);
         this.showAlert(successAlert)
 
 
@@ -512,6 +512,7 @@ export class SavedQueryComponent implements OnInit {
   
         if (findIndex !== -1) { // If item found
           if (type === 'update') {
+
             data[findIndex][`L${findIndex + 1}`] = item;
   
             // Create a new array to store the re-arranged data without duplicates
