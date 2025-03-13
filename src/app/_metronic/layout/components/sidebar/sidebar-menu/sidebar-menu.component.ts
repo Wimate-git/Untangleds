@@ -84,11 +84,16 @@ export class SidebarMenuComponent implements OnInit {
     }, 1000);
 
     this.router.events
-    .pipe(filter((event: any) => event instanceof NavigationEnd))
+    .pipe(
+      filter((event: any) => event instanceof NavigationEnd),
+      filter((event: NavigationEnd) => {
+        // Skip session check for specific routes like login or logout
+        const excludedRoutes = ['/auth/login', '/auth/logout', '/dashboard'];
+        return !excludedRoutes.some(route => event.urlAfterRedirects.includes(route));
+      })
+    )
     .subscribe(() => {
-
-      console.log("Session is called from Init ");
-
+      console.log("Session is called from Init");
       this.authService.checkSession(); // Call your session check method
     });
   }

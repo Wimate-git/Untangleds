@@ -224,6 +224,9 @@ rdtListWorkAround :any =[{
     this.getTreeInputData()
 
 
+    this.getFormData()
+
+
 
     //Testing UserForms Data
     // const userDetails = {
@@ -565,6 +568,18 @@ rdtListWorkAround :any =[{
     })
   }
 
+  async getFormData(){
+    this.lookup_data_Options = []
+    this.formList = []
+    await this.fetchDynamicLookups(1,this.SK_clientID + "#dynamic_form#lookup")
+
+    this.formList = [...this.formList,...this.lookup_data_Options.map((item: any) => (item[0]))]
+    this.lookup_data_Options = []
+    await this.fetchDynamicLookups(1,this.SK_clientID + "#systemCalendarQuery#lookup")
+    this.formList = [...this.formList,...this.lookup_data_Options.map((item: any) => (item[0]))]
+    this.formList.unshift('All')
+    console.log('All the form Data to be displayed is here ',this.formList);
+  }
 
 
   async addFromService() {
@@ -575,16 +590,6 @@ rdtListWorkAround :any =[{
     await this.getCompanyIDs(1);
     await this.getTreeData();
 
-
-    this.lookup_data_Options = []
-    this.formList = []
-    await this.fetchDynamicLookups(1,this.SK_clientID + "#dynamic_form#lookup")
-
-    this.formList = [...this.formList,...this.lookup_data_Options.map((item: any) => (item[0]))]
-    await this.fetchDynamicLookups(1,this.SK_clientID + "#systemCalendarQuery#lookup")
-    this.formList = [...this.formList,...this.lookup_data_Options.map((item: any) => (item[0]))]
-    this.formList.unshift('All')
-    console.log('All the form Data to be displayed is here ',this.formList);
   }
 
 
@@ -1463,29 +1468,7 @@ rdtListWorkAround :any =[{
           }
 
 
-          //Call the Dynamic Admin Service to revoke the User Refresh key only if the permission is being changed 
-          if(this.permissionIDRef != this.allUserDetails.permission_ID){
-
-            const Cognitobody = { "type": "cognitoServices",
-              "event": {
-                "path": "/timeoutUserSession",
-                "queryStringParameters": {
-                "username":this.allUserDetails.username
-                }
-              }
-              }
-
-
-            try {
-              const response = await this.DynamicApi.getData(Cognitobody);
-              console.log("Cognito Revoke successfull  ",JSON.parse(response.body));
-  
-            } catch (error) {
-              console.error('Error calling dynamic lambda:', error);
-              this.spinner.hide();
-            }
-          }
-
+       
 
      
 
@@ -1518,6 +1501,31 @@ rdtListWorkAround :any =[{
           this.updateCognitoAttributes();
 
           this.showAlert(successAlert)
+
+
+             //Call the Dynamic Admin Service to revoke the User Refresh key only if the permission is being changed 
+             if(this.permissionIDRef != this.allUserDetails.permission_ID){
+
+              const Cognitobody = { "type": "cognitoServices",
+                "event": {
+                  "path": "/timeoutUserSession",
+                  "queryStringParameters": {
+                  "username":this.allUserDetails.username
+                  }
+                }
+                }
+  
+  
+              try {
+                const response = await this.DynamicApi.getData(Cognitobody);
+                console.log("Cognito Revoke successfull  ",JSON.parse(response.body));
+    
+              } catch (error) {
+                console.error('Error calling dynamic lambda:', error);
+                this.spinner.hide();
+              }
+            }
+  
   
           this.reloadEvent.next(true)
 

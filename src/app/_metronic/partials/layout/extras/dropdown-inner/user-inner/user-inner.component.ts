@@ -5,6 +5,7 @@ import { AuthService, UserType } from '../../../../../../modules/auth';
 import { signOut } from 'aws-amplify/auth';
 import { SharedService } from 'src/app/pages/shared.service';
 import { AuditTrailService } from 'src/app/pages/services/auditTrail.service';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-user-inner',
@@ -29,7 +30,8 @@ export class UserInnerComponent implements OnInit, OnDestroy {
     private auth: AuthService,
     private translationService: TranslationService,
     private shared:SharedService,
-    private cd:ChangeDetectorRef,private auditTrail:AuditTrailService
+    private cd:ChangeDetectorRef,private auditTrail:AuditTrailService,
+    private router:Router
   ) {}
 
   ngOnInit(): void {
@@ -99,22 +101,63 @@ export class UserInnerComponent implements OnInit, OnDestroy {
       console.log("Error while creating audit trails ",error);
     }
 
-
-
-
-
-
-
-
-
-    this.auth.logout();
-    document.location.reload();
+   
     signOut()
       .then(() => {
         console.log("Cognito signout ");
       })
       .catch(err => console.error(err));
+
+      this.auth.logout();
+      document.location.reload();
   }
+
+  // logout() {
+  //   // Set a flag to prevent additional checkSession calls
+  //   sessionStorage.setItem('isLoggingOut', 'true');
+    
+  //   try {
+  //     const UserDetails = {
+  //       "User Name": this.username,
+  //       "Action": "Logout",
+  //       "Module Name": "Logout",
+  //       "Form Name": "Logout",
+  //       "Description": `${this.username} logged out from the application`,
+  //       "User Id": this.username,
+  //       "Client Id": this.sk_ClientID,
+  //       "created_time": Date.now(),
+  //       "updated_time": Date.now()
+  //     }
+      
+  //     this.auditTrail.mappingAuditTrailData(UserDetails, this.sk_ClientID);
+  //     console.log("Audit trails for login created ");
+  //   } catch(error) {
+  //     console.log("Error while creating audit trails ", error);
+  //   }
+    
+  //   // Clear all tokens first
+  //   sessionStorage.removeItem('accessToken');
+  //   sessionStorage.removeItem('idToken');
+  //   sessionStorage.removeItem('refreshToken');
+    
+  //   // Then sign out from Cognito
+  //   signOut()
+  //     .then(() => {
+  //       console.log("Cognito signout successful");
+  //       // Use router.navigate with replaceUrl to prevent adding to history
+  //       this.router.navigate(['auth/login'], { replaceUrl: true });
+  //       document.location.reload();
+  //     })
+  //     .catch(err => {
+  //       console.error("Error during signout:", err);
+  //       this.router.navigate(['auth/login'], { replaceUrl: true });
+  //       document.location.reload();
+  //     })
+
+
+    
+  //   // Remove the auth.logout() and document.location.reload() here
+  // }
 
   selectLanguage(lang: string) {
     this.translationService.setLanguage(lang);
