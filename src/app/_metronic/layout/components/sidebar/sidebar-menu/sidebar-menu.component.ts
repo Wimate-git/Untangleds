@@ -88,7 +88,7 @@ export class SidebarMenuComponent implements OnInit {
       filter((event: any) => event instanceof NavigationEnd),
       filter((event: NavigationEnd) => {
         // Skip session check for specific routes like login or logout
-        const excludedRoutes = ['/auth/login', '/auth/logout', '/dashboard'];
+        const excludedRoutes = ['/auth/login','/summary-engine', '/auth/logout', '/dashboard'];
         return !excludedRoutes.some(route => event.urlAfterRedirects.includes(route));
       })
     )
