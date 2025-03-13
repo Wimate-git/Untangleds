@@ -65,6 +65,7 @@ import { catchError, throwError } from 'rxjs';
 import { BlobService } from './blob.service';
 import funnel from 'highcharts/modules/funnel';
 import { FunnelChartConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/funnel-chart-config/funnel-chart-config.component';
+import { ProgressTileComponent } from 'src/app/_metronic/partials/content/my-widgets/progress-tile/progress-tile.component';
 
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
@@ -173,6 +174,11 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   @ViewChild(Chart5ConfigComponent, { static: false }) ChartConfig5Component: Chart5ConfigComponent;
   @ViewChild('summaryModal') summaryModal!: TemplateRef<any>;
   @ViewChild(DynamicTileConfigComponent, { static: false }) DynamicTileConfigComponent: DynamicTileConfigComponent;
+  @ViewChild(ProgressTileComponent, { static: false }) ProgressTileComponent: ProgressTileComponent;
+
+
+
+  
   @ViewChild(CloneDashboardComponent, { static: false }) CloneDashboardComponent: CloneDashboardComponent;
   @ViewChild(FilterTileConfigComponent, { static: false }) FilterTileConfigComponent: FilterTileConfigComponent;
   @ViewChild(TableWidgetConfigComponent, { static: false }) TableWidgetConfigComponent: TableWidgetConfigComponent;
@@ -320,6 +326,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   isFullscreen: boolean;
   PinValue: number;
   PinCheck: any;
+  showProgressGrid: boolean;
 
 
   createPieChart() {
@@ -2071,6 +2078,20 @@ exitFullScreen(): void {
           `Height: ${this.DynamicTileHeight[index]}, Width: ${this.DynamicTileWidth[index]}, Top Margin: }`
         );
       }
+
+
+      else if (item.grid_type === 'progressTile') {
+        // const topMargin = 20; // Define the top margin value
+      
+        // Adjust height and width with the top margin
+        this.DynamicTileHeight[index] = itemComponentHeight ; // Subtract additional top margin
+        this.DynamicTileWidth[index] = itemComponentWidth ; // Subtract margin/padding for width
+      
+        console.log(
+          `Resized ${item.grid_type} at index ${index}:`,
+          `Height: ${this.DynamicTileHeight[index]}, Width: ${this.DynamicTileWidth[index]}, Top Margin: }`
+        );
+      }
       else if (item.grid_type === 'HTMLtile') {
         this.HTMLtileHeight[index] = item.itemComponentHeight;
         this.HTMLtileWidth[index] = item.itemComponentWidth;
@@ -3160,6 +3181,8 @@ processFetchedData(result: any): void {
     {value:'MultiTableWidget',label:'MultiTableWidget'},
     {value:'Html Tile',label:'Html Tile'},
     {value:'ImageTile',label:'ImageTile'},
+    {value:'ProgressTile',label:'ProgressTile'},
+    // {ProgressTile}
     
     
     
@@ -3180,7 +3203,7 @@ processFetchedData(result: any): void {
 
 
       // Update visibility based on the selected tile
-      this.showGrid = this.selectedTile === 'Tiles' || this.selectedTile === 'Title' || this.selectedTile === 'Chart'|| this.selectedTile === 'DynamicTile' || this.selectedTile === 'FilterTile' || this.selectedTile === 'TableTile' || this.selectedTile === 'MapWidget' || this.selectedTile === 'MultiTableWidget' ||this.selectedTile ==='Html Tile' ||this.selectedTile ==='ImageTile';
+      this.showGrid = this.selectedTile === 'Tiles' || this.selectedTile === 'Title' || this.selectedTile === 'Chart'|| this.selectedTile === 'DynamicTile' || this.selectedTile === 'FilterTile' || this.selectedTile === 'TableTile' || this.selectedTile === 'MapWidget' || this.selectedTile === 'MultiTableWidget' ||this.selectedTile ==='Html Tile' ||this.selectedTile ==='ImageTile'||this.selectedTile ==='ProgressTile' ;
 
       
       this.showTitleGrid = this.selectedTile === 'Title'; // Show specific grid for Title
@@ -3192,7 +3215,8 @@ processFetchedData(result: any): void {
                               this.showMapGrid =  this.selectedTile === 'MapWidget'
                               this.showMultiTableGrid = this.selectedTile === 'MultiTableWidget'
                               this.showHTMLtileGrid = this.selectedTile === 'Html Tile',
-                              this.showimageGrid = this.selectedTile === 'ImageTile'
+                              this.showimageGrid = this.selectedTile === 'ImageTile',
+                              this.showProgressGrid = this.selectedTile ==='ProgressTile'
 
 
             
@@ -3759,6 +3783,7 @@ justReadStyles(data:any,index:any){
       }, 500);
     }
 
+
     else if(event.arg1.grid_type=='title'){
       this.modalService.open(KPIModal, { size: 'xl' });
       console.log('event check dynamic tile', event)
@@ -3780,6 +3805,20 @@ justReadStyles(data:any,index:any){
       setTimeout(() => {
        
         this.FilterTileConfigComponent.openFilterModal(event.arg1, event.arg2);
+      }, 500);
+    }
+
+
+
+    else if(event.arg1.grid_type=='progressTile'){
+      console.log('i am openining')
+      this.modalService.open(KPIModal, { size: 'xl' });
+      console.log('event check progress', event)
+    
+      // Access the component instance and trigger `openKPIModal`
+      setTimeout(() => {
+       
+        this.ProgressTileComponent.openProgressTileModal(event.arg1, event.arg2);
       }, 500);
     }
 
@@ -4002,6 +4041,22 @@ justReadStyles(data:any,index:any){
 
 
     else if(event.data.arg1.grid_type=='dynamicTile'){
+      console.log('event check from dynamic', event.data.arg1)
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
+      console.log('this.dashboard from dynamic',event.all_Packet_store)
+
+
+    }
+
+
+
+    else if(event.data.arg1.grid_type=='progressTile'){
       console.log('event check from dynamic', event.data.arg1)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push({
@@ -7061,6 +7116,12 @@ refreshFunction(){
     this.modalService.open(TitleModal, { size: 'xl' });
     modal.dismiss();
   }
+
+
+  openProgressModal(ProgressTileModal: TemplateRef<any>,modal:any) {
+    this.modalService.open(ProgressTileModal, { size: 'xl' });
+    modal.dismiss();
+  }
   openChartModal1(ChartModal1: TemplateRef<any>,modal:any) {
     this.modalService.open(ChartModal1, { size: 'xl' });
     modal.dismiss();
@@ -7485,7 +7546,8 @@ helperChartClickChart1(event: any, modalChart: any) {
       filterTile:{width:this.filterTileWidth,height:this.filterTileHeight ,heightOffset: 80, widthOffset: 30 },
       Funnelchart:{width:this.chartWidth, height:this.chartHeight, heightOffset: 10, widthOffset: 30 },
       Barchart:{width:this.chartWidth, height:this.chartHeight, heightOffset: 10, widthOffset: 30 },
-      Areachart:{width:this.chartWidth, height:this.chartHeight, heightOffset: 10, widthOffset: 30 }
+      Areachart:{width:this.chartWidth, height:this.chartHeight, heightOffset: 10, widthOffset: 30 },
+      progressTile:{width:this.DynamicTileWidth, height:this.DynamicTileWidth, heightOffset: 10, widthOffset: 30 },
  
       // filterTileHeight:any []=[];
       // filterTileWidth:any []=[];

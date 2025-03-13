@@ -379,7 +379,29 @@ setTimeout(() => {
 // if (approvalHistory.length > 0) {
 // generateApprovelHistoryTable(approvalHistory)
 // }
+if (all_data_db.trackLocation) {
+  trackLocation = all_data_db.trackLocation
+}
+if (all_data_db.trackHistoryTable) {
+  trackHistoryTable = all_data_db.trackHistoryTable
+}
 
+
+if (all_data_db.trackLocation.length > 0) {
+  createHistoryTable(all_data_db.trackLocation)
+}
+if (all_data_db.trackHistoryTable.length > 0) {
+  createHistoryTable(all_data_db.trackHistoryTable)
+}
+const approvalHistory = extractApprovalHistory(all_data_db, "status");
+const approvalHistoryNew = extractApprovalHistory(all_data_db, "history");
+
+if (approvalHistory.length > 0) {
+  generateApprovelHistoryTable(approvalHistory, 'Status')
+}
+if (approvalHistoryNew.length > 0) {
+  generateApprovelHistoryTable(approvalHistoryNew, 'History')
+}
 // hideLoadingSpinner();
 disableAllInputs();
 // populateTargetOption()
@@ -621,19 +643,19 @@ function populateTablesFromData(tableId, fields, tableValueData) {
  });
 
  // Add action buttons for edit and delete
- const actionsCell = document.createElement('td');
- actionsCell.classList.add('d-flex', 'align-items-center');
- actionsCell.innerHTML = `
- <button type="button" class="btn btn-warning btn-sm me-2 d-flex align-items-center justify-content-center"
- onclick="editRow(this, '${tableId}', ${JSON.stringify(fields).replace(/"/g, '&quot;')})">
- <i class="fas fa-edit ps-1"></i>
- </button>
- <button type="button" class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
- onclick="removeRow(this, '${tableId}')">
- <i class="fas fa-trash-alt ps-1"></i>
- </button>
- `;
- row.appendChild(actionsCell);
+//  const actionsCell = document.createElement('td');
+//  actionsCell.classList.add('d-flex', 'align-items-center');
+//  actionsCell.innerHTML = `
+//  <button type="button" class="btn btn-warning btn-sm me-2 d-flex align-items-center justify-content-center"
+//  onclick="editRow(this, '${tableId}', ${JSON.stringify(fields).replace(/"/g, '&quot;')})">
+//  <i class="fas fa-edit ps-1"></i>
+//  </button>
+//  <button type="button" class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
+//  onclick="removeRow(this, '${tableId}')">
+//  <i class="fas fa-trash-alt ps-1"></i>
+//  </button>
+//  `;
+//  row.appendChild(actionsCell);
 
  // Append the row to the table body
  tbody.appendChild(row);
@@ -1480,4 +1502,330 @@ async function getApprovalMainPkDetails(pkDetails,skDetails){
   
   }
 
+
+  function extractApprovalHistory(data, type) {
+    // Check if 'options' exists and is an object
+    if (data.options && typeof data.options === 'object' && type == 'status') {
+        if (Array.isArray(data.options.approval_history)) {
+            return data.options.approval_history;
+        }
+    }
+    else if (data.options && typeof data.options === 'object' && type == 'history') {
+        if (Array.isArray(data.options.approvalHistoryNew)) {
+            return data.options.approvalHistoryNew;
+        }
+    }
+    // Return empty array if conditions are not met
+    return [];
+  }
+  
+  
+  
+  function generateApprovelHistoryTable(approvalHistoryData, headingType) {
+    console.log('approvalHistoryData :', approvalHistoryData);
+    const formContainer = document.getElementById('dynamic-form');
+  
+    // Create table container
+    const tableContainer = document.createElement('div');
+    tableContainer.classList.add('mt-10'); // Adding the class for margin-top
+  
+    // Create table heading
+    const tableHeading = document.createElement('h3');
+    tableHeading.textContent = `Approval ${headingType}`;
+    tableContainer.appendChild(tableHeading);
+  
+    // Create table
+    const table = document.createElement('table');
+    table.className = "table table-row-dashed border rounded fs-6 gy-5 mt-5";
+  
+    // Create table header row
+    const headerRow = document.createElement('tr');
+    const headers = ["", headingType, "Comment", "Date and Time"];
+  
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        th.style.padding = "8px";
+        th.style.textAlign = "left";
+        th.className = "text-start text-gray-500 fs-7 text-uppercase fw-bold gs-0";
+        headerRow.appendChild(th);
+    });
+    table.appendChild(headerRow);
+  
+    // Create table rows
+    approvalHistoryData.forEach((data, index) => {
+        const row = document.createElement('tr');
+  
+        // Serial No
+        const serialNoCell = document.createElement('td');
+        serialNoCell.textContent = index + 1;
+        serialNoCell.style.padding = "8px";
+        row.appendChild(serialNoCell);
+  
+        // Extract Status (removing the comment part)
+        const splitText = data[0].split('-');
+        const statusText = splitText[0].trim(); // Extract only the first part before '-'
+        const commentText = splitText.length > 1 ? splitText.slice(1).join('-').trim() : "N/A"; // Join rest as comment
+  
+        // Status Column
+        const historyCell = document.createElement('td');
+        historyCell.textContent = statusText // Only Status without Comment
+        historyCell.style.padding = "8px";
+        row.appendChild(historyCell);
+  
+        // Comment Column
+        const commentCell = document.createElement('td');
+        commentCell.textContent = commentText || 'N/A' // Only Comment
+        commentCell.style.padding = "8px";
+        row.appendChild(commentCell);
+  
+        // Date and Time
+        const dateCell = document.createElement('td');
+        const date = new Date(data[1] * 1000); // Convert UNIX timestamp to JavaScript Date object
+        dateCell.textContent = date.toLocaleString(); // Format date and time
+        dateCell.style.padding = "8px";
+        row.appendChild(dateCell);
+  
+        table.appendChild(row);
+    });
+  
+    tableContainer.appendChild(table);
+    formContainer.appendChild(tableContainer);
+  }
+  
+  
+  
+  function createHistoryTable(historyData) {
+  
+    const groupedData = {};
+   
+    // Group by label_id and prepare datas array
+    historyData.forEach((item) => {
+    const labelId = item.label_id;
+   
+    if (!groupedData[labelId]) {
+    groupedData[labelId] = {
+    label_id: labelId,
+    label_name: item.label_name,
+    datas: [],
+    };
+    }
+    groupedData[labelId].datas.push(item);
+   
+    // Update label_name to the latest one based on Date_and_time
+    const currentDate = new Date(item.Date_and_time);
+    const existingDate = groupedData[labelId].latestDate
+    ? new Date(groupedData[labelId].latestDate)
+    : null;
+   
+    if (!existingDate || currentDate > existingDate) {
+    groupedData[labelId].label_name = item.label_name;
+    groupedData[labelId].latestDate = item.Date_and_time;
+    }
+    });
+    // console.log('groupedData :', groupedData);
+    // Remove temporary latestDate key and convert to array
+    const finalData = Object.values(groupedData).map(({ latestDate, ...rest }) => rest);
+   
+    if (finalData) {
+   
+    const formContainer = document.getElementById('dynamic-form');
+   
+    finalData.forEach((tableData) => {
+    // Create table container
+   
+    let isShow = checkShowHistory(tableData.label_id)
+   
+    if (isShow) {
+   
+    const tableContainer = document.createElement('div');
+    tableContainer.style.marginBottom = "20px";
+   
+    // Create table heading
+    const tableHeading = document.createElement('h3');
+    tableHeading.textContent = tableData.label_name + ' History'
+   
+    if (tableData.label_id.startsWith('table-')) {
+    tableHeading.textContent = tableData.label_name + ' Table History'
+    }
+    tableContainer.appendChild(tableHeading);
+   
+    // Create table
+    const table = document.createElement('table');
+    table.className = "table table-row-dashed border rounded fs-6 gy-5 mt-5";
+   
+    // Create table header row
+    const headerRow = document.createElement('tr');
+    const headers = ["User Name", "Type", "Date and Time"];
+    headers.forEach((header) => {
+    const th = document.createElement('th');
+    th.textContent = header;
+    th.style.padding = "8px";
+    th.style.textAlign = "left";
+    headerRow.appendChild(th);
+    });
+    table.appendChild(headerRow);
+   
+    // Create table rows
+    // Create table rows
+    tableData.datas.forEach((data) => {
+    const row = document.createElement('tr');
+   
+    // User Name
+    const userNameCell = document.createElement('td');
+    userNameCell.textContent = data.name;
+    userNameCell.style.padding = "8px";
+    row.appendChild(userNameCell);
+   
+    // Type, handle newline characters to show multiple lines in the same cell
+    const typeCell = document.createElement('td');
+    typeCell.style.padding = "8px";
+    // Split the type data by newline and create a separate text node and <br> for each line
+    const typeLines = data.type.split('\n');
+    typeLines.forEach((line, index) => {
+    if (index > 0) typeCell.appendChild(document.createElement('br'));
+    typeCell.appendChild(document.createTextNode(line));
+    });
+    row.appendChild(typeCell);
+   
+    // Date and Time 
+    const dateTimeCell = document.createElement('td');
+    var date_time = data.Date_and_time;
+    
+    if (typeof data.Date_and_time === 'number' || data.created_epoch) {
+    
+    const options = {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true // Ensures 12-hour time format with AM/PM
+    };
+    var getCorrectEpoch = 0
+    if (data.created_epoch) {
+    getCorrectEpoch = data.created_epoch
+    }
+    else if (!data.created_epoch) {
+    getCorrectEpoch = data.Date_and_time
+    }
+   
+    const dateObj = new Date(getCorrectEpoch);
+    const formattedDate = new Intl.DateTimeFormat('en-US', options).format(dateObj);
+   
+    // Rearranging the date format
+    const [month, day, year] = formattedDate.split(', ')[0].split('/');
+    const time = formattedDate.split(', ')[1];
+   
+    date_time = `${day}/${month}/${year}, ${time}`;
+    console.log('date_time :', date_time);
+    }
+   
+    else if (typeof data.Date_and_time != 'number') {
+    date_time = data.Date_and_time;
+    }
+   
+    dateTimeCell.textContent = date_time;
+    dateTimeCell.style.padding = "8px";
+    row.appendChild(dateTimeCell);
+   
+    // Location button
+    // const locationCell = document.createElement('td');
+    // const locationButton = document.createElement('button');
+    // locationButton.type = "button";
+    // locationButton.className = "btn btn-info btn-lg d-flex align-items-center justify-content-center";
+    // locationButton.style.height = "43px";
+    // locationButton.onclick = () => openMapModalHistory(data.latitude, data.longitude);
+   
+    // Add icon to the button
+    // const locationIcon = document.createElement('i');
+    // locationIcon.className = "fas fa-map-marker-alt";
+    // locationButton.appendChild(locationIcon);
+   
+    // locationCell.style.padding = "8px";
+    // locationCell.appendChild(locationButton);
+    // row.appendChild(locationCell);
+   
+    table.appendChild(row);
+    });
+    
+    tableContainer.appendChild(table);
+    formContainer.appendChild(tableContainer);
+    }
+   
+    });
+    }
+   
+   }
+  
+   function checkShowHistory(labelName) {
+    const isTrackHistoryTrue = formDynamicFields.some(item => item.name === labelName && item.validation?.isTrackHistory === true);
+    return isTrackHistoryTrue
+  }
+  
+  // Function to open the map modal
+  function openMapModalHistory(lat, lon) {
+    // Ensure the modal exists
+    if (!document.getElementById('mapModal')) {
+        createMapModalHistory();
+    }
+  
+    // Show the modal
+    const mapModal = new bootstrap.Modal(document.getElementById('mapModal'), {
+        backdrop: 'static',
+    });
+    mapModal.show();
+  
+    // Initialize the map once the modal is shown
+    mapModal._element.addEventListener('shown.bs.modal', () => {
+        initMapHistory(lat, lon);
+    });
+  }
+  
+  // Create the modal structure for the map
+  function createMapModalHistory() {
+    const modalHTML = `
+        <div class="modal fade" id="mapModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Location</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="map-container" style="height: 400px; width: 100%;"></div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+  }
+  
+  // Initialize the map inside the modal
+  function initMapHistory(lat, lon) {
+    // Clear the map container to prevent conflicts
+    const mapElement = document.getElementById('map-container');
+    mapElement.innerHTML = '';
+  
+    // Map options
+    const mapOptions = {
+        center: new google.maps.LatLng(lat, lon),
+        zoom: 8,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+    };
+  
+    // Create the map
+    const mapInstance = new google.maps.Map(mapElement, mapOptions);
+  
+    // Add a marker
+    new google.maps.Marker({
+        position: new google.maps.LatLng(lat, lon),
+        map: mapInstance,
+    });
+  }
 

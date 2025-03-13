@@ -308,13 +308,23 @@ this.parseChartConfig(this.chartDataConfigExport)
         }
       }
 
-      onCellClick(eventData:any){
-        console.log('eventData check for',eventData)
-        this.dataTableCellInfo.emit(eventData)
-    
-    
-    
-    
+      clickLock = false; // Lock flag to prevent multiple clicks
+
+      onCellClick(eventData: any) {
+        if (this.clickLock) {
+          console.log("Click ignored: Already processing a click.");
+          return; // Ignore repeated clicks
+        }
+      
+        this.clickLock = true; // Lock the click
+        console.log("eventData check for", eventData);
+      
+        this.dataTableCellInfo.emit(eventData);
+      
+        // Unlock click after a short delay (e.g., 500ms)
+        setTimeout(() => {
+          this.clickLock = false;
+        }, 500);
       }
 
 }

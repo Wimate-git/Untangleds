@@ -75,6 +75,8 @@ import { HtmlModalComponent } from './html-modal/html-modal.component';
 import { FunnelChartConfigComponent } from './funnel-chart-config/funnel-chart-config.component';
 import { FunnelChartUiComponent } from './funnel-chart-ui/funnel-chart-ui.component';
 import { DataTableFunnelChartComponent } from './data-table-funnel-chart/data-table-funnel-chart.component';
+import { ProgressTileComponent } from './progress-tile/progress-tile.component';
+import { ProgressTileUiComponent } from './progress-tile-ui/progress-tile-ui.component';
 
 
 
@@ -126,7 +128,9 @@ import { DataTableFunnelChartComponent } from './data-table-funnel-chart/data-ta
     HtmlModalComponent,
     FunnelChartConfigComponent,
     FunnelChartUiComponent,
-    DataTableFunnelChartComponent
+    DataTableFunnelChartComponent,
+    ProgressTileComponent,
+    ProgressTileUiComponent
 
 
 
@@ -217,7 +221,9 @@ import { DataTableFunnelChartComponent } from './data-table-funnel-chart/data-ta
     HtmlModalComponent,   
      FunnelChartConfigComponent,
     FunnelChartUiComponent,
-    DataTableFunnelChartComponent
+    DataTableFunnelChartComponent,
+    ProgressTileComponent,
+    ProgressTileUiComponent
     
   
 

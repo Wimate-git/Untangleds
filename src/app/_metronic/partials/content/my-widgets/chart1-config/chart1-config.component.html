@@ -295,17 +295,16 @@
 
                   <div class="col-md-4 mb-3">
                     <label for="parameterName" class="col-form-label fw-bold fs-6 ">Date Reference X axis</label>
-                    <ngx-select
+                    <p-multiSelect
                       id="parameterName"
-                      [allowClear]="true"
+             
                       formControlName="XaxisFormat"
-                      [items]="FormatXaxisValues"
-                      optionValueField="value"
-                      optionTextField="text"
+                      [options]="getDynamicDateParams(fieldIndex)"
+                      optionLabel="text"
                       placeholder="Select Parameter"
                   
-                      style="width: 100%;">
-                    </ngx-select>
+                     >
+                    </p-multiSelect>
         
                   </div>
                     <div class="col-md-4 mb-3" *ngIf = "shoRowData" >

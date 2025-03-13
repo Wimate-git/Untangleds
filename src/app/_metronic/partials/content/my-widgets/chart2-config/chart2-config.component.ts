@@ -11,6 +11,17 @@ import { APIService } from 'src/app/API.service';
 import { LocationPermissionService } from 'src/app/location-permission.service';
 import { SharedService } from 'src/app/pages/shared.service';
 
+
+interface FormField {
+  columnWidth?: number;
+  label?: string;
+  name?: string;
+  options?: string[];
+  placeholder?: string;
+  type?: string;
+  validation?: any;
+}
+
 @Component({
   selector: 'app-chart2-config',
 
@@ -521,17 +532,17 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     // themeColor: this.createChart.value.themeColor,
     // fontColor: this.createChart.value.fontColor,
 
-    filterDescription:this.createChart.value.filterDescription,
+    filterDescription:this.createChart.value.filterDescription ||'',
     chartConfig: this.createChart.value.all_fields,
-    highchartsOptionsJson: this.chartFinalOptions,
-    filterParameterLine:this.createChart.value.filterParameterLine,
-    filterFormList:this.createChart.value.filterFormList,
+    highchartsOptionsJson: this.chartFinalOptions ||'',
+    filterParameterLine:this.createChart.value.filterParameterLine ||'',
+    filterFormList:this.createChart.value.filterFormList ||'',
     // filterForm:this.createChart.value.filterForm,
     // filterParameter:this.createChart.value.filterParameter,
     // filterDescription:this.createChart.value.filterDescription,
     // Include noOfParams
-    noOfParams:this.dashboard[this.editTileIndex].noOfParams,
-    add_fields:this.createChart.value.add_fields
+    noOfParams:this.dashboard[this.editTileIndex].noOfParams ||'',
+    add_fields:this.createChart.value.add_fields ||''
 
 
       };
@@ -796,6 +807,11 @@ repopulate_fields(getValues: any): FormArray {
         ? configItem.filterParameter
         : [];
 
+
+        const dateParameter = Array.isArray(configItem.XaxisFormat)
+        ? configItem.XaxisFormat
+        : [];
+
       // Push FormGroup into FormArray
       this.all_fields.push(
         this.fb.group({
@@ -814,7 +830,7 @@ repopulate_fields(getValues: any): FormArray {
           formatType:configItem.formatType || '',
           filterParameter: this.fb.control(filterParameterValue),
                filterDescription:configItem.filterDescription ||'',
-                   XaxisFormat:configItem.XaxisFormat ||''
+               XaxisFormat:this.fb.control(dateParameter) ||''
         })
       );
 
@@ -890,9 +906,27 @@ repopulate_fields(getValues: any): FormArray {
               text: 'Updated Time',
             });
           }
+          const formFieldsArray: FormField[] = Object.values(parsedMetadata.formFields) as FormField[];
 
+          const dateFields = formFieldsArray.filter((field: FormField) => field.type === "date");
+          console.log("Date Fields:", dateFields);
+          
+          
+          const dateFieldsList = dateFields.map((field: any) => ({
+            value: field.name,
+            text: field.label,
+          }));
+          
+          dateFieldsList.push({
+            value: 'Default',
+            text: 'Default',
+          });
+          
+          this.dynamicDateParamMap.set(index,dateFieldsList)
           // Store parameters in the map
           this.dynamicParamMap.set(index, dynamicParamList);
+
+
 
           // Trigger change detection
           this.cdr.detectChanges();
@@ -907,6 +941,11 @@ repopulate_fields(getValues: any): FormArray {
     return this.dynamicParamMap.get(index) || [];
   }
 
+  dynamicDateParamMap = new Map<number, any[]>()
+  getDynamicDateParams(index: number): any[] {
+    return this.dynamicDateParamMap.get(index) || [];
+
+  }
 
   fetchDynamicFormDataFilter(value: any) {
     console.log("Data from lookup:", value);

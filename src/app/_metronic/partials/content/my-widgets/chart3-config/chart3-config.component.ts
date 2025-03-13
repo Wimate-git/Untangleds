@@ -10,7 +10,15 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { APIService } from 'src/app/API.service';
 import { LocationPermissionService } from 'src/app/location-permission.service';
 import { SharedService } from 'src/app/pages/shared.service';
-
+interface FormField {
+  columnWidth?: number;
+  label?: string;
+  name?: string;
+  options?: string[];
+  placeholder?: string;
+  type?: string;
+  validation?: any;
+}
 @Component({
   selector: 'app-chart3-config',
 
@@ -772,6 +780,9 @@ repopulate_fields(getValues: any): FormArray {
         const filterParameterValue = Array.isArray(configItem.filterParameter)
         ? configItem.filterParameter
         : [];
+        const dateParameter = Array.isArray(configItem.XaxisFormat)
+        ? configItem.XaxisFormat
+        : [];
 
       // Push FormGroup into FormArray
       this.all_fields.push(
@@ -792,7 +803,7 @@ repopulate_fields(getValues: any): FormArray {
           custom_Label: configItem.custom_Label||'',
             filterParameter: this.fb.control(filterParameterValue),
                filterDescription:configItem.filterDescription ||'',
-               XaxisFormat:configItem.XaxisFormat ||''
+             XaxisFormat:this.fb.control(dateParameter) ||''
         })
       );
 
@@ -869,6 +880,24 @@ repopulate_fields(getValues: any): FormArray {
               text: 'Updated Time',
             });
           }
+
+          const formFieldsArray: FormField[] = Object.values(parsedMetadata.formFields) as FormField[];
+
+          const dateFields = formFieldsArray.filter((field: FormField) => field.type === "date");
+          console.log("Date Fields:", dateFields);
+          
+          
+          const dateFieldsList = dateFields.map((field: any) => ({
+            value: field.name,
+            text: field.label,
+          }));
+          
+          dateFieldsList.push({
+            value: 'Default',
+            text: 'Default',
+          });
+          
+          this.dynamicDateParamMap.set(index,dateFieldsList)
 
           // Store parameters in the map
           this.dynamicParamMap.set(index, dynamicParamList);
@@ -1834,5 +1863,11 @@ FormatXaxisValues = [
   { value: 'Default', text: 'Default' },
   // { value: 'Default', text: 'Default' },
 ]
+
+dynamicDateParamMap = new Map<number, any[]>()
+getDynamicDateParams(index: number): any[] {
+  return this.dynamicDateParamMap.get(index) || [];
+
+}
 
 }

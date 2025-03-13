@@ -11,6 +11,18 @@ import { APIService } from 'src/app/API.service';
 import { LocationPermissionService } from 'src/app/location-permission.service';
 import { SharedService } from 'src/app/pages/shared.service';
 
+
+
+interface FormField {
+  columnWidth?: number;
+  label?: string;
+  name?: string;
+  options?: string[];
+  placeholder?: string;
+  type?: string;
+  validation?: any;
+}
+
 @Component({
   selector: 'app-chart4-config',
 
@@ -93,6 +105,7 @@ export class Chart4ConfigComponent implements OnInit{
   selectedMiniTableFields: any;
   listofFormValues: any;
   dynamicParamMap = new Map<number, any[]>();
+  dynamicDateParamMap = new Map<number, any[]>()
 
 
  
@@ -809,7 +822,13 @@ repopulate_fields(getValues: any): FormArray {
         const arrayParameter = Array.isArray(configItem.parameterName)
         ? configItem.parameterName
         : [];
-   
+        // const dateParameter = Array.isArray(configItem.XaxisFormat)
+        // ? configItem.XaxisFormat
+        // : [];
+
+          const dateParameter = Array.isArray(configItem.XaxisFormat)
+        ? configItem.XaxisFormat
+        : [];
 
       // Create and push FormGroup into FormArray
       this.all_fields.push(
@@ -830,7 +849,7 @@ repopulate_fields(getValues: any): FormArray {
           undefinedCheckLabel:configItem.undefinedCheckLabel ||'',
           custom_Label:configItem.custom_Label ||'',
           filterDescription:configItem.filterDescription ||'',
-          XaxisFormat:configItem.XaxisFormat ||''
+             XaxisFormat:this.fb.control(dateParameter) ||''
 
         })
       );
@@ -977,6 +996,24 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
             });
           }
 
+          const formFieldsArray: FormField[] = Object.values(parsedMetadata.formFields) as FormField[];
+
+          const dateFields = formFieldsArray.filter((field: FormField) => field.type === "date");
+          console.log("Date Fields:", dateFields);
+          
+          
+          const dateFieldsList = dateFields.map((field: any) => ({
+            value: field.name,
+            text: field.label,
+          }));
+          
+          dateFieldsList.push({
+            value: 'Default',
+            text: 'Default',
+          });
+          
+          this.dynamicDateParamMap.set(index,dateFieldsList)
+
           // Store parameters in the map
           this.dynamicParamMap.set(index, dynamicParamList);
 
@@ -988,7 +1025,6 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         console.error("Error fetching data:", err);
       });
   }
-
 
   getDynamicParams(index: number): any[] {
     return this.dynamicParamMap.get(index) || [];
@@ -1045,6 +1081,13 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     { value: 'NewTab', text: 'New Tab' },
     { value: 'Modal', text: 'Modal(Pop Up)' },
   ]
+
+
+
+getDynamicDateParams(index: number): any[] {
+  return this.dynamicDateParamMap.get(index) || [];
+
+}
 
   dynamicparameterValue(event: any, index: any): void {
     console.log('Event check for dynamic param:', event);

@@ -108,6 +108,7 @@
 
               item.grid_type === 'dynamicTile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,dataTableModalDynamicTile) : null) :
               item.grid_type === 'title' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,TitleModal) : null) :
+              item.grid_type === 'progressTile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,'') : null) :
               
                 null
               "
@@ -276,6 +277,14 @@
                     <div *ngIf="item.grid_type === 'dynamicTile'"  >
                       <app-dynamic-tile-ui [item]="item" [index]="i" (customEvent)="helperTile($event,DynamicTileModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton"  [liveDataDynamicTile]="liveDataDynamicTile"       [summaryDashboardUpdate]="summaryDashboardUpdate" 
                       [summaryDashboardView]="summaryDashboardView"></app-dynamic-tile-ui>
+                    </div>
+
+
+
+
+                    <div *ngIf="item.grid_type === 'progressTile'"  >
+                      <app-progress-tile-ui [item]="item" [index]="i" (customEvent)="helperTile($event,ProgressTileModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton"  [liveDataDynamicTile]="liveDataDynamicTile"       [summaryDashboardUpdate]="summaryDashboardUpdate" 
+                      [summaryDashboardView]="summaryDashboardView"></app-progress-tile-ui>
                     </div>
                     <div  *ngIf="item.grid_type === 'filterTile'">
                       <app-filter-tile-ui    [item]="item" 
@@ -1217,7 +1226,7 @@
       </div>
       <!-- <button (click)="createChartGauge()">click me</button> -->
   
-      <div *ngIf="showGrid && selectedTile !== 'Title' &&  selectedTile !== 'Chart' &&  selectedTile !== 'DynamicTile' && selectedTile !== 'FilterTile' && selectedTile !== 'TableTile' && selectedTile !== 'MapWidget'&& selectedTile !== 'MultiTableWidget' &&  selectedTile !=='Html Tile' && selectedTile !=='ImageTile' " class="grid-container">
+      <div *ngIf="showGrid && selectedTile !== 'Title' &&  selectedTile !== 'Chart' &&  selectedTile !== 'DynamicTile' && selectedTile !== 'FilterTile' && selectedTile !== 'TableTile' && selectedTile !== 'MapWidget'&& selectedTile !== 'MultiTableWidget' &&  selectedTile !=='Html Tile' && selectedTile !=='ImageTile'&& selectedTile !=='ProgressTile' " class="grid-container">
         <div class="grid-item highlight" tabindex="0" (click)="openKPIModal(KPIModal,modal);modal.dismiss"  style="background: linear-gradient(to right, #ff7e5f, #feb47b); padding: 20px; border-radius: 8px; color: white;">
           <div>Label</div>
           <div class="value" tabindex="0">Value</div>
@@ -1297,6 +1306,43 @@
                 "
               >
                 <div class="value fw-bold" tabindex="0">Add Title Here</div>
+              </div>
+              </button>
+            </div>
+          </div>
+  
+        </div>
+      </div>
+
+
+
+      <div *ngIf="showGrid" class="container" style="margin-top: 10px;">
+        <div class="row">
+          <!-- Grid item spanning full width -->
+          <div class="col-md-12 d-flex justify-content-center align-items-center">
+            <div 
+              *ngIf="showProgressGrid">
+              <button
+              class="grid-item col bg-light-primary px-6 py-8 rounded-2 mb-7"
+              style="width: 350px; height: 250px; display: flex; justify-content: center; align-items: center; border: 0;"
+              >
+              <div
+                class="grid-item highlight"
+                tabindex="0"
+                (click)="openProgressModal(ProgressTileModal,modal)" 
+                style="
+                  width: 300px;
+                  height: 200px;
+                  background: linear-gradient(to right, #6a11cb, #2575fc);
+                  padding: 20px;
+                  border-radius: 8px;
+                  color: white;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                "
+              >
+                <div class="value fw-bold" tabindex="0">Progress Tile</div>
               </div>
               </button>
             </div>
@@ -2312,6 +2358,14 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
    
        [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
     ></app-data-table-funnel-chart>
+  </ng-template>
+
+
+
+  <ng-template #ProgressTileModal let-modal >
+  
+    <app-progress-tile  [dashboard]="dashboard" (dashboardChange)="getGridDetails2($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver2($event)" ></app-progress-tile>
+  
   </ng-template>
   </div>
 <!--   

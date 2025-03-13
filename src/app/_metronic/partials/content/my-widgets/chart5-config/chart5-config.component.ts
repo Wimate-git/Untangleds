@@ -10,7 +10,15 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { APIService } from 'src/app/API.service';
 import { LocationPermissionService } from 'src/app/location-permission.service';
 import { SharedService } from 'src/app/pages/shared.service';
-
+interface FormField {
+  columnWidth?: number;
+  label?: string;
+  name?: string;
+  options?: string[];
+  placeholder?: string;
+  type?: string;
+  validation?: any;
+}
 @Component({
   selector: 'app-chart5-config',
 
@@ -124,6 +132,11 @@ export class Chart5ConfigComponent implements OnInit{
 
 
 
+  }
+  dynamicDateParamMap = new Map<number, any[]>()
+  getDynamicDateParams(index: number): any[] {
+    return this.dynamicDateParamMap.get(index) || [];
+  
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -977,7 +990,23 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
               text: 'Updated Time',
             });
           }
+          const formFieldsArray: FormField[] = Object.values(parsedMetadata.formFields) as FormField[];
 
+          const dateFields = formFieldsArray.filter((field: FormField) => field.type === "date");
+          console.log("Date Fields:", dateFields);
+          
+          
+          const dateFieldsList = dateFields.map((field: any) => ({
+            value: field.name,
+            text: field.label,
+          }));
+          
+          dateFieldsList.push({
+            value: 'Default',
+            text: 'Default',
+          });
+          
+          this.dynamicDateParamMap.set(index,dateFieldsList)
           // Store parameters in the map
           this.dynamicParamMap.set(index, dynamicParamList);
 

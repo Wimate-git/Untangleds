@@ -1,0 +1,58 @@
+.text_3d {
+    position: fixed;
+    top: 50%; 
+    right: 50%;
+  
+    transform: translate(50%, -50%);
+  }
+  @media (max-width: 760px) {
+    .text_3d {
+      position:unset !important;
+      top: unset !important;       /* Reset top */
+      right: unset !important;     /* Reset right */
+      transform: unset !important; /* Reset transform */
+      font-size: 25px;  /* Optionally adjust font size for smaller screens */
+    }
+    .grid-item{
+      align-items: center !important;
+    }
+  }
+  .processed-value-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Ensure it takes up full width of its parent */
+    height: auto; /* Remove 100% height to make it responsive */
+  }
+  .grid-item-content {
+    background-color: gray;
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: calc(1.2rem + 1vw); /* Responsive font size based on viewport width */
+    height: 100%;
+    border-radius: 5px;
+    text-align: center;
+  }
+  
+  .grid-item-content h3 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  
+  .grid-item-content p {
+    font-size: 1rem;
+  }
+  .grid-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  

@@ -11,12 +11,26 @@ import { APIService } from 'src/app/API.service';
 import { LocationPermissionService } from 'src/app/location-permission.service';
 import { SharedService } from 'src/app/pages/shared.service';
 
+
+interface FormField {
+  columnWidth?: number;
+  label?: string;
+  name?: string;
+  options?: string[];
+  placeholder?: string;
+  type?: string;
+  validation?: any;
+}
+
 @Component({
   selector: 'app-chart1-config',
 
   templateUrl: './chart1-config.component.html',
   styleUrl: './chart1-config.component.scss'
 })
+
+
+
 export class Chart1ConfigComponent implements OnInit {
 
   createChart:FormGroup
@@ -94,6 +108,7 @@ export class Chart1ConfigComponent implements OnInit {
   selectedMiniTableFields: any;
   listofFormValues: any;
   dynamicParamMap = new Map<number, any[]>();
+  dynamicDateParamMap = new Map<number, any[]>()
 
 
  
@@ -810,6 +825,11 @@ repopulate_fields(getValues: any): FormArray {
         const arrayParameter = Array.isArray(configItem.parameterName)
         ? configItem.parameterName
         : [];
+
+
+        const dateParameter = Array.isArray(configItem.XaxisFormat)
+        ? configItem.XaxisFormat
+        : [];
    
 
       // Create and push FormGroup into FormArray
@@ -831,7 +851,7 @@ repopulate_fields(getValues: any): FormArray {
           undefinedCheckLabel:configItem.undefinedCheckLabel ||'',
           custom_Label:configItem.custom_Label ||'',
           filterDescription:configItem.filterDescription ||'',
-          XaxisFormat:configItem.XaxisFormat ||''
+          XaxisFormat:this.fb.control(dateParameter) ||''
 
         })
       );
@@ -957,6 +977,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         if (result && result.metadata) {
           const parsedMetadata = JSON.parse(result.metadata);
           const formFields = parsedMetadata.formFields;
+          console.log('formFields type check data',formFields)
 
           // Prepare parameter list
           const dynamicParamList = formFields.map((field: any) => ({
@@ -977,9 +998,28 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
               text: 'Updated Time',
             });
           }
+console.log('dynamicParamList checking',dynamicParamList)
+const formFieldsArray: FormField[] = Object.values(parsedMetadata.formFields) as FormField[];
 
+const dateFields = formFieldsArray.filter((field: FormField) => field.type === "date");
+console.log("Date Fields:", dateFields);
+
+
+const dateFieldsList = dateFields.map((field: any) => ({
+  value: field.name,
+  text: field.label,
+}));
+
+dateFieldsList.push({
+  value: 'Default',
+  text: 'Default',
+});
+
+this.dynamicDateParamMap.set(index,dateFieldsList)
           // Store parameters in the map
           this.dynamicParamMap.set(index, dynamicParamList);
+        
+
 
           // Trigger change detection
           this.cdr.detectChanges();
@@ -993,7 +1033,16 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
 
   getDynamicParams(index: number): any[] {
     return this.dynamicParamMap.get(index) || [];
+
   }
+
+
+  getDynamicDateParams(index: number): any[] {
+    return this.dynamicDateParamMap.get(index) || [];
+
+  }
+
+
 
   fetchDynamicFormDataFilter(value: any) {
     console.log("Data from lookup:", value);
