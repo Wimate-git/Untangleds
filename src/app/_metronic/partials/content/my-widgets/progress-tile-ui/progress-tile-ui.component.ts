@@ -40,6 +40,7 @@ export class ProgressTileUiComponent implements OnInit{
   calculatedValue: any;
   dataDisplay: any;
   calculatedPercentage: any;
+  dataDisplay2: any;
   ngOnInit(){
     // console.log('item chacke',this.item.grid_details)
     this.summaryService.lookUpData$.subscribe((data: any)=>{
@@ -79,6 +80,7 @@ data.forEach((packet: any,matchedIndex:number) => {
     console.log('this.parsedTileConfig check', this.parsedTileConfig);
     this.dataDisplay=this.parsedTileConfig[0]
     console.log('this.dataDisplay checking',this.dataDisplay)
+    this.dataDisplay2 = this.parsedTileConfig[1]
     
     if (this.parsedTileConfig.length >= 2) {
       // const num1 = parseFloat(this.parsedTileConfig[0].processed_value) || 0; // Pending projects
@@ -116,6 +118,21 @@ data.forEach((packet: any,matchedIndex:number) => {
 
   }
 
+  get calculateWidthPercentage(): any {
+    if (this.parsedTileConfig.length >= 2) {
+      const num1 = parseFloat(this.parsedTileConfig[0].processed_value) || 0; // Pending projects
+      const num2 = parseFloat(this.parsedTileConfig[1].processed_value) || 0; // Total projects
+    const percentage = (num1 / num2) * 100;
+    return Math.min(percentage, 100);
+    }
+  }
+  get formattedWidthPercentage(): any {
+    if (this.parsedTileConfig.length >= 2) {
+      const num1 = parseFloat(this.parsedTileConfig[0].processed_value) || 0; // Pending projects
+      const num2 = parseFloat(this.parsedTileConfig[1].processed_value) || 0; // Total projects
+    const percentage = (num1 / num2) * 100;
+    return Math.min(percentage, 100).toFixed(2) + '%';}
+  }
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  

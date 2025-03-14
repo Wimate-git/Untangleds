@@ -1,9 +1,21 @@
 .text_3d {
-    position: fixed;
-    top: 50%; 
-    right: 50%;
-  
-    transform: translate(50%, -50%);
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.text_3d1{
+    position: absolute;
+    top: 70%;
+    transform: translateY(-70%);
+}
+
+
+  .processed-value-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Ensure it takes up full width of its parent */
+    height: auto; /* Remove 100% height to make it responsive */
   }
   @media (max-width: 760px) {
     .text_3d {
@@ -16,13 +28,13 @@
     .grid-item{
       align-items: center !important;
     }
-  }
-  .processed-value-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%; /* Ensure it takes up full width of its parent */
-    height: auto; /* Remove 100% height to make it responsive */
+    .processed-value-container {
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      // width: 100%; /* Ensure it takes up full width of its parent */
+      // height: unset; /* Remove 100% height to make it responsive */
+    }
   }
   .grid-item-content {
     background-color: gray;
@@ -53,13 +65,9 @@
     align-items: flex-start;
     border-radius: 8px;
     overflow: hidden;
+    padding-left: 5%;
+    padding-right: 5%;
   }
 
 
-  .bg-white {
-    padding: 0;
-    border: none;
-  }
-  
-  
   

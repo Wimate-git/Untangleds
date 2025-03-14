@@ -66,6 +66,8 @@ import { BlobService } from './blob.service';
 import funnel from 'highcharts/modules/funnel';
 import { FunnelChartConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/funnel-chart-config/funnel-chart-config.component';
 import { ProgressTileComponent } from 'src/app/_metronic/partials/content/my-widgets/progress-tile/progress-tile.component';
+import { TileWithIconComponent } from 'src/app/_metronic/partials/content/my-widgets/tile-with-icon/tile-with-icon.component';
+
 
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
@@ -160,6 +162,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   @ViewChild('calendarModal6') calendarModal6: any;
   @ViewChild('dialChartContainer') dialChartContainer!: ElementRef;
   @ViewChild(Tile1ConfigComponent, { static: false }) tileConfig1Component: Tile1ConfigComponent;
+  @ViewChild(TileWithIconComponent, { static: false }) TileWithIconComponent: TileWithIconComponent;
   @ViewChild(Tile2ConfigComponent, { static: false }) tileConfig2Component: Tile2ConfigComponent;
   @ViewChild(Tile3ConfigComponent, { static: false }) tileConfig3Component!: Tile3ConfigComponent;
 
@@ -875,7 +878,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
               }),
           };
 
-          console.log("🚀 Final requestBody:", requestBody);
+          console.log("🚀 Final requestBody: liveTrigger", requestBody);
           this.http.post(apiUrl, requestBody).subscribe(
             (response: any) => {
               console.log('Lambda function triggered successfully:', response);
@@ -1562,6 +1565,7 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
     
     // Hide the navigation menu
     this.hideNavMenu = true;  
+    const disableMenuQP = true;
 
     if (this.modalContent) {
         console.log('modalContent checking', this.modalContent);
@@ -1593,6 +1597,7 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
             `${window.location.origin}/summary-engine/${modulePath}?${queryParams.toString()}`
         );
         
+        console.log('this.currentiframeUrl checking',this.currentiframeUrl)
 
         localStorage.setItem('viewMode', 'true');
         localStorage.setItem('disableMenu', 'true');
@@ -3609,6 +3614,8 @@ justReadStyles(data:any,index:any){
 
   helperTile(event: any, KPIModal: TemplateRef<any>) {
     console.log('KPIModal check',KPIModal)
+
+
     if(event.arg1.grid_type=='tile'){
       this.modalService.open(KPIModal, { size: 'xl' });
 
@@ -3619,7 +3626,21 @@ justReadStyles(data:any,index:any){
         this.tileConfig1Component.openKPIModal(event.arg1, event.arg2);
       }, 500);
     }
-    if(event.arg1.grid_type=='MultiTableWidget'){
+    else if(event.arg1.grid_type=='tileWithIcon'){
+
+      this.modalService.open(KPIModal, { size: 'xl' });
+
+    
+      // Access the component instance and trigger `openKPIModal`
+      setTimeout(() => {
+       
+        this.TileWithIconComponent.openTileWithIcon(event.arg1, event.arg2);
+      }, 500);
+    }
+
+
+    
+    else if(event.arg1.grid_type=='MultiTableWidget'){
       this.modalService.open(KPIModal, { size: 'xl' });
 
     
@@ -3629,7 +3650,7 @@ justReadStyles(data:any,index:any){
         this.MultiTableConfigComponent.openMultiTableModal(event.arg1, event.arg2);
       }, 500);
     }
-    if(event.arg1.grid_type=='logo'){
+    else if(event.arg1.grid_type=='logo'){
       this.modalService.open(KPIModal, { size: 'xl' });
 
     
@@ -3639,7 +3660,7 @@ justReadStyles(data:any,index:any){
         this.ImageConfigComponent.openImageModal(event.arg1, event.arg2);
       }, 500);
     }
-    if(event.arg1.grid_type=='HTMLtile'){
+    else if(event.arg1.grid_type=='HTMLtile'){
       this.modalService.open(KPIModal, { size: 'xl' });
 
     
@@ -3649,7 +3670,7 @@ justReadStyles(data:any,index:any){
         this.HtmlTileConfigComponent.openHTMLtile(event.arg1, event.arg2);
       }, 500);
     }
-    if(event.arg1.grid_type=='TableWidget'){
+    else if(event.arg1.grid_type=='TableWidget'){
       this.modalService.open(KPIModal, { size: 'xl' });
 
     
@@ -3659,7 +3680,7 @@ justReadStyles(data:any,index:any){
         this.TableWidgetConfigComponent.openTableModal(event.arg1, event.arg2);
       }, 500);
     }
-    if(event.arg1.grid_type=='Map'){
+    else if(event.arg1.grid_type=='Map'){
       this.modalService.open(KPIModal, { size: 'xl' });
 
     
@@ -3838,6 +3859,28 @@ justReadStyles(data:any,index:any){
     const { arg1, arg2 } = event.data;
     const { all_Packet_store } = event;
     if(event.data.arg1.grid_type=='tile'){
+      // console.log('event check', event)
+      this.isGirdMoved = false; 
+  // this.dashboard.push(arg1)
+
+  // console.log('event check chart1', event);
+    
+  // Store all company details
+  this.allCompanyDetails = event.all_Packet_store;
+
+  // Directly update the id and push the object into the dashboard in one line
+  this.dashboard.push({
+    ...event.data.arg1,
+    id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+  });
+
+  console.log('event.data.arg1', event.data.arg1);
+ 
+
+    }
+
+
+    if(event.data.arg1.grid_type=='tileWithIcon'){
       // console.log('event check', event)
       this.isGirdMoved = false; 
   // this.dashboard.push(arg1)
@@ -7108,6 +7151,12 @@ refreshFunction(){
     this.modalService.open(KPIModal4, { size: 'xl' });
     modal.dismiss();
   }
+  opentileWithIcon(tileWithIconModal: TemplateRef<any>,modal:any) {
+    this.modalService.open(tileWithIconModal, { size: 'xl' });
+    modal.dismiss();
+  }
+
+  
   openKPIModal5(KPIModal5: TemplateRef<any>,modal:any) {
     this.modalService.open(KPIModal5, { size: 'xl' });
     modal.dismiss();

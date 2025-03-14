@@ -109,6 +109,7 @@
               item.grid_type === 'dynamicTile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,dataTableModalDynamicTile) : null) :
               item.grid_type === 'title' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,TitleModal) : null) :
               item.grid_type === 'progressTile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,'') : null) :
+              item.grid_type === 'tileWithIcon' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,'') : null) :
               
                 null
               "
@@ -141,6 +142,9 @@
                    >
                     </app-tile-ui1>
                   </div>
+
+
+                  
 
                   <div *ngIf="item.grid_type === 'tile2'" >
                     <app-tile-ui2 [item]="item" 
@@ -342,6 +346,34 @@
                         [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"     [HTMLtileWidth]="HTMLtileWidth[i]" 
                         [HTMLtileHeight]="HTMLtileHeight[i]">
                       </app-html-tile-ui>
+                    </div>
+
+
+
+                    <div *ngIf="item.grid_type === 'tileWithIcon'">
+                      <app-tile-with-icon-ui 
+                        [item]="item" 
+                        [index]="i" 
+                      
+                        [isEditModeView]="isEditModeView" 
+                        [hideButton]="hideButton" 
+                        [all_Packet_store]="all_Packet_store" 
+                     
+              
+                        (customEvent)="helperTile($event,tileWithIconModal)" 
+                        (customEvent1)="emitDuplicate($event)" 
+                        (customEvent2)="emitDelete6($event)"
+                        [tileWidth]="tileWidth[i]" 
+                         [tileHeight]="tileHeight[i]"
+                         [liveDataTile]="liveDataTile"
+                         [summaryDashboardView]="summaryDashboardView"
+                         [summaryDashboardUpdate]="summaryDashboardUpdate"
+                        
+                       
+                     
+                 
+                     >
+                      </app-tile-with-icon-ui>
                     </div>
                     <!-- <div *ngIf="item.grid_type === 'HTMLtile'"> -->
                    
@@ -1193,11 +1225,10 @@
                 <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
                 <div>Label: Value 2</div>
               </div>
-              <div class="grid-item" tabindex="0" (click)="openKPIModal5(KPIModal5,modal)" style="background: #2a3439; padding: 20px; border-radius: 8px; color: white;">
+              
+              <div class="grid-item" tabindex="0" (click)="opentileWithIcon(tileWithIconModal,modal)" style="background: #2a3439; padding: 20px; border-radius: 8px; color: white;">
                 <div>Label</div>
-                <div tabindex="0">Label: Value 2</div>
-                <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
-                <div>Label: Value 3</div>
+                <div class="value" tabindex="0">Value</div>
               </div>
 
               <!-- <div class="grid-item" tabindex="0" (click)="openChartModal1(ChartModal1,modal)" style="background: #2a3439; padding: 20px; border-radius: 8px; color: white;">
@@ -1251,11 +1282,9 @@
           <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
           <div>Label: Value 2</div>
         </div>
-        <div class="grid-item" tabindex="0" (click)="openKPIModal5(KPIModal5,modal)" style="background: #2a3439; padding: 20px; border-radius: 8px; color: white;">
+        <div class="grid-item" tabindex="0" (click)="opentileWithIcon(tileWithIconModal,modal)" style="background: #2a3439; padding: 20px; border-radius: 8px; color: white;">
           <div>Label</div>
-          <div tabindex="0">Label: Value 2</div>
-          <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
-          <div>Label: Value 3</div>
+          <div class="value" tabindex="0">Value</div>
         </div>
 
         <!-- <div class="grid-item" tabindex="0" (click)="openChartModal1(ChartModal1,modal)" style="background: #2a3439; padding: 20px; border-radius: 8px; color: white;">
@@ -2181,6 +2210,12 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   <ng-template #KPIModal let-modal >
   
     <app-tile1-config [dashboard]="dashboard" (dashboardChange)="getGridDetails($event)" (update_PowerBoard_config)="updateSummaryHelper2($event)" [modal]="modal" [all_Packet_store]="all_Packet_store" (send_all_Packet_store)="allPacketStoreReceiver($event)"[isGirdMoved]="isGirdMoved"></app-tile1-config>
+  
+  </ng-template>
+
+  <ng-template #tileWithIconModal let-modal >
+  
+    <app-tile-with-icon [dashboard]="dashboard" (dashboardChange)="getGridDetails($event)" (update_PowerBoard_config)="updateSummaryHelper2($event)" [modal]="modal" [all_Packet_store]="all_Packet_store" (send_all_Packet_store)="allPacketStoreReceiver($event)"[isGirdMoved]="isGirdMoved"></app-tile-with-icon>
   
   </ng-template>
   <!-- <ng-template #FilterModal let-modal > -->

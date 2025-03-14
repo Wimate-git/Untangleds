@@ -13,7 +13,7 @@ style="position: absolute; top: 10px; right: 10px; gap: 10px;z-index: 50;">
 </button>
 
 <button 
-*ngIf="!isEditModeView && shouldShowButton && !hideButton && (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))"
+*ngIf="isEditModeView && shouldShowButton && !hideButton && (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))"
 
 (click)="helperDashboard(item, index,modalContent,item.selectType)"
 class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 

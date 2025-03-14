@@ -77,6 +77,8 @@ import { FunnelChartUiComponent } from './funnel-chart-ui/funnel-chart-ui.compon
 import { DataTableFunnelChartComponent } from './data-table-funnel-chart/data-table-funnel-chart.component';
 import { ProgressTileComponent } from './progress-tile/progress-tile.component';
 import { ProgressTileUiComponent } from './progress-tile-ui/progress-tile-ui.component';
+import { TileWithIconComponent } from './tile-with-icon/tile-with-icon.component';
+import { TileWithIconUiComponent } from './tile-with-icon-ui/tile-with-icon-ui.component';
 
 
 
@@ -130,7 +132,9 @@ import { ProgressTileUiComponent } from './progress-tile-ui/progress-tile-ui.com
     FunnelChartUiComponent,
     DataTableFunnelChartComponent,
     ProgressTileComponent,
-    ProgressTileUiComponent
+    ProgressTileUiComponent,
+    TileWithIconComponent,
+    TileWithIconUiComponent
 
 
 
@@ -223,7 +227,9 @@ import { ProgressTileUiComponent } from './progress-tile-ui/progress-tile-ui.com
     FunnelChartUiComponent,
     DataTableFunnelChartComponent,
     ProgressTileComponent,
-    ProgressTileUiComponent
+    ProgressTileUiComponent,
+    TileWithIconComponent,
+    TileWithIconUiComponent
     
   
 

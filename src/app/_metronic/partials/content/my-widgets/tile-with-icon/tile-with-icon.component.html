@@ -1,0 +1,818 @@
+
+<div class="modal-header">
+    <h4 class="modal-title">Widget-1</h4>
+    <button type="button" class="btn-close" aria-label="Close"   (click)="modal.dismiss()"></button>
+  </div>
+  
+  <!-- Modal body with Tabs -->
+  <div class="fv-row" [formGroup]="createKPIWidget" *ngIf="createKPIWidget">
+    <div class="modal-body">
+      <div class="card-body pt-0">
+  
+        <!-- Tab Navigation -->
+        <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap" id="myTab_settings" role="tablist">
+          <div class="col-2" role="Data">
+            <li class="nav-item">
+              <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab" aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Data</a>
+            </li>
+          </div>
+          <div class="col-2" role="Filter">
+            <li class="nav-item">
+              <a class="nav-link text-active-primary me-6" id="filter-tab" data-bs-toggle="tab" role="tab"
+                aria-controls="filter-tab" aria-selected="false" (click)="selectedSettingsTab('filter-tab')">Filter</a>
+            </li>
+          </div>
+          <div class="col-3" role="Settings">
+            <li class="nav-item">
+              <a class="nav-link text-active-primary me-6" id="settings-tabpane" data-bs-toggle="tab" role="tab" aria-controls="settings-tab" aria-selected="false" (click)="selectedSettingsTab('settings-tab')">Settings</a>
+            </li>
+          </div>
+          <div class="col-2" role="Settings">
+            <li class="nav-item">
+              <a class="nav-link text-active-primary me-6" id="equation-tabpane" data-bs-toggle="tab" role="tab" aria-controls="equation-tab" aria-selected="false" (click)="selectedSettingsTab('equation-tab')">Equation</a>
+            </li>
+          </div>
+          <div class="col-3" role="Mini Table">
+            <li class="nav-item">
+              <a class="nav-link text-active-primary me-6" id="minitable-tab" data-bs-toggle="tab" role="tab"
+                aria-controls="minitable-tab" aria-selected="false" (click)="selectedSettingsTab('minitable-tab')">Advance Equation</a>
+            </li>
+          </div>
+        </ul>
+  
+        <!-- Tab Content -->
+        <div class="tab-content mt-3" id="modalTabsContent">
+          <!-- General Tab Content -->
+          <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'dataTab'}" id="dataTab" role="tabpanel" aria-labelledby="home-tab">
+            <div class="row g-3">
+              <!-- Form Fields -->
+              <div class="col-md-4 mb-3">
+                <label for="formlist" class="col-form-label fw-bold fs-6 required">
+                  Forms
+                  <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
+                    <i class="bi bi-info-circle fs-5"></i>
+                  </span>
+                </label>
+                <ngx-select
+            
+                  id="formlist"
+                  [allowClear]="true"
+                  name="icon"
+                  formControlName="formlist"
+                  [items]="listofDeviceIds"
+                  optionValueField="value"
+                  optionTextField="text"
+                  (selectionChanges)="selectFormParams($event)"
+                  placeholder="Select Form">
+                </ngx-select>
+                <div *ngIf="createKPIWidget.get('formlist')?.touched && createKPIWidget.get('formlist')?.invalid" class="text-danger">
+                  <div *ngIf="createKPIWidget.get('formlist')?.errors?.required">Form is required.</div>
+                </div>
+              
+              </div>
+        
+              <div class="col-md-4 mb-3">
+                <label for="parameterName" class="col-form-label fw-bold fs-6 required">Form Fields</label>
+                <ngx-select
+                  id="parameterName"
+                  [allowClear]="true"
+                  formControlName="parameterName"
+                  [items]="listofDynamicParam"
+                  optionValueField="value"
+                  optionTextField="text"
+                  placeholder="Select Parameter"
+                  (selectionChanges)="parameterValue($event)"
+                  style="width: 100%;">
+                </ngx-select>
+                <div *ngIf="createKPIWidget.get('parameterName')?.touched && createKPIWidget.get('parameterName')?.invalid" class="text-danger">
+                  <div *ngIf="createKPIWidget.get('parameterName')?.errors?.required">Form Fields is required.</div>
+                </div>
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label  class="col-form-label fw-bold fs-6 required">Format Type</label>
+                <ngx-select
+                  id="formatType"
+                  [allowClear]="true"
+                  formControlName="formatType"
+                  [items]="FormatTypeValues"
+                  optionValueField="value"
+                  optionTextField="text"
+                  placeholder="Select Parameter"
+              
+                  style="width: 100%;">
+                </ngx-select>
+                <div *ngIf="createKPIWidget.get('formatType')?.touched && createKPIWidget.get('formatType')?.invalid" class="text-danger">
+                  <div *ngIf="createKPIWidget.get('formatType')?.errors?.required">Format Type is required.</div>
+                </div>
+              </div>
+
+
+        
+              <!-- <div class="col-md-4 mb-3">
+                <label for="groupBy" class="col-form-label fw-bold fs-6 required">Group By</label>
+                <ngx-select
+                  id="groupBy"
+                  [allowClear]="true"
+                  formControlName="groupBy"
+                  [items]="groupByOptions"
+                  optionValueField="value"
+                  optionTextField="text"
+                  placeholder="Select Group"
+                  class="w-100">
+                </ngx-select>
+              </div> -->
+        
+              <div class="col-md-4 mb-3">
+                <label for="primaryValue" class="col-form-label fw-bold fs-6 required">
+                  Primary Value
+                  <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Show Value As">
+                    <i class="bi bi-info-circle fs-5"></i>
+                  </span>
+                </label>
+                <ngx-select
+                  id="primaryValue"
+                  [allowClear]="true"
+                  formControlName="primaryValue"
+                  [items]="showValues"
+                  optionValueField="value"
+                  optionTextField="text"
+                  placeholder="Select Group"
+                  (selectionChanges)="onValueChange($event)"
+                  class="w-100"
+           
+                ></ngx-select>
+                <div *ngIf="createKPIWidget.get('primaryValue')?.touched && createKPIWidget.get('primaryValue')?.invalid" class="text-danger">
+                  <div *ngIf="createKPIWidget.get('primaryValue')?.errors?.required">Primary Value is required.</div>
+                </div>
+              </div>
+        
+              <div class="col-md-4 mb-3" *ngIf="primaryValue?.value === 'Constant'">
+                <label for="constant" class="col-form-label fw-bold fs-6 required">Constant</label>
+                <input
+                  id="constant"
+                  type="number"
+                  class="form-control form-control-solid"
+                  placeholder="Select constant"
+                  formControlName="constantValue">
+              </div>
+        
+              <div class="col-md-4 mb-3">
+                <label for="groupByFormat" class="col-form-label fw-bold fs-6 required">Group By Format</label>
+                <input
+                  id="groupByFormat"
+                  type="text"
+                  class="form-control form-control-solid"
+                  placeholder="Select GroupByFormat"
+                  [formControl]="groupByFormatControl"
+                  (click)="openModalCalender()"
+                  readonly>
+                  <div *ngIf="createKPIWidget.get('groupByFormat')?.touched && createKPIWidget.get('groupByFormat')?.invalid" class="text-danger">
+                    <div *ngIf="createKPIWidget.get('groupByFormat')?.errors?.required"> Group By Format is required.</div>
+                  </div>
+              </div>
+        
+              <div class="col-md-4 mb-3" *ngIf="showIdField">
+                <label for="id" class="col-form-label fw-bold fs-6 required">ID</label>
+                <input
+                  id="id"
+                  type="number"
+                  class="form-control form-control-solid"
+                  placeholder="Enter ID"
+                  formControlName="widgetid">
+              </div>
+        
+              <div class="col-md-4 mb-3" *ngIf="shouldShowProcessedValue">
+                <label for="processed_value" class="col-form-label fw-bold fs-6 required">Processed Value</label>
+                <input
+                  id="processed_value"
+                  type="text"
+                  class="form-control form-control-solid"
+                  placeholder="Enter Processed Value"
+                  formControlName="processed_value">
+              </div>
+        
+              <!-- <div class="col-md-4 mb-3">
+                <label for="rangeCalendarTimeRight" class="col-form-label fw-bold fs-6">Pre Defined Date Range</label>
+                <input
+                  id="rangeCalendarCenter"
+                  type="text"
+                  class="form-control"
+                  readonly
+                  ngxDaterangepickerBootstrap
+                  [formControl]="datePickerControl"
+                  [drops]="dropsDown"
+                  [opens]="opensCenter"
+                  [locale]="locale"
+                  [ranges]="ranges"
+                  [showCustomRangeLabel]="true"
+                  
+                  (datesUpdated)="datesUpdatedRange($event)">
+              </div> -->
+        
+              <!-- <div class="col-md-4 mb-3">
+                <label  class="col-form-label fw-bold fs-6 required">Date Range Label</label>
+                <ngx-select
+                id="selectedRangeType"
+                [allowClear]="true"
+                formControlName="selectedRangeType"
+                [items]="dateRangeLabel"
+                optionValueField="value"
+                optionTextField="text"
+                placeholder="Select Group"
+        
+                class="w-100"
+         
+              ></ngx-select>
+              </div> -->
+      
+              <div class="col-md-4 mb-3">
+              <label for="timeInput" class="col-form-label fw-bold fs-6 ">From Time</label>
+<input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"     formControlName="selectFromTime">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="timeInput" class="col-form-label fw-bold fs-6 ">To Time</label>
+<input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"     formControlName="selectToTime">
+                </div>
+
+
+                <div class="col-md-4 mb-3">
+                  <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Module Names</label>
+                  <ngx-select
+                
+                    [allowClear]="true"
+                    formControlName="ModuleNames"
+                    [items]="showModuleNames"
+                    optionValueField="value"
+                    optionTextField="text"
+                    placeholder="Select Parameter"
+                    (selectionChanges)="moduleSelection($event)"
+                
+                    style="width: 100%;">
+                  </ngx-select>
+                </div>
+
+
+
+                <div class="col-md-4 mb-3">
+                  <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Redirect To</label>
+                  <ngx-select
+                 
+                    [allowClear]="true"
+                    formControlName="dashboardIds"
+                    [items]="dynamicIDArray"
+                    optionValueField="value"
+                    optionTextField="text"
+                    placeholder="Select Parameter"
+                    (selectionChanges)="dynamicRedirectChanged($event)"
+                
+                    style="width: 100%;">
+                  </ngx-select>
+                </div>
+                <div class="row g-3 align-items-center">
+                  <!-- Select Type -->
+                  <div class="col-md-4">
+                    <div class="d-flex flex-column">
+                      <label for="dashboardIds" class="col-form-label fw-bold fs-6">Select Type</label>
+                      <ngx-select
+                        id="selectType"
+                        [allowClear]="true"
+                        formControlName="selectType"
+                        [items]="SelectTypeSummary"
+                        optionValueField="value"
+                        optionTextField="text"
+                        placeholder="Select Parameter"
+                      >
+                      </ngx-select>
+                    </div>
+                  </div>
+                
+                  <!-- Column Visibility -->
+                  <div class="col-md-4" style="margin-top:30px;">
+                    <div class="d-flex flex-column">
+                      <label for="columnVisibility" class="fw-bold fs-6">Column Visibility</label>
+                      <p-multiSelect
+                        id="columnVisibility"
+                        formControlName="columnVisibility"
+                        [options]="columnVisisbilityFields"
+                        optionLabel="text"
+                        placeholder="Select Parameter"
+                        >
+                      </p-multiSelect>
+                    </div>
+                  </div>
+                
+       
+                  <div class="col-md-4">
+                    <div class="d-flex flex-column">
+                      <label for="custom_Label" class="col-form-label fw-bold fs-6 required">Custom Label</label>
+                      <input
+                        type="text"
+                        class="form-control form-control-solid"
+                        id="custom_Label"
+                        name="custom_Label"
+                        formControlName="custom_Label"
+                      />
+                      <div *ngIf="createKPIWidget.get('custom_Label')?.touched && createKPIWidget.get('custom_Label')?.invalid" class="text-danger">
+                        <div *ngIf="createKPIWidget.get('custom_Label')?.errors?.required"> Custom Label is required.</div>
+                      </div>
+                    </div>
+                  </div>
+
+
+
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="parameterName" class="col-form-label fw-bold fs-6 required">Icon</label>
+                    <ngx-select
+                      id="parameterName"
+                      [allowClear]="true"
+                      formControlName="iconList"
+                      [items]="icons"
+                      optionValueField="class"
+                      optionTextField="label"
+                      placeholder="Select Parameter"
+                      (selectionChanges)="parameterValue($event)"
+                      style="width: 100%;">
+                    </ngx-select>
+                    <div *ngIf="createKPIWidget.get('iconList')?.touched && createKPIWidget.get('iconList')?.invalid" class="text-danger">
+                      <div *ngIf="createKPIWidget.get('iconList')?.errors?.required">Icon is required.</div>
+                    </div>
+                  </div>
+                
+                <div class="col-md-4 mb-3" *ngIf = "shoRowData" >
+                  <label for="constant" class="col-form-label fw-bold fs-6 "></label>
+                  <input id="constant" type="number" class="form-control form-control-solid"
+                    placeholder="Select constant" formControlName="rowData"
+                   />
+                </div>
+
+
+            </div>
+          </div>
+          <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'filter-tab'}" id="filter-tab"
+          role="tabpanel" aria-labelledby="filter-tabpane">
+          
+          <div class="row g-3 align-items-end mb-4">
+            <!-- Form Fields -->
+            <div class="col-md-4">
+              <label  class="fw-bold fs-6">Form Fields</label>
+              <p-multiSelect
+        
+                formControlName="filterParameter"
+                [options]="listofDynamicParam"
+                optionLabel="text"
+                placeholder="Select Parameter"
+                (onChange)="dynamicparameterValue($event)"
+            
+              ></p-multiSelect>
+            </div>
+          
+            <!-- Add Button -->
+            <div class="col-md-3">
+              <button type="button" class="btn btn-primary w-100 mt-4" (click)="onAdd()">Add</button>
+            </div>
+          
+  
+
+          </div>
+        
+          <div class="col-md-12 mb-3">
+            <label for="description" class="col-createChart-label fw-bold fs-6">Equation</label>
+            <textarea
+              id="description"
+              formControlName="filterDescription"
+              class="form-control"
+              rows="3"
+              placeholder="Enter description"
+              (selectionChanges)="descriptionValue($event)"
+            >
+              {{ selectedParameterValue }}
+            </textarea>
+          </div>
+        </div>
+        
+        
+          <!-- Settings Tab Content -->
+          <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab" role="tabpanel" aria-labelledby="settings-tabpane">
+            <div class="row g-3">
+              <!-- Existing Themes Section -->
+              <div class="col-md-12 mb-3">
+                <label class="col-form-label fw-bold fs-6 required">Themes:</label>
+                <div class="color-boxes">
+                  <div
+                    *ngFor="let theme of themes"
+                    class="color-box"
+                    [ngStyle]="{ 'background-image': theme.color }"
+                    (click)="toggleCheckbox(theme)"
+                    [class.checked]="theme.selected"
+                  >
+                    <div *ngIf="theme.selected" class="checkmark">✔</div>
+                  </div>
+                </div>
+              </div>
+              
+              
+              
+          
+              <!-- Font Size Input -->
+              <div class="col-md-6 mb-3">
+                <label for="fontSize" class="col-form-label fw-bold fs-6 ">Font Size</label>
+                <input
+                  id="fontSize"
+                  type="number"
+                  class="form-control form-control-solid"
+                  placeholder="Enter Font Size (e.g., 14)"
+                  formControlName="fontSize"
+                  min="8"
+                  max="72">
+                  <div *ngIf="createKPIWidget.get('fontSize')?.errors?.min || createKPIWidget.get('fontSize')?.errors?.max" class="text-danger mt-1">
+                    Font size must be between 8 and 72.
+                  </div>
+              </div>
+          
+              <!-- Font Color Input -->
+              <div class="col-md-6 mb-3">
+                <label for="fontColor" class="col-form-label fw-bold fs-6 ">Font Color</label>
+                <div class="d-flex align-items-center">
+                  <!-- Color Picker Input -->
+                  <input
+                    id="fontColor"
+                    type="color"
+                    class="form-control form-control-color me-3"
+                    [value]="createKPIWidget.get('fontColor')?.value"
+                    (input)="onFontColorChange($event)"
+                    style="width: 50px; height: 38px; padding: 0; border-radius: 5px; border: 1px solid #ced4da;">
+                  <!-- Display Selected Color Code -->
+                  <input
+                    type="text"
+                    class="form-control form-control-solid"
+                    formControlName="fontColor"
+                    readonly
+                    style="flex: 1;"
+                    placeholder="Selected Color Code">
+                </div>
+              </div>
+
+              
+              
+            </div>
+          </div>
+
+          <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'equation-tab'}" id="equation-tab"
+          role="tabpanel" aria-labelledby="equation-tabpane" >
+
+          <form [formGroup]="createKPIWidget">
+            <div class="container" *ngIf="createKPIWidget">
+              <div [formGroup]="createKPIWidget">
+              <div class="row">
+                <div class="col-md-6" [formGroup]="createKPIWidget">
+                  <label class="col-lg-12 col-form-label fw-bold fs-6 ">Equation Count
+                  </label>
+                  <input type="number" class="
+                                    form-control form-control-lg form-control-solid
+                                    mb-3 mb-lg-0" name="add_fields" formControlName="add_fields"
+                    (keyup)="addControls($event,'html')" >
+                </div>
+        
+              </div>
+            
+        
+            
+              </div>
+            </div>
+      
+          <div formArrayName="all_fields">
+            <div *ngFor="let field of all_fields?.controls; let fieldIndex = index">
+
+              <div [formGroupName]="fieldIndex"
+                style="border: 2px solid rgb(201, 228, 239); padding: 10px; margin: 5px;border-radius: 5px;">
+          
+          <div class="row g-3 align-items-center mb-4">
+            <!-- Forms Field -->
+            <div class="col-md-4 d-flex flex-column">
+              <label for="formlist" class="col-form-label fw-bold fs-6 mb-2">
+                Forms
+                <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
+                  <i class="bi bi-info-circle fs-5"></i>
+                </span>
+              </label>
+              <ngx-select
+                id="formlist"
+                [allowClear]="true"
+                name="icon"
+                formControlName="EquationFormList"
+                [items]="listofFormValues"
+                optionValueField="value"
+                optionTextField="text"
+                (selectionChanges)="selectFormParams1($event,fieldIndex)"
+                placeholder="Select Form"
+              ></ngx-select>
+            </div>
+          
+            <!-- Form Fields -->
+            <div class="col-md-4 d-flex flex-column" *ngIf ="listofEquationParam&&listofEquationParam[fieldIndex]">
+              <label for="EquationParam" class="fw-bold fs-6 mb-2">Form Fields</label>
+              <p-multiSelect
+            
+                formControlName="EquationParam"
+                [options]="listofEquationParam[fieldIndex]"
+                optionLabel="text"
+                placeholder="Select Parameter"
+                (onChange)="EquationparameterValue($event,fieldIndex)"
+              ></p-multiSelect>
+            </div>
+          
+            <!-- Operation Field -->
+            <div class="col-md-4 d-flex flex-column">
+              <label for="primaryValue" class="col-form-label fw-bold fs-6 mb-2">
+                Operation
+                <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Show Value As">
+                  <i class="bi bi-info-circle fs-5"></i>
+                </span>
+              </label>
+              <ngx-select
+                id="primaryValue"
+                [allowClear]="true"
+                formControlName="EquationOperation"
+                [items]="showValues"
+                optionValueField="value"
+                optionTextField="text"
+                placeholder="Select Group"
+                (selectionChanges)="selectedOperation($event)"
+                class="w-100"
+              ></ngx-select>
+            </div>
+          </div>
+              </div>
+              </div>
+          </div>
+        </form>
+          
+          
+          <div class="col-md-3">
+            <button
+              type="button"
+              class="btn btn-primary w-100 mt-4"
+              (click)="addEquation()"
+           >
+              Add Equation
+            </button>
+          </div>
+        
+          <div class="col-md-12 mb-3">
+            <label for="description" class="col-createChart-label fw-bold fs-6">Equation</label>
+            <textarea
+              id="description"
+              formControlName="EquationDesc"
+              class="form-control"
+              rows="3"
+              placeholder="Enter description"
+           
+            >
+              {{ selectedEquationParameterValue }}
+            </textarea>
+          </div>
+
+        </div>
+        <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'minitable-tab'}" id="minitable-tab" role="tabpanel" aria-labelledby="minitable-tab">
+          <div class="row">
+
+          <div class="col-md-4 mb-3">
+            <label for="formlist" class="col-form-label fw-bold fs-6 ">
+              Forms
+              <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+            </label>
+            <ngx-select
+        
+              id="formlist"
+              [allowClear]="true"
+              name="icon"
+              formControlName="miniForm"
+              [items]="listofDeviceIds"
+              optionValueField="value"
+              optionTextField="text"
+              (focus)="setUserSatus()"
+              (selectionChanges)="checkSelectedFormPram($event)"
+              placeholder="Select Form">
+            </ngx-select>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="formlist" class="col-form-label fw-bold fs-6 ">
+              Mini Table Name
+              <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+            </label>
+            <ngx-select
+        
+              id="formlist"
+              [allowClear]="true"
+              name="icon"
+              formControlName="MiniTableNames"
+              [items]="filteredResults"
+              optionValueField="value"
+              optionTextField="text"
+              (focus)="setUserSatus()"
+              (selectionChanges)="miniTableNames($event)"
+              placeholder="Select Form">
+            </ngx-select>
+          </div>
+
+   
+        <div class="col-md-4 mb-3">
+          <label class="fw-bold fs-6">Mini Table Fields</label>
+          <p-multiSelect
+              formControlName="MiniTableFields"
+              [options]="filteredHeaders"
+              optionLabel="label"  
+              placeholder="Select Form Fields"
+              (onChange)="miniTableFields($event)"  
+          ></p-multiSelect>
+      </div>
+    </div>
+    <div class="col-md-4 d-flex flex-column">
+      <label for="primaryValue" class="col-form-label fw-bold fs-6 mb-2">
+        Operation
+        <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Show Value As">
+          <i class="bi bi-info-circle fs-5"></i>
+        </span>
+      </label>
+      <ngx-select
+        id="primaryValue"
+        [allowClear]="true"
+        formControlName="EquationOperationMini"
+        [items]="showValues"
+        optionValueField="value"
+        optionTextField="text"
+        placeholder="Select Group"
+        (selectionChanges)="selectedOperationMini($event)"
+        class="w-100"
+      ></ngx-select>
+    </div>
+      
+
+        <div class="col-md-3">
+          <button type="button" class="btn btn-primary w-100 mt-4" (click)="AddMiniTableEquation()">Add</button>
+        </div>
+      
+
+
+
+    
+      <div class="col-md-12 mb-3">
+        <label for="description" class="col-createChart-label fw-bold fs-6">Equation</label>
+        <textarea
+          id="description"
+          formControlName="minitableEquation"
+          class="form-control"
+          rows="3"
+          placeholder="Enter description"
+     
+        >
+          {{ selectedParameterValue }}
+        </textarea>
+      </div>
+
+   
+        </div>
+        </div>
+          
+
+        
+  
+      </div>
+  
+      <div class="modal-footer" style="margin-top: 20px;">
+        <button type="button" class="btn btn-secondary" (click)="modal.dismiss()"  >Close</button>
+        <button 
+        type="button" 
+        class="btn btn-primary"  
+        (click)="validateAndSubmit()" 
+        *ngIf="!isEditMode"
+      >
+        Save
+      </button>
+      
+  <button 
+      type="button" 
+      class="btn btn-warning" 
+   
+      (click)="updateTile('tileWithIcon');modal.dismiss() " 
+      *ngIf="isEditMode " 
+     
+      [disabled]="createKPIWidget?.invalid">
+      Update
+    </button>
+      </div>
+    </div>
+  </div>
+  <ng-template #calendarModal let-modal>
+    <div class="modal-header">
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body right-side-modal">
+      <div class="card-body pt-0">
+        <div class="container1">
+          <div class="list-row">
+            <div class="list-column">
+              <div class="list-item active" (click)="selectValue('Last 24 Hours', modal)" (mouseenter)="showTooltip('Last 24 Hours')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Last 24 Hours</div>
+                <div class="example">E.g., Last 24 hours of data</div>
+              </div>
+              <div class="list-item " (click)="selectValue('Today', modal)" (mouseenter)="showTooltip('Today')"
+                (mouseleave)="hideTooltip()" >
+                <div class="title">Today</div>
+                <div class="example">E.g., Data from 00:00 hrs to now</div>
+              </div>
+              <div class="list-item " (click)="selectValue('Yesterday', modal)" (mouseenter)="showTooltip('Yesterday')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Yesterday</div>
+                <div class="example">E.g., Data from previous day</div>
+              </div>
+              <div class="list-item" (click)="selectValue('Last 7 days', modal)" (mouseenter)="showTooltip('Last 7 days')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Last 7 days</div>
+                <div class="example">E.g., Data for past 7 days</div>
+              </div>
+              <div class="list-item" (click)="selectValue('Last 30 days', modal)" (mouseenter)="showTooltip('Last 30 days')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Last 30 days</div>
+                <div class="example">E.g., Data for the past 30 days</div>
+              </div>
+              <div class="list-item" (click)="selectValue('This Week', modal)" (mouseenter)="showTooltip('This Week')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">This Week</div>
+                <div class="example">E.g., Current week (Monday to Sunday)</div>
+              </div>
+              <div class="list-item" (click)="selectValue('Last 5 Weeks', modal)" (mouseenter)="showTooltip('Last 5 Weeks')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Last 5 Weeks</div>
+                <div class="example">E.g., Data for past 5 weeks</div>
+              </div>
+              <div class="list-item" (click)="selectValue('This Month', modal)" (mouseenter)="showTooltip('This Month')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">This Month</div>
+                <div class="example">E.g., Data for current month</div>
+              </div>
+              <div class="list-item" (click)="selectValue('any', modal)" (mouseenter)="showTooltip('any')"
+              (mouseleave)="hideTooltip()">
+              <div class="title">Any</div>
+              <div class="example">E.g., Any</div>
+            </div>
+            </div>
+          
+            <div class="list-column">
+              <div class="list-item" (click)="selectValue('Last Month', modal)" (mouseenter)="showTooltip('Last Month')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Last Month</div>
+                <div class="example">E.g., Data for previous month</div>
+              </div>
+              <div class="list-item" (click)="selectValue('This Quarter', modal)" (mouseenter)="showTooltip('This Quarter')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">This Quarter</div>
+                <div class="example">E.g., Current quarter (Q1/Q2/Q3/Q4)</div>
+              </div>
+              <div class="list-item" (click)="selectValue('Last Quarter', modal)" (mouseenter)="showTooltip('Last Quarter')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Last Quarter</div>
+                <div class="example">E.g., Data from the previous quarter</div>
+              </div>
+              <div class="list-item" (click)="selectValue('This BiAnnual', modal)" (mouseenter)="showTooltip('This BiAnnual')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">This BiAnnual</div>
+                <div class="example">E.g., Current half-year period</div>
+              </div>
+              <div class="list-item" (click)="selectValue('Last BiAnnual', modal)" (mouseenter)="showTooltip('Last BiAnnual')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Last BiAnnual</div>
+                <div class="example">E.g., Previous half-year period</div>
+              </div>
+              <div class="list-item" (click)="selectValue('This Year', modal)" (mouseenter)="showTooltip('This Year')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">This Year</div>
+                <div class="example">E.g., Data for the current year</div>
+              </div>
+              <div class="list-item" (click)="selectValue('Last Year', modal)" (mouseenter)="showTooltip('Last Year')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Last Year</div>
+                <div class="example">E.g., Data from the previous year</div>
+              </div>
+              <div class="list-item" (click)="selectValue('Last 5 Years', modal)" (mouseenter)="showTooltip('Last 5 Years')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Last 5 Years</div>
+                <div class="example">E.g., Data for the past 5 years</div>
+              </div>
+
+            </div>
+          </div>
+          
+          
+        </div>
+      </div>
+    </div>
+  </ng-template>

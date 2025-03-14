@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -116,6 +117,7 @@ export class ProgressTileComponent implements OnInit{
   columnVisisbilityFields: any;
   selectedText: any;
   listofFormParam: any;
+  icons: any;
 
 
 
@@ -165,13 +167,21 @@ export class ProgressTileComponent implements OnInit{
     });
 
 
-  
+    this.http.get<string[]>('/assets/my-icons.json').subscribe((data:any) => {
+      this.icons =  data.map((icon: any) => ({
+        class: `bi bi-${icon}`, // Adds both "bi" and the specific icon class, like "bi bi-alarm"
+        label: icon // The label remains just the icon name
+      }));
+
+      console.log('this.icons checking from progress',this.icons)
+    });
   
 
 
 
 
   }
+  
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange',this.all_Packet_store)
@@ -187,7 +197,7 @@ export class ProgressTileComponent implements OnInit{
 
   constructor(private summaryConfiguration: SharedService, private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector,
-    private spinner: NgxSpinnerService,private zone: NgZone
+    private spinner: NgxSpinnerService,private zone: NgZone,private http: HttpClient
   ){
     this.selectedRangeCalendarTimeRight = {
       startDate: dayjs().startOf('day'),

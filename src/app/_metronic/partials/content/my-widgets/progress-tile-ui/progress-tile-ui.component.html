@@ -5,20 +5,19 @@
 
 <div *ngIf="item.grid_type === 'progressTile'">
   <div
-    class="grid-item"
+    class=""
     tabindex="0"
 
-    style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out; width: 100%; height: 100%;"
-  >
+    style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out; width: 100%; height: 100%;">
     <!-- Content -->
-    <div class="row text_3d" style="display: flex; flex-direction: column; align-items: flex-start;">
+    <!-- <div class="row text_3d" style="display: flex; flex-direction: column; align-items: flex-start;"> -->
       <!-- Chart Title -->
-      <div 
+      <!-- <div class="processed-value-container"
         [style.font-size]="item.fontSize" 
         [style.color]="item.fontColor"
         style="font-weight: bold; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
         {{ item.chart_title }}
-      </div>
+      </div> -->
       <div 
       [style.font-size]="item.fontSize" 
       [style.color]="item.fontColor"
@@ -29,46 +28,104 @@
      
       <!-- Parameter Name and Processed Value -->
       <div class="parameter-container" style="margin-bottom: 5px;">
-        <!-- Custom Label -->
         <div 
+        class="processed-value-container" 
+          [style.font-size]="item.fontSize"
+          [style.color]="item.fontColor" 
+          style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          {{130}}
+          <!-- {{ dataDisplay?.processed_value && dataDisplay.processed_value !== '' ? dataDisplay.processed_value : '0' }} -->
+        </div>
+        <!-- Custom Label -->
+        <div    class="processed-value-container" 
           [style.font-size]="item.fontSize" 
-          class="parameter-name" 
+    
           [style.color]="item.fontColor" 
           style="font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
           {{ dataDisplay?.custom_Label || '' }}
         </div>
+
+
+
       
         <!-- Processed Value -->
-        <div 
-          class="processed-value" 
-          [style.font-size]="item.fontSize"
-          [style.color]="item.fontColor" 
-          style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-          {{ dataDisplay?.processed_value && dataDisplay.processed_value !== '' ? dataDisplay.processed_value : '0' }}
-        </div>
+
       </div>
 
-      <div class="h-8px mx-3 w-100 bg-white bg-opacity-50 rounded position-relative">
+      <div   
+      [style.font-size]="item.fontSize" 
+
+      [style.color]="item.fontColor" 
+      style="font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;margin-top: 30px;">
+      {{130}} {{ dataDisplay2?.custom_Label || '' }} 
+    </div>
+    <div 
+     
+      [style.font-size]="item.fontSize"
+      [style.color]="item.fontColor" 
+      style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+
+      <!-- {{ dataDisplay?.processed_value && dataDisplay.processed_value !== '' ? dataDisplay.processed_value : '0' }} -->
+    </div>
+
+      <div class="position-relative w-100">
+        <!-- Percentage Text Above & Right -->
+        <div 
+          class="position-absolute end-0 text-white fw-bold" 
+          style="top: -25px; right: 5px;"
+        >
+          {{ calculatedPercentage }}%
+        </div>
+      
+        <!-- Progress Bar -->
+         <div class="d-flex align-items-center flex-column mt-3 w-100">
+
+          <div class="h-15px w-100 bg-white bg-opacity-50 rounded">
+            <div
+              role="progressbar"
+              [attr.aria-valuenow]="calculatedPercentage"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              class="bg-white rounded h-15px d-flex align-items-center justify-content-center text-dark fw-bold"
+              [style.width.%]="90"
+            >
+            <!-- {{ 90 }}% -->
+          
+          </div>
+          </div>
+         </div>
+
+      </div>
+      
+  
+        <!-- <div  class="d-flex align-items-center flex-column mt-3 w-100">
+      <div class="h-15px w-100 bg-white bg-opacity-50 rounded ">
         <div
           role="progressbar"
           [attr.aria-valuenow]="calculatedPercentage"
           aria-valuemin="0"
           aria-valuemax="100"
-          class="bg-white rounded h-8px d-flex align-items-center justify-content-center text-dark fw-bold"
-          [style.width.%]="calculatedPercentage"
+          class="bg-white rounded h-15px d-flex align-items-center justify-content-center text-dark fw-bold"
+          [style.width.%]="90"
         >
-          {{ calculatedPercentage }}%
+          {{ 90 }}%
         </div>
       </div>
       
+      </div> -->
       
       
       
+      
+      
+      
+      
+      
 
 
 
 
-    </div>
+    <!-- </div> -->
 
     <div class="action-menu-container d-flex align-items-center"
 style="position: absolute; top: 10px; right: 10px; gap: 10px;"
@@ -117,8 +174,6 @@ style="position: absolute; top: 10px; right: 10px; gap: 10px;"
   </div>
 </div>
 
-  
-  
   
   <ng-template #modalContent>
     <app-custom-info-ui
