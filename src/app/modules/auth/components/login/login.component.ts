@@ -250,14 +250,6 @@ export class LoginComponent implements OnInit, OnDestroy {
         });
       this.unsubscribe.push(loginSubscr);
 
-      
-
-
-
-
-     
-    
-      localStorage.setItem('loginDetails', JSON.stringify(loginCredentials));
     
       this.userDetails = JSON.parse(localStorage.getItem("userAttributes") || '{}');
       this.spinner.hide()
