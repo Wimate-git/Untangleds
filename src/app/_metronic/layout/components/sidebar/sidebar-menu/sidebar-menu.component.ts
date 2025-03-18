@@ -1,7 +1,7 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { APIService } from 'src/app/API.service';
-import { filter } from 'rxjs';
+import { filter, Subscription } from 'rxjs';
 import { AuthService } from 'src/app/modules/auth';
 
 
@@ -17,7 +17,7 @@ export interface MenuItem {
   templateUrl: './sidebar-menu.component.html',
   styleUrls: ['./sidebar-menu.component.scss']
 })
-export class SidebarMenuComponent implements OnInit {
+export class SidebarMenuComponent implements OnInit,OnDestroy {
 
   lookup_data_user: any[];
   dreamdata: any;
@@ -29,6 +29,7 @@ export class SidebarMenuComponent implements OnInit {
   permission_data: any;
 
   permission_list: any;
+  private routerSubscription: Subscription;
 
   constructor(
     private router: Router,
@@ -78,17 +79,15 @@ export class SidebarMenuComponent implements OnInit {
       // console.log("SIDE MENU GET PERMISSION DATA RESPONSE:", this.permission_data.dreamBoardIDs)
 
       this.generatedreamboard()
-
-
-   
     }, 1000);
 
-    this.router.events
+
+    this.routerSubscription = this.router.events
     .pipe(
       filter((event: any) => event instanceof NavigationEnd),
       filter((event: NavigationEnd) => {
         // Skip session check for specific routes like login or logout
-        const excludedRoutes = ['/auth/login','/summary-engine', '/auth/logout', '/dashboard','/'];
+        const excludedRoutes = ['/auth/login', '/summary-engine','/auth/logout', '/dashboard'];
         return !excludedRoutes.some(route => event.urlAfterRedirects.includes(route));
       })
     )
@@ -155,6 +154,16 @@ export class SidebarMenuComponent implements OnInit {
           reject(error); // Reject the promise on error
         });
     });
+  }
+
+
+  ngOnDestroy(): void {
+    console.log('Sidebar Component destroyed.');
+    // document.removeEventListener('keydown', this.handleKeyDown);
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+      console.log("Unsubscribed from router events");
+    }
   }
 
   async generatedreamboard() {
