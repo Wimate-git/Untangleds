@@ -1,6 +1,11 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
+import { EncriptionServiceService } from './encription-service.service';
+import { AuthService } from '../modules/auth';
+import { CognitoUser } from 'amazon-cognito-identity-js';
+import { APIService } from '../API.service';
+import { signOut } from 'aws-amplify/auth';
 
 interface Key {
   PK: string;
@@ -18,7 +23,7 @@ export class SharedService {
 
   apiUrl = 'https://vux77bi1vi.execute-api.ap-south-1.amazonaws.com/default/api_for_Batch';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,private encryption: EncriptionServiceService,private authService:AuthService,private api:APIService) { }
 
   dropdownSettings: {};
 
@@ -102,6 +107,9 @@ export class SharedService {
 
     this.userDetails = JSON.parse(JSON.parse(JSON.stringify(localStorage.getItem("userAttributes"))));
 
+
+
+
   
     // this.getPermission_basedonUser();
 
@@ -126,5 +134,37 @@ export class SharedService {
     }
   }
 
+
+
+  async submit(username:any,password:any){
+    // username = this.encryption.decryptValue(username)
+    // password = this.encryption.decryptValue(password)
+
+    await signOut()
+    .then(() => {
+      console.log("Cognito signout ");
+    })
+    .catch(err => console.error(err));
+
+    console.log(username,password);
+
+    return await this.authService.signIn(username, password)
+      .then(async (user: CognitoUser | any) => {
+        localStorage.setItem('userAttributes','{}')
+
+        try {
+          const result:any = await this.api.GetMaster(`${(username).toLowerCase()}#user#main`, 1);
+          if (result) {
+  
+            const metaData = JSON.parse(result.metadata)  
+            localStorage.setItem('userAttributes', JSON.stringify(metaData));
+            return true
+          }
+        } catch (err) {
+          console.error("Error in fetching the user ", user);
+          return false
+        }
+      })
+  }
 
 }

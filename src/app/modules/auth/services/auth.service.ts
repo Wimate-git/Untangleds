@@ -209,7 +209,7 @@ export class AuthService implements OnDestroy {
     } else {
       this.logout();
       // this.router.navigate(['auth/login']);
-      // document.location.reload();
+      document.location.reload();
     }
   }
   
