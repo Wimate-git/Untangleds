@@ -1090,7 +1090,9 @@ makeTrueCheck:any = false
       }
     );
   }
-  
+  closeModal(): void {
+    this.modalService.dismissAll()
+      }
   
   
   toggleAddFields(event: any, tile: any) {
@@ -1859,13 +1861,13 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   get primaryValue() {
     return this.createChart.get('primaryValue');
   }
-  closeModal(modal: any) {
-    if (modal) {
-      modal.close(); // Close the modal
-    } else {
-      console.error('Modal reference is undefined');
-    }
-  }
+  // closeModal(modal: any) {
+  //   if (modal) {
+  //     modal.close(); // Close the modal
+  //   } else {
+  //     console.error('Modal reference is undefined');
+  //   }
+  // }
   selectValue(value: string, modal: any): void {
     console.log('Selected value:', value);
     console.log('Current calenderIndex:', this.calenderIndex);
@@ -1889,7 +1891,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     }
   
     // Close the modal
-    this.closeModal(modal);
+    // this.closeModal(modal);
   }
   
   

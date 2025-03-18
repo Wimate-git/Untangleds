@@ -79,6 +79,10 @@ import { ProgressTileComponent } from './progress-tile/progress-tile.component';
 import { ProgressTileUiComponent } from './progress-tile-ui/progress-tile-ui.component';
 import { TileWithIconComponent } from './tile-with-icon/tile-with-icon.component';
 import { TileWithIconUiComponent } from './tile-with-icon-ui/tile-with-icon-ui.component';
+import { PieChartConfigComponent } from './pie-chart-config/pie-chart-config.component';
+import { PieChartUiComponent } from './pie-chart-ui/pie-chart-ui.component';
+import { StackedBarConfigComponent } from './stacked-bar-config/stacked-bar-config.component';
+import { StackedBarUiComponent } from './stacked-bar-ui/stacked-bar-ui.component';
 
 
 
@@ -134,7 +138,11 @@ import { TileWithIconUiComponent } from './tile-with-icon-ui/tile-with-icon-ui.c
     ProgressTileComponent,
     ProgressTileUiComponent,
     TileWithIconComponent,
-    TileWithIconUiComponent
+    TileWithIconUiComponent,
+    PieChartConfigComponent,
+    PieChartUiComponent,
+    StackedBarConfigComponent,
+    StackedBarUiComponent
 
 
 
@@ -229,7 +237,11 @@ import { TileWithIconUiComponent } from './tile-with-icon-ui/tile-with-icon-ui.c
     ProgressTileComponent,
     ProgressTileUiComponent,
     TileWithIconComponent,
-    TileWithIconUiComponent
+    TileWithIconUiComponent,
+    PieChartConfigComponent,
+    PieChartUiComponent,
+    StackedBarConfigComponent,
+    StackedBarUiComponent
     
   
 

@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, inject, Injector, NgZone, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, inject, Injector, NgZone, OnDestroy, OnInit, Output, Renderer2, TemplateRef, ViewChild } from '@angular/core';
 import { SharedService } from '../shared.service';
 import { APIService } from 'src/app/API.service';
 import { AbstractControl, FormControl, FormGroup, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
@@ -67,6 +67,9 @@ import funnel from 'highcharts/modules/funnel';
 import { FunnelChartConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/funnel-chart-config/funnel-chart-config.component';
 import { ProgressTileComponent } from 'src/app/_metronic/partials/content/my-widgets/progress-tile/progress-tile.component';
 import { TileWithIconComponent } from 'src/app/_metronic/partials/content/my-widgets/tile-with-icon/tile-with-icon.component';
+import { PieChartConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/pie-chart-config/pie-chart-config.component';
+import { StackedBarConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/stacked-bar-config/stacked-bar-config.component';
+import { AuthService } from 'src/app/modules/auth';
 
 
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
@@ -171,6 +174,10 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   @ViewChild(TitleConfigComponent, { static: false }) titleConfigComponent: TitleConfigComponent;
   @ViewChild(Tile6ConfigComponent, { static: false }) tileConfig6Component: Tile6ConfigComponent;
   @ViewChild(Chart1ConfigComponent, { static: false }) ChartConfig1Component: Chart1ConfigComponent;
+
+  @ViewChild(StackedBarConfigComponent, { static: false }) StackedBarConfigComponent: StackedBarConfigComponent;
+  @ViewChild(PieChartConfigComponent, { static: false }) PieChartConfigComponent: PieChartConfigComponent;
+  
   @ViewChild(Chart2ConfigComponent, { static: false }) ChartConfig2Component: Chart2ConfigComponent;
   @ViewChild(Chart3ConfigComponent, { static: false }) ChartConfig3Component: Chart3ConfigComponent;
   @ViewChild(Chart4ConfigComponent, { static: false }) ChartConfig4Component: Chart4ConfigComponent;
@@ -330,7 +337,10 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   PinValue: number;
   PinCheck: any;
   showProgressGrid: boolean;
-
+  @ViewChild('myDiv') myDiv: ElementRef;
+  viewFullScreenCheck: any;
+  userId: any;
+  userPass: any;
 
   createPieChart() {
     const chartOptions: any = {
@@ -588,6 +598,164 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     };
     Highcharts.chart('columnChart', barchartOptions);
   }
+
+
+  createPieChart1() {
+    const chartOptions: any = {
+      chart: {
+        inverted: false,
+        type: 'pie',
+        // Set the chart height
+      },
+      title: {
+        text: '',
+      },
+      legend: {
+        enabled: false,  // Hide the legend
+      },
+      yAxis: {
+        gridLineWidth: 0,
+      },
+      plotOptions: {
+        pie: {
+          innerSize: '0%',  // This creates the donut shape by setting the inner size
+          cursor: null,  // Hide pointer cursor
+          dataLabels: {
+            enabled: false,  // Disable data labels
+          },
+          showInLegend: false,  // Hide slices in legend
+        },
+      },
+      credits: {
+        enabled: false,
+      },
+      exporting: {
+        enabled: false,
+      },
+      series: [
+        {
+          data: [
+            {
+              name: 'Sales',
+              y: 30,
+            },
+            {
+              name: 'Marketing',
+              y: 20,
+            },
+            {
+              name: 'Development',
+              y: 25,
+            },
+            {
+              name: 'Customer Support',
+              y: 15,
+            },
+            {
+              name: 'Research',
+              y: 10,
+            },
+            {
+              name: 'HR',
+              y: 10,
+            },
+          ],
+        },
+      ],
+    };
+  
+    Highcharts.chart('pieChart1', chartOptions);
+  }
+
+
+
+  createStackedChart1() {
+    const chartOptions: any = {
+      chart: {
+        type: 'bar', // Use 'bar' for horizontal stacked bar, 'column' for vertical
+        backgroundColor: 'var(--bs-body-bg)',
+      },
+      title: {
+        text: 'Stacked Bar Chart',
+        style: {
+          color: 'var(--bs-body-color)',
+        },
+      },
+      tooltip: {
+        pointFormat: '{series.name}: <b>{point.y}</b>',
+      },
+      exporting: {
+        enabled: false,
+      },
+      credits: {
+        enabled: false,
+      },
+      xAxis: {
+        categories: [], // Add your categories dynamically
+        title: {
+          text: null,
+        },
+        labels: {
+          style: {
+            color: 'var(--bs-body-color)',
+          },
+        },
+      },
+      yAxis: {
+        min: 0,
+        title: {
+          text: 'Total Value',
+          align: 'high',
+        },
+        labels: {
+          overflow: 'justify',
+          style: {
+            color: 'var(--bs-body-color)',
+          },
+        },
+        gridLineDashStyle: 'dash',
+      },
+      legend: {
+        enabled: true,
+        layout: 'horizontal',
+        align: 'center',
+        verticalAlign: 'bottom',
+      },
+      plotOptions: {
+        series: {
+          stacking: 'normal', // 'normal' for stacked bars, 'percent' for percentage stacked
+          dataLabels: {
+            enabled: true,
+            format: '{point.y}', // Show values on bars
+            style: {
+              fontSize: '1em',
+              textOutline: 'none',
+            },
+          },
+        },
+      },
+      series: [
+        {
+          name: 'Product A',
+          data: [50, 70, 80, 90], // Sales data for Product A
+          color: '#FF5733',
+        },
+        {
+          name: 'Product B',
+          data: [30, 50, 60, 70], // Sales data for Product B
+          color: '#33FF57',
+        },
+        {
+          name: 'Product C',
+          data: [20, 30, 50, 60], // Sales data for Product C
+          color: '#3357FF',
+        },
+      ],
+    };
+  
+    Highcharts.chart('stackedChart', chartOptions);
+  }
+
 
   // @HostListener('window:scroll', ['$event'])
   // onWindowScroll(event: Event) {
@@ -894,15 +1062,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
                     const processedData = constLiveData.Processed_Data.metadata.grid_details;
                     console.log('processedData check liveData', processedData);
                     this.summaryService.updatelookUpData(processedData)
-      //               if (this.all_Packet_store?.LiveDashboard === true ) {
-          
-      //                 console.log('this.all_Packet_store?.LiveDashboard from lambda',this.all_Packet_store?.LiveDashboard)
-      //     this.liveDashboardDataFormat(processedData);
-      // }else{
-      
-      // }
-      
-                    // this.liveDashboardDataFormat(processedData);
+
                   } else {
                     console.error('Processed_Data.metadata.grid_details not found in response');
                     Swal.fire({
@@ -1682,7 +1842,7 @@ enterFullScreen(): void {
 }
 
 exitFullScreen(): void {
-  localStorage.removeItem('fullscreen');
+  // localStorage.removeItem('fullscreen');
   this.isFullScreen = false;
   this.hidingLink = false;
   console.log('Exited fullscreen mode');
@@ -2047,6 +2207,19 @@ exitFullScreen(): void {
           `Height: ${this.tileHeight[index]}, Width: ${this.tileWidth[index]}, Top Margin: }`
         );
       }
+
+      else if (item.grid_type === 'tileWithIcon') {
+        // const topMargin = 20; // Define the top margin value
+      
+        // Adjust height and width with the top margin
+        this.tileHeight[index] = itemComponentHeight ; // Subtract additional top margin
+        this.tileWidth[index] = itemComponentWidth ; // Subtract margin/padding for width
+      
+        console.log(
+          `Resized ${item.grid_type} at index ${index}:`,
+          `Height: ${this.tileHeight[index]}, Width: ${this.tileWidth[index]}, Top Margin: }`
+        );
+      }
       else if (item.grid_type === 'TableWidget') {
         // const topMargin = 20; // Define the top margin value
       
@@ -2283,7 +2456,7 @@ exitFullScreen(): void {
   constructor(private summaryConfiguration: SharedService, private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector, private auditTrail: AuditTrailService,
     private spinner: NgxSpinnerService, private zone: NgZone,private http: HttpClient,  private sanitizer: DomSanitizer, // Inject DomSanitizer
-    private titleService: Title, private summaryService: SummaryEngineService,private blobService: BlobService
+    private titleService: Title, private summaryService: SummaryEngineService,private blobService: BlobService,private renderer: Renderer2,private authservice: AuthService
   ) {
     this.resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
@@ -2361,8 +2534,12 @@ exitFullScreen(): void {
   }
   ngAfterViewInit(): void {
     console.log('this.allCompanyDetails',this.createSummaryField.value)
+    // const getFormFelds = this.createKPIWidget.get('filterParameter')?.value;
+    const getfullScreenValue = this.createSummaryField.get('fullScreenModeCheck')?.value
+    console.log('ngAfterViewInit check data', getfullScreenValue);
     if (this.routeId) {
-      this.checkAndSetFullscreen();
+
+      // this.checkAndSetFullscreen();
       this.editButtonCheck = true
 
       // this.openModalHelpher(this.routeId)
@@ -2532,46 +2709,14 @@ exitFullScreen(): void {
     // console.log('readPermission_Id checking initialize',readPermission_Id)
     
     this.initializeCompanyFields();
-   
-
-
-    
-    // this.dropdownSettings = this.devicesList.getMultiSelectSettings();
-
-
-
-    
-    // Function to process the savedQuery parameter
-
-    
-    
-    
-    // this.dropdownSettings = this.devicesList.getMultiSelectSettings();
+  
 
     console.log('this.getLoggedUser check', this.getLoggedUser)
 
-    
   
-    // this.getWorkFlowDetails = this.summaryConfiguration.getLoggedUserDetails()
-    // console.log('this.getLoggedUser check',this.getWorkFlowDetails)
-
-  
-
-
-
-
-    
-
-
-
 
     this.initializeTileFields6()
-   
-
-    // Load saved layout
-    // this.loadGridLayout();
-    // this.addJsonValidation();
-    // this.showTable()
+  
     this.addFromService()
 
     this.route.paramMap.subscribe(params => {
@@ -2618,7 +2763,7 @@ exitFullScreen(): void {
             console.error('Error decoding filters:', error);
           }
         }
-        
+
           console.log('params', params['filterTileConfig']);
           if (params['filterTileConfig']) {
             console.log('Raw filterTileConfig:', params['filterTileConfig']);
@@ -2659,6 +2804,14 @@ exitFullScreen(): void {
     const livedatacheck = data
     console.log('livedatacheck',livedatacheck)
     this.checkLiveDashboard = livedatacheck.LiveDashboard
+    this.viewFullScreenCheck = livedatacheck.fullScreenModeCheck
+    console.log('this.viewFullScreenCheck checking',this.viewFullScreenCheck)
+    if(this.viewFullScreenCheck==true){
+      this.checkAndSetFullscreen();
+
+    }
+
+
     console.log('this.checkLiveDashboard check',this.checkLiveDashboard)
     if(this.checkLiveDashboard==true){
     this.reloadPage("from_ts",permissionId) 
@@ -2674,6 +2827,26 @@ exitFullScreen(): void {
     });
         this.editButtonCheck = true
     
+      }
+      else{
+        this.route.queryParams.subscribe(async (params) => {
+        if(params['uid']){
+          console.log('uid checking',params['uid'])
+          this.userId = params['uid']
+          
+        }
+        if(params['pass']){
+          console.log('pass checking',params['pass'])
+          this.userPass = params['pass']
+          const user = await this.authservice.signIn((this.userId).toLowerCase(), this.userPass);
+          console.log('user check query',user)
+          
+        }
+        if(params['clientID']){
+          console.log('clientID checking',params['clientID'])
+
+        }
+      });
       }
     
       //console.log(this.routeId)
@@ -2698,7 +2871,8 @@ exitFullScreen(): void {
     this.fetchContractOrderMasterlookup(1)
     this.permissionIds(1)
     this.fetchCompanyLookupdata(1)
- 
+    this.applyTheme(); // Initial check
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', this.applyTheme.bind(this));
     // this.fetchCalender()
    
          this.rowData = [
@@ -2757,6 +2931,12 @@ this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
 
 
 
+  }
+
+
+  getBodyColor(): string {
+    const style = getComputedStyle(this.myDiv.nativeElement);
+    return style.getPropertyValue('--bs-heading-color').trim();
   }
   async QueryParamsRead(routeId:any,toRouterId:any,eventFilterConditions:any,permissionId:any){
 
@@ -3255,7 +3435,13 @@ setTimeout(() => {
 setTimeout(() => {
   this.createCalumnChart()
 }, 500);
+setTimeout(() => {
+  this.createPieChart1()
+}, 500);
 
+setTimeout(() => {
+  this.createStackedChart1()
+}, 500);
 
  
      
@@ -3749,6 +3935,23 @@ justReadStyles(data:any,index:any){
       }, 500);
 
     }
+    else if(event.arg1.grid_type=='Stackedchart'){
+      this.modalService.open(KPIModal, { size: 'xl' });
+      console.log('event check', event)
+      setTimeout(() => {
+        this.StackedBarConfigComponent.openStackedChartModal(event.arg1, event.arg2)
+      }, 500);
+
+    }
+
+    else if(event.arg1.grid_type=='Piechart'){
+      this.modalService.open(KPIModal, { size: 'xl' });
+      console.log('event check', event)
+      setTimeout(() => {
+        this.PieChartConfigComponent.openPieChartModal(event.arg1, event.arg2)
+      }, 500);
+
+    }
 
     else if(event.arg1.grid_type=='Linechart'){
       this.modalService.open(KPIModal, { size: 'xl' });
@@ -4025,6 +4228,23 @@ justReadStyles(data:any,index:any){
       console.log('event.data.arg1', event.data.arg1);
     }
 
+    else if (event.data.arg1.grid_type === 'Piechart') {
+      console.log('event check chart1', event);
+    
+      // Store all company details
+      this.allCompanyDetails = event.all_Packet_store;
+    
+      // Directly update the id and push the object into the dashboard in one line
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
+    }
+
+    
+
     else if (event.data.arg1.grid_type === 'Funnelchart') {
       console.log('event check chart1', event);
     
@@ -4293,7 +4513,8 @@ console.log('selectedTab checking',this.selectedTab)
       summaryName: '',
       summarydesc: '',
       iconSelect: '',
-      LiveDashboard:''
+      LiveDashboard:'',
+      fullScreenModeCheck:''
       
       
     });
@@ -4327,7 +4548,8 @@ console.log('selectedTab checking',this.selectedTab)
         summarydesc: getValues.summaryDesc || '', // Default to empty string if summaryDesc is undefined
         iconSelect: getValues.summaryIcon || '',
         tilesList:getValues.tilesList,  // Default to empty string if summaryIcon is undefined
-        LiveDashboard: getValues.LiveDashboard
+        LiveDashboard: getValues.LiveDashboard,
+        fullScreenModeCheck:getValues.fullScreenModeCheck
       });
       this.cd.detectChanges(); 
     }
@@ -4364,7 +4586,8 @@ console.log('selectedTab checking',this.selectedTab)
         summarydesc: getValues.summaryDesc,
         iconSelect: getValues.summaryIcon,
         tilesList:this.tilesListDefault,
-        LiveDashboard:getValues.LiveDashboard
+        LiveDashboard:getValues.LiveDashboard,
+        fullScreenModeCheck:getValues.fullScreenModeCheck
 
           // Assign the entire icon object here
       });
@@ -4460,9 +4683,8 @@ console.log('selectedTab checking',this.selectedTab)
       'iconSelect': [[], Validators.required],
       'tilesList':['Tiles'],
       LiveDashboard: [false], // Default toggle state
-      PinCheck:[]
-
-     
+      PinCheck:[],
+      fullScreenModeCheck:['']
 
     })
   }
@@ -4655,6 +4877,7 @@ console.log('selectedTab checking',this.selectedTab)
       summaryIcon: duplicateData.summaryIcon,
       iconObject: duplicateData.iconObject,
       LiveDashboard:duplicateData.LiveDashboard,
+      fullScreenModeCheck:duplicateData.fullScreenModeCheck,
       crDate: createdDate,
       upDate: updatedDate,
       createdUser: this.getLoggedUser.username, // Set the creator's username
@@ -4676,6 +4899,7 @@ console.log('selectedTab checking',this.selectedTab)
         summaryDesc: this.allCompanyDetails.summaryDesc,
         summaryIcon: this.allCompanyDetails.summaryIcon,
         LiveDashboard:this.allCompanyDetails.LiveDashboard,
+        fullScreenModeCheck:this.allCompanyDetails.fullScreenModeCheck,
         grid_details:duplicateData.grid_details,
         created: createdDateISO,
         updated: updatedDateISO,
@@ -5581,7 +5805,8 @@ console.log('value checking summary',value)
         summaryName: this.allCompanyDetails.summaryName || this.all_Packet_store.summaryName,
         summaryDesc: this.allCompanyDetails.summaryDesc || this.all_Packet_store.summaryDesc,
         iconObject: this.allCompanyDetails.iconObject || this.all_Packet_store.iconObject,
-        LiveDashboard:this.allCompanyDetails.LiveDashboard ||''
+        LiveDashboard:this.allCompanyDetails.LiveDashboard ||'',
+        fullScreenModeCheck:this.allCompanyDetails.fullScreenModeCheck ||''
       };
       console.log('Updated allCompanyDetails with Packet Store:', this.allCompanyDetails);
     }
@@ -5893,6 +6118,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
       summaryIcon: this.createSummaryField.value.iconSelect,
       iconObject: this.previewObjDisplay,
       LiveDashboard:this.createSummaryField.value.LiveDashboard,
+      fullScreenModeCheck:this.createSummaryField.value.fullScreenModeCheck,
       updated: new Date().toISOString(),
       createdUser: this.getLoggedUser?.username || this.createdUserName
     };
@@ -5924,6 +6150,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
       summaryIcon: this.createSummaryField.value.iconSelect,
       iconObject: this.previewObjDisplay,
       LiveDashboard:this.createSummaryField.value.LiveDashboard,
+      fullScreenModeCheck:this.createSummaryField.value.fullScreenModeCheck,
 
       // Add the selected icon
       crDate: createdDate, // Created date
@@ -5949,6 +6176,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
         // jsonData: this.allCompanyDetails.jsonData,
         summaryIcon: this.createSummaryField.value.iconSelect,
         LiveDashboard:this.createSummaryField.value.LiveDashboard,
+        fullScreenModeCheck:this.createSummaryField.value.fullScreenModeCheck,
         // Include selected icon in the metadata
         created: createdDateISO, // Created date in ISO format
         updated: updatedDateISO,   // Updated date in ISO format
@@ -7112,13 +7340,31 @@ refreshFunction(){
   }
   
 
-
+  get gridsterStyles() {
+    return `
+      background: ${this.isEditModeView ? '#FFFFFF' : '#333333'} !important;
+      border-radius: 5px !important;
+      padding: 0px !important;
+    `;
+  }
+  
+  
   // gridTitle: { cols: number; rows: number; y: number; x: number; themeColor: string }[] = [
   //   { cols: 2, rows: 1, y: 0, x: 0, themeColor: '#3498db' },
   //   { cols: 2, rows: 1, y: 0, x: 2, themeColor: '#e74c3c' },
   // ];
 
+  applyTheme() {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    console.log('isDarkMode',isDarkMode)
+    const root = document.documentElement;
 
+    if (isDarkMode) {
+      this.renderer.setProperty(root, 'style', '--bs-app-bg-color: #f5e6cc'); // Cream for Dark Mode
+    } else {
+      this.renderer.setProperty(root, 'style', '--bs-app-bg-color: #3a3a3a'); // Dark Gray for Light Mode
+    }
+  }
   updateCustomLabel(event: Event): void {
     const inputValue = (event.target as HTMLElement).innerText;
 
@@ -7202,6 +7448,22 @@ refreshFunction(){
     this.modalService.open(ChartModal5, { size: 'xl' });
     modal.dismiss();
   }
+
+
+  openpieChartModal(pieChartModal: TemplateRef<any>,modal:any) {
+    this.modalService.open(pieChartModal, { size: 'xl' });
+    modal.dismiss();
+  }
+
+  openStackedChartModal(stackedBarChartModal: TemplateRef<any>,modal:any) {
+    this.modalService.open(stackedBarChartModal, { size: 'xl' });
+    modal.dismiss();
+  }
+
+
+
+
+  
   openCloneDashboard(stepperModal: TemplateRef<any>,modal:any) {
     this.modalService.open(stepperModal, {  });
     modal.dismiss();
@@ -7597,6 +7859,7 @@ helperChartClickChart1(event: any, modalChart: any) {
       Barchart:{width:this.chartWidth, height:this.chartHeight, heightOffset: 10, widthOffset: 30 },
       Areachart:{width:this.chartWidth, height:this.chartHeight, heightOffset: 10, widthOffset: 30 },
       progressTile:{width:this.DynamicTileWidth, height:this.DynamicTileWidth, heightOffset: 10, widthOffset: 30 },
+      tileWithIcon:{ width: this.tileWidth, height: this.tileHeight, heightOffset: 80, widthOffset: 30}
  
       // filterTileHeight:any []=[];
       // filterTileWidth:any []=[];

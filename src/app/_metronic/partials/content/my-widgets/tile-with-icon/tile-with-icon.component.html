@@ -1,6 +1,6 @@
 
 <div class="modal-header">
-    <h4 class="modal-title">Widget-1</h4>
+    <h4 class="modal-title">Widget with Icon</h4>
     <button type="button" class="btn-close" aria-label="Close"   (click)="modal.dismiss()"></button>
   </div>
   
@@ -282,13 +282,14 @@
                         optionValueField="value"
                         optionTextField="text"
                         placeholder="Select Parameter"
+                        (change)="onSelectTypeChange()"
                       >
                       </ngx-select>
                     </div>
                   </div>
-                
-                  <!-- Column Visibility -->
-                  <div class="col-md-4" style="margin-top:30px;">
+                  
+                  <!-- Column Visibility (Shown only if 'drill down' is selected) -->
+                  <div class="col-md-4" style="margin-top:30px;" *ngIf="showColumnVisibility">
                     <div class="d-flex flex-column">
                       <label for="columnVisibility" class="fw-bold fs-6">Column Visibility</label>
                       <p-multiSelect
@@ -297,7 +298,7 @@
                         [options]="columnVisisbilityFields"
                         optionLabel="text"
                         placeholder="Select Parameter"
-                        >
+                      >
                       </p-multiSelect>
                     </div>
                   </div>
@@ -338,6 +339,22 @@
                     <div *ngIf="createKPIWidget.get('iconList')?.touched && createKPIWidget.get('iconList')?.invalid" class="text-danger">
                       <div *ngIf="createKPIWidget.get('iconList')?.errors?.required">Icon is required.</div>
                     </div>
+                  </div>
+
+
+                  <div class="col-md-6 mb-3">
+                    <label for="IconfontSize" class="col-form-label fw-bold fs-6 required">Icon Font Size</label>
+                    <input
+                      id="IconfontSize"
+                      type="number"
+                      class="form-control form-control-solid"
+                      placeholder="Enter Font Size (e.g., 14)"
+                      formControlName="IconfontSize"
+                      min="8"
+                      max="72">
+                      <div *ngIf="createKPIWidget.get('IconfontSize')?.errors?.min || createKPIWidget.get('IconfontSize')?.errors?.max" class="text-danger mt-1">
+                        Font size must be between 8 and 72.
+                      </div>
                   </div>
                 
                 <div class="col-md-4 mb-3" *ngIf = "shoRowData" >

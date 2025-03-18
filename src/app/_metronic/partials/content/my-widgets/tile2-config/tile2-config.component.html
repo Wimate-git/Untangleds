@@ -281,13 +281,14 @@
                               optionValueField="value"
                               optionTextField="text"
                               placeholder="Select Parameter"
+                              (change)="onSelectTypeChange()"
                             >
                             </ngx-select>
                           </div>
                         </div>
-                      
-                        <!-- Column Visibility -->
-                        <div class="col-md-4" style="margin-top:30px;">
+                        
+                        <!-- Column Visibility (Shown only if 'drill down' is selected) -->
+                        <div class="col-md-4" style="margin-top:30px;" *ngIf="showColumnVisibility">
                           <div class="d-flex flex-column">
                             <label for="columnVisibility" class="fw-bold fs-6">Column Visibility</label>
                             <p-multiSelect
@@ -296,7 +297,7 @@
                               [options]="columnVisisbilityFields"
                               optionLabel="text"
                               placeholder="Select Parameter"
-                              >
+                            >
                             </p-multiSelect>
                           </div>
                         </div>

@@ -1134,6 +1134,33 @@ gridster-item {
   color: #6c757d; /* Grey color (adjust as needed) */
 }
 
+:root {
+  --gridster-light-bg: #3a3a3a; /* Dark Gray for Light Mode */
+  --gridster-dark-bg: #f5e6cc;  /* Cream for Dark Mode */
+}
+
+/* Light Mode */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bs-app-bg-color: var(--gridster-light-bg);
+  }
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bs-app-bg-color: var(--gridster-dark-bg);
+  }
+}
+
+/* Ensure Gridster applies the correct color */
+.custom-gridster {
+  background: var(--bs-app-bg-color) !important;
+  border-radius: 5px;
+  padding: 0px;
+  transition: background 0.3s ease-in-out; /* Smooth transition */
+}
+
 
 
 

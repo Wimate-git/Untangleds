@@ -123,7 +123,7 @@ export class TileWithIconComponent implements OnInit{
   helpherObjCalender: any;
   formListTitles: any;
   icons: any;
-
+  showColumnVisibility = false;
 
  
   ngOnInit() {
@@ -151,9 +151,17 @@ export class TileWithIconComponent implements OnInit{
 
       console.log('this.icons checking TILE WOTH ICON',this.icons)
     });
+
+    this.createKPIWidget.get('selectType')?.valueChanges.subscribe(value => {
+      this.showColumnVisibility = value === 'drill down';
+    });
     // this.permissionIds(1)
   }
 
+  onSelectTypeChange() {
+    const selectedType = this.createKPIWidget.get('selectType')?.value;
+    this.showColumnVisibility = selectedType === 'drill down';
+  }
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange',this.all_Packet_store)
     console.log('isGirdMoved check',this.isGirdMoved)
@@ -278,7 +286,8 @@ export class TileWithIconComponent implements OnInit{
       MiniTableFields:[''],
       minitableEquation:[''],
       EquationOperationMini:[''],
-      iconList:[this.icons,Validators.required]
+      iconList:[this.icons,Validators.required],
+      IconfontSize:[20, [Validators.required, Validators.min(8), Validators.max(72)]]
     
 
 
@@ -559,6 +568,7 @@ export class TileWithIconComponent implements OnInit{
         minitableEquation:this.createKPIWidget.value.minitableEquation,
         EquationOperationMini:this.createKPIWidget.value.EquationOperationMini,
         iconList:this.createKPIWidget.value.iconList,
+        IconfontSize:`${this.createKPIWidget.value.IconfontSize}px`,
    
 
 
@@ -681,7 +691,8 @@ export class TileWithIconComponent implements OnInit{
         EquationOperationMini:this.createKPIWidget.value.EquationOperationMini||'',
         ModuleNames:this.createKPIWidget.value.ModuleNames||'',
         columnVisibility:this.createKPIWidget.value.columnVisibility,
-        iconList:this.createKPIWidget.value.iconList
+        iconList:this.createKPIWidget.value.iconList,
+        IconfontSize:`${this.createKPIWidget.value.IconfontSize}px`
 
 
       };
@@ -1333,6 +1344,7 @@ openTileWithIcon(tile: any, index: number) {
       minitableEquation:tile.minitableEquation,
       EquationOperationMini:tile.EquationOperationMini, // Set parsed columnVisibility
       iconList:tile.iconList,
+      IconfontSize:tile.IconfontSize? parseInt(tile.IconfontSize.replace('px', ''), 10) : 14,
    
       all_fields: this.repopulate_fields(tile),
     });

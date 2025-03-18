@@ -1,59 +1,43 @@
 <div class="modal-header">
-    <h4 class="modal-title">Progress Tile</h4>
+    <h4 class="modal-title">Pie Chart</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
   </div>
   <div class="container" *ngIf="createChart">
     <div [formGroup]="createChart">
-
-      <div class="row">
-        <div class="col-md-6" >
-          <label class="col-lg-12 col-form-label fw-bold fs-6 ">Parameters
-          </label>
-          <input type="number" class="
-                            form-control form-control-lg form-control-solid
-                            mb-3 mb-lg-0" name="add_fields" formControlName="add_fields"
-            (keyup)="addControls($event,'html')" required min="1" max="2">
-            <div *ngIf="createChart.get('add_fields')?.touched && createChart.get('add_fields')?.invalid" class="text-danger">
-              <div *ngIf="createChart.get('add_fields')?.errors?.required">Parameters is required.</div>
-            </div>
-        </div>
-        <div class="col-md-6" [formGroup]="createChart">
-          <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Title </label>
-    
-          <input type="text" class="
-                      form-control form-control-lg form-control-solid
-                      mb-3 mb-lg-0
-                    " placeholder="Enter title" formControlName="chart_title" required>
-    
-                    <div *ngIf="createChart.get('chart_title')?.touched && createChart.get('chart_title')?.invalid" class="text-danger">
-                      <div *ngIf="createChart.get('chart_title')?.errors?.required">Title is required.</div>
-                    </div>
-    
-        </div>
-        <!-- <div class="col-md-2" >
-  
-          <div class="col-lg-12 form-check form-switch">
-  
-            <label class="col-lg-12 col-form-label fw-bold fs-6  mt-7">Enable Redirect</label>
-  
-            <input class="form-check-input mt-10 mb-3 mb-lg-0" formControlName="redirectionEnabled"
-              type="checkbox">
+    <div class="row">
+      <div class="col-md-6" [formGroup]="createChart">
+        <label class="col-lg-12 col-form-label fw-bold fs-6 required">Parameters
+        </label>
+        <input type="number" class="
+                          form-control form-control-lg form-control-solid
+                          mb-3 mb-lg-0" name="add_fields" formControlName="add_fields" (change)="onValue()"
+          (keyup)="addControls($event,'html')" required>
+          <div *ngIf="createChart.get('add_fields')?.touched && createChart.get('add_fields')?.invalid" class="text-danger">
+            <div *ngIf="createChart.get('add_fields')?.errors?.required">Parameters is required.</div>
           </div>
-            
-        </div> -->
-  
-          <!-- Toggle Control -->
-  
-  
-    
-        
-        
-  
-    
       </div>
-
-
-      <div class="row mb-3">
+      <div class="col-md-6" [formGroup]="createChart">
+        <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Title </label>
+  
+        <input type="text" class="
+                    form-control form-control-lg form-control-solid
+                    mb-3 mb-lg-0
+                  " placeholder="Enter title" formControlName="chart_title" required>
+                  <div *ngIf="createChart.get('chart_title')?.touched && createChart.get('chart_title')?.invalid" class="text-danger">
+                    <div *ngIf="createChart.get('chart_title')?.errors?.required">Title is required.</div>
+                  </div>
+  
+   
+  
+  
+  
+  
+  
+  
+      </div>
+    </div>
+  
+    <div class="row mb-3">
       <div class="col-md-4 mb-3">
         <div class="col-lg-12 form-check form-switch">
         <label for="toggleCheck" class="col-lg-12 col-form-label fw-bold fs-6  mt-7">Enable Redirect</label>
@@ -63,91 +47,10 @@
       </div>
       
       <!-- Conditionally Render Dashboard Ids Field -->
-   
-      <div  *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
-        <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Module Names</label>
-        <ngx-select
-          id="parameterName"
-          [allowClear]="true"
-          formControlName="ModuleNames"
-          [items]="showModuleNames"
-          optionValueField="value"
-          optionTextField="text"
-          placeholder="Select Parameter"
-          (selectionChanges)="moduleSelection($event)"
-      
-          style="width: 100%;">
-        </ngx-select>
-      </div>
-
-
-
-      <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
-        <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Redirect To</label>
-        <ngx-select
-          id="parameterName"
-          [allowClear]="true"
-          formControlName="dashboardIds"
-          [items]="dynamicIDArray"
-          optionValueField="value"
-          optionTextField="text"
-          placeholder="Select Parameter"
-          (selectionChanges)="dynamicRedirectChanged($event)"
-      
-          style="width: 100%;">
-        </ngx-select>
-      </div>
-
-      <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
-        <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Select Type</label>
-        <ngx-select
-          id="selectType"
-          [allowClear]="true"
-          formControlName="selectType"
-          [items]="SelectTypeSummary"
-          optionValueField="value"
-          optionTextField="text"
-          placeholder="Select Parameter"
-         
-          style="width: 100%;">
-        </ngx-select>
-      </div>
-
-      <div *ngIf="createChart.get('selectType')?.value" class="col-md-4 mb-3">
-        <label for="formlist" class="col-form-label fw-bold fs-6 required">
-          Forms
-          <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
-            <i class="bi bi-info-circle fs-5"></i>
-          </span>
-        </label>
-        <ngx-select
     
-          id="formlist"
-          [allowClear]="true"
-          name="icon"
-          formControlName="drillDownForm"
-          [items]="listofFormParam"
-          optionValueField="value"
-          optionTextField="text"
-          (selectionChanges)="selectFormParamsDrill($event)"
-          placeholder="Select Form">
-        </ngx-select>
-      </div>
-
-      <div *ngIf="createChart.get('selectType')?.value"  class="col-md-4">
-        <label for="columnVisibility" class="fw-bold fs-6 ">column Visibility</label>
-        <p-multiSelect
-          id="columnVisibility"
-          formControlName="columnVisibility"
-          [options]="columnVisisbilityFields"
-          optionLabel="text"
-          placeholder="Select Parameter"
-        
-      
-        ></p-multiSelect>
-      </div>
-
-        <!-- <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
+    
+    
+        <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
           <label for="dashboardIds" class="col-form-label fw-bold fs-6">Redirect To</label>
           <ngx-select
             id="dashboardIds"
@@ -161,7 +64,7 @@
           </ngx-select>
         </div>
       
- 
+        <!-- Conditionally Render Select Type Field -->
         <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
           <label for="selectType" class="col-form-label fw-bold fs-6">Select Type</label>
           <ngx-select
@@ -174,13 +77,15 @@
             placeholder="Select Parameter"
             style="width: 100%;">
           </ngx-select>
-        </div> -->
+        </div>
        </div>
+  
     </div>
-
   </div>
   
   <!-- Modal body with Tabs -->
+  
+  
   <div class="card shadow-none rounded-0 w-100" [formGroup]="createChart" *ngIf="createChart" style="margin-top: 10px;">
   
     <div class="card card-custom">
@@ -190,42 +95,32 @@
           <!-- Tab Navigation -->
           <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap"
             id="myTab_settings" role="tablist">
-            <div class="col-2" role="Data">
+            <div class="col-3" role="Data">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab"
                   aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Data</a>
               </li>
             </div>
-            <div class="col-2" role="Filter">
+            <div class="col-3" role="Filter">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="filter-tab" data-bs-toggle="tab" role="tab"
                   aria-controls="filter-tab" aria-selected="false" (click)="selectedSettingsTab('filter-tab')">Filter</a>
               </li>
             </div>
-            <!-- <div class="col-2" role="Settings">
+  
+            <div class="col-3" role="Advanced">
               <li class="nav-item">
-                <a class="nav-link text-active-primary me-6" id="settings-tabpane" data-bs-toggle="tab" role="tab"
-                  aria-controls="settings-tab" aria-selected="false"
-                  (click)="selectedSettingsTab('settings-tab')">Label</a>
-              </li>
-            </div> -->
-            <div class="col-2" role="Theme">
-              <li class="nav-item">
-                <a class="nav-link text-active-primary me-6" id="theme-tabpane" data-bs-toggle="tab" role="tab" aria-controls="theme-tab" aria-selected="false" (click)="selectedSettingsTab('theme-tab')">Theme</a>
+                <a class="nav-link text-active-primary me-6" id="advanced-tabpane" data-bs-toggle="tab" role="tab"
+                  aria-controls="advanced-tab" aria-selected="false"
+                  (click)="selectedSettingsTab('advanced-tab')">Advanced</a>
               </li>
             </div>
-            <div class="col-2" role="Settings">
-              <li class="nav-item">
-                <a class="nav-link text-active-primary me-6" id="equation-tabpane" data-bs-toggle="tab" role="tab" aria-controls="equation-tab" aria-selected="false" (click)="selectedSettingsTab('equation-tab')">Equation</a>
-              </li>
-            </div>
-            <div class="col-2" role="Mini Table">
+            <div class="col-3" role="Mini Table">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="minitable-tab" data-bs-toggle="tab" role="tab"
                   aria-controls="minitable-tab" aria-selected="false" (click)="selectedSettingsTab('minitable-tab')">Advance Equation</a>
               </li>
             </div>
-
           </ul>
   
           <!-- Tab Content -->
@@ -243,73 +138,49 @@
                       <!-- createChart Fields -->
                       <div class="col-md-4 mb-3">
                         <label for="formlist" class="col-createChart-label fw-bold fs-6 required">Forms</label>
-                        <ngx-select
-                          id="formlist"
-                          [allowClear]="true"
-                          formControlName="formlist"
-                          [items]="listofDeviceIds"
-                          optionValueField="value"
-                          optionTextField="text"
-                          (selectionChanges)="selectFormParams($event, fieldIndex)"
-                          placeholder="Select Form">
+                        <ngx-select id="formlist" [allowClear]="true" name="icon" formControlName="formlist"
+                          [items]="listofDeviceIds" optionValueField="value" optionTextField="text"
+                          (selectionChanges)="selectFormParams($event, fieldIndex)" placeholder="Select createChart">
                         </ngx-select>
                         <div *ngIf="field.get('formlist')?.touched && field.get('formlist')?.invalid" class="text-danger">
                           <div *ngIf="field.get('formlist')?.errors?.required">Form is required.</div>
                         </div>
+                        
                       </div>
-                    
-                      <!-- Dynamic Parameters Dropdown -->
+  
                       <div class="col-md-4 mb-3">
-                        <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Parameters</label>
-                        <ngx-select
-                          id="parameterName"
-                          [allowClear]="true"
-                          formControlName="parameterName"
-                          [items]="getDynamicParams(fieldIndex)"
-                          optionValueField="value"
-                          optionTextField="text"
-                          (selectionChanges)="dynamicparameterLabel($event,fieldIndex)"
-                          placeholder="Select Parameter">
-                        </ngx-select>
+                        <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields</label>
+                        <p-multiSelect id="parameterName" formControlName="parameterName"
+                        [options]="getDynamicParams(fieldIndex)"     optionLabel="text"
+                          placeholder="Select Parameter" (onChange)="parameterValueCheck($event,fieldIndex)" >
+                        </p-multiSelect>
                         <div *ngIf="field.get('parameterName')?.touched && field.get('parameterName')?.invalid" class="text-danger">
                           <div *ngIf="field.get('parameterName')?.errors?.required">Form Fields are required.</div>
                         </div>
-
                       </div>
-                    
   
-                      <!-- <div class="col-md-4 mb-3">
-                        <label for="groupBy" class="col-createChart-label fw-bold fs-6 required">Group By</label>
-                        <ngx-select id="groupBy" [allowClear]="true" formControlName="groupBy" [items]="groupByOptions"
-                          optionValueField="value" optionTextField="text" placeholder="Select Group" class="w-100">
-                        </ngx-select>
-                      </div> -->
+  
                       <div class="col-md-4 mb-3">
                         <label for="primaryValue" class="col-form-label fw-bold fs-6 required">
                           Primary Value
-                          <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Show Value As">
+                          <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="Show Value As">
                             <i class="bi bi-info-circle fs-5"></i>
                           </span>
                         </label>
-                        <ngx-select
-                          id="primaryValue" 
-                          [allowClear]="true" 
-                          formControlName="primaryValue"
-                          [items]="showValues" 
-                          optionValueField="value" 
-                          optionTextField="text" 
-                          placeholder="Select Group"
-                          (selectionChanges)="onValueChange($event, fieldIndex)" 
-                          class="w-100">
-                        </ngx-select>
-                        <div *ngIf="field.get('primaryValue')?.touched && field.get('primaryValue')?.invalid" class="text-danger">
-                          <div *ngIf="field.get('primaryValue')?.errors?.required">Primary Value is required.</div>
-                        </div>
+                        <ngx-select id="primaryValue" [allowClear]="true" formControlName="primaryValue"
+                          [items]="showValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
+                          (selectionChanges)="onValueChange($event)" class="w-100"></ngx-select>
+                          <div *ngIf="field.get('primaryValue')?.touched && field.get('primaryValue')?.invalid" class="text-danger">
+                            <div *ngIf="field.get('primaryValue')?.errors?.required">Primary Value is required.</div>
+                          </div>
                       </div>
-                      
-                      <!-- Show only when primaryValue is 'Equation' -->
-
-                      
+                      <div class="col-md-4 mb-3" *ngIf="all_fields.value[fieldIndex].primaryValue === 'Count'">
+                        <label for="constant" class="col-form-label fw-bold fs-6 required">Parameter Value</label>
+                        <ngx-select id="primaryValue" [allowClear]="true" formControlName="parameterValue"
+                        [items]="showStatusValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
+                        (selectionChanges)="onValueChange($event)" class="w-100"  [disabled]="createChart.get('primaryValue')?.value !== 'count'" ></ngx-select>
+                      </div>
   
   
   
@@ -318,6 +189,11 @@
                         <input id="constant" type="number" class="form-control form-control-solid"
                           placeholder="Select constant" formControlName="constantValue"
                           [disabled]="createChart.get('primaryValue')?.value !== 'Constant'" />
+                      </div>
+                      <div class="col-md-4 mb-3" >
+                        <label  class="col-form-label fw-bold fs-6 ">Undefined Format</label>
+                        <input id="undefinedCheckLabel" type="text" class="form-control form-control-solid" placeholder="Enter Value"
+                          formControlName="undefinedCheckLabel">
                       </div>
   
   
@@ -362,7 +238,6 @@
                         <div *ngIf="field.get('selectedRangeType')?.touched && field.get('selectedRangeType')?.invalid" class="text-danger">
                           <div *ngIf="field.get('selectedRangeType')?.errors?.required">Date Range Label is required.</div>
                         </div>
-
                      
                       </div>
                       <div class="col-md-4 mb-3">
@@ -375,28 +250,92 @@
                         <input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"
                           formControlName="selectToTime">
                       </div>
-                      <div class="col-md-8 mb-3" *ngIf="all_fields.at(fieldIndex).get('primaryValue')?.value === 'Equation'">
-                        <label for="description" class="col-createChart-label fw-bold fs-6">Equation Description</label>
-                        <textarea
-                          id="description"
-                          formControlName="EquationDesc"
-                          class="form-control"
-                          rows="3"
-                          placeholder="Enter description"
-                          [disabled]="all_fields.at(fieldIndex).get('staticEquation')?.disabled ?? false">
-                        </textarea>
+                      <div class="col-md-4">
+                        <label for="columnVisibility" class="fw-bold fs-6 ">column Visibility</label>
+                        <p-multiSelect
+                          id="columnVisibility"
+                          formControlName="columnVisibility"
+                          [options]="getDynamicParams(fieldIndex)" 
+                          optionLabel="text"
+                          placeholder="Select Parameter"
+                        
+                      
+                        ></p-multiSelect>
                       </div>
-                      <div class="col-md-4 mb-3">
-                        <label for="custom_Label" class="col-form-label fw-bold fs-6  required">Custom Label</label>
-                        <input type="text" class="form-control form-control-solid"  name="custom_Label"
-                          formControlName="custom_Label">
-                          <div *ngIf="field.get('custom_Label')?.touched && field.get('custom_Label')?.invalid" class="text-danger">
-                            <div *ngIf="field.get('custom_Label')?.errors?.required">Custom Label is required.</div>
-                          </div>
+  
+                    <div class="col-md-4 mb-3">
+                      <label for="parameterName" class="col-form-label fw-bold fs-6 required">Format Type</label>
+                      <ngx-select
+                        id="parameterName"
+                        [allowClear]="true"
+                        formControlName="formatType"
+                        [items]="FormatTypeValues"
+                        optionValueField="value"
+                        optionTextField="text"
+                        placeholder="Select Parameter"
+                    
+                        style="width: 100%;">
+                      </ngx-select>
+                      <div *ngIf="field.get('formatType')?.touched && field.get('formatType')?.invalid" class="text-danger">
+                        <div *ngIf="field.get('formatType')?.errors?.required">Format Type is required.</div>
                       </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label for="custom_Label" class="col-form-label fw-bold fs-6  required">Custom Label</label>
+                      <input type="text" class="form-control form-control-solid"  name="custom_Label"
+                        formControlName="custom_Label">
+                        <div *ngIf="field.get('custom_Label')?.touched && field.get('custom_Label')?.invalid" class="text-danger">
+                          <div *ngIf="field.get('custom_Label')?.errors?.required">Custom Label is required.</div>
+                        </div>
+  
+  
+                    </div>
+  
+  
+  
+                    <div class="col-md-4 mb-3">
+                      <label for="parameterName" class="col-form-label fw-bold fs-6 ">Date Reference X axis</label>
+                      <p-multiSelect
+                        id="parameterName"
+               
+                        formControlName="XaxisFormat"
+                        [options]="getDynamicDateParams(fieldIndex)"
+                        optionLabel="text"
+                        placeholder="Select Parameter"
+                    
+                       >
+                      </p-multiSelect>
+          
+                    </div>
+                      <div class="col-md-4 mb-3" *ngIf = "shoRowData" >
+                        <label for="constant" class="col-form-label fw-bold fs-6 required"></label>
+                        <input id="constant" type="number" class="form-control form-control-solid"
+                          placeholder="Select constant" formControlName="rowData"
+                         />
+                      </div>
+  
+  
+  
+  
+  
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Settings Tab Content -->
+            <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab"
+              role="tabpanel" aria-labelledby="settings-tabpane">
+  
+                    <div class="row">
+  
+  
+  
+               
     
     
-                      <div class="col-md-4 mb-3">
+                      <div class="col-md-6 mb-3">
                         <label for="fontSize" class="col-form-label fw-bold fs-6 required">Font Size</label>
                         <input
                           id="fontSize"
@@ -409,44 +348,31 @@
                           <div *ngIf="createChart.get('fontSize')?.errors?.min || createChart.get('fontSize')?.errors?.max" class="text-danger mt-1">
                             Font size must be between 8 and 72.
                           </div>
-                          <div *ngIf="field.get('fontSize')?.touched && field.get('fontSize')?.invalid" class="text-danger">
-                            <div *ngIf="field.get('fontSize')?.errors?.required">Font Size is required.</div>
-                          </div>
                       </div>
-  
-
-  
-  
-  
                     </div>
-                  </div>
-                </div>
-              </div>
+  
+  
+  
             </div>
   
-            <!-- Settings Tab Content -->
-             <!-- <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab"
-              role="tabpanel" aria-labelledby="settings-tabpane">
-              <div formArrayName="all_fields">
-                <div *ngFor="let field of all_fields.controls; let fieldIndex=index">
-                  <div [formGroupName]="fieldIndex"
-                    style="border: 2px solid rgb(201, 228, 239); padding: 10px; margin: 5px;border-radius: 5px;">
-  
-                    <div class="row">
-  
-  
-  
-
-                    </div>
-                  </div>
+            <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'advanced-tab'}" id="advanced-tab"
+            role="tabpanel" aria-labelledby="advanced-tabpane">
+            <div class="container">
+         
+              <form [formGroup]="createChart">
+                <div class="form-group">
+                  <label for="jsonInput" class="col-form-label fw-bold fs-6">Highcharts Options:</label>
+                  <textarea id="jsonInput" class="form-control" rows="8" formControlName="highchartsOptionsJson"
+                            placeholder="Enter Highcharts options as JSON"></textarea>
                 </div>
-              </div>
-  
-  
-  
-            </div>  -->
-  
-
+              </form>
+              
+            
+    
+              <!-- <div id="chartContainer" style="width: 100%; height: 400px;"></div> -->
+            </div>
+            
+            </div>
             <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'filter-tab'}" id="filter-tab"
             role="tabpanel" aria-labelledby="filter-tabpane">
             <form [formGroup]="createChart">
@@ -455,32 +381,41 @@
                   <div [formGroupName]="fieldIndex"
                     style="border: 2px solid rgb(201, 228, 239); padding: 10px; margin: 5px;border-radius: 5px;">
             
-            <div class="row">
-     
+              <div class="row g-3 align-items-end mb-4">
+                <!-- Form Fields -->
+                <div class="col-md-4">
+                  <label for="parameterName" class="fw-bold fs-6">Form Fields</label>
+                  <p-multiSelect
+                    id="parameterName"
+                    formControlName="filterParameter"
+                    [options]="getDynamicParams(fieldIndex)"
+                    optionLabel="text"
+                    placeholder="Select Parameter"
+                    (onChange)="dynamicparameterValue($event,fieldIndex)"
+                
+                  ></p-multiSelect>
+                </div>
               
-              <div class="col-md-5 mb-3">
-                <label for="parameterName" class="col-createChart-label fw-bold fs-6 ">Form Fields</label>
-                <p-multiSelect
-                id="parameterName"
-            
-                formControlName="filterParameter"
-                [options]="getDynamicParams(fieldIndex)"
-                optionLabel="text"
-                placeholder="Select Parameter"
-                (onChange)="dynamicparameterValue($event,fieldIndex)"
-         
-              ></p-multiSelect>
+                <!-- Add Button -->
+                <div class="col-md-3">
+                  <button type="button" class="btn btn-primary w-100 mt-4" (click)="onAdd(fieldIndex)">Add</button>
+                </div>
               
+                <!-- Custom Label -->
+                <!-- <div class="col-md-5">
+                  <label for="custom_Label" class="col-form-label fw-bold fs-6 required">Custom Label</label>
+                  <input
+                    type="text"
+                    class="form-control form-control-solid"
+                    id="custom_Label"
+                    name="custom_Label"
+                    formControlName="custom_Label"
+                  />
+                </div> -->
               </div>
-
-          
-              <div class="col-md-2 mb-3 d-flex align-items-end">
-                <button type="button" class="btn btn-primary w-100" (click)="onAdd(fieldIndex)">Add</button>
-              </div>
-            </div>
           
             <div class="col-md-12 mb-3">
-              <label for="description" class="col-createChart-label fw-bold fs-6">Description</label>
+              <label for="description" class="col-createChart-label fw-bold fs-6">Equation</label>
               <textarea
               id="description"
               formControlName="filterDescription"  
@@ -489,78 +424,18 @@
               placeholder="Enter description"
             >{{ selectedParameterValue }}</textarea>
             </div>
-  
                   </div>
                 </div>
               </div>
+  
+  
             </form>
             
           </div>
-          <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'theme-tab'}" id="theme-tab" role="tabpanel" aria-labelledby="theme-tabpane">
-          
-            <div class="row g-3" [formGroup]="createChart">
-              <!-- Existing Themes Section -->
-              <div class="col-md-12 mb-3">
-                <label class="col-form-label fw-bold fs-6 required">Themes:</label>
-                <div class="color-boxes">
-                  <div
-                    *ngFor="let theme of themes"
-                    class="color-box"
-                    [ngStyle]="{ 'background-image': theme.color }"
-                    (click)="toggleCheckbox(theme)"
-                    [class.checked]="theme.selected"
-                  >
-                    <div *ngIf="theme.selected" class="checkmark">✔</div>
-                  </div>
-                </div>
-              </div>
-          
-              <!-- Font Size Input -->
-              <div class="col-md-6 mb-3">
-                <label for="fontSize" class="col-form-label fw-bold fs-6 required">Font Size</label>
-                <input
-                  id="fontSize"
-                  type="number"
-                  class="form-control form-control-solid"
-                  placeholder="Enter Font Size (e.g., 14)"
-                  formControlName="fontSize"
-                  min="8"
-                  max="72">
-                  <div *ngIf="createChart.get('fontSize')?.errors?.min || createChart.get('fontSize')?.errors?.max" class="text-danger mt-1">
-                    Font size must be between 8 and 72.
-                  </div>
-              </div>
-          
-              <!-- Font Color Input -->
-              <div class="col-md-6 mb-3">
-                <label for="fontColor" class="col-form-label fw-bold fs-6 required">Font Color</label>
-                <div class="d-flex align-items-center">
-                  <!-- Color Picker Input -->
-                  <input
-                    id="fontColor"
-                    type="color"
-                    class="form-control form-control-color me-3"
-                    [value]="createChart.get('fontColor')?.value"
-                    (input)="onFontColorChange($event)"
-                    style="width: 50px; height: 38px; padding: 0; border-radius: 5px; border: 1px solid #ced4da;">
-                  <!-- Display Selected Color Code -->
-                  <input
-                    type="text"
-                    class="form-control form-control-solid"
-                    formControlName="fontColor"
-                    readonly
-                    style="flex: 1;"
-                    placeholder="Selected Color Code">
-                </div>
-              </div>
-
-              
-              
-            </div>
-          </div>
+  
           <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'minitable-tab'}" id="minitable-tab" role="tabpanel" aria-labelledby="minitable-tab">
             <div class="row">
-
+  
             <div class="col-md-4 mb-3">
               <label for="formlist" class="col-form-label fw-bold fs-6 ">
                 Forms
@@ -582,7 +457,7 @@
                 placeholder="Select Form">
               </ngx-select>
             </div>
-
+  
             <div class="col-md-4 mb-3">
               <label for="formlist" class="col-form-label fw-bold fs-6 ">
                 Mini Table Name
@@ -604,7 +479,7 @@
                 placeholder="Select Form">
               </ngx-select>
             </div>
-
+  
      
           <div class="col-md-4 mb-3">
             <label class="fw-bold fs-6">Mini Table Fields</label>
@@ -637,14 +512,14 @@
         ></ngx-select>
       </div>
         
-
+  
           <div class="col-md-3">
             <button type="button" class="btn btn-primary w-100 mt-4" (click)="AddMiniTableEquation()">Add</button>
           </div>
         
           <!-- Custom Label -->
-
- 
+  
+  
       
         <div class="col-md-12 mb-3">
           <label for="description" class="col-createChart-label fw-bold fs-6">Equation</label>
@@ -659,124 +534,9 @@
             {{ selectedParameterValue }}
           </textarea>
         </div>
-
+  
      
           </div>
-          <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'equation-tab'}" id="equation-tab"
-          role="tabpanel" aria-labelledby="equation-tabpane" >
-          <form [formGroup]="createChart">
-            <div class="container" *ngIf="createChart">
-              <div [formGroup]="createChart">
-              <div class="row">
-                <div class="col-md-6" [formGroup]="createChart">
-                  <label class="col-lg-12 col-form-label fw-bold fs-6 ">Equation Count
-                  </label>
-                  <input type="number" class="
-                                    form-control form-control-lg form-control-solid
-                                    mb-3 mb-lg-0" name="add_fields" formControlName="equation_param"
-                    (keyup)="addEquationControls($event,'html')" >
-                </div>
-            
-              </div>
-            
-            
-            
-              </div>
-            </div>
-      
-          <div formArrayName="equation_fields">
-            <div *ngFor="let field of equation_fields?.controls; let fieldIndex = index">
-
-              <div [formGroupName]="fieldIndex"
-                style="border: 2px solid rgb(201, 228, 239); padding: 10px; margin: 5px;border-radius: 5px;">
-          
-          <div class="row g-3 align-items-center mb-4">
-            <!-- Forms Field -->
-            <div class="col-md-4 d-flex flex-column">
-              <label for="formlist" class="col-form-label fw-bold fs-6 mb-2">
-                Forms
-                <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
-                  <i class="bi bi-info-circle fs-5"></i>
-                </span>
-              </label>
-              <ngx-select
-                id="formlist"
-                [allowClear]="true"
-                name="icon"
-                formControlName="EquationFormList"
-                [items]="listofFormValues"
-                optionValueField="value"
-                optionTextField="text"
-                (selectionChanges)="selectFormParams1($event,fieldIndex)"
-                placeholder="Select Form"
-              ></ngx-select>
-            </div>
-          
-            <!-- Form Fields -->
-            <div class="col-md-4 d-flex flex-column" *ngIf ="listofEquationParam&&listofEquationParam[fieldIndex]">
-              <label for="EquationParam" class="fw-bold fs-6 mb-2">Form Fields</label>
-              <p-multiSelect
-                id="parameterName"
-                formControlName="EquationParam"
-                [options]="listofEquationParam[fieldIndex]"
-                optionLabel="text"
-                placeholder="Select Parameter"
-                (onChange)="EquationparameterValue($event,fieldIndex)"
-              ></p-multiSelect>
-            </div>
-          
-            <!-- Operation Field -->
-            <div class="col-md-4 d-flex flex-column">
-              <label for="primaryValue" class="col-form-label fw-bold fs-6 mb-2">
-                Operation
-                <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Show Value As">
-                  <i class="bi bi-info-circle fs-5"></i>
-                </span>
-              </label>
-              <ngx-select
-                id="primaryValue"
-                [allowClear]="true"
-                formControlName="EquationOperation"
-                [items]="showValues"
-                optionValueField="value"
-                optionTextField="text"
-                placeholder="Select Group"
-                (selectionChanges)="selectedOperation($event)"
-                class="w-100"
-              ></ngx-select>
-            </div>
-          </div>
-              </div>
-              </div>
-          </div>
-        </form>
-          
-          
-          <div class="col-md-3">
-            <button
-              type="button"
-              class="btn btn-primary w-100 mt-4"
-              (click)="addEquation()"
-           >
-              Add Equation
-            </button>
-          </div>
-        
-          <div class="col-md-12 mb-3">
-            <label for="description" class="col-createChart-label fw-bold fs-6">Equation</label>
-            <textarea
-              id="description"
-              formControlName="EquationDesc"
-              class="form-control"
-              rows="3"
-              placeholder="Enter description"
-            >
-              ({{ selectedEquationParameterValue }})
-            </textarea>
-          </div>
-          
-
-        </div>
           
           
           
@@ -787,9 +547,9 @@
         <div class="modal-footer" style="margin-top: 20px;">
           <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
           <button type="button" class="btn btn-primary" *ngIf="!isEditMode"
-            (click)="validateAndSubmit()">Save</button>
-          <button type="button" class="btn btn-warning" (click)="updateTile('progressTile');modal.dismiss() " *ngIf="isEditMode"
-            [disabled]="createChart?.invalid">
+          (click)="validateAndSubmit()"  >Save</button>
+          <button type="button" class="btn btn-warning" (click)="updateTile('Piechart');modal.dismiss() " *ngIf="isEditMode"
+           >
             Update
           </button>
         </div>

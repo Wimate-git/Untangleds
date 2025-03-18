@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -20,13 +20,12 @@ interface FormField {
   validation?: any;
 }
 @Component({
-  selector: 'app-chart5-config',
+  selector: 'app-stacked-bar-config',
 
-  templateUrl: './chart5-config.component.html',
-  styleUrl: './chart5-config.component.scss'
+  templateUrl: './stacked-bar-config.component.html',
+  styleUrl: './stacked-bar-config.component.scss'
 })
-export class Chart5ConfigComponent implements OnInit{
-
+export class StackedBarConfigComponent {
   createChart:FormGroup
 
  
@@ -102,6 +101,7 @@ export class Chart5ConfigComponent implements OnInit{
   selectedMiniTableFields: any;
   listofFormValues: any;
   dynamicParamMap = new Map<number, any[]>();
+  dynamicDateParamMap = new Map<number, any[]>()
 
 
  
@@ -132,11 +132,6 @@ export class Chart5ConfigComponent implements OnInit{
 
 
 
-  }
-  dynamicDateParamMap = new Map<number, any[]>()
-  getDynamicDateParams(index: number): any[] {
-    return this.dynamicDateParamMap.get(index) || [];
-  
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -410,7 +405,7 @@ export class Chart5ConfigComponent implements OnInit{
     console.log('this.noOfParams check', this.noOfParams);
   
     // Only proceed if the key is 'chart'
-    if (key === 'chart') {
+    if (key === 'Stackedchart') {
       const uniqueId = this.generateUniqueId();
       console.log('this.createChart.value:', this.createChart.value);  // Log form values for debugging
   
@@ -449,7 +444,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         colWidth: 100,
         fixedColWidth: true,
         fixedRowHeight: true,
-        grid_type: 'Barchart',
+        grid_type: 'Stackedchart',
   
         chart_title: this.createChart.value.chart_title || '',  // Ensure this value exists
         fontSize: `${this.createChart.value.fontSize || 16}px`,  // Provide a fallback font size
@@ -695,7 +690,7 @@ themes = [
 ];
 
 
-openChartModal5(tile: any, index: number) {
+openStackedChartModal(tile: any, index: number) {
   console.log('Index checking:', index); // Log the index
 
   if (tile) {
@@ -823,6 +818,11 @@ repopulate_fields(getValues: any): FormArray {
         const arrayParameter = Array.isArray(configItem.parameterName)
         ? configItem.parameterName
         : [];
+
+
+        const dateParameter = Array.isArray(configItem.XaxisFormat)
+        ? configItem.XaxisFormat
+        : [];
    
 
       // Create and push FormGroup into FormArray
@@ -844,7 +844,7 @@ repopulate_fields(getValues: any): FormArray {
           undefinedCheckLabel:configItem.undefinedCheckLabel ||'',
           custom_Label:configItem.custom_Label ||'',
           filterDescription:configItem.filterDescription ||'',
-                    XaxisFormat:configItem.XaxisFormat ||''
+          XaxisFormat:this.fb.control(dateParameter) ||''
 
         })
       );
@@ -970,6 +970,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         if (result && result.metadata) {
           const parsedMetadata = JSON.parse(result.metadata);
           const formFields = parsedMetadata.formFields;
+          console.log('formFields type check data',formFields)
 
           // Prepare parameter list
           const dynamicParamList = formFields.map((field: any) => ({
@@ -986,37 +987,40 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
           }
           if (parsedMetadata.updated_time) {
             dynamicParamList.push({
-              value:'updated_time',
+              value: 'updated_time',
               text: 'updated_time',
             });
           }
-          const formFieldsArray: FormField[] = Object.values(parsedMetadata.formFields) as FormField[];
+console.log('dynamicParamList checking',dynamicParamList)
+const formFieldsArray: FormField[] = Object.values(parsedMetadata.formFields) as FormField[];
 
-          const dateFields = formFieldsArray.filter((field: FormField) => field.type === "date");
-          console.log("Date Fields:", dateFields);
-          
-          
-          const dateFieldsList = dateFields.map((field: any) => ({
-            value: field.name,
-            text: field.label,
-          }));
-          
-          dateFieldsList.push({
-            value: 'Default',
-            text: 'Default',
-          });
-          dateFieldsList.push({
-            value: 'created_time',
-            text: 'created_time',
-          });
-          dateFieldsList.push({
-            value: 'updated_time',
-            text: 'updated_time',
-          });
-          
-          this.dynamicDateParamMap.set(index,dateFieldsList)
+const dateFields = formFieldsArray.filter((field: FormField) => field.type === "date");
+console.log("Date Fields:", dateFields);
+
+
+const dateFieldsList = dateFields.map((field: any) => ({
+  value: field.name,
+  text: field.label,
+}));
+
+dateFieldsList.push({
+  value: 'Default',
+  text: 'Default',
+});
+dateFieldsList.push({
+  value: 'created_time',
+  text: 'created_time',
+});
+dateFieldsList.push({
+  value: 'updated_time',
+  text: 'updated_time',
+});
+
+this.dynamicDateParamMap.set(index,dateFieldsList)
           // Store parameters in the map
           this.dynamicParamMap.set(index, dynamicParamList);
+        
+
 
           // Trigger change detection
           this.cdr.detectChanges();
@@ -1030,7 +1034,16 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
 
   getDynamicParams(index: number): any[] {
     return this.dynamicParamMap.get(index) || [];
+
   }
+
+
+  getDynamicDateParams(index: number): any[] {
+    return this.dynamicDateParamMap.get(index) || [];
+
+  }
+
+
 
   fetchDynamicFormDataFilter(value: any) {
     console.log("Data from lookup:", value);
@@ -1146,6 +1159,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   
   
   
+
   onAdd(index: any): void {
     console.log('Index checking from onAdd:', index);
   
@@ -1512,169 +1526,89 @@ toggleCheckbox(theme: any): void {
   };
 
 
-  defaultHighchartsOptionsJson = {
-   
-
+  defaultHighchartsOptionsJson: any = {
     chart: {
+      type: 'bar', // Use 'bar' for horizontal stacked bar, 'column' for vertical
       backgroundColor: 'var(--bs-body-bg)',
-      renderTo: 'scatter',
-      type: 'bar',
-      //zoomType: 'xy',
-    },
-    exporting: {
-      enabled: false
     },
     title: {
+      text: 'Stacked Bar Chart',
       style: {
-        color: 'var(--bs-body-color)'
-       },
-      text: ''
+        color: 'var(--bs-body-color)',
+      },
     },
-    subTitle: {
-      text: ''
+    tooltip: {
+      pointFormat: '{series.name}: <b>{point.y}</b>',
+    },
+    exporting: {
+      enabled: false,
+    },
+    credits: {
+      enabled: false,
     },
     xAxis: {
-      // categories: graph_data1, 
-      labels:{
-        style: {
-          color: 'var(--bs-body-color)'
-         }
-      },
-      type: 'datetime',
+      categories: [], // Add your categories dynamically
       title: {
+        text: null,
+      },
+      labels: {
         style: {
-          color: 'var(--bs-body-color)'
-         },
-        text: null
-      }
+          color: 'var(--bs-body-color)',
+        },
+      },
     },
     yAxis: {
-      labels:{
-        style: {
-          color: 'var(--bs-body-color)'
-         }
-      },
+      min: 0,
       title: {
-        style: {
-          color: 'var(--bs-body-color)'
-         },
-        text: null
-      }
-    },
-
-    tooltip: {
-      shared: true, // Ensure this is true for multiple points
-      useHTML: true,
-      backgroundColor: 'rgba(255, 255, 255, 0.85)',
-      borderColor: '#2c3e50',
-      borderRadius: 10,
-      borderWidth: 2,
-      shadow: true,
-      style: {
-          color: '#333',
-          fontSize: '14px',
-          fontFamily: 'Arial, sans-serif'
+        text: 'Total Value',
+        align: 'high',
       },
-      headerFormat: `
-          <div style="padding: 5px 10px; text-align: center;">
-              <span style="font-size: 16px; font-weight: bold; color: #2c3e50;">
-                  {point.key}
-              </span>
-          </div>
-          <hr style="margin: 5px 0; border-color: #2c3e50;">
-      `,
-      pointFormat: `
-          <div style="padding: 5px 10px;">
-              <span style="color:{series.color}; font-weight: bold;">
-                  ● {series.name}:
-              </span>
-              <span style="font-weight: bold;">
-                  {point.y}
-              </span>
-          </div>
-      `,
-      formatter: function (this: Highcharts.TooltipFormatterContextObject) {
-          if (this.points) { // For shared tooltips
-              let total = 0;
-              const pointsHtml = this.points.reduce((s, point) => {
-                  const yValue = point.y !== null && point.y !== undefined ? point.y : 0;
-                  total += yValue;
-                  return s + '<div style="color:' + point.series.color + '">● ' + 
-                             point.series.name + ': <strong>' + yValue + '</strong></div>';
-              }, '<div style="text-align: center; font-weight: bold; color: #2c3e50;">' + this.x + '</div>');
-              return pointsHtml + 
-                     '<hr style="margin: 5px 0; border-color: #2c3e50;">' + 
-                     '<div style="text-align: right; color: #888;">Total: <strong>' + total + '</strong></div>';
-          } else { // For single series tooltips
-              const yValue = this.y !== null && this.y !== undefined ? this.y : 'N/A';
-              return '<div style="text-align: center; font-weight: bold; color: #2c3e50;">' + this.x + '</div>' +
-                     '<div style="color:' + this.series.color + '">● ' + 
-                     this.series.name + ': <strong>' + yValue + '</strong></div>';
-          }
-      }
-  },
-
+      labels: {
+        overflow: 'justify',
+        style: {
+          color: 'var(--bs-body-color)',
+        },
+      },
+      gridLineDashStyle: 'dash',
+    },
+    legend: {
+      enabled: true,
+      layout: 'horizontal',
+      align: 'center',
+      verticalAlign: 'bottom',
+    },
     plotOptions: {
       series: {
-        turboThreshold: 0, // Comment out this code to display error
-        marker: {
+        stacking: 'normal', // 'normal' for stacked bars, 'percent' for percentage stacked
+        dataLabels: {
           enabled: true,
-          radius: 7
-        }
-      }
-    },
-    // colors: [   '#6993FF', '#1BC5BD', '#8950FC', '#FFA800', '#F64E60', '#212121', '#F3F6F9',
-    //   '#3A3B3C', '#D4E157', '#FF7043', '#AB47BC', '#29B6F6', '#66BB6A', '#EF5350',
-    //   '#8D6E63', '#FFCA28', '#8E44AD', '#3498DB', '#2ECC71', '#E74C3C', '#F39C12',
-    //   '#D35400', '#2C3E50', '#16A085', '#27AE60', '#2980B9', '#8E44AD', '#2C3E50',
-    //   '#E67E22', '#ECF0F1', '#95A5A6', '#34495E', '#F1C40F', '#E74C3C', '#9B59B6',
-    //   '#1ABC9C', '#2ECC71'],
-    series: [
-   
-    ],
-    lineWidth:  2,
-
-
-    credits: {
-      enabled: false
-    },
-    responsive: {
-      rules: [{
-        condition: {
-          maxWidth: 10000//maxWidth: 800
+          format: '{point.y}', // Show values on bars
+          style: {
+            fontSize: '1em',
+            textOutline: 'none',
+          },
         },
-        chartOptions: {
-          legend: {
-
-            itemStyle: {
-              color: 'var(--bs-body-color)'
-             },
-          
-            layout: 'horizontal',
-            align: 'center',
-            verticalAlign: 'bottom'
-          }
-        }
-      }]
-    }
-
-
-    // {
-    //   name: 'Data Series 1',
-    //   data: [1, 3, 2, 4]
-    // }, {
-    //   name: 'Data Series 2',
-    //   data: [2, 4, 3, 5]
-    // }, {
-    //   name: 'Data Series 3',
-    //   data: [3, 2, 4, 6]
-    // }
- 
+      },
+    },
+    series: [
+      {
+        name: 'Product A',
+        data: [50, 70, 80, 90], // Sales data for Product A
+        color: '#FF5733',
+      },
+      {
+        name: 'Product B',
+        data: [30, 50, 60, 70], // Sales data for Product B
+        color: '#33FF57',
+      },
+      {
+        name: 'Product C',
+        data: [20, 30, 50, 60], // Sales data for Product C
+        color: '#3357FF',
+      },
+    ],
   
-
-
-}
-
+  };
   
 
 
@@ -1720,6 +1654,15 @@ FormatTypeValues = [
 
 ]
 
+
+
+
+FormatXaxisValues = [
+
+  { value: 'Default', text: 'Default' },
+  // { value: 'Default', text: 'Default' },
+]
+
 validateAndSubmit() {
   if (this.createChart.invalid) {
     // ✅ Mark all fields as touched to trigger validation messages
@@ -1738,7 +1681,7 @@ validateAndSubmit() {
   }
 
   // ✅ Proceed with saving only if form is valid
-  this.addTile('chart');
+  this.addTile('Stackedchart');
   this.modal.dismiss();
 }
 
@@ -1966,10 +1909,5 @@ miniTableFieldsRead(readFields:any){
 
 
 }
-FormatXaxisValues = [
-
-  { value: 'Default', text: 'Default' },
-  // { value: 'Default', text: 'Default' },
-]
 
 }

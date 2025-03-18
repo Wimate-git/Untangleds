@@ -73,8 +73,12 @@
             <div class="card-body p-0 pb-0"
               style="background-color: var(--bs-app-bg-color) !important; padding: 0 !important;">
           
-              <gridster style="background: var(--bs-app-bg-color)!important;border-radius: 5px;padding: 0px; "
-                [options]="options"     >
+              <gridster 
+              [style]="gridsterStyles"
+              [options]="options" 
+              class="custom-gridster">
+   
+          
                 <gridster-item
                 *ngFor="let item of dashboard; let i = index;"
                 [item]="item"
@@ -220,6 +224,19 @@
                       [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalChart1)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-chart-ui1>
                     </div>
 
+
+                    <div *ngIf="item.grid_type === 'Stackedchart'"  >
+                      <app-stacked-bar-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,stackedBarChartModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
+                 
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalChart1)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-stacked-bar-ui>
+                    </div>
+
+                    <div *ngIf="item.grid_type === 'Piechart'"  >
+                      <app-pie-chart-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,pieChartModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
+                 
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalChart1)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-pie-chart-ui>
+                    </div>
+
                     <div *ngIf="item.grid_type === 'Funnelchart'"  >
                       <app-funnel-chart-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,FunnelChartModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
                  
@@ -262,22 +279,7 @@
                  
                     </div> 
                     
-                    <!-- <div *ngIf="item.grid_type === 'chart'"  >
-                      <app-chart-ui1 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal1)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" ></app-chart-ui1>
-                    </div>
-                    <div *ngIf="item.grid_type === 'Linechart'"  >
-                      <app-chart-ui2 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal2)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" ></app-chart-ui2>
-                    </div>
-                    <div *ngIf="item.grid_type === 'Barchart'"  >
-                      <app-chart-ui3 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal3)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" ></app-chart-ui3>
-                    </div>
-  
-                    <div *ngIf="item.grid_type === 'Areachart'"  >
-                      <app-chart-ui4 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal4)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" ></app-chart-ui4>
-                    </div>
-                    <div *ngIf="item.grid_type === 'Columnchart'"  >
-                      <app-chart-ui5 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal5)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" ></app-chart-ui5>
-                    </div> -->
+              
                     <div *ngIf="item.grid_type === 'dynamicTile'"  >
                       <app-dynamic-tile-ui [item]="item" [index]="i" (customEvent)="helperTile($event,DynamicTileModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton"  [liveDataDynamicTile]="liveDataDynamicTile"       [summaryDashboardUpdate]="summaryDashboardUpdate" 
                       [summaryDashboardView]="summaryDashboardView"></app-dynamic-tile-ui>
@@ -1153,6 +1155,27 @@
                             </div>
                           </div>
                         </div>
+
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 mb-4 mt-4">
+                          <div class="d-flex align-items-center">
+                            <label for="toggleCheck" class="col-form-label fw-bold fs-6  me-2">
+                            Always Full Screen
+                            </label>
+                            <div class="form-check form-switch">
+                              <input
+                              class="form-check-input"
+                              type="checkbox"
+                              name="add_fields"
+                          
+                              formControlName="fullScreenModeCheck"
+                        
+                              id="toggleCheck"
+                            >
+                            
+                            </div>
+                          </div>
+                        </div>
             
             </div>
   
@@ -1447,6 +1470,43 @@
 
   
           </div>
+
+
+
+          <div class="row">
+            <div class="col-md-6">
+              <!-- Bar Chart Button -->
+              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7" style="border: 0px; display: block; width: 100%;">
+                <div id="pieChart1" style="width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;" 
+                (click)="openpieChartModal(pieChartModal, modal)">
+                </div>
+              </button>
+            </div>
+            <div class="col-md-6">
+              <!-- Bar Chart Button -->
+              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7" style="border: 0px; display: block; width: 100%;">
+                <div id="stackedChart" style="width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;" 
+                (click)="openStackedChartModal(stackedBarChartModal, modal)">
+                </div>
+              </button>
+            </div>
+
+            
+            <!-- <div class="col-md-6">
+       
+              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7" style="border: 0px; display: block; width: 100%;">
+                <div id="areaChart" style="width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;" 
+                  (click)="openChartModal4(ChartModal4, modal)">
+                </div>
+              </button>
+            </div> -->
+
+
+  
+          </div>
+
+
+          
         </div>
       </div>
 
@@ -2262,6 +2322,20 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   <ng-template #ChartModal1 let-modal >
   
     <app-chart1-config  [dashboard]="dashboard" (dashboardChange)="getGridDetails2($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver2($event)"></app-chart1-config>
+  
+  </ng-template>
+
+
+  <ng-template #pieChartModal let-modal >
+  
+    <app-pie-chart-config  [dashboard]="dashboard" (dashboardChange)="getGridDetails2($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver2($event)"></app-pie-chart-config>
+  
+  </ng-template>
+
+
+  <ng-template #stackedBarChartModal let-modal >
+  
+    <app-stacked-bar-config  [dashboard]="dashboard" (dashboardChange)="getGridDetails2($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver2($event)"></app-stacked-bar-config>
   
   </ng-template>
   

@@ -108,38 +108,93 @@ this.initializeTileFields()
   get conditions(): FormArray<FormGroup> {
     return this.createKPIWidget.get('conditions') as FormArray<FormGroup>;
   }
-  onAdd1(): void {
-    // Capture the selected parameters (which will be an array of objects with text and value)
-    const selectedParameters = this.selectedParameterValueDupli;
+  // onAdd1(): void {
+  //   // Capture the selected parameters (which will be an array of objects with text and value)
+  //   const selectedParameters = this.selectedParameterValueDupli;
   
+  //   console.log('selectedParameters checking', selectedParameters);
+  
+  //   if (Array.isArray(selectedParameters)) {
+  //     // Format the selected parameters to include the updated structure
+  //     this.selectedParameterValueDupl = selectedParameters
+  //       .map(param => `\${${param.text}.${param.value}}`) // Format as "${Label.Value}"
+  //       .join(' '); // Join all parameters with a space
+  //   } else if (selectedParameters) {
+  //     // If only one parameter is selected, format it directly
+  //     this.selectedParameterValueDupl = `\${${selectedParameters.text}.${selectedParameters.value}}`; // Single parameter format
+  //   } else {
+  //     console.warn('No parameters selected or invalid format:', selectedParameters);
+  //     this.selectedParameterValueDupl = ''; // Fallback in case of no selection
+  //   }
+  
+  //   console.log('this.selectedParameterValueDupl check', this.selectedParameterValueDupl);
+  
+  //   // Update the form control value for filterDescription1 with the formatted string
+  //   this.createKPIWidget.patchValue({
+  //     filterDescription1: `${this.selectedParameterValueDupl}`,
+  //   });
+  
+  //   // Manually trigger change detection to ensure the UI reflects the changes
+  //   this.cdr.detectChanges();
+  // }
+  
+
+  onAdd1(): void {
+    // Get existing text from filterDescription
+    let existingText = this.createKPIWidget.get('filterDescription')?.value?.trim() || '';
+    const getFormFelds = this.createKPIWidget.get('filterParameter')?.value;
+    console.log('getFormFelds checking', getFormFelds);
+  
+    // Capture the selected parameters
+    const selectedParameters = this.selectedParameterValueDupli;
     console.log('selectedParameters checking', selectedParameters);
   
+    let newEquationParts: string[] = [];
+  
     if (Array.isArray(selectedParameters)) {
-      // Format the selected parameters to include the updated structure
-      this.selectedParameterValueDupl = selectedParameters
-        .map(param => `\${${param.text}.${param.value}}`) // Format as "${Label.Value}"
-        .join(' '); // Join all parameters with a space
+      // Format the selected parameters and filter out already existing ones
+      newEquationParts = selectedParameters
+        .map(param => `${param.text}-\${${param.value}}`)
+        .filter(paramString => !existingText.includes(paramString));
     } else if (selectedParameters) {
-      // If only one parameter is selected, format it directly
-      this.selectedParameterValueDupl = `\${${selectedParameters.text}.${selectedParameters.value}}`; // Single parameter format
+      let paramString = `${selectedParameters.text}-\${${selectedParameters.value}}`;
+      if (!existingText.includes(paramString)) {
+        newEquationParts.push(paramString);
+      }
     } else {
       console.warn('No parameters selected or invalid format:', selectedParameters);
-      this.selectedParameterValueDupl = ''; // Fallback in case of no selection
+      return; // No update needed
     }
   
-    console.log('this.selectedParameterValueDupl check', this.selectedParameterValueDupl);
+    if (newEquationParts.length === 0) {
+      console.log('No new unique parameters to add.');
+      return; // Nothing new to add
+    }
   
-    // Update the form control value for filterDescription1 with the formatted string
+    // Trim and remove extra spaces from the existing text
+    existingText = existingText.replace(/\s+/g, ' ').trim();
+    console.log('existingText before', existingText);
+    console.log('Filtered newEquationParts:', newEquationParts);
+  
+    // Construct the new equation string
+    const newEquation = newEquationParts.join(' && ');
+  
+    // Append new equation to existing text properly
+    existingText = existingText ? `${existingText} && ${newEquation}` : newEquation;
+  
+    // Ensure we don't have redundant `&&`
+    existingText = existingText.replace(/&&\s*&&/g, '&&').trim();
+  
+    console.log('Updated Equation:', existingText);
+  
+    // Update the form control with the corrected equation
     this.createKPIWidget.patchValue({
-      filterDescription1: `${this.selectedParameterValueDupl}`,
+      filterDescription: existingText,
     });
   
-    // Manually trigger change detection to ensure the UI reflects the changes
+    // Ensure UI updates properly
     this.cdr.detectChanges();
   }
-  
-
-
 
 
 

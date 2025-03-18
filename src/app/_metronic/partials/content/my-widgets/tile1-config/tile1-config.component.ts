@@ -124,6 +124,7 @@ export class Tile1ConfigComponent implements OnInit {
   reportStudioDetailList: any;
   helpherObjCalender: any;
   formListTitles: any;
+  showColumnVisibility = false;
 
 
  
@@ -142,6 +143,11 @@ export class Tile1ConfigComponent implements OnInit {
     this.dynamicData()
    this.dynamicDataEquation()
     this.dashboardIds(1)
+
+    this.createKPIWidget.get('selectType')?.valueChanges.subscribe(value => {
+      this.showColumnVisibility = value === 'drill down';
+    });
+  
     // this.permissionIds(1)
   }
 
@@ -151,6 +157,12 @@ export class Tile1ConfigComponent implements OnInit {
 
 
   }
+
+  onSelectTypeChange() {
+    const selectedType = this.createKPIWidget.get('selectType')?.value;
+    this.showColumnVisibility = selectedType === 'drill down';
+  }
+
   convertTo12HourFormat(time: string): string {
     if (!time) return '';
     const [hours, minutes] = time.split(':').map(Number);
@@ -844,35 +856,66 @@ private resetEquationParameter(fieldIndex: any): void {
   
   
   
+onAdd(): void {
+  // Get existing text from filterDescription
+  let existingText = this.createKPIWidget.get('filterDescription')?.value?.trim() || '';
+  const getFormFelds = this.createKPIWidget.get('filterParameter')?.value;
+  console.log('getFormFelds checking', getFormFelds);
 
-  onAdd(): void {
-    // Capture the selected parameters (which will be an array of objects with text and value)
-    const selectedParameters =  this.selectedParameterValue;
-    console.log('selectedParameters checking', selectedParameters);
-  
-    if (Array.isArray(selectedParameters)) {
-      // Format the selected parameters to include both text and value
-      this.selectedParameterValue = selectedParameters
-        .map(param => `${param.text}-\${${param.value}}`) // Include both text and value
-        .join(' '); // Join them with a comma and space
-    } else if (selectedParameters) {
-      // If only one parameter is selected, format it directly
-      this.selectedParameterValue = `${selectedParameters.text}-\${${selectedParameters.value}}`;
-    } else {
-      console.warn('No parameters selected or invalid format:', selectedParameters);
-      this.selectedParameterValue = ''; // Fallback in case of no selection
+  // Capture the selected parameters
+  const selectedParameters = this.selectedParameterValue;
+  console.log('selectedParameters checking', selectedParameters);
+
+  let newEquationParts: string[] = [];
+
+  if (Array.isArray(selectedParameters)) {
+    // Format the selected parameters and filter out already existing ones
+    newEquationParts = selectedParameters
+      .map(param => `${param.text}-\${${param.value}}`)
+      .filter(paramString => !existingText.includes(paramString));
+  } else if (selectedParameters) {
+    let paramString = `${selectedParameters.text}-\${${selectedParameters.value}}`;
+    if (!existingText.includes(paramString)) {
+      newEquationParts.push(paramString);
     }
-  
-    console.log('this.selectedParameterValue check', this.selectedParameterValue);
-  
-    // Update the form control value for filterDescription with the formatted string
-    this.createKPIWidget.patchValue({
-      filterDescription: `${this.selectedParameterValue}`,
-    });
-  
-    // Manually trigger change detection to ensure the UI reflects the changes
-    this.cdr.detectChanges();
+  } else {
+    console.warn('No parameters selected or invalid format:', selectedParameters);
+    return; // No update needed
   }
+
+  if (newEquationParts.length === 0) {
+    console.log('No new unique parameters to add.');
+    return; // Nothing new to add
+  }
+
+  // Trim and remove extra spaces from the existing text
+  existingText = existingText.replace(/\s+/g, ' ').trim();
+  console.log('existingText before', existingText);
+  console.log('Filtered newEquationParts:', newEquationParts);
+
+  // Construct the new equation string
+  const newEquation = newEquationParts.join(' && ');
+
+  // Append new equation to existing text properly
+  existingText = existingText ? `${existingText} && ${newEquation}` : newEquation;
+
+  // Ensure we don't have redundant `&&`
+  existingText = existingText.replace(/&&\s*&&/g, '&&').trim();
+
+  console.log('Updated Equation:', existingText);
+
+  // Update the form control with the corrected equation
+  this.createKPIWidget.patchValue({
+    filterDescription: existingText,
+  });
+
+  // Ensure UI updates properly
+  this.cdr.detectChanges();
+}
+
+
+
+
   
   updateFormName(selectedTexteqa: string, idx: number): void {
     console.log(`Updating formName for index ${idx} with:`, selectedTexteqa);

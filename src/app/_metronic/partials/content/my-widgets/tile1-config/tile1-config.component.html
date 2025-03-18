@@ -275,36 +275,41 @@
                     </div>
                     <div class="row g-3 align-items-center">
                       <!-- Select Type -->
-                      <div class="col-md-4">
-                        <div class="d-flex flex-column">
-                          <label for="dashboardIds" class="col-form-label fw-bold fs-6">Select Type</label>
-                          <ngx-select
-                            id="selectType"
-                            [allowClear]="true"
-                            formControlName="selectType"
-                            [items]="SelectTypeSummary"
-                            optionValueField="value"
-                            optionTextField="text"
-                            placeholder="Select Parameter"
-                          >
-                          </ngx-select>
-                        </div>
-                      </div>
-                    
-                      <!-- Column Visibility -->
-                      <div class="col-md-4" style="margin-top:30px;">
-                        <div class="d-flex flex-column">
-                          <label for="columnVisibility" class="fw-bold fs-6">Column Visibility</label>
-                          <p-multiSelect
-                            id="columnVisibility"
-                            formControlName="columnVisibility"
-                            [options]="columnVisisbilityFields"
-                            optionLabel="text"
-                            placeholder="Select Parameter"
-                            >
-                          </p-multiSelect>
-                        </div>
-                      </div>
+<!-- Select Type -->
+<!-- Select Type -->
+<div class="col-md-4">
+  <div class="d-flex flex-column">
+    <label for="dashboardIds" class="col-form-label fw-bold fs-6">Select Type</label>
+    <ngx-select
+      id="selectType"
+      [allowClear]="true"
+      formControlName="selectType"
+      [items]="SelectTypeSummary"
+      optionValueField="value"
+      optionTextField="text"
+      placeholder="Select Parameter"
+      (change)="onSelectTypeChange()"
+    >
+    </ngx-select>
+  </div>
+</div>
+
+<!-- Column Visibility (Shown only if 'drill down' is selected) -->
+<div class="col-md-4" style="margin-top:30px;" *ngIf="showColumnVisibility">
+  <div class="d-flex flex-column">
+    <label for="columnVisibility" class="fw-bold fs-6">Column Visibility</label>
+    <p-multiSelect
+      id="columnVisibility"
+      formControlName="columnVisibility"
+      [options]="columnVisisbilityFields"
+      optionLabel="text"
+      placeholder="Select Parameter"
+    >
+    </p-multiSelect>
+  </div>
+</div>
+
+
                     
                       <!-- Custom Label -->
                       <div class="col-md-4">

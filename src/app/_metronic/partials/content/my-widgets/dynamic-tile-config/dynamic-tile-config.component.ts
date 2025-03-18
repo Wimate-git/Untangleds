@@ -1458,39 +1458,58 @@ addEquationControls(event: any, _type: string) {
     // Retrieve the `filterDescription` control from the group
     const groupByFormatControl = formDescParam.get('filterDescription');
   
-    // Capture the selected parameters (which will be an array of objects with text and value)
+    if (!groupByFormatControl) {
+      console.warn(`filterDescription control not found for index ${index}.`);
+      return;
+    }
+  
+    // Get existing text from `filterDescription`
+    let existingText = groupByFormatControl.value?.trim() || '';
+    console.log('Existing Text before:', existingText);
+  
+    // Capture the selected parameters
     const selectedParameters = this.selectedParameterValue;
     console.log('Selected parameters checking:', selectedParameters);
   
-    let formattedDescription = '';
+    let newEquationParts: string[] = [];
   
     if (Array.isArray(selectedParameters)) {
-      // Format the selected parameters to include both text and value
-      formattedDescription = selectedParameters
-        .map(param => `${param.text}-\${${param.value}}`) // Include both text and value
-        .join(' '); // Join them with a comma and space
+      // Format the selected parameters and remove already existing ones
+      newEquationParts = selectedParameters
+        .map(param => `${param.text}-\${${param.value}}`)
+        .filter(paramString => !existingText.includes(paramString));
     } else if (selectedParameters) {
-      // If only one parameter is selected, format it directly
-      formattedDescription = `${selectedParameters.text}-\${${selectedParameters.value}}`;
+      let paramString = `${selectedParameters.text}-\${${selectedParameters.value}}`;
+      if (!existingText.includes(paramString)) {
+        newEquationParts.push(paramString);
+      }
     } else {
       console.warn('No parameters selected or invalid format:', selectedParameters);
-      formattedDescription = ''; // Fallback in case of no selection
+      return; // No update needed
     }
   
-    console.log('Formatted Description:', formattedDescription);
+    if (newEquationParts.length === 0) {
+      console.log('No new unique parameters to add.');
+      return; // Nothing new to add
+    }
+  
+    // Trim and remove extra spaces from the existing text
+    existingText = existingText.replace(/\s+/g, ' ').trim();
+    console.log('Filtered newEquationParts:', newEquationParts);
+  
+    // Construct the new equation string
+    const newEquation = newEquationParts.join(' && ');
+  
+    // Append new equation to existing text properly
+    existingText = existingText ? `${existingText} && ${newEquation}` : newEquation;
+  
+    // Ensure we don't have redundant `&&`
+    existingText = existingText.replace(/&&\s*&&/g, '&&').trim();
+  
+    console.log(`Updated Equation for index ${index}:`, existingText);
   
     // Update the specific form control value for `filterDescription`
-    if (groupByFormatControl) {
-      groupByFormatControl.patchValue(formattedDescription);
-      console.log(`Patched value for index ${index}:`, formattedDescription);
-    } else {
-      console.warn(`filterDescription control not found for index ${index}.`);
-    }
-  
-    // Optionally patch at the top-level form if needed
-    this.createChart.patchValue({
-      filterDescription: formattedDescription,
-    });
+    groupByFormatControl.patchValue(existingText);
   
     // Manually trigger change detection to ensure the UI reflects the changes
     this.cdr.detectChanges();
