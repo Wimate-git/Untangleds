@@ -175,7 +175,7 @@
                         placeholder="Select Parameter" (onChange)="parameterValueCheck($event,fieldIndex)" >
                       </p-multiSelect>
                       <div *ngIf="field.get('parameterName')?.touched && field.get('parameterName')?.invalid" class="text-danger">
-                        <div *ngIf="field.get('parameterName')?.errors?.required">Form Fields are required.</div>
+                        <div *ngIf="field.get('parameterName')?.errors?.required"  >Form Fields are required.</div>
                       </div>
                     </div>
 

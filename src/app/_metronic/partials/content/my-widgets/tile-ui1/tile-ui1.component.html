@@ -26,7 +26,7 @@ style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.
   [style.font-weight]="item.FontTypeLabel?.includes('bold') ? 'bold' : 'normal'"
   [style.font-style]="item.FontTypeLabel?.includes('italic') ? 'italic' : 'normal'"
   [style.text-decoration]="item.FontTypeLabel?.includes('underline') ? 'underline' : 'none'"
-  style="margin-bottom: 0%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+  style="font-weight: bold; margin-bottom: 0%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
 {{ item.custom_Label }}
 </div>
 
@@ -38,7 +38,7 @@ style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.
       [style.font-weight]="item.FontTypeValue?.includes('bold') ? 'bold' : 'normal'"
       [style.font-style]="item.FontTypeValue?.includes('italic') ? 'italic' : 'normal'"
       [style.text-decoration]="item.FontTypeValue?.includes('underline') ? 'underline' : 'none'"
-      style="margin-bottom: 0%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+      style="font-weight: bold; margin-bottom: 0%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
    {{ item.multi_value[0]?.processed_value }}
  </div>
 </div>

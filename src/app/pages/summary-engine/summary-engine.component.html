@@ -18,33 +18,7 @@
 </div>
 
 
-<!-- <div class="d-flex align-items-center me-2 mb-7" *ngIf="!isSummaryEngine()">
 
-  <button *ngIf="!isGirdMoved && summaryDashboardUpdate" type="button" class="btn fw-bold btn-success translateyr"
-    ngbTooltip="Last Updated Time" >Last Updated Tile</button>
-  
-
-  <button *ngIf="isGirdMoved && summaryDashboardUpdate" type="button" class="btn fw-bold btn-danger translateyr"
-    ngbTooltip="Unsaved changes. Click to save." (click)="positionSave()">
-    {{ getLastSavedMessage() }}.
-  </button>
-</div> -->
-<!-- <div class="d-flex align-items-center me-2 mb-7" *ngIf="!isSummaryEngine()">
-
-  <button *ngIf="!isGirdMoved && summaryDashboardUpdate" type="button" class="btn fw-bold btn-success translateyr"
-    ngbTooltip="Last Updated Time" >Last Updated Tile</button>
-  
-
-  <button *ngIf="isGirdMoved && summaryDashboardUpdate" type="button" class="btn fw-bold btn-danger translateyr"
-    ngbTooltip="Unsaved changes. Click to save." (click)="positionSave()">
-    {{ getLastSavedMessage() }}.
-  </button>
-</div> -->
-<!-- <div class="d-flex align-items-center me-2 mb-7" *ngIf="!isSummaryEngine()">
-
-  <button *ngIf="!isGirdMoved && summaryDashboardUpdate" type="button" class="btn fw-bold btn-primary translateyr"
-  ngbTooltip="Apply filter for Dashboard" >Filter</button>
-</div> -->
 
 
 <div class="page-content" #pageContent [ngClass]="{'full-screen-page': isFullScreen&&editButtonCheck}" >
@@ -794,6 +768,13 @@
     <a *ngIf="summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)" title="Add Dashboard" class="myMenu-item" (click)="openModal('new',null, summaryModal)">
       <i style="color: white;" class="fa fa-plus"></i>
     </a>
+    <a *ngIf="!isSummaryEngine() &&(summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))" 
+    title="Add Dashboard" 
+    class="myMenu-item" 
+    (click)="redirectToSummaryEngine()">
+   <i style="color: white;" class="fa fa-home"></i>
+ </a>
+ 
 <a class="myMenu-item" #myLink 
 *ngIf="(editButtonCheck && summaryDashboardUpdate && summaryDashboardView) || (editButtonCheck && userPermission === 'All')"
    title="Edit Dashboard" 
@@ -840,6 +821,8 @@
     style="cursor: pointer;" [attr.title]="'Duplicate Dashboard'">
    <i style="color: white;" class="fa" [ngClass]="'fa-clone'"></i>
  </a>
+
+ 
 
 
 

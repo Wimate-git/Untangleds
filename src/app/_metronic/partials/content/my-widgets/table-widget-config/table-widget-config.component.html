@@ -11,30 +11,30 @@
         <!-- Tab Navigation -->
         <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap"
         id="myTab_settings" role="tablist">
-        <div class="col-4" role="Data">
+        <div class="col-3" role="Data">
           <li class="nav-item">
             <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab"
               aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Data</a>
           </li>
         </div>
-        <div class="col-4" role="Settings">
+        <div class="col-3" role="Settings">
           <li class="nav-item">
             <a class="nav-link text-active-primary me-6" id="settings-tabpane" data-bs-toggle="tab" role="tab" aria-controls="settings-tab" aria-selected="false" (click)="selectedSettingsTab('settings-tab')">Filter</a>
           </li>
         </div>
-        <div class="col-4" role="Filter">
+        <div class="col-3" role="Filter">
           <li class="nav-item">
             <a class="nav-link text-active-primary me-6" id="filter-tab" data-bs-toggle="tab" role="tab"
               aria-controls="filter-tab" aria-selected="false" (click)="selectedSettingsTab('filter-tab')">Function</a>
           </li>
         </div>
 
-        <!-- <div class="col-4" role="Filter">
+   <div class="col-3" role="Custom Row">
           <li class="nav-item">
-            <a class="nav-link text-active-primary me-6" id="filter-tab" data-bs-toggle="tab" role="tab"
-              aria-controls="filter-tab" aria-selected="false" (click)="selectedSettingsTab('filter-tab')">Function</a>
+            <a class="nav-link text-active-primary me-6" id="custom-row" data-bs-toggle="tab" role="tab"
+              aria-controls="custom-row" aria-selected="false" (click)="selectedSettingsTab('custom-row')">Custom Row</a>
           </li>
-        </div> -->
+        </div> 
 
 
 
@@ -73,9 +73,24 @@
                 </div>
               </div>
         
-        
-            
               <div class="col-md-4 mb-3">
+                <label for="parameterName" class="col-form-label fw-bold fs-6 required">Form Fields</label>
+                <div class="custom-multiselect">
+                  <p-multiSelect
+                    [options]="listofDynamicParam"
+                    formControlName="form_data_selected"
+                    optionLabel="text" 
+                    placeholder="Select Columns"
+                    (onChange)="addControls($event.value, 'ts')"> 
+                  </p-multiSelect>
+                  <div *ngIf="createKPIWidget.get('form_data_selected')?.touched && createKPIWidget.get('form_data_selected')?.invalid" class="text-danger">
+                    <div *ngIf="createKPIWidget.get('form_data_selected')?.errors?.required">Form Fields is required.</div>
+                  </div>
+                </div>
+              </div>
+              
+            
+              <!-- <div class="col-md-4 mb-3">
                 <label for="parameterName" class="col-form-label fw-bold fs-6 required">Form Fields</label>
                 <div class="custom-multiselect">
                   <p-multiSelect
@@ -90,7 +105,7 @@
                     <div *ngIf="createKPIWidget.get('form_data_selected')?.errors?.required">Form Fields is required.</div>
                   </div>
                 </div>
-              </div>
+              </div> -->
 
               <div class="col-md-4 mb-3">
                 <label for="custom_Label" class="col-form-label fw-bold fs-6  required">Custom Label</label>
@@ -300,6 +315,72 @@
 
      
           </div>
+
+          <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'custom-row'}" id="custom-row"
+          role="tabpanel" aria-labelledby="customRow-tabpane">
+          <form [formGroup]="createKPIWidget">
+            <div formArrayName="all_fields">
+              <div *ngFor="let field of all_fields.controls; let fieldIndex=index">
+                <div [formGroupName]="fieldIndex"
+                  style="border: 2px solid rgb(201, 228, 239); padding: 10px; margin: 5px;border-radius: 5px;">
+                  <div class="row g-3">
+                    <div class="col-md-4 mb-3">
+                      <label for="rowCalType" class="col-form-label fw-bold fs-6 ">
+                        Row Type
+                      </label>
+                      <ngx-select
+                        id="rowCalType"
+                        [allowClear]="true"
+                        name="rowCalType"
+                        formControlName="rowCalType"
+                        [items]="selectType"
+                        bindValue="value"
+                        bindLabel="text"
+                        placeholder="Select Type">
+                      </ngx-select>
+                    </div>
+                    
+                    <div class="col-md-4">
+                      <div class="d-flex flex-column">
+                        <label for="rowLabel" class="col-form-label fw-bold fs-6 ">Row Label</label>
+                        <input
+                          type="text"
+                          class="form-control form-control-solid"
+                          id="rowLabel"
+                          name="rowLabel"
+                          formControlName="rowLabel"
+                        />
+                   
+                      </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label for="rowUnit" class="col-form-label fw-bold fs-6 ">
+                        Row Unit
+                      </label>
+                      <ngx-select
+                        id="rowUnit"
+                        [allowClear]="true"
+                        name="rowUnit"
+                        formControlName="rowUnit"
+                        [items]="selectUnits"
+                        bindValue="value"
+                        bindLabel="text"
+                        placeholder="Select Unit">
+                      </ngx-select>
+                    </div>
+                    
+
+
+                  </div>
+   
+                </div>
+              </div>
+            </div>
+
+
+          </form>
+          
+        </div>
   
       </div>
   

@@ -6,7 +6,7 @@ import { AbstractControl, FormControl, FormGroup, UntypedFormArray, UntypedFormB
 import { Config } from 'datatables.net';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CompactType, DisplayGrid, GridsterConfig, GridsterItem, GridsterItemComponentInterface, GridType } from 'angular-gridster2';
-import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, NavigationExtras, NavigationStart, Router } from '@angular/router';
 
 import { LocationPermissionService } from 'src/app/location-permission.service';
 import * as $ from 'jquery';
@@ -61,7 +61,7 @@ import { AuditTrailService } from '../services/auditTrail.service';
 import { HtmlTileConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/html-tile-config/html-tile-config.component';
 import { SummaryEngineService } from './summary-engine.service';
 import { ImageConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/image-config/image-config.component';
-import { catchError, throwError } from 'rxjs';
+import { catchError, take, throwError } from 'rxjs';
 import { BlobService } from './blob.service';
 import funnel from 'highcharts/modules/funnel';
 import { FunnelChartConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/funnel-chart-config/funnel-chart-config.component';
@@ -71,7 +71,7 @@ import { PieChartConfigComponent } from 'src/app/_metronic/partials/content/my-w
 import { StackedBarConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/stacked-bar-config/stacked-bar-config.component';
 import { AuthService } from 'src/app/modules/auth';
 import { MixedChartConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/mixed-chart-config/mixed-chart-config.component';
-
+import * as CryptoJS from 'crypto-js';
 
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
@@ -1407,6 +1407,8 @@ invokeHelperDashboard(item: any, index: number, template: any,modaref:any): void
   const selectedType = item.selectType
   console.log('selectedType checking',selectedType)
   console.log('modaref check',modaref)
+  console.log('this.userId checking from redirectModal',this.userId)
+  console.log('this.userPass checking from redirectModal',this.userPass)
 
 
 
@@ -1661,39 +1663,7 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
 
   let filterTileQueryParam = '';
 
-  // if (Array.isArray(this.dashboard) && this.dashboard.length > 0) {
-  //   this.dashboard.forEach((dashboardPacket, index) => {
-  //     if (dashboardPacket.grid_type === 'filterTile') {
-  //       try {
-  //         // Parse the filterTileConfig
-  //         const parsedFilterTileConfig = dashboardPacket.filterTileConfig
-  //           ? JSON.parse(dashboardPacket.filterTileConfig)
-  //           : [];
-  
-  //         console.log(`Parsed filterTileConfig for packet ${index}:`, parsedFilterTileConfig);
-  
-  //         // Ensure the 'operator' field is preserved
-  //         const validatedFilterConfig = parsedFilterTileConfig.map((filterGroup: any[]) =>
-  //           filterGroup.map((filter: any) => ({
-  //             ...filter,
-  //             operator: filter.operator, // Ensure operator is preserved
-  //           }))
-  //         );
-  
-  //         console.log(`Validated filterTileConfig for packet ${index}:`, validatedFilterConfig);
-  
-  //         // Convert to a JSON string without encoding
-     
-  
-  //         console.log('filterTileQueryParam:', filterTileQueryParam);
-  //       } catch (error) {
-  //         console.error(`Error parsing filterTileConfig for packet ${index}:`, error);
-  //       }
-  //     }
-  //   });
-  // } else {
-  //   console.warn('Dashboard data is empty or not an array.');
-  // }
+
   const validatedFilterConfig = this.eventFilterConditions
 
   
@@ -1704,6 +1674,9 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
   const viewMode = true;
   const disableMenu = true;
   const modulePath = packet.dashboardIds;
+
+
+  // this.userPass = params['pass']
   this.toRouteId = modulePath
   console.log('modulePath checking:', modulePath);
 
@@ -1718,13 +1691,49 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
   this.currentModalIndex = selectedMarkerIndex;
 
   if (packet.selectType === 'NewTab') {
-    const safeUrl = `${window.location.origin}/summary-engine/${modulePath}`;
-    console.log('Opening new tab with URL:', safeUrl);
-    window.open(safeUrl, '_blank');
-  }if (packet.selectType === 'Modal') {
+    this.route.queryParams.pipe(take(1)).subscribe(async (params) => {  // Ensure subscription runs once
+      if (params['uID'] && params['pass']) {
+        console.log('Authentication Params Found:', params);
+        this.userId = params['uID'];
+        this.userPass = params['pass'];
+  
+        const user = await this.authservice.signIn(this.userId.toLowerCase(), this.userPass);
+        console.log('User authentication result:', user);
+  
+        // 🚫 Do not navigate if authentication params exist
+      } else {
+        // ✅ If 'uID' and 'pass' are NOT present, open the new tab
+        const safeUrl = `${window.location.origin}/summary-engine/${modulePath}`;
+        console.log('Opening new tab with URL:', safeUrl);
+        window.open(safeUrl, '_blank');
+      }
+    });
+  }
+    if (packet.selectType === 'Modal') {
+    this.route.queryParams.subscribe(async (params) => {
+      if(params['uID']){
+        console.log('uid checking',params['uID'])
+        this.userId = params['uID']
+
+        
+      }
+      if(params['pass']){
+        console.log('pass checking',params['pass'])
+        this.userPass = params['pass']
+        const user = await this.authservice.signIn((this.userId).toLowerCase(), this.userPass);
+        console.log('user check query',user)
+        
+      }
+      // if(params['clientID']){
+      //   console.log('clientID checking',params['clientID'])
+
+      // }
+    });
+
+
     console.log('packet checking from queryparams', packet);
     this.modalCheck = packet.selectType;
-    
+
     // Hide the navigation menu
     this.hideNavMenu = true;  
     const disableMenuQP = true;
@@ -1755,12 +1764,26 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
         queryParams.append('viewMode', String(viewMode));
         queryParams.append('disableMenu', String(disableMenu));
         
-        this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-            `${window.location.origin}/summary-engine/${modulePath}?${queryParams.toString()}`
-        );
+        // Add userId and userPass to query params
+        console.log('this.userId checking from redirectModal', this.userId);
+        console.log('this.userPass checking from redirectModal', this.userPass);
         
-        console.log('this.currentiframeUrl checking',this.currentiframeUrl)
-
+        if (this.userId) {
+            queryParams.append('uID', this.userId);
+        }
+        
+        if (this.userPass) {
+            queryParams.append('pass', this.userPass);
+        }
+        
+        // Construct the final URL with "?"
+        const finalUrl = `${window.location.origin}/summary-engine/${modulePath}?${queryParams.toString()}`;
+        
+        this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
+        
+        console.log('this.currentiframeUrl checking', this.currentiframeUrl);
+        
+        
         localStorage.setItem('viewMode', 'true');
         localStorage.setItem('disableMenu', 'true');
 
@@ -1770,14 +1793,66 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
         console.error('Modal content is undefined');
     }
 }
- else if (packet.selectType === 'Same page Redirect') {
-    const navigationPath = `/summary-engine/${modulePath}`;
-    console.log('Redirecting to:', navigationPath);
-    this.modalService.dismissAll();
-    this.router.navigate([navigationPath]).then(() => {
+if (packet.selectType === 'Same page Redirect') {
+  // Extract query parameters once (avoid repeated subscription)
+  const queryParams = this.route.snapshot.queryParams;
+
+  if (queryParams['uID']) {
+    this.userId = decodeURIComponent(queryParams['uID']);
+    console.log('User ID:', this.userId);
+  }
+
+  if (queryParams['pass']) {
+    this.userPass = decodeURIComponent(queryParams['pass']);
+    console.log('Password:', this.userPass);
+
+    // Authenticate user
+    this.authservice.signIn(this.userId.toLowerCase(), this.userPass)
+      .then(user => {
+        console.log('User check query:', user);
+      })
+      .catch(err => console.error('Authentication error:', err));
+  }
+
+  console.log('User ID from redirectModal:', this.userId);
+  console.log('User Password from redirectModal:', this.userPass);
+
+  // Ensure modulePath is properly decoded to avoid double encoding
+  const modulePathCheck = decodeURIComponent(modulePath);
+  console.log('Decoded modulePath:', modulePathCheck);
+
+  // Ensure query parameters exist before navigating
+  const queryParamsToSend: any = {};
+  if (this.userId) {
+    queryParamsToSend.uID = this.userId;
+  }
+  if (this.userPass) {
+    queryParamsToSend.pass = this.userPass;
+  }
+
+  console.log('Final query params:', queryParamsToSend);
+
+  // Close the modal before navigating
+  this.modalService.dismissAll();
+
+  // Navigate & reload only after successful navigation
+  this.router.navigate(['/summary-engine', modulePathCheck], { queryParams: queryParamsToSend })
+    .then(() => {
+      console.log('Navigation successful:', `/summary-engine/${modulePathCheck}`, queryParamsToSend);
       window.location.reload();
-    }).catch(err => console.error('Navigation error:', err));
-  }else if (packet.selectType === 'drill down') {
+    })
+    .catch(err => console.error('Navigation error:', err));
+}
+
+
+
+
+
+
+
+  
+  
+  else if (packet.selectType === 'drill down') {
     if (modaref && modaref instanceof TemplateRef) {
       console.log('Opening modal with modaref:', modaref);
       this.modalService.open(modaref, {
@@ -1791,7 +1866,21 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
   }
   
 }
+private encryptionKey = 'your-secret-key'; // Replace with your actual key
 
+encryptData(data: string): string {
+  return encodeURIComponent(CryptoJS.AES.encrypt(data, this.encryptionKey).toString());
+}
+
+decryptData(encryptedData: string): string {
+  try {
+    const bytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedData), this.encryptionKey);
+    return bytes.toString(CryptoJS.enc.Utf8);
+  } catch (error) {
+    console.error('Decryption error:', error);
+    return '';
+  }
+}
 
 storeFilterTileConfig(config: any, index: number): void {
   console.log(`Storing filterTileConfig for packet ${index}:`, config);
@@ -1919,6 +2008,7 @@ exitFullScreen(): void {
   hoverWidget: any = false;
   hideButton:boolean=false;
   lastSavedTime: Date | null = null;
+  hideSummaryGridster:boolean =false
 
   toggleDropdown(event: Event): void {
     this.zone.run(() => {
@@ -2688,7 +2778,10 @@ exitFullScreen(): void {
   //   }, 1000);
   // }
 
-
+  hasSummaryEngineWithParams(): boolean {
+    return this.router.url.startsWith('/summary-engine') && Object.keys(this.route.snapshot.queryParams).length > 0;
+  }
+  
 
 
   async ngOnInit() {
@@ -2835,6 +2928,7 @@ exitFullScreen(): void {
         if(params['uID']){
           console.log('uid checking',params['uID'])
           this.userId = params['uID']
+ 
           
         }
         if(params['pass']){
@@ -2842,12 +2936,13 @@ exitFullScreen(): void {
           this.userPass = params['pass']
           const user = await this.authservice.signIn((this.userId).toLowerCase(), this.userPass);
           console.log('user check query',user)
+          this.hideSummaryGridster = true
           
         }
-        if(params['clientID']){
-          console.log('clientID checking',params['clientID'])
+        // if(params['clientID']){
+        //   console.log('clientID checking',params['clientID'])
 
-        }
+        // }
       });
       }
     
@@ -3476,14 +3571,44 @@ setTimeout(() => {
   
     this.updateSummary('', 'Save');
   }
-  
-
-  
-
-
-  isSummaryEngine(): boolean {
-    return this.router.url === '/summary-engine'; // Check if the current route is /summary-engine
+  redirectToSummaryEngine(): void {
+    if (this.router.url !== '/summary-engine') {
+      this.router.navigate(['/summary-engine']);
+    }
   }
+
+
+  
+  isSummaryEngine(): boolean {
+    const urlWithoutQueryParams = this.router.url.split('?')[0]; // Get base URL without query params
+    const queryParams = this.route.snapshot.queryParams; // Get current query parameters
+  
+    // Ensure the route ends exactly with '/summary-engine'
+    const isBasePathCorrect = urlWithoutQueryParams.endsWith('/summary-engine');
+  
+    // Extract query parameter keys
+    const queryKeys = Object.keys(queryParams);
+  
+    // If no query parameters exist, allow hiding (i.e., `/summary-engine` alone should be hidden)
+    if (queryKeys.length === 0) {
+      return isBasePathCorrect;
+    }
+  
+    // Ensure only 'uID' and 'pass' exist in query params (no extra params)
+    const hasOnlyAllowedParams = queryKeys.every(param => ['uID', 'pass'].includes(param));
+  
+    // Ensure no extra query parameters exist (other than 'uID' & 'pass')
+    const hasExtraParams = queryKeys.some(param => !['uID', 'pass'].includes(param));
+  
+    // Hide only if:
+    // 1. The base path is '/summary-engine'
+    // 2. No query params OR only 'uID' and 'pass' exist
+    return isBasePathCorrect && (!hasExtraParams);
+  }
+  
+  
+  
+
 
   hideTooltips() {
 
@@ -3493,18 +3618,39 @@ setTimeout(() => {
   }
 
   viewItem(id: string): void {
-    console.log('this.all_Packet_store check viewItem',this.lookup_data_summaryCopy)
-   
-    this.setFullscreen()
-    this.router.navigate([`/summary-engine/${id}`]);
-    this.cdr.detectChanges();
+    console.log('this.userId checking from redirect', this.userId);
+    console.log('this.userPass checking from redirect', this.userPass);
+    console.log('this.all_Packet_store check viewItem', this.lookup_data_summaryCopy);
 
+    this.setFullscreen();
+
+    // Prepare query parameters only if they exist
+    let queryParams: any = {};
+    
+    if (this.userId) {
+        queryParams.uID = this.userId;
+    }
+    if (this.userPass) {
+        queryParams.pass = this.userPass;
+    }
+
+    // Navigate accordingly
+    if (Object.keys(queryParams).length > 0) {
+        this.router.navigate([`/summary-engine/${id}`], { 
+            queryParams: queryParams, 
+            queryParamsHandling: 'merge' 
+        });
+        this.openModalHelpher(id)
+    } else {
+        this.router.navigate([`/summary-engine/${id}`]);
+    }
+
+    this.cdr.detectChanges();
+    
     // Set the state to Edit Mode
     this.showModal = true; // Open modal in edit mode
+}
 
-
- 
-  }
   dashboardRedirect(id: string): void {
     // Toggle the full-screen state
     this.setFullscreen();
@@ -6123,7 +6269,8 @@ console.log('Serialized Query Params:', serializedQueryParams);
       equation:this.formatField(tile.equation),
       MiniTableFields:this.formatField(tile.MiniTableFields),
       filterParameterLine:this.formatField(tile.filterParameterLine),
-      parameterNameHTML:this.formatField(tile.parameterNameHTML)
+      parameterNameHTML:this.formatField(tile.parameterNameHTML),
+      table_rowConfig:this.formatField(tile.table_rowConfig)
   
       // parameterName:this.formatField(tile.parameterName)
 

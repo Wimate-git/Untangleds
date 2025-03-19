@@ -49,7 +49,7 @@ export class TableWidgetConfigComponent implements OnInit,AfterViewInit{
   selectedTabset: string = 'dataTab';
   dynamicParamMap = new Map<number, any[]>();
   selectedParameterValue: string;
-  all_fields: any;
+
   dynamicConditions: FormGroup[] = [];
   showRemoveButton:boolean = false;
   dynamicFields: any;
@@ -87,6 +87,7 @@ this.initializeTileFields()
     this.createKPIWidget = this.fb.group({
 
       // all_fields:new FormArray([]),
+      all_fields: new FormArray([]),
       conditions: this.fb.array([]), 
       formlist: ['', Validators.required],
       form_data_selected: ['', Validators.required],
@@ -103,6 +104,58 @@ this.initializeTileFields()
     });
   }
 
+
+  addControls(selectedFields: any[], _type: string) {
+    console.log('Selected Fields:', selectedFields);
+    
+    const noOfParams = selectedFields.length;
+    console.log('noOfParams check', noOfParams);
+  
+    // Get the form array
+    const formArray = this.createKPIWidget.get('all_fields') as FormArray;
+  
+    // Add or remove controls dynamically
+    if (formArray.length < noOfParams) {
+      for (let i = formArray.length; i < noOfParams; i++) {
+        formArray.push(
+          this.fb.group({
+            rowCalType:[''],
+            rowUnit:[''],
+            rowLabel:['']
+          })
+        );
+      }
+    } else {
+      // Remove extra controls
+      while (formArray.length > noOfParams) {
+        formArray.removeAt(formArray.length - 1);
+      }
+    }
+  
+    console.log('Updated Form Array:', formArray.value);
+  }
+
+  selectType = [
+    { value: 'sum', text: 'Sum' },
+    { value: 'min', text: 'Minimum' },
+    { value: 'max', text: 'Maximum' },
+    { value: 'average', text: 'Average' },
+    { value: 'latest', text: 'Latest' },
+    { value: 'previous', text: 'Previous' }
+  ];
+  
+
+
+  selectUnits = [
+    { value: 'Rupee with Value', text: 'Rupee with Value' },
+    { value: 'Dollar with Value', text: 'Dollar with Value' },
+    { value: 'Coma with Unit', text: 'Coma with Unit' }
+  ];
+  
+
+  get all_fields() {
+    return this.createKPIWidget.get('all_fields') as FormArray;
+  }
 
   // Handle dynamic parameter value changes
   get conditions(): FormArray<FormGroup> {
@@ -248,6 +301,7 @@ this.initializeTileFields()
       groupByFormat: this.createKPIWidget.value.groupByFormat,
       conditions: conditionsArray, // Use the updated conditions array
       filterParameter1:this.createKPIWidget.value.filterParameter1,
+      table_rowConfig: this.createKPIWidget.value.all_fields || [],
       // custom_Label1:this.createKPIWidget.value.custom_Label1,
       filterDescription1:this.createKPIWidget.value.filterDescription1,
       // PredefinedScripts:this.createKPIWidget.value.PredefinedScripts
@@ -406,6 +460,7 @@ this.initializeTileFields()
     console.log('Index checking:', index); // Log the index
     
     if (tile) {
+      this.isEditMode = true;
       this.selectedTile = tile;
       this.editTileIndex = index !== undefined ? index : null;
       console.log('this.editTileIndex checking from openkpi', this.editTileIndex); // Store the index, default to null if undefined
@@ -470,16 +525,18 @@ this.initializeTileFields()
   
       // Patch other form values
       this.createKPIWidget.patchValue({
+    
         formlist: tile.formlist,
         form_data_selected: parsedTableWidgetConfig,
         groupByFormat: tile.groupByFormat,
         custom_Label: tile.custom_Label,
         filterParameter1: parsedFilterParameter1, // Parsed array
         filterDescription1: tile.filterDescription1,
+        all_fields: this.repopulate_fields(tile),
         // custom_Label1: tile.custom_Label1,
       });
   
-      this.isEditMode = true; // Set to edit mode
+       // Set to edit mode
     } else {
       this.selectedTile = null; // No tile selected for adding
       this.isEditMode = false; // Set to add mode
@@ -503,6 +560,63 @@ this.initializeTileFields()
   }
   
   
+  repopulate_fields(getValues: any): FormArray {
+    if (!getValues || getValues === null) {
+      console.warn('No data to repopulate');
+      return this.all_fields;
+    }
+  
+    // Clear existing fields in the FormArray
+    this.all_fields.clear();
+  
+    // Parse `chartConfig` safely
+    let parsedChartConfig: any[] = [];
+    try {
+      if (typeof getValues.table_rowConfig === 'string') {
+        parsedChartConfig = JSON.parse(getValues.table_rowConfig || '[]');
+      } else if (Array.isArray(getValues.table_rowConfig)) {
+        parsedChartConfig = getValues.table_rowConfig;
+      }
+    } catch (error) {
+      console.error('Error parsing chartConfig:', error);
+      parsedChartConfig = [];
+    }
+  
+    console.log('Parsed chartConfig:', parsedChartConfig);
+  
+    // Populate FormArray based on parsedChartConfig
+    if (parsedChartConfig.length > 0) {
+      parsedChartConfig.forEach((configItem, index) => {
+        console.log(`Processing index ${index} - Full Object:`, configItem);
+  
+        // Handle columnVisibility as a simple array initialization
+
+     
+  
+        // Create and push FormGroup into FormArray
+        this.all_fields.push(
+          this.fb.group({
+            rowCalType: configItem.rowCalType || '',
+      
+            rowLabel: configItem.rowLabel || '',
+            rowUnit: configItem.rowUnit || '',
+        
+     
+  
+          })
+        );
+  
+        // Log the added FormGroup for debugging
+        console.log(`FormGroup at index ${index}:`, this.all_fields.at(index).value);
+      });
+    } else {
+      console.warn('No parsed data to populate fields');
+    }
+  
+    console.log('Final FormArray Values:', this.all_fields.value);
+  
+    return this.all_fields;
+  }
   
   showTooltip(item: string) {
     this.tooltip = item;
@@ -543,6 +657,7 @@ this.initializeTileFields()
         conditions: updatedConditions ||'', // Directly assign the array
         filterParameter1: this.createKPIWidget.value.filterParameter1 ||'', // Parsed array
         filterDescription1: this.createKPIWidget.value.filterDescription1 ||'',
+        table_rowConfig: this.createKPIWidget.value.all_fields || '',
         // custom_Label1: this.createKPIWidget.value.custom_Label1,
       };
   

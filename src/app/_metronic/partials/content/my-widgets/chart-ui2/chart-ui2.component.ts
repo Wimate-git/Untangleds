@@ -176,7 +176,7 @@ export class ChartUi2Component implements OnInit{
   ngOnInit(){
     console.log('item chacke',this.item.grid_details)
     this.summaryService.lookUpData$.subscribe((data: any)=>{
-      console.log('data check>>>',data)
+      console.log('data check>>> LineChart',data)
  let tempCharts:any=[]
 data.forEach((packet: any,matchedIndex:number) => {
   
