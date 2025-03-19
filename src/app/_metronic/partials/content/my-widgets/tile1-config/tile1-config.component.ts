@@ -280,6 +280,12 @@ export class Tile1ConfigComponent implements OnInit {
       MiniTableFields:[''],
       minitableEquation:[''],
       EquationOperationMini:[''],
+      fontSizeValue:[20, [Validators.required, Validators.min(8), Validators.max(72)]],
+      fontColorValue:['#ebeaea', Validators.required],
+      FontTypeValue:['bold'],
+      FontTypeLabel:['bold']
+
+
     
 
 
@@ -559,6 +565,10 @@ export class Tile1ConfigComponent implements OnInit {
         MiniTableFields:this.createKPIWidget.value.MiniTableFields ,
         minitableEquation:this.createKPIWidget.value.minitableEquation,
         EquationOperationMini:this.createKPIWidget.value.EquationOperationMini,
+        fontSizeValue:`${this.createKPIWidget.value.fontSizeValue}px`,
+        fontColorValue:this.createKPIWidget.value.fontColorValue,
+        FontTypeValue:this.createKPIWidget.value.FontTypeValue,
+        FontTypeLabel:this.createKPIWidget.value.FontTypeLabel,
    
 
 
@@ -606,6 +616,13 @@ export class Tile1ConfigComponent implements OnInit {
   onFontColorChange(event: Event): void {
     const color = (event.target as HTMLInputElement).value;
     this.createKPIWidget.patchValue({ fontColor: color });
+  }
+
+
+  onFontColorChangeValue(event: Event){
+    const color = (event.target as HTMLInputElement).value;
+    this.createKPIWidget.patchValue({ fontColorValue: color });
+
   }
   
   updateTile(key: any) {
@@ -657,7 +674,7 @@ export class Tile1ConfigComponent implements OnInit {
         endDate: this.createKPIWidget.value.endDate ||'',
         themeColor: this.createKPIWidget.value.themeColor,
         fontSize: `${this.createKPIWidget.value.fontSize}px`,
-        fontColor: this.createKPIWidget.value.fontColor,
+        fontColor: this.createKPIWidget.value.fontColor ||'',
         selectFromTime: this.createKPIWidget.value.selectFromTime,
         selectToTime: this.createKPIWidget.value.selectToTime,
         dashboardIds: this.createKPIWidget.value.dashboardIds ||'',
@@ -681,6 +698,10 @@ export class Tile1ConfigComponent implements OnInit {
         EquationOperationMini:this.createKPIWidget.value.EquationOperationMini||'',
         ModuleNames:this.createKPIWidget.value.ModuleNames||'',
         columnVisibility:this.createKPIWidget.value.columnVisibility,
+        fontSizeValue:`${this.createKPIWidget.value.fontSizeValue}px`,
+        fontColorValue:this.createKPIWidget.value.fontColorValue,
+        FontTypeValue:this.createKPIWidget.value.FontTypeValue,
+        FontTypeLabel:this.createKPIWidget.value.FontTypeLabel ||''
 
 
       };
@@ -1362,6 +1383,11 @@ openKPIModal(tile: any, index: number) {
       MiniTableFields:parsedMiniTableFields ,
       minitableEquation:tile.minitableEquation,
       EquationOperationMini:tile.EquationOperationMini, // Set parsed columnVisibility
+
+      fontSizeValue:tile.fontSizeValue ? parseInt(tile.fontSizeValue.replace('px', ''), 10) : 14,
+      fontColorValue:tile.fontColorValue,
+      FontTypeValue:tile.FontTypeValue,
+      FontTypeLabel:tile.FontTypeLabel,
    
       all_fields: this.repopulate_fields(tile),
     });
@@ -1764,6 +1790,16 @@ selectFormParams1(event: any[], index: number): void {
     { value: 'Same page Redirect', text: 'Same page Redirect' },
 
     { value: 'drill down', text: 'drill down' },
+  ]
+
+
+
+FontTypeSummary =[
+    { value: 'italic', text: 'Italic' },
+    { value: 'underline', text: 'underline' },
+    { value: 'bold', text: 'Bold' },
+
+    // { value: 'drill down', text: 'drill down' },
   ]
   onValueChange(selectedValue: any): void {
     // Handle any logic here if needed when the value changes

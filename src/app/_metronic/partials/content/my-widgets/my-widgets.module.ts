@@ -83,6 +83,8 @@ import { PieChartConfigComponent } from './pie-chart-config/pie-chart-config.com
 import { PieChartUiComponent } from './pie-chart-ui/pie-chart-ui.component';
 import { StackedBarConfigComponent } from './stacked-bar-config/stacked-bar-config.component';
 import { StackedBarUiComponent } from './stacked-bar-ui/stacked-bar-ui.component';
+import { MixedChartConfigComponent } from './mixed-chart-config/mixed-chart-config.component';
+import { MixedChartUiComponent } from './mixed-chart-ui/mixed-chart-ui.component';
 
 
 
@@ -142,7 +144,9 @@ import { StackedBarUiComponent } from './stacked-bar-ui/stacked-bar-ui.component
     PieChartConfigComponent,
     PieChartUiComponent,
     StackedBarConfigComponent,
-    StackedBarUiComponent
+    StackedBarUiComponent,
+    MixedChartConfigComponent,
+    MixedChartUiComponent
 
 
 
@@ -241,7 +245,9 @@ import { StackedBarUiComponent } from './stacked-bar-ui/stacked-bar-ui.component
     PieChartConfigComponent,
     PieChartUiComponent,
     StackedBarConfigComponent,
-    StackedBarUiComponent
+    StackedBarUiComponent,
+    MixedChartConfigComponent,
+    MixedChartUiComponent
     
   
 

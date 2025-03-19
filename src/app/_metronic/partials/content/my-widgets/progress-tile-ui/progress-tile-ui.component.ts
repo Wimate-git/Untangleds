@@ -83,10 +83,10 @@ data.forEach((packet: any,matchedIndex:number) => {
     this.dataDisplay2 = this.parsedTileConfig[1]
     
     if (this.parsedTileConfig.length >= 2) {
-      // const num1 = parseFloat(this.parsedTileConfig[0].processed_value) || 0; // Pending projects
-      // const num2 = parseFloat(this.parsedTileConfig[1].processed_value) || 0; // Total projects
-      const num1: number = 70; // Pending projects
-      const num2: number = 100; // Total projects (assumed value for testing)
+      const num1 = parseFloat(this.parsedTileConfig[0].processed_value) || 0; // Pending projects
+      const num2 = parseFloat(this.parsedTileConfig[1].processed_value) || 0; // Total projects
+      // const num1: number = 70; // Pending projects
+      // const num2: number = 100; // Total projects (assumed value for testing)
     
       if (num2 === 0) {
         console.warn("Division by zero error! Setting percentage to 0.");

@@ -351,30 +351,50 @@ if(data){
       // Initialize the Highcharts pie chart
       Highcharts.chart(`pieChart${this.index + 1}`, chartOptionsCopy);
 
-    }else{
+    }else {
+      console.log('this.items checkinh',this.item)
+      const extractOptions = this.item.highchartsOptionsJson
+      console.log('extractOptions checking',extractOptions)
+      const parseExtractOptions = JSON.parse(extractOptions)
+      console.log('parseExtractOptions checking',parseExtractOptions)
       const chartOptionsCopy = JSON.parse(this.item.highchartsOptionsJson);
-
-      console.log('chartOptionsCopy else condition',chartOptionsCopy)
-
-      chartOptionsCopy.series = chartOptionsCopy.series.map((series: any) => {
+    
+      console.log('chartOptionsCopy else condition', chartOptionsCopy);
+    
+      parseExtractOptions.series = parseExtractOptions.series.map((series: any) => {
         return {
           ...series,
-          data: series.data.map((point: any, index: number) => ({
-            name: point[0], // First element as name
-            y: point[1],    // Second element as value
-            customIndex: index,
-            events: {
-              click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event),
-            },
-          })),
+          data: series.data.map((point: any, index: number) => {
+            // Handle both array-based and object-based data
+            let category, value;
+    
+            if (Array.isArray(point)) {
+              category = point[0]; // First element as category name
+              value = point[1]; // Second element as y-value
+            } else if (typeof point === 'object' && point !== null) {
+              category = point.category || 'Unknown'; // Default if missing
+              value = point.value || 0;
+            } else {
+              console.warn("Unexpected data format in series:", point);
+              return null;
+            }
+    
+            return {
+              name: category, // Set correct name
+              y: value,       // Set correct y-value
+              customIndex: index,
+              events: {
+                click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event),
+              },
+            };
+          }).filter((point: any) => point !== null), // Filter out null values if any
         };
       });
     
-      // Initialize the Highcharts pie chart
+      // Initialize the Highcharts stacked bar chart
       Highcharts.chart(`pieChart${this.index + 1}`, chartOptionsCopy);
-
     }
-
+    
     // Ensure that each chart gets a unique copy of the options
 
 }

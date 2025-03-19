@@ -1716,6 +1716,7 @@ FormatTypeValues = [
   { value: 'Years', text: 'Years' },
   {value:'Label With Value',text:'Label With Value'},
   { value: 'Percentage', text: 'Percentage' },
+  { value: 'Rupee with Percentage', text: 'Rupee with Percentage' },
 
 
 ]

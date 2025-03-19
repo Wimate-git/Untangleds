@@ -2,17 +2,17 @@
 
 <div class="d-flex align-items-center me-2 mb-7" *ngIf="!isSummaryEngine()" style="gap: 10px;">
   <!-- Green button -->
-  <button *ngIf="!isGirdMoved && summaryDashboardUpdate" type="button" class="btn fw-bold btn-success translateyr"
+  <button *ngIf="!isGirdMoved && summaryDashboardUpdate && isSummaryEngine()" type="button" class="btn fw-bold btn-success translateyr"
     ngbTooltip="To save dashboard position" (click)="positionSave()">All changes are saved</button>
   
   <!-- Red button -->
-  <button *ngIf="isGirdMoved && summaryDashboardUpdate" type="button" class="btn fw-bold btn-danger translateyr"
+  <button *ngIf="isGirdMoved && summaryDashboardUpdate && isSummaryEngine()" type="button" class="btn fw-bold btn-danger translateyr"
     ngbTooltip="Unsaved changes. Click to save." (click)="positionSave()">
     {{ getLastSavedMessage() }}.
   </button>
 
   <!-- Last Updated Time button -->
-  <button type="button" class="btn fw-bold btn-primary translateyr" ngbTooltip="Last Updated Time">
+  <button *ngIf="isSummaryEngine()" type="button" class="btn fw-bold btn-primary translateyr" ngbTooltip="Last Updated Time">
     Last Updated Time: {{lastUpdatedTime}}
   </button>
 </div>
@@ -67,7 +67,7 @@
 
 
       
-        <div #gridsterContainer>
+        <div #gridsterContainer *ngIf="isSummaryEngine()">
 
           <div class="card" style="width: 100%; height: 100vh; background-color: var(--bs-app-bg-color) !important;">
             <div class="card-body p-0 pb-0"
@@ -250,6 +250,11 @@
                     <div *ngIf="item.grid_type === 'Columnchart'"  >
                       <app-chart-ui3 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal3)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
                       [hidingLink]="hidingLink"  [eventFilterConditions]="eventFilterConditions"  [isFullscreen]="isFullscreen"  (sendCellInfo) = "helperChartClick($event,dataTableModal)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)"  (emitChartConfigTable)="emitchartDatatable($event)" [liveDataColumnChart]="liveDataColumnChart" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [permissionIdRequest]="permissionIdRequest"></app-chart-ui3>
+                    </div>
+
+                    <div *ngIf="item.grid_type === 'mixedChart'"  >
+                      <app-mixed-chart-ui [item]="item" [index]="i" (customEvent)="helperTile($event,MixedChartModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
+                      [hidingLink]="hidingLink"  [eventFilterConditions]="eventFilterConditions"  [isFullscreen]="isFullscreen"  (sendCellInfo) = "helperChartClick($event,dataTableModal)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)"  (emitChartConfigTable)="emitchartDatatable($event)" [liveDataColumnChart]="liveDataColumnChart" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [permissionIdRequest]="permissionIdRequest"></app-mixed-chart-ui>
                     </div>
                     
                     <div *ngIf="item.grid_type === 'Areachart'"  >
@@ -1447,6 +1452,11 @@
             </div>
        
           </div>
+
+
+
+
+          
   
   
           <div class="row">
@@ -1503,6 +1513,19 @@
 
 
   
+          </div>
+
+
+          <div class="row">
+
+            <div class="col-md-6">
+              <!-- Bar Chart Button -->
+              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7" style="border: 0px; display: block; width: 100%;">
+                <div id="barChart" style="width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;" 
+                  (click)="openMixedChartModal(MixedChartModal, modal)">
+                </div>
+              </button>
+            </div>
           </div>
 
 
@@ -2347,6 +2370,12 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   <ng-template #ChartModal3 let-modal >
   
     <app-chart3-config  [dashboard]="dashboard" (dashboardChange)="getGridDetails2($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver2($event)"></app-chart3-config>
+  
+  </ng-template>
+
+  <ng-template #MixedChartModal let-modal >
+  
+    <app-mixed-chart-config  [dashboard]="dashboard" (dashboardChange)="getGridDetails2($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver2($event)"></app-mixed-chart-config>
   
   </ng-template>
   <ng-template #ChartModal4 let-modal >

@@ -202,42 +202,87 @@ export class Chart1ConfigComponent implements OnInit {
       // ... add other ranges as needed
     };
   }
+  // initializeTileFields(): void {
+  //   console.log('i am initialize')
+  //   // Initialize the form group
+  //   this.createChart = this.fb.group({
+  //     add_fields:[''],
+  //     all_fields:new FormArray([]),
+  
+  //     widgetid: [this.generateUniqueId()],
+    
+  //     // themeColor: ['#000000', Validators.required],
+  
+  //     // fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
+  //     // fontColor: ['#000000', Validators.required], // Default to black
+   
+  //     chart_title:['',Validators.required],
+  //     highchartsOptionsJson:[JSON.stringify(this.defaultHighchartsOptionsJson,null,4)],
+  //     filterForm:[''],
+  //     // filterParameter:[[]],
+  //     // filterDescription:[''],
+  //     toggleCheck: [], // Default toggle state
+  //     dashboardIds: [''],
+  //     selectType: [''],
+  //     miniForm:[''],
+  //     MiniTableNames:[''],
+  //     MiniTableFields:[''],
+  //     minitableEquation:[''],
+  //     EquationOperationMini:[''],
+  //     enableLegends:['']
+  //     // custom_Label:['',Validators.required],
+   
+  
+
+
+  //   });
+
+  
+  // }
+
+
   initializeTileFields(): void {
-    console.log('i am initialize')
+    console.log('i am initialize');
+  
     // Initialize the form group
     this.createChart = this.fb.group({
-      add_fields:[''],
-      all_fields:new FormArray([]),
-  
+      add_fields: [''],
+      all_fields: new FormArray([]),
       widgetid: [this.generateUniqueId()],
-    
-      // themeColor: ['#000000', Validators.required],
-  
-      // fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
-      // fontColor: ['#000000', Validators.required], // Default to black
-   
-      chart_title:['',Validators.required],
-      highchartsOptionsJson:[JSON.stringify(this.defaultHighchartsOptionsJson,null,4)],
-      filterForm:[''],
-      // filterParameter:[[]],
-      // filterDescription:[''],
-      toggleCheck: [], // Default toggle state
+      chart_title: ['', Validators.required],
+      highchartsOptionsJson: [JSON.stringify(this.defaultHighchartsOptionsJson, null, 4)],
+      filterForm: [''],
+      toggleCheck: [],
       dashboardIds: [''],
       selectType: [''],
-      miniForm:[''],
-      MiniTableNames:[''],
-      MiniTableFields:[''],
-      minitableEquation:[''],
-      EquationOperationMini:['']
-      // custom_Label:['',Validators.required],
-   
-  
-
-
+      miniForm: [''],
+      MiniTableNames: [''],
+      MiniTableFields: [''],
+      minitableEquation: [''],
+      EquationOperationMini: [''],
+      enableLegends: [false] // Set default value to false
     });
-
   
+    // Listen for checkbox changes and update the chart dynamically
+    this.createChart.get('enableLegends')?.valueChanges.subscribe((value) => {
+      this.toggleLegend(value);
+    });
   }
+  
+  toggleLegend(enable: boolean) {
+    // Update the Highcharts legend property
+    this.defaultHighchartsOptionsJson.legend.enabled = enable;
+    this.defaultHighchartsOptionsJson.plotOptions.series.showInLegend = enable;
+  
+    // Update the form control storing the JSON config
+    this.createChart.patchValue({
+      highchartsOptionsJson: JSON.stringify(this.defaultHighchartsOptionsJson, null, 4)
+    });
+  
+    // If Highcharts is already initialized, update the chart dynamically
+
+  }
+  
   getFormControlValue(selectedTextConfi:any): void {
     // const formlistControl = this.createChart.get('formlist');
     console.log('Formlist Control Value:', selectedTextConfi);
@@ -470,6 +515,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         minitableEquation:this.createChart.value.minitableEquation,
         EquationOperationMini:this.createChart.value.EquationOperationMini,
         add_fields:this.createChart.value.add_fields,
+        enableLegends:this.createChart.value.enableLegends,
     
       
 
@@ -518,105 +564,109 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
   
   updateTile(key: any) {
     console.log('key checking from update', key);
-    // console.log('highchartsOptionsJson checking',highchartsOptionsJson)
-   let tempParsed = this.createChart.value.highchartsOptionsJson
+  
+    let tempParsed = this.createChart.value.highchartsOptionsJson;
+    
     if (this.editTileIndex !== null) {
       console.log('this.editTileIndex check', this.editTileIndex);
-      console.log('Tile checking for update:', this.dashboard[this.editTileIndex]);
-  
-  if (typeof tempParsed === 'string') {
-    tempParsed = JSON.parse(tempParsed);
-}
-
-// Update the chart options dynamically
-const updatedHighchartsOptionsJson = {
-  ...tempParsed,
-  title: {
-    ...tempParsed.title,
-    text: this.createChart.value.chart_title || ''  // Update the title dynamically
-  }
-};
-console.log('updatedHighchartsOptionsJson check',updatedHighchartsOptionsJson)
-this.chartFinalOptions =JSON.stringify(updatedHighchartsOptionsJson,null,4)
-console.log('this.chartFinalOptions check',this.chartFinalOptions)
-      // Update the multi_value array with the new processed_value and constantValue
-
-  
-      // Add defensive checks for predefinedSelectRange
-
-  
       
-      console.log('this.dashboard',this.dashboard)
-      // Now update the tile with the updated multi_value
+      if (typeof tempParsed === 'string') {
+        try {
+          tempParsed = JSON.parse(tempParsed);
+        } catch (error) {
+          console.error('Error parsing highchartsOptionsJson:', error);
+          return;
+        }
+      }
+  
+      // ✅ Ensure that both legend and showInLegend are updated correctly
+      const updatedHighchartsOptionsJson = {
+        ...tempParsed,
+        title: {
+          ...tempParsed.title,
+          text: this.createChart.value.chart_title || ''
+        },
+        legend: {
+          ...tempParsed.legend,
+          enabled: this.createChart.value.enableLegends // ✅ Ensure legend updates correctly
+        },
+        plotOptions: {
+          ...tempParsed.plotOptions,
+          series: {
+            ...tempParsed.plotOptions.series,
+            showInLegend: this.createChart.value.enableLegends // ✅ Ensure legend appears for series
+          }
+        }
+      };
+  
+      console.log('updatedHighchartsOptionsJson check', updatedHighchartsOptionsJson);
+      this.chartFinalOptions =JSON.stringify(updatedHighchartsOptionsJson,null,4)
+console.log('this.chartFinalOptions check',this.chartFinalOptions)
+      
+      // ✅ Store as an OBJECT (not string)
+      // this.chartFinalOptions = updatedHighchartsOptionsJson;
+  
+      console.log('this.chartFinalOptions check', this.chartFinalOptions);
+  
+      // ✅ Update the tile object
       const updatedTile = {
         ...this.dashboard[this.editTileIndex], // Keep existing properties
-
-
-   
-    chart_title: this.createChart.value.chart_title,
-    // fontSize: this.createChart.value.fontSize,
-    // themeColor: this.createChart.value.themeColor,
-    // fontColor: this.createChart.value.fontColor,
-    chartConfig: this.createChart.value.all_fields ||'',
-    highchartsOptionsJson: this.chartFinalOptions,
-    filterParameter:this.createChart.value.filterParameter ||'',
-    filterDescription:this.createChart.value.filterDescription ||'',
-    toggleCheck:this.createChart.value.toggleCheck ||'',
-    dashboardIds:this.createChart.value.dashboardIds ||'',
-    selectType: this.createChart.value.selectType ||'',
-    miniForm:this.createChart.value.miniForm || '',
-    MiniTableNames:this.createChart.value.MiniTableNames ||'',
-    MiniTableFields:this.createChart.value.MiniTableFields ||'',
-    minitableEquation:this.createChart.value.minitableEquation ||'',
-    EquationOperationMini:this.createChart.value.EquationOperationMini ||'',
-    add_fields:this.createChart.value.add_fields ||'',
-
-    // filterForm:this.createChart.value.filterForm,
-    // filterParameter:this.createChart.value.filterParameter,
-    // filterDescription:this.createChart.value.filterDescription,
-    // Include noOfParams
-    noOfParams:this.dashboard[this.editTileIndex].noOfParams,
-
-
+        chart_title: this.createChart.value.chart_title,
+        chartConfig: this.createChart.value.all_fields || '',
+        highchartsOptionsJson: this.chartFinalOptions, // ✅ Store as an object, not string
+        enableLegends: this.createChart.value.enableLegends || '',
+        toggleCheck: this.createChart.value.toggleCheck || '',
+        dashboardIds: this.createChart.value.dashboardIds || '',
+        selectType: this.createChart.value.selectType || '',
+        miniForm: this.createChart.value.miniForm || '',
+        MiniTableNames: this.createChart.value.MiniTableNames || '',
+        MiniTableFields: this.createChart.value.MiniTableFields || '',
+        minitableEquation: this.createChart.value.minitableEquation || '',
+        EquationOperationMini: this.createChart.value.EquationOperationMini || '',
+        add_fields: this.createChart.value.add_fields || '',
+        noOfParams: this.dashboard[this.editTileIndex].noOfParams
       };
+  
       console.log('updatedTile checking', updatedTile);
   
-      // Update the dashboard array using a non-mutative approach
+      // ✅ Update the dashboard array without mutating it
       this.dashboard = [
         ...this.dashboard.slice(0, this.editTileIndex),
         updatedTile,
-        ...this.dashboard.slice(this.editTileIndex + 1),
+        ...this.dashboard.slice(this.editTileIndex + 1)
       ];
   
-      console.log('Updated Tile Details:', this.dashboard[this.editTileIndex]);
-  
-      // Update the grid_details as well
+      // ✅ Update the packet store
       this.all_Packet_store.grid_details[this.editTileIndex] = {
         ...this.all_Packet_store.grid_details[this.editTileIndex],
         ...updatedTile,
       };
-      console.log(
-        '  this.all_Packet_store.grid_details[this.editTileIndex]',
-        this.all_Packet_store.grid_details[this.editTileIndex]
-      );
-      console.log('this.dashboard checking from gitproject', this.dashboard);
-      this.grid_details = this.dashboard;
-      this.dashboardChange.emit(this.grid_details);
   
-      if (this.grid_details) {
-        this.updateSummary(this.all_Packet_store,'update_tile');
-      }
-      this.cdr.detectChanges()
-  
-      console.log('this.dashboard check from updateTile', this.dashboard);
+      console.log('Updated Tile Details:', this.dashboard[this.editTileIndex]);
       console.log('Updated all_Packet_store.grid_details:', this.all_Packet_store.grid_details);
   
-      // Reset the editTileIndex after the update
+      // ✅ Force chart update dynamically
+
+  
+      // ✅ Refresh the UI
+      this.grid_details = this.dashboard;
+      this.dashboardChange.emit(this.grid_details);
+      
+      if (this.grid_details) {
+        this.updateSummary(this.all_Packet_store, 'update_tile');
+      }
+      
+      this.cdr.detectChanges();
+  
+      console.log('this.dashboard check from updateTile', this.dashboard);
+      
+      // Reset the edit index
       this.editTileIndex = null;
     } else {
       console.error('Edit index is null. Unable to update the tile.');
     }
   }
+  
   
 
   selectedSettingsTab(tab: string) {
@@ -756,7 +806,8 @@ this.cd.detectChanges()
       MiniTableNames:tile.MiniTableNames ||'',
       MiniTableFields: [parsedMiniTableFields],
       minitableEquation:tile.minitableEquation,
-      EquationOperationMini:tile.EquationOperationMini, 
+      EquationOperationMini:tile.EquationOperationMini,
+      enableLegends:tile.enableLegends
     });
 
     console.log('Updated all_fields:', this.all_fields);
@@ -1689,6 +1740,8 @@ FormatTypeValues = [
   { value: 'Years', text: 'Years' },
   {value:'Label With Value',text:'Label With Value'},
   { value: 'Percentage', text: 'Percentage' },
+  { value: 'Rupee with Percentage', text: 'Rupee with Percentage' },
+
 
 
 ]

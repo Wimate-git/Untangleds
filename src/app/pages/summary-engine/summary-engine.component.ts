@@ -70,6 +70,7 @@ import { TileWithIconComponent } from 'src/app/_metronic/partials/content/my-wid
 import { PieChartConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/pie-chart-config/pie-chart-config.component';
 import { StackedBarConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/stacked-bar-config/stacked-bar-config.component';
 import { AuthService } from 'src/app/modules/auth';
+import { MixedChartConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/mixed-chart-config/mixed-chart-config.component';
 
 
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
@@ -180,6 +181,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   
   @ViewChild(Chart2ConfigComponent, { static: false }) ChartConfig2Component: Chart2ConfigComponent;
   @ViewChild(Chart3ConfigComponent, { static: false }) ChartConfig3Component: Chart3ConfigComponent;
+  @ViewChild(MixedChartConfigComponent, { static: false }) MixedChartConfigComponent: MixedChartConfigComponent;
   @ViewChild(Chart4ConfigComponent, { static: false }) ChartConfig4Component: Chart4ConfigComponent;
   @ViewChild(Chart5ConfigComponent, { static: false }) ChartConfig5Component: Chart5ConfigComponent;
   @ViewChild('summaryModal') summaryModal!: TemplateRef<any>;
@@ -2830,9 +2832,9 @@ exitFullScreen(): void {
       }
       else{
         this.route.queryParams.subscribe(async (params) => {
-        if(params['uid']){
-          console.log('uid checking',params['uid'])
-          this.userId = params['uid']
+        if(params['uID']){
+          console.log('uid checking',params['uID'])
+          this.userId = params['uID']
           
         }
         if(params['pass']){
@@ -3979,7 +3981,16 @@ justReadStyles(data:any,index:any){
       }, 500);
 
     }
+    else if(event.arg1.grid_type=='mixedChart'){
+      this.modalService.open(KPIModal, { size: 'xl' });
+      console.log('event check', event)
+      setTimeout(() => {
+        this.MixedChartConfigComponent.openMixedChartModal(event.arg1, event.arg2)
+      }, 500);
 
+    }
+
+    
     else if(event.arg1.grid_type=='Areachart'){
       this.modalService.open(KPIModal, { size: 'xl' });
       console.log('event check', event)
@@ -4287,6 +4298,22 @@ justReadStyles(data:any,index:any){
 
 
     }
+    else if(event.data.arg1.grid_type=='mixedChart'){
+      console.log('event check', event)
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
+
+
+    }
+
+
+
+    
         else if(event.data.arg1.grid_type=='Areachart'){
       console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
@@ -7436,6 +7463,12 @@ refreshFunction(){
 
   openChartModal3(ChartModal3: TemplateRef<any>,modal:any) {
     this.modalService.open(ChartModal3, { size: 'xl' });
+    modal.dismiss();
+  }
+
+
+  openMixedChartModal(MixedChartModal: TemplateRef<any>,modal:any) {
+    this.modalService.open(MixedChartModal, { size: 'xl' });
     modal.dismiss();
   }
 

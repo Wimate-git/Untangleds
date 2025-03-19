@@ -33,8 +33,9 @@
           [style.font-size]="item.fontSize"
           [style.color]="item.fontColor" 
           style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-          {{130}}
-          <!-- {{ dataDisplay?.processed_value && dataDisplay.processed_value !== '' ? dataDisplay.processed_value : '0' }} -->
+          
+    
+          {{dataDisplay2?.processed_value}}
         </div>
         <!-- Custom Label -->
         <div    class="processed-value-container" 
@@ -42,7 +43,7 @@
     
           [style.color]="item.fontColor" 
           style="font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-          {{ dataDisplay?.custom_Label || '' }}
+          {{ dataDisplay2?.custom_Label || '' }} 
         </div>
 
 
@@ -57,7 +58,8 @@
 
       [style.color]="item.fontColor" 
       style="font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;margin-top: 30px;">
-      {{130}} {{ dataDisplay2?.custom_Label || '' }} 
+      {{ dataDisplay?.processed_value && dataDisplay.processed_value !== '' ? dataDisplay.processed_value : '0' }}   {{ dataDisplay?.custom_Label || '' }}
+     <!-- {{dataDisplay2?.processed_value}} {{ dataDisplay2?.custom_Label || '' }}  -->
     </div>
     <div 
      
@@ -71,11 +73,12 @@
       <div class="position-relative w-100">
         <!-- Percentage Text Above & Right -->
         <div 
-          class="position-absolute end-0 text-white fw-bold" 
-          style="top: -25px; right: 5px;"
-        >
-          {{ calculatedPercentage }}%
-        </div>
+        class="position-absolute text-white fw-bold" 
+        style="top: -25px; right: 5px;"
+      >
+        {{ calculatedPercentage }}%
+      </div>
+      
       
         <!-- Progress Bar -->
          <div class="d-flex align-items-center flex-column mt-3 w-100">
@@ -87,7 +90,7 @@
               aria-valuemin="0"
               aria-valuemax="100"
               class="bg-white rounded h-15px d-flex align-items-center justify-content-center text-dark fw-bold"
-              [style.width.%]="90"
+              [style.width.%]="calculatedPercentage"
             >
             <!-- {{ 90 }}% -->
           
