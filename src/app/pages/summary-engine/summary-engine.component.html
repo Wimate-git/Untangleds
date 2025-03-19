@@ -2,17 +2,17 @@
 
 <div class="d-flex align-items-center me-2 mb-7" *ngIf="!isSummaryEngine()" style="gap: 10px;">
   <!-- Green button -->
-  <button *ngIf="!isGirdMoved && summaryDashboardUpdate && isSummaryEngine()" type="button" class="btn fw-bold btn-success translateyr"
+  <button *ngIf="!isGirdMoved && summaryDashboardUpdate " type="button" class="btn fw-bold btn-success translateyr"
     ngbTooltip="To save dashboard position" (click)="positionSave()">All changes are saved</button>
   
   <!-- Red button -->
-  <button *ngIf="isGirdMoved && summaryDashboardUpdate && isSummaryEngine()" type="button" class="btn fw-bold btn-danger translateyr"
+  <button *ngIf="isGirdMoved && summaryDashboardUpdate " type="button" class="btn fw-bold btn-danger translateyr"
     ngbTooltip="Unsaved changes. Click to save." (click)="positionSave()">
     {{ getLastSavedMessage() }}.
   </button>
 
   <!-- Last Updated Time button -->
-  <button *ngIf="isSummaryEngine()" type="button" class="btn fw-bold btn-primary translateyr" ngbTooltip="Last Updated Time">
+  <button  type="button" class="btn fw-bold btn-primary translateyr" ngbTooltip="Last Updated Time">
     Last Updated Time: {{lastUpdatedTime}}
   </button>
 </div>
@@ -67,7 +67,7 @@
 
 
       
-        <div #gridsterContainer *ngIf="isSummaryEngine()">
+        <div #gridsterContainer >
 
           <div class="card" style="width: 100%; height: 100vh; background-color: var(--bs-app-bg-color) !important;">
             <div class="card-body p-0 pb-0"
