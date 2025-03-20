@@ -10,6 +10,7 @@ import { Subscription } from 'rxjs';
 import { LayoutService } from './core/layout.service';
 import { LayoutInitService } from './core/layout-init.service';
 import { ILayout, LayoutType } from './core/configs/config';
+import { SharedService } from 'src/app/pages/shared.service';
 
 @Component({
   selector: 'app-layout',
@@ -63,6 +64,10 @@ export class LayoutComponent implements OnInit, OnDestroy {
   appFooterFixedDesktop: boolean;
   appFooterFixedMobile: boolean;
 
+  private subscription: Subscription;
+  receivedData: any;
+  appDisplay:boolean;
+
   // scrolltop
   scrolltopDisplay: boolean;
 
@@ -74,8 +79,35 @@ export class LayoutComponent implements OnInit, OnDestroy {
     private initService: LayoutInitService,
     private layout: LayoutService,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private getDreamBoard:SharedService
   ) {
+
+
+    this.subscription = this.getDreamBoard.getValue().subscribe((data:any) => {
+      this.receivedData = data;
+      console.log("RECIEVED DATA",this.receivedData)
+      if(this.receivedData!=null){
+        this.appDisplay=this.receivedData
+        //.add('disabled');
+        console.log("ENTERED")
+        document.getElementById('kt_app_wrapper')?.classList.remove('app-wrapper');
+      }
+      else{
+        this.appDisplay=true
+        document.getElementById('kt_app_wrapper')?.classList.add('app-wrapper');
+      }
+    });
+
+
+
+
+
+
+
+
+
+
     // define layout type and load layout
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {

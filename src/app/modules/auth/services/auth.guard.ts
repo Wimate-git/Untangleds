@@ -26,6 +26,7 @@ export class AuthGuard  {
       console.log(test)
       if(test===true){
         console.log(state.url)
+        this.getPermission.setValue(false);
         return true
       }
     }

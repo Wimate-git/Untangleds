@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { firstValueFrom, Observable } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
 import { EncriptionServiceService } from './encription-service.service';
 import { AuthService } from '../modules/auth';
 import { CognitoUser } from 'amazon-cognito-identity-js';
@@ -21,11 +21,22 @@ export class SharedService {
   userClientID: any;
   userClientIDCognito: any;
 
+  private myBehaviorSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+
   apiUrl = 'https://vux77bi1vi.execute-api.ap-south-1.amazonaws.com/default/api_for_Batch';
 
   constructor(private http: HttpClient,private encryption: EncriptionServiceService,private authService:AuthService,private api:APIService) { }
 
   dropdownSettings: {};
+
+
+  setValue(value: any) {
+    this.myBehaviorSubject.next(value);
+  }
+  getValue() {
+    return this.myBehaviorSubject.asObservable();
+  }
+
 
 
 
@@ -135,10 +146,9 @@ export class SharedService {
   }
 
 
-
   async submit(username:any,password:any){
-    // username = this.encryption.decryptValue(username)
-    // password = this.encryption.decryptValue(password)
+    username = this.encryption.decryptValue(username)
+    password = this.encryption.decryptValue(password)
 
     await signOut()
     .then(() => {
