@@ -496,7 +496,7 @@
   </div>
   
   
-  <div class="col-xl-5" *ngIf="!editButtonCheck">
+  <div class="col-xl-5" *ngIf="!editButtonCheck && !shouldHideYouTube()">
     <div id="kt_player_widget_2" class="card card-flush h-xl-100">
       <div class="card-body card-rounded bg-black pt-0" style="padding: 0px !important;">
         <iframe
@@ -619,7 +619,7 @@
                   </span>
                 </td>
                 <td class="text-start">
-                  <a href="javascript:void(0);" (click)="viewItem(item.P1); $event.preventDefault()"
+                  <a href="javascript:void(0);" (click)="viewItem(item.P1,item); $event.preventDefault()"
                     class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary w-30px h-30px">
                     <i class="ki-duotone ki-black-right fs-2 text-gray-500"></i>
                   </a>

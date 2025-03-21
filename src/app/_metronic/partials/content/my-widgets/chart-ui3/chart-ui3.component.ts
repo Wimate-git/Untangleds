@@ -40,6 +40,9 @@ export class ChartUi3Component implements OnInit{
   isMobile: boolean = false;
   mobileChartWidth: number = window.innerWidth * 0.85;  // Custom mobile width
   mobileChartHeight: number = window.innerWidth * 0.87; 
+  iframeUrl: any;
+  selectedMarkerIndex: any;
+  tile1Config: any;
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
@@ -135,7 +138,7 @@ export class ChartUi3Component implements OnInit{
       //   };
       // });
      
-
+      this.tile1Config = this.item;
     
   }
   constructor(
@@ -390,7 +393,38 @@ createColumnChart(columnChartData?:any){
 
 }
 
+helperDashboard(item:any,index:any,modalContent:any,selectType:any){
+  console.log('selectType checking dashboard',selectType)
+  console.log('item checking from ',item)
+  // if (typeof this.item.chartConfig === 'string') {
+  //   this.gridOptions = JSON.parse(this.item.chartConfig);
+  // } else {
+  //   this.gridOptions = this.item.chartConfig; // Already an object
+  // }
+  const viewMode = true;
+  const disableMenu = true
 
-  
+
+console.log('this.gridOptions checking from chart',this.gridOptions)
+  localStorage.setItem('isFullScreen', JSON.stringify(true));
+  const modulePath = this.item.dashboardIds; // Adjust with your module route
+  console.log('modulePath checking from chart',modulePath)
+  const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}`;
+  this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(window.location.origin +"/summary-engine/"+ modulePath+queryParams);
+this.selectedMarkerIndex = index
+if (selectType === 'NewTab') {
+// Open in a new tab
+window.open(this.iframeUrl.changingThisBreaksApplicationSecurity, '_blank');
+} else if(selectType === 'Modal'){
+// Open in the modal
+this.modalService.open(modalContent, { size: 'xl' });
+}
+
+
+}
+
+closeModal() {
+  this.modalService.dismissAll(); // Close the modal programmatically
+}
 
 }

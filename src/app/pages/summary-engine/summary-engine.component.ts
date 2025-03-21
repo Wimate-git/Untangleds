@@ -72,6 +72,7 @@ import { StackedBarConfigComponent } from 'src/app/_metronic/partials/content/my
 import { AuthService } from 'src/app/modules/auth';
 import { MixedChartConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/mixed-chart-config/mixed-chart-config.component';
 import * as CryptoJS from 'crypto-js';
+import { FullscreenService } from '../report-studio/services/fullscreen.service';
 
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
@@ -89,7 +90,8 @@ interface ListItem {
     P7: any;
     P8: any;
     P9: any;
-    P10:any
+    P10:any;
+    P11:any;
   };
 }
 interface RowData {
@@ -343,6 +345,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   viewFullScreenCheck: any;
   userId: any;
   userPass: any;
+  storeSummaryMainData: any;
 
   createPieChart() {
     const chartOptions: any = {
@@ -2548,7 +2551,7 @@ exitFullScreen(): void {
   constructor(private summaryConfiguration: SharedService, private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector, private auditTrail: AuditTrailService,
     private spinner: NgxSpinnerService, private zone: NgZone,private http: HttpClient,  private sanitizer: DomSanitizer, // Inject DomSanitizer
-    private titleService: Title, private summaryService: SummaryEngineService,private blobService: BlobService,private renderer: Renderer2,private authservice: AuthService
+    private titleService: Title, private summaryService: SummaryEngineService,private blobService: BlobService,private renderer: Renderer2,private authservice: AuthService, private fullscreenService: FullscreenService
   ) {
     this.resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
@@ -2789,14 +2792,47 @@ exitFullScreen(): void {
     this.route.data.subscribe(data => {
       this.titleService.setTitle(data['title']); // Set tab title dynamically
     });
-
+    // this.createSummaryField.get('fullScreenModeCheck')?.valueChanges.subscribe((newValue) => {
+    //   console.log('Always Full Screen changed:', newValue);
+    // });
     this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
     console.log('this.getLoggedUser read for redirect',this.getLoggedUser)
+
 
     this.SK_clientID = this.getLoggedUser.clientID;
     console.log('this.SK_clientID check', this.SK_clientID)
     this.userdetails = this.getLoggedUser.username;
     console.log('user name permissions check',this.userdetails)
+    const isFullscreen = this.summaryService.getFullscreen();
+    if (isFullscreen) {
+      this.enterFullscreenMode(); // Your logic to make it fullscreen (e.g., adding class, resizing layout etc.)
+    }
+
+    // this.toggleFullScreenFullView(true);
+console.log('this.route checing on top',this.route)
+
+this.fetchCompanyLookupdata(1)
+    .then((data: any) => {
+      console.log("Final lookup data received in ngOnInit:", data);
+      // Use `data` as needed here
+    })
+    .catch((error: any) => {
+      console.error("Error fetching lookup data:", error);
+    });
+
+const fullUrl = this.router.routerState.snapshot.url; // Get full URL string
+  const segments = fullUrl.split('/'); // Split by '/'
+
+  const summaryIndex = segments.indexOf('summary-engine');
+  if (summaryIndex !== -1 && segments.length > summaryIndex + 1) {
+    const id = segments[summaryIndex + 1]; // Get the next segment after 'summary-engine'
+    console.log('Extracted ID:', id);
+
+this.fetchSummaryMain(id)
+
+  }
+
+
 
 
     
@@ -2925,6 +2961,7 @@ exitFullScreen(): void {
       }
       else{
         this.route.queryParams.subscribe(async (params) => {
+          console.log('userparams checking from onInit',params)
         if(params['uID']){
           console.log('uid checking',params['uID'])
           this.userId = params['uID']
@@ -2967,7 +3004,7 @@ exitFullScreen(): void {
     this.fetchLiveContractlookup(1)
     this.fetchContractOrderMasterlookup(1)
     this.permissionIds(1)
-    this.fetchCompanyLookupdata(1)
+
     this.applyTheme(); // Initial check
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', this.applyTheme.bind(this));
     // this.fetchCalender()
@@ -3029,6 +3066,45 @@ this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
 
 
   }
+
+
+  enterFullscreenMode() {
+    // Your fullscreen logic here, e.g.
+    document.body.classList.add('fullscreen-layout');
+  }
+  fetchSummaryMain(receiveId:any){
+    console.log('receiveId checking',receiveId)
+
+
+    // this.toggleFullScreenFullView(true);
+    this.api
+    .GetMaster(`${this.SK_clientID}#${receiveId}#summary#main`, 1)
+    .then((result: any) => {
+      if (result && result.metadata) {
+        const parsedMetadata = JSON.parse(result.metadata);
+       this.storeSummaryMainData = parsedMetadata
+        console.log('parsedMetadata check', this.storeSummaryMainData);
+        const readFullScreenCheck = this.storeSummaryMainData.fullScreenModeCheck
+        // const readFormControl =this.createSummaryField.get('fullScreenModeCheck')?.value
+        // console.log('readFormControl checking',readFormControl)
+        if(readFullScreenCheck==true){
+             this.toggleFullScreenFullView(true);
+
+
+        }
+        console.log('readFullScreenCheck checking',readFullScreenCheck)
+
+      }else{
+  
+      }
+    })
+    .catch((err) => {
+      console.log("Can't fetch", err);
+    });
+
+
+  }
+
 
 
   getBodyColor(): string {
@@ -3223,6 +3299,7 @@ this.http.post(apiUrl, requestBody).subscribe(
 }
 
 
+
   async fetchPermissionIdMain(clientID: number, p1Value: string): Promise<void> {
 
     try {
@@ -3297,70 +3374,57 @@ this.http.post(apiUrl, requestBody).subscribe(
 }
 
 
-
-fetchCompanyLookupdata(sk:any):any {
+fetchCompanyLookupdata(sk: any): Promise<any[]> {
   console.log("I am called Bro");
-  
+
   return new Promise((resolve, reject) => {
     this.api.GetMaster(this.SK_clientID + "#summary" + "#lookup", sk)
       .then(response => {
         if (response && response.options) {
-          // Check if response.options is a string
           if (typeof response.options === 'string') {
             let data = JSON.parse(response.options);
             console.log("d1 =", data);
-            
-            if (Array.isArray(data)) {
-              const promises = []; // Array to hold promises for recursive calls
 
+            if (Array.isArray(data) && data.length > 0) {
               for (let index = 0; index < data.length; index++) {
                 const element = data[index];
-
-                if (element !== null && element !== undefined) {
-                  // Extract values from each element and push them to lookup_data_user
-                  const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
-                  const { P1, P2, P3, P4, P5, P6,P7 ,P8,P9,P10} = element[key]; // Extract values from the nested object
-                 this.lookup_data_summary.push({ P1, P2, P3, P4, P5, P6,P7,P8,P9,P10 }); // Push an array containing P1, P2, P3, P4, P5, P6
-                  console.log("d2 =", this.lookup_data_summary);
-                } else {
-                  break;
+                if (element) {
+                  const key = Object.keys(element)[0];
+                  const { P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11 } = element[key];
+                  this.lookup_data_summary.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11 });
                 }
               }
 
-              // Sort the lookup_data_user array based on P5 values in descending order
-              console.log("Summary LookupData", this.lookup_data_summary);
-              this.lookup_data_summary.sort((a: { P5: number; }, b: { P5: number; }) => b.P5 - a.P5);
-              console.log("Lookup sorting", this.lookup_data_summary);
+              console.log("d2 =", this.lookup_data_summary);
 
-              // Continue fetching recursively
-              promises.push(this.fetchCompanyLookupdata(sk + 1)); // Store the promise for the recursive call
-              
-              // Wait for all promises to resolve
-              Promise.all(promises)
-                .then(() => resolve(this.lookup_data_summary)) // Resolve with the final lookup data
-                .catch(reject); // Handle any errors from the recursive calls
+              this.lookup_data_summary.sort((a: { P5: number; }, b: { P5: number; }) => b.P5 - a.P5);
+
+              // Recursive call and return the combined result
+              this.fetchCompanyLookupdata(sk + 1)
+                .then(() => resolve(this.lookup_data_summary))
+                .catch(reject);
             } else {
-              console.error('Invalid data format - not an array.');
-              reject(new Error('Invalid data format - not an array.'));
+              console.log("No more data to fetch.");
+              this.listofSK = this.lookup_data_summary.map((item: { P1: any; }) => item.P1);
+              resolve(this.lookup_data_summary);
             }
           } else {
-            console.error('response.options is not a string.');
             reject(new Error('response.options is not a string.'));
           }
         } else {
+          // Base condition when no options are present
           console.log("All the users are here", this.lookup_data_summary);
-
-          this.listofSK = this.lookup_data_summary.map((item:any)=>item.P1)
-
-          resolve(this.lookup_data_summary); // Resolve with the current lookup data
+          this.listofSK = this.lookup_data_summary.map((item: { P1: any; }) => item.P1);
+          resolve(this.lookup_data_summary);
         }
       })
       .catch(error => {
         console.error('Error:', error);
-        reject(error); // Reject the promise on error
+        reject(error);
       });
   });
 }
+
 
 
 processFetchedData(result: any): void {
@@ -3572,10 +3636,36 @@ setTimeout(() => {
     this.updateSummary('', 'Save');
   }
   redirectToSummaryEngine(): void {
-    if (this.router.url !== '/summary-engine') {
-      this.router.navigate(['/summary-engine']);
-    }
+    this.route.queryParams.subscribe(async (params) => {
+      let queryParams: any = {}; // Object to hold query params
+  
+      if (params['uID']) {
+        console.log('uid checking', params['uID']);
+        this.userId = params['uID'];
+        queryParams.uID = this.userId;
+      }
+  
+      if (params['pass']) {
+        console.log('pass checking', params['pass']);
+        this.userPass = params['pass'];
+        queryParams.pass = this.userPass;
+  
+        // Perform authentication
+        // const user = await this.authservice.signIn((this.userId).toLowerCase(), this.userPass);
+        // console.log('user check query', user);
+        this.hideSummaryGridster = true;
+      }
+  
+      console.log('this.userId query params check from home redirection', this.userId);
+      console.log('this.userPass query params check from home redirection', this.userPass);
+  
+      // Navigate to summary-engine with or without query params
+      if (this.router.url !== '/summary-engine') {
+        this.router.navigate(['/summary-engine'], { queryParams: Object.keys(queryParams).length ? queryParams : undefined });
+      }
+    });
   }
+  
 
 
   
@@ -3608,7 +3698,14 @@ setTimeout(() => {
   
   
   
-
+  shouldHideYouTube(): boolean {
+    const urlWithoutQueryParams = this.router.url.split('?')[0];
+    const queryParams = this.route.snapshot.queryParams;
+    const queryKeys = Object.keys(queryParams);
+  
+    return urlWithoutQueryParams.endsWith('/summary-engine') && queryKeys.length > 0;
+  }
+  
 
   hideTooltips() {
 
@@ -3617,12 +3714,22 @@ setTimeout(() => {
     this.modalService.open(createcontent, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
   }
 
-  viewItem(id: string): void {
+  viewItem(id: string,receivePacket?:any): void {
     console.log('this.userId checking from redirect', this.userId);
     console.log('this.userPass checking from redirect', this.userPass);
     console.log('this.all_Packet_store check viewItem', this.lookup_data_summaryCopy);
+    console.log('receivePacket checvking',receivePacket)
+    const checkP11 = receivePacket.P11
+    console.log('checkP11 checking',checkP11)
+    if (checkP11 === true) {
+      this.fullscreenService.setFullscreen(true);
+    } else {
+      this.fullscreenService.setFullscreen(false);
+    }
+    
 
-    this.setFullscreen();
+
+    // this.setFullscreen();
 
     // Prepare query parameters only if they exist
     let queryParams: any = {};
@@ -3643,6 +3750,7 @@ setTimeout(() => {
         this.openModalHelpher(id)
     } else {
         this.router.navigate([`/summary-engine/${id}`]);
+        // this.toggleFullScreenFullView(true);
     }
 
     this.cdr.detectChanges();
@@ -5094,7 +5202,8 @@ console.log('selectedTab checking',this.selectedTab)
       P7: this.getLoggedUser.username,
       P8: JSON.stringify(this.allCompanyDetails.iconObject),
       P9: this.allCompanyDetails.summaryIcon,
-      P10:''
+      P10:'',
+      P11:this.allCompanyDetails.fullScreenModeCheck
     };
   
     // API call to create the summary
@@ -5586,8 +5695,8 @@ console.log('selectedTab checking',this.selectedTab)
 
                   if (element !== null && element !== undefined) {
                     const key = Object.keys(element)[0];
-                    const { P1, P2, P3, P4, P5, P6, P7, P8, P9 ,P10} = element[key];
-                    this.lookup_data_summary1.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9,P10 });
+                    const { P1, P2, P3, P4, P5, P6, P7, P8, P9 ,P10,P11} = element[key];
+                    this.lookup_data_summary1.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9,P10,P11 });
                     console.log("d2 =", this.lookup_data_summary1);
                   } else {
                     break; // This may need refinement based on your data structure
@@ -6036,7 +6145,8 @@ console.log('Serialized Query Params:', serializedQueryParams);
       P7: this.extractUserName || value.P7,
       P8: this.previewObjDisplay ? JSON.stringify(this.previewObjDisplay) : value.P8,
       P9: this.allCompanyDetails.iconSelect || value.P9,
-      P10: this.allCompanyDetails.PinCheck || this.PinCheck
+      P10: this.allCompanyDetails.PinCheck || this.PinCheck,
+      P11:this.allCompanyDetails.fullScreenModeCheck ||value.P11
     };
     
   
@@ -6270,7 +6380,8 @@ console.log('Serialized Query Params:', serializedQueryParams);
       MiniTableFields:this.formatField(tile.MiniTableFields),
       filterParameterLine:this.formatField(tile.filterParameterLine),
       parameterNameHTML:this.formatField(tile.parameterNameHTML),
-      table_rowConfig:this.formatField(tile.table_rowConfig)
+      table_rowConfig:this.formatField(tile.table_rowConfig),
+      DrillConfig:this.formatField(tile.DrillConfig)
   
       // parameterName:this.formatField(tile.parameterName)
 
@@ -6384,6 +6495,7 @@ this.createSummaryField.patchValue({
       P8: JSON.stringify(this.previewObjDisplay) ||'',
       P9: this.createSummaryField.value.iconSelect, // Add selected icon
       P10:this.createSummaryField.value.PinCheck ||'',
+      P11:this.createSummaryField.value.fullScreenModeCheck
     };
     console.log('items checking from create Summary',items)
 
@@ -6608,7 +6720,7 @@ this.createSummaryField.patchValue({
 refreshFunction(){
   if (this.routeId) {
     console.log('this.routeId check',this.routeId)
-    this.checkAndSetFullscreen();
+    // this.checkAndSetFullscreen();
     this.editButtonCheck = true
 
     // this.openModalHelpher(this.routeId)
@@ -6658,8 +6770,8 @@ refreshFunction(){
 
               if (element !== null && element !== undefined) {
                 const key = Object.keys(element)[0];
-                const { P1, P2, P3, P4, P5, P6, P7, P8, P9,P10 } = element[key];
-                this.lookup_data_client.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9,P10 });
+                const { P1, P2, P3, P4, P5, P6, P7, P8, P9,P10,P11 } = element[key];
+                this.lookup_data_client.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9,P10,P11 });
                 console.log("d2 =", this.lookup_data_client);
               } else {
                 break;

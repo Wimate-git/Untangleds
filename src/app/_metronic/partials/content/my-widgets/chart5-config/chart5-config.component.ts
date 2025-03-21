@@ -1323,7 +1323,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     { value: 'Monthly', text: 'Monthly' },
     { value: 'Day of Month', text: 'Day of Month' },
     { value: 'Yearly', text: 'Yearly' },
-    { value: 'Any', text: 'Any' }
+    { value: 'Any', text: 'any' }
   ];
   onValueChange(selectedValue: any): void {
     console.log('selectedValue check', selectedValue[0].value);  // Log the selected value

@@ -10,7 +10,17 @@ export class SummaryEngineService {
 
   constructor() { }
 
+  private fullscreenSubject = new BehaviorSubject<boolean>(false);
+  fullscreen$ = this.fullscreenSubject.asObservable();
 
+  setFullscreen(value: boolean) {
+    localStorage.setItem('fullscreen', value.toString());
+    this.fullscreenSubject.next(value);
+  }
+
+  getFullscreen(): boolean {
+    return localStorage.getItem('fullscreen') === 'true';
+  }
   private lookUpDataSubject = new BehaviorSubject<any>(null);
 
   // Observable for components to subscribe to
