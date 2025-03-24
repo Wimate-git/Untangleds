@@ -800,7 +800,7 @@
     
     <!-- New Full View Icon -->
     <a class="myMenu-item full-view-btn" *ngIf="!isSummaryEngine()"  
-    (click)="toggleFullScreenFullView()" 
+    (click)="toggleFullScreenFullView(!isFullScreen)" 
     style="cursor: pointer;" 
     [attr.title]="isFullScreen ? 'Exit Full View' : 'Full View'">
     <i style="color: white;" class="fa" [ngClass]="{'fa-expand': !isFullScreen, 'fa-compress': isFullScreen}"></i>
@@ -875,20 +875,22 @@
   [reload]="reloadEvent">
 </app-crud-summary> -->
 
-<app-crud-summary 
-
-  [datatableConfig]="datatableConfig" 
+<app-crud-summary
+  [datatableConfig]="datatableConfig"
   route="/summary-engine"
   (deleteEvent)="handleDelete($event)"
-  (editEvent)="edit($event)" 
-  (createEvent)="create()" 
+  (editEvent)="edit($event)"
+  (createEvent)="create()"
   [reload]="reloadEvent"
   [summaryDashboardUpdate]="summaryDashboardUpdate"
   [summaryDashboardView]="summaryDashboardView"
-  [userPermission]="userPermission"
-
-  >
+  [userPermission]="userPermission" class="table-responsive">
+  <div class="datatable-container" >
+    <!-- The table content will be rendered inside this container -->
+    <!-- The table will be horizontally scrollable on mobile -->
+  </div>
 </app-crud-summary>
+
 
 
         <table #dataTable class="table table-striped table-bordered"></table>

@@ -1170,6 +1170,27 @@ gridster-item {
   transition: background 0.3s ease-in-out; /* Smooth transition */
 }
 
+@media (max-width: 768px) {
+  .datatable-container {
+    overflow-x: auto; /* Enable horizontal scrolling */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling for mobile */
+  }
+
+  .datatable-container table {
+    width: 100%; /* Ensure the table spans the container */
+    min-width: 600px; /* Set a minimum width for the table if needed */
+    table-layout: fixed; /* Prevent the table from adjusting its columns */
+  }
+
+  .datatable-container th,
+  .datatable-container td {
+    white-space: nowrap; /* Prevent text from wrapping */
+    text-overflow: ellipsis; /* Adds ellipsis when the content is too long */
+    overflow: hidden; /* Hides overflowed content */
+  }
+}
+
+
 
 
 

@@ -346,6 +346,9 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   userId: any;
   userPass: any;
   storeSummaryMainData: any;
+  storeFullScreen: any;
+  readLookupData: any;
+  storeCheck: any;
 
   createPieChart() {
     const chartOptions: any = {
@@ -1005,6 +1008,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
  isDashboardConfigured: boolean = true;
 
  isFullScreen:boolean =false;
+//  isFullScreenFinal:boolean =false;
 //  // Track the fullscreen state
 
   isFullView = false;   // Track if the icon is in full view mode
@@ -1391,19 +1395,20 @@ liveDashboardDataFormat(processedData: any) {
 }
 
 
-checkAndSetFullscreen(): void {
-    const isFullscreen = localStorage.getItem('fullscreen') === 'true';
+checkAndSetFullscreen(receiveFullScreenCheck:any): void {
+    const isFullscreen = receiveFullScreenCheck
     console.log('isFullscreen check:', isFullscreen);
 
     // Update the fullscreen state and related flags
     this.isFullscreen = isFullscreen;
+    // this.isFullScreenFinal = receiveFullScreenCheck
     this.hidingLink = isFullscreen;
-
-    if (isFullscreen) {
-        this.toggleFullScreenFullView(true); // Enter fullscreen directly
-    } else {
-        this.toggleFullScreenFullView(false); // Exit fullscreen
-    }
+    this.toggleFullScreenFullView(isFullscreen);
+    // if (isFullscreen) {
+    //     this.toggleFullScreenFullView(true); // Enter fullscreen directly
+    // } else {
+    //     this.toggleFullScreenFullView(false); // Exit fullscreen
+    // }
 }
 invokeHelperDashboard(item: any, index: number, template: any,modaref:any): void {
   console.log('item check for switch case',item)
@@ -1699,20 +1704,48 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
         console.log('Authentication Params Found:', params);
         this.userId = params['uID'];
         this.userPass = params['pass'];
-  
+    
         const user = await this.authservice.signIn(this.userId.toLowerCase(), this.userPass);
         console.log('User authentication result:', user);
-  
+    
         // 🚫 Do not navigate if authentication params exist
       } else {
         // ✅ If 'uID' and 'pass' are NOT present, open the new tab
+        // Get the value for isFullScreen before constructing the URL
         const safeUrl = `${window.location.origin}/summary-engine/${modulePath}`;
-        console.log('Opening new tab with URL:', safeUrl);
-        window.open(safeUrl, '_blank');
+    
+        // Wait for the storeCheck value
+        this.openModalHelpher(packet.dashboardIds).then((data) => {
+          console.log('✅ this.all_Packet_store permissions:', data);
+          const readMainData = data;
+          console.log('readMainData checking', readMainData);
+          this.storeCheck = readMainData.fullScreenModeCheck;
+          console.log('this.storeCheck checking', this.storeCheck);
+    
+          // Construct the final URL with isFullScreen
+          const fullSafeUrl = `${safeUrl}?isFullScreen=${this.storeCheck}`;
+          console.log('Opening new tab with URL:', fullSafeUrl);
+    
+          // Open the URL in a new tab
+          window.open(fullSafeUrl, '_blank');
+          window.location.reload();
+        }).catch(err => {
+          console.error('Error in openModalHelpher:', err);
+        });
       }
     });
+    
   }
     if (packet.selectType === 'Modal') {
+
+
+      // this.fetchCompanyLookupdataOnit(1)
+      // .then((data: any) => {
+      //   this.readLookupData = data; // Assign fetched data to the component property
+      //   console.log('this.readLookupData check', this.readLookupData);
+      // });
+
+    
     this.route.queryParams.subscribe(async (params) => {
       if(params['uID']){
         console.log('uid checking',params['uID'])
@@ -1740,6 +1773,7 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
     // Hide the navigation menu
     this.hideNavMenu = true;  
     const disableMenuQP = true;
+    // window.location.reload();
 
     if (this.modalContent) {
         console.log('modalContent checking', this.modalContent);
@@ -1747,50 +1781,66 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
 
         const queryParams = new URLSearchParams();
 
-        console.log('this.eventFilterConditions checking', this.eventFilterConditions);
+console.log('this.eventFilterConditions checking', this.eventFilterConditions);
+
+if (this.eventFilterConditions && this.eventFilterConditions.length > 0) {
+  queryParams.append('filters', encodeURIComponent(JSON.stringify(this.eventFilterConditions)));
+}
+
+if (packet.dashboardIds) {
+  queryParams.append('dashboardId', packet.dashboardIds);
+}
+
+if (this.routeId) {
+  queryParams.append('routeId', this.routeId);
+}
+
+// Add viewMode and disableMenu to query params
+const viewMode = true;
+const disableMenu = true;
+queryParams.append('viewMode', String(viewMode));
+queryParams.append('disableMenu', String(disableMenu));
+
+// Add userId and userPass to query params
+console.log('this.userId checking from redirectModal', this.userId);
+console.log('this.userPass checking from redirectModal', this.userPass);
+
+if (this.userId) {
+  queryParams.append('uID', this.userId);
+}
+if (this.userPass) {
+  queryParams.append('pass', this.userPass);
+}
+
+// Wait for permissions and then build final URL
+this.openModalHelpher(packet.dashboardIds).then((data) => {
+  console.log('✅ this.all_Packet_store permissions:', data);
+  const readMainData = data;
+  console.log('readMainData checking', readMainData);
+  this.storeCheck = readMainData.fullScreenModeCheck;
+  console.log('this.storeCheck checking', this.storeCheck);
+
+  // Append isFullScreen based on storeCheck AFTER getting it
+  queryParams.append('isFullScreen', String(this.storeCheck));
+
+  // Build final URL
+  const finalUrl = `${window.location.origin}/summary-engine/${modulePath}?${queryParams.toString()}`;
+  
+  this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
+
+
+  console.log('this.currentiframeUrl checking', this.currentiframeUrl);
+});
+
         
-        if (this.eventFilterConditions && this.eventFilterConditions.length > 0) {
-            queryParams.append('filters', encodeURIComponent(JSON.stringify(this.eventFilterConditions)));
-        }
-        
-        if (packet.dashboardIds) {
-            queryParams.append('dashboardId', packet.dashboardIds);
-        }
-        
-        if (this.routeId) {
-            queryParams.append('routeId', this.routeId);
-        }
-        
-        // Add viewMode and disableMenu to query params
-        const viewMode = true;
-        const disableMenu = true;
-        queryParams.append('viewMode', String(viewMode));
-        queryParams.append('disableMenu', String(disableMenu));
-        
-        // Add userId and userPass to query params
-        console.log('this.userId checking from redirectModal', this.userId);
-        console.log('this.userPass checking from redirectModal', this.userPass);
-        
-        if (this.userId) {
-            queryParams.append('uID', this.userId);
-        }
-        
-        if (this.userPass) {
-            queryParams.append('pass', this.userPass);
-        }
-        
-        // Construct the final URL with "?"
-        const finalUrl = `${window.location.origin}/summary-engine/${modulePath}?${queryParams.toString()}`;
-        
-        this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
-        
-        console.log('this.currentiframeUrl checking', this.currentiframeUrl);
+        // console.log('this.currentiframeUrl checking', this.currentiframeUrl);
         
         
         localStorage.setItem('viewMode', 'true');
         localStorage.setItem('disableMenu', 'true');
 
         this.cdr.detectChanges();
+  
         console.log('Opening modal with iframe URL:', this.currentiframeUrl);
     } else {
         console.error('Modal content is undefined');
@@ -1822,29 +1872,45 @@ if (packet.selectType === 'Same page Redirect') {
 
   // Ensure modulePath is properly decoded to avoid double encoding
   const modulePathCheck = decodeURIComponent(modulePath);
-  console.log('Decoded modulePath:', modulePathCheck);
+console.log('Decoded modulePath:', modulePathCheck);
 
-  // Ensure query parameters exist before navigating
-  const queryParamsToSend: any = {};
-  if (this.userId) {
-    queryParamsToSend.uID = this.userId;
-  }
-  if (this.userPass) {
-    queryParamsToSend.pass = this.userPass;
-  }
+// Ensure query parameters exist before navigating
+const queryParamsToSend: any = {};
+if (this.userId) {
+  queryParamsToSend.uID = this.userId;
+}
+if (this.userPass) {
+  queryParamsToSend.pass = this.userPass;
+}
 
-  console.log('Final query params:', queryParamsToSend);
+console.log('Final query params:', queryParamsToSend);
 
-  // Close the modal before navigating
-  this.modalService.dismissAll();
+// Close the modal before navigating
+this.modalService.dismissAll();
 
-  // Navigate & reload only after successful navigation
+// Get the storeCheck value before navigating
+this.openModalHelpher(packet.dashboardIds).then((data) => {
+  console.log('✅ this.all_Packet_store permissions:', data);
+  const readMainData = data;
+  console.log('readMainData checking', readMainData);
+  this.storeCheck = readMainData.fullScreenModeCheck;
+  console.log('this.storeCheck checking', this.storeCheck);
+
+  // Append isFullScreen based on storeCheck AFTER getting it
+  queryParamsToSend.isFullScreen = String(this.storeCheck);
+
+  // Now navigate & reload after adding isFullScreen
   this.router.navigate(['/summary-engine', modulePathCheck], { queryParams: queryParamsToSend })
     .then(() => {
       console.log('Navigation successful:', `/summary-engine/${modulePathCheck}`, queryParamsToSend);
-      window.location.reload();
+      window.location.reload(); // Reload after navigation
     })
     .catch(err => console.error('Navigation error:', err));
+})
+.catch(err => {
+  console.error('Error in openModalHelpher:', err);
+});
+
 }
 
 
@@ -1898,29 +1964,32 @@ storeFilterTileConfig(config: any, index: number): void {
 
 closeModal1() {
   this.modalService.dismissAll(); // Close the modal programmatically
+  window.location.reload()
 }
 // handleKeyDown = (event: KeyboardEvent): void => {
 //   if (event.key === 'Escape' && this.isFullScreen) {
-//       this.toggleFullScreenFullView(false); // Exit fullscreen
+ // Exit fullscreen
 //   }
 // };
 
-toggleFullScreenFullView(enterFullscreen?: boolean): void {
-  if (enterFullscreen !== undefined) {
-    this.isFullScreen = enterFullscreen;
-  } else {
-    this.isFullScreen = !this.isFullScreen; // Toggle fullscreen
-  }
+toggleFullScreenFullView(enterFullscreen: boolean): void {
+  // if (enterFullscreen !== undefined) {
+    this.isFullScreen =  enterFullscreen
+    // this.isFullScreenFinal =enterFullscreen
+
+  // } else {
+  //   this.isFullScreen = !this.isFullScreen; // Toggle fullscreen
+  // }
 
   console.log('Fullscreen state updated:', this.isFullScreen);
   this.updateOptions();
 
-  if (this.isFullScreen) {
-    console.log('Entered fullscreen mode');
-    this.enterFullScreen();
-  } else {
-    this.exitFullScreen(); // Call existing exit function
-  }
+  // if (this.isFullScreen) {
+  //   console.log('Entered fullscreen mode');
+  //   this.enterFullScreen();
+  // } else {
+  //   this.exitFullScreen(); // Call existing exit function
+  // }
 }
 
 enterFullScreen(): void {
@@ -1942,13 +2011,13 @@ exitFullScreen(): void {
   console.log('Exited fullscreen mode');
   this.updateOptions();
 
-  if (document.exitFullscreen) {
-    document.exitFullscreen();
-  } else if ((document as any).webkitExitFullscreen) { /* Safari */
-    (document as any).webkitExitFullscreen();
-  } else if ((document as any).msExitFullscreen) { /* IE11 */
-    (document as any).msExitFullscreen();
-  }
+  // if (document.exitFullscreen) {
+  //   document.exitFullscreen();
+  // } else if ((document as any).webkitExitFullscreen) { /* Safari */
+  //   (document as any).webkitExitFullscreen();
+  // } else if ((document as any).msExitFullscreen) { /* IE11 */
+  //   (document as any).msExitFullscreen();
+  // }
 }
 
 // Listen for 'Escape' or 'F11' key presses to exit fullscreen
@@ -2633,8 +2702,10 @@ exitFullScreen(): void {
     const getfullScreenValue = this.createSummaryField.get('fullScreenModeCheck')?.value
     console.log('ngAfterViewInit check data', getfullScreenValue);
     if (this.routeId) {
-
-      // this.checkAndSetFullscreen();
+      
+     
+      // console.log('temp check from afterViewInit',temp)
+      this.checkAndSetFullscreen(this.storeFullScreen);
       this.editButtonCheck = true
 
       // this.openModalHelpher(this.routeId)
@@ -2663,13 +2734,13 @@ exitFullScreen(): void {
       new Tooltip(tooltipTriggerEl);
     });
 
-    $(document).on('click', '[data-action="view"]', (event) => {
-      const id = $(event.target).closest('[data-id]').attr('data-id');
-      console.log('id checking summary',id)
-      if (id) {
-        this.viewItem(id);
-      }
-    });
+    // $(document).on('click', '[data-action="view"]', (event) => {
+    //   const id = $(event.target).closest('[data-id]').attr('data-id');
+    //   console.log('id checking summary',id)
+    //   if (id) {
+    //     this.viewItem(id);
+    //   }
+    // });
     // this.createBulletChart();
 
     // this.createPieChart()
@@ -2803,12 +2874,12 @@ exitFullScreen(): void {
     console.log('this.SK_clientID check', this.SK_clientID)
     this.userdetails = this.getLoggedUser.username;
     console.log('user name permissions check',this.userdetails)
-    const isFullscreen = this.summaryService.getFullscreen();
-    if (isFullscreen) {
-      this.enterFullscreenMode(); // Your logic to make it fullscreen (e.g., adding class, resizing layout etc.)
-    }
+    // const isFullscreen = this.summaryService.getFullscreen();
+    // if (isFullscreen) {
+    //   this.enterFullscreenMode(); // Your logic to make it fullscreen (e.g., adding class, resizing layout etc.)
+    // }
 
-    // this.toggleFullScreenFullView(true);
+
 console.log('this.route checing on top',this.route)
 
 this.fetchCompanyLookupdata(1)
@@ -2894,6 +2965,19 @@ this.fetchSummaryMain(id)
             console.error('Error decoding filters:', error);
           }
         }
+        if(params['isFullScreen']){
+      
+          if(params['isFullScreen']==="true"){
+            this.storeFullScreen = true
+          }else{
+            this.storeFullScreen = false
+          }
+       
+       
+          
+          console.log('fullScreen checking from onInit',typeof this.storeFullScreen)
+
+        }
 
           console.log('params', params['filterTileConfig']);
           if (params['filterTileConfig']) {
@@ -2938,7 +3022,7 @@ this.fetchSummaryMain(id)
     this.viewFullScreenCheck = livedatacheck.fullScreenModeCheck
     console.log('this.viewFullScreenCheck checking',this.viewFullScreenCheck)
     if(this.viewFullScreenCheck==true){
-      this.checkAndSetFullscreen();
+      // this.checkAndSetFullscreen();
 
     }
 
@@ -2976,6 +3060,7 @@ this.fetchSummaryMain(id)
           this.hideSummaryGridster = true
           
         }
+
         // if(params['clientID']){
         //   console.log('clientID checking',params['clientID'])
 
@@ -3068,15 +3153,15 @@ this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
   }
 
 
-  enterFullscreenMode() {
-    // Your fullscreen logic here, e.g.
-    document.body.classList.add('fullscreen-layout');
-  }
+  // enterFullscreenMode() {
+  //   // Your fullscreen logic here, e.g.
+  //   document.body.classList.add('fullscreen-layout');
+  // }
   fetchSummaryMain(receiveId:any){
     console.log('receiveId checking',receiveId)
 
 
-    // this.toggleFullScreenFullView(true);
+
     this.api
     .GetMaster(`${this.SK_clientID}#${receiveId}#summary#main`, 1)
     .then((result: any) => {
@@ -3088,7 +3173,7 @@ this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
         // const readFormControl =this.createSummaryField.get('fullScreenModeCheck')?.value
         // console.log('readFormControl checking',readFormControl)
         if(readFullScreenCheck==true){
-             this.toggleFullScreenFullView(true);
+            //  this.toggleFullScreenFullView(true);
 
 
         }
@@ -3714,50 +3799,46 @@ setTimeout(() => {
     this.modalService.open(createcontent, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
   }
 
-  viewItem(id: string,receivePacket?:any): void {
+  viewItem(id: string, receivePacket?: any): void {
     console.log('this.userId checking from redirect', this.userId);
     console.log('this.userPass checking from redirect', this.userPass);
     console.log('this.all_Packet_store check viewItem', this.lookup_data_summaryCopy);
-    console.log('receivePacket checvking',receivePacket)
-    const checkP11 = receivePacket.P11
-    console.log('checkP11 checking',checkP11)
-    if (checkP11 === true) {
-      this.fullscreenService.setFullscreen(true);
-    } else {
-      this.fullscreenService.setFullscreen(false);
-    }
-    
-
-
-    // this.setFullscreen();
-
-    // Prepare query parameters only if they exist
-    let queryParams: any = {};
-    
+    console.log('receivePacket checvking', receivePacket);
+  
+    const checkP11 = receivePacket?.P11 ?? false;
+    console.log('checkP11 checking', checkP11);
+  
+    // Always include isFullScreen in queryParams
+    let queryParams: any = {
+      isFullScreen: checkP11
+    };
+  
+    // Conditionally add userId and userPass
     if (this.userId) {
-        queryParams.uID = this.userId;
+      queryParams.uID = this.userId;
     }
     if (this.userPass) {
-        queryParams.pass = this.userPass;
+      queryParams.pass = this.userPass;
     }
-
-    // Navigate accordingly
-    if (Object.keys(queryParams).length > 0) {
-        this.router.navigate([`/summary-engine/${id}`], { 
-            queryParams: queryParams, 
-            queryParamsHandling: 'merge' 
-        });
-        this.openModalHelpher(id)
+  
+    // Navigate
+    if (this.userId || this.userPass) {
+      this.router.navigate([`/summary-engine/${id}`], { 
+        queryParams: queryParams, 
+        queryParamsHandling: 'merge' 
+      });
+      this.openModalHelpher(id);
     } else {
-        this.router.navigate([`/summary-engine/${id}`]);
-        // this.toggleFullScreenFullView(true);
+      this.router.navigate([`/summary-engine/${id}`], {
+        queryParams: queryParams,
+        queryParamsHandling: 'merge'
+      });
     }
-
+  
     this.cdr.detectChanges();
-    
-    // Set the state to Edit Mode
     this.showModal = true; // Open modal in edit mode
-}
+  }
+  
 
   dashboardRedirect(id: string): void {
     // Toggle the full-screen state
@@ -3801,17 +3882,52 @@ setTimeout(() => {
 
   
   redirectDashboard(id: string): void {
-    console.log('i am redirect to dashboard')
+    console.log('I am redirecting to the dashboard');
     this.isLoading = true;
   
     // Dismiss all modals
     this.modalService.dismissAll(); // Remove the modal-open class
   
-    // Navigate to the desired route
-    this.router.navigate([`/summary-engine/${id}`]).then(() => {
-      window.location.reload(); // Reload the window after navigation
+    // Wait for the storeCheck value from openModalHelpher
+    this.route.queryParams.subscribe(async (params) => {
+      let queryParams: any = {};  // Initialize queryParams object
+      
+      // Conditionally add userId and userPass if they exist
+      if (this.userId) {
+        queryParams.uID = this.userId; // Add uID to queryParams
+      }
+      if (this.userPass) {
+        queryParams.pass = this.userPass; // Add pass to queryParams
+      }
+  
+      // Fetch the storeCheck value asynchronously and update the queryParams
+      this.openModalHelpher(id).then((data) => {
+        console.log('✅ this.all_Packet_store permissions:', data);
+        const readMainData = data;
+        this.storeCheck = readMainData.fullScreenModeCheck;
+        console.log('this.storeCheck checking', this.storeCheck);
+  
+        // Append 'isFullScreen' to the query parameters after resolving the promise
+        queryParams.isFullScreen = String(this.storeCheck);  // Ensure it's a string
+  
+        // Merge the queryParams and navigate
+        this.router.navigate([`/summary-engine/${id}`], { 
+          queryParams: queryParams, 
+          queryParamsHandling: 'merge'  // Merges the query parameters without encoding
+        }).then(() => {
+          window.location.reload(); // Reload the window after navigation
+        }).catch(err => {
+          console.error('Error in navigation:', err);
+        });
+      }).catch(err => {
+        console.error('Error in openModalHelpher:', err);
+      });
     });
   }
+  
+  
+  
+  
   
   
   

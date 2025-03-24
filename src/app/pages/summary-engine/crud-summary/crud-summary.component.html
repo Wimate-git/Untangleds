@@ -1,7 +1,10 @@
+
+
+<div class="datatable-container table-responsive">
 <table
   datatable
   [dtOptions]="dtOptions"
-  class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer"
+  class="table table-responsive align-middle table-row-dashed fs-6 gy-5 dataTable no-footer"
 >
   <thead>
     <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
@@ -14,6 +17,7 @@
     <!-- Add rows dynamically as needed -->
   </tbody>
 </table>
+</div>
 
   
   <swal #deleteSwal [swalOptions]="swalOptions" title="Are you sure you want to delete?" text="This cannot be undone" icon="warning" [showCancelButton]="true"
