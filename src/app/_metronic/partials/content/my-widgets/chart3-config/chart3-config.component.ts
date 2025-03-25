@@ -158,7 +158,7 @@ export class Chart3ConfigComponent implements OnInit{
       drillTypeFields: [fieldValue], // Ensure ngx-select control is properly initialized
       drillTypeLabel:[''],
       drillTypePrimary:[''],
-      DrillFilter:['']
+  
     });
   
     conditionsArray.push(newConditionGroup);
@@ -393,7 +393,7 @@ export class Chart3ConfigComponent implements OnInit{
       drillTypeFields: [''],
       drillTypeLabel: [''],
       drillTypePrimary:[''],
-      DrillFilter:['']
+
     });
   }
   
@@ -584,7 +584,9 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         selectType: this.createChart.value.selectType ||'',
         toggleCheck: this.createChart.value.toggleCheck ||'',
         DrillConfig:this.createChart.value.drill_fields || [],
-        DrillDownType:this.createChart.value.DrillDownType ||''
+        DrillDownType:this.createChart.value.DrillDownType ||'',
+        DrillFilter:this.createChart.value.DrillFilter ||'',
+        DrillFilterLevel:this.createChart.value.DrillFilterLevel ||''
 
   
 
@@ -1135,7 +1137,7 @@ repopulateDrill_fields(getValues: any): FormArray {
             drillTypeFields: [condition.drillTypeFields || ''],
             drillTypeLabel: [condition.drillTypeLabel || ''],
             drillTypePrimary:[condition.drillTypePrimary ||''],
-            DrillFilter:[]
+     
           })
         );
       });

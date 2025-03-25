@@ -54,6 +54,7 @@ export class ChartUi3Component implements OnInit{
   selectedMarkerIndex: any;
   tile1Config: any;
   isChecked: boolean = false; // Initial state is false
+  parseChartData: any;
 
   toggleCheck() {
     this.isChecked = !this.isChecked; // Toggle the value
@@ -285,7 +286,10 @@ const extractcolumnVisibility = chartConfig
           permissionId:this.permissionIdRequest,
           permissionList:this.readFilterEquation,
           userName:this.userdetails,
-          conditions:this.eventFilterConditions ||[]
+          conditions:this.eventFilterConditions ||[],
+          DrillFilter:'',
+          DrillFilterLevel:''
+
         }),
       };
     
@@ -299,8 +303,22 @@ const extractcolumnVisibility = chartConfig
           console.log('this.checkResBody',this.checkResBody)
           this.parsedResBody = JSON.parse(this.checkResBody)
           console.log('this.parsedResBody checking',this.parsedResBody)
+
+          this.parseChartData = JSON.parse(this.parsedResBody.ChartData)
+          console.log('this.parseChartDatav checking',this.parseChartData)
+          this.summaryService.updatelookUpData(this.parseChartData)
+
+          // this.parseChartOptions = JSON.parse(this.parseChartData.highchartsOptionsJson)
+          console.log('this.parseChartOptions checking',this.parseChartOptions)
+
+
+
+
+
+
           this.processedData = JSON.parse(this.parsedResBody.rowdata)
           console.log('this.processedData check',this.processedData)
+  
           this.paresdDataEmit.emit(this.processedData); 
           
           
@@ -413,26 +431,40 @@ const extractcolumnVisibility = chartConfig
 
   ngOnInit(){
     console.log('item chacke',this.item.grid_details)
-    this.summaryService.lookUpData$.subscribe((data: any)=>{
-      console.log('data check>>>',data)
- let tempCharts:any=[]
-data.forEach((packet: any,matchedIndex:number) => {
-  
-  if(packet.grid_type == 'Columnchart'&& this.index==matchedIndex && packet.id === this.item.id){
-    tempCharts[matchedIndex] = packet
-    setTimeout(() => {
-      this.createColumnChart(packet)
-    }, 1000);
-  }
-});
-
-      
-      // console.log("✅ Matched Charts:", matchedCharts);
-      
+    this.summaryService.lookUpData$.subscribe((data: any) => {
+      console.log('data check from chart3', data);
     
-      
-      
-    })
+      let tempCharts: any[] = [];
+    
+      // If data is not an array, convert it into an array to ensure we can use forEach
+      const dataArray = Array.isArray(data) ? data : [data];
+    
+      // Loop through the data array
+      dataArray.forEach((packet: any, matchedIndex: number) => {
+        console.log('packet:', packet); // Log each packet to ensure it is as expected
+    
+        // If data is a single item, skip the check for this.index == matchedIndex
+        if (packet.grid_type == 'Columnchart' && packet.id === this.item.id) {
+          if (dataArray.length > 1) {
+            // For multiple data, match the index as well
+            if (this.index == matchedIndex) {
+              tempCharts[matchedIndex] = packet;
+              setTimeout(() => {
+                this.createColumnChart(packet);
+              }, 1000);
+            }
+          } else {
+            // For single data, do not check index, just use the packet
+            tempCharts[0] = packet;
+            setTimeout(() => {
+              this.createColumnChart(packet);
+            }, 1000);
+          }
+        }
+      });
+    });
+    
+    
 
 
 

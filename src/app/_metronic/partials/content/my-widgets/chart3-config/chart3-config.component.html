@@ -333,6 +333,19 @@
                           placeholder="Select constant" formControlName="rowData"
                          />
                       </div>
+
+                      <div class="col-md-4 mb-3" *ngIf="isRequredField">
+                        <label for="constant" class="col-form-label fw-bold fs-6 "></label>
+                        <input id="constant" type="number" class="form-control form-control-solid"
+                          placeholder="Select constant" formControlName="DrillFilter"
+                      />
+                      </div>
+                      <div class="col-md-4 mb-3" *ngIf="isRequredField">
+                        <label for="constant" class="col-form-label fw-bold fs-6 "></label>
+                        <input id="constant" type="number" class="form-control form-control-solid"
+                          placeholder="Select constant" formControlName="DrillFilterLevel"
+                      />
+                      </div>
                     
 
 
@@ -682,12 +695,11 @@
                 <div *ngIf="field.get('primaryValue')?.errors?.required">Primary Value is required.</div>
               </div>
           </div>
-          <div class="col-md-4 mb-3" *ngIf="isRequredField">
-            <label for="constant" class="col-form-label fw-bold fs-6 "></label>
-            <input id="constant" type="number" class="form-control form-control-solid"
-              placeholder="Select constant" formControlName="DrillFilter"
-          />
-          </div>
+
+
+
+
+          
 
           <!-- Remove Condition Button -->
           <div class="col-md-2 mt-12 d-flex justify-content-end">
