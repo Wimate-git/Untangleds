@@ -16,7 +16,6 @@ import {
 import { APIService } from 'src/app/API.service';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { DynamicApiService } from '../dynamic-api.service';
 
 type Tabs = 'Sidebar' | 'Header' | 'Toolbar' | 'User';
 interface ListItem {
@@ -54,12 +53,12 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   dreamBoardIDs: any[] = [];
   dropdownSettings: IDropdownSettings = {
     itemsShowLimit: 1,
-    allowSearchFilter: true
+    allowSearchFilter: true,
   };
 
   dropdownSettings_: IDropdownSettings = {
     singleSelection: true,
-    allowSearchFilter: true
+    allowSearchFilter: true,
   };
   swalOptions: SweetAlertOptions = {};
 
@@ -93,6 +92,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   dynamicFields: FormArray<any>;
   form_permission: any[] = [];
   selectedRelatedValue: string | null = null;
+  disabled = false;
 
 
   permissionsList = [
@@ -144,14 +144,15 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   loading: boolean = false;
   formSelect: any;
   summaryList: any[] = [];
+  List: any[];
+  userStorList: any[];
 
   constructor(
     private cdr: ChangeDetectorRef,
     private fb: FormBuilder,
     private api: APIService,
     private spinner: NgxSpinnerService,
-    private auditTrail: AuditTrailService,
-    private DynamicApi:DynamicApiService
+    private auditTrail: AuditTrailService
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -247,19 +248,21 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
             `;
 
             const nameAndEmail = `
-              <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
-                <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
+              <div class="d-flex flex-column" >
+                <a href="javascript:;" data-action="view" class="text-gray-800 text-hover-primary mb-1 view-item" data-id="${full.id}">${data}</a>
               </div>
             `;
 
             return `
               <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
-                <a href="javascript:;">
+                <a href="javascript:; class="view-item">
                   ${symbolLabel}
                 </a>
               </div>
               ${nameAndEmail}
             `;
+
+            // return nameAndEmail
           }
         },
         {
@@ -278,8 +281,12 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
           }
         }
       ],
-      createdRow: function (row, data, dataIndex) {
+      createdRow: (row, data:any, dataIndex) => {
         $('td:eq(0)', row).addClass('d-flex align-items-center');
+        $(row).find('.view-item').on('click', () => {
+            console.log("Event triggered ");
+            this.edit(data.P1)
+        });
       },
     };
 
@@ -316,10 +323,44 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
   }
 
+  onModuleSelect(option: any) {
+    const selectedValues = this.permissionForm.get('summaryList')?.value;
+    
+    if(selectedValues.includes('All')){
+      this.permissionForm.get('summaryList')?.setValue(['All'])
+    }
+
+    if(selectedValues.includes('None')){
+      this.permissionForm.get('summaryList')?.setValue(['None'])
+    }
+  }
+
+  onDreamboardSelect(option: any) {
+    const selectedValues = this.permissionForm.get('dreamBoardIDs')?.value;
+    
+    if(selectedValues.includes('All')){
+      this.permissionForm.get('dreamBoardIDs')?.setValue(['All'])
+    }
+  }
+
+  onUserSelect(option: any) {
+    const selectedValues = this.permissionForm.get('userList')?.value;
+    
+    if(selectedValues.includes('All')){
+      this.permissionForm.get('userList')?.setValue(['All'])
+    }
+
+    if(selectedValues.includes('None')){
+      this.permissionForm.get('userList')?.setValue(['None'])
+    }
+  }
+
+
 
   async dynamicFormSelect(selectForm: any): Promise<void> {
 
     this.formfieldData = []
+
     // this.permissionForm.get('fieldValue')?.reset();
     console.log("SELECTION OF FORMS:", selectForm)
 
@@ -381,7 +422,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
   }
 
-  populateFilterEquation(): void {
+   populateFilterEquation(): void {
 
     const errorAlertform: SweetAlertOptions = {
       icon: 'error',
@@ -1328,38 +1369,6 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
         this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
 
-
-
-
-        //Asad March 17 2025 Code for revoking refresh tokens of users associated with updated permission ID
-        if(this.permissionItem && this.permissionItem.P1){
-
-          const Cognitobody = { "type": "cognitoServices",
-            "event": {
-              "path": "/timeoutPermissionSession",
-              "queryStringParameters": {
-                  "permissionID":this.permissionItem.P1,
-                  "clientID":this.client 
-              }
-            }
-            }
-
-
-          try {
-            const response = await this.DynamicApi.getData(Cognitobody);
-            console.log("Cognito Revoke Response  ",JSON.parse(response.body));
-
-          } catch (error) {
-            console.error('Error calling dynamic lambda:', error);
-          }
-        }
-
-
-
-
-
-
-
       }).catch((error) => {
         console.log('UPDATE WORK ORDER ERROR:', error)
         errorAlert.text = this.extractText(error.error);
@@ -1619,6 +1628,8 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
         console.log("All the formgroup Id are here ", this.userList);
 
+        this.userStorList = this.userList
+
       }
     } catch (error) {
       console.error('Error:', error);
@@ -1681,6 +1692,8 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
         this.summaryList.unshift("None");
 
         console.log("All the formgroup Id are here ", this.summaryList);
+
+        this.List = this.summaryList
 
       }
     } catch (error) {

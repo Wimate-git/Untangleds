@@ -79,4 +79,8 @@ background-color: #d9534f; /* Darker red (Bootstrap's btn-danger on hover) */
 //   width: 30%;
 //   margin-top: 10px;
 // }
-  
+#kt_modal_update_customer_scroll {
+  max-height: 60vh; /* Adjust the height as per your requirements */
+  overflow-y: auto; /* Enables vertical scrolling */
+}
+

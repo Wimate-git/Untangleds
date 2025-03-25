@@ -22,12 +22,17 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Reload emitter inside datatable
   @Input() reload: EventEmitter<boolean>;
+  
 
   @Input() modal: TemplateRef<any>;
 
   @Output() deleteEvent = new EventEmitter<number>();
   @Output() editEvent = new EventEmitter<number>();
   @Output() createEvent = new EventEmitter<boolean>();
+
+  modalConfig: NgbModalOptions = {
+    modalDialogClass: 'modal-dialog modal-dialog-centered mw-650px',
+  };
 
   dtOptions: Config = {};
 
@@ -42,9 +47,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private idInAction: number;
 
-  modalConfig: NgbModalOptions = {
-    modalDialogClass: 'modal-dialog modal-dialog-centered mw-650px',
-  };
+  
 
   swalOptions: SweetAlertOptions = { buttonsStyling: false };
 
@@ -65,14 +68,20 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     if(this.componentSource == 'permission3'){
       this.modalConfig ={
-          modalDialogClass: 'modal-dialog modal-dialog-centered mw-900px ',
+          // modalDialogClass: 'modal-dialog modal-dialog-centered mw-1000px ',
+
+          modalDialogClass: 'modal-dialog modal-fullscreen p-9'
           
         };
     }
+
+
     this.dtOptions = {
       dom: "<'row'<'col-sm-12'tr>>" +
         "<'d-flex justify-content-between'<'col-sm-12 col-md-5'i><'d-flex justify-content-between'p>>",
       processing: true,
+      paging: true, // Enable pagination
+      pageLength: 10,
       language: {
         processing: '<span class="spinner-border spinner-border-sm align-middle"></span> Loading...'
       }, ...this.datatableConfig
@@ -149,11 +158,11 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
           case 'edit':
             this.editEvent.emit(this.idInAction);
-            // this.modalRef = this.modalService.open(this.modal, this.modalConfig);
             this.modalRef = this.modalService.open(this.modal, {
               ...this.modalConfig, // Keep existing modal configuration if any
               backdrop: 'static'
           });
+            // this.modalRef = this.modalService.open(this.modal, this.modalConfig);
             break;
 
           case 'delete':

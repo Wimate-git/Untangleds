@@ -11,6 +11,7 @@ import { Permission3Component } from "./permission3.component";
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatCardModule} from '@angular/material/card';
+import { MultiSelectModule } from "primeng/multiselect";
 // import { Crud2Module } from "src/app/modules/crud2/crud.module";
 
 
@@ -21,6 +22,7 @@ import {MatCardModule} from '@angular/material/card';
         {
             path: '',
             component: Permission3Component,
+            data:{ title:'Permission' }
         },
     ]),
     SharedModule,
@@ -38,7 +40,8 @@ import {MatCardModule} from '@angular/material/card';
     MatTabsModule,
     MatCardModule,
     // Crud2Module ,
-    SweetAlert2Module
+    SweetAlert2Module,
+    MultiSelectModule
     
 ]
 })
