@@ -63,6 +63,8 @@ export class ChartUi1Component implements OnChanges,OnInit {
   storeDrillFilter: string;
   DrillFilterLevel: string;
   parseChartData: any;
+  storeDrillConfig: any;
+  counter: number=0;
   
 ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui', this.all_Packet_store);
@@ -245,121 +247,120 @@ toggleCheck() {
 
 }
 onBarClick(event: Highcharts.PointClickEventObject): void {
-  console.log('event check for column chart',event)
+  console.log('event check for column chart', event);
   console.log('Bar clicked:', {
     category: event.point.category,
     value: event.point.y,
-    // customIndex: event.point.customIndex,
-    colorIndex:event.point.colorIndex
-
-
-   
+    colorIndex: event.point.colorIndex
   });
+
   const pointData = {
     name: event.point.category,
     value: event.point.y,
-    customIndex: (event.point.options as CustomPointOptions).customIndex, // Using a custom type for options
+    customIndex: (event.point.options as CustomPointOptions).customIndex,
     colorIndex: event.point.colorIndex
-};
+  };
 
-  console.log('pointData checking column chart',pointData)
-  const chartConfig =JSON.parse(this.item.chartConfig)
-console.log('chartConfig check from chart ui',chartConfig)
-const extractcolumnVisibility = chartConfig
+  console.log('pointData checking column chart', pointData);
+  
+  // Get chart config and storeDrillConfig
+  const chartConfig = JSON.parse(this.item.chartConfig);
+  console.log('chartConfig check from chart ui', chartConfig);
+  const extractcolumnVisibility = chartConfig;
 
   this.formTableConfig = {
-    columnVisibility:extractcolumnVisibility,
-    actualData:this.item,
-    formName:this.item.chartConfig.formlist
+    columnVisibility: extractcolumnVisibility,
+    formName: this.item.chartConfig.formlist
+  };
+
+  console.log('this.formTableConfig checking from ui', this.formTableConfig);
+
+  this.storeDrillConfig = JSON.parse(this.item.DrillConfig);
+  console.log('this.storeDrillConfig checking', this.storeDrillConfig);
+  const storeconditionsLength = this.storeDrillConfig[0]?.conditions.length
+
+
+
+  // // Check the index of the clicked bar and control the logic
+  // const currentConditionIndex = this.storeDrillConfig[0]?.conditions.findIndex((condition: { drillTypeFields: string | number; }) => {
+  //   return condition.drillTypeFields === event.point.category; // Assuming 'category' matches drillTypeFields
+  // });
+  
+
+  // if (currentConditionIndex === 0) {
+  //   console.log('First bar clicked, no action triggered');
+  //   // Do not emit if it's the first bar click
+  //   return;
+  // }
+
+  if (storeconditionsLength === this.counter) {
+    console.log('Second bar clicked, emitting action');
+    // Only emit for second bar click
+    this.emitChartConfigTable.emit(this.formTableConfig);
+    this.counter=0
+  } 
+
+  // Proceed with API request
+  const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+  
+  const requestBody = {
+    body: JSON.stringify({
+      clientId: this.SK_clientID,
+      routeId: this.routeId,
+      widgetId: this.item.id,
+      chartData: pointData,
+      MsgType: 'DrillDown',
+      permissionId: this.permissionIdRequest,
+      permissionList: this.readFilterEquation,
+      userName: this.userdetails,
+      conditions: this.eventFilterConditions || [],
+      DrillFilter: this.storeDrillFilter || '',
+      DrillFilterLevel: this.DrillFilterLevel || ''
+    }),
+  };
+
+  console.log('requestBody checking chart1Drilldown', requestBody);
+
+  // Send a POST request to the Lambda function
+  this.http.post(apiUrl, requestBody).subscribe(
+    (response: any) => {
+      console.log('Lambda function triggered successfully:', response);
+      this.checkResBody = response.body;
+      console.log('this.checkResBody', this.checkResBody);
+      this.parsedResBody = JSON.parse(this.checkResBody);
+      console.log('this.parsedResBody checking', this.parsedResBody);
+
+      this.parseChartData = JSON.parse(this.parsedResBody.ChartData);
+      console.log('this.parseChartDatav checking', this.parseChartData);
+
+      this.storeDrillFilter = this.parseChartData.DrillFilter;
+      this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
+      this.summaryService.updatelookUpData(this.parseChartData);
+
+      console.log('this.parseChartOptions checking', this.parseChartOptions);
+
+      this.processedData = JSON.parse(this.parsedResBody.rowdata);
+      console.log('this.processedData check', this.processedData);
+
+      this.paresdDataEmit.emit(this.processedData);
+    },
+    (error: any) => {
+      console.error('Error triggering Lambda function:', error);
+
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to trigger the Lambda function. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
     }
-    console.log('this.formTableConfig checking from ui',this.formTableConfig)
-    this.emitChartConfigTable.emit(this.formTableConfig); 
-
-
-    // Define the API Gateway URL
-    const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
-  
-    // Prepare the request body
-    const requestBody = {
-      body: JSON.stringify({
-        clientId: this.SK_clientID,
-        routeId: this.routeId,
-        widgetId:this.item.id,
-        chartData:pointData,
-        MsgType:'DrillDown',
-        permissionId:this.permissionIdRequest,
-        permissionList:this.readFilterEquation,
-        userName:this.userdetails,
-        conditions:this.eventFilterConditions ||[],
-        DrillFilter:this.storeDrillFilter ||'',
-        DrillFilterLevel:this.DrillFilterLevel ||''
-
-      }),
-    };
-  
-    console.log('requestBody checking chart1Drilldown', requestBody);
-  
-    // Send a POST request to the Lambda function with the body
-    this.http.post(apiUrl, requestBody).subscribe(
-      (response: any) => {
-        console.log('Lambda function triggered successfully:', response);
-        this.checkResBody = response.body
-        console.log('this.checkResBody',this.checkResBody)
-        this.parsedResBody = JSON.parse(this.checkResBody)
-        console.log('this.parsedResBody checking',this.parsedResBody)
-
-        this.parseChartData = JSON.parse(this.parsedResBody.ChartData)
-        console.log('this.parseChartDatav checking',this.parseChartData)
-        this.storeDrillFilter = this.parseChartData.DrillFilter,
-        this.DrillFilterLevel = this.parseChartData.DrillFilterLevel
-        this.summaryService.updatelookUpData(this.parseChartData)
-
-        // this.parseChartOptions = JSON.parse(this.parseChartData.highchartsOptionsJson)
-        console.log('this.parseChartOptions checking',this.parseChartOptions)
-
-
-
-
-
-
-        this.processedData = JSON.parse(this.parsedResBody.rowdata)
-        console.log('this.processedData check',this.processedData)
-
-        this.paresdDataEmit.emit(this.processedData); 
-        
-        
-    
-        // Display SweetAlert success message
-        // Swal.fire({
-        //   title: 'Success!',
-        //   text: 'Lambda function triggered successfully.',
-        //   icon: 'success',
-        //   confirmButtonText: 'OK'
-        // });
-  
-        // Proceed with route parameter handling
-
-  
- // Reset loading state
-      },
-      (error: any) => {
-        console.error('Error triggering Lambda function:', error);
-  
-        // Display SweetAlert error message
-        Swal.fire({
-          title: 'Error!',
-          text: 'Failed to trigger the Lambda function. Please try again.',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
- // Reset loading state
-      }
-    );
+  );
 
   // Emit the cell info if needed
   this.sendCellInfo.emit(event);
-
+  this.counter++
 }
+
   parseChartOptions(arg0: string, parseChartOptions: any) {
     throw new Error('Method not implemented.');
   }

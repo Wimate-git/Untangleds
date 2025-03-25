@@ -42,7 +42,7 @@ export class ChartUi3Component implements OnInit{
   @Input() eventFilterConditions : any
   
   checkResBody: any;
-  parsedResBody: any;
+  parsedResBody: any[]=[];
   processedData: any;
   @Output() paresdDataEmit = new EventEmitter<any>();
   @Output() emitChartConfigTable = new EventEmitter<any>();
@@ -57,6 +57,8 @@ export class ChartUi3Component implements OnInit{
   parseChartData: any;
   storeDrillFilter: any;
   DrillFilterLevel: any;
+  storeDrillConfig: any;
+  counter: number=0;
 
   toggleCheck() {
     this.isChecked = !this.isChecked; // Toggle the value
@@ -70,7 +72,8 @@ export class ChartUi3Component implements OnInit{
           columnVisibility:extractcolumnVisibility,
           formName:this.item.chartConfig.formlist
           }
-          this.emitChartConfigTable.emit(this.formTableConfig); 
+          this.counter=0
+          // this.emitChartConfigTable.emit(this.formTableConfig); 
     
     
           // Define the API Gateway URL
@@ -102,18 +105,19 @@ export class ChartUi3Component implements OnInit{
               console.log('Lambda function triggered successfully:', response);
               this.checkResBody = response.body
               console.log('this.checkResBody',this.checkResBody)
-              this.parsedResBody = JSON.parse(this.checkResBody)
+              const storeparsedResBody=JSON.parse(this.checkResBody)
 
 
-              this.parseChartData = JSON.parse(this.parsedResBody.ChartData)
+
+              this.parseChartData = JSON.parse(storeparsedResBody.ChartData)
               console.log('this.parseChartDatav checking',this.parseChartData)
               this.storeDrillFilter = this.parseChartData.DrillFilter,
               this.DrillFilterLevel = this.parseChartData.DrillFilterLevel
               this.summaryService.updatelookUpData(this.parseChartData)
               console.log('this.parsedResBody checking',this.parsedResBody)
-              this.processedData = JSON.parse(this.parsedResBody.rowdata)
-              console.log('this.processedData check',this.processedData)
-              this.paresdDataEmit.emit(this.processedData); 
+              // this.processedData = JSON.parse(this.parsedResBody.rowdata)
+              // console.log('this.processedData check',this.processedData)
+              // this.paresdDataEmit.emit(this.processedData); 
               
               
           
@@ -145,7 +149,7 @@ export class ChartUi3Component implements OnInit{
           );
     
         // Emit the cell info if needed
-        this.sendCellInfo.emit(event);
+        // this.sendCellInfo.emit(event);
     
 
   }
@@ -281,7 +285,20 @@ const extractcolumnVisibility = chartConfig
       columnVisibility:extractcolumnVisibility,
       formName:this.item.chartConfig.formlist
       }
-      this.emitChartConfigTable.emit(this.formTableConfig); 
+      this.storeDrillConfig = JSON.parse(this.item.DrillConfig);
+      console.log('this.storeDrillConfig checking', this.storeDrillConfig);
+      const storeconditionsLength = this.storeDrillConfig[0]?.conditions.length
+      console.log('storeconditionsLength checking',storeconditionsLength)
+      console.log('this.counter checking',this.counter)
+
+      if (storeconditionsLength === this.counter) {
+        console.log('Second bar clicked, emitting action');
+     
+        // Only emit for second bar click
+        this.emitChartConfigTable.emit(this.formTableConfig);
+        this.counter=0
+      } 
+ 
 
 
       // Define the API Gateway URL
@@ -313,27 +330,42 @@ const extractcolumnVisibility = chartConfig
           console.log('Lambda function triggered successfully:', response);
           this.checkResBody = response.body
           console.log('this.checkResBody',this.checkResBody)
-          this.parsedResBody = JSON.parse(this.checkResBody)
+          this.parsedResBody.push(JSON.parse(this.checkResBody))
           console.log('this.parsedResBody checking',this.parsedResBody)
+       
+          this.parsedResBody.forEach((item, index) => {
+            if (Object.keys(item).includes('ChartData')) {
+              // Handle the case when ChartData is present
+              this.parseChartData = JSON.parse(item.ChartData);
+              console.log(`this.parseChartDatav checking at index ${index}`, this.parseChartData);
+          
+              this.storeDrillFilter = this.parseChartData.DrillFilter;
+              this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
+          
+              // Update lookup data in the summary service
+              this.summaryService.updatelookUpData(this.parseChartData);
+            } else {
+              // Handle the case when ChartData is not present, rowdata should be used
+              console.log(`StoreparsedResBody checking at index ${index}`, this.parsedResBody);
+          
+              // Deep clone rowdata (if it's nested, use deep copy)
+              this.processedData = JSON.parse(item.rowdata);
+              console.log(`this.processedData check at index ${index}`, this.processedData);
+          
+              // Emit the processed data
+              this.paresdDataEmit.emit(this.processedData);
+          
+              // You can log any other details if needed
+              console.log(`this.parseChartOptions checking at index ${index}`, this.parseChartOptions);
+            }
+          });
+          
+     
 
-          this.parseChartData = JSON.parse(this.parsedResBody.ChartData)
-          console.log('this.parseChartDatav checking',this.parseChartData)
-          this.storeDrillFilter = this.parseChartData.DrillFilter,
-          this.DrillFilterLevel = this.parseChartData.DrillFilterLevel
-          this.summaryService.updatelookUpData(this.parseChartData)
-
-          // this.parseChartOptions = JSON.parse(this.parseChartData.highchartsOptionsJson)
-          console.log('this.parseChartOptions checking',this.parseChartOptions)
 
 
 
 
-
-
-          this.processedData = JSON.parse(this.parsedResBody.rowdata)
-          console.log('this.processedData check',this.processedData)
-  
-          this.paresdDataEmit.emit(this.processedData); 
           
           
       
@@ -366,6 +398,7 @@ const extractcolumnVisibility = chartConfig
 
     // Emit the cell info if needed
     this.sendCellInfo.emit(event);
+    this.counter++
 
   }
   

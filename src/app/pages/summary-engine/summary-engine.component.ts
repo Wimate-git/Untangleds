@@ -352,7 +352,6 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   storeFullScreen: any;
   readLookupData: any;
   storeCheck: any;
-  storeDrillConfig: any;
 
   createPieChart() {
     const chartOptions: any = {
@@ -8281,8 +8280,6 @@ helperChartClickChart1(event: any, modalChart: any) {
   console.log('event checking:', event);
   console.log('modalChart reference:', modalChart);
   console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
-  this.storeDrillConfig = JSON.parse(this.chartDataConfigExport.actualData.DrillConfig)
-  console.log('this.storeDrillConfig checking',this.storeDrillConfig)
 
   // ✅ Step 1: Check if modal opening is manually stopped
   if (this.preventModalOpening) {
