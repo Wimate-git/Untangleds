@@ -104,6 +104,7 @@ export class Chart3ConfigComponent implements OnInit{
   fieldLabelsShow: any;
   populateFormBuilder: never[];
   formlistValues: string[];
+  isRequredField:boolean=false
   
 
 
@@ -155,7 +156,9 @@ export class Chart3ConfigComponent implements OnInit{
   
     const newConditionGroup = this.fb.group({
       drillTypeFields: [fieldValue], // Ensure ngx-select control is properly initialized
-      drillTypeLabel:['']
+      drillTypeLabel:[''],
+      drillTypePrimary:[''],
+      DrillFilter:['']
     });
   
     conditionsArray.push(newConditionGroup);
@@ -387,8 +390,10 @@ export class Chart3ConfigComponent implements OnInit{
   
   createCondition(): FormGroup {
     return this.fb.group({
-      drillTypeFields: ['', Validators.required],
-      drillTypeLabel: ['', Validators.required]
+      drillTypeFields: [''],
+      drillTypeLabel: [''],
+      drillTypePrimary:[''],
+      DrillFilter:['']
     });
   }
   
@@ -1127,8 +1132,10 @@ repopulateDrill_fields(getValues: any): FormArray {
       conditions.forEach((condition: any) => {
         conditionArray.push(
           this.fb.group({
-            drillTypeFields: [condition.drillTypeFields || '', Validators.required],
-            drillTypeLabel: [condition.drillTypeLabel || '', Validators.required]
+            drillTypeFields: [condition.drillTypeFields || ''],
+            drillTypeLabel: [condition.drillTypeLabel || ''],
+            drillTypePrimary:[condition.drillTypePrimary ||''],
+            DrillFilter:[]
           })
         );
       });

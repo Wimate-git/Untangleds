@@ -6,7 +6,17 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
 import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engine.service';
+interface CustomPointOptions {
+  customIndex: number;
+  // Other properties of options if needed
+}
 
+interface CustomPoint {
+  options: CustomPointOptions;
+  category: string;
+  y: number;
+  colorIndex: number;
+}
 @Component({
   selector: 'app-chart-ui3',
 
@@ -43,6 +53,91 @@ export class ChartUi3Component implements OnInit{
   iframeUrl: any;
   selectedMarkerIndex: any;
   tile1Config: any;
+  isChecked: boolean = false; // Initial state is false
+
+  toggleCheck() {
+    this.isChecked = !this.isChecked; // Toggle the value
+    console.log('this.isChecked checking',this.isChecked)
+
+    const chartConfig =JSON.parse(this.item.chartConfig)
+    console.log('chartConfig check from chart ui',chartConfig)
+    const extractcolumnVisibility = chartConfig
+    
+        this.formTableConfig = {
+          columnVisibility:extractcolumnVisibility,
+          formName:this.item.chartConfig.formlist
+          }
+          this.emitChartConfigTable.emit(this.formTableConfig); 
+    
+    
+          // Define the API Gateway URL
+          const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+        
+          // Prepare the request body
+          const requestBody = {
+            body: JSON.stringify({
+              clientId: this.SK_clientID,
+              routeId: this.routeId,
+              widgetId:this.item.id,
+       
+              MsgType:'DrillDown',
+              permissionId:this.permissionIdRequest,
+              permissionList:this.readFilterEquation,
+              userName:this.userdetails,
+              conditions:this.eventFilterConditions ||[],
+              ButtonClick:this.isChecked
+            }),
+          };
+        
+          console.log('requestBody checking chart1Drilldown from button click', requestBody);
+        
+          // Send a POST request to the Lambda function with the body
+          this.http.post(apiUrl, requestBody).subscribe(
+            (response: any) => {
+              console.log('Lambda function triggered successfully:', response);
+              this.checkResBody = response.body
+              console.log('this.checkResBody',this.checkResBody)
+              this.parsedResBody = JSON.parse(this.checkResBody)
+              console.log('this.parsedResBody checking',this.parsedResBody)
+              this.processedData = JSON.parse(this.parsedResBody.rowdata)
+              console.log('this.processedData check',this.processedData)
+              this.paresdDataEmit.emit(this.processedData); 
+              
+              
+          
+              // Display SweetAlert success message
+              // Swal.fire({
+              //   title: 'Success!',
+              //   text: 'Lambda function triggered successfully.',
+              //   icon: 'success',
+              //   confirmButtonText: 'OK'
+              // });
+        
+              // Proceed with route parameter handling
+    
+        
+       // Reset loading state
+            },
+            (error: any) => {
+              console.error('Error triggering Lambda function:', error);
+        
+              // Display SweetAlert error message
+              Swal.fire({
+                title: 'Error!',
+                text: 'Failed to trigger the Lambda function. Please try again.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+              });
+       // Reset loading state
+            }
+          );
+    
+        // Emit the cell info if needed
+        this.sendCellInfo.emit(event);
+    
+
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
@@ -151,13 +246,19 @@ export class ChartUi3Component implements OnInit{
     console.log('Bar clicked:', {
       category: event.point.category,
       value: event.point.y,
+      // customIndex: event.point.customIndex,
+      colorIndex:event.point.colorIndex
+
+
      
     });
-
     const pointData = {
-      name: event.point.category,  // Pie chart label
-      value: event.point.y     // Data value
-    };
+      name: event.point.category,
+      value: event.point.y,
+      customIndex: (event.point.options as CustomPointOptions).customIndex, // Using a custom type for options
+      colorIndex: event.point.colorIndex
+  };
+  
     console.log('pointData checking column chart',pointData)
     const chartConfig =JSON.parse(this.item.chartConfig)
 console.log('chartConfig check from chart ui',chartConfig)
