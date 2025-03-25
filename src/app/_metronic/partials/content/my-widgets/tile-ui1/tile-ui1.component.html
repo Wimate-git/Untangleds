@@ -48,7 +48,7 @@ style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.
     style="position: absolute; top: 10px; right: 10px; gap: 10px;"
     (click)="$event.stopPropagation()">
  <!-- Edit Button -->
- <button *ngIf="!isEditModeView && !hideButton && (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))"
+ <button *ngIf="isButtonVisible"
          class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px"
          (click)="edit_each_tileUI(item, index)"
          aria-haspopup="menu"

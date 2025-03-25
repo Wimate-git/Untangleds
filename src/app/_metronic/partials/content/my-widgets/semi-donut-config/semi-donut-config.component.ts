@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -10,8 +10,6 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { APIService } from 'src/app/API.service';
 import { LocationPermissionService } from 'src/app/location-permission.service';
 import { SharedService } from 'src/app/pages/shared.service';
-
-
 interface FormField {
   columnWidth?: number;
   label?: string;
@@ -23,15 +21,12 @@ interface FormField {
 }
 
 @Component({
-  selector: 'app-chart1-config',
+  selector: 'app-semi-donut-config',
 
-  templateUrl: './chart1-config.component.html',
-  styleUrl: './chart1-config.component.scss'
+  templateUrl: './semi-donut-config.component.html',
+  styleUrl: './semi-donut-config.component.scss'
 })
-
-
-
-export class Chart1ConfigComponent implements OnInit {
+export class SemiDonutConfigComponent {
 
   createChart:FormGroup
 
@@ -444,6 +439,8 @@ export class Chart1ConfigComponent implements OnInit {
     this.createChart.get('enableLegends')?.valueChanges.subscribe((enable: boolean) => {
       this.toggleLegend(enable);
     });
+
+    
   }
   
 
@@ -742,7 +739,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         colWidth: 100,
         fixedColWidth: true,
         fixedRowHeight: true,
-        grid_type: 'chart',
+        grid_type: 'semiDonut',
   
         chart_title: this.createChart.value.chart_title || '',  // Ensure this value exists
         fontSize: `${this.createChart.value.fontSize || 16}px`,  // Provide a fallback font size
@@ -997,7 +994,7 @@ themes = [
 ];
 
 
-openChartModal1(tile: any, index: number): void {
+opensemiDonutModal(tile: any, index: number): void {
   console.log('Index checking:', index);
 
   if (tile) {
@@ -1047,7 +1044,7 @@ openChartModal1(tile: any, index: number): void {
       toggleCheck: tile.toggleCheck,
       selectType: tile.selectType,
       DrillDownType: tile.DrillDownType,
-      enableLegends:tile.enableLegends ||''
+      enableLegends:tile.enableLegends
     });
 
     // ✅ Populate all_fields and drill_fields separately
@@ -1920,7 +1917,10 @@ toggleCheckbox(theme: any): void {
     },
     plotOptions: {
       series: {
-        innerSize: '40%',
+        innerSize: "40%",
+        startAngle: -90,
+        endAngle: 90,
+        slicedOffset: 20,
         allowPointSelect: true,
         cursor: 'pointer',
         showInLegend: false, // Set to false to disable legends
@@ -2268,6 +2268,5 @@ miniTableFieldsRead(readFields:any){
 
 
 }
+
 }
-
-

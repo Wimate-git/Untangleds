@@ -73,6 +73,7 @@ import { AuthService } from 'src/app/modules/auth';
 import { MixedChartConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/mixed-chart-config/mixed-chart-config.component';
 import * as CryptoJS from 'crypto-js';
 import { FullscreenService } from '../report-studio/services/fullscreen.service';
+import { SemiDonutConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/semi-donut-config/semi-donut-config.component';
 
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
@@ -177,6 +178,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   @ViewChild(TitleConfigComponent, { static: false }) titleConfigComponent: TitleConfigComponent;
   @ViewChild(Tile6ConfigComponent, { static: false }) tileConfig6Component: Tile6ConfigComponent;
   @ViewChild(Chart1ConfigComponent, { static: false }) ChartConfig1Component: Chart1ConfigComponent;
+  @ViewChild(SemiDonutConfigComponent, { static: false }) SemiDonutConfigComponent: SemiDonutConfigComponent;
+  
 
   @ViewChild(StackedBarConfigComponent, { static: false }) StackedBarConfigComponent: StackedBarConfigComponent;
   @ViewChild(PieChartConfigComponent, { static: false }) PieChartConfigComponent: PieChartConfigComponent;
@@ -417,6 +420,60 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     Highcharts.chart('pieChart', chartOptions);
   }
 
+  createSemiDonut(){
+    const chartOptions: any = {
+      chart: {
+        inverted: false,
+        type: 'pie',
+        // Set the chart height
+      },
+      title: {
+        text: '',
+      },
+      legend: {
+        enabled: false,  // Hide the legend
+      },
+      yAxis: {
+        gridLineWidth: 0,
+      },
+      plotOptions: {
+        pie: {
+          innerSize: '50%', // Makes it a donut chart
+          startAngle: -90, // Starts the chart at the top
+          endAngle: 90, // Ends at the halfway point
+          slicedOffset: 20,  // This creates the donut shape by setting the inner size
+          cursor: null,  // Hide pointer cursor
+          dataLabels: {
+            enabled: false,  // Disable data labels
+          },
+          showInLegend: false,  // Hide slices in legend
+        },
+      },
+      credits: {
+        enabled: false,
+      },
+      exporting: {
+        enabled: false,
+      },
+      series: [
+        {
+          data: [
+            ['Chrome', 60],
+            ['Edge', 15],
+            ['Firefox', 10],
+            ['Safari', 8],
+            ['Others', 7]
+          ]
+        },
+      ],
+    };
+  
+    Highcharts.chart('semiDonut', chartOptions);
+
+  }
+  ngOnChanges() {
+    this.setCheck();
+  }
 
   createFunnelChart() {
     const chartOptions: any = {
@@ -539,6 +596,70 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     Highcharts.chart('barChart', barchartOptions);
   }
 
+
+
+  createMixedChart(){
+    const barchartOptions: any = {
+      chart: {
+        type: 'line'  // Default chart type for line series
+    },
+    title: {
+        text: 'Mixed Chart with Dual X-Axis'
+    },
+    xAxis: [{
+      categories: ['CHILLER', 'HEAT PU', 'PAC', 'AHU'],
+  // Region Labels
+      title: {
+          text: 'Region'
+      },
+      gridLineWidth: 0,  // Remove gridlines between categories
+      labels: {
+          style: {
+              fontSize: '12px'
+          }
+      }
+  }, {
+    categories: ['East', 'North', 'South', 'West'], // Unit Type Labels
+      title: {
+          text: 'Unit Type'
+      },
+      gridLineWidth: 0,  // Remove gridlines between this axis
+      labels: {
+          style: {
+              fontSize: '12px'
+          },
+          y: 15  // Adjust label positioning to avoid overlap with the first x-axis
+      },
+      linkedTo: 0 // Link to the first axis to align the ticks properly
+  }],
+  
+    yAxis: [{
+        title: {
+            text: 'Total Tonnage (TR)'
+        }
+    }, {
+        title: {
+            text: 'No of Units'
+        },
+        opposite: false
+    }],
+    series: [{
+      name: 'Units',
+      data: [20, 30, 40, 50],
+      type: 'column',
+  }, {
+      name: 'Tonnage',
+      data: [50, 60, 70, 80],
+      type: 'line',
+      yAxis: 1
+  }],
+    tooltip: {
+        shared: true,
+        crosshairs: true
+    }
+}
+Highcharts.chart('MixedChart', barchartOptions);
+  }
 
   createAreaChart() {
     const areachartOptions: any = {
@@ -1738,14 +1859,6 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
   }
     if (packet.selectType === 'Modal') {
 
-
-      // this.fetchCompanyLookupdataOnit(1)
-      // .then((data: any) => {
-      //   this.readLookupData = data; // Assign fetched data to the component property
-      //   console.log('this.readLookupData check', this.readLookupData);
-      // });
-
-    
     this.route.queryParams.subscribe(async (params) => {
       if(params['uID']){
         console.log('uid checking',params['uID'])
@@ -1767,6 +1880,21 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
     });
 
 
+    // this.openModalHelpher(packet.dashboardIds).then((data) => {
+    //   console.log('✅ this.all_Packet_store permissions:', data);
+    //   const readMainData = data;
+    //   console.log('readMainData checking', readMainData);
+    //   this.storeCheck = readMainData.fullScreenModeCheck;
+    //   console.log('this.storeCheck checking', this.storeCheck);
+    // });
+    // this.openModalHelpher(packet.dashboardIds).then((data) => {
+    //   console.log('✅ this.all_Packet_store permissions:', data);
+    //   const readMainData = data;
+    //   console.log('readMainData checking', readMainData);
+    //   this.storeCheck = readMainData.fullScreenModeCheck;
+    //   console.log('this.storeCheck checking', this.storeCheck);
+    // });
+
     console.log('packet checking from queryparams', packet);
     this.modalCheck = packet.selectType;
 
@@ -1774,27 +1902,44 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
     this.hideNavMenu = true;  
     const disableMenuQP = true;
     // window.location.reload();
-
     if (this.modalContent) {
-        console.log('modalContent checking', this.modalContent);
-        this.modalService.open(this.modalContent, { size: 'xl' });
+      console.log('modalContent checking', this.modalContent);
+      this.modalService.open(this.modalContent, { size: 'xl' });
 
-        const queryParams = new URLSearchParams();
+      const queryParams = new URLSearchParams();
 
 console.log('this.eventFilterConditions checking', this.eventFilterConditions);
 
 if (this.eventFilterConditions && this.eventFilterConditions.length > 0) {
-  queryParams.append('filters', encodeURIComponent(JSON.stringify(this.eventFilterConditions)));
+queryParams.append('filters', encodeURIComponent(JSON.stringify(this.eventFilterConditions)));
 }
 
 if (packet.dashboardIds) {
-  queryParams.append('dashboardId', packet.dashboardIds);
+queryParams.append('dashboardId', packet.dashboardIds);
 }
 
 if (this.routeId) {
-  queryParams.append('routeId', this.routeId);
+queryParams.append('routeId', this.routeId);
 }
+this.route.queryParams.subscribe(async (params) => {
+if(params['uID']){
+  console.log('uid checking',params['uID'])
+  this.userId = params['uID']
 
+  
+}
+if(params['pass']){
+  console.log('pass checking',params['pass'])
+  this.userPass = params['pass']
+  const user = await this.authservice.signIn((this.userId).toLowerCase(), this.userPass);
+  console.log('user check query',user)
+  
+}
+// if(params['clientID']){
+//   console.log('clientID checking',params['clientID'])
+
+// }
+});
 // Add viewMode and disableMenu to query params
 const viewMode = true;
 const disableMenu = true;
@@ -1806,45 +1951,69 @@ console.log('this.userId checking from redirectModal', this.userId);
 console.log('this.userPass checking from redirectModal', this.userPass);
 
 if (this.userId) {
-  queryParams.append('uID', this.userId);
+queryParams.append('uID', this.userId);
 }
 if (this.userPass) {
-  queryParams.append('pass', this.userPass);
+queryParams.append('pass', this.userPass);
 }
 
 // Wait for permissions and then build final URL
-this.openModalHelpher(packet.dashboardIds).then((data) => {
-  console.log('✅ this.all_Packet_store permissions:', data);
-  const readMainData = data;
-  console.log('readMainData checking', readMainData);
-  this.storeCheck = readMainData.fullScreenModeCheck;
-  console.log('this.storeCheck checking', this.storeCheck);
 
-  // Append isFullScreen based on storeCheck AFTER getting it
-  queryParams.append('isFullScreen', String(this.storeCheck));
+this.fetchCompanyLookupdataOnit(1)
+  .then((data: any) => {
+    const readLookupSummary = data; // Assign fetched data to the component property
+    console.log('readLookupSummary', readLookupSummary);
+    console.log('this.lookup_data_summaryCopy check', this.lookup_data_summaryCopy);
 
-  // Build final URL
-  const finalUrl = `${window.location.origin}/summary-engine/${modulePath}?${queryParams.toString()}`;
-  
-  this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
+    // Assuming `dashboardIds` is an array that contains the values to compare with `P1`
+    const dashboardIds = packet.dashboardIds;
 
 
-  console.log('this.currentiframeUrl checking', this.currentiframeUrl);
-});
+    // Loop through the data and find the matching packet
+    const matchingPacket = readLookupSummary.find((packet: any) => {
+      return dashboardIds.includes(packet.P1); // Check if P1 matches any value in dashboardIds
+    });
 
-        
-        // console.log('this.currentiframeUrl checking', this.currentiframeUrl);
-        
-        
-        localStorage.setItem('viewMode', 'true');
-        localStorage.setItem('disableMenu', 'true');
+    if (matchingPacket) {
+      console.log('Matching Packet:', matchingPacket);
+          this.storeCheck = matchingPacket.P11
+          console.log('this.storeCheck check from setmoduleId',this.storeCheck)
+    queryParams.append('isFullScreen', String(this.storeCheck));
+      const finalUrl = `${window.location.origin}/summary-engine/${modulePath}?${queryParams.toString()}`;
 
-        this.cdr.detectChanges();
-  
-        console.log('Opening modal with iframe URL:', this.currentiframeUrl);
+      this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
+      
+      
+      console.log('this.currentiframeUrl checking', this.currentiframeUrl);
+      // Do something with the matching packet here
     } else {
-        console.error('Modal content is undefined');
+      console.log('No matching packet found');
     }
+  })
+  .catch((error: any) => {
+    console.error('Error fetching data:', error);
+  });
+
+// Append isFullScreen based on storeCheck AFTER getting it
+
+
+// Build final URL
+
+
+      
+      // console.log('this.currentiframeUrl checking', this.currentiframeUrl);
+      
+      
+      localStorage.setItem('viewMode', 'true');
+      localStorage.setItem('disableMenu', 'true');
+
+      this.cdr.detectChanges();
+
+      console.log('Opening modal with iframe URL:', this.currentiframeUrl);
+  } else {
+      console.error('Modal content is undefined');
+  }
+
 }
 if (packet.selectType === 'Same page Redirect') {
   // Extract query parameters once (avoid repeated subscription)
@@ -1964,7 +2133,7 @@ storeFilterTileConfig(config: any, index: number): void {
 
 closeModal1() {
   this.modalService.dismissAll(); // Close the modal programmatically
-  window.location.reload()
+  // window.location.reload()
 }
 // handleKeyDown = (event: KeyboardEvent): void => {
 //   if (event.key === 'Escape' && this.isFullScreen) {
@@ -2297,6 +2466,24 @@ exitFullScreen(): void {
           `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
         );
       }
+      else if (item.grid_type === 'semiDonut') {
+        const baseHeight = 400; // Base height for the chart
+        // const extraHeight = 40; // Additional height for labels, etc.
+  
+        this.chartHeight[index] = Math.max(0, itemComponentHeight); // Adjust height
+        this.chartWidth[index] = Math.max(0, itemComponentWidth);
+  
+        console.log(
+          `Updated chart dimensions at index ${index}:`,
+          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        );
+      }
+
+
+
+
+
+      
       else if (item.grid_type === 'Funnelchart') {
         const baseHeight = 400; // Base height for the chart
         // const extraHeight = 40; // Additional height for labels, etc.
@@ -2633,6 +2820,7 @@ exitFullScreen(): void {
     this.resetInactivityTimer()
 
     this.loadPinnedItems();
+    this.setCheck();
 
   }
 
@@ -3602,28 +3790,19 @@ processFetchedData(result: any): void {
     { value: 'option3', label: 'Option 3' },
   ];
   listofTiles = [
-    { value: 'Tiles', label: 'Tiles' },
-    { value: 'Title', label: 'Title' },
     { value: 'Chart', label: 'Chart' },
     { value: 'DynamicTile', label: 'DynamicTile' },
-    {value:'FilterTile',label:'FilterTile'},
-    {value:'TableTile',label:'TableTile'},
-    {value:'MapWidget',label:'MapWidget'},
-    {value:'MultiTableWidget',label:'MultiTableWidget'},
-    {value:'Html Tile',label:'Html Tile'},
-    {value:'ImageTile',label:'ImageTile'},
-    {value:'ProgressTile',label:'ProgressTile'},
-    // {ProgressTile}
-    
-    
-    
-
-    
-
-    // { value: 'Pharagraph', label: 'Pharagraph' },
-    // { value: 'Image', label: 'Image' },
-    // { value: 'Embed', label: 'Embed' },
-  ]
+    { value: 'FilterTile', label: 'FilterTile' },
+    { value: 'Html Tile', label: 'Html Tile' },
+    { value: 'ImageTile', label: 'ImageTile' },
+    { value: 'MapWidget', label: 'MapWidget' },
+    { value: 'MultiTableWidget', label: 'MultiTableWidget' },
+    { value: 'ProgressTile', label: 'ProgressTile' },
+    { value: 'TableTile', label: 'TableTile' },
+    { value: 'Tiles', label: 'Tiles' },
+    { value: 'Title', label: 'Title' }
+  ];
+  
   tileChange(event: any): void {
     console.log('Tile changed:', event);
 
@@ -3655,6 +3834,10 @@ processFetchedData(result: any): void {
       setTimeout(() => {
         this.createPieChart()
       }, 500);
+
+      setTimeout(() => {
+        this.createSemiDonut()
+      }, 500);
       setTimeout(() => {
         this.createLineChart()
         
@@ -3666,6 +3849,11 @@ setTimeout(() => {
 
     this.createBarChart()
  
+}, 500);
+
+setTimeout(() => {
+  this.createMixedChart()
+  
 }, 500);
 
 setTimeout(() => {
@@ -3865,9 +4053,39 @@ setTimeout(() => {
     // }));
   
     // Navigate to the new URL and reload the page
-    console.log('i am redirect to dashboardopen')
-    this.router.navigate([`/summary-engine/${id}`]).then(() => {
-      location.reload(); // Reload the window after navigation
+    this.route.queryParams.subscribe(async (params) => {
+      let queryParams: any = {};  // Initialize queryParams object
+      
+      // Conditionally add userId and userPass if they exist
+      if (this.userId) {
+        queryParams.uID = this.userId; // Add uID to queryParams
+      }
+      if (this.userPass) {
+        queryParams.pass = this.userPass; // Add pass to queryParams
+      }
+  
+      // Fetch the storeCheck value asynchronously and update the queryParams
+      this.openModalHelpher(id).then((data) => {
+        console.log('✅ this.all_Packet_store permissions:', data);
+        const readMainData = data;
+        this.storeCheck = readMainData.fullScreenModeCheck;
+        console.log('this.storeCheck checking', this.storeCheck);
+  
+        // Append 'isFullScreen' to the query parameters after resolving the promise
+        queryParams.isFullScreen = String(this.storeCheck);  // Ensure it's a string
+  
+        // Merge the queryParams and navigate
+        this.router.navigate([`/summary-engine/${id}`], { 
+          queryParams: queryParams, 
+          queryParamsHandling: 'merge'  // Merges the query parameters without encoding
+        }).then(() => {
+          window.location.reload(); // Reload the window after navigation
+        }).catch(err => {
+          console.error('Error in navigation:', err);
+        });
+      }).catch(err => {
+        console.error('Error in openModalHelpher:', err);
+      });
     });
 
     // setTimeout(() => {
@@ -4306,6 +4524,15 @@ justReadStyles(data:any,index:any){
         this.ChartConfig1Component.openChartModal1(event.arg1, event.arg2)
       }, 500);
 
+
+    }
+    else if(event.arg1.grid_type=='semiDonut'){
+      this.modalService.open(KPIModal, { size: 'xl' });
+      console.log('event check', event)
+      setTimeout(() => {
+        this.SemiDonutConfigComponent.opensemiDonutModal(event.arg1, event.arg2)
+      }, 500);
+
     }
     else if(event.arg1.grid_type=='Stackedchart'){
       this.modalService.open(KPIModal, { size: 'xl' });
@@ -4608,6 +4835,25 @@ justReadStyles(data:any,index:any){
     
       console.log('event.data.arg1', event.data.arg1);
     }
+
+    else if (event.data.arg1.grid_type === 'semiDonut') {
+      console.log('event check chart1', event);
+    
+      // Store all company details
+      this.allCompanyDetails = event.all_Packet_store;
+    
+      // Directly update the id and push the object into the dashboard in one line
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
+    }
+
+
+
+    
 
     else if (event.data.arg1.grid_type === 'Piechart') {
       console.log('event check chart1', event);
@@ -6814,6 +7060,7 @@ this.createSummaryField.patchValue({
           };
   
           await this.api.UpdateMaster(updateData);
+          
         } else { // If item not found
           await new Promise(resolve => setTimeout(resolve, 500));
           await this.fetchTimeMachineById(sk + 1, id, type, item);
@@ -7733,9 +7980,10 @@ refreshFunction(){
   
     // If the user has the necessary permission, toggle the mode
     this.isEditModeView = !this.isEditModeView;
-    this.updateOptions();  // Update grid options based on mode
+    this.updateOptions(); 
+    this.setCheck(!this.isEditModeView);  // Update grid options based on mode
   
-    console.log('Current Mode (After Toggle):', this.isEditModeView ? 'Edit Mode' : 'View Mode');
+    console.log('Current Mode (After Toggle):', this.isEditModeView );
   
     // Store the mode in localStorage
     localStorage.setItem('editModeState', this.isEditModeView.toString());
@@ -7743,11 +7991,24 @@ refreshFunction(){
   
 
   get gridsterStyles() {
+    // Check the value of `check` and update the background color accordingly
+    const backgroundColor = this.check ? '#333333' : '#FFFFFF';  // Gray if check is true, White if false
+    
     return `
-      background: ${this.isEditModeView ? '#FFFFFF' : '#333333'} !important;
+      background: ${backgroundColor} !important;
       border-radius: 5px !important;
       padding: 0px !important;
     `;
+  }
+  
+  check: boolean = false;
+  setCheck(receiveCheck?: any) {
+    if (receiveCheck !== undefined && receiveCheck !== null) {
+      this.check = receiveCheck;  // Use the provided `receiveCheck` value
+    } else {
+      this.check = this.isEditModeView ? true : false;  // Fallback to the state of `isEditModeView`
+    }
+    console.log('Checking icon view:', this.check);
   }
   
   
@@ -7847,6 +8108,12 @@ refreshFunction(){
     modal.dismiss();
   }
 
+
+  opensemiDonutChartModal(semiDonutModal: TemplateRef<any>,modal:any){
+    this.modalService.open(semiDonutModal, { size: 'xl' });
+    modal.dismiss();
+
+  }
   openChartModal4(ChartModal4: TemplateRef<any>,modal:any) {
     this.modalService.open(ChartModal4, { size: 'xl' });
     modal.dismiss();
@@ -8267,7 +8534,8 @@ helperChartClickChart1(event: any, modalChart: any) {
       Barchart:{width:this.chartWidth, height:this.chartHeight, heightOffset: 10, widthOffset: 30 },
       Areachart:{width:this.chartWidth, height:this.chartHeight, heightOffset: 10, widthOffset: 30 },
       progressTile:{width:this.DynamicTileWidth, height:this.DynamicTileWidth, heightOffset: 10, widthOffset: 30 },
-      tileWithIcon:{ width: this.tileWidth, height: this.tileHeight, heightOffset: 80, widthOffset: 30}
+      tileWithIcon:{ width: this.tileWidth, height: this.tileHeight, heightOffset: 80, widthOffset: 30},
+      semiDonut:{width:this.chartWidth, height:this.chartHeight, heightOffset: 10, widthOffset: 30 },
  
       // filterTileHeight:any []=[];
       // filterTileWidth:any []=[];

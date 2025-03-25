@@ -49,6 +49,7 @@ export class TileUi1Component implements OnInit{
   @Input () summaryDashboardView :any
   @Input() summaryDashboardUpdate:any;
   @Input() queryParamsSend:any
+  check: boolean = false;
 
 
 
@@ -80,6 +81,11 @@ export class TileUi1Component implements OnInit{
 
   
 }
+
+
+get isButtonVisible(): boolean {
+  return !this.isEditModeView && !this.hideButton && (this.summaryDashboardUpdate || (this.summaryDashboardUpdate && !this.summaryDashboardView));
+}
 get shouldShowButton(): boolean {
   return this.item.dashboardIds !== "";
 }
@@ -96,7 +102,8 @@ get shouldShowButton(): boolean {
     console.log('disableMenuQP check from ngOnint',this.disableMenuQP)
     console.log('this.queryParamsSend check ngOnInit',)
 
-
+    this.check = this.isButtonVisible;
+    console.log('this.check checking',this.check)
 
       this.summaryService.lookUpData$.subscribe((data: any)=>{
         console.log('data check>>> tileui1',data)

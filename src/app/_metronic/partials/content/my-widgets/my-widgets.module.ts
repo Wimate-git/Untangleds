@@ -85,6 +85,8 @@ import { StackedBarConfigComponent } from './stacked-bar-config/stacked-bar-conf
 import { StackedBarUiComponent } from './stacked-bar-ui/stacked-bar-ui.component';
 import { MixedChartConfigComponent } from './mixed-chart-config/mixed-chart-config.component';
 import { MixedChartUiComponent } from './mixed-chart-ui/mixed-chart-ui.component';
+import { SemiDonutConfigComponent } from './semi-donut-config/semi-donut-config.component';
+import { SemiDonutUiComponent } from './semi-donut-ui/semi-donut-ui.component';
 
 
 
@@ -146,7 +148,10 @@ import { MixedChartUiComponent } from './mixed-chart-ui/mixed-chart-ui.component
     StackedBarConfigComponent,
     StackedBarUiComponent,
     MixedChartConfigComponent,
-    MixedChartUiComponent
+    MixedChartUiComponent,
+    SemiDonutConfigComponent,
+ SemiDonutUiComponent 
+    
 
 
 
@@ -247,7 +252,9 @@ import { MixedChartUiComponent } from './mixed-chart-ui/mixed-chart-ui.component
     StackedBarConfigComponent,
     StackedBarUiComponent,
     MixedChartConfigComponent,
-    MixedChartUiComponent
+    MixedChartUiComponent,
+    SemiDonutConfigComponent,
+    SemiDonutUiComponent
     
   
 

@@ -210,6 +210,11 @@
                  
                       [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalChart1)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-pie-chart-ui>
                     </div>
+                    <div *ngIf="item.grid_type === 'semiDonut'"  >
+                      <app-semi-donut-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,semiDonutModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
+                 
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalChart1)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-semi-donut-ui>
+                    </div>
 
                     <div *ngIf="item.grid_type === 'Funnelchart'"  >
                       <app-funnel-chart-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,FunnelChartModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
@@ -786,11 +791,13 @@
     </a>
     <a *ngIf="!isSummaryEngine() && (summaryDashboardUpdate || userPermission === 'All' || !summaryDashboardView)"
     class="myMenu-item" 
-    (click)="toggleMode()" 
+    (click)="toggleMode()"
     style="cursor: pointer;" 
     [attr.title]="isEditModeView ? 'Widgets Edit Mode' : 'View Mode'">
     <i style="color: white;" class="fa" [ngClass]="isEditModeView ? 'fa-pencil-alt' : 'fa-eye'"></i>
-</a>
+ </a>
+ 
+ 
 
  
  
@@ -1193,7 +1200,7 @@
         <div class="container" [formGroup]="createSummaryField">
           <div class="row">
             <div class="col-md-6 centered-dropdown-container">
-              <label class="col-form-label fw-bold fs-6">Widget Type</label>
+              <label class="col-form-label fw-bold fs-6">Widget Types</label>
               <ngx-select
                 [allowClear]="true"
                 name="icon"
@@ -1201,7 +1208,7 @@
                 [items]="listofTiles"
                 optionValueField="value"
                 optionTextField="text"
-                placeholder="Select Form"
+                placeholder="Select Widget Type"
                 (selectionChanges)="tileChange($event)"
               >
               </ngx-select>
@@ -1435,6 +1442,11 @@
                 </div>
               </button>
             </div>
+
+
+
+
+        
        
           </div>
 
@@ -1503,10 +1515,25 @@
 
           <div class="row">
 
+
+
             <div class="col-md-6">
               <!-- Bar Chart Button -->
               <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7" style="border: 0px; display: block; width: 100%;">
-                <div id="barChart" style="width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;" 
+                <div id="semiDonut" style="width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;" 
+                  (click)="opensemiDonutChartModal(semiDonutModal, modal)">
+                </div>
+              </button>
+            </div>
+
+            
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <!-- Bar Chart Button -->
+              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7" style="border: 0px; display: block; width: 100%;">
+                <div id="MixedChart" style="width: 600px; height: 600px; display: flex; justify-content: center; align-items: center;" 
                   (click)="openMixedChartModal(MixedChartModal, modal)">
                 </div>
               </button>
@@ -2330,6 +2357,13 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   <ng-template #ChartModal1 let-modal >
   
     <app-chart1-config  [dashboard]="dashboard" (dashboardChange)="getGridDetails2($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver2($event)"></app-chart1-config>
+  
+  </ng-template>
+
+
+  <ng-template #semiDonutModal let-modal >
+  
+    <app-semi-donut-config  [dashboard]="dashboard" (dashboardChange)="getGridDetails2($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver2($event)"></app-semi-donut-config>
   
   </ng-template>
 
