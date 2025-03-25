@@ -55,6 +55,8 @@ export class ChartUi3Component implements OnInit{
   tile1Config: any;
   isChecked: boolean = false; // Initial state is false
   parseChartData: any;
+  storeDrillFilter: any;
+  DrillFilterLevel: any;
 
   toggleCheck() {
     this.isChecked = !this.isChecked; // Toggle the value
@@ -86,7 +88,9 @@ export class ChartUi3Component implements OnInit{
               permissionList:this.readFilterEquation,
               userName:this.userdetails,
               conditions:this.eventFilterConditions ||[],
-              ButtonClick:this.isChecked
+              ChartClick:this.isChecked,
+                     DrillFilter:this.storeDrillFilter ||'',
+          DrillFilterLevel:this.DrillFilterLevel ||''
             }),
           };
         
@@ -99,6 +103,13 @@ export class ChartUi3Component implements OnInit{
               this.checkResBody = response.body
               console.log('this.checkResBody',this.checkResBody)
               this.parsedResBody = JSON.parse(this.checkResBody)
+
+
+              this.parseChartData = JSON.parse(this.parsedResBody.ChartData)
+              console.log('this.parseChartDatav checking',this.parseChartData)
+              this.storeDrillFilter = this.parseChartData.DrillFilter,
+              this.DrillFilterLevel = this.parseChartData.DrillFilterLevel
+              this.summaryService.updatelookUpData(this.parseChartData)
               console.log('this.parsedResBody checking',this.parsedResBody)
               this.processedData = JSON.parse(this.parsedResBody.rowdata)
               console.log('this.processedData check',this.processedData)
@@ -145,6 +156,7 @@ export class ChartUi3Component implements OnInit{
       console.log("DynamicLine chart",this.item)
       console.log('liveDataColumnChart check',this.liveDataColumnChart)
       console.log('eventFilterConditions chart ui1',this.eventFilterConditions)
+      console.log('this.storeDrillFilter checking',this.storeDrillFilter)
       // this.parseChartOptions = this.item.highchartsOptionsJson;
       // console.log('this.parseChartOptions checking',this.parseChartOptions)
       // const check = JSON.parse(this.parseChartOptions);
@@ -287,8 +299,8 @@ const extractcolumnVisibility = chartConfig
           permissionList:this.readFilterEquation,
           userName:this.userdetails,
           conditions:this.eventFilterConditions ||[],
-          DrillFilter:'',
-          DrillFilterLevel:''
+          DrillFilter:this.storeDrillFilter ||'',
+          DrillFilterLevel:this.DrillFilterLevel ||''
 
         }),
       };
@@ -306,6 +318,8 @@ const extractcolumnVisibility = chartConfig
 
           this.parseChartData = JSON.parse(this.parsedResBody.ChartData)
           console.log('this.parseChartDatav checking',this.parseChartData)
+          this.storeDrillFilter = this.parseChartData.DrillFilter,
+          this.DrillFilterLevel = this.parseChartData.DrillFilterLevel
           this.summaryService.updatelookUpData(this.parseChartData)
 
           // this.parseChartOptions = JSON.parse(this.parseChartData.highchartsOptionsJson)

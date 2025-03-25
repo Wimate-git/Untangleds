@@ -342,6 +342,20 @@
                     </div>
 
 
+                    <div class="col-md-4 mb-3" *ngIf="isRequredField">
+                      <label for="constant" class="col-form-label fw-bold fs-6 "></label>
+                      <input id="constant" type="number" class="form-control form-control-solid"
+                        placeholder="Select constant" formControlName="DrillFilter"
+                    />
+                    </div>
+                    <div class="col-md-4 mb-3" *ngIf="isRequredField">
+                      <label for="constant" class="col-form-label fw-bold fs-6 "></label>
+                      <input id="constant" type="number" class="form-control form-control-solid"
+                        placeholder="Select constant" formControlName="DrillFilterLevel"
+                    />
+                    </div>
+
+
 
 
 
@@ -602,7 +616,17 @@
         
         <!-- Select Field -->
         <div class="col-md-4">
-          <label class="col-form-label fw-bold fs-6 required">Select Field</label>
+          <label for="drillTypeLabel" class="col-form-label fw-bold fs-6 ">Custom Label</label>
+          <input
+            type="text"
+            class="form-control form-control-solid"
+            id="drillTypeLabel"
+            name="drillTypeLabel"
+            formControlName="drillTypeLabel"
+          />
+        </div>
+        <div class="col-md-4">
+          <label class="col-form-label fw-bold fs-6 ">Select Field</label>
           <ngx-select
             [items]="dynamicParamMap.get(fieldIndex) || []"
             formControlName="drillTypeFields"
@@ -613,17 +637,23 @@
         </div>
 
         <!-- Custom Label -->
-        <div class="col-md-4">
-          <label for="drillTypeLabel" class="col-form-label fw-bold fs-6 required">Custom Label</label>
-          <input
-            type="text"
-            class="form-control form-control-solid"
-            id="drillTypeLabel"
-            name="drillTypeLabel"
-            formControlName="drillTypeLabel"
-          />
-        </div>
 
+
+        <div class="col-md-4 mb-3">
+          <label for="primaryValue" class="col-form-label fw-bold fs-6 required">
+            Primary Value
+            <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top"
+              title="Show Value As">
+              <i class="bi bi-info-circle fs-5"></i>
+            </span>
+          </label>
+          <ngx-select id="primaryValue" [allowClear]="true" formControlName="drillTypePrimary"
+            [items]="showValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
+            (selectionChanges)="onValueChange($event)" class="w-100"></ngx-select>
+            <div *ngIf="field.get('primaryValue')?.touched && field.get('primaryValue')?.invalid" class="text-danger">
+              <div *ngIf="field.get('primaryValue')?.errors?.required">Primary Value is required.</div>
+            </div>
+        </div>
         <!-- Remove Condition Button -->
         <div class="col-md-2 mt-12 d-flex justify-content-end">
           <button *ngIf="conditionIndex > 0" type="button" class="btn btn-danger btn-sm mt-4" (click)="removeCondition(fieldIndex, conditionIndex)">

@@ -302,7 +302,9 @@ export class Chart3ConfigComponent implements OnInit{
       dashboardIds: [''],
       selectType: [''],
       toggleCheck: [],
-      DrillDownType: ['']
+      DrillDownType: [''],
+      DrillFilter:[''],
+      DrillFilterLevel:[''],
     });
   
     // Subscribe to DrillDownType changes

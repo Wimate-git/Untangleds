@@ -101,6 +101,7 @@ export class Chart1ConfigComponent implements OnInit {
   extractedTables: unknown[];
   readMinitableName: any;
   readMinitableLabel: any;
+  isRequredField:boolean=false
   filteredHeaders: {
     value: any; // Set the 'name' field as value
     label: any; // Set the 'label' field as label
@@ -166,7 +167,8 @@ export class Chart1ConfigComponent implements OnInit {
   
     const newConditionGroup = this.fb.group({
       drillTypeFields: [fieldValue], // Ensure ngx-select control is properly initialized
-      drillTypeLabel:['']
+      drillTypeLabel:[''],
+      drillTypePrimary:[''],
     });
   
     conditionsArray.push(newConditionGroup);
@@ -208,8 +210,9 @@ export class Chart1ConfigComponent implements OnInit {
         conditions.forEach((condition: any) => {
           conditionArray.push(
             this.fb.group({
-              drillTypeFields: [condition.drillTypeFields || '', Validators.required],
-              drillTypeLabel: [condition.drillTypeLabel || '', Validators.required]
+              drillTypeFields: [condition.drillTypeFields || ''],
+              drillTypeLabel: [condition.drillTypeLabel || ''],
+              drillTypePrimary:[condition.drillTypePrimary ||''],
             })
           );
         });
@@ -411,7 +414,9 @@ export class Chart1ConfigComponent implements OnInit {
       selectType: [''],
       toggleCheck: [],
       DrillDownType: [''],
-      enableLegends:[]
+      enableLegends:[],
+      DrillFilter:[''],
+      DrillFilterLevel:[''],
     });
   
     // Subscribe to DrillDownType changes
@@ -510,8 +515,9 @@ export class Chart1ConfigComponent implements OnInit {
   
   createCondition(): FormGroup {
     return this.fb.group({
-      drillTypeFields: ['', Validators.required],
-      drillTypeLabel: ['', Validators.required]
+      drillTypeFields: [''],
+      drillTypeLabel: [''],
+      drillTypePrimary:[''],
     });
   }
   
@@ -761,9 +767,11 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         minitableEquation:this.createChart.value.minitableEquation,
         EquationOperationMini:this.createChart.value.EquationOperationMini,
         add_fields:this.createChart.value.add_fields,
-        enableLegends:this.createChart.value.enableLegends,
+        enableLegends:this.createChart.value.enableLegends ||'',
                 DrillConfig:this.createChart.value.drill_fields || [],
         DrillDownType:this.createChart.value.DrillDownType ||'',
+               DrillFilter:this.createChart.value.DrillFilter ||'',
+        DrillFilterLevel:this.createChart.value.DrillFilterLevel ||'',
     
       
 

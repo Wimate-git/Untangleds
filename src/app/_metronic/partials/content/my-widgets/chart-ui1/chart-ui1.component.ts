@@ -7,6 +7,19 @@ import Swal from 'sweetalert2';
 import { HttpClient } from '@angular/common/http';
 import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engine.service';
 
+
+
+interface CustomPointOptions {
+  customIndex: number;
+  // Other properties of options if needed
+}
+
+interface CustomPoint {
+  options: CustomPointOptions;
+  category: string;
+  y: number;
+  colorIndex: number;
+}
 @Component({
   selector: 'app-chart-ui1',
 
@@ -44,8 +57,12 @@ export class ChartUi1Component implements OnChanges,OnInit {
   @Output() paresdDataEmit = new EventEmitter<any>();
   @Output() emitChartConfigTable = new EventEmitter<any>();
   @Input() eventFilterConditions : any
+  isChecked: boolean = false;
   
   formTableConfig: {};
+  storeDrillFilter: string;
+  DrillFilterLevel: string;
+  parseChartData: any;
   
 ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui', this.all_Packet_store);
@@ -134,101 +151,219 @@ ngOnChanges(changes: SimpleChanges): void {
 
     this.tile1Config = this.item;
 }
+toggleCheck() {
+  this.isChecked = !this.isChecked; // Toggle the value
+  console.log('this.isChecked checking',this.isChecked)
 
-  onBarClick(event: Highcharts.PointClickEventObject): void {
-    console.log('event checking from ui',event)
-    console.log('Pie clicked:', {
-      name: event.point.name, // Use `name` for pie chart labels
-      value: event.point.y,   // Use `y` for the data value
-    });
-    const pointData = {
-      name: event.point.name,  // Pie chart label
-      value: event.point.y     // Data value
-    };
-console.log('checking data for chart',this.item)
-const chartConfig =JSON.parse(this.item.chartConfig)
+  const chartConfig =JSON.parse(this.item.chartConfig)
+  console.log('chartConfig check from chart ui',chartConfig)
+  const extractcolumnVisibility = chartConfig
+  
+      this.formTableConfig = {
+        columnVisibility:extractcolumnVisibility,
+
+        formName:this.item.chartConfig.formlist
+        }
+    
+        this.emitChartConfigTable.emit(this.formTableConfig); 
+  
+  
+        // Define the API Gateway URL
+        const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+      
+        // Prepare the request body
+        const requestBody = {
+          body: JSON.stringify({
+            clientId: this.SK_clientID,
+            routeId: this.routeId,
+            widgetId:this.item.id,
+     
+            MsgType:'DrillDown',
+            permissionId:this.permissionIdRequest,
+            permissionList:this.readFilterEquation,
+            userName:this.userdetails,
+            conditions:this.eventFilterConditions ||[],
+            ChartClick:this.isChecked,
+                   DrillFilter:this.storeDrillFilter ||'',
+        DrillFilterLevel:this.DrillFilterLevel ||''
+          }),
+        };
+      
+        console.log('requestBody checking chart1Drilldown from button click', requestBody);
+      
+        // Send a POST request to the Lambda function with the body
+        this.http.post(apiUrl, requestBody).subscribe(
+          (response: any) => {
+            console.log('Lambda function triggered successfully:', response);
+            this.checkResBody = response.body
+            console.log('this.checkResBody',this.checkResBody)
+            this.parsedResBody = JSON.parse(this.checkResBody)
+
+
+            this.parseChartData = JSON.parse(this.parsedResBody.ChartData)
+            console.log('this.parseChartDatav checking',this.parseChartData)
+            this.storeDrillFilter = this.parseChartData.DrillFilter,
+            this.DrillFilterLevel = this.parseChartData.DrillFilterLevel
+            this.summaryService.updatelookUpData(this.parseChartData)
+            console.log('this.parsedResBody checking',this.parsedResBody)
+            this.processedData = JSON.parse(this.parsedResBody.rowdata)
+            console.log('this.processedData check',this.processedData)
+            this.paresdDataEmit.emit(this.processedData); 
+            
+            
+        
+            // Display SweetAlert success message
+            // Swal.fire({
+            //   title: 'Success!',
+            //   text: 'Lambda function triggered successfully.',
+            //   icon: 'success',
+            //   confirmButtonText: 'OK'
+            // });
+      
+            // Proceed with route parameter handling
+  
+      
+     // Reset loading state
+          },
+          (error: any) => {
+            console.error('Error triggering Lambda function:', error);
+      
+            // Display SweetAlert error message
+            Swal.fire({
+              title: 'Error!',
+              text: 'Failed to trigger the Lambda function. Please try again.',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
+     // Reset loading state
+          }
+        );
+  
+      // Emit the cell info if needed
+      this.sendCellInfo.emit(event);
+  
+
+}
+onBarClick(event: Highcharts.PointClickEventObject): void {
+  console.log('event check for column chart',event)
+  console.log('Bar clicked:', {
+    category: event.point.category,
+    value: event.point.y,
+    // customIndex: event.point.customIndex,
+    colorIndex:event.point.colorIndex
+
+
+   
+  });
+  const pointData = {
+    name: event.point.category,
+    value: event.point.y,
+    customIndex: (event.point.options as CustomPointOptions).customIndex, // Using a custom type for options
+    colorIndex: event.point.colorIndex
+};
+
+  console.log('pointData checking column chart',pointData)
+  const chartConfig =JSON.parse(this.item.chartConfig)
 console.log('chartConfig check from chart ui',chartConfig)
 const extractcolumnVisibility = chartConfig
 
-this.formTableConfig = {
-  columnVisibility:extractcolumnVisibility,
-  formName:this.item.chartConfig.formlist
+  this.formTableConfig = {
+    columnVisibility:extractcolumnVisibility,
+    actualData:this.item,
+    formName:this.item.chartConfig.formlist
+    }
+    console.log('this.formTableConfig checking from ui',this.formTableConfig)
+    this.emitChartConfigTable.emit(this.formTableConfig); 
+
+
+    // Define the API Gateway URL
+    const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+  
+    // Prepare the request body
+    const requestBody = {
+      body: JSON.stringify({
+        clientId: this.SK_clientID,
+        routeId: this.routeId,
+        widgetId:this.item.id,
+        chartData:pointData,
+        MsgType:'DrillDown',
+        permissionId:this.permissionIdRequest,
+        permissionList:this.readFilterEquation,
+        userName:this.userdetails,
+        conditions:this.eventFilterConditions ||[],
+        DrillFilter:this.storeDrillFilter ||'',
+        DrillFilterLevel:this.DrillFilterLevel ||''
+
+      }),
+    };
+  
+    console.log('requestBody checking chart1Drilldown', requestBody);
+  
+    // Send a POST request to the Lambda function with the body
+    this.http.post(apiUrl, requestBody).subscribe(
+      (response: any) => {
+        console.log('Lambda function triggered successfully:', response);
+        this.checkResBody = response.body
+        console.log('this.checkResBody',this.checkResBody)
+        this.parsedResBody = JSON.parse(this.checkResBody)
+        console.log('this.parsedResBody checking',this.parsedResBody)
+
+        this.parseChartData = JSON.parse(this.parsedResBody.ChartData)
+        console.log('this.parseChartDatav checking',this.parseChartData)
+        this.storeDrillFilter = this.parseChartData.DrillFilter,
+        this.DrillFilterLevel = this.parseChartData.DrillFilterLevel
+        this.summaryService.updatelookUpData(this.parseChartData)
+
+        // this.parseChartOptions = JSON.parse(this.parseChartData.highchartsOptionsJson)
+        console.log('this.parseChartOptions checking',this.parseChartOptions)
+
+
+
+
+
+
+        this.processedData = JSON.parse(this.parsedResBody.rowdata)
+        console.log('this.processedData check',this.processedData)
+
+        this.paresdDataEmit.emit(this.processedData); 
+        
+        
+    
+        // Display SweetAlert success message
+        // Swal.fire({
+        //   title: 'Success!',
+        //   text: 'Lambda function triggered successfully.',
+        //   icon: 'success',
+        //   confirmButtonText: 'OK'
+        // });
+  
+        // Proceed with route parameter handling
+
+  
+ // Reset loading state
+      },
+      (error: any) => {
+        console.error('Error triggering Lambda function:', error);
+  
+        // Display SweetAlert error message
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to trigger the Lambda function. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+ // Reset loading state
+      }
+    );
+
+  // Emit the cell info if needed
+  this.sendCellInfo.emit(event);
+
+}
+  parseChartOptions(arg0: string, parseChartOptions: any) {
+    throw new Error('Method not implemented.');
   }
-  console.log('this.permissionIdRequest',this.permissionIdRequest)
-  console.log('this.readFilterEquation',this.readFilterEquation)
-  console.log('this.userdetails',this.userdetails)
-  this.emitChartConfigTable.emit(this.formTableConfig); 
 
-      // Define the API Gateway URL
-      const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
-      console.log('check id',this.item.id)
-    
-
-      // Prepare the request body
-      const requestBody = {
-        body: JSON.stringify({
-          clientId: this.SK_clientID,
-          routeId: this.routeId,
-          widgetId:this.item.id,
-          chartData:pointData,
-          MsgType:'DrillDown',
-          permissionId:this.permissionIdRequest,
-          permissionList:this.readFilterEquation,
-          userName:this.userdetails,
-          conditions:this.eventFilterConditions ||[]
-
-
-         
-
-        }),
-      };
-    
-      console.log('requestBody checking', requestBody);
-    
-      // Send a POST request to the Lambda function with the body
-      this.http.post(apiUrl, requestBody).subscribe(
-        (response: any) => {
-          console.log('Lambda function triggered successfully:', response);
-          this.checkResBody = response.body
-          console.log('this.checkResBody',this.checkResBody)
-          this.parsedResBody = JSON.parse(this.checkResBody)
-          console.log('this.parsedResBody checking',this.parsedResBody)
-          this.processedData = JSON.parse(this.parsedResBody.rowdata)
-          console.log('this.processedData check',this.processedData)
-          this.paresdDataEmit.emit(this.processedData); 
-          
-          
-      
-          // Display SweetAlert success message
-          // Swal.fire({
-          //   title: 'Success!',
-          //   text: 'Lambda function triggered successfully.',
-          //   icon: 'success',
-          //   confirmButtonText: 'OK'
-          // });
-    
-          // Proceed with route parameter handling
-
-    
-   // Reset loading state
-        },
-        (error: any) => {
-          console.error('Error triggering Lambda function:', error);
-    
-          // Display SweetAlert error message
-          Swal.fire({
-            title: 'Error!',
-            text: 'Failed to trigger the Lambda function. Please try again.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-          });
-   // Reset loading state
-        }
-      );
-
-    // Emit the cell info if needed
-    this.sendCellInfo.emit(event);
-  }
   ngAfterViewInit(){
     setTimeout(() => {
       this.createPieChart()
@@ -286,28 +421,39 @@ this.formTableConfig = {
   ngOnInit(){
 
     console.log('item chacke',this.item.grid_details)
-    this.summaryService.lookUpData$.subscribe((data: any)=>{
-      console.log('data check>>> chart ui1',data)
- let tempCharts:any=[]
-data.forEach((packet: any,matchedIndex:number) => {
-  
-  if(packet.grid_type == 'chart'&& this.index==matchedIndex && packet.id === this.item.id){
-    tempCharts[matchedIndex] = packet
-    console.log('packet checking from chart ui',packet)
-    setTimeout(() => {
-      this.createPieChart(packet);
-    }, 1000);
 
-  }
-});
-
-      
-      // console.log("✅ Matched Charts:", matchedCharts);
-      
+    this.summaryService.lookUpData$.subscribe((data: any) => {
+      console.log('data check from chart3', data);
     
-      
-      
-    })
+      let tempCharts: any[] = [];
+    
+      // If data is not an array, convert it into an array to ensure we can use forEach
+      const dataArray = Array.isArray(data) ? data : [data];
+    
+      // Loop through the data array
+      dataArray.forEach((packet: any, matchedIndex: number) => {
+        console.log('packet:', packet); // Log each packet to ensure it is as expected
+    
+        // If data is a single item, skip the check for this.index == matchedIndex
+        if (packet.grid_type == 'chart' && packet.id === this.item.id) {
+          if (dataArray.length > 1) {
+            // For multiple data, match the index as well
+            if (this.index == matchedIndex) {
+              tempCharts[matchedIndex] = packet;
+              setTimeout(() => {
+                this.createPieChart(packet);
+              }, 1000);
+            }
+          } else {
+            // For single data, do not check index, just use the packet
+            tempCharts[0] = packet;
+            setTimeout(() => {
+              this.createPieChart(packet);
+            }, 1000);
+          }
+        }
+      });
+    });
 
 
 
