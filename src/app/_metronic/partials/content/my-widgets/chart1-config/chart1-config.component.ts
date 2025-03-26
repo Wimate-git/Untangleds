@@ -1010,6 +1010,7 @@ openChartModal1(tile: any, index: number): void {
 
   if (tile) {
     this.selectedTile = tile;
+    console.log('tile checking from chartmodal1',tile)
     this.editTileIndex = index ?? null;
     this.paramCount = tile.noOfParams;
     this.highchartsOptionsJson = JSON.parse(tile.highchartsOptionsJson);

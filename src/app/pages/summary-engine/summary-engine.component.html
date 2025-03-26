@@ -1,3 +1,13 @@
+<!-- <ngx-spinner 
+*ngIf="isMainLoading"
+  bdColor="rgba(0, 0, 0, 0.8)"
+  [name]="'mainLoading'"
+  size="medium"
+  color="#fff"
+  type="square-jelly-box"
+  [fullScreen]="true">
+  <p style="color: white">Loading data, please wait...</p>
+</ngx-spinner> -->
 
 
 <div class="d-flex align-items-center me-2 mb-7" *ngIf="!isSummaryEngine()" style="gap: 10px;">
@@ -202,24 +212,24 @@
                     <div *ngIf="item.grid_type === 'Stackedchart'"  >
                       <app-stacked-bar-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,stackedBarChartModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
                  
-                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalChart1)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-stacked-bar-ui>
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-stacked-bar-ui>
                     </div>
 
                     <div *ngIf="item.grid_type === 'Piechart'"  >
                       <app-pie-chart-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,pieChartModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
                  
-                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalChart1)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-pie-chart-ui>
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-pie-chart-ui>
                     </div>
                     <div *ngIf="item.grid_type === 'semiDonut'"  >
                       <app-semi-donut-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,semiDonutModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
                  
-                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalChart1)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-semi-donut-ui>
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-semi-donut-ui>
                     </div>
 
                     <div *ngIf="item.grid_type === 'Funnelchart'"  >
                       <app-funnel-chart-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,FunnelChartModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
                  
-                      [hidingLink]="hidingLink"   (sendCellInfo) = "helperChartClickChart1($event,dataTableModalFunnelChart)" [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-funnel-chart-ui>
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-funnel-chart-ui>
                       
                     </div>
                     <div *ngIf="item.grid_type === 'Linechart'"  >
@@ -233,7 +243,7 @@
 
                     <div *ngIf="item.grid_type === 'mixedChart'"  >
                       <app-mixed-chart-ui [item]="item" [index]="i" (customEvent)="helperTile($event,MixedChartModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
-                      [hidingLink]="hidingLink"  [eventFilterConditions]="eventFilterConditions"  [isFullscreen]="isFullscreen"  (sendCellInfo) = "helperChartClick($event,dataTableModal)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)"  (emitChartConfigTable)="emitchartDatatable($event)" [liveDataColumnChart]="liveDataColumnChart" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [permissionIdRequest]="permissionIdRequest"></app-mixed-chart-ui>
+                      [hidingLink]="hidingLink"  [eventFilterConditions]="eventFilterConditions"  [isFullscreen]="isFullscreen"   [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)"  (emitChartConfigTable)="emitchartDatatable($event)" [liveDataColumnChart]="liveDataColumnChart" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [permissionIdRequest]="permissionIdRequest"></app-mixed-chart-ui>
                     </div>
                     
                     <div *ngIf="item.grid_type === 'Areachart'"  >
@@ -1450,36 +1460,6 @@
        
           </div>
 
-
-
-
-          
-  
-  
-          <div class="row">
-            <div class="col-md-6">
-              <!-- Bar Chart Button -->
-              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7" style="border: 0px; display: block; width: 100%;">
-                <div id="columnChart" style="width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;" 
-                (click)="openChartModal5(ChartModal5, modal)">
-                </div>
-              </button>
-            </div>
-            <div class="col-md-6">
-              <!-- Area Chart Button -->
-              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7" style="border: 0px; display: block; width: 100%;">
-                <div id="areaChart" style="width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;" 
-                  (click)="openChartModal4(ChartModal4, modal)">
-                </div>
-              </button>
-            </div>
-
-
-  
-          </div>
-
-
-
           <div class="row">
             <div class="col-md-6">
               <!-- Bar Chart Button -->
@@ -1513,32 +1493,67 @@
           </div>
 
 
+
+
+          
+  
+  
+          <div class="row">
+            <div class="col-md-6">
+              <!-- Bar Chart Button -->
+              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7 disabled-button" [disabled]="true" style="border: 0px; display: block; width: 100%;" >
+                <div id="columnChart" style="width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;" 
+              >
+              <!-- (click)="openChartModal5(ChartModal5, modal)" -->
+                </div>
+              </button>
+            </div>
+            <div class="col-md-6">
+              <!-- Area Chart Button -->
+              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7 disabled-button" [disabled]="true" style="border: 0px; display: block; width: 100%;">
+                <div id="areaChart" style="width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;" 
+                 >
+                 <!-- (click)="openChartModal4(ChartModal4, modal)" -->
+                </div>
+              </button>
+            </div>
+
+
+  
+          </div>
+
+
+
+
+
+
           <div class="row">
 
 
 
             <div class="col-md-6">
               <!-- Bar Chart Button -->
-              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7" style="border: 0px; display: block; width: 100%;">
+              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7 disabled-button" [disabled]="true" style="border: 0px; display: block; width: 100%;">
                 <div id="semiDonut" style="width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;" 
-                  (click)="opensemiDonutChartModal(semiDonutModal, modal)">
+           >
+                  <!-- (click)="opensemiDonutChartModal(semiDonutModal, modal)" -->
                 </div>
               </button>
             </div>
 
+            <div class="col-md-6">
+              <!-- Bar Chart Button -->
+              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7 disabled-button" [disabled]="true" style="border: 0px; display: block; width: 100%;">
+                <div id="MixedChart" style="width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;" 
+                >
+                  <!-- (click)="openMixedChartModal(MixedChartModal, modal)" -->
+                </div>
+              </button>
+            </div>
             
           </div>
 
-          <div class="row">
-            <div class="col-md-6">
-              <!-- Bar Chart Button -->
-              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7" style="border: 0px; display: block; width: 100%;">
-                <div id="MixedChart" style="width: 600px; height: 600px; display: flex; justify-content: center; align-items: center;" 
-                  (click)="openMixedChartModal(MixedChartModal, modal)">
-                </div>
-              </button>
-            </div>
-          </div>
+
 
 
           

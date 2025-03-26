@@ -352,6 +352,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   storeFullScreen: any;
   readLookupData: any;
   storeCheck: any;
+  loadingMain = true;
+  isMainLoading =true
 
   createPieChart() {
     const chartOptions: any = {
@@ -361,7 +363,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
         // Set the chart height
       },
       title: {
-        text: '',
+        text: 'Pie Chart',
       },
       legend: {
         enabled: false,  // Hide the legend
@@ -428,7 +430,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
         // Set the chart height
       },
       title: {
-        text: '',
+        text: 'Semi Donut Chart',
       },
       legend: {
         enabled: false,  // Hide the legend
@@ -526,7 +528,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
         type: 'line' // Line chart type
     },
     title: {
-        text: ''
+        text: 'Line Chart'
     },
     subtitle: {
         text: ''
@@ -569,7 +571,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
         type: 'column'  // Change 'bar' to 'column' for vertical bars
       },
       title: {
-        text: ''
+        text: 'Column Chart'
       },
       xAxis: {
         categories: ['Category 1', 'Category 2', 'Category 3', 'Category 4']
@@ -667,7 +669,7 @@ Highcharts.chart('MixedChart', barchartOptions);
         type: 'area'
       },
       title: {
-        text: ''
+        text: 'Area Chart'
       },
       subtitle: {
         text: ''
@@ -701,7 +703,7 @@ Highcharts.chart('MixedChart', barchartOptions);
         type: 'bar'  // Change 'bar' to 'column' for vertical bars
       },
       title: {
-        text: ''
+        text: 'Side Bar Chart'
       },
       xAxis: {
         categories: ['Category 1', 'Category 2', 'Category 3', 'Category 4']
@@ -737,7 +739,7 @@ Highcharts.chart('MixedChart', barchartOptions);
         // Set the chart height
       },
       title: {
-        text: '',
+        text: 'Pie Chart',
       },
       legend: {
         enabled: false,  // Hide the legend
@@ -2807,7 +2809,7 @@ exitFullScreen(): void {
   constructor(private summaryConfiguration: SharedService, private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector, private auditTrail: AuditTrailService,
     private spinner: NgxSpinnerService, private zone: NgZone,private http: HttpClient,  private sanitizer: DomSanitizer, // Inject DomSanitizer
-    private titleService: Title, private summaryService: SummaryEngineService,private blobService: BlobService,private renderer: Renderer2,private authservice: AuthService, private fullscreenService: FullscreenService
+    private titleService: Title, private summaryService: SummaryEngineService,private blobService: BlobService,private renderer: Renderer2,private authservice: AuthService, private fullscreenService: FullscreenService,
   ) {
     this.resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
@@ -2885,6 +2887,7 @@ exitFullScreen(): void {
     // document.removeEventListener('keydown', this.handleKeyDown);
   }
   ngAfterViewInit(): void {
+    // this.spinner.show('mainLoading');
     console.log('this.allCompanyDetails',this.createSummaryField.value)
     // const getFormFelds = this.createKPIWidget.get('filterParameter')?.value;
     const getfullScreenValue = this.createSummaryField.get('fullScreenModeCheck')?.value
@@ -2902,6 +2905,7 @@ exitFullScreen(): void {
     }
     this.loadData()
   
+    // this.spinner.hide('mainLoading');
     this.addFromService()
 
   
@@ -3047,7 +3051,9 @@ exitFullScreen(): void {
 
 
   async ngOnInit() {
+    // this.isMainLoading=true
    
+    // this.spinner.show('mainLoading')
     this.route.data.subscribe(data => {
       this.titleService.setTitle(data['title']); // Set tab title dynamically
     });
@@ -3336,7 +3342,7 @@ this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
 
 // console.log('check live',this.checkLiveDashboard )
 
-
+// this.spinner.hide('mainLoading')
 
   }
 
@@ -6420,7 +6426,7 @@ console.log('selectedTab checking',this.selectedTab)
   //   this.validateAndSubmit(tempObj, key);
   // }
   updateSummary(value: any,key: any,pinValue?:any) {
-    if(key=='editSummary'){
+    if(key=='addPin'){
       this.PinCheck =pinValue
       console.log('PinCheck from updateSummary',this.PinCheck)
     }
@@ -6555,7 +6561,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
     console.log('this.createSummaryField.value checking:', this.createSummaryField.value);
   
     // Call update function with latest epoch timestamp
-    this.updateSummary(receiveItem, 'editSummary', this.PinValue);
+    this.updateSummary(receiveItem, 'addPin', this.PinValue);
   
     // Your logic for pin action
   }
@@ -6571,7 +6577,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
     console.log('Updated receive object after unpin:', receive);
   
     // Call update function with the modified object
-    this.updateSummary(receive, 'editSummary');
+    this.updateSummary(receive, 'addPin');
   }
   
   
@@ -6611,7 +6617,8 @@ console.log('Serialized Query Params:', serializedQueryParams);
           update_table:'Table Widget Updated',
           add_multiTable:'Table Widget Added',
           update_multiTable:'Table Widget Updated',
-          query_applied:'Query Applied'
+          query_applied:'Query Applied',
+          addPin:'Pin Updated'
         }[actionKey] || 'Dashboard changes saved';
   
         console.log('Action key condition check:', actionKey);
@@ -6636,6 +6643,9 @@ console.log('Serialized Query Params:', serializedQueryParams);
             }
             else if(actionKey === 'add_multiTable' || actionKey === 'update_multiTable'){
           
+
+            }else if(actionKey === 'addPin'){
+              window.location.reload();
 
             }
           }

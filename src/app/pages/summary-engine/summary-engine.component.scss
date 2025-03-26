@@ -1190,6 +1190,12 @@ gridster-item {
   }
 }
 
+.disabled-button:disabled {
+  background-color: #e0e0e0;  /* Light grey color */
+  cursor: not-allowed;
+  opacity: 0.6;  /* Make the button look disabled */
+}
+
 
 
 

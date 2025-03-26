@@ -6,6 +6,7 @@ import * as Highcharts from 'highcharts';
 import Swal from 'sweetalert2';
 import { HttpClient } from '@angular/common/http';
 import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engine.service';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 
 
@@ -52,7 +53,7 @@ export class ChartUi1Component implements OnChanges,OnInit {
   allChartsData:any[] =[]
   
   checkResBody: any;
-  parsedResBody: any;
+  parsedResBody: any[]=[];
   processedData: any;
   @Output() paresdDataEmit = new EventEmitter<any>();
   @Output() emitChartConfigTable = new EventEmitter<any>();
@@ -65,6 +66,8 @@ export class ChartUi1Component implements OnChanges,OnInit {
   parseChartData: any;
   storeDrillConfig: any;
   counter: number=0;
+  storeDrillPacket: any;
+  storeRedirectionCheck: any;
   
 ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui', this.all_Packet_store);
@@ -73,6 +76,10 @@ ngOnChanges(changes: SimpleChanges): void {
     console.log('routeId checking from ui', this.routeId);
     console.log('SK_clientID checking', this.SK_clientID);
     console.log('eventFilterConditions chart ui1',this.eventFilterConditions)
+    this.storeDrillPacket = JSON.parse(this.item.DrillConfig)
+
+    console.log('this.storeDrillPacket checking',this.storeDrillPacket )
+    this.storeRedirectionCheck = this.item.toggleCheck
 
     // if (this.item && this.liveDataChart !== undefined) {
     //     console.log("✅ LiveDashboard is TRUE - Updating highchartsOptionsJson & chartConfig...");
@@ -153,9 +160,11 @@ ngOnChanges(changes: SimpleChanges): void {
 
     this.tile1Config = this.item;
 }
-toggleCheck() {
-  this.isChecked = !this.isChecked; // Toggle the value
-  console.log('this.isChecked checking',this.isChecked)
+toggleCheck(isChecked: boolean,index:any) {
+  this.isChecked = isChecked;
+  console.log('this.isChecked checking', this.isChecked);
+
+  this.spinner.show('dataProcess' + index);
 
   const chartConfig =JSON.parse(this.item.chartConfig)
   console.log('chartConfig check from chart ui',chartConfig)
@@ -167,7 +176,7 @@ toggleCheck() {
         formName:this.item.chartConfig.formlist
         }
     
-        this.emitChartConfigTable.emit(this.formTableConfig); 
+        // this.emitChartConfigTable.emit(this.formTableConfig); 
   
   
         // Define the API Gateway URL
@@ -199,18 +208,16 @@ toggleCheck() {
             console.log('Lambda function triggered successfully:', response);
             this.checkResBody = response.body
             console.log('this.checkResBody',this.checkResBody)
-            this.parsedResBody = JSON.parse(this.checkResBody)
+            const storeparsedResBody=JSON.parse(this.checkResBody)
 
 
-            this.parseChartData = JSON.parse(this.parsedResBody.ChartData)
+
+            this.parseChartData = JSON.parse(storeparsedResBody.ChartData)
             console.log('this.parseChartDatav checking',this.parseChartData)
             this.storeDrillFilter = this.parseChartData.DrillFilter,
             this.DrillFilterLevel = this.parseChartData.DrillFilterLevel
             this.summaryService.updatelookUpData(this.parseChartData)
             console.log('this.parsedResBody checking',this.parsedResBody)
-            this.processedData = JSON.parse(this.parsedResBody.rowdata)
-            console.log('this.processedData check',this.processedData)
-            this.paresdDataEmit.emit(this.processedData); 
             
             
         
@@ -226,6 +233,8 @@ toggleCheck() {
   
       
      // Reset loading state
+
+     this.spinner.hide('dataProcess' + index);
           },
           (error: any) => {
             console.error('Error triggering Lambda function:', error);
@@ -242,20 +251,24 @@ toggleCheck() {
         );
   
       // Emit the cell info if needed
-      this.sendCellInfo.emit(event);
+      // this.sendCellInfo.emit(event);
   
 
 }
-onBarClick(event: Highcharts.PointClickEventObject): void {
-  console.log('event check for column chart', event);
+onBarClick(event: Highcharts.PointClickEventObject,index:any): void {
+  console.log('event check for donut chart', event);
+
+
+  this.spinner.show('dataProcess' + index);
   console.log('Bar clicked:', {
     category: event.point.category,
+    name: event.point.name,
     value: event.point.y,
     colorIndex: event.point.colorIndex
   });
 
   const pointData = {
-    name: event.point.category,
+    name: event.point.name,
     value: event.point.y,
     customIndex: (event.point.options as CustomPointOptions).customIndex,
     colorIndex: event.point.colorIndex
@@ -293,12 +306,15 @@ onBarClick(event: Highcharts.PointClickEventObject): void {
   //   return;
   // }
 
-  if (storeconditionsLength === this.counter) {
-    console.log('Second bar clicked, emitting action');
-    // Only emit for second bar click
+
+  if (storeconditionsLength === this.counter || storeconditionsLength === undefined) {
+    console.log('Emitting action, either conditions are empty or second bar clicked');
+    
+    // Emit action
     this.emitChartConfigTable.emit(this.formTableConfig);
-    this.counter=0
-  } 
+    this.sendCellInfo.emit(event);
+    this.counter = 0; // Reset counter after emitting
+}
 
   // Proceed with API request
   const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
@@ -324,40 +340,67 @@ onBarClick(event: Highcharts.PointClickEventObject): void {
   // Send a POST request to the Lambda function
   this.http.post(apiUrl, requestBody).subscribe(
     (response: any) => {
-      console.log('Lambda function triggered successfully:', response);
-      this.checkResBody = response.body;
-      console.log('this.checkResBody', this.checkResBody);
-      this.parsedResBody = JSON.parse(this.checkResBody);
-      console.log('this.parsedResBody checking', this.parsedResBody);
+        if (response?.statusCode === 200) {
+            console.log('Lambda function triggered successfully:', response);
+            this.checkResBody = response.body;
+            this.parsedResBody.push(JSON.parse(this.checkResBody));
+            console.log('this.parsedResBody checking', this.parsedResBody);
 
-      this.parseChartData = JSON.parse(this.parsedResBody.ChartData);
-      console.log('this.parseChartDatav checking', this.parseChartData);
+            this.parsedResBody.forEach((item, index) => {
+                if (Object.keys(item).includes('ChartData')) {
+                    this.parseChartData = JSON.parse(item.ChartData);
+                    console.log(`this.parseChartDatav checking at index ${index}`, this.parseChartData);
+                    this.storeDrillFilter = this.parseChartData.DrillFilter;
+                    this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
 
-      this.storeDrillFilter = this.parseChartData.DrillFilter;
-      this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
-      this.summaryService.updatelookUpData(this.parseChartData);
-
-      console.log('this.parseChartOptions checking', this.parseChartOptions);
-
-      this.processedData = JSON.parse(this.parsedResBody.rowdata);
-      console.log('this.processedData check', this.processedData);
-
-      this.paresdDataEmit.emit(this.processedData);
+                    this.summaryService.updatelookUpData(this.parseChartData);
+                } else {
+                    this.processedData = JSON.parse(item.rowdata);
+                    console.log(`this.processedData check at index ${index}`, this.processedData);
+                    this.paresdDataEmit.emit(this.processedData);
+                }
+        
+            });
+            // Hide the spinner after API processing
+            this.spinner.hide('dataProcess' + index);
+        } else {
+            // Hide the spinner in case of an error
+            this.spinner.hide('dataProcess' + index);
+            console.error('Unexpected statusCode:', response?.statusCode);
+            Swal.fire({
+                title: 'Error!',
+                text: `Unexpected response received (Status Code: ${response?.statusCode}).`,
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
     },
     (error: any) => {
-      console.error('Error triggering Lambda function:', error);
+        // Hide the spinner if there's an error
+        this.spinner.hide('dataProcess' + index);
+        console.error('Error triggering Lambda function:', error);
 
-      Swal.fire({
-        title: 'Error!',
-        text: 'Failed to trigger the Lambda function. Please try again.',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      });
+        if (error.status === 404) {
+            console.log('Received 404 error - stopping loading and showing error message.');
+            Swal.fire({
+                title: 'Error!',
+                text: 'Data not found. Please check your inputs and try again.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        } else {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to trigger the Lambda function. Please try again.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
     }
-  );
+);
 
   // Emit the cell info if needed
-  this.sendCellInfo.emit(event);
+
   this.counter++
 }
 
@@ -489,7 +532,7 @@ if(data){
             y: point[1],    // Second element as value
             customIndex: index,
             events: {
-              click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event),
+              click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event,this.index),
             },
           })),
         };
@@ -511,7 +554,7 @@ if(data){
             y: point[1],    // Second element as value
             customIndex: index,
             events: {
-              click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event),
+              click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event,this.index),
             },
           })),
         };
@@ -532,7 +575,7 @@ if(data){
   }
   
     constructor(
-     private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient,private summaryService:SummaryEngineService
+     private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient,private summaryService:SummaryEngineService,private spinner: NgxSpinnerService
      
     ){}
 

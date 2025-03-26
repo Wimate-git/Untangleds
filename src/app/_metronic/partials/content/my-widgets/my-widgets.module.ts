@@ -180,12 +180,13 @@ import { SemiDonutUiComponent } from './semi-donut-ui/semi-donut-ui.component';
     // BrowserAnimationsModule, // Required for Angular Material animations
     MatButtonModule,
     MatMenuModule,
-    NgxSpinnerModule,
+  
     MatTooltipModule,
     NgbTooltipModule,
     MultiSelectModule,
     GoogleMapsModule ,
     HttpClientModule,
+    NgxSpinnerModule,
 
   
   ],
