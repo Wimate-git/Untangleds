@@ -947,4 +947,21 @@ addConditionForExistingData1(formGroupIndex: number, tableIndex: number, conditi
     this.configSaved.emit(advacnedExcelConfiguration); 
     this.modal.close()
   }
+
+
+
+
+  isEquationVisible1: boolean = false;
+
+  toggleEquationField1() {
+    this.isEquationVisible1 = !this.isEquationVisible1;
+  }
+
+
+
+  isEquationVisible2: boolean = false;
+
+  toggleEquationField2() {
+    this.isEquationVisible2 = !this.isEquationVisible2;
+  }
 }

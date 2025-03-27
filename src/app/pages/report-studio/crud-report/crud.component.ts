@@ -65,9 +65,13 @@ export class CrudreportComponent implements OnInit, AfterViewInit, OnDestroy{
 
     this.dtOptions = {
      
-      dom: "<'row'<'col-sm-12'tr>>" +
-      "<'d-flex align-items-baseline justify-content-between'<'col-sm-12 col-md-5'i><'d-flex align-items-baseline justify-content-between'p>>",
+      // dom: "<'row'<'col-sm-12'tr>>" +
+      // "<'d-flex align-items-baseline justify-content-between'<'col-sm-12 col-md-5'i><'d-flex align-items-baseline justify-content-between'p>>",
+      dom: `<"row"<"col-sm-6"><"col-sm-6"f>>` +
+      `<"row"<"col-sm-12"tr>>` +
+      `<"row"<"col-sm-12"p>>`,
       processing: true,
+
       language: {
         processing: '<span class="spinner-border spinner-border-sm align-middle"></span> Loading...'
       },

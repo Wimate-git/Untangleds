@@ -166,27 +166,59 @@
 
             <div class="mb-3" style="width: 30%;">
               <label class="required">Operator</label>
-              <select formControlName="operator" placeholder="Select operator" class="form-control">
-                <option value="" disabled selected>Select operator</option>
-                <option value="==">Equals</option>
-                <option value=">">Not equals</option>
-                <option value="includes">Contains</option>
-                <option value="startsWith">Starts with</option>
-                <option value="endsWith">Ends with</option>
-                <option value=">">Greater than</option>
-                <option value="<">Less than</option>
-                <option value="<=">Less than equals to</option>
-                <option value=">=">Greater than equals to</option>
-              </select>
+
+              <ng-container *ngIf="isDateField(formIndex,condIndex)">
+                <select formControlName="operator" placeholder="Select date type" class="form-control">
+                  <option value="" disabled selected>Select operator</option>
+                  <option value="is">is</option>
+                <option value=">=">&gt;=</option>
+                <option value="<=">&lt;=</option>
+                <option value="between">between</option>
+                <option value="between time">between time</option>
+                <option value="less than days ago">less than days ago</option>
+                <option value="more than days ago">more than days ago</option>
+                <option value="in the past">in the past</option>
+                <option value="days ago">days ago</option>
+                <option value="today">today</option>
+                <option value="yesterday">yesterday</option>
+                <option value="this week">this week</option>
+                <option value="last week">last week</option>
+                <option value="last 2 weeks">last 2 weeks</option>
+                <option value="this month">this month</option>
+                <option value="last month">last month</option>
+                <option value="this year">this year</option>
+                <option value="any">any</option>
+                <option value="latest 10">latest 10</option>
+                </select>
+              </ng-container>
+
+
+
+
+              <ng-container *ngIf="!isDateField(formIndex,condIndex)">
+                <select formControlName="operator" placeholder="Select operator" class="form-control">
+                  <option value="" disabled selected>Select operator</option>
+                  <option value="==">Equals</option>
+                  <option value=">">Not equals</option>
+                  <option value="includes">Contains</option>
+                  <option value="startsWith">Starts with</option>
+                  <option value="endsWith">Ends with</option>
+                  <option value=">">Greater than</option>
+                  <option value="<">Less than</option>
+                  <option value="<=">Less than equals to</option>
+                  <option value=">=">Greater than equals to</option>
+                </select>
+              </ng-container>
             </div>
 
        
 
 
       <div class="mb-3" style="width: 30%;">
-        <label class="required">Value</label>
+  
         
-        <ng-container *ngIf="isDropdown(formIndex,condIndex)">
+        <ng-container *ngIf="isDropdown(formIndex,condIndex) == 'select'">
+          <label class="required">Value</label>
           <select 
             formControlName="value" 
             class="form-control"
@@ -210,7 +242,8 @@
 
 
         
-        <ng-container *ngIf="!isDropdown(formIndex,condIndex)">
+        <ng-container *ngIf="isDropdown(formIndex,condIndex) == 'value'">
+          <label class="required">Value</label>
           <input 
             type="text" 
             formControlName="value" 
@@ -218,6 +251,50 @@
             class="form-control" 
           />
         </ng-container>
+
+
+        <ng-container *ngIf="isDropdown(formIndex,condIndex) == 'date'">
+          
+          <!-- <input 
+            type="datetime-local" 
+            formControlName="value" 
+            placeholder="Enter value" 
+            class="form-control" 
+          /> -->
+
+
+          <div *ngIf="dateFilterConfig[dateFilterOperator]?.showDate">
+            <label class="required">Value</label>
+              <input type="date" formControlName="val1" class="form-control">
+        </div>
+    
+        <div *ngIf="dateFilterConfig[dateFilterOperator]?.showStartDate" class="mb-7">
+          <label class="required">Start and End Date</label>
+          <!-- <div class="form-group row ps-4 mb-2"> -->
+              
+                  <!-- Dynamically change the type based on dateType -->
+                  <input [type]="dateFilterConfig[dateFilterOperator]?.isBetweenTime ? 'datetime-local' : 'date'" formControlName="val1" class="form-control">
+          
+          <!-- </div> -->
+          <br>
+          <!-- <div class="form-group row ps-4"> -->
+                  <input [type]="dateFilterConfig[dateFilterOperator]?.isBetweenTime ? 'datetime-local' : 'date'" formControlName="val2" class="form-control">
+
+          <!-- </div> -->
+        </div>
+    
+    
+        <div  *ngIf="dateFilterConfig[dateFilterOperator]?.showDaysAgo" class="mb-7">
+          <label class="required">Value</label>
+                    <input type="number" formControlName="val1" class="form-control" placeholder="Enter number of days">
+        </div>
+    
+
+        </ng-container>
+
+
+
+
       </div>
         
 
@@ -402,10 +479,24 @@
 
 
 
-                <div class="mb-3" style="width: 100%;height: 40%;">
+                <!-- <div class="mb-3" style="width: 100%;height: 40%;">
                   <label class="required">Equation</label>
                 <textarea  formControlName="equationText" class="form-control"></textarea>                
+                </div> -->
+
+                <div class="mb-3" style="width: 100%; height: 40%;">
+                  <label class="required">Equation</label>
+                  <textarea formControlName="equationText" class="form-control" [ngStyle]="{ 'display': isEquationVisible ? 'block' : 'none' }"></textarea>
                 </div>
+                
+
+                <button class="btn btn-sm btn-dark btn-advanced" type="button" (click)="toggleEquationField()">
+                  {{ isEquationVisible ? 'Hide Equation ' : 'Show Equation' }}
+                  <i class="fas" [ngClass]="isEquationVisible ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                </button>
+                
+
+
             </div>
 
 
@@ -458,7 +549,7 @@
 
 
               <div>
-                <button type="submit" [disabled]="reportsFeilds.invalid" class="btn fw-bold custom-success translatey me-5" (click)="onSubmit()">Apply</button>
+                <button type="submit" [disabled]="reportsFeilds.invalid" class="btn fw-bold custom-success translatey me-5" (click)="callLambdaResponse()">Apply</button>
                 <button type="submit" class="btn fw-bold custom-primary" (click)="clearFeilds()">Clear</button>
                 <button type="submit" *ngIf="onSubmitFlag" class="btn fw-bold btn-primary translatey ms-5" (click)="saveQuery(openModal1)">Save</button>
                 <button type="submit" *ngIf="saveButton" class="btn fw-bold btn-primary translatey ms-5" (click)="editQuery(openModal1)">Edit</button>

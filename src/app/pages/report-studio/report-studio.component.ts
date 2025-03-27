@@ -98,6 +98,20 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     'days ago': { showDaysAgo: true },
     'in the past': { showDaysAgo: true },
   };
+
+  dateFilterConfig:any = {
+    'is': { showDate: true },
+    '>=': { showDate: true },
+    '<=': { showDate: true },
+    'between': { showStartDate: true, showEndDate: true, isBetweenTime: false },
+    'between time': { showStartDate: true, showEndDate: true, isBetweenTime: true },
+    'less than days ago': { showDaysAgo: true },
+    'more than days ago': { showDaysAgo: true },
+    'days ago': { showDaysAgo: true },
+    'in the past': { showDaysAgo: true },
+  }
+
+
   tableDataWithFormFilters: any = [];
 
   conditionflag: boolean = false;
@@ -161,6 +175,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
   totalRecordsViewed: number = 0;
   lookup_data_Options: any = [];
   blobUrl: string = '';
+  dateFilterOperator: any;
 
 
   constructor(private fb: FormBuilder, private api: APIService, private configService: SharedService, private scheduleAPI: scheduleApiService,
@@ -311,7 +326,9 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
       if (this.savedQuery) {
         this.spinner.show()
         this.selectedValues = []
-        this.editSavedQuery(this.savedQuery, 'saved')
+        // this.editSavedQuery(this.savedQuery, 'saved')
+
+        this.tempEditSavedQuery(this.savedQuery, 'saved')
       }
 
 
@@ -710,15 +727,25 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
             const initials = data[0].toUpperCase();
 
-            const nameAndEmail = `
-                <div class="d-flex flex-column" data-action="editQueryTable" data-id="${full.id} ">
-                  <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
-                </div>
-              `;
+            // const nameAndEmail = `
+            //     <div class="d-flex flex-column" data-action="editQueryTable" data-id="${full.id} ">
+            //       <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
+            //     </div>
+            //   `;
 
-            return `
-                ${nameAndEmail}
-              `;
+            // return `
+            //     ${nameAndEmail}
+            //   `;
+            const nameAndEmail = `
+            <div class="d-flex flex-column">
+                  <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1 view-item" data-id="${full.P1}">
+                    ${full.P1}
+                  </a>
+                </div>
+          `;
+
+            return nameAndEmail;
+
           }
         },
         {
@@ -747,8 +774,11 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
           }
         }
       ],
-      createdRow: (row, data, dataIndex) => {
+      createdRow: (row, data:any, dataIndex) => {
         $('td:eq(0)', row).addClass('d-flex align-items-center');
+        $(row).find('.view-item').on('click', () => {
+          this.editRoute(data.P1)
+        });
       }
     };
 
@@ -833,6 +863,8 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
       condition: ['', Validators.required],
       operator: ['', Validators.required],
       value: ['', Validators.required],
+      val1:[''],
+      val2:[''],
       operatorBetween: ['', Validators.required]
     });
   }
@@ -935,7 +967,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
               }
               else if ((field.name.startsWith("dynamic_table_values") || field.type == 'table') && table == false) {
                 table = true
-                return { name: field.name, label: "dynamic_table_values", formName: formName, type: field.type };
+                return { name: 'dynamic_table_values', label: "Mini Table", formName: formName, type: field.type };
               }
               else if (field && field.name && field.validation && field.validation.isTrackHistory && trackFlag == false) {
                 trackFlag = true
@@ -968,7 +1000,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
             
 
             if (trackFlag) {
-              tempMetadata[item].push({ name: "track-3274927276", label: "trackLocation", formName: formName })
+              tempMetadata[item].push({ name: "trackLocation", label: "trackLocation", formName: formName })
             }
 
             // console.log("tempMetadata[item] ",tempMetadata[item]);
@@ -979,7 +1011,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
 
         this.populateFormData = Array.from(new Set(this.populateFormData))
-        // console.log("Data to be added in dropdowns ", this.populateFormData);
+        console.log("Data to be added in dropdowns ", this.populateFormData);
 
       } catch (error) {
         this.spinner.hide();
@@ -1005,7 +1037,6 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
         // console.log("Populated is called ");
         this.initializeFormControls1()
       }
-      // console.log("Dropdown keys are here ", this.dropdownKeys);
     }
 
     this.cd.detectChanges();
@@ -1143,13 +1174,14 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
   }
 
 
-  isDropdown(formIndex: number, index: any): boolean {
+
+  isDateField(formIndex: number, index: any): boolean {
     try {
       const selectedField = this.forms().at(formIndex).get('conditions')?.value[index]?.condition;
       const formName = this.getFormNameByIndex(formIndex);
       const formFields = this.populateFormBuilder.find((form: { [key: string]: any }) => form[formName]);
       const field = formFields[formName].find((f: { name: string }) => f.name === selectedField);
-      return field?.type === 'select';
+      return field?.name.includes('date');
     }
 
     catch (error) {
@@ -1157,6 +1189,35 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
       return false
     }
   }
+
+
+  isDropdown(formIndex: number, index: any) {
+    try {
+      const selectedField = this.forms().at(formIndex).get('conditions')?.value[index]?.condition;
+      const formName = this.getFormNameByIndex(formIndex);
+      const formFields = this.populateFormBuilder.find((form: { [key: string]: any }) => form[formName]);
+      const field = formFields[formName].find((f: { name: string }) => f.name === selectedField);
+
+      if(field.name.includes('date')){
+        const selectedOperator = this.forms().at(formIndex).get('conditions')?.value[index]?.operator;
+        this.dateFilterOperator = selectedOperator
+        return 'date'
+      }
+      else if(field?.type === 'select'){ 
+        return 'select'
+      }
+
+      return 'value'
+    }
+
+    catch (error) {
+      console.log("Error in dynamic dropdown ");
+      return false
+    }
+  }
+
+
+  
 
 
 
@@ -1287,6 +1348,10 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
           }
         });
       }
+      // else if(field.name.includes('date')){
+      //   observer.next(['today','yesterday','this year']);
+      //   observer.complete();
+      // }
 
       else {
         // Return static options if not a lookup field
@@ -1488,6 +1553,311 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     return conditionString;
   }
 
+
+
+  async callLambdaResponse(){
+    console.log("reportMetadata.excelSheets ", this.reportsFeilds.value.excelSheets);
+
+    const addCustomColumns = this.customColumnsGroup.value.customForms
+
+    this.tableDataWithFormFilters = []
+    this.spinner.show()
+
+    this.trackLocationMapFlag = false
+    let body: any;
+    this.showTable = true
+    this.tableData = [];
+
+    let formMap
+    let formValues
+
+    if (this.visibiltyflag) {
+
+      formValues = this.reportsFeilds.value.form_data_selected;
+      this.selectedValues = formValues
+
+      console.log('Selected columns are here ', this.selectedValues);
+
+
+
+      formMap = this.selectedValues.reduce((acc: { [x: string]: any[]; }, group: { formName: string | number; label: any; }[]) => {
+
+        group && group.forEach((item: any) => {
+          if (!acc[item.formName]) {
+            acc[item.formName] = [];
+          }
+          acc[item.formName].push(item.name);
+        });
+        return acc;
+      }, {});
+      // console.log("Form mapped data is here on Submit",formMap);
+    }
+
+
+    console.log("Form Map are here ",formMap);
+
+    // this.spinner.show();
+
+    // this.selectedItem = this.selectedValues;
+
+
+    if (['between time'].includes(this.reportsFeilds.get('dateType')?.value)) {
+      const startEpoch = new Date(this.reportsFeilds.get('startDate')?.value).getTime();
+
+      const endEpoch = new Date(this.reportsFeilds.get('endDate')?.value).getTime();
+
+
+      console.log("Between time is checked ", startEpoch, endEpoch);
+
+
+      if (startEpoch >= endEpoch) {
+
+        Swal.fire({
+          title: "Error",
+          text: "Please ensure that the start date is earlier than the end date and all fields are filled correctly.",
+          icon: "error",
+          confirmButtonText: "Got it"
+        });
+        this.spinner.hide()
+        return;
+      }
+
+      body = {
+        dateType: this.reportsFeilds.get('dateType')?.value,
+        clientID: this.SK_clientID,
+        conditionValue: [startEpoch, endEpoch]
+      };
+
+
+      console.log("After body is here ", body);
+    }
+
+
+
+
+    else if (['between'].includes(this.reportsFeilds.get('dateType')?.value)) {
+      const startEpoch = new Date(this.reportsFeilds.get('startDate')?.value).getTime();
+
+      // const endEpoch = new Date(this.reportsFeilds.get('endDate')?.value).getTime();
+
+
+      const endDate = new Date(this.reportsFeilds.get('endDate')?.value);
+      endDate.setHours(23, 59, 59, 999);
+      const endDateTimestamp = endDate.getTime() + (5.5 * 60 * 60 * 1000);
+
+
+      if (startEpoch >= endDateTimestamp) {
+
+        Swal.fire({
+          title: "Error",
+          text: "Please ensure that the start date is earlier than the end date and all fields are filled correctly.",
+          icon: "error",
+          confirmButtonText: "Got it"
+        });
+        this.spinner.hide()
+        return;
+      }
+
+      body = {
+        dateType: this.reportsFeilds.get('dateType')?.value,
+        clientID: this.SK_clientID,
+        conditionValue: [startEpoch, endDateTimestamp]
+      };
+    }
+
+    else if (['is', '>=', '<='].includes(this.reportsFeilds.get('dateType')?.value)) {
+      const singleEpoch = new Date(this.reportsFeilds.get('singleDate')?.value).getTime();
+      body = {
+        dateType: this.reportsFeilds.get('dateType')?.value,
+        clientID: this.SK_clientID,
+        conditionValue: singleEpoch
+      };
+    }
+
+    else {
+      body = {
+        dateType: this.reportsFeilds.get('dateType')?.value,
+        clientID: this.SK_clientID,
+        conditionValue: this.reportsFeilds.get('daysAgo')?.value
+      };
+    }
+
+
+
+    const tempArray = this.reportsFeilds.get('form_permission')?.value;
+
+    console.log("Form groups are here ",tempArray);
+
+    if (this.savedQuery == undefined || this.savedQuery == '') {
+      this.onSubmitFlag = true
+    }
+    else {
+      this.onSubmitFlag = false
+    }
+
+
+    const groupedData: { [key: string]: any[] } = {};
+
+    let index = 0
+
+
+    if(this.visibiltyflag){
+      body.formMap = formMap
+    }
+
+    body.permissionID = this.permissionID
+
+    for (let item of tempArray) {
+      const formFilter = item;
+
+      if (this.conditionflag) {
+        body.conditionEnable = true
+        body.formConditions = this.formFieldsGroup.value.forms[index]
+        body.formFilter = formFilter;
+      }
+      else{
+        body.conditionEnable = false
+        body.formFilter = formFilter;
+      }
+
+
+      if(this.customColumnsflag){
+        body.addCustomColumns = addCustomColumns[index]
+      }
+
+
+      console.log("Request body is here ", (JSON.parse(JSON.stringify(body))));
+
+      try {
+
+        const response = await this.scheduleAPI.sendDataV2(body);
+        console.log('Response from Lambda:', response);
+
+        if (!groupedData[formFilter]) {
+          groupedData[formFilter] = [];
+        }
+        groupedData[formFilter].push(response);
+      } catch (error) {
+        console.error('Error calling dynamic lambda:', error);
+        this.spinner.hide();
+      }
+
+      index++
+    }
+
+    console.log("Grouped data is here ",groupedData);
+
+
+    //Check for permission filters master filters
+    this.tableDataWithFormFilters = await this.preprocessData(groupedData,formMap)
+
+
+
+    // for (let formFilter in groupedData) {
+    //   this.tableDataWithFormFilters.push({formFilter:formFilter,rows:groupedData[formFilter].flat()})
+    // }
+
+
+    console.log("Table rows are here ", this.tableDataWithFormFilters);
+
+
+
+    try {
+      setTimeout(() => {
+        this.loadColumnState()
+      }, 2000);
+
+    }
+    catch (error) {
+      console.log('Error while Loading Column State ', error);
+    }
+
+    this.spinner.hide()
+
+    this.cd.detectChanges()
+  }
+
+
+
+  async preprocessData(groupedData:any,formMap:any){
+
+    const tableDataWithFormFilters: any = [];
+
+    this.dyanmicFormDataArray = []
+    // const addCustomColumns = this.customColumnsGroup.value.customForms
+    let index = 0;
+
+    for (let formFilter in groupedData) {
+      const res = await this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${formFilter}#main`, 1)
+      let dynamicMetadata: any;
+      if (res && res.metadata) {
+        dynamicMetadata = JSON.parse(res.metadata).formFields
+      }
+
+      this.dyanmicFormDataArray.push({ [formFilter]: dynamicMetadata });
+
+      const tempMetaArray = groupedData[formFilter]
+
+      console.log("Before adding custom columns ",tempMetaArray);
+
+
+      // if (this.customColumnsflag && addCustomColumns[index] && addCustomColumns[index].conditions && Array.isArray(addCustomColumns[index].conditions) && addCustomColumns[index].conditions.length > 0 && addCustomColumns[index].conditions[0].columnName != '') {
+      //   let modifyRows = await this.addModifiedColumns(tempMetaArray.flat(), addCustomColumns[index].conditions)
+      //   console.log("Modified rows are here ", modifyRows);
+
+      //   // if (this.visibiltyflag) {
+      //   //   for (let col of addCustomColumns[index].conditions) {
+      //   //     formMap[`${formFilter}`] && formMap[`${formFilter}`].push(col.columnName)
+      //   //   }
+      //   // }
+      // }
+
+
+        for (let i = 0; i < tempMetaArray.length; i++) {
+
+          const tempHolder = Array.isArray(tempMetaArray[i].trackLocation)
+            ? tempMetaArray[i].trackLocation.flat()  // Flatten the array
+            : [];
+          this.trackLocationArray.push(...tempHolder)
+          tempMetaArray[i].formFilter = formFilter
+        }
+
+
+        tableDataWithFormFilters.push({ formFilter, rows:tempMetaArray.flat() });
+
+      index++;
+
+    }
+
+
+    this.totalRecordsViewed = 0
+    for (let ele of this.tableDataWithFormFilters) {
+      this.totalRecordsViewed = this.totalRecordsViewed + ele.rows.length
+    }
+
+
+    try {
+      const UserDetails = {
+        "User Name": this.username,
+        "Action": "View",
+        "Module Name": "Report Studio",
+        "Form Name": this.selectedForms.join(),
+        "Description": `${this.filterType} filter applied. Total records viewed: ${this.totalRecordsViewed}`,
+        "User Id": this.username,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+
+      this.auditTrail.mappingAuditTrailData(UserDetails, this.SK_clientID)
+    }
+    catch (error) {
+      console.log("Error while creating audit trails ", error);
+    }
+
+
+    return tableDataWithFormFilters
+  }
 
 
 
@@ -1871,7 +2241,11 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
                 filteredItem["id"] = item["id"]; // Preserve "id"
               }
             }
-            if (key === "dynamic_table_values") {
+            if (key === "Mini Table") {
+              if (item.hasOwnProperty('dynamic_table_values')) {
+                filteredItem['Mini Table'] = item['dynamic_table_values'];
+              }
+
               if (item.hasOwnProperty("id")) {
                 filteredItem["id"] = item["id"]; // Preserve "id"
               }
@@ -1879,8 +2253,8 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
             if(key === "Form View"){
               if (item.hasOwnProperty("PK")) {
-                filteredItem["PK"] = item["PK"]; // Preserve "id"
-                filteredItem["SK"] = item["SK"];
+                filteredItem["PK"] = item["PK"]; // Preserve "PK"
+                filteredItem["SK"] = item["SK"]; // Preserve "SK"
               }
             }
 
@@ -1924,8 +2298,14 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     }
 
 
-    this.tableDataWithFormFilters = tableDataWithFormFilters;
-    console.log("Table rows are here ", this.tableDataWithFormFilters);
+
+    this.tableDataWithFormFilters = tableDataWithFormFilters
+
+
+    console.log("this.tableDataWithFormFilters ",this.tableDataWithFormFilters);
+
+
+    
 
 
     this.totalRecordsViewed = 0
@@ -2092,10 +2472,14 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
     // Iterate through all rows and identify dynamic columns based on data presence
     rowData.forEach(row => {
-      row['Form View'] = {
-        PK:row.PK,
-        SK:row.SK
+
+      if(this.visibiltyflag && row.hasOwnProperty('Form View')){
+        row['Form View'] = {
+          PK:row.PK,
+          SK:row.SK
+        }
       }
+
       for (let key in row) {
         // Check if the column is Base64 image, location, or TrackLocation
         const isBase64Image = this.isBase64(row[key]);
@@ -2129,7 +2513,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
 
   isMiniTable(key: any, value: any): boolean {
-    return key == 'dynamic_table_values' && Object.keys(value).length > 0;
+    return key == 'Mini Table' && Object.keys(value).length > 0;
   }
 
 
@@ -2945,10 +3329,16 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
             delete mappedResponse[fieldName];
           }
           else {
-            mappedResponse[label] = 'N/A';
+            mappedResponse[label] = '';
           }
         }
       });
+
+
+      if(mappedResponse.hasOwnProperty('dynamic_table_values')){
+        mappedResponse['Mini Table'] = mappedResponse['dynamic_table_values']
+        delete mappedResponse.dynamic_table_values
+      }
 
 
       if (mappedResponse.hasOwnProperty('id') && uniqueIDKey) {
@@ -3216,6 +3606,199 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
 
 
+
+  async tempEditSavedQuery(P1: any, key: any){
+    this.editedQueryName = P1
+
+    // console.log("Edit si being called");
+
+    this.populateFormData = []
+
+    try {
+
+      this.api.GetMaster(`${this.SK_clientID}#savedquery#${P1}#main`, 1).then(async (result) => {
+        if (result && result.metadata) {
+
+          this.tempResHolder = JSON.parse(result.metadata)
+
+          console.log("Result is here ", this.tempResHolder);
+
+          this.tempResHolder.reportMetadata = JSON.parse(this.tempResHolder.reportMetadata)
+          this.tempResHolder.conditionMetadata = JSON.parse(this.tempResHolder.conditionMetadata).forms
+          this.tempResHolder.customColumnMetadata = JSON.parse(this.tempResHolder.customColumnMetadata).customForms
+          this.tempResHolder.columnVisibility = this.tempResHolder && this.tempResHolder.columnVisibility && JSON.parse(this.tempResHolder.columnVisibility)
+          this.tempResHolder.tableState = this.tempResHolder && this.tempResHolder.tableState && JSON.parse(this.tempResHolder.tableState)
+          this.tempResHolder.advancedCustomColumnMetadata = this.tempResHolder.advancedCustomColumnMetadata && JSON.parse(this.tempResHolder.advancedCustomColumnMetadata)
+          this.tempResHolder.advancedFilterColumnMetadata = this.tempResHolder.advancedFilterColumnMetadata && JSON.parse(this.tempResHolder.advancedFilterColumnMetadata)
+          this.tempResHolder.allAdvancedExcelConfigurations = this.tempResHolder.allAdvancedExcelConfigurations && JSON.parse(this.tempResHolder.allAdvancedExcelConfigurations)
+
+          this.allAdvancedExcelConfigurations = this.tempResHolder.allAdvancedExcelConfigurations && JSON.parse(JSON.stringify(this.tempResHolder.allAdvancedExcelConfigurations))
+
+          this.editSavedDataArray = this.tempResHolder
+
+          //  console.log("Result for the edit is here ",this.tempResHolder);
+          const reportMetadata = this.tempResHolder.reportMetadata
+          const conditionMetadata = this.tempResHolder.conditionMetadata
+          const columnVisibility = this.tempResHolder.columnVisibility
+          const customColumnMetadata = this.tempResHolder && this.tempResHolder.customColumnMetadata
+          const advancedFilterColumnMetadata = this.tempResHolder && this.tempResHolder.advancedFilterColumnMetadata
+          const advancedCustomColumnMetadata = this.tempResHolder && this.tempResHolder.advancedCustomColumnMetadata
+
+          //Get the table State
+          this.tableState = this.tempResHolder.tableState && JSON.parse(JSON.stringify(this.tempResHolder.tableState))
+
+          //  console.log("conditionMetadata is here ",conditionMetadata);
+
+          this.reportsFeilds.patchValue({
+            dateType: reportMetadata.dateType,
+            singleDate: reportMetadata.singleDate,
+            startDate: reportMetadata.startDate,
+            endDate: reportMetadata.endDate,
+            daysAgo: reportMetadata.daysAgo,
+            form_permission: reportMetadata.form_permission,
+            filterOption: reportMetadata.filterOption,
+            columnOption: reportMetadata.columnOption,
+            addColumn: reportMetadata.addColumn,
+            addExcellOption: reportMetadata.addExcellOption,
+            advanceOption: reportMetadata.advanceOption,
+            excelSheets: reportMetadata && reportMetadata.excelSheets ? reportMetadata.excelSheets : []
+          })
+
+          this.selectedItem = []
+
+          if (columnVisibility) {
+            this.selectedValues = JSON.parse(JSON.stringify(columnVisibility))
+          }
+
+
+          if (reportMetadata.columnOption != 'all' && Array.isArray(this.selectedValues) && this.selectedValues.length > 0) {
+            this.visibiltyflag = true
+          }
+
+          this.saveButton = true
+
+
+          if (reportMetadata.addColumn != 'false') {
+
+            console.log("Add column is executed ");
+
+            this.customForms().clear()
+
+            await this.addColumns("true", '')
+
+
+            customColumnMetadata.forEach((formData: any) => {
+              this.populateCustomForm(formData);
+            });
+
+
+          }
+          else {
+            this.customForms().clear();
+
+            this.selectedForms.forEach((formData: any) => {
+              this.addCustomForm();
+            });
+
+            this.customColumnsflag = false
+          }
+
+
+
+
+
+          if (reportMetadata.filterOption != 'all') {
+
+            this.forms().clear();
+
+            await this.onFilterChange('onCondition', '', 'edit')
+
+
+
+            //  console.log("conditionMetadata - - - - -- - -- - ",conditionMetadata);
+
+            conditionMetadata.forEach((formData: any) => {
+              this.populateForm(formData);
+            });
+
+
+          }
+          else {
+
+            this.forms().clear();
+
+            this.selectedForms.forEach((formData: any) => {
+              this.addForm();
+            });
+
+
+
+
+            this.conditionflag = false
+          }
+          if (this.selectedValues != undefined && Array.isArray(this.selectedValues) && this.selectedValues.length > 0 && reportMetadata.columnOption != 'all') {
+
+            this.reportsFeilds.get('form_data_selected')?.patchValue([])
+
+            // console.log("Column Option is false");
+
+            await this.onColumnChange('onCondition', 'savedQuery')
+          }
+          else {
+            this.visibiltyflag = false
+          }
+
+
+
+          try {
+            const UserDetails = {
+              "User Name": this.username,
+              "Action": "View",
+              "Module Name": "Report Studio",
+              "Form Name": this.selectedForms.join(),
+              "Description": `${this.editedQueryName} Saved Query was Viewed`,
+              "User Id": this.username,
+              "Client Id": this.SK_clientID,
+              "created_time": Date.now(),
+              "updated_time": Date.now()
+            }
+
+            this.auditTrail.mappingAuditTrailData(UserDetails, this.SK_clientID)
+          }
+          catch (error) {
+            console.log("Error in Audit Trail Data ", error);
+          }
+
+
+
+
+
+
+
+
+
+
+
+
+          this.callLambdaResponse()
+          this.onSubmitFlag = false
+          this.dismissModal1(this.modalRef);
+
+
+        }
+      })
+      this.spinner.hide()
+      this.cd.detectChanges()
+
+    }
+    catch (error) {
+      this.spinner.hide()
+      console.log("Error fetching reports table ", error);
+    }
+  }
+
+
+
   async editSavedQuery(P1: any, key: any) {
 
 
@@ -3439,7 +4022,9 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
       condition: [conditionData.condition, Validators.required],
       operator: [conditionData.operator, Validators.required],
       value: [conditionData.value, Validators.required],
-      operatorBetween: [conditionData.operatorBetween]  // Optional field
+      operatorBetween: [conditionData.operatorBetween],
+      val1:[conditionData.val1],
+      val2:[conditionData.val2]  // Optional field
     });
   }
 
@@ -3662,7 +4247,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
         if (data && data[0]) {
           let headers = data && data[0] && data[0].map((header: string) => header.replace(/[\r\n]+/g, '').replace(/^"|"$/g, '').trim());
 
-          const headersToRemove = ['Dynamic Table Values', 'TrackLocation', 'Approval History', 'Approval Status','Form View'];
+          const headersToRemove = ['Dynamic Table Values', 'TrackLocation', 'Approval History', 'Approval Status','Form View','Mini Table'];
           const removeIndices = headers
             .map((header: string, index: any) => headersToRemove.includes(header) || header.includes('Signature') ? index : -1)
             .filter((index: number) => index !== -1);
@@ -3691,30 +4276,34 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
 
           try {
-            const trackLocationColumnIndex = headers.indexOf('TrackLocation');
-            if (trackLocationColumnIndex !== -1) {
-              // Await the trackLocation data
 
-              const trackLocationData: any = await this.extractTrackLocationData(data, trackLocationColumnIndex, index);
-              console.log("Track location data is here 99999", trackLocationData);
-
-              const trackLocationSheet = XLSX.utils.aoa_to_sheet(trackLocationData);
-              let sheetName1 = `TrackLocation ${this.tableDataWithFormFilters[index].formFilter}`;
-              sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
-
-
-              if (excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0) {
-                if (excelSheets.includes('trackLocation')) {
+            try{
+              const trackLocationColumnIndex = headers.indexOf('TrackLocation');
+              if (trackLocationColumnIndex !== -1) {
+                // Await the trackLocation data
+  
+                const trackLocationData: any = await this.extractTrackLocationData(data, trackLocationColumnIndex, index);
+                console.log("Track location data is here 99999", trackLocationData);
+  
+                const trackLocationSheet = XLSX.utils.aoa_to_sheet(trackLocationData);
+                let sheetName1 = `TrackLocation ${this.tableDataWithFormFilters[index].formFilter}`;
+                sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
+  
+  
+                if (excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0) {
+                  if (excelSheets.includes('trackLocation')) {
+                    XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
+                  }
+                }
+                else {
                   XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
                 }
               }
-              else {
-                XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
-              }
-
-
-
             }
+            catch(error){
+              console.log("Error in trackLocation Excel ",error)
+            }
+          
 
             const approvalColumnIndex = headers.indexOf('Approval History');
             if (approvalColumnIndex !== -1) {
@@ -3769,7 +4358,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
             console.log("HEaders are here ", headers);
 
-            const tableColumnIndex = headers.indexOf('Dynamic Table Values');
+            const tableColumnIndex = headers.indexOf('Mini Table');
             console.log("Table column index is here ", tableColumnIndex);
             if (tableColumnIndex !== -1) {
               const tableData: any = await this.extractMiniTableData(data, tableColumnIndex, index);
@@ -4046,17 +4635,17 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     console.log("table with filters are here ", this.tableDataWithFormFilters[index]["rows"]);
 
     let tempHolder = this.tableDataWithFormFilters[index]["rows"].map((item: any) => {
-      if (item?.dynamic_table_values) {
-        Object.keys(item.dynamic_table_values).forEach((dynamicRow: any) => {
+      if (item['Mini Table']) {
+        Object.keys(item['Mini Table']).forEach((dynamicRow: any) => {
           // Loop through each dynamic table row
-          Array.isArray(item.dynamic_table_values[dynamicRow]) && item.dynamic_table_values[dynamicRow].forEach((ele: any, i: number) => {
+          Array.isArray(item['Mini Table'][dynamicRow]) && item['Mini Table'][dynamicRow].forEach((ele: any, i: number) => {
             // Add 'id' to each dynamic row element
-            item.dynamic_table_values[dynamicRow][i] = Object.assign({ id: item.id }, ele);
+            item['Mini Table'][dynamicRow][i] = Object.assign({ id: item.id }, ele);
           });
         });
       }
 
-      return item?.dynamic_table_values;
+      return item['Mini Table'];
     });
 
     console.log("TempHolder is here ", tempHolder);
@@ -4131,7 +4720,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
             tableRows = newTableRows;
           }
 
-          console.log("Table rows are here after evaluation ", tableRows);
+          // console.log("Table rows are here after evaluation ", tableRows);
 
           if (tableRows && Array.isArray(tableRows) && tableRows.length > 0) {
 
@@ -4208,10 +4797,14 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
     console.log("Approval History rows are here ", this.tableDataWithFormFilters);
 
-    let tempHolder = this.tableDataWithFormFilters[index]["rows"].map((item: { approval_status: any[]; id: any; }) => {
+    const tempTableHolder = JSON.parse(JSON.stringify(this.tableDataWithFormFilters[index]["rows"]))
+
+    let tempHolder = tempTableHolder.map((item: { approval_status: any[]; id: any; }) => {
       if (item?.approval_status && Array.isArray(item?.approval_status) && item?.approval_status.length > 0) {
         item?.approval_status.forEach((dynamicRow: any[]) => {
-          dynamicRow.unshift(item.id)
+          if(dynamicRow && dynamicRow[0] !=  item.id){
+            dynamicRow.unshift(item.id)
+          }
         });
       }
       return item?.approval_status;
@@ -4270,10 +4863,14 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
     console.log("Approval rows are here ", this.tableDataWithFormFilters);
 
-    let tempHolder = this.tableDataWithFormFilters[index]["rows"].map((item: { approval_history: any[]; id: any; }) => {
+    const tempApprovalHolder = JSON.parse(JSON.stringify(this.tableDataWithFormFilters[index]["rows"]))
+
+    let tempHolder = tempApprovalHolder.map((item: { approval_history: any[]; id: any; }) => {
       if (item?.approval_history && Array.isArray(item?.approval_history) && item?.approval_history.length > 0) {
         item?.approval_history.forEach((dynamicRow: any[]) => {
-          dynamicRow.unshift(item.id)
+            if(dynamicRow && dynamicRow[0] !=  item.id){
+              dynamicRow.unshift(item.id)
+            } 
         });
       }
       return item?.approval_history;
@@ -4379,10 +4976,22 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
         for (const custom of customColumnForm) {
           if (custom.predefined === "km Difference") {
             // rowValues.push(await this.calculateKmDifference(trackLocationObjects, obj.type,custom));
-            rowValues.push(await this.calculateKmDifference(trackLocationObjects, obj.type, custom))
+            try{
+              rowValues.push(await this.calculateKmDifference(trackLocationObjects, obj.type, custom))
+            }
+            catch(error){
+              console.log("Distance Calculation failed",error);
+            }
+        
 
           } else if (custom.predefined === "time_taken_distance") {
-            rowValues.push(await this.calculateTimeTaken(trackLocationObjects, obj.type, custom));
+            try{
+              rowValues.push(await this.calculateTimeTaken(trackLocationObjects, obj.type, custom));
+            }
+            catch(error){
+              console.log("Time Difference Failed ",error);
+            }
+           
           } else {
             const res = await this.evaluateTemplate(custom.equationText, obj, 'None');
             // custom.values.push(res)
@@ -4434,17 +5043,17 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     }
 
 
-    console.log("Text is here ", kmCalculations);
+    // console.log("Text is here ", kmCalculations);
 
 
 
     for (const calc of kmCalculations) {
 
-      console.log("Calc is ", calc);
+      // console.log("Calc is ", calc);
 
       if (currentType === calc.matchType) {
 
-        console.log("Match type is here ", currentType, calc.matchType);
+        // console.log("Match type is here ", currentType, calc.matchType);
 
         const startPosition = trackLocationObjects.find((item: any) =>
           item?.latitude != null && item?.longitude != null && calc.start.includes(item.type)
@@ -4498,8 +5107,8 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
         const endPosition = trackLocationObjects.find((item: any) =>
           calc.end.includes(item.type)
         );
-        console.log("Time should be taken in obj ", trackLocationObjects);
-        console.log("Start Position ", startPosition, "End Position ", endPosition);
+        // console.log("Time should be taken in obj ", trackLocationObjects);
+        // console.log("Start Position ", startPosition, "End Position ", endPosition);
 
         if (startPosition && endPosition) {
           const startDate = startPosition.created_epoch ? startPosition.created_epoch : this.parseDateTime(startPosition.Date_and_time);
@@ -4508,16 +5117,17 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
           console.log("Start Date ", startDate, "End Date ", endDate);
 
           if (startDate && endDate) {
-            console.log("Time will be calculated for ", trackLocationObjects);
+            // console.log("Time will be calculated for ", trackLocationObjects);
 
             // Get the difference in milliseconds
             let diffInMs = 0
-            if(startPosition.created_epoch || endPosition.created_epoch){
-              diffInMs = endPosition.created_epoch ? endDate : endDate.getTime() - startPosition.created_epoch ? startDate :startDate.getTime() ;
-            }
-            else{
-              diffInMs = endDate.getTime() - startDate.getTime();
-            }
+            diffInMs = endDate - startDate;
+            // if(startPosition.created_epoch || endPosition.created_epoch){
+            //   diffInMs = endPosition.created_epoch ? endDate : endDate.getTime() - startPosition.created_epoch ? startDate :startDate.getTime() ;
+            // }
+            // else{
+            //   diffInMs = endDate.getTime() - startDate.getTime();
+            // }
  
 
             // Calculate different time units
@@ -4642,7 +5252,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
     while ((match = regex.exec(csv)) !== null) {
       // The first capture group will be the quoted value, the second will be unquoted
-      console.log("Matched:", match);
+      // console.log("Matched:", match);
       result.push(match[1] || match[2]); // Add the match to the result
     }
 
@@ -6010,6 +6620,16 @@ generateTimeDifferenceScript()`
         }
       );
     });
+  }
+
+
+
+
+
+  isEquationVisible: boolean = false;
+
+  toggleEquationField() {
+    this.isEquationVisible = !this.isEquationVisible;
   }
 }
 
