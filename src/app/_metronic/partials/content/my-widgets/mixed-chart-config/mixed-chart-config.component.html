@@ -685,10 +685,10 @@
   
   
         <div class="modal-footer" style="margin-top: 20px;">
-          <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+          <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Discard</button>
           <button type="button" class="btn btn-primary" *ngIf="!isEditMode"
              (click)="validateAndSubmit()">Save</button>
-          <button type="button" class="btn btn-warning" (click)="updateTile('chart');modal.dismiss() " *ngIf="isEditMode"
+          <button type="button" class="btn btn-primary" (click)="updateTile('chart');modal.dismiss() " *ngIf="isEditMode"
             >
             Update
           </button>

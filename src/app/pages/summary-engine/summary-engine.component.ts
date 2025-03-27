@@ -3053,7 +3053,7 @@ exitFullScreen(): void {
   async ngOnInit() {
     // this.isMainLoading=true
    
-    // this.spinner.show('mainLoading')
+    this.spinner.show('mainLoading')
     this.route.data.subscribe(data => {
       this.titleService.setTitle(data['title']); // Set tab title dynamically
     });
@@ -8434,11 +8434,13 @@ helperChartClickChart1(event: any, modalChart: any) {
             if (permissionId !== "All") {
                 console.log("Stored permission ID:", permissionId);
                 this.loadData();
+                this.spinner.hide('mainLoading')
             } else {
                 this.userPermission = permissionId;
                 console.log("this.userPermission checking", this.userPermission);
                 this.summaryDashboardUpdate = true;
                 this.loadData();
+                this.spinner.hide('mainLoading')
                 console.log("Permission ID is 'All', skipping action.");
             }
 

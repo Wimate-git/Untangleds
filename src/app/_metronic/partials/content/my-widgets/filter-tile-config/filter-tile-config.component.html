@@ -12,6 +12,19 @@ type="square-jelly-box"
 </ngx-spinner>
 
 
+<ngx-spinner 
+*ngIf="isLoadingFilter" 
+bdColor="rgba(0, 0, 0, 0.8)" 
+size="medium" 
+color="#fff" 
+
+name="clearFilterProcess"
+type="square-jelly-box" 
+[fullScreen]="true">
+<p style="color: white">Filter Clearing, Please Wait....</p>
+</ngx-spinner>
+
+
 <div class="modal fade" id="filterDashModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
@@ -65,7 +78,7 @@ type="square-jelly-box"
             <label 
               for="dateTypeSelect" 
               class="col-lg-4 col-md-4 col-sm-4 col-form-label text-lg-end text-md-start text-sm-start fw-bold ">
-              Date Filter
+              Date 
             </label>
             <div class="col-lg-8 col-md-8 col-sm-8">
               <select 
@@ -183,7 +196,7 @@ type="square-jelly-box"
           <div class="col-6" role="Data">
             <li class="nav-item">
               <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab"
-                aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Filter</a>
+                aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Conditions</a>
             </li>
           </div>
 
@@ -472,7 +485,7 @@ type="square-jelly-box"
                         class="btn btn-primary btn-sm me-4"
                         (click)="addCondition(fieldIndex, '', '')"
                       >
-                        Add Condition
+                        Add Conditions
                       </button>
                       <button
                       type="button"
@@ -578,7 +591,7 @@ type="square-jelly-box"
   
   
         <div class="modal-footer" style="margin-top: 20px;">
-          <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Discard</button>
           <button 
             type="button" 
             class="btn btn-primary"  
@@ -588,13 +601,13 @@ type="square-jelly-box"
           >
             Save
           </button>
-          <button type="button" class="btn btn-warning"  (click)="updateTile('filterTile');modal.dismiss() "
+          <button type="button" data-bs-dismiss="modal" class="btn btn-primary"  (click)="updateTile('filterTile');modal.dismiss() "
           *ngIf="isEditMode" >
             Update
           </button>
           <button type="button" class="btn btn-success"  (click)="reloadPage() "
           data-bs-dismiss="modal" *ngIf="isEditMode">
-            Live Filter
+            Apply Filter
           </button>
           <button data-bs-dismiss="modal"  type="button" class="btn btn-info" (click)="clearForm()" *ngIf="isEditMode">Clear Filter</button>
         </div>

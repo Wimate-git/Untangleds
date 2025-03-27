@@ -164,7 +164,7 @@
       </div>
   
       <div class="modal-footer" style="margin-top: 20px;">
-        <button type="button" class="btn btn-secondary" (click)="modal.dismiss()"  >Close</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.dismiss()"  >Discard</button>
   <button type="button" class="btn btn-primary" 
   (click)="addTile('HTMLtile');modal.dismiss()" 
   *ngIf="!isEditMode" 
@@ -174,7 +174,7 @@
 >Save</button>
   <button 
       type="button" 
-      class="btn btn-warning"
+      class="btn btn-primary"
       (click)="updateTile('HTMLtile');modal.dismiss()" 
       *ngIf="isEditMode" 
       

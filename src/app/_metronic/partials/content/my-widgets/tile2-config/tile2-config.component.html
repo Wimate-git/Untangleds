@@ -697,9 +697,9 @@
       
     
     <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+      <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Discard</button>
       <button type="button" class="btn btn-primary"     (click)="validateAndSubmit()" *ngIf="!isEditMode">Save</button> 
-      <button type="button" class="btn btn-warning" (click)="updateTile1('tile'); modal.dismiss()" [disabled]="createKPIWidget1.invalid" *ngIf="isEditMode">Update</button> <!-- Update button shown only in edit mode -->
+      <button type="button" class="btn btn-primary" (click)="updateTile1('tile'); modal.dismiss()" [disabled]="createKPIWidget1.invalid" *ngIf="isEditMode">Update</button> <!-- Update button shown only in edit mode -->
     </div>
     </div>
 

@@ -1298,8 +1298,8 @@ getDynamicDateParams(index: number): any[] {
     { value: 'Constant', text: 'Constant' },
   
     { value: 'Count', text: 'Count' },
-    { value: 'Count_Multiple', text: 'Count Multiple' },
-    { value: 'Count Dynamic', text: 'Count Dynamic' },
+    // { value: 'Count_Multiple', text: 'Count Multiple' },
+    // { value: 'Count Dynamic', text: 'Count Dynamic' },
     { value: 'Count MultiplePram', text: 'Count Multiple Parameter' },
     { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
     { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },

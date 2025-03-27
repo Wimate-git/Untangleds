@@ -545,7 +545,7 @@ onAdd() {
     { value: 'Constant', text: 'Constant' },
    
     { value: 'Count', text: 'Count' },
-    { value: 'Count Dynamic', text: 'Count Dynamic' },
+    // { value: 'Count Dynamic', text: 'Count Dynamic' },
     { value: 'Equation', text: 'Equation' },
     { value: 'Count MultiplePram', text: 'Count Multiple Parameter' },
     { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },

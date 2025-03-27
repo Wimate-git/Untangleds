@@ -49,6 +49,12 @@ export class FilterTileUiComponent implements OnInit{
   
       // If data is present, consider the filter applied
       this.appliedFilter = data && data.length > 0;
+      console.log('this.appliedFilter checking',this.appliedFilter)
+
+      if ((!data || data.length === 0) &&data != null) {
+        this.appliedFilter = false;
+
+      }
   
       // Trigger change detection
       // this.cdRef.detectChanges();
@@ -71,6 +77,7 @@ export class FilterTileUiComponent implements OnInit{
   }
   
   shouldApplyMessage(): boolean {
+    // console.log('this.appliedFilter return check',this.appliedFilter)
     return this.appliedFilter;
   }
   

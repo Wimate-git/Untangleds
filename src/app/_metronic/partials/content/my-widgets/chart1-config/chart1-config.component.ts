@@ -1062,7 +1062,7 @@ openChartModal1(tile: any, index: number): void {
     // ✅ Populate all_fields and drill_fields separately
     this.all_fields.clear(); // Clear existing FormArray
     const populatedAllFields = this.repopulate_fields(tile);
-    populatedAllFields.controls.forEach(control => this.all_fields.push(control));
+    // populatedAllFields.controls.forEach(control => this.all_fields.push(control));
 
     this.drill_fields.clear(); // Clear existing FormArray
     const populatedDrillFields = this.repopulateDrill_fields(tile);
@@ -1680,8 +1680,8 @@ this.dynamicDateParamMap.set(index,dateFieldsList)
     { value: 'Constant', text: 'Constant' },
   
     { value: 'Count', text: 'Count' },
-    { value: 'Count_Multiple', text: 'Count Multiple' },
-    { value: 'Count Dynamic', text: 'Count Dynamic' },
+    // { value: 'Count_Multiple', text: 'Count Multiple' },
+    // { value: 'Count Dynamic', text: 'Count Dynamic' },
     { value: 'Count MultiplePram', text: 'Count Multiple Parameter' },
     { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
     { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },

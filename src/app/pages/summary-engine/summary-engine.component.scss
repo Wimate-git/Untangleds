@@ -1196,6 +1196,12 @@ gridster-item {
   opacity: 0.6;  /* Make the button look disabled */
 }
 
+.disabled {
+  pointer-events: none; /* Prevent clicking */
+  opacity: 0.5; /* Make it visually appear disabled */
+}
+
+
 
 
 

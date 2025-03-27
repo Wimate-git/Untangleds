@@ -474,7 +474,7 @@ if (key === 'tile3') {
     { value: 'Constant', text: 'Constant' },
  
     { value: 'Count', text: 'Count' },
-    { value: 'Count Dynamic', text: 'Count Dynamic' },
+    // { value: 'Count Dynamic', text: 'Count Dynamic' },
     { value: 'Count MultiplePram', text: 'Count Multiple Parameter' },
     { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
     { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },

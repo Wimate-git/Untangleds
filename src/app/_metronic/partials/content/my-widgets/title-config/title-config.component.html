@@ -267,24 +267,24 @@
           >
             <label class="col-form-label fw-bold fs-6 required">Name</label>
             <div
-            formControlName="customLabel"
-            contenteditable="true"
-            class="form-control form-control-solid "
-            [style.font-family]="createTitle.value.fontFamily"
-            [style.font-size]="createTitle.value.fontSize"
-            [style.text-align]="createTitle.value.textAlign"
-            [style.font-weight]="createTitle.value.fontWeight"
-            [style.font-style]="createTitle.value.fontStyle"
-            [style.text-decoration]="createTitle.value.textDecoration"
-            [style.background-color]="createTitle.value.themeColor"
-            [style.color]="createTitle.value.textColor"
-            (input)="updateCustomLabel($event)"
-            [textContent]="createTitle.value.customLabel"
-          >
-          </div>
-          
-          
-          
+              formControlName="customLabel"
+              contenteditable="true"
+              class="form-control form-control-solid"
+              [style.font-family]="createTitle.value.fontFamily"
+              [style.font-size]="createTitle.value.fontSize"
+              [style.text-align]="'center'"  
+              [style.font-weight]="createTitle.value.fontWeight"
+              [style.font-style]="createTitle.value.fontStyle"
+              [style.text-decoration]="createTitle.value.textDecoration"
+              [style.background-color]="createTitle.value.themeColor"
+              [style.color]="createTitle.value.textColor"
+              [style.direction]="'ltr'"  
+              [style.white-space]="'pre-wrap'"  
+              [style.overflow]="'auto'"  
+              (input)="updateCustomLabel($event)"
+              [textContent]="createTitle.value.customLabel"
+            >
+            </div>
           
             <!-- Validation Feedback -->
             <div
@@ -296,6 +296,8 @@
             </div>
           </div>
           
+          
+          
             
           
   
@@ -306,9 +308,9 @@
         </div>
   
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
+          <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Discard</button>
           <button type="button" class="btn btn-primary" (click)="addTile('title'); modal.dismiss()" *ngIf="!isEditMode">Save</button>
-          <button type="button" class="btn btn-warning" (click)="updateTitle(); modal.dismiss()" *ngIf="isEditMode">Update</button>
+          <button type="button" class="btn btn-primary" (click)="updateTitle(); modal.dismiss()" *ngIf="isEditMode">Update</button>
         </div>
       </div>
   

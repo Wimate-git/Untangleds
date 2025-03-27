@@ -953,6 +953,7 @@ makeTrueCheck:any = false
   @Input() parsedPermission:any
   @Input() userdetails:any
   @Input() permissionIdRequest:any
+  isLoadingFilter:boolean=false
   
   reloadPage() {
     const fields = this.createChart.value.all_fields || [];
@@ -1809,8 +1810,8 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     { value: 'Constant', text: 'Constant' },
     { value: 'Live', text: 'Live' },
     { value: 'Count', text: 'Count' },
-    { value: 'Count_Multiple', text: 'Count Multiple' },
-    { value: 'Count Dynamic', text: 'Count Dynamic' },
+    // { value: 'Count_Multiple', text: 'Count Multiple' },
+    // { value: 'Count Dynamic', text: 'Count Dynamic' },
 
 
   ]
@@ -2610,7 +2611,72 @@ console.log('tempMetadata',tempMetadata)
   }
   
   clearForm() {
-    window.location.reload();
+    // window.location.reload();
+
+    // this.isLoadingFilter = true;
+  
+    console.log('this.routeId check', this.routeId);
+    console.log('client id check', this.SK_clientID);
+    this.spinner.show('clearFilterProcess');
+    this.createChart.reset();
+
+  
+    const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+  
+    const requestBody = {
+      body: JSON.stringify({
+        clientId: this.SK_clientID,
+        routeId: this.routeId,
+        permissionId: this.permissionIdRequest,
+        permissionList: this.readFilterEquation || [],
+        userName: this.userdetails,
+   
+        MsgType:'FilterRequest',
+      
+
+      }),
+    };
+  
+    console.log('requestBody checking from clear Filter', requestBody);
+  
+    this.http.post(apiUrl, requestBody).subscribe(
+      (response) => {
+        console.log('Lambda function triggered successfully:', response);
+
+        
+        const constLiveData = JSON.parse((response as any)?.body);
+        console.log('constLiveData check', constLiveData);
+        const processedData = constLiveData.Processed_Data.metadata.grid_details;
+  
+        console.log('processedData check', processedData);
+        this.storeliveFilterData = processedData
+        this.liveFilterData.emit('');
+
+        this.isLoadingFilter = false;
+        this.spinner.hide('clearFilterProcess');
+
+
+  
+        // window.location.reload();
+
+
+     
+      },
+      (error: any) => {
+        console.error('Error triggering Lambda function:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to trigger the Lambda function. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+  
+        this.isLoadingFilter = false;
+      }
+    );
+    setTimeout(() => {
+      location.reload()
+     }, 500);
   }
 
   

@@ -431,9 +431,9 @@
       
     
     <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
+      <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Discard</button>
       <button type="button" class="btn btn-primary" (click)="addTile('tile5'); modal.dismiss()" [disabled]="createKPIWidget4.invalid" *ngIf="!isEditMode">Save</button> <!-- Save button shown only in add mode -->
-      <button type="button" class="btn btn-warning" (click)="updateTile4(); modal.dismiss()" [disabled]="createKPIWidget4.invalid"  *ngIf="isEditMode">Update</button> <!-- Update button shown only in edit mode -->
+      <button type="button" class="btn btn-primary" (click)="updateTile4(); modal.dismiss()" [disabled]="createKPIWidget4.invalid"  *ngIf="isEditMode">Update</button> <!-- Update button shown only in edit mode -->
     </div>
     </div>
 

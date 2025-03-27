@@ -1,13 +1,13 @@
-<!-- <ngx-spinner 
-*ngIf="isMainLoading"
+<ngx-spinner 
+
   bdColor="rgba(0, 0, 0, 0.8)"
   [name]="'mainLoading'"
   size="medium"
   color="#fff"
   type="square-jelly-box"
   [fullScreen]="true">
-  <p style="color: white">Loading data, please wait...</p>
-</ngx-spinner> -->
+  <p style="color: white">Loading Dashboard, please wait...</p>
+</ngx-spinner>
 
 
 <div class="d-flex align-items-center me-2 mb-7" *ngIf="!isSummaryEngine()" style="gap: 10px;">
@@ -755,11 +755,15 @@
   <p style="color: white">Redirecting to Dashboard, Please Wait....</p>
   </ngx-spinner>
 
-  <div style="top: 1%;
+  <!-- <div style="top: 1%;
   z-index: 100;
   right:44px;
   flex-direction: column;" class=" d-flex position-fixed fw-bolder zindex-2  mt-20 gap-2" 
-   [style.visibility]="hideNavMenu ||  !(!disableMenuQP&&(!(summaryPermission?.includes('None')) || userPermission === 'All'))&&!isNone?'hidden':'visible' ">
+   [style.visibility]="hideNavMenu ||  !(!disableMenuQP&&(!(summaryPermission?.includes('None')) || userPermission === 'All'))&&!isNone?'hidden':'visible' "> -->
+
+   <div style="top: 1%; z-index: 100; right:44px; flex-direction: column;" 
+     class="d-flex position-fixed fw-bolder zindex-2 mt-20 gap-2" 
+     [style.visibility]="hideNavMenu ||  !(!disableMenuQP && (!(summaryPermission?.includes('None')) || userPermission === 'All')) && !isNone ? 'hidden' : 'visible'">
 
   
   <nav class="myMenu" #tooltipContainer  >
@@ -776,15 +780,15 @@
    <i style="color: white;" class="fa" ></i>
    </a> -->
 
-   <a class="myMenu-item" *ngIf="!isSummaryEngine()" 
+   <!-- <a class="myMenu-item" *ngIf="!isSummaryEngine()" 
    style="cursor: pointer;" [attr.title]="lastUpdatedTime">
   <i style="color: white;" class="fa" [ngClass]="'fa-clock'"></i>
-  </a>
-    <a *ngIf="summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)" title="Add Dashboard" class="myMenu-item" (click)="openModal('new',null, summaryModal)">
+  </a> -->
+    <a *ngIf="summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)" title="New Dashboard" class="myMenu-item" (click)="openModal('new',null, summaryModal)">
       <i style="color: white;" class="fa fa-plus"></i>
     </a>
     <a *ngIf="!isSummaryEngine() &&(summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))" 
-    title="Add Dashboard" 
+    title="Go To Home" 
     class="myMenu-item" 
     (click)="redirectToSummaryEngine()">
    <i style="color: white;" class="fa fa-home"></i>
@@ -1231,32 +1235,34 @@
             
             <!-- Conditionally render grid-item -->
             <div *ngIf="!showGrid" class="grid-container">
-              <div class="grid-item highlight" tabindex="0" (click)="openKPIModal(KPIModal,modal);modal.dismiss"  style="background: linear-gradient(to right, #ff7e5f, #feb47b); padding: 20px; border-radius: 8px; color: white;">
+              <div class="grid-item highlight tile-style" tabindex="0" (click)="openKPIModal(KPIModal,modal);modal.dismiss"  style="background: linear-gradient(to right, #ff7e5f, #feb47b); padding: 20px; border-radius: 8px; color: white;">
                 <div>Label</div>
                 <div class="value" tabindex="0">Value</div>
               </div>
-              <div class="grid-item" tabindex="0" (click)="openKPIModal1(KPIModal1,modal);modal.dismiss" style="background: #3498db; padding: 20px; border-radius: 8px; color: white;">
+              <div class="grid-item tile-style" tabindex="0" (click)="openKPIModal1(KPIModal1,modal);modal.dismiss" style="background: #3498db; padding: 20px; border-radius: 8px; color: white;">
                 <div>Label</div>
                 <div class="value" tabindex="0">Value</div>
                 <div tabindex="0">Label: Value 2</div>
               </div>
-              <div class="grid-item" tabindex="0" (click)="openKPIModal2(KPIModal2,modal)" style="background: #e74c3c; padding: 20px; border-radius: 8px; color: white;">
+              <div class="grid-item tile-style" tabindex="0" (click)="openKPIModal2(KPIModal2,modal)" style="background: #e74c3c; padding: 20px; border-radius: 8px; color: white;">
                 <div>Label</div>
                 <div tabindex="0">Label: Value 2</div>
                 <div class="value" tabindex="0">Value</div>
                 <div>Label: Value 3</div>
               </div>
-              <div class="grid-item" tabindex="0" (click)="openKPIModal3(KPIModal3,modal)" style="background: #8e44ad; padding: 20px; border-radius: 8px; color: white;">
+              <div class="grid-item tile-style " [class.disabled]="true" tabindex="0"  style="background: #8e44ad; padding: 20px; border-radius: 8px; color: white;">
                 <div>Label</div>
-                <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
+                <!-- (click)="openKPIModal3(KPIModal3,modal)" -->
+                <div class="value " tabindex="0">Value <span class="up-arrow">↑</span></div>
               </div>
-              <div class="grid-item" tabindex="0" (click)="openKPIModal4(KPIModal4,modal)" style="background: #2ecc71; padding: 20px; border-radius: 8px; color: white;">
+              <div class="grid-item tile-style " [class.disabled]="true" tabindex="0"  style="background: #2ecc71; padding: 20px; border-radius: 8px; color: white;">
                 <div>Label</div>
-                <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
+                <!-- (click)="openKPIModal4(KPIModal4,modal)" -->
+                <div class="value tile-style" tabindex="0">Value <span class="up-arrow">↑</span></div>
                 <div>Label: Value 2</div>
               </div>
               
-              <div class="grid-item" tabindex="0" (click)="opentileWithIcon(tileWithIconModal,modal)" style="background: #2a3439; padding: 20px; border-radius: 8px; color: white;">
+              <div class="grid-item tile-style" tabindex="0" (click)="opentileWithIcon(tileWithIconModal,modal)" style="background: #2a3439; padding: 20px; border-radius: 8px; color: white;">
                 <div>Label</div>
                 <div class="value" tabindex="0">Value</div>
               </div>
@@ -1288,31 +1294,37 @@
       <!-- <button (click)="createChartGauge()">click me</button> -->
   
       <div *ngIf="showGrid && selectedTile !== 'Title' &&  selectedTile !== 'Chart' &&  selectedTile !== 'DynamicTile' && selectedTile !== 'FilterTile' && selectedTile !== 'TableTile' && selectedTile !== 'MapWidget'&& selectedTile !== 'MultiTableWidget' &&  selectedTile !=='Html Tile' && selectedTile !=='ImageTile'&& selectedTile !=='ProgressTile' " class="grid-container">
-        <div class="grid-item highlight" tabindex="0" (click)="openKPIModal(KPIModal,modal);modal.dismiss"  style="background: linear-gradient(to right, #ff7e5f, #feb47b); padding: 20px; border-radius: 8px; color: white;">
+        <div class="grid-item highlight tile-style" tabindex="0" (click)="openKPIModal(KPIModal,modal);modal.dismiss"  style="background: linear-gradient(to right, #ff7e5f, #feb47b); padding: 20px; border-radius: 8px; color: white;">
           <div>Label</div>
           <div class="value" tabindex="0">Value</div>
         </div>
-        <div class="grid-item" tabindex="0" (click)="openKPIModal1(KPIModal1,modal);modal.dismiss" style="background: #3498db; padding: 20px; border-radius: 8px; color: white;">
+        <div class="grid-item tile-style" tabindex="0" (click)="openKPIModal1(KPIModal1,modal);modal.dismiss" style="background: #3498db; padding: 20px; border-radius: 8px; color: white;">
           <div>Label</div>
           <div class="value" tabindex="0">Value</div>
           <div tabindex="0">Label: Value 2</div>
         </div>
-        <div class="grid-item" tabindex="0" (click)="openKPIModal2(KPIModal2,modal)" style="background: #e74c3c; padding: 20px; border-radius: 8px; color: white;">
+        <div class="grid-item tile-style" tabindex="0" (click)="openKPIModal2(KPIModal2,modal)" style="background: #e74c3c; padding: 20px; border-radius: 8px; color: white;">
           <div>Label</div>
           <div tabindex="0">Label: Value 2</div>
           <div class="value" tabindex="0">Value</div>
           <div>Label: Value 3</div>
         </div>
-        <div class="grid-item" tabindex="0" (click)="openKPIModal3(KPIModal3,modal)" style="background: #8e44ad; padding: 20px; border-radius: 8px; color: white;">
+        <div class="grid-item tile-style " [class.disabled]="true" tabindex="0"  style="background: #8e44ad; padding: 20px; border-radius: 8px; color: white;">
           <div>Label</div>
-          <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
+          <!-- (click)="openKPIModal3(KPIModal3,modal)" -->
+          <div class="value " tabindex="0">Value <span class="up-arrow">↑</span></div>
         </div>
-        <div class="grid-item" tabindex="0" (click)="openKPIModal4(KPIModal4,modal)" style="background: #2ecc71; padding: 20px; border-radius: 8px; color: white;">
-          <div>Label</div>
-          <div class="value" tabindex="0">Value <span class="up-arrow">↑</span></div>
+        <div class="grid-item tile-style" [class.disabled]="true" tabindex="0" style="background: #2ecc71; padding: 20px; border-radius: 8px; color: white;">
+          <div class="label-container">
+            <span class="up-arrow">↑</span> <!-- Move this to the left of the label -->
+            <div>Label</div>
+          </div>
+          <div class="value tile-style" tabindex="0">Value </div>
           <div>Label: Value 2</div>
         </div>
-        <div class="grid-item" tabindex="0" (click)="opentileWithIcon(tileWithIconModal,modal)" style="background: #2a3439; padding: 20px; border-radius: 8px; color: white;">
+        
+        
+        <div class="grid-item tile-style" tabindex="0" (click)="opentileWithIcon(tileWithIconModal,modal)" style="background: #2a3439; padding: 20px; border-radius: 8px; color: white;">
           <div>Label</div>
           <div class="value" tabindex="0">Value</div>
         </div>
