@@ -90,3 +90,9 @@
 .btn-advanced:hover .fas {
   transform: translateX(5px); /* Move icon slightly right on hover */
 }
+
+
+#kt_modal_update_customer_scroll {
+  max-height: 80vh; /* Adjust the height as per your requirements */
+  overflow-y: auto; /* Enables vertical scrolling */
+}

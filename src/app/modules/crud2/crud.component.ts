@@ -26,12 +26,13 @@ export class Crud2Component implements OnInit, AfterViewInit, OnDestroy{
   @Input() modal: TemplateRef<any>;
 
   @Output() deleteEvent = new EventEmitter<number>();
-  @Output() editEvent = new EventEmitter<number>();
+  @Output() editEvent = new EventEmitter<number>(); 
   @Output() createEvent = new EventEmitter<boolean>();
 
 
   modalConfig: NgbModalOptions = {
-    modalDialogClass: 'modal-dialog modal-dialog-centered mw-1000px',
+    // modalDialogClass: 'modal-dialog modal-dialog-centered mw-1000px',
+    modalDialogClass: 'modal-dialog modal-fullscreen p-9'
   };
 
   dtOptions: Config = {};

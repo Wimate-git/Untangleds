@@ -30,7 +30,7 @@ export class CrudcompanyComponent implements OnInit, AfterViewInit, OnDestroy{
   @Output() createEvent = new EventEmitter<boolean>();
 
   modalConfig: NgbModalOptions = {
-    modalDialogClass: 'modal-dialog modal-dialog-centered mw-1000px',
+  modalDialogClass: 'modal-dialog modal-fullscreen p-9'
   };
 
   dtOptions: Config = {};

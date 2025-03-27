@@ -5764,7 +5764,7 @@ function generateTimeDifferenceScript() {
   //   "resolved < planned_to": resolvedTime < plannedToTime
   // });
   
-  if (inProgressTime > plannedFromTime && resolvedTime < plannedToTime) {
+  if ((inProgressTime < plannedFromTime || inProgressTime > plannedFromTime) && resolvedTime < plannedToTime) {
     return 'OK';
   } else if (inProgressTime > plannedFromTime && resolvedTime > plannedToTime) {
     return 'Breached';

@@ -67,7 +67,7 @@
         </div>
 
         <div class="modal-body">
-            <div class="d-flex flex-column scroll-y me-n7 pe-7 mw-1000px" id="kt_modal_update_customer_scroll"
+            <div class="d-flex flex-column scroll-y p-9"  id="kt_modal_update_customer_scroll"
                 data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}"
                 data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_update_customer_header"
                 data-kt-scroll-wrappers="#kt_modal_update_customer_scroll" data-kt-scroll-offset="300px">
@@ -185,7 +185,7 @@
                                                 <b>Allow User to add new Company</b>
                                             </label>
                                         </div>
-        
+                                    </div>
                                 </div>
                             </div>
         
@@ -742,28 +742,7 @@
                                 <!--end::Button-->
                             </div>
         
-                            <!-- <div class="modal-footer">
-        
-                                <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal"
-                                    #closeUser>Cancel</button>
-                                 
-                                <button [hidden]="hideUpdateButton" type="submit" class="btn btn-sm btn-primary"
-                                    [disabled]="!createUserField.dirty || createUserField.invalid
-                                || errorForUniqueID !='' || errorForUniqueEmail == 'Email already exists' || errorForInvalidEmail == 'Invalid Email Address' 
-                                ||errorForInvalidName == 'Field must contains at least 1 numeric character,at least 1 lowercase letter,at least 1 uppercase letter,at least 1 special character,minimum 6 of length'"
-                                    (click)="updateUser(createUserField.value,'editUser')" *ngIf="showModal"
-                                   >
-                                    Update
-                                </button>
-        
-        
-                            
-                                <button type="button" class="btn btn-sm btn-primary not-allowed" *ngIf="!showModal"
-                                [disabled]="createUserField.invalid || errorForUniqueUserID == 'User ID already exists' || errorForUniqueID !='' || errorForUniqueEmail == 'Email already exists'
-                                || errorForInvalidEmail == 'Invalid Email Address'
-                                || errorForInvalidName == 'Field must contains at least 1 numeric character,at least 1 lowercase letter,at least 1 uppercase letter,at least 1 special character,minimum 6 of length'"
-                                    (click)="createNewUser('','html')">Save</button>
-                            </div> -->
+                         
                         </div>
                    
                 
@@ -771,7 +750,7 @@
                 </div>
                 <!--end::User form-->
             </div>
-        </div>
+
     </form>
 
 </ng-template> 
