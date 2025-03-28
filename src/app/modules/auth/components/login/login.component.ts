@@ -287,9 +287,13 @@ export class LoginComponent implements OnInit, OnDestroy {
             errorTitle ='⚠️ Incorrect Credentials',
             errorMessage = 'Username or Password is Incorrect please try again.'
             break;
+          case 'Password attempts exceeded':
+            errorTitle ='⚠️ Password attempts exceeded',
+            errorMessage = 'Password attempts exceeded please try again after 24 hours.'
+            break;
           default:
-            errorTitle = '⚠️ Unknown Error';
-            errorMessage = 'An unexpected error occurred. Please try again later.';
+            errorTitle = '⚠️ Error';
+            errorMessage = error.message;
         }
       }
   

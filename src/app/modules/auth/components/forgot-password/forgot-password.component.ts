@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { filter, first } from 'rxjs/operators';
-import { CognitoUser, CognitoUserPool } from 'amazon-cognito-identity-js';
+import { AuthenticationDetails, CognitoUser, CognitoUserAttribute, CognitoUserPool } from 'amazon-cognito-identity-js';
 import Swal from 'sweetalert2';
 import { SharedService } from 'src/app/pages/shared.service';
 import { APIService } from 'src/app/API.service';
@@ -279,6 +279,7 @@ async confirmNewPassword() {
       console.log("Result is here for getting data ",result);
 
 
+      //Update cognito Custom attributes as well
 
 
 
@@ -309,6 +310,10 @@ async confirmNewPassword() {
       const tempResult = JSON.parse(result.metadata || '')
 
       tempResult.password = newPassword
+
+
+      this.updateCognitoAttributes(this.selectedUser,newPassword);
+
       
 
       const tempObj = {
@@ -319,6 +324,7 @@ async confirmNewPassword() {
 
       await this.api.UpdateMaster(tempObj)
       // Notify user of success
+
       this.showVerificationFields = false; // Hide the verification fields
 
       const body = { type: "forgot_password", username:this.selectedUser,email:tempResult.email,password:confirmPassword};
@@ -367,6 +373,125 @@ async confirmNewPassword() {
         });
     }
   });
+}
+
+
+
+updateCognitoAttributes(username:any,password:any) {
+
+
+  let authenticationData = {
+    Username: username,
+    Password: password,
+  };
+
+  let poolData = {
+    UserPoolId: "ap-south-1_aaPSwPS14", // user pool id here
+    ClientId: "42pb85v3sv84jdrfi1rub7a4e5"// client id here
+  };
+
+  let userPool = new CognitoUserPool(poolData);
+
+
+  let poolDetails: any = {
+    Username:username,
+    Pool: userPool
+  }
+
+
+
+  let userData: any = {
+    // "email": this.createUserField.get('email')?.value,
+    // 'custom:userID': this.createUserField.value.userID,
+    'custom:password':password,
+    // 'custom:clientID': this.allUserDetails.clientID,
+    // 'custom:companyID': this.allUserDetails.companyID,
+    // 'custom:username': this.tempUpdateUser,
+    // 'custom:description': this.createUserField.value.description,
+    // 'custom:mobile': JSON.stringify(this.createUserField.value.mobile),
+    // 'custom:mobile_privacy': this.createUserField.value.mobile_privacy,
+    // // 'custom:admin': JSON.stringify(this.createUserField.value.admin),
+    // // 'custom:user_type': JSON.stringify(this.createUserField.value.user_type),
+    // 'custom:user_type': JSON.stringify(this.createUserField.value.user_type),
+    // 'custom:enable_user': JSON.stringify(this.createUserField.value.enable_user == null ? false : this.createUserField.value.enable_user),
+    // 'custom:disable_user': JSON.stringify(this.createUserField.value.disable_user == null ? false : this.createUserField.value.disable_user),
+    // 'custom:alert_email': JSON.stringify(this.createUserField.value.alert_email == null ? false : this.createUserField.value.alert_email),
+    // 'custom:alert_sms': JSON.stringify(this.createUserField.value.alert_sms == null ? false : this.createUserField.value.alert_sms),
+    // 'custom:alert_telegram': JSON.stringify(this.createUserField.value.alert_telegram == null ? false : this.createUserField.value.alert_telegram),
+    // 'custom:escalation_email': JSON.stringify(this.createUserField.value.escalation_email == null ? false : this.createUserField.value.escalation_email),
+    // 'custom:escalation_sms': JSON.stringify(this.createUserField.value.escalation_sms == null ? false : this.createUserField.value.escalation_sms),
+    // 'custom:escalation_telegram': JSON.stringify(this.createUserField.value.escalation_telegram == null ? false : this.createUserField.value.escalation_telegram),
+    // 'custom:telegramID': JSON.stringify(this.createUserField.value.telegramID),
+    // 'custom:permission_id': this.allUserDetails.permission_ID,
+    // 'custom:defaultdevloc': this.createUserField.value.default_dev_loc,
+    // "phone_number": (this.registrationForm.value.phone_number)
+  }
+
+  let cognitoUser = new CognitoUser(poolDetails);
+
+  let authenticationDetails = new AuthenticationDetails(authenticationData);
+
+  cognitoUser.authenticateUser(authenticationDetails, {
+    onSuccess: function (result) {
+      let accessToken = result.getAccessToken().getJwtToken();
+
+      // console.log('after authenicated result', result);
+
+      // console.log('accessToken after receiving result', accessToken);
+
+      /* Use the idToken for Logins Map when Federating User Pools 
+      with identity pools or when passing through an Authorization Header to an API Gateway Authorizer */
+      //let idToken = result.idToken.jwtToken;
+      let attributeList = [];
+      for (let key in userData) {
+        let attrData = {
+          Name: key,
+          Value: userData[key]
+        }
+        //console.log('attribute data', attrData)
+        let attribute = new CognitoUserAttribute(attrData);
+        attributeList.push(attribute);
+      }
+      // console.log('userData', userData);
+      // console.log('attributeList', attributeList);
+      //cognitoUser.getUserAttributes
+      cognitoUser.updateAttributes(attributeList, (err, result) => {
+        if (err) {
+          console.log("\n\nUpdate Error: ", err, "\n\n");
+        } else {
+          console.log('after updating', result);
+        }
+      });
+    },
+
+    
+
+    onFailure: function (err) {13419
+      console.log("Cognito Error",err);
+
+      if(err.message != 'User is disabled.'){
+        Swal.fire(err.message)
+        if(err.message == 'User is not confirmed.'){
+          Swal.fire({
+            icon: 'error',
+            title: 'User is not confirmed!',
+            text: 'User details weren\'t updated in Cognito.'
+          });
+        }
+        else{
+          Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: err.message
+          });
+        }
+      }
+    },
+
+  });
+
+
+
 }
 
 

@@ -120,11 +120,11 @@
         
                                     <!-- [ngClass]="{'d-none': editOperation}" -->
         
-                                    <div class="col-md-4" >
+                                    <div class="col-md-4" [ngClass]="{'d-none': editOperation}">
                                         <label class="required fw-semibold fs-6 mb-2"> Password
                                         </label>
         
-                                        <input [type]="editOperation ? 'password' : 'text'" [ngbTooltip]="'To change the password, visit the Forgot Password page from the login screen.'" class="
+                                        <input type="text" [ngbTooltip]="'To change the password, visit the Forgot Password page from the login screen.'" class="
                                         form-control form-control-lg form-control-solid
                                         mb-3 mb-lg-0
                                       " placeholder="Enter Password" name="name" formControlName="name" required
