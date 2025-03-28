@@ -3,11 +3,26 @@ import { ModalConfig, ModalComponent } from '../../_metronic/partials';
 import { APIService } from 'src/app/API.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
-import Swal,{ SweetAlertOptions } from 'sweetalert2';
+import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { AuditTrailService } from '../services/auditTrail.service';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
-
+interface ListItem {
+  [key: string]: {
+    P1: any;
+    P2: any;
+    P3: any;
+    P4: any;
+    P5: any;
+    P6: any;
+    P7: any;
+    P8: any;
+    P9: any;
+    P10: any;
+    P11: any;
+  };
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -46,6 +61,13 @@ export class DashboardComponent implements OnInit {
   loading = true;
   icon: any;
   iconData: { class1: string; class2: string; label: string; value: string; };
+  Item: { P1: any; P2: any; P3: any; P4: string; P5: any; P6: any; P7: any; P8: any; P9: number; };
+  permission_id: any;
+  permissionList: any;
+  dashboard: boolean = false
+
+
+
 
 
   constructor(
@@ -62,7 +84,7 @@ export class DashboardComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.spinner.show()
 
-    
+
 
     setTimeout(async () => {
       this.login_detail = localStorage.getItem('userAttributes')
@@ -76,7 +98,6 @@ export class DashboardComponent implements OnInit {
       const test = await this.api.GetMaster(this.user + '#user#main', 1);
       this.permission_data = JSON.parse(JSON.parse(JSON.stringify(test.metadata)))
 
-      console.log("PERMISSION DATA:", this.permission_data)
 
       if (this.permission_data.permission_ID !== 'All') {
 
@@ -84,13 +105,28 @@ export class DashboardComponent implements OnInit {
 
         this.permission_data = JSON.parse(JSON.parse(JSON.stringify(permisson_response.metadata)))
 
-        this.permissionFormgroup = (this.permission_data.formgroup)
+        console.log("PERMISSION:",this.permission_data)
+
+        this.permissionFormgroup = this.permission_data.formgroup
+
+      this.permissionList = this.permission_data.permissionsList
+
+      console.log("PERMISSION LIST:",this.permissionList[12].view)
+
+      // console.log("PERMISSION DATA:", this.permissionList[12].view)
+
+      if(this.permissionList[12].view === true && this.permissionList[12].update=== true){
+        this.dashboard = true;
+      }
+      else{
+        this.dashboard = false;
+      }
 
         console.log("Permission Table Formgroup Selected:", this.permissionFormgroup)
 
         var result = this.permissionFormgroup.map((item: string) => item.split('-')[0]);
 
-          console.log(result);
+        console.log(result);
 
 
         await this.api.GetMaster(this.client + "#formgroup#lookup", 1).then((result: any) => {
@@ -119,7 +155,7 @@ export class DashboardComponent implements OnInit {
                 try {
                   this.iconData = JSON.parse(item.P4);
 
-                  
+
                 }
                 catch (error) {
 
@@ -137,10 +173,16 @@ export class DashboardComponent implements OnInit {
                 }),  // Convert timestamp to a readable date format
                 totalEarnings: item.P1 || '',  // Fallback in case P5 is empty
                 online: item.P8, // Placeholder for 'online' status
+                updateUser: item.P5,
+                TileColor: item.P6,
+                Index: item.P9,
+                updatedTime: item.P7
 
               };
             })
           );
+
+          this.cards_2.sort((a, b) => a.Index - b.Index);
           const UserDetails = {
             "User Name": this.user,
             "Action": "View",
@@ -152,9 +194,9 @@ export class DashboardComponent implements OnInit {
             "created_time": Date.now(),
             "updated_time": Date.now()
           }
-    
-          this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
-    
+
+          this.auditTrail.mappingAuditTrailData(UserDetails, this.client)
+
 
         }
         else {
@@ -170,8 +212,8 @@ export class DashboardComponent implements OnInit {
             "created_time": Date.now(),
             "updated_time": Date.now()
           }
-    
-          this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+
+          this.auditTrail.mappingAuditTrailData(UserDetails, this.client)
 
           const filteredData = this.formgroup.filter(data => {      // this.formgroup getting form permission table
             const key = Object.keys(data)[0];
@@ -192,7 +234,7 @@ export class DashboardComponent implements OnInit {
 
                 try {
                   this.iconData = JSON.parse(item.P4);
-                 
+
                 }
                 catch (error) {
 
@@ -212,13 +254,21 @@ export class DashboardComponent implements OnInit {
                 }),  // Convert timestamp to a readable date format
                 totalEarnings: item.P1 || '',  // Fallback in case P5 is empty
                 online: item.P8, // Placeholder for 'online' status
+                updateUser: item.P5,
+                TileColor: item.P6,
+                Index: item.P9,
+                updatedTime: item.P7
+
               };
             })
           );
+          this.cards_2.sort((a, b) => a.Index - b.Index);
         }
 
       }
       else {
+
+        this.dashboard = true
 
         const UserDetails = {
           "User Name": this.user,
@@ -231,8 +281,8 @@ export class DashboardComponent implements OnInit {
           "created_time": Date.now(),
           "updated_time": Date.now()
         }
-  
-        this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+
+        this.auditTrail.mappingAuditTrailData(UserDetails, this.client)
         await this.api.GetMaster(this.client + "#formgroup#lookup", 1).then((result: any) => {
           if (result) {
             const helpherObj = JSON.parse(result.options)
@@ -273,10 +323,15 @@ export class DashboardComponent implements OnInit {
               }),  // Convert timestamp to a readable date format
               totalEarnings: item.P1 || '',  // Fallback in case P5 is empty
               online: item.P8, // Placeholder for 'online' status
+              updateUser: item.P5,
+              TileColor: item.P6,
+              Index: item.P9,
+              updatedTime: item.P7
 
             };
           })
         );
+        this.cards_2.sort((a, b) => a.Index - b.Index);
         this.loading = false;
         this.spinner.hide();
       }
@@ -284,6 +339,8 @@ export class DashboardComponent implements OnInit {
       console.log("CARDS ON FORMGROUP:", this.cards_2)
       this.loading = false;
       this.spinner.hide();
+
+
 
       if (this.cards_2.length === 0) {
 
@@ -312,6 +369,174 @@ export class DashboardComponent implements OnInit {
     }, 1000);
 
   }
+
+  async drop(event: CdkDragDrop<string[]>) {
+    // const previousIndex = this.filteredCards.findIndex(card => card === event.previousIndex);
+
+    if(this.dashboard == false){
+
+      // Swal.fire({
+      //   toast: true,
+      //   position: 'bottom',
+      //   icon: 'success', // or another icon like 'info', 'error', etc.
+      //   title: 'No Form Group data available',
+      //   showConfirmButton: false,
+      //   timer: 2000,
+      //   timerProgressBar: true
+      // });
+
+      const errorAlert_dashboard: SweetAlertOptions = {
+        icon: 'error',
+        title: 'You dont have permission to edit dashboard.',
+        text: '',
+      };
+
+      this.showAlert(errorAlert_dashboard)
+      return;
+    }
+
+    console.log("before", event)
+    console.log('this.cards_2 before:>> ', this.cards_2);
+    console.log('Moving card:', event.previousIndex, event.currentIndex);
+    moveItemInArray(this.cards_2, event.previousIndex, event.currentIndex);
+    console.log('this.cards_2 after:>> ', this.cards_2);
+    console.log("After", event)
+
+    //     this.Item = [{
+    //       P1: this.cards_2[event.previousIndex].totalEarnings,
+    //       P2: this.cards_2[event.previousIndex].name,
+    //       P3: this.cards_2[event.previousIndex].job,
+    //       P4: JSON.stringify(this.cards_2[event.previousIndex].icon),
+    //       P5: this.cards_2[event.previousIndex].updateUser,
+    //       P6: this.cards_2[event.previousIndex].TileColor,
+    //       P7: this.cards_2[event.previousIndex].updatedTime,
+    //       P8: this.cards_2[event.previousIndex].online,
+    //       P9: event.previousIndex,
+
+    //     },
+    //     {
+    //       P1: this.cards_2[event.currentIndex].totalEarnings,
+    //       P2: this.cards_2[event.currentIndex].name,
+    //       P3: this.cards_2[event.currentIndex].job,
+    //       P4: JSON.stringify(this.cards_2[event.currentIndex].icon),
+    //       P5: this.cards_2[event.currentIndex].updateUser,
+    //       P6: this.cards_2[event.currentIndex].TileColor,
+    //       P7: this.cards_2[event.previousIndex].updatedTime,
+    //       P8: this.cards_2[event.currentIndex].online,
+    //       P9: event.currentIndex,
+
+    //     }
+    // ]
+
+    for (let i = 0; i < this.cards_2.length; i++) {
+
+      this.Item = {
+        P1: this.cards_2[i].totalEarnings,
+        P2: this.cards_2[i].name,
+        P3: this.cards_2[i].job,
+        P4: JSON.stringify(this.cards_2[i].icon),
+        P5: this.cards_2[i].updateUser,
+        P6: this.cards_2[i].TileColor,
+        P7: this.cards_2[i].updatedTime,
+        P8: this.cards_2[i].online,
+        P9: i
+
+      }
+
+      await this.updatedreamboardlookup(1, this.Item.P1, 'update', this.Item)
+    }
+
+
+  }
+
+  searchQuery = '';
+  get filteredCards() {
+    return this.cards_2.filter(card =>
+      card.name?.toLowerCase().includes(this.searchQuery.toLowerCase())
+      // card.name?.toLowerCase().includes(this.searchQuery.toLowerCase()
+    );
+  }
+
+
+  async updatedreamboardlookup(sk: any, id: any, type: any, item: any) {
+
+    const tempClient = this.client + '#formgroup' + "#lookup";
+    // console.log("Temp client is ", tempClient);
+    // console.log("Type of client", typeof tempClient);
+    try {
+      const response = await this.api.GetMaster(tempClient, sk);
+
+      if (response && response.options) {
+        let data: ListItem[] = await JSON.parse(response.options);
+
+        // Find the index of the item with the matching id
+        let findIndex = data.findIndex((obj) => obj[Object.keys(obj)[0]].P1 === id);
+
+        if (findIndex !== -1) { // If item found
+          if (type === 'update') {
+            data[findIndex][`L${findIndex + 1}`] = item;
+
+            // Create a new array to store the re-arranged data without duplicates
+            const newData = [];
+
+            // Loop through each object in the data array
+            for (let i = 0; i < data.length; i++) {
+              const originalKey = Object.keys(data[i])[0]; // Get the original key (e.g., L1, L2, ...)
+              const newKey = `L${i + 1}`; // Generate the new key based on the current index
+
+              // Check if the original key exists before renaming
+              if (originalKey) {
+                // Create a new object with the new key and the data from the original object
+                const newObj = { [newKey]: data[i][originalKey] };
+
+                // Check if the new key already exists in the newData array
+                const existingIndex = newData.findIndex(obj => Object.keys(obj)[0] === newKey);
+
+                if (existingIndex !== -1) {
+                  // Merge the properties of the existing object with the new object
+                  Object.assign(newData[existingIndex][newKey], data[i][originalKey]);
+                } else {
+                  // Add the new object to the newData array
+                  newData.push(newObj);
+                }
+              } else {
+                console.error(`Original key not found for renaming in data[${i}].`);
+                // Handle the error or log a message accordingly
+              }
+            }
+
+            // Replace the original data array with the newData array
+            data = newData;
+
+          } else if (type === 'delete') {
+            // Remove the item at the found index
+            data.splice(findIndex, 1);
+          }
+
+          // Prepare the updated data for API update
+          let updateData = {
+            PK: tempClient,
+            SK: response.SK,
+            options: JSON.stringify(data)
+          };
+
+          // Update the data in the API
+          await this.api.UpdateMaster(updateData);
+
+        } else { // If item not found
+          await new Promise(resolve => setTimeout(resolve, 500)); // Wait before retrying
+          await this.updatedreamboardlookup(sk + 1, id, type, item); // Retry with next SK
+
+        }
+        // this.reloadEvent.emit(true);
+      } else { // If response or listOfItems is null
+        console.log("LOOKUP ID NOT FOUND")
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
 
   showAlert(swalOptions: SweetAlertOptions) {
     let style = swalOptions.icon?.toString() || 'success';

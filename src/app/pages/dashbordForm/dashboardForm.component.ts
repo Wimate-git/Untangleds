@@ -490,8 +490,8 @@ export class DashboardFormComponent implements OnInit {
     searchQuery = '';
     get filteredCards() {
         return this.cards.filter(card =>
-            card.name?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-            card.job?.toLowerCase().includes(this.searchQuery.toLowerCase())
+            card.name?.toLowerCase().includes(this.searchQuery.toLowerCase())
+            // card.job?.toLowerCase().includes(this.searchQuery.toLowerCase())
         );
     }
 

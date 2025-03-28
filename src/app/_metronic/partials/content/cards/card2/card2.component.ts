@@ -18,7 +18,11 @@ export class Card2Component implements OnInit{
   @Input() budget: string = '';
   @Input() progress: number = 50;
   @Input() online: string;
-  @Input() formgroup: string = '';
+  @Input() formgroup: string =''
+  @Input() updateUser: string = '';
+  @Input() TileColor: string ='';
+  @Input() Index: string ='';
+  @Input() updatedTime:string ='';
   @Input() users: Array<IconUserModel> = [];
   @Input() icon_: { value: string; label: string; class1: string; class2: string };
  
