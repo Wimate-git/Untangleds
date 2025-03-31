@@ -152,3 +152,17 @@
 }
 
 
+.gradient-picker-container {
+  position: relative;
+}
+
+.gradient-display {
+  width: 100%;
+  height: 40px;
+  margin-top: 10px;
+  border-radius: 4px;
+}
+
+input.form-control {
+  cursor: pointer;
+}

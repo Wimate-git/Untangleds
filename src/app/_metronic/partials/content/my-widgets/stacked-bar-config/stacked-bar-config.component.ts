@@ -240,6 +240,9 @@ export class StackedBarConfigComponent {
       DrillDownType: [''],
       DrillFilter:[''],
       DrillFilterLevel:[''],
+      dataLabelFontColor:[''],
+      chartBackgroundColor1:[''],
+      chartBackgroundColor2:[''],
       // multiColorCheck: [true]
     });
   
@@ -713,6 +716,9 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         DrillDownType:this.createChart.value.DrillDownType ||'',
         DrillFilter:this.createChart.value.DrillFilter ||'',
         DrillFilterLevel:this.createChart.value.DrillFilterLevel ||'',
+        dataLabelFontColor:this.createChart.value.dataLabelFontColor,
+        chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
+        chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
     
       
 
@@ -815,6 +821,9 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     add_fields:this.createChart.value.add_fields ||'',
     DrillConfig:this.createChart.value.drill_fields || [],
     DrillDownType:this.createChart.value.DrillDownType ||'',
+    dataLabelFontColor:this.createChart.value.dataLabelFontColor,
+    chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
+    chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
 
     // filterForm:this.createChart.value.filterForm,
     // filterParameter:this.createChart.value.filterParameter,
@@ -992,7 +1001,10 @@ openStackedChartModal(tile: any, index: number) {
       toggleCheck: tile.toggleCheck,
       selectType: tile.selectType,
       DrillDownType: tile.DrillDownType,
-      multiColorCheck:tile.multiColorCheck
+      multiColorCheck:tile.multiColorCheck,
+      dataLabelFontColor:tile.dataLabelFontColor,
+      chartBackgroundColor1:tile.chartBackgroundColor1,
+      chartBackgroundColor2:tile.chartBackgroundColor2
     });
 
     // ✅ Populate all_fields and drill_fields separately

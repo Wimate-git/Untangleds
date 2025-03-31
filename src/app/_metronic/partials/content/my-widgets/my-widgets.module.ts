@@ -95,6 +95,7 @@ import { DataTablePieChartComponent } from './data-table-pie-chart/data-table-pi
 
 
 
+
 @NgModule({
   declarations: [TileUi1Component,Tile1ConfigComponent,Tile2ConfigComponent,TileUi2Component,Tile3ConfigComponent,TileUi3Component,TileUi4Component,Tile4ConfigComponent,
     TileUi5Component,
@@ -189,6 +190,7 @@ import { DataTablePieChartComponent } from './data-table-pie-chart/data-table-pi
     GoogleMapsModule ,
     HttpClientModule,
     NgxSpinnerModule,
+
 
   
   ],

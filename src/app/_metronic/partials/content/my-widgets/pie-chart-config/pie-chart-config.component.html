@@ -80,6 +80,49 @@
           </ngx-select>
         </div>
        </div>
+
+
+       <div class="row mb-3">
+
+        <div class="col-md-4 mb-3" [formGroup]="createChart">
+          <div class="color-picker-container d-flex align-items-center">
+            <label for="textColorPicker" class="col-form-label fw-bold fs-6">Data Label Font Color</label>
+            <input
+              id="textColorPicker"
+              type="color"
+              class="form-control-color"
+              title="Choose text color"
+              formControlName="dataLabelFontColor"
+            />
+          </div>
+        </div>
+        <div class="col-md-4 mb-3" [formGroup]="createChart">
+          <div class="color-picker-container d-flex align-items-center">
+            <label for="textColorPicker" class="col-form-label fw-bold fs-6 mb-0 me-2">Chart Background From Color</label>
+            <input
+              id="textColorPicker"
+              type="color"
+              class="form-control-color"
+              title="Choose text color"
+              formControlName="chartBackgroundColor1"
+            />
+          </div>
+        </div>
+        
+        <div class="col-md-4 mb-3" [formGroup]="createChart">
+          <div class="color-picker-container d-flex align-items-center">
+            <label for="textColorPicker" class="col-form-label fw-bold fs-6">Chart Background To Color</label>
+            <input
+              id="textColorPicker"
+              type="color"
+              class="form-control-color"
+              title="Choose text color"
+              formControlName="chartBackgroundColor2"
+            />
+          </div>
+        </div>
+       </div>
+
   
     </div>
   </div>

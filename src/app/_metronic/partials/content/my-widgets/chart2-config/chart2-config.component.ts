@@ -218,7 +218,10 @@ validateAndSubmit() {
       filterFormList: [''],
 
       toggleCheck: [],
-      DrillDownType: ['']
+      DrillDownType: [''],
+      dataLabelFontColor:[''],
+      chartBackgroundColor1:[''],
+      chartBackgroundColor2:['']
     });
   
     // Subscribe to DrillDownType changes
@@ -610,7 +613,10 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         add_fields:this.createChart.value.add_fields,
         noOfParams: this.noOfParams || 0,  // Ensure noOfParams has a valid value
               DrillConfig:this.createChart.value.drill_fields || [],
-        DrillDownType:this.createChart.value.DrillDownType ||''
+        DrillDownType:this.createChart.value.DrillDownType ||'',
+        dataLabelFontColor:this.createChart.value.dataLabelFontColor,
+        chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
+        chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
       };
   
       // Log the new tile object to verify it's being created correctly
@@ -707,7 +713,10 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     noOfParams:this.dashboard[this.editTileIndex].noOfParams ||'',
     add_fields:this.createChart.value.add_fields ||'',
              DrillConfig:this.createChart.value.drill_fields || [],
-        DrillDownType:this.createChart.value.DrillDownType ||''
+        DrillDownType:this.createChart.value.DrillDownType ||'',
+        dataLabelFontColor:this.createChart.value.dataLabelFontColor,
+        chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
+        chartBackgroundColor2:this.createChart.value.chartBackgroundColor2
 
 
       };
@@ -878,6 +887,9 @@ openChartModal2(tile: any, index: number): void {
       toggleCheck: tile.toggleCheck,
       // selectType: tile.selectType,
       DrillDownType: tile.DrillDownType,
+            dataLabelFontColor:tile.dataLabelFontColor,
+      chartBackgroundColor1:tile.chartBackgroundColor1,
+      chartBackgroundColor2:tile.chartBackgroundColor2
     });
 
     // ✅ Populate all_fields and drill_fields separately

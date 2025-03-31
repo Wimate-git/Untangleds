@@ -1203,9 +1203,21 @@ gridster-item {
 
 
 
-.custom-modal-size .modal-dialog {
-  max-width: 95%;
+// .custom-modal-size .modal-dialog {
+//   max-width: 95%;
+// }
+
+
+/* Ensure the padding is added to the modal dialog */
+.ngb-modal-window .modal-dialog {
+  padding: 9px !important;  /* Apply the padding here */
 }
+
+
+
+
+
+
 
 
 

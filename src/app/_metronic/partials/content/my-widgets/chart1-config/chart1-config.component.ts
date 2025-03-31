@@ -417,6 +417,9 @@ export class Chart1ConfigComponent implements OnInit {
       enableLegends:[],
       DrillFilter:[''],
       DrillFilterLevel:[''],
+      dataLabelFontColor:[''],
+      chartBackgroundColor1:[''],
+      chartBackgroundColor2:['']
     });
   
     // Subscribe to DrillDownType changes
@@ -772,6 +775,9 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         DrillDownType:this.createChart.value.DrillDownType ||'',
                DrillFilter:this.createChart.value.DrillFilter ||'',
         DrillFilterLevel:this.createChart.value.DrillFilterLevel ||'',
+        dataLabelFontColor:this.createChart.value.dataLabelFontColor,
+        chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
+        chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
     
       
 
@@ -882,7 +888,10 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         add_fields: this.createChart.value.add_fields || '',
         noOfParams: this.dashboard[this.editTileIndex].noOfParams,
                  DrillConfig:this.createChart.value.drill_fields || [],
-        DrillDownType:this.createChart.value.DrillDownType ||''
+        DrillDownType:this.createChart.value.DrillDownType ||'',
+        dataLabelFontColor:this.createChart.value.dataLabelFontColor,
+        chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
+        chartBackgroundColor2:this.createChart.value.chartBackgroundColor2
       };
   
       console.log('updatedTile checking', updatedTile);
@@ -1056,7 +1065,10 @@ openChartModal1(tile: any, index: number): void {
       toggleCheck: tile.toggleCheck,
       selectType: tile.selectType,
       DrillDownType: tile.DrillDownType,
-      enableLegends:tile.enableLegends ||''
+      enableLegends:tile.enableLegends ||'',
+      dataLabelFontColor:tile.dataLabelFontColor,
+      chartBackgroundColor1:tile.chartBackgroundColor1,
+      chartBackgroundColor2:tile.chartBackgroundColor2
     });
 
     // ✅ Populate all_fields and drill_fields separately

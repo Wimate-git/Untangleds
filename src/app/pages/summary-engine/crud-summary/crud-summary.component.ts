@@ -62,7 +62,9 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
   private clickListener: () => void;
   idInAction: number | undefined;
   modalConfig: NgbModalOptions = {
-    modalDialogClass: 'modal-dialog modal-dialog-centered mw-1000px',
+    // modalDialogClass: 'modal-dialog modal-dialog-centered mw-1000px',
+       modalDialogClass: 'modal-dialog modal-fullscreen p-9',
+
   };
 
   constructor(

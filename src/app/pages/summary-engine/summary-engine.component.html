@@ -891,47 +891,35 @@
   
   
   <ng-template #content let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title">Summary Configuration</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
-  </div>
-  <div class="modal-body">
-    <div class="card-body pt-0">
-  <!-- <app-crud-summary 
-  *ngIf="summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)"
-  [datatableConfig]="datatableConfig" 
-  route="/summary-engine"
-  (deleteEvent)="delete($event); hideModal()"
-  (editEvent)="edit($event); hideModal()"
-  (createEvent)="create()" 
-  [reload]="reloadEvent">
-</app-crud-summary> -->
 
-<app-crud-summary
-  [datatableConfig]="datatableConfig"
-  route="/summary-engine"
-  (deleteEvent)="handleDelete($event)"
-  (editEvent)="edit($event)"
-  (createEvent)="create()"
-  [reload]="reloadEvent"
-  [summaryDashboardUpdate]="summaryDashboardUpdate"
-  [summaryDashboardView]="summaryDashboardView"
-  [userPermission]="userPermission" class="table-responsive">
-  <div class="datatable-container" >
-    <!-- The table content will be rendered inside this container -->
-    <!-- The table will be horizontally scrollable on mobile -->
-  </div>
-</app-crud-summary>
-
-
-
-        <table #dataTable class="table table-striped table-bordered"></table>
+    <div class="modal-content p-9">
+      <div class="modal-header">
+        <h4 class="modal-title">Summary Configuration</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+      </div>
+      <div class="modal-body">
+        <div class="card-body pt-0">
+          <app-crud-summary
+            [datatableConfig]="datatableConfig"
+            route="/summary-engine"
+            (deleteEvent)="handleDelete($event)"
+            (editEvent)="edit($event)"
+            (createEvent)="create()"
+            [reload]="reloadEvent"
+            [summaryDashboardUpdate]="summaryDashboardUpdate"
+            [summaryDashboardView]="summaryDashboardView"
+            [userPermission]="userPermission"
+            class="table-responsive">
+          </app-crud-summary>
+          <table #dataTable class="table table-striped table-bordered"></table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
+      </div>
     </div>
-  
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
-  </div>
+
+
   </ng-template>
   
   
@@ -991,7 +979,7 @@
   
   
   <ng-template #summaryModal let-modal>
-  <div class="modal-header">
+  <div class="modal-header" style="max-width: 1040px;">
     <h2 class="modal-title">{{ showHeading ? 'Add Summary' : 'Edit Summary' }}</h2>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
   </div>
@@ -1633,26 +1621,27 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
                 class="grid-item col bg-light-primary px-6 py-8 rounded-2 mb-7"
                 style="width: 350px; height: 250px; display: flex; justify-content: center; align-items: center; border: 0;"
               >
-                <div
-                  class="grid-item highlight"
-                  tabindex="0"
-                  [attr.data-bs-target]="'#filterDashModal'"
-                  [attr.data-bs-toggle]="'modal'"
-                  (click)="addModal();modal.dismiss();"
-                  style="
-                    width: 300px;
-                    height: 200px;
-                    background: linear-gradient(to right, #B24592, #F15F79);
-                    padding: 20px;
-                    border-radius: 8px;
-                    color: white;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                  "
-                >
-                  <div class="value fw-bold" tabindex="0">Filter Tile</div>
-                </div>
+              <div
+              class="grid-item highlight"
+              tabindex="0"
+              [attr.data-bs-target]="'#filterDashModal'"
+              [attr.data-bs-toggle]="'modal'"
+              (click)="addModal();modal.dismiss();"
+              style="
+                width: 300px;
+                height: 200px;
+                background: linear-gradient(to right, #B24592, #F15F79);
+                padding: 20px;
+                border-radius: 8px;
+                color: white;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+              "
+            >
+              <div class="value fw-bold" tabindex="0">Filter Tile</div>
+            </div>
+            
               </button>
             </div>
           </div>
@@ -2584,11 +2573,13 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   <ng-template #modalContent>
     <app-custom-info-ui
       [iframeUrl]="currentiframeUrl"
+      [width]="modalWidth"  
       [item]="currentItem"
       [selectedMarkerIndex]="currentModalIndex"
       (closeModalEvent)="closeModal1()">
     </app-custom-info-ui>
   </ng-template>
+  
   
   <!-- (closeModalEvent)="closeModal()" -->
 

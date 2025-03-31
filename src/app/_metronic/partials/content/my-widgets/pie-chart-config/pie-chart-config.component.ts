@@ -220,6 +220,9 @@ export class PieChartConfigComponent {
       enableLegends:[],
       DrillFilter:[''],
       DrillFilterLevel:[''],
+      dataLabelFontColor:[''],
+      chartBackgroundColor1:[''],
+      chartBackgroundColor2:[''],
     });
   
     // Subscribe to DrillDownType changes
@@ -488,6 +491,9 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         DrillDownType:this.createChart.value.DrillDownType ||'',
                DrillFilter:this.createChart.value.DrillFilter ||'',
         DrillFilterLevel:this.createChart.value.DrillFilterLevel ||'',
+        dataLabelFontColor:this.createChart.value.dataLabelFontColor,
+        chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
+        chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
     
       
 
@@ -596,6 +602,9 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     // Include noOfParams
     noOfParams:this.dashboard[this.editTileIndex].noOfParams,
 
+    dataLabelFontColor:this.createChart.value.dataLabelFontColor,
+    chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
+    chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
 
       };
       console.log('updatedTile checking', updatedTile);
@@ -767,7 +776,10 @@ openPieChartModal(tile: any, index: number) {
       toggleCheck: tile.toggleCheck,
       selectType: tile.selectType,
       DrillDownType: tile.DrillDownType,
-      enableLegends:tile.enableLegends ||''
+      enableLegends:tile.enableLegends ||'',
+      dataLabelFontColor:tile.dataLabelFontColor,
+      chartBackgroundColor1:tile.chartBackgroundColor1,
+      chartBackgroundColor2:tile.chartBackgroundColor2
     });
 
     // ✅ Populate all_fields and drill_fields separately

@@ -354,6 +354,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   storeCheck: any;
   loadingMain = true;
   isMainLoading =true
+  modalWidth: any;
 
   createPieChart() {
     const chartOptions: any = {
@@ -1702,7 +1703,7 @@ showDrillDownData(dynamicDrill:any,modalref:any){
       return;
   }else {
     setTimeout(() => {
-      this.modalService.open(modalref, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+      this.modalService.open(modalref, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     }, 500);
 
   }
@@ -1782,7 +1783,7 @@ showDrillDownData(dynamicDrill:any,modalref:any){
 
 helperTileClick(event:any,modalChart:any){
   console.log('event checking',event)
-  this.modalService.open(modalChart, { size: 'xl' });
+  this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
 
 }
 
@@ -1906,7 +1907,16 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
     // window.location.reload();
     if (this.modalContent) {
       console.log('modalContent checking', this.modalContent);
-      this.modalService.open(this.modalContent, { size: 'xl' });
+      this.modalService.open(this.modalContent, {
+        fullscreen: true,
+
+        modalDialogClass:'p-9',
+        centered: true// Custom class for modal width
+      });
+      
+      
+      
+
 
       const queryParams = new URLSearchParams();
 
@@ -1958,6 +1968,10 @@ queryParams.append('uID', this.userId);
 if (this.userPass) {
 queryParams.append('pass', this.userPass);
 }
+
+
+const modalWidth = 900; // Example width, replace with your actual dynamic width value
+queryParams.append('modalWidth', String(modalWidth));
 
 // Wait for permissions and then build final URL
 
@@ -2096,9 +2110,10 @@ this.openModalHelpher(packet.dashboardIds).then((data) => {
     if (modaref && modaref instanceof TemplateRef) {
       console.log('Opening modal with modaref:', modaref);
       this.modalService.open(modaref, {
-        size: 'xl',
-        backdrop: true, // Allows closing by clicking outside of the modal
-        centered: true
+        fullscreen: true,
+
+        modalDialogClass:'p-9',
+        centered: true// Custom class for modal width
       });
     } else {
       console.error('Invalid TemplateRef passed for modal:', modaref);
@@ -3185,6 +3200,11 @@ this.fetchSummaryMain(id)
           console.log('fullScreen checking from onInit',typeof this.storeFullScreen)
 
         }
+        if(params['modalWidth']){
+          console.log('check width Modal',params['modalWidth'])
+          this.modalWidth = params['modalWidth'];
+
+        }
 
           console.log('params', params['filterTileConfig']);
           if (params['filterTileConfig']) {
@@ -3267,6 +3287,7 @@ this.fetchSummaryMain(id)
           this.hideSummaryGridster = true
           
         }
+
 
         // if(params['clientID']){
         //   console.log('clientID checking',params['clientID'])
@@ -3796,7 +3817,16 @@ processFetchedData(result: any): void {
 
 
   openSummaryTable(content: any) {
-    this.modalService.open(content, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+    this.modalService.open(content, {
+      fullscreen: true,
+
+      modalDialogClass:'p-9',
+      centered: true
+    });
+    
+    
+    
+    
     this.showTable()
     // 
     this.reloadEvent.next(true);
@@ -4003,7 +4033,7 @@ setTimeout(() => {
 
   }
   openCreateContent(createcontent: any) {
-    this.modalService.open(createcontent, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+    this.modalService.open(createcontent, {fullscreen: true, modalDialogClass:'p-9', centered: true});
   }
 
   viewItem(id: string, receivePacket?: any): void {
@@ -4382,12 +4412,16 @@ console.log('Formatted Date:', this.lastUpdatedTime);
       });
     });
   }
+  // fullscreen: true,
+
+  // modalDialogClass:'p-9',
+  // centered: true// Custom class for modal width
 justReadStyles(data:any,index:any){
   this.FilterTileConfigComponent.openFilterModal(data, index);
 }
   helperFilter(data:any,index:any, KPIModal: TemplateRef<any>){
     if(data.grid_type=='filterTile'){
-    this.modalService.open(KPIModal, { size: 'xl' });
+    this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
 
     // Access the component instance and trigger `openKPIModal`
     setTimeout(() => {
@@ -4396,7 +4430,7 @@ justReadStyles(data:any,index:any){
     }, 500);
   }
   else if(data.grid_type=='tile'){
-    this.modalService.open(KPIModal, { size: 'xl' });
+    this.modalService.open(KPIModal, {fullscreen: true, modalDialogClass:'p-9', centered: true} );
 
     // Access the component instance and trigger `openKPIModal`
     setTimeout(() => {
@@ -4412,7 +4446,7 @@ justReadStyles(data:any,index:any){
 
 
     if(event.arg1.grid_type=='tile'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -4423,7 +4457,7 @@ justReadStyles(data:any,index:any){
     }
     else if(event.arg1.grid_type=='tileWithIcon'){
 
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -4436,7 +4470,7 @@ justReadStyles(data:any,index:any){
 
     
     else if(event.arg1.grid_type=='MultiTableWidget'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -4446,7 +4480,7 @@ justReadStyles(data:any,index:any){
       }, 500);
     }
     else if(event.arg1.grid_type=='logo'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -4456,7 +4490,7 @@ justReadStyles(data:any,index:any){
       }, 500);
     }
     else if(event.arg1.grid_type=='HTMLtile'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -4466,7 +4500,7 @@ justReadStyles(data:any,index:any){
       }, 500);
     }
     else if(event.arg1.grid_type=='TableWidget'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -4476,7 +4510,7 @@ justReadStyles(data:any,index:any){
       }, 500);
     }
     else if(event.arg1.grid_type=='Map'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -4490,14 +4524,14 @@ justReadStyles(data:any,index:any){
     
     else if(event.arg1.grid_type=='tile2'){
       console.log('modal check',KPIModal)
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check', event)
       setTimeout(() => {
         this.tileConfig2Component.openKPIModal1(event.arg1, event.arg2)
       }, 500);
     }
     else if(event.arg1.grid_type=='tile3'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check', event)
   
       setTimeout(() => {
@@ -4506,14 +4540,14 @@ justReadStyles(data:any,index:any){
 
     }
     else if (event.arg1.grid_type=='tile4'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check', event)
       setTimeout(() => {
         this.tileConfig4Component?.openKPIModal3(event.arg1, event.arg2)
       }, 500);
     }
     else if(event.arg1.grid_type=='tile5'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check', event)
       setTimeout(() => {
         this.tileConfig5Component?.openKPIModal4(event.arg1, event.arg2)
@@ -4521,14 +4555,14 @@ justReadStyles(data:any,index:any){
 
     }
     else if(event.arg1.grid_type=='tile6'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check', event)
       setTimeout(() => {
         this.tileConfig6Component?.openKPIModal5(event.arg1, event.arg2)
       }, 500);
     }
     else if(event.arg1.grid_type=='title'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check', event)
       setTimeout(() => {
         this.titleConfigComponent.openTitleModal(event.arg1, event.arg2)
@@ -4537,7 +4571,7 @@ justReadStyles(data:any,index:any){
     }
 
     else if(event.arg1.grid_type=='chart'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig1Component.openChartModal1(event.arg1, event.arg2)
@@ -4546,7 +4580,7 @@ justReadStyles(data:any,index:any){
 
     }
     else if(event.arg1.grid_type=='semiDonut'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check', event)
       setTimeout(() => {
         this.SemiDonutConfigComponent.opensemiDonutModal(event.arg1, event.arg2)
@@ -4554,7 +4588,7 @@ justReadStyles(data:any,index:any){
 
     }
     else if(event.arg1.grid_type=='Stackedchart'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check', event)
       setTimeout(() => {
         this.StackedBarConfigComponent.openStackedChartModal(event.arg1, event.arg2)
@@ -4563,7 +4597,7 @@ justReadStyles(data:any,index:any){
     }
 
     else if(event.arg1.grid_type=='Piechart'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check', event)
       setTimeout(() => {
         this.PieChartConfigComponent.openPieChartModal(event.arg1, event.arg2)
@@ -4572,7 +4606,7 @@ justReadStyles(data:any,index:any){
     }
 
     else if(event.arg1.grid_type=='Linechart'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig2Component.openChartModal2(event.arg1, event.arg2)
@@ -4581,7 +4615,7 @@ justReadStyles(data:any,index:any){
     }
 
     else if(event.arg1.grid_type=='Funnelchart'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check', event)
       setTimeout(() => {
         this.FunnelChartConfigComponent.openFunnelChartModal(event.arg1, event.arg2)
@@ -4590,7 +4624,7 @@ justReadStyles(data:any,index:any){
     }
 
     else if(event.arg1.grid_type=='Columnchart'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig3Component.openChartModal3(event.arg1, event.arg2)
@@ -4598,7 +4632,7 @@ justReadStyles(data:any,index:any){
 
     }
     else if(event.arg1.grid_type=='mixedChart'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check', event)
       setTimeout(() => {
         this.MixedChartConfigComponent.openMixedChartModal(event.arg1, event.arg2)
@@ -4608,7 +4642,7 @@ justReadStyles(data:any,index:any){
 
     
     else if(event.arg1.grid_type=='Areachart'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig4Component.openChartModal4(event.arg1, event.arg2)
@@ -4616,7 +4650,7 @@ justReadStyles(data:any,index:any){
 
     }
     else if(event.arg1.grid_type=='Barchart'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig5Component.openChartModal5(event.arg1, event.arg2)
@@ -4624,7 +4658,7 @@ justReadStyles(data:any,index:any){
 
     }
     else if(event.arg1.grid_type=='dynamicTile'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check dynamic tile', event)
     
       // Access the component instance and trigger `openKPIModal`
@@ -4636,7 +4670,7 @@ justReadStyles(data:any,index:any){
 
 
     else if(event.arg1.grid_type=='title'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check dynamic tile', event)
     
       // Access the component instance and trigger `openKPIModal`
@@ -4647,7 +4681,7 @@ justReadStyles(data:any,index:any){
     }
 
     else if(event.arg1.grid_type=='filterTile'){
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check dynamic tile', event)
       console.log('event.arg1 checking',event.arg1)
       console.log('event.arg2 checking',event.arg2)
@@ -4663,7 +4697,7 @@ justReadStyles(data:any,index:any){
 
     else if(event.arg1.grid_type=='progressTile'){
       console.log('i am openining')
-      this.modalService.open(KPIModal, { size: 'xl' });
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check progress', event)
     
       // Access the component instance and trigger `openKPIModal`
@@ -5182,7 +5216,7 @@ console.log('selectedTab checking',this.selectedTab)
     });
   
     // Open modal for new entry
-    this.modalService.open(content, { size: 'xl' });
+    this.modalService.open(content, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
   }
   
 
@@ -5262,7 +5296,7 @@ console.log('selectedTab checking',this.selectedTab)
     }
 
     // Open modal for editing
-    this.modalService.open(content, { size: 'xl' });
+    this.modalService.open(content,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
   }
 
 
@@ -8064,103 +8098,103 @@ refreshFunction(){
     this.createTitle.patchValue({ customLabel: inputValue }, { emitEvent: false });
   }
   openKPIModal(KPIModal: TemplateRef<any>,modal: any) {
-    this.modalService.open(KPIModal, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+    this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
   }
 
   openKPIModal1(KPIModal1: TemplateRef<any>,modal:any) {
 
-    this.modalService.open(KPIModal1, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+    this.modalService.open(KPIModal1,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
 
   }
   openKPIModal2(KPIModal2: TemplateRef<any>,modal:any) {
   
-    this.modalService.open(KPIModal2, { size: 'xl' });
+    this.modalService.open(KPIModal2, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
  
 
   }
   openKPIModal3(KPIModal3: TemplateRef<any>,modal:any) {
-    this.modalService.open(KPIModal3, { size: 'xl' });
+    this.modalService.open(KPIModal3, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
   }
   openKPIModal4(KPIModal4: TemplateRef<any>,modal:any) {
-    this.modalService.open(KPIModal4, { size: 'xl' });
+    this.modalService.open(KPIModal4, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
   }
   opentileWithIcon(tileWithIconModal: TemplateRef<any>,modal:any) {
-    this.modalService.open(tileWithIconModal, { size: 'xl' });
+    this.modalService.open(tileWithIconModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
   }
 
   
   openKPIModal5(KPIModal5: TemplateRef<any>,modal:any) {
-    this.modalService.open(KPIModal5, { size: 'xl' });
+    this.modalService.open(KPIModal5, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
   }
   openTitleModal(TitleModal: TemplateRef<any>,modal:any) {
-    this.modalService.open(TitleModal, { size: 'xl' });
+    this.modalService.open(TitleModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
   }
 
 
   openProgressModal(ProgressTileModal: TemplateRef<any>,modal:any) {
-    this.modalService.open(ProgressTileModal, { size: 'xl' });
+    this.modalService.open(ProgressTileModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
   }
   openChartModal1(ChartModal1: TemplateRef<any>,modal:any) {
-    this.modalService.open(ChartModal1, { size: 'xl' });
+    this.modalService.open(ChartModal1, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
   }
 
 
   openFunnelChartModal1(FunnelChartModal: TemplateRef<any>,modal:any) {
-    this.modalService.open(FunnelChartModal, { size: 'xl' });
+    this.modalService.open(FunnelChartModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
   }
 
 
   openChartModal2(ChartModal2: TemplateRef<any>,modal:any) {
-    this.modalService.open(ChartModal2, { size: 'xl' });
+    this.modalService.open(ChartModal2, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
   }
 
   openChartModal3(ChartModal3: TemplateRef<any>,modal:any) {
-    this.modalService.open(ChartModal3, { size: 'xl' });
+    this.modalService.open(ChartModal3, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
   }
 
 
   openMixedChartModal(MixedChartModal: TemplateRef<any>,modal:any) {
-    this.modalService.open(MixedChartModal, { size: 'xl' });
+    this.modalService.open(MixedChartModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
   }
 
 
   opensemiDonutChartModal(semiDonutModal: TemplateRef<any>,modal:any){
-    this.modalService.open(semiDonutModal, { size: 'xl' });
+    this.modalService.open(semiDonutModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
 
   }
   openChartModal4(ChartModal4: TemplateRef<any>,modal:any) {
-    this.modalService.open(ChartModal4, { size: 'xl' });
+    this.modalService.open(ChartModal4, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
   }
 
   openChartModal5(ChartModal5: TemplateRef<any>,modal:any) {
-    this.modalService.open(ChartModal5, { size: 'xl' });
+    this.modalService.open(ChartModal5, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
   }
 
 
   openpieChartModal(pieChartModal: TemplateRef<any>,modal:any) {
-    this.modalService.open(pieChartModal, { size: 'xl' });
+    this.modalService.open(pieChartModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
   }
 
   openStackedChartModal(stackedBarChartModal: TemplateRef<any>,modal:any) {
-    this.modalService.open(stackedBarChartModal, { size: 'xl' });
+    this.modalService.open(stackedBarChartModal,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
   }
 
@@ -8173,17 +8207,17 @@ refreshFunction(){
     modal.dismiss();
   }
   openDynamicTileModal(DynamicTileModal:TemplateRef<any>,modal:any){
-    this.modalService.open(DynamicTileModal, {size: 'xl' });
+    this.modalService.open(DynamicTileModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
 
   }
   openHTMLModalTile(htmlTileModal:TemplateRef<any>,modal:any){
-    this.modalService.open(htmlTileModal, {size: 'xl' });
+    this.modalService.open(htmlTileModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
 
   }
   openimageModal(imageModal:TemplateRef<any>,modal:any){
-    this.modalService.open(imageModal, {size: 'xl' });
+    this.modalService.open(imageModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
 
   }
@@ -8192,22 +8226,22 @@ refreshFunction(){
   
 
   openFilterModal(FilterModal:TemplateRef<any>,modal:any){
-    this.modalService.open(FilterModal, {size: 'xl' });
+    this.modalService.open(FilterModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
 
   }
   openTableModal(tableModal:TemplateRef<any>,modal:any){
-    this.modalService.open(tableModal, {size: 'xl' });
+    this.modalService.open(tableModal,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
 
   }
   openMapModal(MapModal:TemplateRef<any>,modal:any){
-    this.modalService.open(MapModal, {size: 'xl' });
+    this.modalService.open(MapModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
 
   }
   openMultiTableModal(MultiTableModal:TemplateRef<any>,modal:any){
-    this.modalService.open(MultiTableModal, {size: 'xl' });
+    this.modalService.open(MultiTableModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     modal.dismiss();
 
   }
@@ -8224,7 +8258,7 @@ refreshFunction(){
   }
   helperInfo(event: any, templateref: any) {
     console.log('event checking', event);
-    this.modalService.open(templateref, { size: 'xl' });
+    this.modalService.open(templateref, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
   
     setTimeout(() => {
       this.emitEvent = event;
@@ -8279,7 +8313,7 @@ refreshFunction(){
     }else if(this.isEditModeView == true){
       console.log('this.isEditModeView checking chart3', this.isEditModeView);
       setTimeout(() => {
-        this.modalService.open(modalChart, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+        this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       }, 500);
    
     }
@@ -8351,7 +8385,7 @@ helperChartClickChart1(event: any, modalChart: any) {
     console.log('this.isEditModeView checking',this.isEditModeView)
     console.log("✅ columnVisibility has data, opening modal...");
     setTimeout(() => {
-      this.modalService.open(modalChart, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+      this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     }, 500);
     
 
@@ -8411,7 +8445,7 @@ helperChartClickFunnel(event: any, modalChart: any) {
     console.log('this.isEditModeView checking',this.isEditModeView)
     console.log("✅ columnVisibility has data, opening modal...");
     setTimeout(() => {
-      this.modalService.open(modalChart, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+      this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     }, 500);
     
 
@@ -8453,7 +8487,7 @@ helperChartClickFunnel(event: any, modalChart: any) {
         return;
     }else if(this.isEditModeView == true){
       setTimeout(() => {
-        this.modalService.open(modalChart, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+        this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       }, 500);
 
     }
@@ -8665,7 +8699,9 @@ helperChartClickFunnel(event: any, modalChart: any) {
       existingModal.hide();
     }
 
-  
+    modalElement.classList.add('p-9');  // For custom padding
+  modalElement.classList.add('modal-dialog-centered');  // Center the modal
+  modalElement.classList.add('modal-fullscreen'); 
 
     // Open the modal programmatically
     setTimeout(() => {
@@ -8723,7 +8759,7 @@ helperChartClickFunnel(event: any, modalChart: any) {
     }, 1000);
 
     setTimeout(() => {
-      this.modalService.open(modalref, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+      this.modalService.open(modalref,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
     }, 500);
 }
 

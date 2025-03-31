@@ -13,6 +13,7 @@ export class CustomInfoUiComponent implements OnInit{
   @Input() selectedMarkerIndex: number = -1;
   @Output() closeModalEvent = new EventEmitter<void>();
   @Input() tile1Config:any
+  @Input() width: string;
 
   isModalOpen: boolean = false;
   ngOnChanges(changes: SimpleChanges): void {
