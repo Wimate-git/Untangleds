@@ -2454,7 +2454,20 @@ exitFullScreen(): void {
           `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
         );
       }
+      else if (item.grid_type === 'Piechart') {
+        const baseHeight = 400; // Base height for the chart
+        // const extraHeight = 40; // Additional height for labels, etc.
+  
+        this.chartHeight[index] = Math.max(0, itemComponentHeight); // Adjust height
+        this.chartWidth[index] = Math.max(0, itemComponentWidth);
+  
+        console.log(
+          `Updated chart dimensions at index ${index}:`,
+          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        );
+      }
 
+      
       
       else if (item.grid_type === 'chart') {
         const baseHeight = 400; // Base height for the chart
@@ -7971,6 +7984,8 @@ refreshFunction(){
       console.log("Error fetching the dynamic form data", err);
     }
   }
+
+  modeMessage: string = 'View Mode'; 
   toggleMode(): void {
     console.log('Current Mode (Before Toggle):', this.isEditModeView ? 'Edit Mode' : 'View Mode');
   
@@ -7990,6 +8005,7 @@ refreshFunction(){
   
     // If the user has the necessary permission, toggle the mode
     this.isEditModeView = !this.isEditModeView;
+    this.setModeMessage();
     this.updateOptions(); 
     this.setCheck(!this.isEditModeView);  // Update grid options based on mode
   
@@ -7999,6 +8015,9 @@ refreshFunction(){
     localStorage.setItem('editModeState', this.isEditModeView.toString());
   }
   
+  setModeMessage() {
+    this.modeMessage = !this.isEditModeView ? 'Widgets Edit Mode' : 'View Mode';
+  }
 
   get gridsterStyles() {
     // Check the value of `check` and update the background color accordingly
@@ -8344,6 +8363,65 @@ helperChartClickChart1(event: any, modalChart: any) {
 
 
 
+helperChartClickFunnel(event: any, modalChart: any) {
+  console.log('this.assignGridMode from chartDrill', this.assignGridMode);
+  console.log('this.isEditModeView checking chart1', this.isEditModeView);
+  console.log('event checking:', event);
+  console.log('modalChart reference:', modalChart);
+  console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
+
+  // ✅ Step 1: Check if modal opening is manually stopped
+  if (this.preventModalOpening) {
+    console.log("🚫 Modal opening is manually disabled. Not opening modal.");
+    return;
+  }
+
+  // ✅ Step 2: Ensure chartDataConfigExport exists and is an object
+  if (!this.chartDataConfigExport || typeof this.chartDataConfigExport !== 'object') {
+    console.log("❌ chartDataConfigExport is undefined or not an object, not opening the modal.");
+    return;
+  }
+
+  // ✅ Step 3: Extract columnVisibility safely
+  const columnVisibility = this.chartDataConfigExport.columnVisibility;
+  console.log('columnVisibility checking', columnVisibility);
+  
+  if (!Array.isArray(columnVisibility) || columnVisibility.length === 0) {
+    console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
+    return;
+  }
+
+  const columnVisibilityRead = columnVisibility[0]?.columnVisibility;
+  console.log('columnVisibilityRead check:', columnVisibilityRead);
+
+  if (!Array.isArray(columnVisibilityRead) || columnVisibilityRead.length === 0) {
+    console.log("❌ columnVisibilityRead is empty or not an array, modal will NOT open.");
+    return;
+  }
+
+  // ✅ Step 4: Ensure modalChart is not undefined before opening modal
+  if (!modalChart) {
+    console.log("❌ Modal reference is undefined, cannot open modal.");
+    return;
+  }
+
+  if (this.isEditModeView === true) {
+
+    console.log('this.assignGridMode checking',this.assignGridMode)
+    console.log('this.isEditModeView checking',this.isEditModeView)
+    console.log("✅ columnVisibility has data, opening modal...");
+    setTimeout(() => {
+      this.modalService.open(modalChart, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
+    }, 500);
+    
+
+
+  }
+}
+
+
+
+
 
 
   helperChartClickChart2(event:any,modalChart:any){
@@ -8548,6 +8626,7 @@ helperChartClickChart1(event: any, modalChart: any) {
       progressTile:{width:this.DynamicTileWidth, height:this.DynamicTileWidth, heightOffset: 10, widthOffset: 30 },
       tileWithIcon:{ width: this.tileWidth, height: this.tileHeight, heightOffset: 80, widthOffset: 30},
       semiDonut:{width:this.chartWidth, height:this.chartHeight, heightOffset: 10, widthOffset: 30 },
+      Piechart:{ width: this.chartWidth, height: this.chartHeight, heightOffset: 10, widthOffset: 30  },
  
       // filterTileHeight:any []=[];
       // filterTileWidth:any []=[];

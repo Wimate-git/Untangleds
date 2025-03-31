@@ -64,6 +64,8 @@ export class ChartUi3Component implements OnInit{
   isLoading = false;
   storeDrillPacket: any;
   storeRedirectionCheck: any;
+  isDrillPacketAvailable: any;
+  disable: boolean = false;
   toggleCheck(isChecked: boolean,index:any) {
     this.isChecked = isChecked;
     console.log('this.isChecked checking', this.isChecked);
@@ -276,6 +278,10 @@ export class ChartUi3Component implements OnInit{
  
       console.log("check chart3 data",this.item)
       this.storeDrillPacket = JSON.parse(this.item.DrillConfig)
+      console.log('this.storeDrillPacket checking',this.storeDrillPacket)
+          // Check if storeDrillPacket is not empty
+    this.isDrillPacketAvailable = this.storeDrillPacket && this.storeDrillPacket.length > 0;
+
 
       console.log('this.storeDrillPacket checking',this.storeDrillPacket )
       this.storeRedirectionCheck = this.item.toggleCheck
@@ -430,89 +436,93 @@ export class ChartUi3Component implements OnInit{
           this.sendCellInfo.emit(event);
           this.counter = 0; // Reset counter after emitting
       }
-  
-      // Show the spinner while API is processing
-      const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+
+
+
+    const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
       
-      const requestBody = {
-          body: JSON.stringify({
-              clientId: this.SK_clientID,
-              routeId: this.routeId,
-              widgetId: this.item.id,
-              chartData: pointData,
-              MsgType: 'DrillDown',
-              permissionId: this.permissionIdRequest,
-              permissionList: this.readFilterEquation,
-              userName: this.userdetails,
-              conditions: this.eventFilterConditions || [],
-              DrillFilter: this.storeDrillFilter || '',
-              DrillFilterLevel: this.DrillFilterLevel || ''
-          }),
-      };
-  
-      console.log('requestBody checking chart1Drilldown', requestBody);
-  
-      this.http.post(apiUrl, requestBody).subscribe(
-          (response: any) => {
-              if (response?.statusCode === 200) {
-                  console.log('Lambda function triggered successfully:', response);
-                  this.checkResBody = response.body;
-                  this.parsedResBody.push(JSON.parse(this.checkResBody));
-                  console.log('this.parsedResBody checking', this.parsedResBody);
-  
-                  this.parsedResBody.forEach((item, index) => {
-                      if (Object.keys(item).includes('ChartData')) {
-                          this.parseChartData = JSON.parse(item.ChartData);
-                          console.log(`this.parseChartDatav checking at index ${index}`, this.parseChartData);
-                          this.storeDrillFilter = this.parseChartData.DrillFilter;
-                          this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
-  
-                          this.summaryService.updatelookUpData(this.parseChartData);
-                      } else {
-                          this.processedData = JSON.parse(item.rowdata);
-                          console.log(`this.processedData check at index ${index}`, this.processedData);
-                          this.paresdDataEmit.emit(this.processedData);
-                      }
-              
-                  });
-                  // Hide the spinner after API processing
-                  this.spinner.hide('dataProcess' + index);
-              } else {
-                  // Hide the spinner in case of an error
-                  this.spinner.hide('dataProcess' + index);
-                  console.error('Unexpected statusCode:', response?.statusCode);
-                  Swal.fire({
-                      title: 'Error!',
-                      text: `Unexpected response received (Status Code: ${response?.statusCode}).`,
-                      icon: 'error',
-                      confirmButtonText: 'OK'
-                  });
-              }
-          },
-          (error: any) => {
-              // Hide the spinner if there's an error
-              this.spinner.hide('dataProcess' + index);
-              console.error('Error triggering Lambda function:', error);
-  
-              if (error.status === 404) {
-                  console.log('Received 404 error - stopping loading and showing error message.');
-                  Swal.fire({
-                      title: 'Error!',
-                      text: 'Data not found. Please check your inputs and try again.',
-                      icon: 'error',
-                      confirmButtonText: 'OK'
-                  });
-              } else {
-                  Swal.fire({
-                      title: 'Error!',
-                      text: 'Failed to trigger the Lambda function. Please try again.',
-                      icon: 'error',
-                      confirmButtonText: 'OK'
-                  });
-              }
-          }
-      );
-  
+    const requestBody = {
+        body: JSON.stringify({
+            clientId: this.SK_clientID,
+            routeId: this.routeId,
+            widgetId: this.item.id,
+            chartData: pointData,
+            MsgType: 'DrillDown',
+            permissionId: this.permissionIdRequest,
+            permissionList: this.readFilterEquation,
+            userName: this.userdetails,
+            conditions: this.eventFilterConditions || [],
+            DrillFilter: this.storeDrillFilter || '',
+            DrillFilterLevel: this.DrillFilterLevel || ''
+        }),
+    };
+
+    console.log('requestBody checking chart1Drilldown', requestBody);
+
+    this.http.post(apiUrl, requestBody).subscribe(
+        (response: any) => {
+            if (response?.statusCode === 200) {
+                console.log('Lambda function triggered successfully:', response);
+                this.checkResBody = response.body;
+                this.parsedResBody.push(JSON.parse(this.checkResBody));
+                console.log('this.parsedResBody checking', this.parsedResBody);
+
+                this.parsedResBody.forEach((item, index) => {
+                    if (Object.keys(item).includes('ChartData')) {
+                        this.parseChartData = JSON.parse(item.ChartData);
+                        console.log(`this.parseChartDatav checking at index ${index}`, this.parseChartData);
+                        this.storeDrillFilter = this.parseChartData.DrillFilter;
+                        this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
+
+                        this.summaryService.updatelookUpData(this.parseChartData);
+                    } else {
+                        this.processedData = JSON.parse(item.rowdata);
+                        console.log(`this.processedData check at index ${index}`, this.processedData);
+                        this.paresdDataEmit.emit(this.processedData);
+                    }
+            
+                });
+                // Hide the spinner after API processing
+                this.spinner.hide('dataProcess' + index);
+            } else {
+                // Hide the spinner in case of an error
+                this.spinner.hide('dataProcess' + index);
+                console.error('Unexpected statusCode:', response?.statusCode);
+                Swal.fire({
+                    title: 'Error!',
+                    text: `Unexpected response received (Status Code: ${response?.statusCode}).`,
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        },
+        (error: any) => {
+            // Hide the spinner if there's an error
+            this.spinner.hide('dataProcess' + index);
+            console.error('Error triggering Lambda function:', error);
+
+            if (error.status === 404) {
+                console.log('Received 404 error - stopping loading and showing error message.');
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Data not found. Please check your inputs and try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Failed to trigger the Lambda function. Please try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+    );
+
+
+      // Show the spinner while API is processing
+
       // Once the request is finished, hide the spinner
   
       this.counter++;

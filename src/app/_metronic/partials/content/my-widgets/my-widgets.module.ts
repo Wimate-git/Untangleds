@@ -87,6 +87,7 @@ import { MixedChartConfigComponent } from './mixed-chart-config/mixed-chart-conf
 import { MixedChartUiComponent } from './mixed-chart-ui/mixed-chart-ui.component';
 import { SemiDonutConfigComponent } from './semi-donut-config/semi-donut-config.component';
 import { SemiDonutUiComponent } from './semi-donut-ui/semi-donut-ui.component';
+import { DataTablePieChartComponent } from './data-table-pie-chart/data-table-pie-chart.component';
 
 
 
@@ -150,7 +151,8 @@ import { SemiDonutUiComponent } from './semi-donut-ui/semi-donut-ui.component';
     MixedChartConfigComponent,
     MixedChartUiComponent,
     SemiDonutConfigComponent,
- SemiDonutUiComponent 
+ SemiDonutUiComponent ,
+ DataTablePieChartComponent
     
 
 
@@ -255,7 +257,7 @@ import { SemiDonutUiComponent } from './semi-donut-ui/semi-donut-ui.component';
     MixedChartConfigComponent,
     MixedChartUiComponent,
     SemiDonutConfigComponent,
-    SemiDonutUiComponent
+    SemiDonutUiComponent,DataTablePieChartComponent
     
   
 

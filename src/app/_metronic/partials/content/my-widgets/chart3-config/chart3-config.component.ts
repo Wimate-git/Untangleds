@@ -150,6 +150,29 @@ export class Chart3ConfigComponent implements OnInit{
 
   }
 
+  isDisabled: boolean = false; 
+
+  // toggleDisable() {
+  //   this.isDisabled = this.isDisabled;  // Toggle the disabled state
+  //   console.log('this.isDisabled checking', this.isDisabled);
+  //   const multiColorControl = this.createChart.get('multiColorCheck');
+  //   if (this.isDisabled) {
+  //     multiColorControl?.disable();
+  //   } else {
+  //     multiColorControl?.enable();
+  //   }
+  // }
+  
+
+  colorOptions = [
+    { value: 'red', text: 'Red' },
+    { value: 'green', text: 'Green' },
+    { value: 'blue', text: 'Blue' },
+    { value: 'yellow', text: 'Yellow' },
+    { value: 'purple', text: 'Purple' }
+  ];
+
+
   addCondition(fieldIndex: number, initialValue: string = '', fieldValue: string = '') {
     const drillFieldsArray = this.createChart.get('drill_fields') as FormArray;
     const conditionsArray = drillFieldsArray.at(fieldIndex).get('conditions') as FormArray;
@@ -305,6 +328,7 @@ export class Chart3ConfigComponent implements OnInit{
       DrillDownType: [''],
       DrillFilter:[''],
       DrillFilterLevel:[''],
+      multiColorCheck: [true]
     });
   
     // Subscribe to DrillDownType changes
@@ -483,7 +507,8 @@ export class Chart3ConfigComponent implements OnInit{
             filterDescription:[''],
             XaxisFormat:[''],
             drillTypeFields:[[]],
-            drillTypeCustomLable:['']
+            drillTypeCustomLable:[''],
+         
           })
         );
         console.log('this.all_fields check', this.all_fields);
@@ -588,7 +613,8 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         DrillConfig:this.createChart.value.drill_fields || [],
         DrillDownType:this.createChart.value.DrillDownType ||'',
         DrillFilter:this.createChart.value.DrillFilter ||'',
-        DrillFilterLevel:this.createChart.value.DrillFilterLevel ||''
+        DrillFilterLevel:this.createChart.value.DrillFilterLevel ||'',
+        multiColorCheck:this.createChart.value.multiColorCheck 
 
   
 
@@ -694,7 +720,9 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     // Include noOfParams
     noOfParams:this.dashboard[this.editTileIndex].noOfParams,
          DrillConfig:this.createChart.value.drill_fields || [],
-        DrillDownType:this.createChart.value.DrillDownType ||''
+        DrillDownType:this.createChart.value.DrillDownType ||'',
+        multiColorCheck: this.createChart.value.multiColorCheck 
+
 
 
       };
@@ -984,6 +1012,7 @@ openChartModal3(tile: any, index: number): void {
       toggleCheck: tile.toggleCheck,
       selectType: tile.selectType,
       DrillDownType: tile.DrillDownType,
+      multiColorCheck:tile.multiColorCheck
     });
 
     // ✅ Populate all_fields and drill_fields separately

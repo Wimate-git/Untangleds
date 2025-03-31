@@ -10,8 +10,9 @@
         </label>
         <input type="number" class="
                           form-control form-control-lg form-control-solid
-                          mb-3 mb-lg-0" name="add_fields" formControlName="add_fields" (change)="onValue()"
-          (keyup)="addControls($event,'html')" required>
+                          mb-3 mb-lg-0" name="add_fields" formControlName="add_fields"
+                          (change)="onCombinedAddFieldsChange($event)"
+          required>
           <div *ngIf="createChart.get('add_fields')?.touched && createChart.get('add_fields')?.invalid" class="text-danger">
             <div *ngIf="createChart.get('add_fields')?.errors?.required">Parameters is required.</div>
           </div>
@@ -95,30 +96,37 @@
           <!-- Tab Navigation -->
           <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap"
             id="myTab_settings" role="tablist">
-            <div class="col-3" role="Data">
+            <div class="col-2" role="Data">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab"
                   aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Data</a>
               </li>
             </div>
-            <div class="col-3" role="Filter">
+            <div class="col-2" role="Filter">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="filter-tab" data-bs-toggle="tab" role="tab"
                   aria-controls="filter-tab" aria-selected="false" (click)="selectedSettingsTab('filter-tab')">Filter</a>
               </li>
             </div>
   
-            <div class="col-3" role="Advanced">
+            <div class="col-2" role="Advanced">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="advanced-tabpane" data-bs-toggle="tab" role="tab"
                   aria-controls="advanced-tab" aria-selected="false"
                   (click)="selectedSettingsTab('advanced-tab')">Advanced</a>
               </li>
             </div>
-            <div class="col-3" role="Mini Table">
+            <div class="col-2" role="Mini Table">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="minitable-tab" data-bs-toggle="tab" role="tab"
                   aria-controls="minitable-tab" aria-selected="false" (click)="selectedSettingsTab('minitable-tab')">Advance Equation</a>
+              </li>
+            </div>
+
+            <div class="col-2" role="drill">
+              <li class="nav-item">
+                <a class="nav-link text-active-primary me-6" id="drill-tab" data-bs-toggle="tab" role="tab"
+                  aria-controls="drill-tab" aria-selected="false" (click)="selectedSettingsTab('drill-tab')">Drill Down Type</a>
               </li>
             </div>
           </ul>
@@ -534,6 +542,122 @@
      
           </div>
           
+          <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'drill-tab'}" id="drill-tab"
+          role="tabpanel" aria-labelledby="drill-tabpane">
+          <div class="col-md-4 mb-3">
+            <label for="parameterName" class="col-form-label fw-bold fs-6 ">Format Type</label>
+            <ngx-select
+              id="parameterName"
+              [allowClear]="true"
+              formControlName="DrillDownType"
+              [items]="DrillDownTypeFields"
+              optionValueField="value"
+              optionTextField="text"
+              placeholder="Select Parameter"
+          
+              style="width: 100%;">
+
+            </ngx-select>
+   
+          </div>
+
+<!-- Drill Fields Form Array - Only show if selected value is 'Multi Level' -->
+<div *ngIf="drillFields?.length" formArrayName="drill_fields">
+  <div
+    *ngFor="let field of drill_fields.controls; let fieldIndex = index"
+    [formGroupName]="fieldIndex"
+    style="border: 2px solid rgb(21, 163, 219); padding: 10px; margin: 5px; border-radius: 5px;"
+  >
+    <!-- Dynamic Heading for Each Form -->
+    <h5 class="fw-bold mb-3">{{ formHeadings.get(fieldIndex) || 'No Heading' }}:</h5>
+
+    <!-- Loop through conditions and generate ngx-select -->
+    <div formArrayName="conditions">
+      <div *ngFor="let condition of getFormArrayControls(field); let conditionIndex = index" [formGroupName]="conditionIndex">
+        
+        <!-- Form Row: Select Field, Custom Label, and Remove Button on the same row -->
+        <div class="row g-3 align-items-center" style="border: 2px solid rgb(157, 159, 159); padding: 10px; margin: 5px; border-radius: 5px;">
+          
+          <!-- Select Field -->
+          <div class="col-md-4">
+            <label for="drillTypeLabel" class="col-form-label fw-bold fs-6 ">Custom Label</label>
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              id="drillTypeLabel"
+              name="drillTypeLabel"
+              formControlName="drillTypeLabel"
+            />
+          </div>
+          <div class="col-md-4">
+            <label class="col-form-label fw-bold fs-6 ">Select Field</label>
+            <ngx-select
+              [items]="dynamicParamMap.get(fieldIndex) || []"
+              formControlName="drillTypeFields"
+              optionValueField="value"
+              optionTextField="text"
+              placeholder="Select Field">
+            </ngx-select>
+          </div>
+
+          <!-- Custom Label -->
+
+
+          <div class="col-md-4 mb-3">
+            <label for="primaryValue" class="col-form-label fw-bold fs-6 required">
+              Primary Value
+              <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top"
+                title="Show Value As">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+            </label>
+            <ngx-select id="primaryValue" [allowClear]="true" formControlName="drillTypePrimary"
+              [items]="showValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
+              (selectionChanges)="onValueChange($event)" class="w-100"></ngx-select>
+              <div *ngIf="field.get('primaryValue')?.touched && field.get('primaryValue')?.invalid" class="text-danger">
+                <div *ngIf="field.get('primaryValue')?.errors?.required">Primary Value is required.</div>
+              </div>
+          </div>
+
+
+
+
+          
+
+          <!-- Remove Condition Button -->
+          <div class="col-md-2 mt-12 d-flex justify-content-end">
+            <button *ngIf="conditionIndex > 0" type="button" class="btn btn-danger btn-sm mt-4" (click)="removeCondition(fieldIndex, conditionIndex)">
+              Remove Condition
+            </button>
+          </div>
+        
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Condition & Remove Field Buttons -->
+    <div class="d-flex mt-3">
+      <button type="button" class="btn btn-primary btn-sm me-4" (click)="addCondition(fieldIndex)">
+        Add Condition
+      </button>
+      <button type="button" class="btn btn-danger btn-sm me-4" (click)="remove(fieldIndex)">
+        Remove
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+        
+        <!-- Add Condition Button -->
+
+        
+
+     
+          </div>
           
           
           </div>

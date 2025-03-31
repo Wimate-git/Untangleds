@@ -94,7 +94,33 @@
           </ngx-select>
         </div>
        </div>
-  </div>
+
+
+  <form [formGroup]="createChart">
+    <div class="col-md-4 mb-3">
+      <div class="col-lg-12 form-check form-switch">
+        <label for="multiColorCheck" class="col-lg-12 col-form-label fw-bold fs-6 mt-7">
+          Enable Multi Color
+        </label>
+        <input
+          class="form-check-input mt-10 mb-3 mb-lg-0"
+          type="checkbox"
+          formControlName="multiColorCheck"
+          id="multiColorCheck"
+          [checked]="createChart.get('multiColorCheck')?.value"
+          [disabled]="isDisabled"
+ 
+        />
+      </div>
+    </div>
+  </form>
+
+
+
+
+  
+</div>
+
   
   <!-- Modal body with Tabs -->
   <div class="card shadow-none rounded-0 w-100" [formGroup]="createChart" *ngIf="createChart" style="margin-top: 10px;">
@@ -285,7 +311,7 @@
                         ></p-multiSelect>
                       </div>
                       <div class="col-md-4 mb-3">
-                        <label for="parameterName" class="col-form-label fw-bold fs-6 ">Format Type</label>
+                        <label for="parameterName" class="col-form-label fw-bold fs-6 required">Format Type</label>
                         <ngx-select
                           id="parameterName"
                           [allowClear]="true"
@@ -346,6 +372,16 @@
                           placeholder="Select constant" formControlName="DrillFilterLevel"
                       />
                       </div>
+                      <!-- <div class="col-md-4 mb-3">
+                        <label for="color" class="col-createChart-label fw-bold fs-6 ">Select Color</label>
+                        <ngx-select id="color" [allowClear]="true" formControlName="color"
+                          [items]="colorOptions" optionValueField="value" optionTextField="text" placeholder="Select Color">
+                        </ngx-select>
+                        <div *ngIf="field.get('color')?.touched && field.get('color')?.invalid" class="text-danger">
+                          <div *ngIf="field.get('color')?.errors?.required">Color is required.</div>
+                        </div>
+                      </div> -->
+              
                     
 
 

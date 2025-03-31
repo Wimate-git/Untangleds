@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -134,6 +134,27 @@ export class StackedBarConfigComponent {
 
   }
 
+
+
+  onCombinedAddFieldsChange(event: any): void {
+    this.onAdd_fieldsChange(event);
+    this.addControls(event, 'html');
+  }
+
+  DrillDownTypeFields = [
+    { value: 'Table', text: 'Table' },
+    { value: 'Multi Level', text: 'Multi Level' },
+  ]
+  onAdd_fieldsChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input.valueAsNumber; // gets the number directly
+    console.log('Changed add_fields value:', value);
+  
+    // Optional: Use the value to add fields
+    if (!isNaN(value) && value > 0) {
+ // or repopulateDrill_fields
+    }
+  }
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange',this.all_Packet_store)
   }
@@ -196,40 +217,58 @@ export class StackedBarConfigComponent {
     };
   }
   initializeTileFields(): void {
-    console.log('i am initialize')
-    // Initialize the form group
+    console.log('i am initialize');
+  
     this.createChart = this.fb.group({
-      add_fields:[''],
-      all_fields:new FormArray([]),
-  
+      add_fields: ['', Validators.required],
+      all_fields: new FormArray([]),
+      drill_fields: new FormArray([]),
+      conditions: this.fb.array([]),
       widgetid: [this.generateUniqueId()],
-    
-      // themeColor: ['#000000', Validators.required],
-  
-      // fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
-      // fontColor: ['#000000', Validators.required], // Default to black
-   
-      chart_title:['',Validators.required],
-      highchartsOptionsJson:[JSON.stringify(this.defaultHighchartsOptionsJson,null,4)],
-      filterForm:[''],
-      // filterParameter:[[]],
-      // filterDescription:[''],
-      toggleCheck: [], // Default toggle state
+      chart_title: ['', Validators.required],
+      highchartsOptionsJson: [JSON.stringify(this.defaultHighchartsOptionsJson, null, 4)],
+      filterForm: [''],
+      miniForm: [''],
+      MiniTableNames: [''],
+      MiniTableFields: [''],
+      minitableEquation: [''],
+      EquationOperationMini: [''],
+      filterFormList: [''],
       dashboardIds: [''],
       selectType: [''],
-      miniForm:[''],
-      MiniTableNames:[''],
-      MiniTableFields:[''],
-      minitableEquation:[''],
-      EquationOperationMini:['']
-      // custom_Label:['',Validators.required],
-   
-  
-
-
+      toggleCheck: [],
+      DrillDownType: [''],
+      DrillFilter:[''],
+      DrillFilterLevel:[''],
+      // multiColorCheck: [true]
     });
-
   
+    // Subscribe to DrillDownType changes
+    this.createChart.get('DrillDownType')?.valueChanges.subscribe(() => {
+      this.updateDrillFields();
+    });
+  
+    // Subscribe to add_fields changes
+    this.createChart.get('add_fields')?.valueChanges.subscribe((val: any) => {
+      if (val === null || val === undefined || val === '') return;
+  
+      const parsedVal = parseInt(val, 10);
+      if (isNaN(parsedVal)) return;
+  
+      if (parsedVal < 0) {
+        this.toast.open("Negative values not allowed", "Check again", {
+          duration: 5000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top',
+        });
+        return;
+      }
+  
+      // Call both methods
+      const fakeEvent = { target: { value: parsedVal } };
+      this.addControls(fakeEvent, 'html');
+      this.updateDrillFields();
+    });
   }
   getFormControlValue(selectedTextConfi:any): void {
     // const formlistControl = this.createChart.get('formlist');
@@ -283,6 +322,213 @@ export class StackedBarConfigComponent {
         console.log("Can't fetch", err);
       });
   }
+
+
+
+  updateDrillFields(): void {
+    const selectedType = this.createChart.get('DrillDownType')?.value;
+    const count = parseInt(this.createChart.get('add_fields')?.value, 10);
+    console.log('Updating drill fields based on count:', count);
+  
+    if (selectedType !== 'Multi Level' || isNaN(count) || count <= 0) {
+      this.drillFields.clear();
+      return;
+    }
+  
+    const currentLength = this.drillFields.length;
+  
+    // Add fields
+    if (count > currentLength) {
+      for (let i = currentLength; i < count; i++) {
+        this.drillFields.push(this.createDrillField());
+      }
+    }
+  
+    // Remove extra fields
+    else if (count < currentLength) {
+      for (let i = currentLength - 1; i >= count; i--) {
+        this.drillFields.removeAt(i);
+      }
+    }
+  }
+  get drillFields(): FormArray {
+    return this.createChart?.get('drill_fields') as FormArray || this.fb.array([]);
+  }
+  
+  addCondition(fieldIndex: number, initialValue: string = '', fieldValue: string = '') {
+    const drillFieldsArray = this.createChart.get('drill_fields') as FormArray;
+    const conditionsArray = drillFieldsArray.at(fieldIndex).get('conditions') as FormArray;
+  
+    const newConditionGroup = this.fb.group({
+      drillTypeFields: [fieldValue], // Ensure ngx-select control is properly initialized
+      drillTypeLabel:[''],
+      drillTypePrimary:[''],
+  
+    });
+  
+    conditionsArray.push(newConditionGroup);
+  }
+  
+  get drill_fields() {
+    return this.createChart.get('drill_fields') as FormArray;
+  }
+  addNewDrillField() {
+    const drillFieldsArray = this.createChart.get('drill_fields') as FormArray;
+  
+    // Create a new drill field group
+    const fieldGroup = this.fb.group({
+      conditions: this.fb.array([]), // Initialize conditions array
+      
+    });
+  
+    // Push it to the form array
+    drillFieldsArray.push(fieldGroup);
+  
+    // Ensure at least one condition is added
+    this.addCondition(drillFieldsArray.length - 1, '', '');
+  }
+  
+  
+
+  addDrillFields() {
+    const drillFieldsArray = this.createChart.get('drill_fields') as FormArray;
+    if (drillFieldsArray.length === 0) {  // Prevent duplicate generation
+      this.addNewDrillField();  // Add an initial field
+    }
+  }
+  
+  // Function to clear the form array when 'Table' is selected
+  clearDrillFields() {
+    this.createChart.setControl('drill_fields', this.fb.array([])); // Reset the array
+  }
+  
+
+  createDrillField(): FormGroup {
+    return this.fb.group({
+      conditions: this.fb.array([this.createCondition()])
+    });
+  }
+  
+  createCondition(): FormGroup {
+    return this.fb.group({
+      drillTypeFields: [''],
+      drillTypeLabel: [''],
+      drillTypePrimary:[''],
+
+    });
+  }
+
+
+      
+  getFormArrayControls(field: AbstractControl | null): AbstractControl[] {
+    if (field) {
+      const formArray = field.get('conditions') as FormArray;
+      return formArray?.controls || [];
+    }
+    return [];
+  }
+
+
+  formHeadings: Map<number, string> = new Map(); 
+  fetchDynamicFormData(value: any, index: number) {
+    console.log("Fetching data for:", value);
+    this.formHeadings.set(index, value);  
+    
+
+    // Simulating API call
+    this.api
+      .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
+      .then((result: any) => {
+        if (result && result.metadata) {
+          const parsedMetadata = JSON.parse(result.metadata);
+          const formFields = parsedMetadata.formFields;
+
+          // Prepare parameter list
+          const dynamicParamList = formFields.map((field: any) => ({
+            value: field.name,
+            text: field.label,
+          }));
+
+          // Add created_time and updated_time
+          if (parsedMetadata.created_time) {
+            dynamicParamList.push({
+              value: 'created_time',
+              text: 'created_time',
+            });
+          }
+          if (parsedMetadata.updated_time) {
+            dynamicParamList.push({
+              value: 'updated_time',
+              text: 'updated_time',
+            });
+          }
+
+          const formFieldsArray: FormField[] = Object.values(parsedMetadata.formFields) as FormField[];
+
+          const dateFields = formFieldsArray.filter((field: FormField) => field.type === "date");
+          console.log("Date Fields:", dateFields);
+          
+          
+          const dateFieldsList = dateFields.map((field: any) => ({
+            value: field.name,
+            text: field.label,
+          }));
+          
+          dateFieldsList.push({
+            value: 'Default',
+            text: 'Default',
+          });
+          dateFieldsList.push({
+            value: 'created_time',
+            text: 'created_time',
+          });
+          dateFieldsList.push({
+            value: 'updated_time',
+            text: 'updated_time',
+          });
+          
+          this.dynamicDateParamMap.set(index,dateFieldsList)
+
+          // Store parameters in the map
+          this.dynamicParamMap.set(index, dynamicParamList);
+
+          // Trigger change detection
+          this.cdr.detectChanges();
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching data:", err);
+      });
+  }
+  remove(fieldIndex: number): void {
+    // Access the specific field group
+    const parentGroup = this.drill_fields.at(fieldIndex) as FormGroup;
+  
+    // Access the conditions FormArray within the field group
+    const conditions = parentGroup.get('conditions') as FormArray;
+  
+    // Check if there are any conditions to remove
+    if (conditions && conditions.length > 0) {
+      // Remove the last condition in the array
+      conditions.removeAt(conditions.length - 1);
+    } else {
+      console.warn(`No conditions available to remove for field index ${fieldIndex}`);
+    }
+  }
+
+  removeCondition(fieldIndex: number, conditionIndex: number) {
+    const drillFieldsArray = this.createChart.get('drill_fields') as FormArray;
+    const parentGroup = drillFieldsArray.at(fieldIndex) as FormGroup;
+    const conditions = parentGroup.get('conditions') as FormArray;
+  
+    if (conditions && conditions.length > conditionIndex) {
+      conditions.removeAt(conditionIndex);
+      console.log(`Condition removed from index ${fieldIndex}, condition ${conditionIndex}`);
+    } else {
+      console.warn('Condition index out of range or conditions not found');
+    }
+  }
+  
 
   get constants() {
     return (this.createChart.get('constants') as FormArray);
@@ -463,6 +709,10 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         minitableEquation:this.createChart.value.minitableEquation,
         EquationOperationMini:this.createChart.value.EquationOperationMini,
         add_fields:this.createChart.value.add_fields,
+        DrillConfig:this.createChart.value.drill_fields || [],
+        DrillDownType:this.createChart.value.DrillDownType ||'',
+        DrillFilter:this.createChart.value.DrillFilter ||'',
+        DrillFilterLevel:this.createChart.value.DrillFilterLevel ||'',
     
       
 
@@ -563,6 +813,8 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     minitableEquation:this.createChart.value.minitableEquation ||'',
     EquationOperationMini:this.createChart.value.EquationOperationMini ||'',
     add_fields:this.createChart.value.add_fields ||'',
+    DrillConfig:this.createChart.value.drill_fields || [],
+    DrillDownType:this.createChart.value.DrillDownType ||'',
 
     // filterForm:this.createChart.value.filterForm,
     // filterParameter:this.createChart.value.filterParameter,
@@ -695,73 +947,144 @@ openStackedChartModal(tile: any, index: number) {
 
   if (tile) {
     this.selectedTile = tile;
-    this.editTileIndex = index !== undefined ? index : null;
-    console.log('this.editTileIndex checking from openChartModal1', this.editTileIndex); // Store the index, default to null if undefined
-    console.log('Tile Object:', tile);
-
-    // Parse necessary fields
+    this.editTileIndex = index ?? null;
     this.paramCount = tile.noOfParams;
     this.highchartsOptionsJson = JSON.parse(tile.highchartsOptionsJson);
 
-    const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14; // Default to 14px if undefined
-this.cd.detectChanges()
-    // Parse filterParameter if it exists and is a string
-    let parsedFilterParameter = [];
-    if (tile.filterParameter) {
-      try {
-        parsedFilterParameter = JSON.parse(tile.filterParameter);
-      } catch (error) {
-        console.error('Error parsing filterParameter:', error);
-      }
-    }
+    const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14;
 
+    let parsedFilterParameter = [];
+    try {
+      parsedFilterParameter = tile.filterParameterLine ? JSON.parse(tile.filterParameterLine) : [];
+    } catch (error) {
+      console.error('Error parsing filterParameter:', error);
+    }
 
     let parsedMiniTableFields = [];
-    if (typeof tile.MiniTableFields === 'string') {
-      try {
-        parsedMiniTableFields = JSON.parse(tile.MiniTableFields);
-        console.log('Parsed filterParameter1:', parsedMiniTableFields);
-      } catch (error) {
-        console.error('Error parsing filterParameter1:', error);
-      }
-    } else {
-      parsedMiniTableFields = tile.MiniTableFields;
+    try {
+      parsedMiniTableFields = typeof tile.MiniTableFields === 'string'
+        ? JSON.parse(tile.MiniTableFields)
+        : tile.MiniTableFields;
+    } catch (error) {
+      console.error('Error parsing MiniTableFields:', error);
     }
 
-    console.log('Parsed FilterParameter:', parsedMiniTableFields);
+    // ✅ Initialize form group and valueChanges
+    this.initializeTileFields();
 
-    // Initialize form fields and pre-select values
-    this.createChart = this.fb.group({
+    // ✅ Now patch values into the form
+    this.createChart.patchValue({
       add_fields: tile.add_fields,
       chart_title: tile.chart_title,
-      all_fields: this.repopulate_fields(tile),
       highchartsOptionsJson: JSON.stringify(this.highchartsOptionsJson, null, 4),
       custom_Label: tile.custom_Label,
       fontSize: fontSizeValue,
       filterDescription: tile.filterDescription,
       filterForm: tile.filterForm,
-      filterParameter: [parsedFilterParameter], // Patch the parsed value here
-      toggleCheck: tile.toggleCheck,
+      filterFormList: tile.filterFormList,
+      filterParameterLine: parsedFilterParameter,
+      miniForm: tile.miniForm || '',
+      MiniTableNames: tile.MiniTableNames || '',
+      MiniTableFields: parsedMiniTableFields,
+      minitableEquation: tile.minitableEquation,
+      EquationOperationMini: tile.EquationOperationMini,
       dashboardIds: tile.dashboardIds,
-  
+      toggleCheck: tile.toggleCheck,
       selectType: tile.selectType,
-      miniForm:tile.miniForm || '',
-      MiniTableNames:tile.MiniTableNames ||'',
-      MiniTableFields: [parsedMiniTableFields],
-      minitableEquation:tile.minitableEquation,
-      EquationOperationMini:tile.EquationOperationMini, 
+      DrillDownType: tile.DrillDownType,
+      multiColorCheck:tile.multiColorCheck
     });
 
-    console.log('Updated all_fields:', this.all_fields);
+    // ✅ Populate all_fields and drill_fields separately
+    this.all_fields.clear(); // Clear existing FormArray
+    const populatedAllFields = this.repopulate_fields(tile);
+    // populatedAllFields.controls.forEach(control => this.all_fields.push(control));
 
-    this.isEditMode = true; // Set to edit mode
+    this.drill_fields.clear(); // Clear existing FormArray
+    const populatedDrillFields = this.repopulateDrill_fields(tile);
+    populatedDrillFields.controls.forEach(control => this.drill_fields.push(control));
+
+    // ✅ Manually trigger addControls and updateDrillFields once
+    const fakeEvent = { target: { value: tile.add_fields } };
+    this.addControls(fakeEvent, 'html');
+    this.updateDrillFields();
+
+    this.isEditMode = true;
   } else {
-    this.selectedTile = null; // No tile selected for adding
-    this.isEditMode = false; // Set to add mode
-    this.createChart.reset(); // Reset the form for new entry
+    this.selectedTile = null;
+    this.isEditMode = false;
+    this.createChart.reset();
   }
+
+  this.cdr.detectChanges();
 }
 
+
+
+repopulateDrill_fields(getValues: any): FormArray {
+  console.log('getValues check from readbackDrill', getValues);
+
+  if (!getValues) {
+    console.warn('No data to repopulate');
+    return this.drill_fields;
+  }
+
+  const noOfParams = getValues.add_fields || '';
+  this.drill_fields.clear();
+
+  let parsedChartConfig: any[] = [];
+  try {
+    if (typeof getValues.DrillConfig === 'string') {
+      parsedChartConfig = JSON.parse(getValues.DrillConfig || '[]');
+    } else if (Array.isArray(getValues.DrillConfig)) {
+      parsedChartConfig = getValues.DrillConfig;
+    }
+  } catch (error) {
+    console.error('Error parsing chartConfig:', error);
+    parsedChartConfig = [];
+  }
+
+  console.log('Parsed chartConfig:', parsedChartConfig);
+  const readCount = this.createChart?.get('add_fields')?.value;
+  console.log('readCount checking the value ', readCount);
+
+  if (parsedChartConfig.length > 0) {
+    parsedChartConfig.forEach((configItem) => {
+      const conditionArray = this.fb.array([]);
+      const conditions = Array.isArray(configItem.conditions) ? configItem.conditions : [];
+
+      conditions.forEach((condition: any) => {
+        conditionArray.push(
+          this.fb.group({
+            drillTypeFields: [condition.drillTypeFields || ''],
+            drillTypeLabel: [condition.drillTypeLabel || ''],
+            drillTypePrimary:[condition.drillTypePrimary ||''],
+     
+          })
+        );
+      });
+
+      this.drill_fields.push(
+        this.fb.group({
+          conditions: conditionArray
+        })
+      );
+    });
+  } else {
+    console.warn('No parsed data to populate fields');
+
+    const parsedCount = parseInt(noOfParams, 10);
+    if (!isNaN(parsedCount) && parsedCount > 0) {
+      for (let i = 0; i < parsedCount; i++) {
+        this.drill_fields.push(this.createDrillField());
+      }
+    }
+  }
+
+  console.log('Final FormArray Values:', this.drill_fields.value);
+
+  return this.drill_fields;
+}
 
 preDefinedRange(preDefined:any){
   console.log('preDefined check',preDefined)
@@ -960,76 +1283,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   onMouseLeave(): void {
     this.isHovered = false;
   }
-  fetchDynamicFormData(value: any, index: number) {
-    console.log("Fetching data for:", value);
 
-    // Simulating API call
-    this.api
-      .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
-      .then((result: any) => {
-        if (result && result.metadata) {
-          const parsedMetadata = JSON.parse(result.metadata);
-          const formFields = parsedMetadata.formFields;
-          console.log('formFields type check data',formFields)
-
-          // Prepare parameter list
-          const dynamicParamList = formFields.map((field: any) => ({
-            value: field.name,
-            text: field.label,
-          }));
-
-          // Add created_time and updated_time
-          if (parsedMetadata.created_time) {
-            dynamicParamList.push({
-              value: 'created_time',
-              text: 'created_time',
-            });
-          }
-          if (parsedMetadata.updated_time) {
-            dynamicParamList.push({
-              value: 'updated_time',
-              text: 'updated_time',
-            });
-          }
-console.log('dynamicParamList checking',dynamicParamList)
-const formFieldsArray: FormField[] = Object.values(parsedMetadata.formFields) as FormField[];
-
-const dateFields = formFieldsArray.filter((field: FormField) => field.type === "date");
-console.log("Date Fields:", dateFields);
-
-
-const dateFieldsList = dateFields.map((field: any) => ({
-  value: field.name,
-  text: field.label,
-}));
-
-dateFieldsList.push({
-  value: 'Default',
-  text: 'Default',
-});
-dateFieldsList.push({
-  value: 'created_time',
-  text: 'created_time',
-});
-dateFieldsList.push({
-  value: 'updated_time',
-  text: 'updated_time',
-});
-
-this.dynamicDateParamMap.set(index,dateFieldsList)
-          // Store parameters in the map
-          this.dynamicParamMap.set(index, dynamicParamList);
-        
-
-
-          // Trigger change detection
-          this.cdr.detectChanges();
-        }
-      })
-      .catch((err) => {
-        console.error("Error fetching data:", err);
-      });
-  }
 
 
   getDynamicParams(index: number): any[] {
@@ -1591,21 +1845,7 @@ toggleCheckbox(theme: any): void {
       },
     },
     series: [
-      {
-        name: 'Product A',
-        data: [50, 70, 80, 90], // Sales data for Product A
-        color: '#FF5733',
-      },
-      {
-        name: 'Product B',
-        data: [30, 50, 60, 70], // Sales data for Product B
-        color: '#33FF57',
-      },
-      {
-        name: 'Product C',
-        data: [20, 30, 50, 60], // Sales data for Product C
-        color: '#3357FF',
-      },
+
     ],
   
   };

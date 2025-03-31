@@ -59,16 +59,19 @@ export class ChartUi1Component implements OnChanges,OnInit {
   @Output() emitChartConfigTable = new EventEmitter<any>();
   @Input() eventFilterConditions : any
   isChecked: boolean = false;
+  counter: number=0;
+  isHomeChecked:boolean = false;
   
   formTableConfig: {};
   storeDrillFilter: string;
   DrillFilterLevel: string;
   parseChartData: any;
   storeDrillConfig: any;
-  counter: number=0;
+
   storeDrillPacket: any;
   storeRedirectionCheck: any;
-  isHomeChecked:boolean = false;
+
+  isDrillPacketAvailable: any;
   
 ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui', this.all_Packet_store);
@@ -80,6 +83,7 @@ ngOnChanges(changes: SimpleChanges): void {
     this.storeDrillPacket = JSON.parse(this.item.DrillConfig)
 
     console.log('this.storeDrillPacket checking',this.storeDrillPacket )
+    this.isDrillPacketAvailable = this.storeDrillPacket && this.storeDrillPacket.length > 0;
     this.storeRedirectionCheck = this.item.toggleCheck
 
     // if (this.item && this.liveDataChart !== undefined) {

@@ -1,6 +1,28 @@
 
 <div class="action-menu-container d-flex align-items-center"
 style="position: absolute; top: 10px; right: 10px; gap: 10px;z-index: 50;">
+
+
+<button 
+  *ngIf="isEditModeView && isDrillPacketAvailable"
+  class="mat-icon-button btn btn-primary btn-icon btn-custom btn-active-light btn-active-color-primary w-50px h-30px w-md-40px h-md-30px mb-4"
+  style="transition: background-color 0.3s ease;margin-top: -2px;" 
+  (click)="toggleCheck(true,index)"
+
+>
+  <i class="bi bi-arrow-left text-white" style="transition: color 0.3s ease;"></i>
+</button>
+
+<button 
+*ngIf="isEditModeView && isDrillPacketAvailable"
+  class="mat-icon-button btn btn-success btn-icon btn-custom btn-active-light btn-active-color-primary w-50px h-30px w-md-40px h-md-30px mb-4" 
+  style="transition: background-color 0.3s ease;margin-top: -2px;" 
+  (click)="homeCheck(true,index)"
+  aria-haspopup="menu"
+  aria-expanded="false"
+>
+  <i class="bi bi-house-door text-white" style="transition: color 0.3s ease;"></i>
+</button>
 <!-- Edit Button -->
 <button *ngIf="!isEditModeView && !hideButton && (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)) " style="z-index: 50;"
      class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px"
@@ -13,13 +35,14 @@ style="position: absolute; top: 10px; right: 10px; gap: 10px;z-index: 50;">
 </button>
 
 <button 
-*ngIf="isEditModeView && shouldShowButton && !hideButton && (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))"
+*ngIf="isEditModeView && shouldShowButton && !hideButton &&  storeRedirectionCheck &&(summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))"
+class="mat-icon-button btn btn-warning btn-icon btn-custom btn-active-light btn-active-color-primary w-50px h-30px w-md-40px h-md-30px mb-4"
 
 (click)="helperDashboard(item, index,modalContent,item.selectType)"
-class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px" 
+
 aria-haspopup="menu" 
 aria-expanded="false" 
-style="background: none; border: none; cursor: pointer;">
+>
 <i class="bi bi-graph-up" style="color: var(--bs-body-color);"></i> 
 </button>
 

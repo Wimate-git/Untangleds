@@ -25,6 +25,12 @@
   <button  type="button" class="btn fw-bold btn-primary translateyr" ngbTooltip="Last Updated Time">
     Last Updated Time: {{lastUpdatedTime}}
   </button>
+  <button  type="button" class="btn fw-bold btn-info translateyr" [ngbTooltip]="modeMessage">
+    {{modeMessage}}
+    <!-- [attr.title]="isEditModeView ? 'Widgets Edit Mode' : 'View Mode'" -->
+    <!-- Last Updated Time: {{lastUpdatedTime}} -->
+  </button>
+
 </div>
 
 
@@ -209,6 +215,9 @@
                     </div>
 
 
+
+
+
                     <div *ngIf="item.grid_type === 'Stackedchart'"  >
                       <app-stacked-bar-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,stackedBarChartModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
                  
@@ -218,8 +227,10 @@
                     <div *ngIf="item.grid_type === 'Piechart'"  >
                       <app-pie-chart-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,pieChartModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
                  
-                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-pie-chart-ui>
+                      [hidingLink]="hidingLink" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalPieChart)"   [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-pie-chart-ui>
                     </div>
+
+                    
                     <div *ngIf="item.grid_type === 'semiDonut'"  >
                       <app-semi-donut-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,semiDonutModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
                  
@@ -229,7 +240,7 @@
                     <div *ngIf="item.grid_type === 'Funnelchart'"  >
                       <app-funnel-chart-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,FunnelChartModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
                  
-                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-funnel-chart-ui>
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions" (sendCellInfo) = "helperChartClickFunnel($event,dataTableModalFunnelChart)"></app-funnel-chart-ui>
                       
                     </div>
                     <div *ngIf="item.grid_type === 'Linechart'"  >
@@ -2473,6 +2484,14 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
    
        [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
     ></app-data-table-chart1>
+  </ng-template>
+
+
+  <ng-template #dataTableModalPieChart let-modal>
+    <app-data-table-pie-chart
+   
+       [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
+    ></app-data-table-pie-chart>
   </ng-template>
   <ng-template #dataTableModalChart2 let-modal>
     <app-data-table-chart2
