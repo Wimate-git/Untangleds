@@ -2,6 +2,8 @@ import { Component, input, Input, OnInit } from '@angular/core';
 import { IconUserModel } from '../icon-user.model';
 import { Router } from '@angular/router';
 import { AuditTrailService } from 'src/app/pages/services/auditTrail.service'; 
+import { APIService } from 'src/app/API.service';
+
 @Component({
   selector: 'app-card2',
   templateUrl: './card2.component.html',
@@ -32,8 +34,14 @@ export class Card2Component implements OnInit{
   loginDetail_string: any;
   client: any;
   user: any;
+  groupFormResponse: any;
+  groupForm: any;
 
-  constructor(private router: Router, private auditTrail: AuditTrailService) {}
+  constructor(
+    private router: Router, 
+    private auditTrail: AuditTrailService,
+    private api: APIService
+  ) {}
 
 
   ngOnInit(): void {
@@ -52,7 +60,7 @@ export class Card2Component implements OnInit{
 
   }
 
-  onStatusClick(data: { title: string; id: string }): void {
+  async onStatusClick(data: { title: string; id: string }): Promise<void> {
 
     console.log("ID:", data.id)
 
@@ -71,6 +79,21 @@ export class Card2Component implements OnInit{
 
     if(this.componentSource == 'dashboard'){
 
+
+      await this.api.GetMaster(this.client + "#formgroup#" + data.title + '#main', 1).then(async (result: any) => {
+
+        this.groupFormResponse = JSON.parse(result.metadata)
+
+        console.log("FORMGROUP MAIN:", this.groupFormResponse.formList)
+
+        this.groupForm = this.groupFormResponse.formList
+
+      }).catch((error)=>{
+
+        console.log("ERROR:",error)
+
+      })
+
       const UserDetails = {
         "User Name": this.user,
         "Action": "View",
@@ -86,8 +109,14 @@ export class Card2Component implements OnInit{
       this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
 
 
-      
-       this.router.navigate([`dashboard/dashboardFrom/${this.id}/${data.title}`]);
+      if(this.groupForm.length === 1){
+
+        this.router.navigate([`view-dreamboard/${this.id}/${this.groupForm[0] }`]);
+      }
+      else{
+        this.router.navigate([`dashboard/dashboardFrom/${this.id}/${data.title}`]);
+      }
+
 
     }
     else if(this.componentSource == 'dashboardForm'){

@@ -494,6 +494,21 @@ export class DashboardComponent implements OnInit {
       // this.showAlert(errorAlert_dashboard)
       this.isCardMoved = false;
       this.cdr.detectChanges();
+
+      const UserDetails = {
+        "User Name": this.user,
+        "Action": "View",
+        "Module Name": "Dashboard",
+        "Form Name": "Dashboard Group",
+        "Description": "Dashboard Edited",
+        "User Id": this.user,
+        "Client Id": this.client,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+
+      this.auditTrail.mappingAuditTrailData(UserDetails, this.client)
+
     }
     catch (error) {
       console.log("Error:", error)
