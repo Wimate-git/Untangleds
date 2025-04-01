@@ -487,12 +487,20 @@ export class DashboardFormComponent implements OnInit {
     }
 
 
+    onFabClick(){
+        
+    }
+
     searchQuery = '';
     get filteredCards() {
         return this.cards.filter(card =>
-            card.name?.toLowerCase().includes(this.searchQuery.toLowerCase())
+            // card.name?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
             // card.job?.toLowerCase().includes(this.searchQuery.toLowerCase())
+            (card.name?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+            (card.job && card.job !== 'N/A' && card.job.toLowerCase().includes(this.searchQuery.toLowerCase())))
+      
         );
+        
     }
 
 

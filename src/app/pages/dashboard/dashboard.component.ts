@@ -65,6 +65,7 @@ export class DashboardComponent implements OnInit {
   permission_id: any;
   permissionList: any;
   dashboard: boolean = false
+  isCardMoved: boolean = false;
 
 
 
@@ -373,6 +374,8 @@ export class DashboardComponent implements OnInit {
   async drop(event: CdkDragDrop<string[]>) {
     // const previousIndex = this.filteredCards.findIndex(card => card === event.previousIndex);
 
+    this.isCardMoved = true;
+
     if(this.dashboard == false){
 
       // Swal.fire({
@@ -387,7 +390,7 @@ export class DashboardComponent implements OnInit {
 
       const errorAlert_dashboard: SweetAlertOptions = {
         icon: 'error',
-        title: 'You dont have permission to edit dashboard.',
+        title: 'You do not have permission to update tile positions.',
         text: '',
       };
 
@@ -428,32 +431,94 @@ export class DashboardComponent implements OnInit {
     //     }
     // ]
 
-    for (let i = 0; i < this.cards_2.length; i++) {
+    // for (let i = 0; i < this.cards_2.length; i++) {
 
-      this.Item = {
-        P1: this.cards_2[i].totalEarnings,
-        P2: this.cards_2[i].name,
-        P3: this.cards_2[i].job,
-        P4: JSON.stringify(this.cards_2[i].icon),
-        P5: this.cards_2[i].updateUser,
-        P6: this.cards_2[i].TileColor,
-        P7: this.cards_2[i].updatedTime,
-        P8: this.cards_2[i].online,
-        P9: i
+    //   this.Item = {
+    //     P1: this.cards_2[i].totalEarnings,
+    //     P2: this.cards_2[i].name,
+    //     P3: this.cards_2[i].job,
+    //     P4: JSON.stringify(this.cards_2[i].icon),
+    //     P5: this.cards_2[i].updateUser,
+    //     P6: this.cards_2[i].TileColor,
+    //     P7: this.cards_2[i].updatedTime,
+    //     P8: this.cards_2[i].online,
+    //     P9: i
 
-      }
+    //   }
 
-      await this.updatedreamboardlookup(1, this.Item.P1, 'update', this.Item)
-    }
+    //   await this.updatedreamboardlookup(1, this.Item.P1, 'update', this.Item)
+    // }
 
 
   }
 
+  async onFabClick() {
+
+    try {
+
+      const errorAlert_dashboard: SweetAlertOptions = {
+        icon: 'success',
+        title: 'Dashboard saved successfully.',
+        text: '',
+      };
+
+      this.showAlert(errorAlert_dashboard)
+
+      for (let i = 0; i < this.cards_2.length; i++) {
+       
+
+        this.Item = {
+          P1: this.cards_2[i].totalEarnings,
+          P2: this.cards_2[i].name,
+          P3: this.cards_2[i].job,
+          P4: JSON.stringify(this.cards_2[i].icon),
+          P5: this.cards_2[i].updateUser,
+          P6: this.cards_2[i].TileColor,
+          P7: this.cards_2[i].updatedTime,
+          P8: this.cards_2[i].online,
+          P9: i
+
+        }
+
+        await this.updatedreamboardlookup(1, this.Item.P1, 'update', this.Item)
+
+       
+      }
+      // this.spinner.hide();
+      // const errorAlert_dashboard: SweetAlertOptions = {
+      //   icon: 'success',
+      //   title: 'Dashboard saved successfully.',
+      //   text: '',
+      // };
+
+      // this.showAlert(errorAlert_dashboard)
+      this.isCardMoved = false;
+      this.cdr.detectChanges();
+    }
+    catch (error) {
+      console.log("Error:", error)
+
+      const errorAlert_dashboarderror: SweetAlertOptions = {
+        icon: 'error',
+        title: 'Dashboard not saved.',
+        text: '',
+      };
+
+      this.showAlert(errorAlert_dashboarderror)
+      this.isCardMoved = false
+      this.cdr.detectChanges();
+    }
+  }
+
+  
   searchQuery = '';
   get filteredCards() {
     return this.cards_2.filter(card =>
-      card.name?.toLowerCase().includes(this.searchQuery.toLowerCase())
-      // card.name?.toLowerCase().includes(this.searchQuery.toLowerCase()
+    // card.name?.toLowerCase().includes(this.searchQuery.toLowerCase() )|| card.job?.toLowerCase().includes(this.searchQuery.toLowerCase())
+
+    (card.name?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+      (card.job && card.job !== 'N/A' && card.job.toLowerCase().includes(this.searchQuery.toLowerCase())))
+
     );
   }
 
