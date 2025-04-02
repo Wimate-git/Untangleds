@@ -69,6 +69,7 @@ export class StackedBarUiComponent {
   liveDataColumnChart: any;
   storeDrillConfig: any;
   isLoading = false;
+  enableDrillButton: boolean;
   
   toggleCheck(isChecked: boolean,index:any) {
     this.isChecked = isChecked;
@@ -77,7 +78,8 @@ export class StackedBarUiComponent {
     console.log('this.DrillFilterLevel checking from initial',this.DrillFilterLevel)
     if(this.storeDrillFilter !== undefined && this.storeDrillFilter !== '' && 
       this.DrillFilterLevel !== undefined && this.DrillFilterLevel !== ''){
-  
+        
+        this.enableDrillButton = true
       this.spinner.show('dataProcess' + index);
   
   
@@ -161,6 +163,8 @@ export class StackedBarUiComponent {
               }
             );
   
+    }else{
+      this.enableDrillButton = false
     }
   
   
@@ -292,95 +296,10 @@ export class StackedBarUiComponent {
       console.log('liveDataColumnChart check',this.liveDataColumnChart)
       console.log('eventFilterConditions chart ui1',this.eventFilterConditions)
       console.log('this.storeDrillFilter checking',this.storeDrillFilter)
-      // this.parseChartOptions = this.item.highchartsOptionsJson;
-      // console.log('this.parseChartOptions checking',this.parseChartOptions)
-      // const check = JSON.parse(this.parseChartOptions);
-      // console.log('check parsed data',check)
-      // this.extractSeries = check.series[0].name
-      // console.log('this.extractSeries',this.extractSeries)
-    //   if (this.all_Packet_store?.LiveDashboard === true ||(this.all_Packet_store?.grid_details &&
-    //     this.all_Packet_store.grid_details.some((packet: { grid_type: string; }) => packet.grid_type === "filterTile"))) {
-    //     console.log("✅ LiveDashboard is TRUE - Updating highchartsOptionsJson & chartConfig...");
-    
-    //     if (this.item && this.liveDataColumnChart && Array.isArray(this.liveDataColumnChart)) {
-    //         // Find the matching packet from this.liveDataChart based on id
-    //         const matchingLiveChart = this.liveDataColumnChart.find(liveChart => liveChart.id === this.item.id);
-    
-    //         console.log('🔍 Matching Live Chart for ID:', this.item.id, matchingLiveChart);
-    
-    //         // Update highchartsOptionsJson and chartConfig only if a match is found
-    //         if (matchingLiveChart) {
-    //             this.item.highchartsOptionsJson = matchingLiveChart.highchartsOptionsJson;
-    //             this.item.chartConfig = matchingLiveChart.chartConfig;
-    //         }
-    
-    //         console.log('✅ Updated this.item: after Live', this.item);
-    //         if (typeof this.item.highchartsOptionsJson === 'string') {
-    //           try {
-    //             this.chartOptions = JSON.parse(this.item.highchartsOptionsJson);
-             
-    //           } catch (error) {
-    //             console.error('Error parsing JSON:', error);
-    //           }
-    //         } else {
-    //           // If it's already an object, assign it directly
-    //           this.chartOptions = this.item.highchartsOptionsJson;
-    //           console.log('this.chartOptions from column', this.chartOptions);
-    //         }
-            
-      
-    //         if (typeof this.item.chartConfig === 'string') {
-    //           this.gridOptions = JSON.parse(this.item.chartConfig);
-    //         } else {
-    //           this.gridOptions = this.item.chartConfig; // Already an object
-    //         }
-    //     } else {
-    //         console.warn("⚠️ Either this.item is empty or this.liveDataChart is not an array.");
-    //     }
-    // } else {
-    //     console.log("❌ LiveDashboard is FALSE - Keeping original item.");
-    //     if (typeof this.item.highchartsOptionsJson === 'string') {
-    //       try {
-    //         this.chartOptions = JSON.parse(this.item.highchartsOptionsJson);
-         
-    //       } catch (error) {
-    //         console.error('Error parsing JSON:', error);
-    //       }
-    //     } else {
-    //       // If it's already an object, assign it directly
-    //       this.chartOptions = this.item.highchartsOptionsJson;
-    //       console.log('this.chartOptions from column', this.chartOptions);
-    //     }
-        
-  
-    //     if (typeof this.item.chartConfig === 'string') {
-    //       this.gridOptions = JSON.parse(this.item.chartConfig);
-    //     } else {
-    //       this.gridOptions = this.item.chartConfig; // Already an object
-    //     }
-    //     // Do nothing, retain the existing this.item as is
-    // }
-
-
-
-
-      
-      // console.log('this.gridOptions check', this.gridOptions);
      
-      // this.chartOptions.series = this.chartOptions.series.map((series: any) => {
-      //   return {
-      //     ...series,
-      //     data: series.data.map((value: any, index: number) => ({
-      //       y: value, 
-      //       name: series.name, 
-      //       customIndex: index, 
-      //       events: {
-      //         click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event),
-      //       },
-      //     })),
-      //   };
-      // });
-     
+      if(this.storeDrillFilter==undefined && this.DrillFilterLevel==undefined){
+        this.enableDrillButton = false
+      }
       this.tile1Config = this.item;
     
   }
@@ -390,6 +309,7 @@ export class StackedBarUiComponent {
     console.log('event check for stacked chart', event);
 
     if(this.isEditModeView==true){
+      this.enableDrillButton = true
 
 
       this.spinner.show('dataProcess' + index);
@@ -634,10 +554,20 @@ if(data){
       
     })
 
+    this.updateDrillButtonState();
+
     this.detectScreenSize()
   }
 
-  
+  updateDrillButtonState() {
+    // Check the initial state of storeDrillFilter and DrillFilterLevel
+    if (this.storeDrillFilter !== undefined && this.storeDrillFilter !== '' && 
+        this.DrillFilterLevel !== undefined && this.DrillFilterLevel !== '') {
+        this.enableDrillButton = true;
+    } else {
+        this.enableDrillButton = false;
+    }
+  }
   createStackedBarChart(chartdata?:any) {
 
     console.log(' Initializing Pie Chart for ', chartdata);

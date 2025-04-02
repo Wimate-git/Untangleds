@@ -69,7 +69,8 @@ aria-expanded="false"
 <div *ngIf="item.grid_type === 'Stackedchart'" 
      [id]="'pieChart' + (index + 1)"
      [style.width.px]="isMobile ? mobileChartWidth : chartWidth"
-     [style.height.px]="isMobile ? mobileChartHeight : chartHeight">
+     [style.height.px]="isMobile ? mobileChartHeight : chartHeight" [matTooltip]="!isEditModeView ? 'Double-click to edit widget' : null"
+     matTooltipPosition="above">
 </div>
 
 

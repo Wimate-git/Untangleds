@@ -221,7 +221,8 @@ validateAndSubmit() {
       DrillDownType: [''],
       dataLabelFontColor:[''],
       chartBackgroundColor1:[''],
-      chartBackgroundColor2:['']
+      chartBackgroundColor2:[''],
+      multiColorCheck: [true],
     });
   
     // Subscribe to DrillDownType changes
@@ -309,7 +310,8 @@ validateAndSubmit() {
   
     const newConditionGroup = this.fb.group({
       drillTypeFields: [fieldValue], // Ensure ngx-select control is properly initialized
-      drillTypeLabel:['']
+      drillTypeLabel:[''],
+      drillTypePrimary:[''],
     });
   
     conditionsArray.push(newConditionGroup);
@@ -394,8 +396,9 @@ validateAndSubmit() {
   
   createCondition(): FormGroup {
     return this.fb.group({
-      drillTypeFields: ['', Validators.required],
-      drillTypeLabel: ['', Validators.required]
+      drillTypeFields: [''],
+      drillTypeLabel: [''],
+      drillTypePrimary:[''],
     });
   }
   // Add a new constant form control
@@ -617,6 +620,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         dataLabelFontColor:this.createChart.value.dataLabelFontColor,
         chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
         chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
+        multiColorCheck:this.createChart.value.multiColorCheck ,
       };
   
       // Log the new tile object to verify it's being created correctly
@@ -716,7 +720,8 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         DrillDownType:this.createChart.value.DrillDownType ||'',
         dataLabelFontColor:this.createChart.value.dataLabelFontColor,
         chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
-        chartBackgroundColor2:this.createChart.value.chartBackgroundColor2
+        chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
+        multiColorCheck:this.createChart.value.multiColorCheck ||'',
 
 
       };
@@ -889,7 +894,8 @@ openChartModal2(tile: any, index: number): void {
       DrillDownType: tile.DrillDownType,
             dataLabelFontColor:tile.dataLabelFontColor,
       chartBackgroundColor1:tile.chartBackgroundColor1,
-      chartBackgroundColor2:tile.chartBackgroundColor2
+      chartBackgroundColor2:tile.chartBackgroundColor2,
+      multiColorCheck:tile.multiColorCheck ,
     });
 
     // ✅ Populate all_fields and drill_fields separately
@@ -956,8 +962,9 @@ repopulateDrill_fields(getValues: any): FormArray {
       conditions.forEach((condition: any) => {
         conditionArray.push(
           this.fb.group({
-            drillTypeFields: [condition.drillTypeFields || '', Validators.required],
-            drillTypeLabel: [condition.drillTypeLabel || '', Validators.required]
+            drillTypeFields: [condition.drillTypeFields || ''],
+            drillTypeLabel: [condition.drillTypeLabel || ''],
+            drillTypePrimary:[condition.drillTypePrimary ||''],
           })
         );
       });

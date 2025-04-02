@@ -95,22 +95,32 @@
                 
                 [style.height.px]="item.grid_type === 'chart' ? 300 : null" 
                 [style.width.px]="item.grid_type === 'chart' ? 400 : null" 
-                (click)="
-                item.grid_type === 'filterTile' ? justReadStyles(item, i) :
-                item.grid_type === 'tile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,dataTableModalTile1) : null) :
-                item.grid_type === 'tile2' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,dataTableModalTile2) : null) :
-
-              item.grid_type === 'dynamicTile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,dataTableModalDynamicTile) : null) :
-              item.grid_type === 'title' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,TitleModal) : null) :
-              item.grid_type === 'progressTile' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,'') : null) :
-              item.grid_type === 'tileWithIcon' ? (isEditModeView && !hideButton ? invokeHelperDashboard(item, i, modalContent,'') : null) :
-              
-                null
+                (click)="handleClick(item, i, $event)"
+                (dblclick)="
+                item.grid_type === 'tile' 
+                  ? (!isEditModeView ? helperEditModalOpen(item, i, KPIModal) : null) 
+                  : item.grid_type === 'dynamicTile' 
+                    ? (!isEditModeView && !hideButton ? helperEditModalOpen(item, i, DynamicTileModal) : null) 
+                    :    item.grid_type === 'tile2' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, KPIModal1) : null): item.grid_type === 'title' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, TitleModal) : null):item.grid_type === 'tileWithIcon' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, tileWithIconModal) : null):item.grid_type === 'progressTile' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, ProgressTileModal) : null):item.grid_type === 'chart' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, ChartModal1) : null):item.grid_type === 'Linechart' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, ChartModal2) : null):item.grid_type === 'Columnchart' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, ChartModal3) : null):item.grid_type === 'Funnelchart' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, FunnelChartModal) : null):item.grid_type === 'Piechart' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, pieChartModal) : null):item.grid_type === 'Stackedchart' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, stackedBarChartModal) : null): null
               "
+              
+              
+              
+              
               >
-          
+
          
-                  <div *ngIf="item.grid_type === 'tile'">
+                  <div *ngIf="item.grid_type === 'tile'" >
                     <app-tile-ui1 
                       [item]="item" 
                       [index]="i" 

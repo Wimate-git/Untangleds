@@ -1744,9 +1744,9 @@ selectFormParams1(event: any[], index: number): void {
   SelectTypeSummary =[
     { value: 'NewTab', text: 'New Tab' },
     { value: 'Modal', text: 'Modal(Pop Up)' },
-    { value: 'Same page Redirect', text: 'Same page Redirect' },
+    { value: 'Same page Redirect', text: 'Same Page Redirect' },
 
-    { value: 'drill down', text: 'drill down' },
+    { value: 'drill down', text: 'Drill Down' },
   ]
   onValueChange(selectedValue: any): void {
     // Handle any logic here if needed when the value changes

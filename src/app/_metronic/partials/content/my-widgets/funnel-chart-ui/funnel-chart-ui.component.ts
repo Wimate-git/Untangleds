@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -24,7 +24,8 @@ interface CustomPoint {
   selector: 'app-funnel-chart-ui',
 
   templateUrl: './funnel-chart-ui.component.html',
-  styleUrl: './funnel-chart-ui.component.scss'
+  styleUrl: './funnel-chart-ui.component.scss',
+  encapsulation: ViewEncapsulation.None 
 })
 export class FunnelChartUiComponent implements OnChanges,OnInit{
   chartOptions: any;
@@ -70,6 +71,7 @@ export class FunnelChartUiComponent implements OnChanges,OnInit{
   parseChartData: any;
   storeDrillConfig: any;
   isLoading = false;
+  enableDrillButton: boolean;
   
   
 ngOnChanges(changes: SimpleChanges): void {
@@ -88,7 +90,9 @@ ngOnChanges(changes: SimpleChanges): void {
 
     console.log('this.storeDrillPacket checking',this.storeDrillPacket )
     this.storeRedirectionCheck = this.item.toggleCheck
-
+    if(this.storeDrillFilter==undefined && this.DrillFilterLevel==undefined){
+      this.enableDrillButton = false
+    }
    
 
     this.tile1Config = this.item;
@@ -98,7 +102,7 @@ onBarClick(event: Highcharts.PointClickEventObject, index: any): void {
   console.log('index checking from toggle', index);
 
   if(this.isEditModeView==true){
-
+    this.enableDrillButton = true
 
     this.spinner.show('dataProcess' + index);
 
@@ -349,9 +353,23 @@ if(data){
       
     })
 
+
+    this.updateDrillButtonState();
+
+
     this.detectScreenSize()
   }
 
+
+  updateDrillButtonState() {
+    // Check the initial state of storeDrillFilter and DrillFilterLevel
+    if (this.storeDrillFilter !== undefined && this.storeDrillFilter !== '' && 
+        this.DrillFilterLevel !== undefined && this.DrillFilterLevel !== '') {
+        this.enableDrillButton = true;
+    } else {
+        this.enableDrillButton = false;
+    }
+  }
   
   createFunnelChart(chartdata?:any) {
 
@@ -459,6 +477,7 @@ console.log('this.gridOptions checking from chart',this.gridOptions)
     console.log('this.DrillFilterLevel checking from initial',this.DrillFilterLevel)
     if(this.storeDrillFilter !== undefined && this.storeDrillFilter !== '' && 
       this.DrillFilterLevel !== undefined && this.DrillFilterLevel !== ''){
+        this.enableDrillButton = true
   
       this.spinner.show('dataProcess' + index);
   
@@ -543,6 +562,8 @@ console.log('this.gridOptions checking from chart',this.gridOptions)
               }
             );
   
+    }else{
+      this.enableDrillButton = false
     }
   
   

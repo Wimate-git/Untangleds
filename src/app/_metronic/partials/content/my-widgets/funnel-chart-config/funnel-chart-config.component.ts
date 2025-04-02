@@ -1549,15 +1549,15 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     { value: 'Count', text: 'Count' },
     // { value: 'Count_Multiple', text: 'Count Multiple' },
     // { value: 'Count Dynamic', text: 'Count Dynamic' },
-    { value: 'Count MultiplePram', text: 'Count Multiple Parameter' },
-    { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
-    { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
+    // { value: 'Count MultiplePram', text: 'Count Multiple Parameter' },
+    // { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
+    // { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
     { value: 'sumArray', text: 'SumArray' },
-    { value: 'Advance Equation', text: 'Advance Equation' },
-    { value: 'sum_difference', text: 'Sum Difference' },
-    { value: 'distance_sum', text: 'Distance Sum' },
-    { value: 'Count Multiple Minitable', text: 'Count Multiple Minitable' },
-    {value:'Avg_Utilization_wise_multiple',text:'Avg_Utilization_wise_multiple'}
+    // { value: 'Advance Equation', text: 'Advance Equation' },
+    // { value: 'sum_difference', text: 'Sum Difference' },
+    // { value: 'distance_sum', text: 'Distance Sum' },
+    // { value: 'Count Multiple Minitable', text: 'Count Multiple Minitable' },
+    // {value:'Avg_Utilization_wise_multiple',text:'Avg_Utilization_wise_multiple'}
     
     
 

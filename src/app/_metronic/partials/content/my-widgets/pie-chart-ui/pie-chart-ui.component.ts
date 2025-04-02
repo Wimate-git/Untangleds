@@ -67,6 +67,7 @@ export class PieChartUiComponent implements OnChanges,OnInit{
   storeDrillPacket: any;
   isDrillPacketAvailable: any;
   storeRedirectionCheck: any;
+  enableDrillButton: boolean;
   
 ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui', this.all_Packet_store);
@@ -80,84 +81,10 @@ ngOnChanges(changes: SimpleChanges): void {
     console.log('this.storeDrillPacket checking',this.storeDrillPacket )
     this.isDrillPacketAvailable = this.storeDrillPacket && this.storeDrillPacket.length > 0;
     this.storeRedirectionCheck = this.item.toggleCheck
-
-    // if (this.item && this.liveDataChart !== undefined) {
-    //     console.log("✅ LiveDashboard is TRUE - Updating highchartsOptionsJson & chartConfig...");
-
-    //     if (this.item && this.liveDataChart && Array.isArray(this.liveDataChart)) {
-    //         // Find the matching packet from this.liveDataChart based on id
-    //         const matchingLiveChart = this.liveDataChart.find(liveChart => liveChart.id === this.item.id);
-    //         console.log('🔍 Matching Live Chart for ID:', this.item.id, matchingLiveChart);
-
-    //         if (matchingLiveChart) {
-    //             console.log("✅ Chart Config Found for this.item.id:", this.item.id);
-    //             this.item.highchartsOptionsJson = matchingLiveChart.highchartsOptionsJson;
-    //             this.item.chartConfig = matchingLiveChart.chartConfig;
-
-    //             try {
-    //                 // Parse highchartsOptionsJson if it's a string
-    //                 this.chartOptions = typeof this.item.highchartsOptionsJson === 'string'
-    //                     ? JSON.parse(this.item.highchartsOptionsJson)
-    //                     : this.item.highchartsOptionsJson;
-
-    //                 console.log('this.chartOptions:', this.chartOptions);
-
-    //                 // Ensure allChartsData[this.index] exists
-    //                 if (!this.allChartsData[this.index]) {
-    //                     this.allChartsData[this.index] = { chartInstance: null, chartOptions: {} };
-    //                 }
-
-    //                 // If chartInstance exists, update it
-    //                 if (this.allChartsData[this.index].chartInstance) {
-    //                     console.log(`🔄 Updating chart instance for index ${this.index}`);
-    //                     this.allChartsData[this.index].chartInstance.update(this.chartOptions, true, true);
-    //                 } else {
-    //                     console.warn(`⚠️ No existing chart instance for index ${this.index}, waiting for initialization.`);
-    //                     this.allChartsData[this.index].chartOptions = this.chartOptions;
-    //                 }
-    //             } catch (error) {
-    //                 console.error('❌ Error parsing highchartsOptionsJson:', error);
-    //             }
-
-    //             try {
-    //                 // Parse chartConfig if it's a string
-    //                 this.gridOptions = typeof this.item.chartConfig === 'string'
-    //                     ? JSON.parse(this.item.chartConfig)
-    //                     : this.item.chartConfig;
-
-    //                 console.log('this.gridOptions:', this.gridOptions);
-    //             } catch (error) {
-    //                 console.error('❌ Error parsing chartConfig:', error);
-    //             }
-    //         } else {
-    //             console.warn("⚠️ No matching chart configuration found for this.item.id:", this.item.id);
-    //         }
-    //     } else {
-    //         console.warn("⚠️ Either this.item is empty or this.liveDataChart is not an array.");
-    //     }
-    // } else {
-    //     console.log("❌ LiveDashboard is FALSE - Keeping original item.");
-    //     try {
-    //         this.chartOptions = typeof this.item.highchartsOptionsJson === 'string'
-    //             ? JSON.parse(this.item.highchartsOptionsJson)
-    //             : this.item.highchartsOptionsJson;
-    //         console.log('this.chartOptions else condition', this.chartOptions);
-    //     } catch (error) {
-    //         console.error('❌ Error parsing JSON:', error);
-    //     }
-
-    //     try {
-    //         this.gridOptions = typeof this.item.chartConfig === 'string'
-    //             ? JSON.parse(this.item.chartConfig)
-    //             : this.item.chartConfig;
-    //     } catch (error) {
-    //         console.error('❌ Error parsing JSON:', error);
-    //     }
-    // }
-
-    // console.log('this.chartOptions check before live', this.chartOptions);
-    // console.log('this.gridOptions check', this.gridOptions);
-
+    if(this.storeDrillFilter==undefined && this.DrillFilterLevel==undefined){
+      this.enableDrillButton = false
+    }
+   
     this.tile1Config = this.item;
 }
 
@@ -169,6 +96,18 @@ ngOnChanges(changes: SimpleChanges): void {
 
   
 
+  }
+
+
+
+  updateDrillButtonState() {
+    // Check the initial state of storeDrillFilter and DrillFilterLevel
+    if (this.storeDrillFilter !== undefined && this.storeDrillFilter !== '' && 
+        this.DrillFilterLevel !== undefined && this.DrillFilterLevel !== '') {
+        this.enableDrillButton = true;
+    } else {
+        this.enableDrillButton = false;
+    }
   }
   @Input() item:any
   @Input() index:any
@@ -266,6 +205,8 @@ if(data){
       
       
     })
+
+    this.updateDrillButtonState();
 
     this.detectScreenSize()
   }
@@ -379,6 +320,7 @@ console.log('this.gridOptions checking from chart',this.gridOptions)
     console.log('this.DrillFilterLevel checking from initial',this.DrillFilterLevel)
     if(this.storeDrillFilter !== undefined && this.storeDrillFilter !== '' && 
       this.DrillFilterLevel !== undefined && this.DrillFilterLevel !== ''){
+        this.enableDrillButton = true
   
       this.spinner.show('dataProcess' + index);
   
@@ -463,6 +405,8 @@ console.log('this.gridOptions checking from chart',this.gridOptions)
               }
             );
   
+    }else{
+      this.enableDrillButton = false
     }
   
   
@@ -475,6 +419,7 @@ console.log('this.gridOptions checking from chart',this.gridOptions)
   onBarClick(event: Highcharts.PointClickEventObject,index:any): void {
     console.log('event check for donut chart', event);
   if(this.isEditModeView==true){
+    this.enableDrillButton = true
     console.log('i am in editmode',this.isEditModeView)
     this.spinner.show('dataProcess' + index);
     console.log('Bar clicked:', {

@@ -1,5 +1,6 @@
 
-<div *ngIf="item.grid_type === 'TableWidget'">
+<div *ngIf="item.grid_type === 'TableWidget'" [matTooltip]="!isEditModeView ? 'Double-click to edit widget' : null"
+matTooltipPosition="above">
     <div 
          tabindex="0"
        

@@ -986,9 +986,9 @@ generateUniqueId(): number {
     { value: 'Count', text: 'Count' },
     // { value: 'Count Dynamic', text: 'Count Dynamic' },
     { value: 'Equation', text: 'Equation' },
-    { value: 'Count MultiplePram', text: 'Count Multiple Parameter' },
-    { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
-    { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
+    // { value: 'Count MultiplePram', text: 'Count Multiple Parameter' },
+    // { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
+    // { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
     { value: 'sumArray', text: 'SumArray' },
     { value: 'Advance Equation', text: 'Advance Equation' },
     { value: 'sum_difference', text: 'Sum Difference' },
@@ -1059,9 +1059,9 @@ generateUniqueId(): number {
   SelectTypeSummary =[
     { value: 'NewTab', text: 'New Tab' },
     { value: 'Modal', text: 'Modal(Pop Up)' },
-    { value: 'Same page Redirect', text: 'Same page Redirect' },
+    { value: 'Same page Redirect', text: 'Same Page Redirect' },
 
-    { value: 'drill down', text: 'drill down' },
+    { value: 'drill down', text: 'Drill Down' },
   ]
   fetchDynamicFormData(value: any) {
     console.log("Data from lookup:", value);

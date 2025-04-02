@@ -4,7 +4,7 @@ style="position: absolute; top: 10px; right: 10px; gap: 10px;z-index: 50;">
 
 
 <button 
-  *ngIf="isEditModeView && isDrillPacketAvailable"
+  *ngIf="isEditModeView && isDrillPacketAvailable && enableDrillButton"
   class="mat-icon-button btn btn-primary btn-icon btn-custom btn-active-light btn-active-color-primary w-50px h-30px w-md-40px h-md-30px mb-4"
   style="transition: background-color 0.3s ease;margin-top: -2px;" 
   (click)="toggleCheck(true,index)"
@@ -14,7 +14,7 @@ style="position: absolute; top: 10px; right: 10px; gap: 10px;z-index: 50;">
 </button>
 
 <button 
-*ngIf="isEditModeView && isDrillPacketAvailable"
+*ngIf="isEditModeView && isDrillPacketAvailable && enableDrillButton"
   class="mat-icon-button btn btn-success btn-icon btn-custom btn-active-light btn-active-color-primary w-50px h-30px w-md-40px h-md-30px mb-4" 
   style="transition: background-color 0.3s ease;margin-top: -2px;" 
   (click)="homeCheck(true,index)"
@@ -69,7 +69,9 @@ aria-expanded="false"
 <div *ngIf="item.grid_type === 'Funnelchart'" 
      [id]="'funnelChart' + (index + 1)"
      [style.width.px]="isMobile ? mobileChartWidth : chartWidth"
-     [style.height.px]="isMobile ? mobileChartHeight : chartHeight">
+     [style.height.px]="isMobile ? mobileChartHeight : chartHeight"      [matTooltip]="!isEditModeView ? 'Double-click to edit widget' : null"
+     matTooltipPosition="above"
+     >
 </div>
 
 <ngx-spinner 

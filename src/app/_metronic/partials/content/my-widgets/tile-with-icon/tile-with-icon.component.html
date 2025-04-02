@@ -230,81 +230,49 @@
               <label for="timeInput" class="col-form-label fw-bold fs-6 ">From Time</label>
 <input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"     formControlName="selectFromTime">
               </div>
-              <div class="col-md-4 mb-3">
-                <label for="timeInput" class="col-form-label fw-bold fs-6 ">To Time</label>
-<input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"     formControlName="selectToTime">
-                </div>
-
-
-                <div class="col-md-4 mb-3">
-                  <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Module Names</label>
-                  <ngx-select
-                
-                    [allowClear]="true"
-                    formControlName="ModuleNames"
-                    [items]="showModuleNames"
-                    optionValueField="value"
-                    optionTextField="text"
-                    placeholder="Select Parameter"
-                    (selectionChanges)="moduleSelection($event)"
-                
-                    style="width: 100%;">
-                  </ngx-select>
-                </div>
-
-
-
-                <div class="col-md-4 mb-3">
-                  <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Redirect To</label>
-                  <ngx-select
-                 
-                    [allowClear]="true"
-                    formControlName="dashboardIds"
-                    [items]="dynamicIDArray"
-                    optionValueField="value"
-                    optionTextField="text"
-                    placeholder="Select Parameter"
-                    (selectionChanges)="dynamicRedirectChanged($event)"
-                
-                    style="width: 100%;">
-                  </ngx-select>
-                </div>
-                <div class="row g-3 align-items-center">
-                  <!-- Select Type -->
-                  <div class="col-md-4">
-                    <div class="d-flex flex-column">
-                      <label for="dashboardIds" class="col-form-label fw-bold fs-6">Select Type</label>
-                      <ngx-select
-                        id="selectType"
-                        [allowClear]="true"
-                        formControlName="selectType"
-                        [items]="SelectTypeSummary"
-                        optionValueField="value"
-                        optionTextField="text"
-                        placeholder="Select Parameter"
-                        (change)="onSelectTypeChange()"
-                      >
-                      </ngx-select>
-                    </div>
+              <div class="row g-3 align-items-center">
+                <div class="col-md-3 mb-3">
+                  <label for="timeInput" class="col-form-label fw-bold fs-6 ">To Time</label>
+  <input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"     formControlName="selectToTime">
                   </div>
+  
+  
+                  <div class="col-md-3 mb-3">
+                    <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Module Names</label>
+                    <ngx-select
                   
-                  <!-- Column Visibility (Shown only if 'drill down' is selected) -->
-                  <div class="col-md-4" style="margin-top:30px;" *ngIf="showColumnVisibility">
-                    <div class="d-flex flex-column">
-                      <label for="columnVisibility" class="fw-bold fs-6">Column Visibility</label>
-                      <p-multiSelect
-                        id="columnVisibility"
-                        formControlName="columnVisibility"
-                        [options]="columnVisisbilityFields"
-                        optionLabel="text"
-                        placeholder="Select Parameter"
-                      >
-                      </p-multiSelect>
-                    </div>
+                      [allowClear]="true"
+                      formControlName="ModuleNames"
+                      [items]="showModuleNames"
+                      optionValueField="value"
+                      optionTextField="text"
+                      placeholder="Select Parameter"
+                      (selectionChanges)="moduleSelection($event)"
+                  
+                      style="width: 100%;">
+                    </ngx-select>
                   </div>
-                
-       
-                  <div class="col-md-4">
+  
+  
+  
+                  <div class="col-md-3 mb-3">
+                    <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Redirect To</label>
+                    <ngx-select
+                   
+                      [allowClear]="true"
+                      formControlName="dashboardIds"
+                      [items]="dynamicIDArray"
+                      optionValueField="value"
+                      optionTextField="text"
+                      placeholder="Select Parameter"
+                      (selectionChanges)="dynamicRedirectChanged($event)"
+                  
+                      style="width: 100%;">
+                    </ngx-select>
+                  </div>
+  
+  
+                  <div class="col-md-3">
                     <div class="d-flex flex-column">
                       <label for="custom_Label" class="col-form-label fw-bold fs-6 required">Custom Label</label>
                       <input
@@ -322,8 +290,47 @@
 
 
 
-                </div>
-                <div class="col-md-4 mb-3">
+
+              </div>
+
+                <div class="row g-3 align-items-center">
+                  <!-- Select Type -->
+                  <div class="col-md-3">
+                    <div class="d-flex flex-column">
+                      <label for="dashboardIds" class="col-form-label fw-bold fs-6">Select Type</label>
+                      <ngx-select
+                        id="selectType"
+                        [allowClear]="true"
+                        formControlName="selectType"
+                        [items]="SelectTypeSummary"
+                        optionValueField="value"
+                        optionTextField="text"
+                        placeholder="Select Parameter"
+                        (change)="onSelectTypeChange()"
+                      >
+                      </ngx-select>
+                    </div>
+                  </div>
+                  
+                  <!-- Column Visibility (Shown only if 'drill down' is selected) -->
+                  <div class="col-md-3" style="margin-top:30px;" *ngIf="showColumnVisibility">
+                    <div class="d-flex flex-column">
+                      <label for="columnVisibility" class="fw-bold fs-6">Column Visibility</label>
+                      <p-multiSelect
+                        id="columnVisibility"
+                        formControlName="columnVisibility"
+                        [options]="columnVisisbilityFields"
+                        optionLabel="text"
+                        placeholder="Select Parameter"
+                      >
+                      </p-multiSelect>
+                    </div>
+                  </div>
+                
+       
+
+
+                  <div class="col-md-3 mb-3">
                     <label for="parameterName" class="col-form-label fw-bold fs-6 required">Icon</label>
                     <ngx-select
                       id="parameterName"
@@ -340,9 +347,7 @@
                       <div *ngIf="createKPIWidget.get('iconList')?.errors?.required">Icon is required.</div>
                     </div>
                   </div>
-
-
-                  <div class="col-md-6 mb-3">
+                  <div class="col-md-3 mb-3">
                     <label for="IconfontSize" class="col-form-label fw-bold fs-6 required">Icon Font Size</label>
                     <input
                       id="IconfontSize"
@@ -356,6 +361,13 @@
                         Font size must be between 8 and 72.
                       </div>
                   </div>
+
+
+
+                </div>
+
+
+
                 
                 <div class="col-md-4 mb-3" *ngIf = "shoRowData" >
                   <label for="constant" class="col-form-label fw-bold fs-6 "></label>

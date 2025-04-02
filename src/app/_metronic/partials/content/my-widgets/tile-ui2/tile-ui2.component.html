@@ -3,8 +3,11 @@
   [style.width]="tile2Width" [style.height]="tile2Height">
     <div class="grid-item"
          tabindex="0"
-         [style.background]="item.themeColor"
+     
          style="padding: 20px; position: relative; border-radius: 8px; transition: all 0.3s ease-in-out;"
+
+         [matTooltip]="!isEditModeView ? 'Double-click to edit widget' : null"
+matTooltipPosition="above"
        >
        <div class="row text_3d" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <!-- Parameter Name -->

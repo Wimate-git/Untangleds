@@ -66,6 +66,7 @@ export class ChartUi3Component implements OnInit{
   storeRedirectionCheck: any;
   isDrillPacketAvailable: any;
   disable: boolean = false;
+  enableDrillButton: boolean;
   toggleCheck(isChecked: boolean,index:any) {
     this.isChecked = isChecked;
     console.log('this.isChecked checking', this.isChecked);
@@ -73,6 +74,7 @@ export class ChartUi3Component implements OnInit{
     console.log('this.DrillFilterLevel checking from initial',this.DrillFilterLevel)
     if(this.storeDrillFilter !== undefined && this.storeDrillFilter !== '' && 
       this.DrillFilterLevel !== undefined && this.DrillFilterLevel !== ''){
+        this.enableDrillButton = true
   
       this.spinner.show('dataProcess' + index);
   
@@ -157,6 +159,10 @@ export class ChartUi3Component implements OnInit{
               }
             );
   
+    }else{
+      
+      this.enableDrillButton = false
+
     }
   
   
@@ -288,6 +294,11 @@ export class ChartUi3Component implements OnInit{
       console.log('liveDataColumnChart check',this.liveDataColumnChart)
       console.log('eventFilterConditions chart ui1',this.eventFilterConditions)
       console.log('this.storeDrillFilter checking',this.storeDrillFilter)
+      console.log('this.storeDrillFilter  checking from ngOnChanges',this.storeDrillFilter )
+      console.log('this.DrillFilterLevel checking from ngOnChanges',this.DrillFilterLevel)
+      if(this.storeDrillFilter==undefined && this.DrillFilterLevel==undefined){
+        this.enableDrillButton = false
+      }
       // this.parseChartOptions = this.item.highchartsOptionsJson;
       // console.log('this.parseChartOptions checking',this.parseChartOptions)
       // const check = JSON.parse(this.parseChartOptions);
@@ -390,6 +401,7 @@ export class ChartUi3Component implements OnInit{
 
     if(this.isEditModeView==true){
 
+      this.enableDrillButton = true
 
       this.spinner.show('dataProcess' + index);
 
@@ -611,6 +623,9 @@ export class ChartUi3Component implements OnInit{
 
   ngOnInit(){
     console.log('item chacke',this.item.grid_details)
+
+
+
     this.summaryService.lookUpData$.subscribe((data: any) => {
       console.log('data check from chart3', data);
     
@@ -661,6 +676,8 @@ if(data){
       
     })
 
+    this.updateDrillButtonState();
+
     this.detectScreenSize()
   }
 createColumnChart(columnChartData?:any){
@@ -704,6 +721,16 @@ createColumnChart(columnChartData?:any){
   }
 
 
+}
+
+updateDrillButtonState() {
+  // Check the initial state of storeDrillFilter and DrillFilterLevel
+  if (this.storeDrillFilter !== undefined && this.storeDrillFilter !== '' && 
+      this.DrillFilterLevel !== undefined && this.DrillFilterLevel !== '') {
+      this.enableDrillButton = true;
+  } else {
+      this.enableDrillButton = false;
+  }
 }
 
 helperDashboard(item:any,index:any,modalContent:any,selectType:any){

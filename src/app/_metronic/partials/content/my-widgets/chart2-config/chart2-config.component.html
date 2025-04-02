@@ -3,7 +3,7 @@
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
   </div>
   <div class="container" *ngIf="createChart">
-    <div class="row">
+    <div class="row mb-3">
       <div class="col-md-6" [formGroup]="createChart">
         <label class="col-lg-12 col-form-label fw-bold fs-6 required">Parameters
         </label>
@@ -33,8 +33,23 @@
     </div>
 
     <div class="row mb-3">
+      <div class="col-md-3 mb-3">
+        <div class="form-check form-switch">
+          <label for="multiColorCheck" class="col-lg-12 col-form-label fw-bold fs-6 mt-7">
+            Enable Multi Color
+          </label>
+          <input
+            class="form-check-input mt-10 mb-3 mb-lg-0"
+            type="checkbox"
+            formControlName="multiColorCheck"
+            id="multiColorCheck"
+            [checked]="createChart.get('multiColorCheck')?.value"
+    
+          />
+        </div>
+      </div>
 
-      <div class="col-md-4 mb-3" [formGroup]="createChart">
+      <div class="col-md-3 mb-3" [formGroup]="createChart">
         <div class="color-picker-container d-flex align-items-center">
           <label for="textColorPicker" class="col-form-label fw-bold fs-6">Data Label Font Color</label>
           <input
@@ -46,7 +61,7 @@
           />
         </div>
       </div>
-      <div class="col-md-4 mb-3" [formGroup]="createChart">
+      <div class="col-md-3 mb-3" [formGroup]="createChart">
         <div class="color-picker-container d-flex align-items-center">
           <label for="textColorPicker" class="col-form-label fw-bold fs-6 mb-0 me-2">Chart Background From Color</label>
           <input
@@ -59,7 +74,7 @@
         </div>
       </div>
       
-      <div class="col-md-4 mb-3" [formGroup]="createChart">
+      <div class="col-md-3 mb-3" [formGroup]="createChart">
         <div class="color-picker-container d-flex align-items-center">
           <label for="textColorPicker" class="col-form-label fw-bold fs-6">Chart Background To Color</label>
           <input
@@ -511,6 +526,16 @@
         
         <!-- Form Row: Select Field, Custom Label, and Remove Button on the same row -->
         <div class="row g-3 align-items-center" style="border: 2px solid rgb(157, 159, 159); padding: 10px; margin: 5px; border-radius: 5px;">
+          <div class="col-md-4">
+            <label for="drillTypeLabel" class="col-form-label fw-bold fs-6 required">Custom Label</label>
+            <input
+              type="text"
+              class="form-control form-control-solid"
+              id="drillTypeLabel"
+              name="drillTypeLabel"
+              formControlName="drillTypeLabel"
+            />
+          </div>
           
           <!-- Select Field -->
           <div class="col-md-4">
@@ -525,15 +550,21 @@
           </div>
 
           <!-- Custom Label -->
-          <div class="col-md-4">
-            <label for="drillTypeLabel" class="col-form-label fw-bold fs-6 required">Custom Label</label>
-            <input
-              type="text"
-              class="form-control form-control-solid"
-              id="drillTypeLabel"
-              name="drillTypeLabel"
-              formControlName="drillTypeLabel"
-            />
+
+          <div class="col-md-4 mb-3">
+            <label for="primaryValue" class="col-form-label fw-bold fs-6 required">
+              Primary Value
+              <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top"
+                title="Show Value As">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+            </label>
+            <ngx-select id="primaryValue" [allowClear]="true" formControlName="drillTypePrimary"
+              [items]="showValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
+              (selectionChanges)="onValueChange($event)" class="w-100"></ngx-select>
+              <div *ngIf="field.get('primaryValue')?.touched && field.get('primaryValue')?.invalid" class="text-danger">
+                <div *ngIf="field.get('primaryValue')?.errors?.required">Primary Value is required.</div>
+              </div>
           </div>
 
           <!-- Remove Condition Button -->

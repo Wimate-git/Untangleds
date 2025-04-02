@@ -1,6 +1,7 @@
 <div style="padding-left: 5%; padding-right: 5%; z-index: -1;" *ngIf="item.grid_type === 'tileWithIcon'">
     <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between;"
-         [style.width]="tileWidth" [style.height]="tileHeight">
+         [style.width]="tileWidth" [style.height]="tileHeight" [matTooltip]="!isEditModeView ? 'Double-click to edit widget' : null"
+         matTooltipPosition="above">
   
       <!-- Icon Section (Left) -->
    

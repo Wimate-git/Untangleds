@@ -472,9 +472,9 @@ async moduleSelection(event: any): Promise<void> {
 SelectTypeSummary =[
   { value: 'NewTab', text: 'New Tab' },
   { value: 'Modal', text: 'Modal(Pop Up)' },
-  { value: 'Same page Redirect', text: 'Same page Redirect' },
+  { value: 'Same page Redirect', text: 'Same Page Redirect' },
 
-  { value: 'drill down', text: 'drill down' },
+  { value: 'drill down', text: 'Drill Down' },
 ]
 async dynamicData(){
   try {

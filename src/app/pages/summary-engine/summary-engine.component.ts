@@ -940,6 +940,8 @@ Highcharts.chart('MixedChart', barchartOptions);
 
   }
 
+  
+
 
   tooltip: string | null = null;
   chartType: string = 'solidgauge';
@@ -1393,6 +1395,70 @@ Highcharts.chart('MixedChart', barchartOptions);
 
 
     
+  }
+  @ViewChild('KPIModal', { static: false }) KPIModal: TemplateRef<any>;
+  @ViewChild('KPIModal1', { static: false }) KPIModal1: TemplateRef<any>;
+  @ViewChild('DynamicTileModal', { static: false }) DynamicTileModal: TemplateRef<any>;
+  @ViewChild('dataTableModalTile1', { static: false }) dataTableModalTile1: TemplateRef<any>;
+  @ViewChild('dataTableModalTile2', { static: false }) dataTableModalTile2: TemplateRef<any>;
+  @ViewChild('dataTableModalDynamicTile', { static: false }) dataTableModalDynamicTile: TemplateRef<any>;
+  @ViewChild('TitleModal', { static: false }) TitleModal: TemplateRef<any>;
+  handleClick(item: any, i: number, $event: any) {
+    console.log('item is checking from handleclick',item)
+    console.log('index is checking from i',i)
+    if (item.grid_type === 'filterTile') {
+      this.justReadStyles(item, i);
+    } else if (item.grid_type === 'tile') {
+      if (this.isEditModeView && !this.hideButton) {
+        this.invokeHelperDashboard(item, i, this.modalContent, this.dataTableModalTile1);
+      } 
+      // else if (!this.isEditModeView) {
+      //   console.log('i am triggering helperTile')
+      //   // this.helperTile($event, this.KPIModal);
+      //   this.helperEditModalOpen(item,i,this.KPIModal)
+      // }
+    } else if (item.grid_type === 'tile2') {
+      if (this.isEditModeView && !this.hideButton) {
+        this.invokeHelperDashboard(item, i, this.modalContent, this.dataTableModalTile2);
+      } 
+      
+      // else if (!this.isEditModeView) {
+      //   console.log('i am triggering helperTile')
+      //   // this.helperTile($event, this.KPIModal);
+      //   this.helperEditModalOpen(item,i,this.KPIModal1)
+      // }
+    } else if (item.grid_type === 'dynamicTile') {
+      if (this.isEditModeView && !this.hideButton) {
+        this.invokeHelperDashboard(item, i, this.modalContent, this.dataTableModalDynamicTile);
+      }
+      // else if (!this.isEditModeView) {
+      //   console.log('i am triggering helperTile')
+      //   // this.helperTile($event, this.KPIModal);
+      //   this.helperEditModalOpen(item,i,this.DynamicTileModal)
+      // }
+    } else if (item.grid_type === 'title') {
+      if (this.isEditModeView && !this.hideButton) {
+        this.invokeHelperDashboard(item, i, this.modalContent, this.TitleModal);
+      }
+    } else if (item.grid_type === 'progressTile') {
+      if (this.isEditModeView && !this.hideButton) {
+        this.invokeHelperDashboard(item, i, this.modalContent, '');
+      }
+    } 
+    
+    else if (item.grid_type === 'tileWithIcon') {
+      if (this.isEditModeView && !this.hideButton) {
+        this.invokeHelperDashboard(item, i, this.modalContent, '');
+      }
+      
+
+    }
+
+    else if(item.grid_type === 'chart'){
+
+    }
+
+
   }
   
   setFullscreen(): void {
@@ -2470,6 +2536,18 @@ exitFullScreen(): void {
         );
       }
       else if (item.grid_type === 'Piechart') {
+        const baseHeight = 400; // Base height for the chart
+        // const extraHeight = 40; // Additional height for labels, etc.
+  
+        this.chartHeight[index] = Math.max(0, itemComponentHeight); // Adjust height
+        this.chartWidth[index] = Math.max(0, itemComponentWidth);
+  
+        console.log(
+          `Updated chart dimensions at index ${index}:`,
+          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        );
+      }
+      else if (item.grid_type === 'Stackedchart') {
         const baseHeight = 400; // Base height for the chart
         // const extraHeight = 40; // Additional height for labels, etc.
   
@@ -4442,6 +4520,7 @@ justReadStyles(data:any,index:any){
   }
 
   helperTile(event: any, KPIModal: TemplateRef<any>) {
+    console.log('event checking from helperTile',event)
     console.log('KPIModal check',KPIModal)
 
 
@@ -4658,6 +4737,7 @@ justReadStyles(data:any,index:any){
 
     }
     else if(event.arg1.grid_type=='dynamicTile'){
+
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
       console.log('event check dynamic tile', event)
     
@@ -4710,8 +4790,162 @@ justReadStyles(data:any,index:any){
     
 
     
+
+    
     }
 
+    helperEditModalOpen(argument1:any,argument2:any,modalReference: TemplateRef<any>){
+      console.log('i am entered to tile 1 edit modal')
+      if(argument1.grid_type=='tile'){
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+  
+      
+        // Access the component instance and trigger `openKPIModal`
+        setTimeout(() => {
+         
+          this.tileConfig1Component.openKPIModal(argument1, argument2);
+        }, 500);
+      }
+      else if(argument1.grid_type=='tile2'){
+        console.log('modal check',modalReference)
+      this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      console.log('event check', event)
+      setTimeout(() => {
+        this.tileConfig2Component.openKPIModal1(argument1, argument2)
+      }, 500);
+
+      }
+
+      else if (argument1.grid_type=='dynamicTile'){
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      console.log('event check dynamic tile', event)
+    
+      // Access the component instance and trigger `openKPIModal`
+      setTimeout(() => {
+       
+        this.DynamicTileConfigComponent.openDynamicTileModal(argument1, argument2);
+      }, 500);
+        
+      }
+
+      else if(argument1.grid_type=='title'){
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        console.log('event check dynamic tile', event)
+      
+        // Access the component instance and trigger `openKPIModal`
+        setTimeout(() => {
+         
+          this.titleConfigComponent.openTitleModal(argument1, argument2);
+        }, 500);
+      }
+
+
+
+      else if(argument1.grid_type=='tileWithIcon'){
+
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+  
+      
+        // Access the component instance and trigger `openKPIModal`
+        setTimeout(() => {
+         
+          this.TileWithIconComponent.openTileWithIcon(argument1, argument2);
+        }, 500);
+      }
+      else if(argument1.grid_type=='progressTile'){
+        console.log('i am openining')
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        console.log('event check progress', event)
+      
+        // Access the component instance and trigger `openKPIModal`
+        setTimeout(() => {
+         
+          this.ProgressTileComponent.openProgressTileModal(argument1, argument2);
+        }, 500);
+      }
+
+
+
+      else if(argument1.grid_type=='chart'){
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        console.log('event check', event)
+        setTimeout(() => {
+          this.ChartConfig1Component.openChartModal1(argument1, argument2)
+        }, 500);
+  
+  
+      }
+
+
+      else if(argument1.grid_type=='Linechart'){
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        console.log('event check', event)
+        setTimeout(() => {
+          this.ChartConfig2Component.openChartModal2(argument1, argument2)
+        }, 500);
+  
+      }
+
+
+      else if(argument1.grid_type=='Columnchart'){
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        console.log('event check', event)
+        setTimeout(() => {
+          this.ChartConfig3Component.openChartModal3(argument1, argument2)
+        }, 500);
+  
+      }
+      else if(argument1.grid_type=='Funnelchart'){
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        console.log('event check', event)
+        setTimeout(() => {
+          this.FunnelChartConfigComponent.openFunnelChartModal(argument1, argument2)
+        }, 500);
+  
+      }
+
+      else if(argument1.grid_type=='Piechart'){
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        console.log('event check', event)
+        setTimeout(() => {
+          this.PieChartConfigComponent.openPieChartModal(argument1, argument2)
+        }, 500);
+  
+      }
+
+      else if(argument1.grid_type=='Stackedchart'){
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        console.log('event check', event)
+        setTimeout(() => {
+          this.StackedBarConfigComponent.openStackedChartModal(argument1, argument2)
+        }, 500);
+  
+      }
+      else if(argument1.grid_type=='TableWidget'){
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+  
+      
+        // Access the component instance and trigger `openKPIModal`
+        setTimeout(() => {
+         
+          this.TableWidgetConfigComponent.openTableModal(argument1, argument2);
+        }, 500);
+      }
+      
+
+    }
+
+    // isHovered = false;  // Flag to manage hover state
+
+    // // Method to handle mouse enter event
+    // onMouseEnter() {
+    //   this.isHovered = true;  // Set hover state to true
+    // }
+  
+    // // Method to handle mouse leave event
+    // onMouseLeave() {
+    //   this.isHovered = false;  // Set hover state to false
+    // }
 
 
 
@@ -5029,6 +5263,20 @@ justReadStyles(data:any,index:any){
 
     }
     else if(event.data.arg1.grid_type=='title'){
+      console.log('event check from dynamic', event.data.arg1)
+      this.allCompanyDetails = event.all_Packet_store;
+      this.dashboard.push({
+        ...event.data.arg1,
+        id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
+      });
+    
+      console.log('event.data.arg1', event.data.arg1);
+      console.log('this.dashboard from dynamic',event.all_Packet_store)
+
+
+
+    }
+    else if(event.data.arg1.grid_type=='Stackedchart'){
       console.log('event check from dynamic', event.data.arg1)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push({
@@ -8661,6 +8909,7 @@ helperChartClickFunnel(event: any, modalChart: any) {
       tileWithIcon:{ width: this.tileWidth, height: this.tileHeight, heightOffset: 80, widthOffset: 30},
       semiDonut:{width:this.chartWidth, height:this.chartHeight, heightOffset: 10, widthOffset: 30 },
       Piechart:{ width: this.chartWidth, height: this.chartHeight, heightOffset: 10, widthOffset: 30  },
+      Stackedchart:{ width: this.chartWidth, height: this.chartHeight, heightOffset: 10, widthOffset: 30  }
  
       // filterTileHeight:any []=[];
       // filterTileWidth:any []=[];
