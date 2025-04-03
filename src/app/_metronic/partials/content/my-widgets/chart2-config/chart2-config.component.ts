@@ -433,10 +433,11 @@ validateAndSubmit() {
 
   }
   addControls(event: any, _type: string) {
-    console.log('event check', event);
+    console.log('event check from line chart', event);
   
     let noOfParams: any = '';
   
+    // Determine the new number of parameters
     if (_type === 'html' && event && event.target) {
       if (event.target.value >= 0) {
         noOfParams = JSON.parse(event.target.value);
@@ -454,35 +455,40 @@ validateAndSubmit() {
     }
     console.log('noOfParams check', noOfParams);
   
-    // Update all_fields based on noOfParams
+    // Ensure we have the correct number of form groups
     if (this.createChart.value.all_fields.length < noOfParams) {
+      // Get the first form group's values if they exist
+      const firstFieldValues = this.getFormArrayValues();
+  
       for (let i = this.all_fields.length; i < noOfParams; i++) {
-        this.all_fields.push(
-          this.fb.group({
-            formlist: ['', Validators.required],
-            parameterName: [[], Validators.required],
-            // groupBy: ['', Validators.required],
-            primaryValue: ['', Validators.required],
-            groupByFormat: ['', Validators.required],
-            constantValue: [''],
-            processed_value: ['234567'],
-            selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
-     
-            selectedRangeType: ['',Validators.required],
-            selectFromTime: [''],
-            selectToTime: [''],
-            parameterValue:[''],
-            columnVisibility:[[]],
-            rowData:[''],
-            undefinedCheckLabel:[''],
-            custom_Label:['',Validators.required],
-            formatType:['',Validators.required],
-            filterDescription:[''],
-            filterParameter:[[]],
-            XaxisFormat:['']
-          })
-        );
+        // Create a new group and set groupByFormat and selectedRangeType based on the first form group
+        const newGroup = this.fb.group({
+          formlist: ['', Validators.required],
+          parameterName: [[], Validators.required],
+          primaryValue: ['', Validators.required],
+          groupByFormat: [firstFieldValues.groupByFormat || '', Validators.required],  // Autofill with first group's value
+          constantValue: [''],
+          processed_value: [''],
+          selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
+          selectedRangeType: [firstFieldValues.selectedRangeType || '', Validators.required],  // Autofill with first group's value
+          selectFromTime: [''],
+          selectToTime: [''],
+          parameterValue: [''],
+          columnVisibility: [[]],
+          rowData: [''],
+          undefinedCheckLabel: [''],
+          custom_Label: ['', Validators.required],
+          formatType: ['', Validators.required],
+          filterDescription: [''],
+          filterParameter: [[]],
+          XaxisFormat: ['']
+        });
+  
+        this.all_fields.push(newGroup);
         console.log('this.all_fields check', this.all_fields);
+  
+        // After adding a new form group, subscribe to value changes
+        this.subscribeToValueChanges(i);
       }
     } else {
       if (noOfParams !== "" && noOfParams !== undefined && noOfParams !== null) {
@@ -495,6 +501,91 @@ validateAndSubmit() {
     // Update noOfParams for use in addTile
     this.noOfParams = noOfParams;
   }
+  
+  getFormArrayValues() {
+    // Check if form array has at least one element
+    if (this.createChart.value.all_fields.length > 0) {
+      // Get the first form group
+      const firstField = this.createChart.value.all_fields[0];
+  
+      // Extract the desired values from the first form group
+      const formValues = {
+        groupByFormat: firstField.groupByFormat,
+        selectedRangeType: firstField.selectedRangeType
+      };
+  
+      console.log('Extracted values from the first form group:', formValues);
+      return formValues;  // Returning or processing the extracted values
+    } else {
+      console.log('Form array is empty');
+      return { groupByFormat: '', selectedRangeType: '' };  // Return default empty values
+    }
+  }
+  
+  
+  
+  
+  
+  // Function to trigger autofill after selecting the first configuration
+  triggerAutofill(firstConfig: any) {
+    // Autofill all existing form groups (except the first one) with the values from the first configuration
+    for (let i = 1; i < this.all_fields.length; i++) {
+      const group = this.all_fields.at(i);
+      // Autofill groupByFormat and selectedRangeType based on the first config selection
+      group.get('groupByFormat')?.setValue(firstConfig.groupByFormat || '', { emitEvent: false });
+      group.get('selectedRangeType')?.setValue(firstConfig.selectedRangeType || '', { emitEvent: false });
+    }
+  }
+  
+  // Function to get values from the first configuration
+  getFirstConfigurationValues() {
+    // Example: You should return the selected values from the first config
+    return {
+      groupByFormat: 'someValueFromFirstConfig', // Replace with actual value from the config
+      selectedRangeType: 'someRangeValueFromFirstConfig', // Replace with actual value from the config
+    };
+  }
+  
+  // Example of how you could trigger the autofill
+  onFirstConfigSelected(event: any) {
+    const firstConfig = this.getFirstConfigurationValues(); // Get selected values from first config
+    this.triggerAutofill(firstConfig);
+  }
+  
+  
+  
+  subscribeToValueChanges(fieldIndex: number) {
+    const group = this.all_fields.at(fieldIndex);
+    
+    // Subscribe to groupByFormat field value changes
+    group.get('groupByFormat')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new groupByFormat value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('groupByFormat')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+  
+    // Subscribe to selectedRangeType field value changes
+    group.get('selectedRangeType')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('selectedRangeType')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+  }
+  
+
+
   get all_fields() {
     return this.createChart.get('all_fields') as FormArray;
   }
@@ -621,6 +712,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
         chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
         multiColorCheck:this.createChart.value.multiColorCheck ,
+        filterDescription:'',
       };
   
       // Log the new tile object to verify it's being created correctly
@@ -659,6 +751,12 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     const color = (event.target as HTMLInputElement).value;
     this.createChart.patchValue({ fontColor: color });
   }
+
+
+
+
+  
+  
   
   updateTile(key: any) {
     console.log('key checking from update', key);
@@ -1005,16 +1103,7 @@ repopulate_fields(getValues: any): FormArray {
   try {
     if (typeof getValues.chartConfig === 'string') {
       parsedChartConfig = JSON.parse(getValues.chartConfig || '[]');
-      console.log('parsedChartConfig check',parsedChartConfig[0].formlist)
-
-      // this.fetchDynamicFormData(parsedChartConfig[0].formlist).then((data: any[]) => {
-      //   console.log('Updated listFormFields:', data);
-      //   this.listofDynamicParam = [...data]; // Ensure reference update for change detection
-      //   this.cdr.detectChanges(); // Manually trigger change detection
-      // });
-      
-      
-      
+      console.log('parsedChartConfig check', parsedChartConfig[0].formlist);
     } else if (Array.isArray(getValues.chartConfig)) {
       parsedChartConfig = getValues.chartConfig;
     }
@@ -1029,44 +1118,43 @@ repopulate_fields(getValues: any): FormArray {
     parsedChartConfig.forEach((configItem, index) => {
       console.log(`Processing index ${index} - Full Object:`, configItem);
 
-      // Handle `columnVisibility` as a simple array initialization
+      // Handle columnVisibility as a simple array initialization
       const columnVisibility = Array.isArray(configItem.columnVisibility)
         ? configItem.columnVisibility.map((item: { text: any; value: any; }) => ({
             text: item.text || '',
             value: item.value || '',
           }))
         : [];
-        const arrayParameter = Array.isArray(configItem.parameterName)
+
+      const arrayParameter = Array.isArray(configItem.parameterName)
         ? configItem.parameterName
         : [];
-        const filterParameterValue = Array.isArray(configItem.filterParameter)
+      const filterParameterValue = Array.isArray(configItem.filterParameter)
         ? configItem.filterParameter
         : [];
-
-
-        const dateParameter = Array.isArray(configItem.XaxisFormat)
+      const dateParameter = Array.isArray(configItem.XaxisFormat)
         ? configItem.XaxisFormat
         : [];
 
-      // Push FormGroup into FormArray
+      // Create FormGroup with required validators where needed
       this.all_fields.push(
         this.fb.group({
-          formlist: configItem.formlist || '',
-          parameterName: this.fb.control(arrayParameter) || '',
-          primaryValue: configItem.primaryValue || '',
-          groupByFormat: configItem.groupByFormat || '',
-          constantValue: configItem.constantValue || '',
-          selectedRangeType: configItem.selectedRangeType || '',
-          selectFromTime: configItem.selectFromTime || '',
-          selectToTime: configItem.selectToTime || '',
-          parameterValue: configItem.parameterValue || '',
-          undefinedCheckLabel:configItem.undefinedCheckLabel || '',
-          columnVisibility: this.fb.control(columnVisibility), // Initialize columnVisibility as a control
-          custom_Label:configItem.custom_Label || '',
-          formatType:configItem.formatType || '',
+          formlist: [configItem.formlist || '', Validators.required],
+          parameterName: this.fb.control(arrayParameter, Validators.required),
+          primaryValue: [configItem.primaryValue || '', Validators.required],
+          groupByFormat: [configItem.groupByFormat || '', Validators.required],
+          constantValue: [configItem.constantValue || ''],
+          selectedRangeType: [configItem.selectedRangeType || '', Validators.required],
+          selectFromTime: [configItem.selectFromTime || ''],
+          selectToTime: [configItem.selectToTime || ''],
+          parameterValue: [configItem.parameterValue || ''],
+          undefinedCheckLabel: configItem.undefinedCheckLabel || '',
+          columnVisibility: this.fb.control(columnVisibility),
+          custom_Label: [configItem.custom_Label || '', Validators.required],
+          formatType: [configItem.formatType || '', Validators.required],
           filterParameter: this.fb.control(filterParameterValue),
-               filterDescription:configItem.filterDescription ||'',
-               XaxisFormat:this.fb.control(dateParameter) ||''
+          filterDescription: configItem.filterDescription || '',
+          XaxisFormat: this.fb.control(dateParameter)
         })
       );
 
@@ -1084,7 +1172,41 @@ repopulate_fields(getValues: any): FormArray {
 
   console.log('Final FormArray Values:', this.all_fields.value);
 
+  // **Validate the FormArray after repopulating**
+  const allFieldsValid = this.validateFormArray();
+  if (!allFieldsValid) {
+    console.error('Some required fields are missing or invalid.');
+    alert('Please complete all required fields before proceeding.');
+    return this.all_fields; // Return without proceeding
+  }
+
   return this.all_fields;
+}
+
+// **Validation function for checking required fields in the FormArray**
+validateFormArray(): boolean {
+  let isValid = true;
+
+  // Loop through all FormGroups in the FormArray
+  this.all_fields.controls.forEach((control: AbstractControl) => {
+    const formGroup = control as FormGroup;
+
+    // Check if any of the required fields in the FormGroup are invalid
+    if (
+      formGroup.get('formlist')?.invalid ||
+      formGroup.get('parameterName')?.invalid ||
+      formGroup.get('primaryValue')?.invalid ||
+      formGroup.get('groupByFormat')?.invalid ||
+      formGroup.get('selectedRangeType')?.invalid ||
+      formGroup.get('custom_Label')?.invalid ||
+      formGroup.get('formatType')?.invalid
+    ) {
+      console.error('A required field is missing or invalid in the form group');
+      isValid = false;
+    }
+  });
+
+  return isValid;
 }
 
 
@@ -1447,11 +1569,11 @@ repopulate_fields(getValues: any): FormArray {
     { value: 'Count', text: 'Count' },
     // { value: 'Count_Multiple', text: 'Count Multiple' },
     // { value: 'Count Dynamic', text: 'Count Dynamic' },
-    { value: 'Count MultiplePram', text: 'Count Multiple Parameter' },
-    { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
-    { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
-    { value: 'sumArray', text: 'SumArray' },
-    {value:'Avg_Utilization_wise_multiple',text:'Avg_Utilization_wise_multiple'}
+    // { value: 'Count MultiplePram', text: 'Count Multiple Parameter' },
+    // { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
+    // { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
+    // { value: 'sumArray', text: 'SumArray' },
+    // {value:'Avg_Utilization_wise_multiple',text:'Avg_Utilization_wise_multiple'}
 
 
   ]
@@ -1812,4 +1934,63 @@ FormatXaxisValues = [
   // { value: 'Default', text: 'Default' },
 ]
 
+
+
+
+validateAndUpdate() {
+  let isFormValid = true; // Initialize form validity as true
+
+  // Mark all controls as touched for validation, including controls inside FormArray
+  Object.values(this.createChart.controls).forEach(control => {
+    if (control instanceof FormControl) {
+      // Mark the control as touched and update its validity
+      control.markAsTouched();
+      control.updateValueAndValidity();
+
+      // If it's a required field and it's empty, mark the form as invalid
+      if (control.hasError('required') && !control.value) {
+        console.error('Required field is empty, update stopped');
+        isFormValid = false;
+      }
+    } else if (control instanceof FormArray) {
+      // Iterate over the controls in the FormArray
+      control.controls.forEach((controlItem, index) => {
+        if (controlItem instanceof FormGroup) {
+          // Iterate over inner controls in the FormGroup
+          Object.values(controlItem.controls).forEach(innerControl => {
+            innerControl.markAsTouched();
+            innerControl.updateValueAndValidity();
+
+            // Check if the inner control is required and empty
+            if (innerControl.hasError('required') && !innerControl.value) {
+              console.error('Required field is empty in FormGroup, update stopped');
+              isFormValid = false;
+            }
+          });
+        }
+      });
+    }
+  });
+
+  // Check overall form validity
+  const allFieldsValid = this.createChart.get('all_fields')?.valid;
+  console.log('check form array', allFieldsValid);
+
+  // Check if the form is valid, including nested FormArray controls
+  console.log('isFormValid checking', isFormValid);
+
+  // Only proceed with update if the form is valid
+  if (isFormValid && this.createChart.valid && allFieldsValid) {
+    this.updateTile('chart');
+    this.modal.dismiss();
+  } else {
+    console.error('Form is invalid. Cannot update.');
+    // Show error message
+    // alert('Please fill all required fields before updating.');
+  }
 }
+
+}
+
+
+

@@ -116,6 +116,7 @@ export class DynamicTileConfigComponent implements OnInit{
   columnVisisbilityFields: any;
   selectedText: any;
   listofFormParam: any;
+  isSummaryDashboardSelected = false;
 
 
 
@@ -954,17 +955,17 @@ repopulate_fields(getValues: any) {
   if (getValues && getValues !== null) {
     noOfParams = getValues.noOfParams;
 
-    this.all_fields.clear();
+    this.all_fields.clear(); // Clear existing fields in the FormArray
 
     // Parse tileConfig
     let parsedtileConfig = [];
     try {
       if (typeof getValues.tileConfig === 'string') {
         parsedtileConfig = JSON.parse(getValues.tileConfig || '[]');
+        console.log('Parsed tileConfig:', parsedtileConfig);
       } else {
         parsedtileConfig = Array.isArray(getValues.tileConfig) ? getValues.tileConfig : [];
       }
-      console.log('Parsed tileConfig:', parsedtileConfig);
     } catch (error) {
       console.error('Error parsing tileConfig:', error);
     }
@@ -981,22 +982,22 @@ repopulate_fields(getValues: any) {
           console.warn(`filterParameter is empty or invalid at index ${i}`, parsedtileConfig[i]);
         }
 
-        // Add the fields to the form group
+        // Add the fields to the form group with validation
         this.all_fields.push(this.fb.group({
-          formlist: parsedtileConfig[i].formlist || '',
-          parameterName: parsedtileConfig[i].parameterName || '',
-          primaryValue: parsedtileConfig[i].primaryValue || '',
-          groupByFormat: parsedtileConfig[i].groupByFormat || '',
-          constantValue: parsedtileConfig[i].constantValue || '',
-          selectedRangeType: parsedtileConfig[i].selectedRangeType || '',
-          selectFromTime: parsedtileConfig[i].selectFromTime || '',
-          selectToTime: parsedtileConfig[i].selectToTime || '',
-          filterDescription: parsedtileConfig[i].filterDescription || '',
-          custom_Label: parsedtileConfig[i].custom_Label || '',
-          fontSize: parsedtileConfig[i].fontSize || 14,
-          filterForm: parsedtileConfig[i].filterForm || '',
-          filterParameter: this.fb.control(filterParameterValue), // Properly assign filterParameter as a form control
-          EquationDesc:parsedtileConfig[i].EquationDesc
+          formlist: [parsedtileConfig[i].formlist || '', Validators.required],
+          parameterName: [parsedtileConfig[i].parameterName || '', Validators.required],
+          primaryValue: [parsedtileConfig[i].primaryValue || '', Validators.required],
+          groupByFormat: [parsedtileConfig[i].groupByFormat || '', Validators.required],
+          constantValue: [parsedtileConfig[i].constantValue || ''],
+          selectedRangeType: [parsedtileConfig[i].selectedRangeType || '', Validators.required],
+          selectFromTime: [parsedtileConfig[i].selectFromTime || ''],
+          selectToTime: [parsedtileConfig[i].selectToTime || ''],
+          filterDescription: [parsedtileConfig[i].filterDescription || ''],
+          custom_Label: [parsedtileConfig[i].custom_Label || '', Validators.required],
+          fontSize: [parsedtileConfig[i].fontSize || 14, [Validators.required, Validators.min(8), Validators.max(72)]],
+          filterForm: [parsedtileConfig[i].filterForm || ''],
+          filterParameter: this.fb.control(filterParameterValue),
+          EquationDesc: [parsedtileConfig[i].EquationDesc || '']
         }));
 
         // Log to confirm the field was added correctly
@@ -1016,6 +1017,7 @@ repopulate_fields(getValues: any) {
 
   return this.all_fields;
 }
+
 
 populate_equationFields(getValues: any): FormArray {
   if (!getValues || getValues === null) {
@@ -1082,6 +1084,61 @@ populate_equationFields(getValues: any): FormArray {
   return this.equation_fields;
 }
 
+
+
+
+validateAndUpdate() {
+  let isFormValid = true; // Initialize form validity as true
+
+  // Mark all controls as touched for validation, including controls inside FormArray
+  Object.values(this.createChart.controls).forEach(control => {
+    if (control instanceof FormControl) {
+      // Mark the control as touched and update its validity
+      control.markAsTouched();
+      control.updateValueAndValidity();
+
+      // If it's a required field and it's empty, mark the form as invalid
+      if (control.hasError('required') && !control.value) {
+        console.error('Required field is empty, update stopped');
+        isFormValid = false;
+      }
+    } else if (control instanceof FormArray) {
+      // Iterate over the controls in the FormArray
+      control.controls.forEach((controlItem, index) => {
+        if (controlItem instanceof FormGroup) {
+          // Iterate over inner controls in the FormGroup
+          Object.values(controlItem.controls).forEach(innerControl => {
+            innerControl.markAsTouched();
+            innerControl.updateValueAndValidity();
+
+            // Check if the inner control is required and empty
+            if (innerControl.hasError('required') && !innerControl.value) {
+              console.error('Required field is empty in FormGroup, update stopped');
+              isFormValid = false;
+            }
+          });
+        }
+      });
+    }
+  });
+
+  // Check overall form validity
+  const allFieldsValid = this.createChart.get('all_fields')?.valid;
+  console.log('check form array', allFieldsValid);
+
+  // Check if the form is valid, including nested FormArray controls
+  console.log('isFormValid checking', isFormValid);
+
+  // Only proceed with update if the form is valid
+  if (isFormValid && this.createChart.valid && allFieldsValid) {
+    this.updateTile('dynamicTile');
+    this.modal.dismiss();
+  } else {
+    console.error('Form is invalid. Cannot update.');
+    // Show error message
+    // alert('Please fill all required fields before updating.');
+  }
+}
 
 
 addEquationControls(event: any, _type: string) {
@@ -1594,7 +1651,7 @@ addEquationControls(event: any, _type: string) {
     // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
     // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
     { value: 'Constant', text: 'Constant' },
-    { value: 'Live', text: 'Live' },
+    // { value: 'Live', text: 'Live' },
     { value: 'Count', text: 'Count' },
     // { value: 'Count_Multiple', text: 'Count Multiple' },
     // { value: 'Count Dynamic', text: 'Count Dynamic' },
@@ -2249,6 +2306,11 @@ showModuleNames = [
 ]
 async moduleSelection(event: any): Promise<void> {
   const selectedValue = event[0].value; // Get selected value
+  if (selectedValue === 'Summary Dashboard') {
+    this.isSummaryDashboardSelected = true;
+  } else {
+    this.isSummaryDashboardSelected = false;
+  }
   console.log('selectedValue checking',selectedValue)
   switch (selectedValue) {
     case 'None':

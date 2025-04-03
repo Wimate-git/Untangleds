@@ -1,5 +1,5 @@
 <div class="modal-header">
-    <h4 class="modal-title">Funnel Chart</h4>
+    <h4 class="modal-title">Funnel Chart Configuration</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
   </div>
   <div class="container" *ngIf="createChart">
@@ -96,7 +96,7 @@
         </div>
         <div class="col-md-4 mb-3" [formGroup]="createChart">
           <div class="color-picker-container d-flex align-items-center">
-            <label for="textColorPicker" class="col-form-label fw-bold fs-6 mb-0 me-2">Chart Background From Color</label>
+            <label for="textColorPicker" class="col-form-label fw-bold fs-6 mb-0 me-2">BG Gradient Top Color</label>
             <input
               id="textColorPicker"
               type="color"
@@ -109,7 +109,7 @@
         
         <div class="col-md-4 mb-3" [formGroup]="createChart">
           <div class="color-picker-container d-flex align-items-center">
-            <label for="textColorPicker" class="col-form-label fw-bold fs-6">Chart Background To Color</label>
+            <label for="textColorPicker" class="col-form-label fw-bold fs-6">BG Gradient Bottom Color</label>
             <input
               id="textColorPicker"
               type="color"
@@ -708,7 +708,7 @@
           <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Discard</button>
           <button type="button" class="btn btn-primary" *ngIf="!isEditMode"
           (click)="validateAndSubmit()"  >Save</button>
-          <button type="button" class="btn btn-primary" (click)="updateTile('chart');modal.dismiss() " *ngIf="isEditMode"
+          <button type="button" class="btn btn-primary" (click)="validateAndUpdate() " *ngIf="isEditMode"
            >
             Update
           </button>
@@ -757,12 +757,12 @@
               <div class="list-item" (click)="selectValue('This Week', modal)" (mouseenter)="showTooltip('This Week')"
                 (mouseleave)="hideTooltip()">
                 <div class="title">This Week</div>
-                <div class="example">E.g., Current week (Monday to Sunday)</div>
+                <div class="example">E.g., Current week (Sunday to Saturday)</div>
               </div>
-              <div class="list-item" (click)="selectValue('Last 5 Weeks', modal)" (mouseenter)="showTooltip('Last 5 Weeks')"
+              <div class="list-item" (click)="selectValue('Last Week', modal)" (mouseenter)="showTooltip('Last 5 Weeks')"
                 (mouseleave)="hideTooltip()">
-                <div class="title">Last 5 Weeks</div>
-                <div class="example">E.g., Data for past 5 weeks</div>
+                <div class="title">Last Week</div>
+                <div class="example">E.g., Data for last week</div>
               </div>
               <div class="list-item" (click)="selectValue('This Month', modal)" (mouseenter)="showTooltip('This Month')"
                 (mouseleave)="hideTooltip()">
@@ -812,10 +812,10 @@
                 <div class="title">Last Year</div>
                 <div class="example">E.g., Data from the previous year</div>
               </div>
-              <div class="list-item" (click)="selectValue('Last 5 Years', modal)" (mouseenter)="showTooltip('Last 5 Years')"
+              <div class="list-item" (click)="selectValue('Last 5 Weeks', modal)" (mouseenter)="showTooltip('Last 5 Years')"
                 (mouseleave)="hideTooltip()">
-                <div class="title">Last 5 Years</div>
-                <div class="example">E.g., Data for the past 5 years</div>
+                <div class="title">Last 5 Weeks</div>
+                <div class="example">E.g., Data for the last 5 weeks</div>
               </div>
             </div>
           </div>

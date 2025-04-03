@@ -4,7 +4,7 @@
 
 
     <div class="modal-header">
-        <h4 class="modal-title">Widget-1</h4>
+        <h4 class="modal-title">Tile-1 Configuration</h4>
         <button type="button" class="btn-close" aria-label="Close"   (click)="modal.dismiss()"></button>
       </div>
       
@@ -258,7 +258,7 @@
 
 
 
-                    <div class="col-md-4 mb-3">
+                    <div  class="col-md-4 mb-3">
                       <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Redirect To</label>
                       <ngx-select
                      
@@ -277,9 +277,9 @@
                       <!-- Select Type -->
 <!-- Select Type -->
 <!-- Select Type -->
-<div class="col-md-4">
+<div *ngIf="isSummaryDashboardSelected" class="col-md-4">
   <div class="d-flex flex-column">
-    <label for="dashboardIds" class="col-form-label fw-bold fs-6">Select Type</label>
+    <label for="dashboardIds" class="col-form-label fw-bold fs-6">Select Redirection Type</label>
     <ngx-select
       id="selectType"
       [allowClear]="true"
@@ -764,10 +764,10 @@
           type="button" 
           class="btn btn-primary" 
        
-          (click)="updateTile('tile');modal.dismiss() " 
+          (click)="validateAndUpdate() " 
           *ngIf="isEditMode " 
          
-          [disabled]="createKPIWidget?.invalid">
+        >
           Update
         </button>
           </div>
@@ -787,12 +787,12 @@
                     <div class="title">Last 24 Hours</div>
                     <div class="example">E.g., Last 24 hours of data</div>
                   </div>
-                  <div class="list-item " (click)="selectValue('Today', modal)" (mouseenter)="showTooltip('Today')"
-                    (mouseleave)="hideTooltip()" >
+                  <div class="list-item" (click)="selectValue('Today', modal)" (mouseenter)="showTooltip('Today')"
+                    (mouseleave)="hideTooltip()">
                     <div class="title">Today</div>
                     <div class="example">E.g., Data from 00:00 hrs to now</div>
                   </div>
-                  <div class="list-item " (click)="selectValue('Yesterday', modal)" (mouseenter)="showTooltip('Yesterday')"
+                  <div class="list-item" (click)="selectValue('Yesterday', modal)" (mouseenter)="showTooltip('Yesterday')"
                     (mouseleave)="hideTooltip()">
                     <div class="title">Yesterday</div>
                     <div class="example">E.g., Data from previous day</div>
@@ -810,12 +810,12 @@
                   <div class="list-item" (click)="selectValue('This Week', modal)" (mouseenter)="showTooltip('This Week')"
                     (mouseleave)="hideTooltip()">
                     <div class="title">This Week</div>
-                    <div class="example">E.g., Current week (Monday to Sunday)</div>
+                    <div class="example">E.g., Current week (Sunday to Saturday)</div>
                   </div>
-                  <div class="list-item" (click)="selectValue('Last 5 Weeks', modal)" (mouseenter)="showTooltip('Last 5 Weeks')"
+                  <div class="list-item" (click)="selectValue('Last Week', modal)" (mouseenter)="showTooltip('Last 5 Weeks')"
                     (mouseleave)="hideTooltip()">
-                    <div class="title">Last 5 Weeks</div>
-                    <div class="example">E.g., Data for past 5 weeks</div>
+                    <div class="title">Last Week</div>
+                    <div class="example">E.g., Data for last week</div>
                   </div>
                   <div class="list-item" (click)="selectValue('This Month', modal)" (mouseenter)="showTooltip('This Month')"
                     (mouseleave)="hideTooltip()">
@@ -865,12 +865,11 @@
                     <div class="title">Last Year</div>
                     <div class="example">E.g., Data from the previous year</div>
                   </div>
-                  <div class="list-item" (click)="selectValue('Last 5 Years', modal)" (mouseenter)="showTooltip('Last 5 Years')"
+                  <div class="list-item" (click)="selectValue('Last 5 Weeks', modal)" (mouseenter)="showTooltip('Last 5 Years')"
                     (mouseleave)="hideTooltip()">
-                    <div class="title">Last 5 Years</div>
-                    <div class="example">E.g., Data for the past 5 years</div>
+                    <div class="title">Last 5 Weeks</div>
+                    <div class="example">E.g., Data for the last 5 weeks</div>
                   </div>
-
                 </div>
               </div>
               

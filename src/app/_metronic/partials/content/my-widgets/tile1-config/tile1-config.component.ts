@@ -125,6 +125,7 @@ export class Tile1ConfigComponent implements OnInit {
   helpherObjCalender: any;
   formListTitles: any;
   showColumnVisibility = false;
+  isSummaryDashboardSelected = false;
 
 
  
@@ -311,6 +312,30 @@ export class Tile1ConfigComponent implements OnInit {
   
     // ✅ Proceed with saving only if form is valid
     this.addTile('tile');
+    this.modal.dismiss();
+  }
+
+
+
+  validateAndUpdate() {
+    if (this.createKPIWidget.invalid) {
+      // ✅ Mark all fields as touched to trigger validation messages
+      Object.values(this.createKPIWidget.controls).forEach(control => {
+        if (control instanceof FormControl) {
+          control.markAsTouched();
+          control.updateValueAndValidity();
+        } else if (control instanceof FormArray) {
+          control.controls.forEach((group) => {
+            (group as FormGroup).markAllAsTouched();
+          });
+        }
+      });
+  
+      return; // 🚨 Stop execution if the form is invalid
+    }
+  
+    // ✅ Proceed with saving only if form is valid
+    this.updateTile('tile');
     this.modal.dismiss();
   }
   
@@ -1755,7 +1780,7 @@ selectFormParams1(event: any[], index: number): void {
     { value: 'sumArray', text: 'SumArray' },
     { value: 'Advance Equation', text: 'Advance Equation' },
     { value: 'sum_difference', text: 'Sum Difference' },
-    { value: 'sum_difference', text: 'Sum Difference' },
+    // { value: 'sum_difference', text: 'Sum Difference' },
     { value: 'distance_sum', text: 'Distance Sum' },
     {value:'Avg_Utilization_wise_multiple',text:'Avg_Utilization_wise_multiple'}
     
@@ -2238,6 +2263,12 @@ showModuleNames = [
 
   async moduleSelection(event: any): Promise<void> {
   const selectedValue = event[0].value; // Get selected value
+
+  if (selectedValue === 'Summary Dashboard') {
+    this.isSummaryDashboardSelected = true;
+  } else {
+    this.isSummaryDashboardSelected = false;
+  }
   console.log('selectedValue checking',selectedValue)
   switch (selectedValue) {
     case 'None':

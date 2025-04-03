@@ -124,6 +124,7 @@ export class TileWithIconComponent implements OnInit{
   formListTitles: any;
   icons: any;
   showColumnVisibility = false;
+  isSummaryDashboardSelected = false;
 
  
   ngOnInit() {
@@ -316,6 +317,29 @@ export class TileWithIconComponent implements OnInit{
     this.modal.dismiss();
   }
   
+
+
+  validateAndUpdate() {
+    if (this.createKPIWidget.invalid) {
+      // ✅ Mark all fields as touched to trigger validation messages
+      Object.values(this.createKPIWidget.controls).forEach(control => {
+        if (control instanceof FormControl) {
+          control.markAsTouched();
+          control.updateValueAndValidity();
+        } else if (control instanceof FormArray) {
+          control.controls.forEach((group) => {
+            (group as FormGroup).markAllAsTouched();
+          });
+        }
+      });
+  
+      return; // 🚨 Stop execution if the form is invalid
+    }
+  
+    // ✅ Proceed with saving only if form is valid
+    this.updateTile('tileWithIcon');
+    this.modal.dismiss();
+  }
   
   async dynamicData(){
     try {
@@ -2185,6 +2209,12 @@ showModuleNames = [
 
   async moduleSelection(event: any): Promise<void> {
   const selectedValue = event[0].value; // Get selected value
+
+  if (selectedValue === 'Summary Dashboard') {
+    this.isSummaryDashboardSelected = true;
+  } else {
+    this.isSummaryDashboardSelected = false;
+  }
   console.log('selectedValue checking',selectedValue)
   switch (selectedValue) {
     case 'None':

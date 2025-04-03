@@ -92,6 +92,7 @@ export class Tile2ConfigComponent implements OnInit{
   listofFormValues: any;
   paramCount: any;
   showColumnVisibility = false;
+  isSummaryDashboardSelected = false;
 
 ngOnInit(): void {
   this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
@@ -992,7 +993,7 @@ generateUniqueId(): number {
     { value: 'sumArray', text: 'SumArray' },
     { value: 'Advance Equation', text: 'Advance Equation' },
     { value: 'sum_difference', text: 'Sum Difference' },
-    { value: 'sum_difference', text: 'Sum Difference' },
+    // { value: 'sum_difference', text: 'Sum Difference' },
     { value: 'distance_sum', text: 'Distance Sum' },
     {value:'Avg_Utilization_wise_multiple',text:'Avg_Utilization_wise_multiple'}
     
@@ -1207,6 +1208,13 @@ generateUniqueId(): number {
 
   async moduleSelection(event: any): Promise<void> {
     const selectedValue = event[0].value; // Get selected value
+
+
+    if (selectedValue === 'Summary Dashboard') {
+      this.isSummaryDashboardSelected = true;
+    } else {
+      this.isSummaryDashboardSelected = false;
+    }
     console.log('selectedValue checking',selectedValue)
     switch (selectedValue) {
       case 'None':
@@ -1680,12 +1688,48 @@ generateUniqueId(): number {
 
   validateAndSubmit() {
     if (this.createKPIWidget1.invalid) {
-      this.markFormGroupTouched(this.createKPIWidget1);
+      // ✅ Mark all fields as touched to trigger validation messages
+      Object.values(this.createKPIWidget1.controls).forEach(control => {
+        if (control instanceof FormControl) {
+          control.markAsTouched();
+          control.updateValueAndValidity();
+        } else if (control instanceof FormArray) {
+          control.controls.forEach((group) => {
+            (group as FormGroup).markAllAsTouched();
+          });
+        }
+      });
+  
       return; // 🚨 Stop execution if the form is invalid
     }
   
     // ✅ Proceed with saving only if form is valid
     this.addTile('tile');
+    this.modal.dismiss();
+  }
+
+
+
+
+  validateAndUpdate() {
+    if (this.createKPIWidget1.invalid) {
+      // ✅ Mark all fields as touched to trigger validation messages
+      Object.values(this.createKPIWidget1.controls).forEach(control => {
+        if (control instanceof FormControl) {
+          control.markAsTouched();
+          control.updateValueAndValidity();
+        } else if (control instanceof FormArray) {
+          control.controls.forEach((group) => {
+            (group as FormGroup).markAllAsTouched();
+          });
+        }
+      });
+  
+      return; // 🚨 Stop execution if the form is invalid
+    }
+  
+    // ✅ Proceed with saving only if form is valid
+    this.updateTile1('tile');
     this.modal.dismiss();
   }
   

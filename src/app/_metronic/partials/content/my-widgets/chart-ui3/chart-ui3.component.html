@@ -76,17 +76,19 @@ aria-expanded="false"
 </div>
 </div>
 
-<div *ngIf="item.grid_type === 'Columnchart'" id="Columnchart{{index + 1}}"  [style.width.px]="isMobile ? mobileChartWidth : chartWidth"
-[style.height.px]="isMobile ? mobileChartHeight : chartHeight" [matTooltip]="!isEditModeView ? 'Double-click to edit widget' : null"
-matTooltipPosition="above">
+<div *ngIf="item.grid_type === 'Columnchart'" 
+     id="Columnchart{{index + 1}}"  
+     [style.width.px]="isMobile ? mobileChartWidth : chartWidth"
+     [style.height.px]="isMobile ? mobileChartHeight : chartHeight"
+     [matTooltip]="!isEditModeView ? 'Double-click to edit widget' : null"
+     matTooltipPosition="above">
 
   <div class="custom-label" *ngIf="item.custom_Label">
     {{ item.custom_Label }}
   </div>
 
-
-
 </div>
+
 
 
 

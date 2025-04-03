@@ -468,8 +468,29 @@ export class Chart1ConfigComponent implements OnInit {
   }
   onCombinedAddFieldsChange(event: any): void {
     this.onAdd_fieldsChange(event);
+    
+    const value = event.target.value;
+    
+    // Validate the value is greater than 0 and less than or equal to 1
+    if (value <= 0) {
+      this.toast.open("The parameter must be greater than 0.", "Check again", {
+        duration: 5000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+      });
+      event.target.value = 1;  // Reset to 1 if invalid value (0 or negative) is entered
+    } else if (value > 1) {
+      this.toast.open("Only one form array can be generated", "Check again", {
+        duration: 5000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+      });
+      event.target.value = 1;  // Reset to 1 if a value greater than 1 is entered
+    }
+  
     this.addControls(event, 'html');
   }
+  
   
   updateDrillFields(): void {
     const selectedType = this.createChart.get('DrillDownType')?.value;
@@ -621,10 +642,9 @@ export class Chart1ConfigComponent implements OnInit {
       console.log("Error fetching the dynamic form data", err);
     }
   }
-
   addControls(event: any, _type: string) {
-    const getConfigCount =this.createChart.get('add_fields')?.value
-    console.log('getConfigCount checking',getConfigCount)
+    const getConfigCount = this.createChart.get('add_fields')?.value;
+    console.log('getConfigCount checking', getConfigCount);
     console.log('event check', event);
   
     let noOfParams: any = '';
@@ -644,54 +664,50 @@ export class Chart1ConfigComponent implements OnInit {
         noOfParams = event;
       }
     }
+  
     console.log('noOfParams check', noOfParams);
   
-    // Update all_fields based on noOfParams
-    if (this.createChart.value.all_fields.length < noOfParams) {
-      for (let i = this.all_fields.length; i < noOfParams; i++) {
-        this.all_fields.push(
-          this.fb.group({
-            formlist: ['', Validators.required],
-            parameterName: [[], Validators.required],
-            // groupBy: ['', Validators.required],
-            primaryValue: ['', Validators.required],
-            groupByFormat: ['', Validators.required],
-            constantValue: [''],
-            processed_value: ['234567'],
-            selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
-     
-            selectedRangeType: ['',Validators.required],
-            selectFromTime: [''],
-            selectToTime: [''],
-            parameterValue:[''],
-            columnVisibility:[[]],
-            rowData:[''],
-            formatType:['',Validators.required],
-            undefinedCheckLabel:[''],
-            custom_Label:['',Validators.required],
-            filterParameter:[[]],
-            filterDescription:[''],
-            XaxisFormat:['']
-
-            
-
-       
-
-          })
-        );
-        console.log('this.all_fields check', this.all_fields);
-      }
-    } else {
-      if (noOfParams !== "" && noOfParams !== undefined && noOfParams !== null) {
-        for (let i = this.all_fields.length; i >= noOfParams; i--) {
-          this.all_fields.removeAt(i);
-        }
-      }
+    // Restrict to only one form array generation
+    if (this.createChart.value.all_fields.length < 1 && noOfParams > 0) {
+      // Only add a form group if the length is less than 1
+      this.all_fields.push(
+        this.fb.group({
+          formlist: ['', Validators.required],
+          parameterName: [[], Validators.required],
+          primaryValue: ['', Validators.required],
+          groupByFormat: ['', Validators.required],
+          constantValue: [''],
+          processed_value: ['234567'],
+          selectedColor: [this.selectedColor || '#FFFFFF'],
+          selectedRangeType: ['', Validators.required],
+          selectFromTime: [''],
+          selectToTime: [''],
+          parameterValue: [''],
+          columnVisibility: [[]],
+          rowData: [''],
+          formatType: ['', Validators.required],
+          undefinedCheckLabel: [''],
+          custom_Label: ['', Validators.required],
+          filterParameter: [[]],
+          filterDescription: [''],
+          XaxisFormat: ['']
+        })
+      );
+    } else if (this.createChart.value.all_fields.length > 0) {
+      // Ensure we don't add more fields if one already exists
+      this.toast.open("Only one form array can be generated", "Check again", {
+        duration: 5000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+      });
     }
   
     // Update noOfParams for use in addTile
     this.noOfParams = noOfParams;
   }
+  
+  
+  
 
   onValue() {
   const getConfigCount = this.createChart.get('add_fields')?.value;
@@ -779,6 +795,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
         chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
     
+        filterDescription:'',
       
 
   
@@ -1148,37 +1165,34 @@ repopulate_fields(getValues: any): FormArray {
         ? configItem.filterParameter1
         : [];
 
-        const arrayParameter = Array.isArray(configItem.parameterName)
+      const arrayParameter = Array.isArray(configItem.parameterName)
         ? configItem.parameterName
         : [];
 
-
-        const dateParameter = Array.isArray(configItem.XaxisFormat)
+      const dateParameter = Array.isArray(configItem.XaxisFormat)
         ? configItem.XaxisFormat
         : [];
-   
 
       // Create and push FormGroup into FormArray
       this.all_fields.push(
         this.fb.group({
-          formlist: configItem.formlist || '',
-          parameterName: this.fb.control(arrayParameter),
-          primaryValue: configItem.primaryValue || '',
-          groupByFormat: configItem.groupByFormat || '',
-          constantValue: configItem.constantValue || '',
-          selectedRangeType: configItem.selectedRangeType || '',
-          selectFromTime: configItem.selectFromTime || '',
-          selectToTime: configItem.selectToTime || '',
-          parameterValue: configItem.parameterValue || '',
-          columnVisibility: this.fb.control(columnVisibility), // Use control to handle as an array
-          filterParameter: this.fb.control(filterParameterValue), // Use control for dynamic handling
-          filterParameter1: this.fb.control(filterParameter1Value), // Same for filterParameter1
-          formatType:configItem.formatType ||'',
-          undefinedCheckLabel:configItem.undefinedCheckLabel ||'',
-          custom_Label:configItem.custom_Label ||'',
-          filterDescription:configItem.filterDescription ||'',
-          XaxisFormat:this.fb.control(dateParameter) ||''
-
+          formlist: [configItem.formlist || '', Validators.required],
+          parameterName: this.fb.control(arrayParameter, Validators.required),
+          primaryValue: [configItem.primaryValue || '', Validators.required],
+          groupByFormat: [configItem.groupByFormat || '', Validators.required],
+          constantValue: [configItem.constantValue || ''],
+          selectedRangeType: [configItem.selectedRangeType || '', Validators.required],
+          selectFromTime: [configItem.selectFromTime || ''],
+          selectToTime: [configItem.selectToTime || ''],
+          parameterValue: [configItem.parameterValue || ''],
+          columnVisibility: this.fb.control(columnVisibility),
+          filterParameter: this.fb.control(filterParameterValue),
+          filterParameter1: this.fb.control(filterParameter1Value),
+          formatType: [configItem.formatType || '', Validators.required],
+          undefinedCheckLabel: [configItem.undefinedCheckLabel || ''],
+          custom_Label: [configItem.custom_Label || '', Validators.required],
+          filterDescription: [configItem.filterDescription || ''],
+          XaxisFormat: this.fb.control(dateParameter)
         })
       );
 
@@ -1191,8 +1205,44 @@ repopulate_fields(getValues: any): FormArray {
 
   console.log('Final FormArray Values:', this.all_fields.value);
 
+  // **Validate if any required field is missing**
+  const allFieldsValid = this.validateRequiredFields();
+  if (!allFieldsValid) {
+    console.error('Required fields missing in the form');
+    // alert('Some required fields are missing. Please complete all required fields.');
+    return this.all_fields; // Return without proceeding with the update
+  }
+
   return this.all_fields;
 }
+
+// **Validation function to check required fields**
+validateRequiredFields(): boolean {
+  let isValid = true;
+
+  // Loop through all controls and check for required fields
+  this.all_fields.controls.forEach((control: AbstractControl, index: number) => {
+    // Cast AbstractControl to FormGroup
+    const formGroupControl = control as FormGroup;
+  
+    if (
+      formGroupControl.get('formlist')?.invalid ||
+      formGroupControl.get('parameterName')?.invalid ||
+      formGroupControl.get('primaryValue')?.invalid ||
+      formGroupControl.get('groupByFormat')?.invalid ||
+      formGroupControl.get('selectedRangeType')?.invalid ||
+      formGroupControl.get('formatType')?.invalid ||
+      formGroupControl.get('custom_Label')?.invalid
+    ) {
+      isValid = false;
+      console.error('A required field is missing or invalid');
+    }
+  });
+  
+
+  return isValid;
+}
+
 
 toggleCheckbox1(themeOrEvent: any): void {
   // If it's a color picker input (e.g., from a custom input field)
@@ -1679,24 +1729,26 @@ this.dynamicDateParamMap.set(index,dateFieldsList)
     // Add more hardcoded options as needed
   ];
   showValues = [
-    { value: 'sum', text: 'Sum' },
-    { value: 'min', text: 'Minimum' },
-    { value: 'max', text: 'Maximum' },
-    { value: 'average', text: 'Average' },
-    { value: 'latest', text: 'Latest' },
-    { value: 'previous', text: 'Previous' },
+    // { value: 'sum', text: 'Sum' },
+    // { value: 'min', text: 'Minimum' },
+    // { value: 'max', text: 'Maximum' },
+    // { value: 'average', text: 'Average' },
+    // { value: 'latest', text: 'Latest' },
+    // { value: 'previous', text: 'Previous' },
     // { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
     // { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
     // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
     // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
-    { value: 'Constant', text: 'Constant' },
+    // { value: 'Constant', text: 'Constant' },
   
-    { value: 'Count', text: 'Count' },
+    // { value: 'Count', text: 'Count' },
     // { value: 'Count_Multiple', text: 'Count Multiple' },
     // { value: 'Count Dynamic', text: 'Count Dynamic' },
     { value: 'Count MultiplePram', text: 'Count Multiple Parameter' },
     { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
     { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
+    {value:'count with sum MultipleParameter' , text:'Count With Sum Multiple Parameter'},
+    {value:'sum with count MultipleParameter' , text:'Sum With Count Multiple Parameter'},
     { value: 'sumArray', text: 'SumArray' },
     { value: 'Advance Equation', text: 'Advance Equation' },
     { value: 'sum_difference', text: 'Sum Difference' },
@@ -1722,14 +1774,14 @@ this.dynamicDateParamMap.set(index,dateFieldsList)
 
   showCustomValues = [
 
-    { value: 'Hourly', text: 'Hourly' },
-    { value: 'Daily', text: 'Daily' },
-    { value: 'Hour of the Day', text: 'Hour of the Day' },
-    { value: 'Weekly', text: 'Weekly' },
-    { value: 'Day of Week', text: 'Day of Week' },
-    { value: 'Monthly', text: 'Monthly' },
-    { value: 'Day of Month', text: 'Day of Month' },
-    { value: 'Yearly', text: 'Yearly' },
+    // { value: 'Hourly', text: 'Hourly' },
+    // { value: 'Daily', text: 'Daily' },
+    // { value: 'Hour of the Day', text: 'Hour of the Day' },
+    // { value: 'Weekly', text: 'Weekly' },
+    // { value: 'Day of Week', text: 'Day of Week' },
+    // { value: 'Monthly', text: 'Monthly' },
+    // { value: 'Day of Month', text: 'Day of Month' },
+    // { value: 'Yearly', text: 'Yearly' },
     { value: 'Any', text: 'any' }
   ];
   onValueChange(selectedValue: any): void {
@@ -2065,6 +2117,68 @@ validateAndSubmit() {
   this.modal.dismiss();
 }
 
+validateAndUpdate() {
+  let isFormValid = true; // Initialize form validity as true
+
+  // Mark all controls as touched for validation, including controls inside FormArray
+  Object.values(this.createChart.controls).forEach(control => {
+    if (control instanceof FormControl) {
+      // Mark the control as touched and update its validity
+      control.markAsTouched();
+      control.updateValueAndValidity();
+
+      // If it's a required field and it's empty, mark the form as invalid
+      if (control.hasError('required') && !control.value) {
+        console.error('Required field is empty, update stopped');
+        isFormValid = false;
+      }
+    } else if (control instanceof FormArray) {
+      // Iterate over the controls in the FormArray
+      control.controls.forEach((controlItem, index) => {
+        if (controlItem instanceof FormGroup) {
+          // Iterate over inner controls in the FormGroup
+          Object.values(controlItem.controls).forEach(innerControl => {
+            innerControl.markAsTouched();
+            innerControl.updateValueAndValidity();
+
+            // Check if the inner control is required and empty
+            if (innerControl.hasError('required') && !innerControl.value) {
+              console.error('Required field is empty in FormGroup, update stopped');
+              isFormValid = false;
+            }
+          });
+        }
+      });
+    }
+  });
+
+  // Check overall form validity
+  const allFieldsValid = this.createChart.get('all_fields')?.valid;
+  console.log('check form array', allFieldsValid);
+
+  // Check if the form is valid, including nested FormArray controls
+  console.log('isFormValid checking', isFormValid);
+
+  // Only proceed with update if the form is valid
+  if (isFormValid && this.createChart.valid && allFieldsValid) {
+    this.updateTile('chart');
+    this.modal.dismiss();
+  } else {
+    console.error('Form is invalid. Cannot update.');
+    // Show error message
+    // alert('Please fill all required fields before updating.');
+  }
+}
+
+
+
+
+
+
+
+
+
+
 setUserSatus(){
   this.userIsChanging = true
   this.cdr.detectChanges()
@@ -2191,7 +2305,7 @@ showValuesForMini = [
   // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
   // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
   { value: 'Constant', text: 'Constant' },
-  { value: 'Live', text: 'Live' },
+  // { value: 'Live', text: 'Live' },
   { value: 'Count', text: 'Count' },
   { value: 'Count_Multiple', text: 'Count Multiple' },
   { value: 'Count Dynamic', text: 'Count Dynamic' },

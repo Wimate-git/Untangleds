@@ -88,7 +88,7 @@ export class ChartUi3Component implements OnInit{
     
             formName:this.item.chartConfig.formlist
             }
-  
+            this.counter=0
             const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
           
             // Prepare the request body
@@ -442,7 +442,7 @@ export class ChartUi3Component implements OnInit{
   
       if (storeconditionsLength === this.counter || storeconditionsLength === undefined) {
           console.log('Emitting action, either conditions are empty or second bar clicked');
-          
+          console.log('this.formTableConfig checking inside',this.formTableConfig)
           // Emit action
           this.emitChartConfigTable.emit(this.formTableConfig);
           this.sendCellInfo.emit(event);
@@ -701,8 +701,9 @@ createColumnChart(columnChartData?:any){
     Highcharts.chart(`Columnchart${this.index+1}`, columnChartDataFormat);
   }else{
    
-    const columnChartDataFormat = JSON.parse(this.item.highchartsOptionsJson)
-    console.log('columnChartDataFormat from else',columnChartDataFormat)
+    const columnChartDataFormat = JSON.parse(this.item.highchartsOptionsJson);
+    console.log('columnChartDataFormat from else', columnChartDataFormat);
+
     columnChartDataFormat.series = columnChartDataFormat.series.map((series: any) => {
       return {
         ...series,
@@ -711,13 +712,17 @@ createColumnChart(columnChartData?:any){
           name: series.name, // Series name (optional)
           customIndex: index, // Custom property to track index
           events: {
-            click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event,this.index),
+            click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event, this.index),
           },
         })),
       };
     });
 
-    Highcharts.chart(`Columnchart${this.index+1}`, columnChartDataFormat);
+    // Ensure this runs after Angular change detection
+    setTimeout(() => {
+      Highcharts.chart(`Columnchart${this.index + 1}`, columnChartDataFormat);
+      this.cdr.detectChanges(); // Manually trigger change detection
+    }, 0);
   }
 
 

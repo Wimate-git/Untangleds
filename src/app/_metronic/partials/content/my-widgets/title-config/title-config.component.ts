@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, SimpleChanges } from '@angular/core';
-import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -140,7 +140,7 @@ ngOnChanges(changes: SimpleChanges): void {
     // Initialize the form group
     this.createTitle = this.fb.group({
     
-      'customLabel': ['', Validators.required], // Title content
+      customLabel: ['', Validators.required], // Title content
       fontFamily: [''], // Font family
       fontSize: [''], // Font size
       textAlign: ['left'], // Text alignment
@@ -155,6 +155,55 @@ ngOnChanges(changes: SimpleChanges): void {
     });
   }
   
+
+
+  validateAndSubmit() {
+    if (this.createTitle.invalid) {
+      // Mark all fields as touched to trigger validation messages
+      Object.values(this.createTitle.controls).forEach(control => {
+        if (control instanceof FormControl) {
+          control.markAsTouched();
+          control.updateValueAndValidity();
+        } else if (control instanceof FormArray) {
+          control.controls.forEach((group) => {
+            (group as FormGroup).markAllAsTouched();
+          });
+        }
+      });
+  
+      // Stop the function if the form is invalid
+      return; // 🚨 Stop execution if the form is invalid
+    }
+  
+    // Proceed with saving if the form is valid
+    this.addTile('title');
+    this.modal.dismiss();
+  }
+  
+  
+  
+  
+  validateAndUpdate() {
+    if (this.createTitle.invalid) {
+      // ✅ Mark all fields as touched to trigger validation messages
+      Object.values(this.createTitle.controls).forEach(control => {
+        if (control instanceof FormControl) {
+          control.markAsTouched();
+          control.updateValueAndValidity();
+        } else if (control instanceof FormArray) {
+          control.controls.forEach((group) => {
+            (group as FormGroup).markAllAsTouched();
+          });
+        }
+      });
+  
+      return; // 🚨 Stop execution if the form is invalid
+    }
+  
+    // ✅ Proceed with saving only if form is valid
+    this.updateTitle();
+    this.modal.dismiss();
+  }
   duplicateTitle(tile: any, index: number): void {
     // Validate the tile and dashboard before proceeding
     if (!tile || !this.dashboard || index < 0 || index >= this.dashboard.length) {

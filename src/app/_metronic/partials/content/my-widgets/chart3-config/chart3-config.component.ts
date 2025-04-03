@@ -628,7 +628,8 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         multiColorCheck:this.createChart.value.multiColorCheck ,
         dataLabelFontColor:this.createChart.value.dataLabelFontColor,
         chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
-        chartBackgroundColor2:this.createChart.value.chartBackgroundColor2
+        chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
+        filterDescription:'',
 
   
 
@@ -1071,8 +1072,8 @@ repopulate_fields(getValues: any): FormArray {
     return this.all_fields;
   }
 
-  const noOfParams = getValues.noOfParams || '';
-  this.all_fields.clear(); // Clear existing fields in the FormArray
+  // Clear existing fields in the FormArray
+  this.all_fields.clear();
 
   // Parse `chartConfig` safely
   let parsedChartConfig: any[] = [];
@@ -1089,67 +1090,162 @@ repopulate_fields(getValues: any): FormArray {
 
   console.log('Parsed chartConfig:', parsedChartConfig);
 
+  // Populate FormArray based on parsedChartConfig
   if (parsedChartConfig.length > 0) {
     parsedChartConfig.forEach((configItem, index) => {
       console.log(`Processing index ${index} - Full Object:`, configItem);
 
-      // Handle `columnVisibility` dynamically
+      // Handle columnVisibility as a simple array initialization
       const columnVisibility = Array.isArray(configItem.columnVisibility)
         ? configItem.columnVisibility.map((item: { text: any; value: any; }) => ({
             text: item.text || '',
             value: item.value || '',
           }))
         : [];
-        const arrayParameter = Array.isArray(configItem.parameterName)
-        ? configItem.parameterName
-        : [];
-        const filterParameterValue = Array.isArray(configItem.filterParameter)
+
+      // Handle filterParameter dynamically
+      const filterParameterValue = Array.isArray(configItem.filterParameter)
         ? configItem.filterParameter
         : [];
-        const dateParameter = Array.isArray(configItem.XaxisFormat)
+
+      // Handle filterParameter1 dynamically
+      const filterParameter1Value = Array.isArray(configItem.filterParameter1)
+        ? configItem.filterParameter1
+        : [];
+
+      const arrayParameter = Array.isArray(configItem.parameterName)
+        ? configItem.parameterName
+        : [];
+
+      const dateParameter = Array.isArray(configItem.XaxisFormat)
         ? configItem.XaxisFormat
         : [];
 
-      // Push FormGroup into FormArray
+      // Create and push FormGroup into FormArray
       this.all_fields.push(
         this.fb.group({
-          formlist: configItem.formlist || '',
-          parameterName: this.fb.control(arrayParameter)||'',
-  
-          primaryValue: configItem.primaryValue || '',
-          groupByFormat: configItem.groupByFormat || '',
-          constantValue: configItem.constantValue || '',
-          selectedRangeType: configItem.selectedRangeType || '',
-          selectFromTime: configItem.selectFromTime || '',
-          selectToTime: configItem.selectToTime || '',
-          parameterValue: configItem.parameterValue || '',
-          columnVisibility: this.fb.control(columnVisibility), // Use control to handle as an array
-          formatType:configItem.formatType||'',
-          undefinedCheckLabel:configItem.undefinedCheckLabel||'',
-          custom_Label: configItem.custom_Label||'',
-            filterParameter: this.fb.control(filterParameterValue),
-               filterDescription:configItem.filterDescription ||'',
-             XaxisFormat:this.fb.control(dateParameter) ||''
+          formlist: [configItem.formlist || '', Validators.required],
+          parameterName: this.fb.control(arrayParameter, Validators.required),
+          primaryValue: [configItem.primaryValue || '', Validators.required],
+          groupByFormat: [configItem.groupByFormat || '', Validators.required],
+          constantValue: [configItem.constantValue || ''],
+          selectedRangeType: [configItem.selectedRangeType || '', Validators.required],
+          selectFromTime: [configItem.selectFromTime || ''],
+          selectToTime: [configItem.selectToTime || ''],
+          parameterValue: [configItem.parameterValue || ''],
+          columnVisibility: this.fb.control(columnVisibility),
+          filterParameter: this.fb.control(filterParameterValue),
+          filterParameter1: this.fb.control(filterParameter1Value),
+          formatType: [configItem.formatType || '', Validators.required],
+          undefinedCheckLabel: [configItem.undefinedCheckLabel || ''],
+          custom_Label: [configItem.custom_Label || '', Validators.required],
+          filterDescription: [configItem.filterDescription || ''],
+          XaxisFormat: this.fb.control(dateParameter)
         })
       );
 
+      // Log the added FormGroup for debugging
       console.log(`FormGroup at index ${index}:`, this.all_fields.at(index).value);
     });
   } else {
     console.warn('No parsed data to populate fields');
-    if (noOfParams !== '' && noOfParams !== undefined && noOfParams !== null) {
-      // Adjust FormArray length based on noOfParams
-      for (let i = this.all_fields.length; i >= noOfParams; i--) {
-        this.all_fields.removeAt(i);
-      }
-    }
   }
 
   console.log('Final FormArray Values:', this.all_fields.value);
 
+  // **Validate if any required field is missing**
+  const allFieldsValid = this.validateRequiredFields();
+  if (!allFieldsValid) {
+    console.error('Required fields missing in the form');
+    // alert('Some required fields are missing. Please complete all required fields.');
+    return this.all_fields; // Return without proceeding with the update
+  }
+
   return this.all_fields;
 }
 
+
+
+validateRequiredFields(): boolean {
+  let isValid = true;
+
+  // Loop through all controls and check for required fields
+  this.all_fields.controls.forEach((control: AbstractControl, index: number) => {
+    // Cast AbstractControl to FormGroup
+    const formGroupControl = control as FormGroup;
+  
+    if (
+      formGroupControl.get('formlist')?.invalid ||
+      formGroupControl.get('parameterName')?.invalid ||
+      formGroupControl.get('primaryValue')?.invalid ||
+      formGroupControl.get('groupByFormat')?.invalid ||
+      formGroupControl.get('selectedRangeType')?.invalid ||
+      formGroupControl.get('formatType')?.invalid ||
+      formGroupControl.get('custom_Label')?.invalid
+    ) {
+      isValid = false;
+      console.error('A required field is missing or invalid');
+    }
+  });
+  
+
+  return isValid;
+}
+
+
+
+validateAndUpdate() {
+  let isFormValid = true; // Initialize form validity as true
+
+  // Mark all controls as touched for validation, including controls inside FormArray
+  Object.values(this.createChart.controls).forEach(control => {
+    if (control instanceof FormControl) {
+      // Mark the control as touched and update its validity
+      control.markAsTouched();
+      control.updateValueAndValidity();
+
+      // If it's a required field and it's empty, mark the form as invalid
+      if (control.hasError('required') && !control.value) {
+        console.error('Required field is empty, update stopped');
+        isFormValid = false;
+      }
+    } else if (control instanceof FormArray) {
+      // Iterate over the controls in the FormArray
+      control.controls.forEach((controlItem, index) => {
+        if (controlItem instanceof FormGroup) {
+          // Iterate over inner controls in the FormGroup
+          Object.values(controlItem.controls).forEach(innerControl => {
+            innerControl.markAsTouched();
+            innerControl.updateValueAndValidity();
+
+            // Check if the inner control is required and empty
+            if (innerControl.hasError('required') && !innerControl.value) {
+              console.error('Required field is empty in FormGroup, update stopped');
+              isFormValid = false;
+            }
+          });
+        }
+      });
+    }
+  });
+
+  // Check overall form validity
+  const allFieldsValid = this.createChart.get('all_fields')?.valid;
+  console.log('check form array', allFieldsValid);
+
+  // Check if the form is valid, including nested FormArray controls
+  console.log('isFormValid checking', isFormValid);
+
+  // Only proceed with update if the form is valid
+  if (isFormValid && this.createChart.valid && allFieldsValid) {
+    this.updateTile('chart');
+    this.modal.dismiss();
+  } else {
+    console.error('Form is invalid. Cannot update.');
+    // Show error message
+    // alert('Please fill all required fields before updating.');
+  }
+}
 repopulateDrill_fields(getValues: any): FormArray {
   console.log('getValues check from readbackDrill', getValues);
 
@@ -1629,6 +1725,8 @@ repopulateDrill_fields(getValues: any): FormArray {
     { value: 'Count MultiplePram', text: 'Count Multiple Parameter' },
     { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
     { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
+    {value:'count with sum MultipleParameter' , text:'Count With Sum Multiple Parameter'},
+    {value:'sum with count MultipleParameter' , text:'Sum With Count Multiple Parameter'},
     { value: 'sumArray', text: 'SumArray' },
     { value: 'sum_difference', text: 'Sum Difference' },
     { value: 'distance_sum', text: 'Distance Sum' },

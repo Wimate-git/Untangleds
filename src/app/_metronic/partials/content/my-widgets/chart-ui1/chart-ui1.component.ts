@@ -130,7 +130,7 @@ toggleCheck(isChecked: boolean,index:any) {
   
           formName:this.item.chartConfig.formlist
           }
-
+          this.counter=0
           const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
         
           // Prepare the request body
@@ -214,6 +214,7 @@ toggleCheck(isChecked: boolean,index:any) {
 }
 onBarClick(event: Highcharts.PointClickEventObject,index:any): void {
   console.log('event check for donut chart', event);
+  // this.counter=0
 if(this.isEditModeView==true){
   this.enableDrillButton = true
   console.log('i am in editmode',this.isEditModeView)
@@ -507,7 +508,7 @@ if(data){
     }else{
       const chartOptionsCopy = JSON.parse(this.item.highchartsOptionsJson);
 
-      console.log('chartOptionsCopy else condition',chartOptionsCopy)
+      console.log('chartOptionsCopy else condition from donut chart',chartOptionsCopy)
 
       chartOptionsCopy.series = chartOptionsCopy.series.map((series: any) => {
         return {

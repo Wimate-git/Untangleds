@@ -79,15 +79,16 @@
                   <p-multiSelect
                     [options]="listofDynamicParam"
                     formControlName="form_data_selected"
-                    optionLabel="text" 
+                    optionLabel="text"
                     placeholder="Select Columns"
-                    (onChange)="addControls($event.value, 'ts')"> 
+                    (onChange)="handleChange($event)"> 
                   </p-multiSelect>
                   <div *ngIf="createKPIWidget.get('form_data_selected')?.touched && createKPIWidget.get('form_data_selected')?.invalid" class="text-danger">
                     <div *ngIf="createKPIWidget.get('form_data_selected')?.errors?.required">Form Fields is required.</div>
                   </div>
                 </div>
               </div>
+              
               
             
               <!-- <div class="col-md-4 mb-3">
@@ -393,8 +394,8 @@
    
 
     
-      (click)="updateTile('TableWidget');modal.dismiss() " 
-      *ngIf="isEditMode" [disabled]="createKPIWidget?.invalid">
+      (click)="validateAndUpdate() " 
+      *ngIf="isEditMode" >
       Update
     </button>
       </div>
@@ -508,12 +509,12 @@
                 <div class="list-item" (click)="selectValue('This Week', modal)" (mouseenter)="showTooltip('This Week')"
                   (mouseleave)="hideTooltip()">
                   <div class="title">This Week</div>
-                  <div class="example">E.g., Current week (Monday to Sunday)</div>
+                  <div class="example">E.g., Current week (Sunday to Saturday)</div>
                 </div>
-                <div class="list-item" (click)="selectValue('Last 5 Weeks', modal)" (mouseenter)="showTooltip('Last 5 Weeks')"
+                <div class="list-item" (click)="selectValue('Last Week', modal)" (mouseenter)="showTooltip('Last 5 Weeks')"
                   (mouseleave)="hideTooltip()">
-                  <div class="title">Last 5 Weeks</div>
-                  <div class="example">E.g., Data for past 5 weeks</div>
+                  <div class="title">Last Week</div>
+                  <div class="example">E.g., Data for last week</div>
                 </div>
                 <div class="list-item" (click)="selectValue('This Month', modal)" (mouseenter)="showTooltip('This Month')"
                   (mouseleave)="hideTooltip()">
@@ -563,10 +564,10 @@
                   <div class="title">Last Year</div>
                   <div class="example">E.g., Data from the previous year</div>
                 </div>
-                <div class="list-item" (click)="selectValue('Last 5 Years', modal)" (mouseenter)="showTooltip('Last 5 Years')"
+                <div class="list-item" (click)="selectValue('Last 5 Weeks', modal)" (mouseenter)="showTooltip('Last 5 Years')"
                   (mouseleave)="hideTooltip()">
-                  <div class="title">Last 5 Years</div>
-                  <div class="example">E.g., Data for the past 5 years</div>
+                  <div class="title">Last 5 Weeks</div>
+                  <div class="example">E.g., Data for the last 5 weeks</div>
                 </div>
               </div>
             </div>

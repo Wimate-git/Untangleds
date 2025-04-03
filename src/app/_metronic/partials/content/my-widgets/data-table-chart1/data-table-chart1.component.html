@@ -31,32 +31,35 @@
 
 </div>
 
-
-  <div class="modal-body right-side-modal">
-    <div class="card-body pt-0">
-      <div class="container1">
-        <div class="ag-theme-alpine" style="width: 100%; height: 400px;">
-          <ag-grid-angular
-            [rowData]="sendRowDynamic"
-            [columnDefs]="columnDefs"
-            [defaultColDef]="{
-              flex: 1,
-              minWidth: 100,
-              filter: true,
-              resizable: true
-            }"
-            [pagination]="true"
-            [paginationPageSize]="10"
-            [paginationPageSizeSelector]="pageSizeOptions"
-            style="width: 100%; height: 100%;"
-            (gridReady)="onGridReady($event)"
-            (cellClicked)="onCellClick($event)"
-          ></ag-grid-angular>
-        </div>
+<div class="modal-body right-side-modal">
+  <div class="card-body pt-0">
+    <div class="container1">
+      <!-- Center the heading -->
+      <div class="table-heading text-align-center">
+        <h3>{{ FormName }}</h3> <!-- Binding FormName here -->
+      </div>
+  
+      <div class="ag-theme-alpine" style="width: 100%; height: 600px;"> <!-- Increased height -->
+        <ag-grid-angular
+          [rowData]="sendRowDynamic"
+          [columnDefs]="columnDefs"
+          [defaultColDef]="{
+            flex: 1,
+            minWidth: 100,
+            filter: true,
+            resizable: true
+          }"
+          [pagination]="true"
+          [paginationPageSize]="10"
+          [paginationPageSizeSelector]="pageSizeOptions"
+          style="width: 100%; height: 100%;"
+          (gridReady)="onGridReady($event)"
+          (cellClicked)="onCellClick($event)"
+        ></ag-grid-angular>
       </div>
     </div>
-
-
-
   </div>
+</div>
+
+
   

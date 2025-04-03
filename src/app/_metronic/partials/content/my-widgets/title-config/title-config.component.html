@@ -116,6 +116,8 @@
                   <option value="Sans-serif" style="font-family: 'Sans-serif';">Sans-serif</option>
       <option value="Inter" style="font-family: 'Inter';">Inter</option>
       <option value="Helvetica" style="font-family: 'Helvetica';">Helvetica</option>
+
+ 
                 </select>
               </div>
             </div>
@@ -261,40 +263,39 @@
             
             
             <!-- Name Container -->
-            <div
-            class="col-md-12"
-            style="padding: 10px; border-radius: 8px;"
-          >
-            <label class="col-form-label fw-bold fs-6 required">Name</label>
-            <div
-              formControlName="customLabel"
-              contenteditable="true"
-              class="form-control form-control-solid"
-              [style.font-family]="createTitle.value.fontFamily"
-              [style.font-size]="createTitle.value.fontSize"
-              [style.text-align]="'center'"  
-              [style.font-weight]="createTitle.value.fontWeight"
-              [style.font-style]="createTitle.value.fontStyle"
-              [style.text-decoration]="createTitle.value.textDecoration"
-              [style.background-color]="createTitle.value.themeColor"
-              [style.color]="createTitle.value.textColor"
-              [style.direction]="'ltr'"  
-              [style.white-space]="'pre-wrap'"  
-              [style.overflow]="'auto'"  
-              (input)="updateCustomLabel($event)"
-              [textContent]="createTitle.value.customLabel"
-            >
+            <div class="col-md-12" style="padding: 10px; border-radius: 8px;">
+              <label class="col-form-label fw-bold fs-6 required">Name</label>
+              <div
+                formControlName="customLabel"
+                contenteditable="true"
+                class="form-control form-control-solid"
+                [style.font-family]="createTitle.value.fontFamily"
+                [style.font-size]="createTitle.value.fontSize"
+                [style.font-weight]="createTitle.value.fontWeight"
+                [style.font-style]="createTitle.value.fontStyle"
+                [style.text-decoration]="createTitle.value.textDecoration"
+                [style.background-color]="createTitle.value.themeColor"
+                [style.color]="createTitle.value.textColor"
+                [style.direction]="'ltr'"
+                [style.white-space]="'pre-wrap'"
+                [style.overflow]="'auto'"
+                [style.text-align]="createTitle.value.textAlign" 
+                (input)="updateCustomLabel($event)"
+                [textContent]="createTitle.value.customLabel"
+              >
+              </div>
+            
+              <!-- Validation Feedback -->
+              <div
+                class="invalid-feedback"
+                *ngIf="createTitle.get('customLabel')?.invalid && createTitle.get('customLabel')?.touched"
+                style="padding: 5px; border-radius: 5px;"
+              >
+                Title Name is required
+              </div>
             </div>
-          
-            <!-- Validation Feedback -->
-            <div
-              class="invalid-feedback"
-              *ngIf="createTitle.get('customLabel')?.invalid && createTitle.get('customLabel')?.touched"
-              style="padding: 5px; border-radius: 5px;"
-            >
-              Title Name is required
-            </div>
-          </div>
+            
+            
           
           
           
@@ -309,8 +310,8 @@
   
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Discard</button>
-          <button type="button" class="btn btn-primary" (click)="addTile('title'); modal.dismiss()" *ngIf="!isEditMode">Save</button>
-          <button type="button" class="btn btn-primary" (click)="updateTitle(); modal.dismiss()" *ngIf="isEditMode">Update</button>
+          <button type="button" class="btn btn-primary" (click)="validateAndSubmit()" *ngIf="!isEditMode">Save</button>
+          <button type="button" class="btn btn-primary" (click)="validateAndUpdate()" *ngIf="isEditMode">Update</button>
         </div>
       </div>
   

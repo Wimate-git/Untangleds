@@ -67,3 +67,10 @@
     text-overflow: ellipsis;
     font-size: 18px; /* Adjust size as needed */
   }
+
+  .text-align-center {
+    text-align: center;
+    width: 100%;  /* Ensure it takes up full width for centering */
+    display: flex;
+    justify-content: center;
+  }

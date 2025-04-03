@@ -36,7 +36,10 @@
   <div class="modal-body right-side-modal">
     <div class="card-body pt-0">
       <div class="container1">
-        <div class="ag-theme-alpine" style="width: 100%; height: 400px;">
+        <div class="table-heading text-align-center">
+          <h3>{{ FormName }}</h3> <!-- Binding FormName here -->
+        </div>
+        <div class="ag-theme-alpine" style="width: 100%; height: 600px;">
           <ag-grid-angular
             [rowData]="responseRowData"
             [columnDefs]="columnDefs"

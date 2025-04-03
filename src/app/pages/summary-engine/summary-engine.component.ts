@@ -1409,9 +1409,13 @@ Highcharts.chart('MixedChart', barchartOptions);
     if (item.grid_type === 'filterTile') {
       this.justReadStyles(item, i);
     } else if (item.grid_type === 'tile') {
-      if (this.isEditModeView && !this.hideButton) {
+      if (this.isEditModeView && !this.hideButton && (this.summaryDashboardUpdate || this.summaryDashboardView)) {
+        console.log('Triggering the function'); // Log to confirm condition
         this.invokeHelperDashboard(item, i, this.modalContent, this.dataTableModalTile1);
-      } 
+      } else {
+        console.log('Condition not met'); // Log if the condition isn't met
+      }
+      
       // else if (!this.isEditModeView) {
       //   console.log('i am triggering helperTile')
       //   // this.helperTile($event, this.KPIModal);
@@ -3742,14 +3746,17 @@ this.http.post(apiUrl, requestBody).subscribe(
           item.name === "Summary Dashboard"
       );
       console.log("Summary Dashboard Item:", summaryDashboardItem);
+      // localStorage.setItem('editModeState', this.isEditModeView.toString());
 
       if (summaryDashboardItem) {
         this.summaryDashboardUpdate = summaryDashboardItem.update;
         this.summaryDashboardView = summaryDashboardItem.view;
         console.log("this.summaryDashboardUpdate check", this.summaryDashboardUpdate);
 
-        this.isEditModeView = this.summaryDashboardUpdate || 
-                              (this.summaryDashboardUpdate && !this.summaryDashboardView);
+        this.isEditModeView = this.summaryDashboardView && !this.summaryDashboardUpdate || this.summaryDashboardUpdate;
+        console.log('this.isEditModeView checking from permission', this.isEditModeView);
+        
+                              console.log('this.isEditModeView checking from permission',this.isEditModeView)
         this.updateOptions();
       }
 

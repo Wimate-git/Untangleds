@@ -97,22 +97,33 @@
                 [style.width.px]="item.grid_type === 'chart' ? 400 : null" 
                 (click)="handleClick(item, i, $event)"
                 (dblclick)="
-                item.grid_type === 'tile' 
+                (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)) &&
+                (item.grid_type === 'tile' 
                   ? (!isEditModeView ? helperEditModalOpen(item, i, KPIModal) : null) 
                   : item.grid_type === 'dynamicTile' 
                     ? (!isEditModeView && !hideButton ? helperEditModalOpen(item, i, DynamicTileModal) : null) 
-                    :    item.grid_type === 'tile2' 
-                    ? (!isEditModeView ? helperEditModalOpen(item, i, KPIModal1) : null): item.grid_type === 'title' 
-                    ? (!isEditModeView ? helperEditModalOpen(item, i, TitleModal) : null):item.grid_type === 'tileWithIcon' 
-                    ? (!isEditModeView ? helperEditModalOpen(item, i, tileWithIconModal) : null):item.grid_type === 'progressTile' 
-                    ? (!isEditModeView ? helperEditModalOpen(item, i, ProgressTileModal) : null):item.grid_type === 'chart' 
-                    ? (!isEditModeView ? helperEditModalOpen(item, i, ChartModal1) : null):item.grid_type === 'Linechart' 
-                    ? (!isEditModeView ? helperEditModalOpen(item, i, ChartModal2) : null):item.grid_type === 'Columnchart' 
-                    ? (!isEditModeView ? helperEditModalOpen(item, i, ChartModal3) : null):item.grid_type === 'Funnelchart' 
-                    ? (!isEditModeView ? helperEditModalOpen(item, i, FunnelChartModal) : null):item.grid_type === 'Piechart' 
-                    ? (!isEditModeView ? helperEditModalOpen(item, i, pieChartModal) : null):item.grid_type === 'Stackedchart' 
-                    ? (!isEditModeView ? helperEditModalOpen(item, i, stackedBarChartModal) : null): null
-              "
+                    : item.grid_type === 'tile2' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, KPIModal1) : null)
+                    : item.grid_type === 'title' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, TitleModal) : null)
+                    : item.grid_type === 'tileWithIcon' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, tileWithIconModal) : null)
+                    : item.grid_type === 'progressTile' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, ProgressTileModal) : null)
+                    : item.grid_type === 'chart' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, ChartModal1) : null)
+                    : item.grid_type === 'Linechart' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, ChartModal2) : null)
+                    : item.grid_type === 'Columnchart' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, ChartModal3) : null)
+                    : item.grid_type === 'Funnelchart' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, FunnelChartModal) : null)
+                    : item.grid_type === 'Piechart' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, pieChartModal) : null)
+                    : item.grid_type === 'Stackedchart' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, stackedBarChartModal) : null)
+                    : null
+                )"
               
               
               
@@ -808,7 +819,7 @@
     <a *ngIf="summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)" title="New Dashboard" class="myMenu-item" (click)="openModal('new',null, summaryModal)">
       <i style="color: white;" class="fa fa-plus"></i>
     </a>
-    <a *ngIf="!isSummaryEngine() &&(summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))" 
+    <a *ngIf="!isSummaryEngine()" 
     title="Go To Home" 
     class="myMenu-item" 
     (click)="redirectToSummaryEngine()">
@@ -989,10 +1000,11 @@
   
   
   <ng-template #summaryModal let-modal>
-  <div class="modal-header" style="max-width: 1040px;">
-    <h2 class="modal-title">{{ showHeading ? 'Add Summary' : 'Edit Summary' }}</h2>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
-  </div>
+    <div class="modal-header" style="max-width: 1040px; display: flex; justify-content: space-between; align-items: flex-start;">
+      <h2 class="modal-title">{{ showHeading ? 'Add Summary' : 'Edit Summary' }}</h2>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+    </div>
+    
   
   
   <div class="modal-body">

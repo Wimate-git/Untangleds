@@ -92,7 +92,7 @@ export class StackedBarUiComponent {
     
             formName:this.item.chartConfig.formlist
             }
-  
+            this.counter=0
             const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
           
             // Prepare the request body
