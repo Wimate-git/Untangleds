@@ -24,9 +24,6 @@ export type UserType = UserModel | undefined;
 export class AuthService implements OnDestroy {
 
 
-
-
-  private readonly sessionTimeout = 10000; // 1 hour in milliseconds
   private sessionTimer: any;
 
   private userPool = new CognitoUserPool({
@@ -85,78 +82,6 @@ export class AuthService implements OnDestroy {
   }
 
 
-  // checkSession() {
-  //   console.log("Session is triggered ");
-
-  //   const cognitoUser = this.userPool.getCurrentUser();
-  //   console.log("cognitoUser session details are here ",cognitoUser);
-  //   if (cognitoUser != null) {
-  //       cognitoUser.getSession((err:any, session:any) =>{
-  //           if (err) {
-  //               console.log("Error logging session ",err);
-  //               // alert(err.message || JSON.stringify(err));
-  //               this.logout()
-  //               cognitoUser.signOut();
-               
-  //               document.location.reload()
-  //               this.router.navigate(['auth/login'])
-  //               return;
-  //           }
-  //           if (session.isValid()) {
-  //               console.log("Session is valid",session);
-
-  //               // if(session.clockDrift != 0){
-  //               //   this.logout()
-  //               //   cognitoUser.signOut();
-                 
-  //               //   document.location.reload()
-  //               //   this.router.navigate(['auth/login'])
-             
-  //               // }
- 
-  //           } else {
-  //               console.log("Session is invalid");
-              
-  //               this.logout()
-  //               cognitoUser.signOut();
-               
-  //               document.location.reload()
-  //               this.router.navigate(['auth/login'])
-           
-  //           }
-  //       });
-  //   }
-  //   else{
-  //     this.logout()
-  //     this.router.navigate(['auth/login'])
-  //     document.location.reload()
-  //   }
-  // }
-
-
-  // private startSessionTimer() {
-  //   this.sessionTimer = setTimeout(() => {
-  //     console.log("Session Loged out ");
-  //     this.logout(); // Automatically log out the user after 1 hour
-  //      // Display toastr message
-      
-  //     // document.location.reload()
-
-  //     Swal.fire({
-  //       position: 'center',
-  //       text: "Session Timed Out, Re-login please",
-  //       icon: 'error',
-  //       allowOutsideClick: false,
-  //       confirmButtonText: 'OK'
-  //     }).then((result) => {
-  //       if (result.isConfirmed) {
-  //         // Reload the page on clicking OK
-  //         document.location.reload();
-  //       }
-  //     });
-    
-  //   }, this.sessionTimeout);
-  // }
 
 
   checkSession() {
@@ -213,7 +138,7 @@ export class AuthService implements OnDestroy {
     }
   }
   
-  refreshSession(cognitoUser: any) {
+  async refreshSession(cognitoUser: any) {
     const refreshTokenValue = localStorage.getItem('refreshToken');
     
     if (!refreshTokenValue) {
@@ -227,14 +152,35 @@ export class AuthService implements OnDestroy {
     
     const refreshToken = new CognitoRefreshToken({RefreshToken: refreshTokenValue});
     
-    cognitoUser.refreshSession(refreshToken, (err: any, session: any) => {
+    cognitoUser.refreshSession(refreshToken, async (err: any, session: any) => {
       if (err) {
-        console.log("Error refreshing token: ", err);
-        this.logout();
-        cognitoUser.signOut();
-        document.location.reload();
-        this.router.navigate(['auth/login']);
-        return;
+
+
+        await Swal.fire({
+          // toast: true,
+          position: 'center',
+          icon: 'warning',
+          title: `Session expired! Please re-login.`,
+          showConfirmButton: true,
+          timer: 5000,
+          timerProgressBar: true,
+        }).then((err)=>{
+          console.log("Error refreshing token: ", err);
+          this.logout();
+          cognitoUser.signOut();
+          document.location.reload();
+          this.router.navigate(['auth/login']);
+          return
+        });
+
+
+
+        // console.log("Error refreshing token: ", err);
+        // this.logout();
+        // cognitoUser.signOut();
+        // document.location.reload();
+        // this.router.navigate(['auth/login']);
+        // return;
       }
       
       // Update tokens in session storage

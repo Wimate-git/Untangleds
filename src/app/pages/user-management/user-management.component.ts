@@ -2868,16 +2868,138 @@ rdtListWorkAround :any =[{
     }
   }
 
+  async showTable() {
+    console.log("Show DataTable is called BTW");
+  
+    this.datatableConfig = {};
+    this.lookup_data_user = [];
+    
+    this.datatableConfig = {
+      ajax: (dataTablesParameters: any, callback) => {
+        this.datatableConfig = {};
+        this.lookup_data_user = [];
+  
+        this.fetchUserLookupdata(1)
+          .then((resp: any) => {
+            const responseData = resp || []; // Default to empty array if resp is null
+  
+            callback({
+              draw: dataTablesParameters.draw,
+              recordsTotal: responseData.length,
+              recordsFiltered: responseData.length,
+              data: responseData,
+            });
+  
+            console.log("Response is in this form ", responseData);
+          })
+          .catch((error: any) => {
+            console.error("Error fetching user lookup data:", error);
+            callback({
+              draw: dataTablesParameters.draw,
+              recordsTotal: 0,
+              recordsFiltered: 0,
+              data: [],
+            });
+          });
+      },
+      columns: [
+        {
+          title: "Username",
+          data: "P1",
+          render: function (data, type, full) {
+            const colorClasses = ["success", "info", "warning", "danger"];
+            const randomColorClass =
+              colorClasses[Math.floor(Math.random() * colorClasses.length)];
+  
+            const initials = data[0].toUpperCase();
+            const symbolLabel = `
+              <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
+                ${initials}
+              </div>
+            `;
+  
+            const nameAndEmail = `
+              <div class="d-flex flex-column">
+                <a href="javascript:;" class="clicable-href text-gray-800 text-hover-primary mb-1 view-item" data-action="edit" data-id="${full.P1}">
+                  ${data}
+                </a>
+                <span>${full.P3}</span> 
+              </div>
+            `;
+  
+            return `
+              <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
+                <a href="javascript:;" class="view-item" data-action="edit">
+                  ${symbolLabel}
+                </a>
+              </div>
+              ${nameAndEmail}
+            `;
+          },
+        },
+        {
+          title: "Phone",
+          data: "P2",
+        },
+        {
+          title: "Permission",
+          data: "P4",
+        },
+        {
+          title: "Location Permission",
+          data: "P5",
+          render: (data) => data || "update required",
+        },
+        {
+          title: "Form ID Permission",
+          data: "P6",
+          render: (data) => data || "update required",
+        },
+        {
+          title: "Updated",
+          data: "P7",
+          render: function (data) {
+            const date =
+              new Date(data * 1000).toLocaleDateString() +
+              " " +
+              new Date(data * 1000).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+            return date;
+          },
+        },
+      ],
+      createdRow: (row, data: any) => {
+        $("td:eq(0)", row).addClass("d-flex align-items-center");
+  
+        // Ensure the click event is bound correctly to `P1`
+        $(row)
+        .find(".view-item")
+        .on("click", () => {
+          console.log("Event is triggered for:", data.P1);
+          this.edit(data.P1); // `this` now correctly refers to the component
+        });
+      },
+    };
+  }
+  
+
 
   // async showTable() {
+
+  //   console.log("Show DataTable is called BTW");
+
+  //   this.datatableConfig = {}
+  //   this.lookup_data_user = []
   //   this.datatableConfig = {
-  //     serverSide: true,
-  //     ajax: (dataTablesParameters: any, callback) => {
+  //     ajax: (dataTablesParameters:any, callback) => {
+  //       this.datatableConfig = {}
+  //       this.lookup_data_user = []
   //       this.fetchUserLookupdata(1)
-  //         .then((resp: any) => {
-  //           // Assuming 'resp' is the array you provided
+  //         .then((resp:any) => {
   //           const responseData = resp || []; // Default to an empty array if resp is null
-    
+  
   //           // Prepare the response structure expected by DataTables
   //           callback({
   //             draw: dataTablesParameters.draw, // Echo the draw parameter
@@ -2885,7 +3007,7 @@ rdtListWorkAround :any =[{
   //             recordsFiltered: responseData.length, // Filtered records (you may want to adjust this)
   //             data: responseData // The actual data array
   //           });
-    
+  
   //           console.log("Response is in this form ", responseData);
   //         })
   //         .catch((error: any) => {
@@ -2901,27 +3023,29 @@ rdtListWorkAround :any =[{
   //     },
   //     columns: [
   //       {
-  //         title: 'Username', data: 'P1', render: function (data, type, full) {
+  //         title: 'Username', 
+  //         data: 'P1', 
+  //         render: function (data, type, full) {
   //           const colorClasses = ['success', 'info', 'warning', 'danger'];
   //           const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
-    
+            
   //           const initials = data[0].toUpperCase();
   //           const symbolLabel = `
   //             <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
   //               ${initials}
   //             </div>
   //           `;
-    
+  
   //           const nameAndEmail = `
   //             <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
-  //               <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
+  //               <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1" class="view-item" data-id="${full.P1}">${data}</a>
   //               <span>${full.P3}</span> <!-- Assuming P3 is the email -->
   //             </div>
   //           `;
-    
+  
   //           return `
   //             <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
-  //               <a href="javascript:;">
+  //               <a href="javascript:;" >
   //                 ${symbolLabel}
   //               </a>
   //             </div>
@@ -2932,150 +3056,63 @@ rdtListWorkAround :any =[{
   //       {
   //         title: 'Phone', data: 'P2' // Added a new column for phone numbers
   //       },
-  //       {
-  //         title: 'Email', data: 'P3' // Added a new column for email
-  //       },
+  //       // {
+  //       //   title: 'Email', data: 'P3' // Added a new column for email
+  //       // },
   //       {
   //         title: 'Permission', data: 'P4' // Assuming P4 is the role
   //       },
   //       {
-  //         title: 'Updated', data: 'P5', render: function (data) {
-  //           // Ensure data is in seconds; convert to milliseconds for Date
-  //           const date = new Date(data * 1000);
-  //           return `${date.toDateString()} ${date.toLocaleTimeString()}`; // Format the date and time
+  //         title: 'Location Permission',
+  //         data: 'P5',
+  //         render: (data) => data || 'update required' // Handle undefined
+  //       },
+  //       {
+  //         title: 'Form ID Permission',
+  //         data: 'P6',
+  //         render: (data) => data || 'update required' // Handle undefined
+  //       },
+  //       {
+  //         title: 'Updated', data: 'P7', render: function (data) {
+  //           const date = new Date(data * 1000).toLocaleDateString() + " " + new Date(data * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+
+  //           // const date = new Date(data * 1000);
+  //           // return `${date.toDateString()} ${date.toLocaleTimeString()}`; // Format the date and time
+  //           return date
   //         }
   //       }
   //     ],
   //     createdRow: (row, data:any, dataIndex) => {
   //       $('td:eq(0)', row).addClass('d-flex align-items-center');
+  //        $(row).find('.view-item').on('click', () => {
+  //         console.log("Event is triggered ");
+  //         this.edit(data.P1) 
+  //       });
   //     },
   //   };
+
+
+  //   try{
+  //     const UserDetails = {
+  //       "User Name": this.username,
+  //       "Action": "View",
+  //       "Module Name": "User Management",
+  //       "Form Name": 'User Management',
+  //      "Description": `User Table was Viewed`,
+  //       "User Id": this.username,
+  //       "Client Id": this.SK_clientID,
+  //       "created_time": Date.now(),
+  //       "updated_time": Date.now()
+  //     }
+  
+  //     this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+  //   }
+  //   catch(error){
+  //     console.log("Error while creating audit trails ",error);
+  //   }
+
+  
   // }
-
-
-  async showTable() {
-
-    console.log("Show DataTable is called BTW");
-
-    this.datatableConfig = {}
-    this.lookup_data_user = []
-    this.datatableConfig = {
-      ajax: (dataTablesParameters:any, callback) => {
-        this.datatableConfig = {}
-        this.lookup_data_user = []
-        this.fetchUserLookupdata(1)
-          .then((resp:any) => {
-            const responseData = resp || []; // Default to an empty array if resp is null
-  
-            // Prepare the response structure expected by DataTables
-            callback({
-              draw: dataTablesParameters.draw, // Echo the draw parameter
-              recordsTotal: responseData.length, // Total number of records
-              recordsFiltered: responseData.length, // Filtered records (you may want to adjust this)
-              data: responseData // The actual data array
-            });
-  
-            console.log("Response is in this form ", responseData);
-          })
-          .catch((error: any) => {
-            console.error('Error fetching user lookup data:', error);
-            // Provide an empty dataset in case of an error
-            callback({
-              draw: dataTablesParameters.draw,
-              recordsTotal: 0,
-              recordsFiltered: 0,
-              data: []
-            });
-          });
-      },
-      columns: [
-        {
-          title: 'Username', 
-          data: 'P1', 
-          render: function (data, type, full) {
-            const colorClasses = ['success', 'info', 'warning', 'danger'];
-            const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
-            
-            const initials = data[0].toUpperCase();
-            const symbolLabel = `
-              <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
-                ${initials}
-              </div>
-            `;
-  
-            const nameAndEmail = `
-              <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
-                <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
-                <span>${full.P3}</span> <!-- Assuming P3 is the email -->
-              </div>
-            `;
-  
-            return `
-              <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
-                <a href="javascript:;">
-                  ${symbolLabel}
-                </a>
-              </div>
-              ${nameAndEmail}
-            `;
-          }
-        },
-        {
-          title: 'Phone', data: 'P2' // Added a new column for phone numbers
-        },
-        // {
-        //   title: 'Email', data: 'P3' // Added a new column for email
-        // },
-        {
-          title: 'Permission', data: 'P4' // Assuming P4 is the role
-        },
-        {
-          title: 'Location Permission',
-          data: 'P5',
-          render: (data) => data || 'update required' // Handle undefined
-        },
-        {
-          title: 'Form ID Permission',
-          data: 'P6',
-          render: (data) => data || 'update required' // Handle undefined
-        },
-        {
-          title: 'Updated', data: 'P7', render: function (data) {
-            const date = new Date(data * 1000).toLocaleDateString() + " " + new Date(data * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-
-            // const date = new Date(data * 1000);
-            // return `${date.toDateString()} ${date.toLocaleTimeString()}`; // Format the date and time
-            return date
-          }
-        }
-      ],
-      createdRow: (row, data, dataIndex) => {
-        $('td:eq(0)', row).addClass('d-flex align-items-center');
-      },
-    };
-
-
-    try{
-      const UserDetails = {
-        "User Name": this.username,
-        "Action": "View",
-        "Module Name": "User Management",
-        "Form Name": 'User Management',
-       "Description": `User Table was Viewed`,
-        "User Id": this.username,
-        "Client Id": this.SK_clientID,
-        "created_time": Date.now(),
-        "updated_time": Date.now()
-      }
-  
-      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
-    }
-    catch(error){
-      console.log("Error while creating audit trails ",error);
-    }
-
-  
-  }
   
 
   openModalHelpher(getData:any){

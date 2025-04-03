@@ -227,14 +227,14 @@ export class ClientComponent implements OnInit {
     
               const nameAndEmail = `
                 <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
-                  <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
+                  <a href="javascript:;" class="clicable-href text-gray-800 text-hover-primary mb-1 view-item" data-action="edit" data-id="${full.P1}">${data}</a>
                   <span>${full.P3}</span> <!-- Assuming P3 is the email -->
                 </div>
               `;
     
               return `
                 <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
-                  <a href="javascript:;">
+                  <a href="javascript:;" class="view-item" data-action="edit">
                     ${symbolLabel}
                   </a>
                 </div>
@@ -261,8 +261,14 @@ export class ClientComponent implements OnInit {
             }
           }
         ],
-        createdRow: (row, data, dataIndex) => {
+        createdRow: (row, data:any, dataIndex) => {
           $('td:eq(0)', row).addClass('d-flex align-items-center');
+          $(row)
+          .find(".view-item")
+          .on("click", () => {
+            console.log("Event is triggered for:", data.P1);
+            this.edit(data.P1); // `this` now correctly refers to the component
+          });
         },
       };
 

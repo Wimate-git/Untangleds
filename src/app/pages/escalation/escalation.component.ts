@@ -1011,15 +1011,15 @@ console.log("PARRAY3:",permissionsArray)
             `;
   
             const nameAndEmail = `
-              <div class="d-flex flex-column" data-action="view" data-id="${full.id}">
-                <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1">${data}</a>
+              <div class="d-flex flex-column">
+                <a href="javascript:;" class="clicable-href text-gray-800 text-hover-primary mb-1 view-item" data-action="edit" data-id="${full.P1}">${data}</a>
                 <span>${full.P2}</span> <!-- Assuming P3 is the email -->
               </div>
             `;
   
             return `
               <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
-                <a href="javascript:;">
+                <a href="javascript:;" class="view-item" data-action="edit">
                   ${symbolLabel}
                 </a>
               </div>

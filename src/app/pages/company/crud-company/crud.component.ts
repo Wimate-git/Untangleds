@@ -130,7 +130,9 @@ export class CrudcompanyComponent implements OnInit, AfterViewInit, OnDestroy{
 
   ngAfterViewInit(): void {
     this.clickListener = this.renderer.listen(document, 'click', (event) => {
-      const closestBtn = event.target.closest('.btn');
+      const closestBtn = event.target.closest('.btn,.clicable-href');
+
+      console.log("Closest BTN is here ",closestBtn);
      
       if (closestBtn) {
         const { action, id } = closestBtn.dataset;

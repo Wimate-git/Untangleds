@@ -148,7 +148,12 @@ export class Crud2Component implements OnInit, AfterViewInit, OnDestroy{
 
   ngAfterViewInit(): void {
     this.clickListener = this.renderer.listen(document, 'click', (event) => {
-      const closestBtn = event.target.closest('.btn');
+      
+      console.log("Clicked event is here b ",event);
+
+      const closestBtn = event.target.closest('.btn,.clicable-href');
+
+      console.log("Clicked event is here ",closestBtn);
      
       if (closestBtn) {
         const { action, id } = closestBtn.dataset;
