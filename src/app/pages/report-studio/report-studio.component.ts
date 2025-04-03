@@ -5884,27 +5884,18 @@ generateTimeDifferenceScript()`
 
             const diffInMs = status_type - created_time;
         
-            const diffInSecs = Math.floor(diffInMs / 1000);
-            const diffInMins = Math.floor(diffInSecs / 60);
-            const diffInHours = Math.floor(diffInMins / 60);
-            const diffInDays = Math.floor(diffInMs / (1000 * 3600 * 24));
-            const diffInMonths = Math.floor(diffInDays / 30); // Approximate months
-            const diffInYears = Math.floor(diffInDays / 365); // Approximate years
-        
-            // Determine which unit to use for the difference
-            if (diffInSecs < 60) {
-                return diffInSecs + " seconds";
-            } else if (diffInMins < 60) {
-                return diffInMins + " minutes";
-            } else if (diffInHours < 24) {
-                return diffInHours + " hours";
-            } else if (diffInDays < 30) {
-                return diffInDays + " days";
-            } else if (diffInMonths < 12) {
-                return diffInMonths + " months";
-            } else {
-                return diffInYears + " years";
-            }
+            console.log("Diff in ms:", diffInMs);
+
+            const diffInSecs = Math.floor(diffInMs / 1000); // Convert to seconds
+            console.log("Diff in seconds:", diffInSecs);
+
+            const diffInMins = Math.floor(diffInSecs / 60); // Convert to minutes
+            console.log("Diff in minutes:", diffInMins);
+
+            const diffInHours = diffInMins / 60; // Convert to hours as a decimal
+            console.log("Diff in hours:", diffInHours);
+
+            return diffInHours.toFixed(2) + " hours"; // Format the result to 2 decimal places
           }
             
           
@@ -5921,48 +5912,82 @@ generateTimeDifferenceScript()`
   generateResponseScript(): string {
     // The script will calculate time difference and format it in a human-readable way
     let script = `
-      const status_type = new Date(\${track_history.Open to Accept})
+      const status_type = new Date(\${track_history.Open to Accept});
       const created_time = new Date(\${Created.created_time});
 
-      function generateTimeDifferenceScript(){
+          function generateTimeDifferenceScript(){
+                if (isNaN(status_type) || isNaN(created_time)) {
+                return " ";
+            }
 
-         if (isNaN(status_type) || isNaN(created_time)) {
-              return " ";
-          }
+            const diffInMs = status_type - created_time; // Get the difference in milliseconds
+            console.log("Diff in ms:", diffInMs);
 
-        const diffInMs = status_type - created_time;
-    
-        const diffInSecs = Math.floor(diffInMs / 1000);
-        const diffInMins = Math.floor(diffInSecs / 60);
-        const diffInHours = Math.floor(diffInMins / 60);
-        const diffInDays = Math.floor(diffInMs / (1000 * 3600 * 24));
-        const diffInMonths = Math.floor(diffInDays / 30); // Approximate months
-        const diffInYears = Math.floor(diffInDays / 365); // Approximate years
-    
-        // Determine which unit to use for the difference
-        if (diffInSecs < 60) {
-            return diffInSecs + " seconds";
-        } else if (diffInMins < 60) {
-            return diffInMins + " minutes";
-        } else if (diffInHours < 24) {
-            return diffInHours + " hours";
-        } else if (diffInDays < 30) {
-            return diffInDays + " days";
-        } else if (diffInMonths < 12) {
-            return diffInMonths + " months";
-        } else {
-            return diffInYears + " years";
+            const diffInSecs = Math.floor(diffInMs / 1000); // Convert to seconds
+            console.log("Diff in seconds:", diffInSecs);
+
+            const diffInMins = Math.floor(diffInSecs / 60); // Convert to minutes
+            console.log("Diff in minutes:", diffInMins);
+
+            const diffInHours = diffInMins / 60; // Convert to hours as a decimal
+            console.log("Diff in hours:", diffInHours);
+
+            return diffInHours.toFixed(2) + " hours"; // Format the result to 2 decimal places
         }
-      }
-        
-      
+
       generateTimeDifferenceScript()
-    
-        
     `;
 
     return script;
-  }
+}
+
+
+
+  // generateResponseScript(): string {
+  //   // The script will calculate time difference and format it in a human-readable way
+  //   let script = `
+  //     const status_type = new Date(\${track_history.Open to Accept})
+  //     const created_time = new Date(\${Created.created_time});
+
+  //     function generateTimeDifferenceScript(){
+
+  //        if (isNaN(status_type) || isNaN(created_time)) {
+  //             return " ";
+  //         }
+
+  //       const diffInMs = status_type - created_time;
+    
+  //       const diffInSecs = Math.floor(diffInMs / 1000);
+  //       const diffInMins = Math.floor(diffInSecs / 60);
+  //       const diffInHours = Math.floor(diffInMins / 60);
+  //       const diffInDays = Math.floor(diffInMs / (1000 * 3600 * 24));
+  //       const diffInMonths = Math.floor(diffInDays / 30); // Approximate months
+  //       const diffInYears = Math.floor(diffInDays / 365); // Approximate years
+    
+  //       // Determine which unit to use for the difference
+  //       if (diffInSecs < 60) {
+  //           return diffInSecs + " seconds";
+  //       } else if (diffInMins < 60) {
+  //           return diffInMins + " minutes";
+  //       } else if (diffInHours < 24) {
+  //           return diffInHours + " hours";
+  //       } else if (diffInDays < 30) {
+  //           return diffInDays + " days";
+  //       } else if (diffInMonths < 12) {
+  //           return diffInMonths + " months";
+  //       } else {
+  //           return diffInYears + " years";
+  //       }
+  //     }
+        
+      
+  //     generateTimeDifferenceScript()
+    
+        
+  //   `;
+
+  //   return script;
+  // }
 
 
 
