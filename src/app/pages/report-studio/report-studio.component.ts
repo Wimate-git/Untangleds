@@ -1706,6 +1706,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     }
 
     body.permissionID = this.permissionID
+    body.username = this.username
 
     for (let item of tempArray) {
       const formFilter = item;
@@ -5895,7 +5896,7 @@ generateTimeDifferenceScript()`
             const diffInHours = diffInMins / 60; // Convert to hours as a decimal
             console.log("Diff in hours:", diffInHours);
 
-            return diffInHours.toFixed(2) + " hours"; // Format the result to 2 decimal places
+            return diffInMins + " mins"; // Format the result to 2 decimal places
           }
             
           
@@ -5932,7 +5933,7 @@ generateTimeDifferenceScript()`
             const diffInHours = diffInMins / 60; // Convert to hours as a decimal
             console.log("Diff in hours:", diffInHours);
 
-            return diffInHours.toFixed(2) + " hours"; // Format the result to 2 decimal places
+            return diffInMins + " mins"; // Format the result to 2 decimal places
         }
 
       generateTimeDifferenceScript()
