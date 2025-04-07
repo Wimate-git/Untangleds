@@ -2435,7 +2435,7 @@ rdtListWorkAround :any =[{
 
     this.disableFields = false
 
-    console.log("Openmodal value are here ",getValues);
+    // console.log("Openmodal value are here ",getValues);
 
     this.switchBetweenDropdown_textField = false;
     this.disabled_CLientID_textField = true;
@@ -2536,7 +2536,7 @@ rdtListWorkAround :any =[{
         this.disabled_CLientID_textField = true
        
 
-        console.log('edit of user', getValues);
+        // console.log('edit of user', getValues);
         this.showHeading = false;
         this.showModal = true;
         this.base64textString_temp = getValues.profile;
@@ -2664,7 +2664,7 @@ rdtListWorkAround :any =[{
         }
 
 
-          console.log("Final thing on openModal :",this.createUserField.value);
+          // console.log("Final thing on openModal :",this.createUserField.value);
         this.cd.detectChanges()
       }
     }
@@ -3119,7 +3119,7 @@ rdtListWorkAround :any =[{
 
     this.avgLabourHistory = []
     this.getRefAvgLabour = []
-    console.log("Data from llokup :",getData);
+    // console.log("Data from llokup :",getData);
     this.data_temp = []
 
     this.api
@@ -3127,7 +3127,7 @@ rdtListWorkAround :any =[{
       .then((result :any) => {
         if (result && result !== undefined) {
           this.data_temp.push(JSON.parse(result.metadata));
-          console.log("User Manangement details", this.data_temp);
+          // console.log("User Manangement details", this.data_temp);
 
 
           if(result){
@@ -3256,7 +3256,7 @@ rdtListWorkAround :any =[{
             }
 
 
-            console.log("Edited User Will be ,",userTable);
+            // console.log("Edited User Will be ,",userTable);
             for(let i = 0;i<userTable.length;i++){
               console.log(userTable[i].username+ "=="+ getData);
               if(userTable[i].username == getData){

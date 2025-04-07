@@ -16,6 +16,7 @@ import {
 import { APIService } from 'src/app/API.service';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { DynamicApiService } from '../dynamic-api.service';
 
 type Tabs = 'Sidebar' | 'Header' | 'Toolbar' | 'User';
 interface ListItem {
@@ -152,7 +153,8 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     private fb: FormBuilder,
     private api: APIService,
     private spinner: NgxSpinnerService,
-    private auditTrail: AuditTrailService
+    private auditTrail: AuditTrailService,
+    private DynamicApi:DynamicApiService
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -1368,6 +1370,26 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
         }
 
         this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+
+        const Cognitobody = { "type": "cognitoServices",
+          "event": {
+            "path": "/timeoutPermissionSession",
+            "queryStringParameters": {
+            "permissionID":this.updateResponse.permissionID,
+            "clientID":this.client
+            }
+          }
+          }
+
+
+        try {
+          const response = await this.DynamicApi.getData(Cognitobody);
+          console.log("Cognito Revoke successfull  ",JSON.parse(response.body));
+
+        } catch (error) {
+          console.error('Error calling dynamic lambda:', error);
+        }
+
 
       }).catch((error) => {
         console.log('UPDATE WORK ORDER ERROR:', error)

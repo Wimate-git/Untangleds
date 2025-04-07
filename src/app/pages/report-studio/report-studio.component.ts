@@ -5896,7 +5896,7 @@ generateTimeDifferenceScript()`
             const diffInHours = diffInMins / 60; // Convert to hours as a decimal
             console.log("Diff in hours:", diffInHours);
 
-            return diffInMins + " mins"; // Format the result to 2 decimal places
+            return diffInMins + ""; // Format the result to 2 decimal places
           }
             
           
@@ -5933,7 +5933,7 @@ generateTimeDifferenceScript()`
             const diffInHours = diffInMins / 60; // Convert to hours as a decimal
             console.log("Diff in hours:", diffInHours);
 
-            return diffInMins + " mins"; // Format the result to 2 decimal places
+            return diffInMins + ""; // Format the result to 2 decimal places
         }
 
       generateTimeDifferenceScript()

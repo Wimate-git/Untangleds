@@ -35,7 +35,7 @@ export class LocationPermissionService implements OnInit {
     try {
       // Get logged user details
       this.getLoggedUser = this.companyConfiguration.getLoggedUserDetails()
-      console.log('getLoggedUser checking',this.getLoggedUser)
+      // console.log('getLoggedUser checking',this.getLoggedUser)
       this.SK_clientID = this.getLoggedUser.clientID;
       console.log('this.SK_clientID check',this.SK_clientID)
 
@@ -54,7 +54,7 @@ export class LocationPermissionService implements OnInit {
 
       // Fetch user management data
       const data = await this.api.GetMaster(this.userClient, 1);
-      console.log('data checking',data)
+      // console.log('data checking',data)
       const metadataString: string | null | undefined = data.metadata;
 
       // Check if metadataString is a valid string before parsing

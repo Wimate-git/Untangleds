@@ -45,7 +45,7 @@ export class SidebarMenuComponent implements OnInit,OnDestroy {
 
       this.login_detail = localStorage.getItem('userAttributes')
 
-      console.log("SIDE MENU ITEM LOGIN DETAIL FROM LOCAL STORAGE:", this.login_detail)
+      // console.log("SIDE MENU ITEM LOGIN DETAIL FROM LOCAL STORAGE:", this.login_detail)
 
       this.loginDetail_string = JSON.parse(this.login_detail)
       console.log("AFTER JSON STRINGIFY", this.loginDetail_string)
