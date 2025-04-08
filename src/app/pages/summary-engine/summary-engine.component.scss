@@ -75,203 +75,71 @@ html, body {
 
 
 
-  /* Adjustments for hamburger menu size based on screen width */
-.myMenu {
-  filter: url("#shadowed-goo");
+
+
+
+  .myMenu {
+    filter: url("#shadowed-goo");
+  }
+  
+  .myMenu-item, .myMenu-open-button {
+    background: #009EF7; /* Default background */
+    border-radius: 100%;
+    width: 50px;
+    height: 50px;
+    margin-left: -40px;
+    position: absolute;
+    top: 20px;
+    color: white;
+    text-align: center;
+    line-height: 50px;
+    transform: translate3d(0, 0, 0);
+    transition: transform ease-out 200ms;
 }
 
-.myMenu-item, .myMenu-open-button {
-  background: #009EF7; /* Default background */
-  border-radius: 100%;
-  width: 50px;
-  height: 50px;
-  margin-left: -40px;
-  position: absolute;
-  top: 20px;
-  color: white;
-  text-align: center;
-  line-height: 50px;
-  transform: translate3d(0, 0, 0);
-  transition: transform ease-out 200ms;
-}
-
-/* Full view button */
 .myMenu-item.full-view-btn {
   background: #dc3545 !important; /* Bootstrap danger color */
 }
 
-/* Hidden checkbox input */
-.myMenu-open {
-  display: none;
-}
-
-/* Hamburger bars */
-.hamburger {
-  width: 25px;
-  height: 3px;
-  background: white;
-  display: block;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-left: -12.5px;
-  margin-top: -1.5px;
-  transition: transform 200ms;
-}
-
-.hamburger-1 {
-  transform: translate3d(0, -8px, 0);
-}
-
-.hamburger-2 {
-  transform: translate3d(0, 0, 0);
-}
-
-.hamburger-3 {
-  transform: translate3d(0, 8px, 0);
-}
-
-/* Change of hamburger appearance when checked */
-.myMenu-open:checked + .myMenu-open-button .hamburger-1 {
-  transform: translate3d(0, 0, 0) rotate(45deg);
-}
-.myMenu-open:checked + .myMenu-open-button .hamburger-2 {
-  transform: translate3d(0, 0, 0) scale(0.1, 1);
-}
-.myMenu-open:checked + .myMenu-open-button .hamburger-3 {
-  transform: translate3d(0, 0, 0) rotate(-45deg);
-}
-
-/* Media Queries for screen responsiveness */
-@media (max-width: 1200px) {
-  .myMenu-item, .myMenu-open-button {
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
-    margin-left: -35px;
+  
+  .myMenu-open {
+    display: none;
   }
-
+  
   .hamburger {
-    width: 20px;
-    height: 2px;
-    margin-left: -10px;
-    margin-top: -1px;
-  }
-}
-
-@media (max-width: 992px) {
-  .myMenu-item, .myMenu-open-button {
-    width: 35px;
-    height: 35px;
-    line-height: 35px;
-    margin-left: -30px;
-  }
-
-  .hamburger {
-    width: 18px;
-    height: 2px;
-    margin-left: -9px;
-    margin-top: -1px;
-  }
-}
-
-@media (max-width: 768px) {
-  .myMenu-item, .myMenu-open-button {
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
-    margin-left: -25px;
-  }
-
-  .hamburger {
-    width: 15px;
-    height: 2px;
-    margin-left: -7.5px;
-    margin-top: -1px;
-  }
-}
-
-@media (max-width: 576px) {
-  .myMenu-item, .myMenu-open-button {
     width: 25px;
-    height: 25px;
-    line-height: 25px;
-    margin-left: -20px;
+    height: 3px;
+    background: white;
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -12.5px;
+    margin-top: -1.5px;
+    transition: transform 200ms;
   }
-
-  .hamburger {
-    width: 12px;
-    height: 1.5px;
-    margin-left: -6px;
-    margin-top: -0.75px;
+  
+  .hamburger-1 {
+    transform: translate3d(0, -8px, 0);
   }
-}
-
-
-
-
-//   .myMenu {
-//     filter: url("#shadowed-goo");
-//   }
   
-//   .myMenu-item, .myMenu-open-button {
-//     background: #009EF7; /* Default background */
-//     border-radius: 100%;
-//     width: 50px;
-//     height: 50px;
-//     margin-left: -40px;
-//     position: absolute;
-//     top: 20px;
-//     color: white;
-//     text-align: center;
-//     line-height: 50px;
-//     transform: translate3d(0, 0, 0);
-//     transition: transform ease-out 200ms;
-// }
-
-// .myMenu-item.full-view-btn {
-//   background: #dc3545 !important; /* Bootstrap danger color */
-// }
-
+  .hamburger-2 {
+    transform: translate3d(0, 0, 0);
+  }
   
-//   .myMenu-open {
-//     display: none;
-//   }
+  .hamburger-3 {
+    transform: translate3d(0, 8px, 0);
+  }
   
-//   .hamburger {
-//     width: 25px;
-//     height: 3px;
-//     background: white;
-//     display: block;
-//     position: absolute;
-//     top: 50%;
-//     left: 50%;
-//     margin-left: -12.5px;
-//     margin-top: -1.5px;
-//     transition: transform 200ms;
-//   }
-  
-//   .hamburger-1 {
-//     transform: translate3d(0, -8px, 0);
-//   }
-  
-//   .hamburger-2 {
-//     transform: translate3d(0, 0, 0);
-//   }
-  
-//   .hamburger-3 {
-//     transform: translate3d(0, 8px, 0);
-//   }
-  
-//   .myMenu-open:checked + .myMenu-open-button .hamburger-1 {
-//     transform: translate3d(0, 0, 0) rotate(45deg);
-//   }
-//   .myMenu-open:checked + .myMenu-open-button .hamburger-2 {
-//     transform: translate3d(0, 0, 0) scale(0.1, 1);
-//   }
-//   .myMenu-open:checked + .myMenu-open-button .hamburger-3 {
-//     transform: translate3d(0, 0, 0) rotate(-45deg);
-//   }
+  .myMenu-open:checked + .myMenu-open-button .hamburger-1 {
+    transform: translate3d(0, 0, 0) rotate(45deg);
+  }
+  .myMenu-open:checked + .myMenu-open-button .hamburger-2 {
+    transform: translate3d(0, 0, 0) scale(0.1, 1);
+  }
+  .myMenu-open:checked + .myMenu-open-button .hamburger-3 {
+    transform: translate3d(0, 0, 0) rotate(-45deg);
+  }
   
   .myMenu {
     position: absolute;
@@ -292,31 +160,31 @@ html, body {
     
   }
   .myMenu-item:nth-child(3) {
-    transition-duration: 50ms;
+    transition-duration: 180ms;
   }
   .myMenu-item:nth-child(4) {
-    transition-duration: 50ms;
+    transition-duration: 180ms;
   }
   .myMenu-item:nth-child(5) {
-    transition-duration: 50ms;
+    transition-duration: 180ms;
   }
   .myMenu-item:nth-child(6) {
-    transition-duration: 50ms;
+    transition-duration: 180ms;
   }
   .myMenu-item:nth-child(7) {
-    transition-duration: 50ms;
+    transition-duration: 180ms;
   }
   .myMenu-item:nth-child(8) {
-    transition-duration: 50ms;
+    transition-duration: 180ms;
   }
   .myMenu-item:nth-child(9) {
-    transition-duration: 50ms;
+    transition-duration: 180ms;
   }
   .myMenu-item:nth-child(10) {
-    transition-duration: 50ms;
+    transition-duration: 180ms;
   }
   .myMenu-item:nth-child(11) {
-    transition-duration: 50ms;
+    transition-duration: 180ms;
   }
   .myMenu-open-button {
  
@@ -331,66 +199,57 @@ html, body {
     transform: scale(1.2, 1.2) translate3d(0, 0, 0);
   }
   
-.myMenu-open:checked + .myMenu-open-button {
-  transition-timing-function: linear;
-  transition-duration: 200ms;
-  transform: scale(0.8, 0.8) translate3d(0, 0, 0);
-}
+  .myMenu-open:checked + .myMenu-open-button {
+    transition-timing-function: linear;
+    transition-duration: 200ms;
+    transform: scale(0.8, 0.8) translate3d(0, 0, 0);
+  }
+  
+  .myMenu-open:checked ~ .myMenu-item {
+    transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
+  .myMenu-open:checked ~ .myMenu-item:nth-child(3) {
+    transition-duration: 150ms;
+    transform: translate3d(0,70px, 0);
+  }
+  .myMenu-open:checked ~ .myMenu-item:nth-child(4) {
+    transition-duration: 250ms;
+    transform: translate3d(0,140px,0);
+  }
+  .myMenu-open:checked ~ .myMenu-item:nth-child(5) {
+    transition-duration: 350ms;
+    transform: translate3d(0,210px,  0);
+  }
+  .myMenu-open:checked ~ .myMenu-item:nth-child(6) {
+    transition-duration: 450ms;
+    transform: translate3d(0,280px, 0);
+  }
+  .myMenu-open:checked ~ .myMenu-item:nth-child(7) {
+    transition-duration: 550ms;
+    transform: translate3d(0,350px, 0);
+  }
+  .myMenu-open:checked ~ .myMenu-item:nth-child(8) {
+    transition-duration: 650ms;
+    transform: translate3d(0,420px, 0);
+  }
+  .myMenu-open:checked ~ .myMenu-item:nth-child(9) {
+    transition-duration: 750ms;
+    transform: translate3d(0,490px, 0);
+  }
+  .myMenu-open:checked ~ .myMenu-item:nth-child(10) {
+    transition-duration: 850ms;
+    transform: translate3d(0,560px, 0);
+  }
+  .myMenu-open:checked ~ .myMenu-item:nth-child(11) {
+    transition-duration: 950ms;
+    transform: translate3d(0,630px, 0);
+  }
 
-.myMenu-open:checked ~ .myMenu-item {
-  transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
-}
 
-.myMenu-open:checked ~ .myMenu-item:nth-child(3) {
-  transition-duration: 150ms;
-  transform: translate3d(0, 5vw, 0); /* Adjusting translate for zoom */
-}
-
-.myMenu-open:checked ~ .myMenu-item:nth-child(4) {
-  transition-duration: 250ms;
-  transform: translate3d(0, 10vw, 0);
-}
-
-.myMenu-open:checked ~ .myMenu-item:nth-child(5) {
-  transition-duration: 350ms;
-  transform: translate3d(0, 15vw, 0);
-}
-
-.myMenu-open:checked ~ .myMenu-item:nth-child(6) {
-  transition-duration: 450ms;
-  transform: translate3d(0, 20vw, 0);
-}
-
-.myMenu-open:checked ~ .myMenu-item:nth-child(7) {
-  transition-duration: 550ms;
-  transform: translate3d(0, 25vw, 0);
-}
-
-.myMenu-open:checked ~ .myMenu-item:nth-child(8) {
-  transition-duration: 650ms;
-  transform: translate3d(0, 30vw, 0);
-}
-
-.myMenu-open:checked ~ .myMenu-item:nth-child(9) {
-  transition-duration: 750ms;
-  transform: translate3d(0, 35vw, 0);
-}
-
-.myMenu-open:checked ~ .myMenu-item:nth-child(10) {
-  transition-duration: 850ms;
-  transform: translate3d(0, 40vw, 0);
-}
-
-.myMenu-open:checked ~ .myMenu-item:nth-child(11) {
-  transition-duration: 950ms;
-  transform: translate3d(0, 45vw, 0);
-}
-
-.myMenu-open:checked ~ .myMenu-item:nth-child(12) {
-  transition-duration: 1050ms;
-  transform: translate3d(0, 50vw, 0);
-}
-
+  .myMenu-open:checked ~ .myMenu-item:nth-child(12) {
+    transition-duration: 1050ms;
+    transform: translate3d(0,700px, 0);
+  }
   // .myMenu-open:checked ~ .myMenu-item:nth-child(10) {
   //   transition-duration: 950ms;
   //   transform: translate3d(0,630px, 0);
@@ -1078,6 +937,195 @@ gridster-item {
 
 
 
+@media (max-width: 767px) {
+
+  /* Position the menu at the bottom-right with margin from the bottom */
+  .myMenu {
+    position: fixed;
+    bottom: 40px;
+    /* Adjust margin from the bottom */
+    right: 20px;
+    /* Adjust margin from the right */
+    left: auto;
+    margin-left: 0;
+    padding-top: 0;
+    /* Remove extra padding */
+    padding-left: 0;
+    /* Remove extra padding */
+    width: 50px;
+    /* Button width */
+    height: 50px;
+    /* Button height */
+    box-sizing: border-box;
+    font-size: 20px;
+    text-align: center;
+    z-index: 1000;
+  }
+
+  /* Style for the menu open button */
+  .myMenu-open-button {
+    background-color: #009EF7;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 2;
+    cursor: pointer;
+    transition: transform 200ms ease-out;
+    /* Ensure smooth transition */
+  }
+
+  /* Hamburger icon */
+  .hamburger {
+    width: 25px;
+    height: 3px;
+    background: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -12.5px;
+    margin-top: -1.5px;
+    transition: transform 200ms ease-out;
+  }
+
+  /* Hamburger icon transforms when the menu is opened */
+  .myMenu-open:checked+.myMenu-open-button .hamburger-1 {
+    transform: translate3d(0, 0, 0) rotate(45deg);
+  }
+
+  .myMenu-open:checked+.myMenu-open-button .hamburger-2 {
+    transform: translate3d(0, 0, 0) scale(0.1, 1);
+  }
+
+  .myMenu-open:checked+.myMenu-open-button .hamburger-3 {
+    transform: translate3d(0, 0, 0) rotate(-45deg);
+  }
+
+  /* Menu items with transition for smooth opening and reduced spacing */
+  .myMenu-item {
+    display: none;
+    /* Initially hide all items */
+    background: #009EF7;
+    border-radius: 50%;
+    width: 50px;
+    height: 45px;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    line-height: 50px;
+    color: white;
+    transition: transform 300ms ease, opacity 300ms ease;
+    /* Smooth transition */
+    margin-bottom: 10px;
+    /* Add padding between items */
+    top: 122px;
+  }
+
+  .myMenu-item i {
+    display: flex;
+    justify-content: center;
+    /* Center horizontally */
+    align-items: center;
+    /* Center vertically */
+    height: 100%;
+    /* Ensure the icon takes full height of its container */
+    width: 100%;
+    /* Ensure the icon takes full width of its container */
+  }
+
+  .myMenu-item:hover {
+    background: black;
+    color: #009EF7;
+  }
+
+  /* Show items when the menu is open */
+  .myMenu-open:checked~.myMenu-item {
+    display: block;
+    /* Show the menu items */
+    opacity: 1;
+  }
+
+  /* Transition for each item when opening - position from bottom (starting 50px above) */
+  .myMenu-open:checked~.myMenu-item:nth-child(1) {
+    transition-duration: 200ms;
+    transform: translate3d(0, -50px, 0);
+    /* Move the first item 50px above the button */
+  }
+
+  .myMenu-open:checked~.myMenu-item:nth-child(2) {
+    transition-duration: 300ms;
+    transform: translate3d(0, -110px, 0);
+    /* Move the second item up */
+  }
+
+  .myMenu-open:checked~.myMenu-item:nth-child(3) {
+    transition-duration: 400ms;
+    transform: translate3d(0, -170px, 0);
+    /* Move the third item up */
+  }
+
+  .myMenu-open:checked~.myMenu-item:nth-child(4) {
+    transition-duration: 500ms;
+    transform: translate3d(0, -230px, 0);
+    /* Move the fourth item up */
+  }
+
+  .myMenu-open:checked~.myMenu-item:nth-child(5) {
+    transition-duration: 600ms;
+    transform: translate3d(0, -290px, 0);
+    /* Move the fifth item up */
+  }
+
+  .myMenu-open:checked~.myMenu-item:nth-child(6) {
+    transition-duration: 700ms;
+    transform: translate3d(0, -350px, 0);
+    /* Move the sixth item up */
+  }
+
+  .myMenu-open:checked~.myMenu-item:nth-child(7) {
+    transition-duration: 800ms;
+    transform: translate3d(0, -410px, 0);
+    /* Move the seventh item up */
+  }
+
+  .myMenu-open:checked~.myMenu-item:nth-child(8) {
+    transition-duration: 900ms;
+    transform: translate3d(0, -470px, 0);
+    /* Move the eighth item up */
+  }
+
+  .myMenu-open:checked~.myMenu-item:nth-child(9) {
+    transition-duration: 1000ms;
+    transform: translate3d(0, -530px, 0);
+    /* Move the ninth item up */
+  }
+
+  /* Reduce space between the button and first option */
+  .myMenu-open:checked~.myMenu-item:nth-child(1) {
+    margin-top: 0px;
+    /* Remove any extra space */
+  }
+
+  /* Smooth transition for menu expansion when opened */
+  .myMenu-open:checked+.myMenu-open-button {
+    transition: transform 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Smooth button opening */
+    transform: scale(0.8, 0.8) translate3d(0, 0, 0);
+  }
+
+
+  gridster-item {
+    user-select: auto !important;
+    -webkit-user-drag: auto !important;
+    touch-action: auto !important;
+    -webkit-tap-highlight-color: auto !important;
+  }
+
+
+
+}
 
 .dropdown-item {
   display: flex;
@@ -1164,6 +1212,7 @@ gridster-item {
 .ngb-modal-window .modal-dialog {
   padding: 9px !important;  /* Apply the padding here */
 }
+
 
 
 .gridster-item {
