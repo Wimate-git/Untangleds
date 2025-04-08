@@ -127,6 +127,10 @@ export class ChartUi3Component implements OnInit{
                 this.DrillFilterLevel = this.parseChartData.DrillFilterLevel
                 this.summaryService.updatelookUpData(this.parseChartData)
                 console.log('this.parsedResBody checking',this.parsedResBody)
+                if (this.DrillFilterLevel == 0) {
+                  console.log('I am on level 1, disabling drill button');
+                  this.enableDrillButton = false;
+                }
                 
                 
             
@@ -234,6 +238,11 @@ export class ChartUi3Component implements OnInit{
                   this.DrillFilterLevel = this.parseChartData.DrillFilterLevel
                   this.summaryService.updatelookUpData(this.parseChartData)
                   console.log('this.parsedResBody checking',this.parsedResBody)
+
+                  if (this.DrillFilterLevel == 0) {
+                    console.log('I am on level 1, disabling drill button');
+                    this.enableDrillButton = false;
+                  }
                   // this.processedData = JSON.parse(this.parsedResBody.rowdata)
                   // console.log('this.processedData check',this.processedData)
                   // this.paresdDataEmit.emit(this.processedData); 

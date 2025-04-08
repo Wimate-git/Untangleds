@@ -122,10 +122,11 @@
                     ? (!isEditModeView ? helperEditModalOpen(item, i, pieChartModal) : null)
                     : item.grid_type === 'Stackedchart' 
                     ? (!isEditModeView ? helperEditModalOpen(item, i, stackedBarChartModal) : null)
-                    : null
+                    : item.grid_type === 'TableWidget' 
+                    ? (!isEditModeView ? helperEditModalOpen(item, i, tableModal) : null): null
                 )"
               
-              
+                
               
               
               >

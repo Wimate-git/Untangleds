@@ -2849,11 +2849,12 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
       console.error('Invalid readData object:', readData);
       return;
     }
-
-    this.blobUrl = await this.blobService.createBlobUrl();
+    let formId = readData.PK ? readData.PK.split("#")[1] || "" : "";
+    console.log('formId checking from dataTableCell',formId)
+    this.blobUrl = await this.blobService.createBlobUrl(formId);
     
     // ✅ Store PK & SK in `window` (for main app)
-    let formId = readData.PK ? readData.PK.split("#")[1] || "" : "";
+    // let formId = readData.PK ? readData.PK.split("#")[1] || "" : "";
     let SK = readData.SK;
     
     window.pk = `${this.SK_clientID}#${formId}#main`;

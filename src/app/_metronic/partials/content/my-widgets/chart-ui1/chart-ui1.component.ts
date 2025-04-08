@@ -64,7 +64,7 @@ export class ChartUi1Component implements OnChanges,OnInit {
   
   formTableConfig: {};
   storeDrillFilter: string;
-  DrillFilterLevel: string;
+  DrillFilterLevel: any;
   parseChartData: any;
   storeDrillConfig: any;
 
@@ -109,109 +109,208 @@ updateDrillButtonState() {
       this.enableDrillButton = false;
   }
 }
-toggleCheck(isChecked: boolean,index:any) {
-  this.isChecked = isChecked;
-  console.log('this.isChecked checking', this.isChecked);
-  console.log('this.storeDrillFilter  checking from initial',this.storeDrillFilter )
-  console.log('this.DrillFilterLevel checking from initial',this.DrillFilterLevel)
-  if(this.storeDrillFilter !== undefined && this.storeDrillFilter !== '' && 
-    this.DrillFilterLevel !== undefined && this.DrillFilterLevel !== ''){
+// toggleCheck(isChecked: boolean,index:any) {
+//   this.isChecked = isChecked;
+//   console.log('this.isChecked checking', this.isChecked);
+//   console.log('this.storeDrillFilter  checking from initial',this.storeDrillFilter )
+//   console.log('this.DrillFilterLevel checking from initial',this.DrillFilterLevel)
 
-      this.enableDrillButton = true
-    this.spinner.show('dataProcess' + index);
+  
+//   if(this.storeDrillFilter !== undefined && this.storeDrillFilter !== '' && 
+//     this.DrillFilterLevel !== undefined && this.DrillFilterLevel !== ''){
+
+//       this.enableDrillButton = true
+//     this.spinner.show('dataProcess' + index);
 
 
-    const chartConfig =JSON.parse(this.item.chartConfig)
-    console.log('chartConfig check from chart ui',chartConfig)
-    const extractcolumnVisibility = chartConfig
+//     const chartConfig =JSON.parse(this.item.chartConfig)
+//     console.log('chartConfig check from chart ui',chartConfig)
+//     const extractcolumnVisibility = chartConfig
     
-        this.formTableConfig = {
-          columnVisibility:extractcolumnVisibility,
+//         this.formTableConfig = {
+//           columnVisibility:extractcolumnVisibility,
   
-          formName:this.item.chartConfig.formlist
-          }
-          this.counter=0
-          const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+//           formName:this.item.chartConfig.formlist
+//           }
+//           this.counter=0
+//           const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
         
-          // Prepare the request body
-          const requestBody = {
-            body: JSON.stringify({
-              clientId: this.SK_clientID,
-              routeId: this.routeId,
-              widgetId:this.item.id,
+//           // Prepare the request body
+//           const requestBody = {
+//             body: JSON.stringify({
+//               clientId: this.SK_clientID,
+//               routeId: this.routeId,
+//               widgetId:this.item.id,
        
-              MsgType:'DrillDown',
-              permissionId:this.permissionIdRequest,
-              permissionList:this.readFilterEquation,
-              userName:this.userdetails,
-              conditions:this.eventFilterConditions ||[],
-              ChartClick:this.isChecked,
-                     DrillFilter:this.storeDrillFilter ||'',
-          DrillFilterLevel:this.DrillFilterLevel ||''
-            }),
-          };
+//               MsgType:'DrillDown',
+//               permissionId:this.permissionIdRequest,
+//               permissionList:this.readFilterEquation,
+//               userName:this.userdetails,
+//               conditions:this.eventFilterConditions ||[],
+//               ChartClick:this.isChecked,
+//                      DrillFilter:this.storeDrillFilter ||'',
+//           DrillFilterLevel:this.DrillFilterLevel ||''
+//             }),
+//           };
         
-          console.log('requestBody checking chart1Drilldown from button click', requestBody);
+//           console.log('requestBody checking chart1Drilldown from button click', requestBody);
         
-          // Send a POST request to the Lambda function with the body
-          this.http.post(apiUrl, requestBody).subscribe(
-            (response: any) => {
-              console.log('Lambda function triggered successfully:', response);
-              this.checkResBody = response.body
-              console.log('this.checkResBody',this.checkResBody)
-              const storeparsedResBody=JSON.parse(this.checkResBody)
+//           // Send a POST request to the Lambda function with the body
+//           this.http.post(apiUrl, requestBody).subscribe(
+//             (response: any) => {
+//               console.log('Lambda function triggered successfully:', response);
+//               this.checkResBody = response.body
+//               console.log('this.checkResBody',this.checkResBody)
+//               const storeparsedResBody=JSON.parse(this.checkResBody)
   
   
   
-              this.parseChartData = JSON.parse(storeparsedResBody.ChartData)
-              console.log('this.parseChartDatav checking',this.parseChartData)
-              this.storeDrillFilter = this.parseChartData.DrillFilter,
-              this.DrillFilterLevel = this.parseChartData.DrillFilterLevel
-              this.summaryService.updatelookUpData(this.parseChartData)
-              console.log('this.parsedResBody checking',this.parsedResBody)
+//               this.parseChartData = JSON.parse(storeparsedResBody.ChartData)
+//               console.log('this.parseChartDatav checking',this.parseChartData)
+//               this.storeDrillFilter = this.parseChartData.DrillFilter,
+//               this.DrillFilterLevel = this.parseChartData.DrillFilterLevel
+//               this.summaryService.updatelookUpData(this.parseChartData)
+//               console.log('this.parsedResBody checking',this.parsedResBody)
               
               
           
-              // Display SweetAlert success message
-              // Swal.fire({
-              //   title: 'Success!',
-              //   text: 'Lambda function triggered successfully.',
-              //   icon: 'success',
-              //   confirmButtonText: 'OK'
-              // });
+//               // Display SweetAlert success message
+//               // Swal.fire({
+//               //   title: 'Success!',
+//               //   text: 'Lambda function triggered successfully.',
+//               //   icon: 'success',
+//               //   confirmButtonText: 'OK'
+//               // });
         
-              // Proceed with route parameter handling
+//               // Proceed with route parameter handling
     
         
-       // Reset loading state
+//        // Reset loading state
   
-       this.spinner.hide('dataProcess' + index);
-            },
-            (error: any) => {
-              console.error('Error triggering Lambda function:', error);
+//        this.spinner.hide('dataProcess' + index);
+//             },
+//             (error: any) => {
+//               console.error('Error triggering Lambda function:', error);
         
-              // Display SweetAlert error message
-              Swal.fire({
-                title: 'Error!',
-                text: 'Failed to trigger the Lambda function. Please try again.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-              });
-       // Reset loading state
-            }
-          );
+//               // Display SweetAlert error message
+//               Swal.fire({
+//                 title: 'Error!',
+//                 text: 'Failed to trigger the Lambda function. Please try again.',
+//                 icon: 'error',
+//                 confirmButtonText: 'OK'
+//               });
+//        // Reset loading state
+//             }
+//           );
 
-  }else{
-    this.enableDrillButton = false
+//   }else if (this.DrillFilterLevel==1){
+//     console.log('i am on level1',this.DrillFilterLevel)
+
+//     this.enableDrillButton = false
+  
+//   }
+
+
+  
+//       // Emit the cell info if needed
+//       // this.sendCellInfo.emit(event);
+  
+
+// }
+
+
+
+toggleCheck(isChecked: boolean, index: any) {
+  this.isChecked = isChecked;
+  console.log('this.isChecked checking', this.isChecked);
+  console.log('this.storeDrillFilter checking from initial', this.storeDrillFilter);
+  console.log('this.DrillFilterLevel checking from initial', this.DrillFilterLevel);
+
+  // Proceed with logic only if DrillFilterLevel is not 1
+  // if (this.DrillFilterLevel !== 1) {
+    if (this.storeDrillFilter !== undefined && this.storeDrillFilter !== '' && 
+        this.DrillFilterLevel !== undefined && this.DrillFilterLevel !== '') {
+      
+      this.enableDrillButton = true; // Enable the drill button
+      this.spinner.show('dataProcess' + index);
+
+      const chartConfig = JSON.parse(this.item.chartConfig);
+      console.log('chartConfig check from chart UI', chartConfig);
+      const extractcolumnVisibility = chartConfig;
+      
+      this.formTableConfig = {
+        columnVisibility: extractcolumnVisibility,
+        formName: this.item.chartConfig.formlist
+      };
+      this.counter = 0;
+      
+      const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+      
+      const requestBody = {
+        body: JSON.stringify({
+          clientId: this.SK_clientID,
+          routeId: this.routeId,
+          widgetId: this.item.id,
+          MsgType: 'DrillDown',
+          permissionId: this.permissionIdRequest,
+          permissionList: this.readFilterEquation,
+          userName: this.userdetails,
+          conditions: this.eventFilterConditions || [],
+          ChartClick: this.isChecked,
+          DrillFilter: this.storeDrillFilter || '',
+          DrillFilterLevel: this.DrillFilterLevel || ''
+        }),
+      };
+
+      console.log('requestBody checking chart1Drilldown from button click', requestBody);
+
+      this.http.post(apiUrl, requestBody).subscribe(
+        (response: any) => {
+          console.log('Lambda function triggered successfully:', response);
+          this.checkResBody = response.body;
+          console.log('this.checkResBody', this.checkResBody);
+          
+          const storeparsedResBody = JSON.parse(this.checkResBody);
+          this.parseChartData = JSON.parse(storeparsedResBody.ChartData);
+          console.log('this.parseChartDatav checking', this.parseChartData);
+          
+          this.storeDrillFilter = this.parseChartData.DrillFilter;
+          this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
+          this.summaryService.updatelookUpData(this.parseChartData);
+          
+          console.log('this.parsedResBody checking', this.parsedResBody);
+
+          // After processing the data, disable the drill button
+          if (this.DrillFilterLevel == 0) {
+            console.log('I am on level 1, disabling drill button');
+            this.enableDrillButton = false;
+          }
+
+          // Hide spinner once done
+          this.spinner.hide('dataProcess' + index);
+        },
+        (error: any) => {
+          console.error('Error triggering Lambda function:', error);
+
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to trigger the Lambda function. Please try again.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+
+          this.spinner.hide('dataProcess' + index); // Reset loading state
+        }
+      );
+    }
+ else {
+    // If DrillFilterLevel is 1, disable the drill button immediately
+    console.log('I am on level 1, disabling drill button');
+    // this.enableDrillButton = false;
   }
-
-
-  
-      // Emit the cell info if needed
-      // this.sendCellInfo.emit(event);
-  
-
 }
+
+
 onBarClick(event: Highcharts.PointClickEventObject,index:any): void {
   console.log('event check for donut chart', event);
   // this.counter=0
@@ -270,6 +369,7 @@ if(this.isEditModeView==true){
     console.log('Emitting action, either conditions are empty or second bar clicked');
     
     // Emit action
+    this.enableDrillButton = false
     this.emitChartConfigTable.emit(this.formTableConfig);
     this.sendCellInfo.emit(event);
     this.counter = 0; // Reset counter after emitting
@@ -586,6 +686,8 @@ console.log('this.gridOptions checking from chart',this.gridOptions)
     this.isHomeChecked = isChecked;
     console.log('this.isChecked checking', this.isHomeChecked);
 
+    console.log('this.DrillFilterLevel from home button',this.DrillFilterLevel)
+    console.log('this.storeDrillFilter from home button',this.storeDrillFilter)
 
     if(this.storeDrillFilter !== undefined && this.storeDrillFilter !== '' && 
       this.DrillFilterLevel !== undefined && this.DrillFilterLevel !== ''){
@@ -642,6 +744,11 @@ console.log('this.gridOptions checking from chart',this.gridOptions)
                   this.DrillFilterLevel = this.parseChartData.DrillFilterLevel
                   this.summaryService.updatelookUpData(this.parseChartData)
                   console.log('this.parsedResBody checking',this.parsedResBody)
+
+                  if (this.DrillFilterLevel == 0) {
+                    console.log('I am on level 1, disabling drill button');
+                    this.enableDrillButton = false;
+                  }
                   // this.processedData = JSON.parse(this.parsedResBody.rowdata)
                   // console.log('this.processedData check',this.processedData)
                   // this.paresdDataEmit.emit(this.processedData); 

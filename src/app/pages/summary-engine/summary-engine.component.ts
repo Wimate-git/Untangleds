@@ -355,6 +355,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   loadingMain = true;
   isMainLoading =true
   modalWidth: any;
+  readFormName: any;
 
   createPieChart() {
     const chartOptions: any = {
@@ -1639,7 +1640,7 @@ invokeHelperDashboard(item: any, index: number, template: any,modaref:any): void
     
   
           case '': // Assuming 'Drill Down' is the expected value for drill-down cases
-          this.redirectModule(item);
+          // this.redirectModule(item);
           break;
     
         default:
@@ -8986,11 +8987,14 @@ helperChartClickFunnel(event: any, modalChart: any) {
       console.error('Invalid readData object:', readData);
       return;
     }
-
-    this.blobUrl = await this.blobService.createBlobUrl();
+    // this.readFormName = readData.data.PK ? readData.data.PK.split("#")[1] || "" : "";
+    // console.log()
+    let formId = readData.data.PK ? readData.data.PK.split("#")[1] || "" : "";
+    console.log('formId checking from dataTableCell',formId)
+    this.blobUrl = await this.blobService.createBlobUrl(formId);
     
     // ✅ Store PK & SK in `window` (for main app)
-    let formId = readData.data.PK ? readData.data.PK.split("#")[1] || "" : "";
+
     let SK = readData.data.SK;
     
     window.pk = `${this.SK_clientID}#${formId}#main`;

@@ -8,7 +8,8 @@ import { lastValueFrom } from 'rxjs';
 export class BlobService {
   constructor(private http: HttpClient) {}
 
-  async createBlobUrl(): Promise<string> {
+  async createBlobUrl(formId: string): Promise<string> {
+    console.log('receive Form name',formId)
     try {
       console.log('Fetching HTML, CSS & JS files...');
 
@@ -134,7 +135,15 @@ export class BlobService {
       const completeHtml = `
         <!DOCTYPE html>
         <html lang="en">
+        <style>
+             h1 {
+        text-align: center;
+      }
+        
+        </style>
+                   <h1>${formId}</h1>
         <head>
+
           <title>Workflow</title>
           <meta charset="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -152,10 +161,12 @@ export class BlobService {
 
           <!-- ✅ Ensure Metronic and Dynamic Form scripts execute -->
           ${reinitializeDynamicFormScript}
+         
 
         </head>
         <body>
   	<div id="dynamic-form" class="ms-10 me-10">
+  
 
           <!-- ✅ Inject JavaScript -->
           ${scriptContents}
