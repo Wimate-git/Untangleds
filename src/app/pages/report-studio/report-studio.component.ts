@@ -4633,118 +4633,119 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
 
   async buildConditionVerion2(conditions: any){
-      const dynamicFormulaCreator:any = {
-        'today':(condition: { field: any; })=>{
-          const { startOfDay, endOfDay } = this.getTodayTimestamps();
-          return `new Date(${startOfDay}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfDay})`
-        },
-        'is':(condition: { val1: any; field: any; })=>{
-          const { startOfis, endOfis } = this.getDayStartAndEndTimestamps(condition.val1);
-          return `new Date(${startOfis}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfis})`
-        },
-        '>=':(condition: { field: any; val1: any; })=>{
-          return `new Date(\${${condition.field}}) >= new Date('${condition.val1}')`
-        },
-        '<=':(condition: { field: any; val1: any; })=>{
-          return `new Date(\${${condition.field}}) <= new Date('${condition.val1}')`
-        },
-        'between':(condition: { val1: any; field: any; val2: any; })=>{
-          return `new Date('${condition.val1}') <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date('${condition.val2}')`
-        },
-        'between time':(condition: { val1: any; field: any; val2: any; })=>{
-          return `new Date('${condition.val1}') <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date('${condition.val2}')`
-        },
-        'less than days ago':(condition: { val1: any; field: any; })=>{
-          const start = this.getTimestampDaysAgo(condition.val1)
-          return `new Date(${start}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${new Date().setHours(0,0,0,0)})`
-        },
-        'more than days ago':(condition: { val1: any; field: any; })=>{
-          const start = this.getTimestampDaysAgo(condition.val1)
-          return `new Date(${start}) > new Date(\${${condition.field}})`
-        },
-        'in the past':(condition: { val1: any; field: any; })=>{
-          const start = this.getTimeInPastStampDaysAgo(condition.val1)
-          return `new Date(${start}) < new Date(\${${condition.field}})`
-        },
-        'days ago':(condition: { val1: any; field: any; })=>{
-          const start = this.getTimeInPastStampDaysAgo(condition.val1)
-          return `new Date(${start}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${new Date(start).setHours(23, 59, 59, 999)})`
-        },
-        "yesterday":(condition: { field: any; })=>{
-          const { startOfDay, endOfDay } = this.getTodayTimestamps();
-          return `new Date(${startOfDay - 86400000}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfDay - 86400000})`
-        },
-        "this week":(condition: { field: any; })=>{
-          const { startOfWeek, endOfWeek } = this.getThisWeekTimestamps();
-          return `new Date('${startOfWeek}') <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date('${endOfWeek}')`
-        },
-        "last week":(condition: { field: any; })=>{
-          const { startOfLastWeek, endOfLastWeek } = this.getLastWeekTimestamps();
-          return `new Date(${startOfLastWeek}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfLastWeek})`
-        },
-        "last 2 weeks":(condition: { field: any; })=>{
-          const { startOfLastTwoWeeks, endOfLastTwoWeeks } = this.getLastTwoWeeksTimestamps();
-          return `new Date('${startOfLastTwoWeeks}') <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date('${endOfLastTwoWeeks}')`
-        },
-        "this month":(condition: { field: any; })=>{
-          const { startOfMonth, endOfMonth } = this.getThisMonthTimestamps();
-          return `new Date(${startOfMonth}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfMonth})`
-        },
-        "last month":(condition: { field: any; })=>{
-          const { startOfLastMonth, endOfLastMonth } = this.getLastMonthTimestamps();
-          return `new Date(${startOfLastMonth}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfLastMonth})`
-        },
-        "this year":(condition: { field: any; })=>{
-          const { startOfYear, endOfYear } = this.getThisYearTimestamps();
-          return `new Date(${startOfYear}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfYear})`
-        },
-        "any":(condition: any)=>{
-          return 'true';
-        },
-        "latest 10":(condition: { field: string; })=>{
-          return condition.field + " LATEST 10"
-        }
+    const dynamicFormulaCreator:any = {
+      'today':(condition: { field: any; })=>{
+        const { startOfDay, endOfDay } = this.getTodayTimestamps();
+        return `new Date(${startOfDay}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfDay})`
+      },
+      'is':(condition: { val1: any; field: any; })=>{
+        const { startOfis, endOfis } = this.getDayStartAndEndTimestamps(condition.val1);
+        return `new Date(${startOfis}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfis})`
+      },
+      '>=':(condition: { field: any; val1: any; })=>{
+        return `new Date(\${${condition.field}}) >= new Date('${condition.val1}')`
+      },
+      '<=':(condition: { field: any; val1: any; })=>{
+        return `new Date(\${${condition.field}}) <= new Date('${condition.val1}')`
+      },
+      'between':(condition: { val1: any; field: any; val2: any; })=>{
+        return `new Date('${condition.val1}') <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date('${condition.val2}')`
+      },
+      'between time':(condition: { val1: any; field: any; val2: any; })=>{
+        return `new Date('${condition.val1}') <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date('${condition.val2}')`
+      },
+      'less than days ago':(condition: { val1: any; field: any; })=>{
+        const start = this.getTimestampDaysAgo(condition.val1)
+        return `new Date(${start}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${new Date().setHours(0,0,0,0)})`
+      },
+      'more than days ago':(condition: { val1: any; field: any; })=>{
+        const start = this.getTimestampDaysAgo(condition.val1)
+        return `new Date(${start}) > new Date(\${${condition.field}})`
+      },
+      'in the past':(condition: { val1: any; field: any; })=>{
+        const start = this.getTimeInPastStampDaysAgo(condition.val1)
+        return `new Date(${start}) < new Date(\${${condition.field}})`
+      },
+      'days ago':(condition: { val1: any; field: any; })=>{
+        const start = this.getTimeInPastStampDaysAgo(condition.val1)
+        return `new Date(${start}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${new Date(start).setHours(23, 59, 59, 999)})`
+      },
+      "yesterday":(condition: { field: any; })=>{
+        const { startOfDay, endOfDay } = this.getTodayTimestamps();
+        return `new Date(${startOfDay - 86400000}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfDay - 86400000})`
+      },
+      "this week":(condition: { field: any; })=>{
+        const { startOfWeek, endOfWeek } = this.getThisWeekTimestamps();
+        return `new Date('${startOfWeek}') <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date('${endOfWeek}')`
+      },
+      "last week":(condition: { field: any; })=>{
+        const { startOfLastWeek, endOfLastWeek } = this.getLastWeekTimestamps();
+        return `new Date(${startOfLastWeek}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfLastWeek})`
+      },
+      "last 2 weeks":(condition: { field: any; })=>{
+        const { startOfLastTwoWeeks, endOfLastTwoWeeks } = this.getLastTwoWeeksTimestamps();
+        return `new Date('${startOfLastTwoWeeks}') <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date('${endOfLastTwoWeeks}')`
+      },
+      "this month":(condition: { field: any; })=>{
+        const { startOfMonth, endOfMonth } = this.getThisMonthTimestamps();
+        return `new Date(${startOfMonth}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfMonth})`
+      },
+      "last month":(condition: { field: any; })=>{
+        const { startOfLastMonth, endOfLastMonth } = this.getLastMonthTimestamps();
+        return `new Date(${startOfLastMonth}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfLastMonth})`
+      },
+      "this year":(condition: { field: any; })=>{
+        const { startOfYear, endOfYear } = this.getThisYearTimestamps();
+        return `new Date(${startOfYear}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfYear})`
+      },
+      "any":(condition: any)=>{
+        return 'true';
+      },
+      "latest 10":(condition: { field: string; })=>{
+        return condition.field + " LATEST 10"
       }
-    
-      //Get all the keys of the dynamicFormula Calculator
-      const dynamicKeys = Object.keys(dynamicFormulaCreator)
-    
-      console.log("Conditions are here ",conditions);
-    
-      let conditionString = '';
-    
-      conditions.forEach((condition: any, index: number) => {
-        const operator = condition.operator;
-    
-    
-        let formattedCondition = ''
-        if (condition.operator == 'includes') {
-          formattedCondition = `\${${condition.field}}.${operator}('${condition.value}')`;
-        }
-        else if (condition.operator == 'startsWith') {
-          formattedCondition = `\${${condition.field}}.${operator}('${condition.value}')`;
-        }
-        else if (condition.operator == 'endsWith') {
-          formattedCondition = `\${${condition.field}}.${operator}('${condition.value}')`;
-        }
-        else if(dynamicKeys.includes(condition.operator)){
-          formattedCondition = dynamicFormulaCreator[condition.operator](condition)
-        }
-        else {
-          formattedCondition = `\${${condition.field}} ${operator} '${condition.value}'`;
-        }
-        conditionString += formattedCondition;
-    
-        if (index !== conditions.length - 1) {
-          const logicalOperator = condition.operatorBetween ? condition.operatorBetween : '';
-          conditionString += ` ${logicalOperator} `;
-        }
-      });
-    
-      console.log('Conditional String built is here ',conditionString);
-    
-      return conditionString;
-  }
+    }
+  
+    //Get all the keys of the dynamicFormula Calculator
+    const dynamicKeys = Object.keys(dynamicFormulaCreator)
+  
+    console.log("Conditions are here ",conditions);
+  
+    let conditionString = '';
+  
+    conditions.forEach((condition: any, index: number) => {
+      const operator = condition.operator;
+  
+  
+      let formattedCondition = ''
+      if (condition.operator == 'includes') {
+        formattedCondition = `\${${condition.field}}.${operator}('${condition.value}')`;
+      }
+      else if (condition.operator == 'startsWith') {
+        formattedCondition = `\${${condition.field}}.${operator}('${condition.value}')`;
+      }
+      else if (condition.operator == 'endsWith') {
+        formattedCondition = `\${${condition.field}}.${operator}('${condition.value}')`;
+      }
+      else if(dynamicKeys.includes(condition.operator)){
+        formattedCondition = dynamicFormulaCreator[condition.operator](condition)
+      }
+      else {
+        formattedCondition = `\${${condition.field}} ${operator} '${condition.value}'`;
+      }
+      conditionString += formattedCondition;
+  
+      if (index !== conditions.length - 1) {
+        const logicalOperator = condition.logicalOperator ? condition.logicalOperator : '';
+        conditionString += ` ${logicalOperator} `;
+      }
+    });
+  
+    console.log('Conditional String built is here ',conditionString);
+  
+    return conditionString;
+}
+
 
 
 
