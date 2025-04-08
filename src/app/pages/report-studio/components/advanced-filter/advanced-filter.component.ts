@@ -38,6 +38,7 @@ export class AdvancedFilterComponent {
   getLoggedUser: any;
   SK_clientID: any;
   miniTableFormBuilderData: any = {};
+  dateFilterOperator: any;
 
   constructor(public modal: NgbActiveModal,private fb: FormBuilder,private cd:ChangeDetectorRef,private api:APIService,private configService:SharedService){}
 
@@ -576,6 +577,54 @@ initializeForm() {
 
 }
 
+dateFilterConfig:any = {
+  'is': { showDate: true },
+  '>=': { showDate: true },
+  '<=': { showDate: true },
+  'between': { showStartDate: true, showEndDate: true, isBetweenTime: false },
+  'between time': { showStartDate: true, showEndDate: true, isBetweenTime: true },
+  'less than days ago': { showDaysAgo: true },
+  'more than days ago': { showDaysAgo: true },
+  'days ago': { showDaysAgo: true },
+  'in the past': { showDaysAgo: true },
+}
+
+
+isDateField(formIndex: number, tableIndex: any,condIndex:any): boolean {
+  try {
+    const selectedField = this.getConditions1(formIndex, tableIndex).value[condIndex];
+    return selectedField.field.includes('date');
+  }
+
+  catch (error) {
+    console.log("Error in dynamic dropdown ");
+    return false
+  }
+}
+
+
+
+isDropdown(formIndex: number, tableIndex: any,condIndex:any) {
+  try {
+    const selectedField = this.getConditions1(formIndex, tableIndex).value[condIndex];
+
+    if(selectedField.field.includes('date')){
+      const selectedOperator = selectedField.operator;
+      this.dateFilterOperator = selectedOperator
+      return 'date'
+    }
+    else{
+      return 'other'
+    }
+  }
+
+  catch (error) {
+    console.log("Error in dynamic dropdown ");
+    return false
+  }
+}
+
+
 
 get formGroups(): FormArray {
   return this.queryBuilderForm.get('formGroups') as FormArray;
@@ -634,7 +683,9 @@ addCondition(formGroupIndex: number, tableIndex: number) {
     field: ['', Validators.required],
     operator: ['==', Validators.required],
     value: ['', Validators.required],
-    logicalOperator: ['&&']
+    logicalOperator: ['&&'],
+    val1:[''],
+    val2:['']
   });
 
   this.getConditions1(formGroupIndex, tableIndex).push(condition);
@@ -709,7 +760,9 @@ addConditionForExistingData(formGroupIndex: number, tableIndex: number, conditio
     field: [condition.field, Validators.required],
     operator: [condition.operator, Validators.required],
     value: [condition.value, Validators.required],
-    logicalOperator: [condition.logicalOperator || '&&']
+    logicalOperator: [condition.logicalOperator || '&&'],
+    val1:[condition.val1 || ''],
+    val2:[condition.val2 || '']  // Optional field
   });
 
   this.getConditions1(formGroupIndex, tableIndex).push(conditionFormGroup);
@@ -942,6 +995,9 @@ addConditionForExistingData1(formGroupIndex: number, tableIndex: number, conditi
       advancedcustomMiniColumns:this.customMiniColumns.value,
       advancedMiniTableFilter:this.queryBuilderForm.value
     }
+
+
+    console.log("queryBuilderForm ",this.queryBuilderForm.value);
 
 
     this.configSaved.emit(advacnedExcelConfiguration); 

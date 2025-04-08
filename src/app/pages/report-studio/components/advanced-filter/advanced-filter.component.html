@@ -374,18 +374,18 @@
             <div formArrayName="formGroups" style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px;">
               <div *ngFor="let formGroup of formGroups.controls; let formIndex=index" 
                    [formGroupName]="formIndex" 
-                   class="form-group" style="border: 1px solid blue; padding: 10px; min-width: 600px; margin: 5px;">
+                   class="form-group" style="border: 1px solid blue; padding: 10px; width: 100%; margin: 5px;">
                 
                 <h4>{{formGroup.get('name')?.value}}</h4>
                 
                 <div formArrayName="tables" style="display: flex; flex-wrap: wrap; gap: 10px;">
                   <div *ngFor="let table of getTables(formIndex).controls; let tableIndex=index"
                        [formGroupName]="tableIndex" 
-                       style="flex: 1 0 48%; border: 1px solid gray; padding: 10px; display: flex; flex-wrap: wrap; flex-direction: column; gap: 10px;width:540px">
+                       style="flex: 0 0 48%; border: 1px solid gray; padding: 10px; display: flex; flex-wrap: wrap; flex-direction: column; gap: 10px;width:540px">
                     <h5>{{table.get('tableName')?.value}}</h5>
                     
                     <div formArrayName="conditions" style="display: flex; flex-wrap: wrap; gap: 10px;">
-                      <div *ngFor="let condition of getConditions1(formIndex, tableIndex).controls; let condIndex=index"
+                      <div style="width:100%" *ngFor="let condition of getConditions1(formIndex, tableIndex).controls; let condIndex=index"
                            [formGroupName]="condIndex">
                         
                         <div style="display: flex; flex-wrap: wrap; gap: 10px;">
@@ -401,7 +401,7 @@
                           
                           <div class="mb-3" style="width: 30%;">
                             <label>Operator</label>
-                            <select formControlName="operator" class="form-control">
+                            <!-- <select formControlName="operator" class="form-control">
                               <option value="" disabled selected>Select operator</option>
                               <option value="==">Equals</option>
                               <option value=">">Not equals</option>
@@ -412,15 +412,106 @@
                               <option value="<">Less than</option>
                               <option value="<=">Less than equals to</option>
                               <option value=">=">Greater than equals to</option>
-                            </select>
+                            </select> -->
+
+
+
+                            <ng-container *ngIf="isDateField(formIndex,tableIndex,condIndex)">
+                              <select formControlName="operator" placeholder="Select date type" class="form-control">
+                                <option value="" disabled selected>Select operator</option>
+                                <option value="is">is</option>
+                              <option value=">=">&gt;=</option>
+                              <option value="<=">&lt;=</option>
+                              <option value="between">between</option>
+                              <option value="between time">between time</option>
+                              <option value="less than days ago">less than days ago</option>
+                              <option value="more than days ago">more than days ago</option>
+                              <option value="in the past">in the past</option>
+                              <option value="days ago">days ago</option>
+                              <option value="today">today</option>
+                              <option value="yesterday">yesterday</option>
+                              <option value="this week">this week</option>
+                              <option value="last week">last week</option>
+                              <option value="last 2 weeks">last 2 weeks</option>
+                              <option value="this month">this month</option>
+                              <option value="last month">last month</option>
+                              <option value="this year">this year</option>
+                              <option value="any">any</option>
+                              <!-- <option value="latest 10">latest 10</option> -->
+                              </select>
+                            </ng-container>
+              
+              
+              
+              
+                            <ng-container *ngIf="!isDateField(formIndex,tableIndex,condIndex)">
+                              <select formControlName="operator" placeholder="Select operator" class="form-control">
+                                <option value="" disabled selected>Select operator</option>
+                                <option value="==">Equals</option>
+                                <option value=">">Not equals</option>
+                                <option value="includes">Contains</option>
+                                <option value="startsWith">Starts with</option>
+                                <option value="endsWith">Ends with</option>
+                                <option value=">">Greater than</option>
+                                <option value="<">Less than</option>
+                                <option value="<=">Less than equals to</option>
+                                <option value=">=">Greater than equals to</option>
+                              </select>
+                            </ng-container>
+
+              
+
+
+
+
+
+
+
+
+
                           </div>
-                          
-                          <div class="mb-3" style="width: 30%;">
-                            <label>Value</label>
-                            <input type="text" formControlName="value" class="form-control">
+
+
+
+                          <ng-container class="mb-3" style="width: 30%;" *ngIf="isDropdown(formIndex,tableIndex,condIndex) == 'date'">
+          
+                            <div *ngIf="dateFilterConfig[dateFilterOperator]?.showDate">
+                              <label class="required">Value</label>
+                                <input type="date" formControlName="val1" class="form-control">
                           </div>
+                      
+                          <div *ngIf="dateFilterConfig[dateFilterOperator]?.showStartDate" class="mb-7">
+                            <label class="required">Start and End Date</label>
                           
-                          <div class="mb-3" style="width: 30%;" *ngIf="condIndex < getConditions1(formIndex, tableIndex).length - 1">
+                                    <input [type]="dateFilterConfig[dateFilterOperator]?.isBetweenTime ? 'datetime-local' : 'date'" formControlName="val1" class="form-control">
+                            <br>
+                                    <input [type]="dateFilterConfig[dateFilterOperator]?.isBetweenTime ? 'datetime-local' : 'date'" formControlName="val2" class="form-control">
+                          </div>
+                      
+                      
+                          <div  *ngIf="dateFilterConfig[dateFilterOperator]?.showDaysAgo" class="mb-7">
+                            <label class="required">Value</label>
+                                      <input type="number" formControlName="val1" class="form-control" placeholder="Enter number of days">
+                          </div>
+                          </ng-container>
+
+
+
+
+
+                          
+                          <ng-container *ngIf="isDropdown(formIndex,tableIndex,condIndex) != 'date'">
+                            <div class="mb-3" style="width: 30%;">
+                              <label>Value</label>
+                              <input type="text" formControlName="value" class="form-control">
+                            </div>
+                          </ng-container>
+                          
+                       
+                          
+                        </div>
+
+                           <div class="mb-3" style="width: 30%;" *ngIf="condIndex < getConditions1(formIndex, tableIndex).length - 1">
                             <label>Logical Operator</label>
                             <select formControlName="logicalOperator" class="form-control">
                               <option value="" disabled selected>Select operator</option>
@@ -428,22 +519,30 @@
                               <option value="||">OR</option>
                             </select>
                           </div>
-                          
-                        </div>
-                        
-                        <button type="button" 
+
+
+                      <div style="display: flex;flex-direction: row;gap:10px">
+                          <button type="button" 
                             class="btn btn-danger btn-sm"
                             *ngIf="getConditions1(formIndex, tableIndex).length > 1"
                             (click)="removeCondition(formIndex, tableIndex, condIndex)">
-                        Remove
+                          Remove
+                        </button>
+
+
+                        <button type="button" 
+                            class="btn btn-primary btn-sm"
+                            (click)="addCondition(formIndex, tableIndex)">
+                            Add Condition
                         </button>
                       </div>
+                        
                       
-                      <button type="button" 
-                        class="btn btn-primary btn-sm"
-                        (click)="addCondition(formIndex, tableIndex)">
-                        Add Condition
-                      </button>
+
+
+                      </div>
+                      
+                    
                     </div>
                   </div>
                 </div>

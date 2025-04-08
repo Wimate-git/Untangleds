@@ -2849,12 +2849,11 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
       console.error('Invalid readData object:', readData);
       return;
     }
-    let formId = readData.PK ? readData.PK.split("#")[1] || "" : "";
-    console.log('formId checking from dataTableCell',formId)
-    this.blobUrl = await this.blobService.createBlobUrl(formId);
+
+    this.blobUrl = await this.blobService.createBlobUrl();
     
     // ✅ Store PK & SK in `window` (for main app)
-    // let formId = readData.PK ? readData.PK.split("#")[1] || "" : "";
+    let formId = readData.PK ? readData.PK.split("#")[1] || "" : "";
     let SK = readData.SK;
     
     window.pk = `${this.SK_clientID}#${formId}#main`;
@@ -4630,6 +4629,217 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
 
 
+  async buildConditionVerion2(conditions: any){
+      const dynamicFormulaCreator:any = {
+        'today':(condition: { field: any; })=>{
+          const { startOfDay, endOfDay } = this.getTodayTimestamps();
+          return `new Date(${startOfDay}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfDay})`
+        },
+        'is':(condition: { val1: any; field: any; })=>{
+          const { startOfis, endOfis } = this.getDayStartAndEndTimestamps(condition.val1);
+          return `new Date(${startOfis}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfis})`
+        },
+        '>=':(condition: { field: any; val1: any; })=>{
+          return `new Date(\${${condition.field}}) >= new Date('${condition.val1}')`
+        },
+        '<=':(condition: { field: any; val1: any; })=>{
+          return `new Date(\${${condition.field}}) <= new Date('${condition.val1}')`
+        },
+        'between':(condition: { val1: any; field: any; val2: any; })=>{
+          return `new Date('${condition.val1}') <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date('${condition.val2}')`
+        },
+        'between time':(condition: { val1: any; field: any; val2: any; })=>{
+          return `new Date('${condition.val1}') <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date('${condition.val2}')`
+        },
+        'less than days ago':(condition: { val1: any; field: any; })=>{
+          const start = this.getTimestampDaysAgo(condition.val1)
+          return `new Date(${start}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${new Date().setHours(0,0,0,0)})`
+        },
+        'more than days ago':(condition: { val1: any; field: any; })=>{
+          const start = this.getTimestampDaysAgo(condition.val1)
+          return `new Date(${start}) > new Date(\${${condition.field}})`
+        },
+        'in the past':(condition: { val1: any; field: any; })=>{
+          const start = this.getTimeInPastStampDaysAgo(condition.val1)
+          return `new Date(${start}) < new Date(\${${condition.field}})`
+        },
+        'days ago':(condition: { val1: any; field: any; })=>{
+          const start = this.getTimeInPastStampDaysAgo(condition.val1)
+          return `new Date(${start}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${new Date(start).setHours(23, 59, 59, 999)})`
+        },
+        "yesterday":(condition: { field: any; })=>{
+          const { startOfDay, endOfDay } = this.getTodayTimestamps();
+          return `new Date(${startOfDay - 86400000}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfDay - 86400000})`
+        },
+        "this week":(condition: { field: any; })=>{
+          const { startOfWeek, endOfWeek } = this.getThisWeekTimestamps();
+          return `new Date('${startOfWeek}') <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date('${endOfWeek}')`
+        },
+        "last week":(condition: { field: any; })=>{
+          const { startOfLastWeek, endOfLastWeek } = this.getLastWeekTimestamps();
+          return `new Date(${startOfLastWeek}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfLastWeek})`
+        },
+        "last 2 weeks":(condition: { field: any; })=>{
+          const { startOfLastTwoWeeks, endOfLastTwoWeeks } = this.getLastTwoWeeksTimestamps();
+          return `new Date('${startOfLastTwoWeeks}') <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date('${endOfLastTwoWeeks}')`
+        },
+        "this month":(condition: { field: any; })=>{
+          const { startOfMonth, endOfMonth } = this.getThisMonthTimestamps();
+          return `new Date(${startOfMonth}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfMonth})`
+        },
+        "last month":(condition: { field: any; })=>{
+          const { startOfLastMonth, endOfLastMonth } = this.getLastMonthTimestamps();
+          return `new Date(${startOfLastMonth}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfLastMonth})`
+        },
+        "this year":(condition: { field: any; })=>{
+          const { startOfYear, endOfYear } = this.getThisYearTimestamps();
+          return `new Date(${startOfYear}) <= new Date(\${${condition.field}}) && new Date(\${${condition.field}}) <= new Date(${endOfYear})`
+        },
+        "any":(condition: any)=>{
+          return 'true';
+        },
+        "latest 10":(condition: { field: string; })=>{
+          return condition.field + " LATEST 10"
+        }
+      }
+    
+      //Get all the keys of the dynamicFormula Calculator
+      const dynamicKeys = Object.keys(dynamicFormulaCreator)
+    
+      console.log("Conditions are here ",conditions);
+    
+      let conditionString = '';
+    
+      conditions.forEach((condition: any, index: number) => {
+        const operator = condition.operator;
+    
+    
+        let formattedCondition = ''
+        if (condition.operator == 'includes') {
+          formattedCondition = `\${${condition.field}}.${operator}('${condition.value}')`;
+        }
+        else if (condition.operator == 'startsWith') {
+          formattedCondition = `\${${condition.field}}.${operator}('${condition.value}')`;
+        }
+        else if (condition.operator == 'endsWith') {
+          formattedCondition = `\${${condition.field}}.${operator}('${condition.value}')`;
+        }
+        else if(dynamicKeys.includes(condition.operator)){
+          formattedCondition = dynamicFormulaCreator[condition.operator](condition)
+        }
+        else {
+          formattedCondition = `\${${condition.field}} ${operator} '${condition.value}'`;
+        }
+        conditionString += formattedCondition;
+    
+        if (index !== conditions.length - 1) {
+          const logicalOperator = condition.operatorBetween ? condition.operatorBetween : '';
+          conditionString += ` ${logicalOperator} `;
+        }
+      });
+    
+      console.log('Conditional String built is here ',conditionString);
+    
+      return conditionString;
+  }
+
+
+
+
+getTodayTimestamps() {
+  const now = new Date();
+  const startOfDay = new Date(now.setHours(0, 0, 0, 0)).getTime(); // Start of today
+  const endOfDay = new Date(now.setHours(23, 59, 59, 999)).getTime(); // End of today
+  return { startOfDay, endOfDay };
+}
+
+getDayStartAndEndTimestamps(epochTime:any) {
+  const date = new Date(epochTime);
+  date.setHours(0, 0, 0, 0);
+  let startOfis = date.getTime();
+  date.setHours(23, 59, 59, 999); 
+  let endOfis = date.getTime();
+  return { startOfis, endOfis };
+}
+
+
+getTimestampDaysAgo(days:any) {
+  const now = new Date();
+  now.setDate(now.getDate() - days);
+  now.setHours(0, 0, 0, 0); 
+  return now.getTime(); 
+}
+
+getTimeInPastStampDaysAgo(days:any) {
+  const now = new Date();
+  now.setDate(now.getDate() - days);
+  now.setHours(0, 0, 0, 0);
+  return now.getTime();
+}
+
+getLastTwoWeeksTimestamps() {
+  const now = new Date();
+  const diffToSunday = now.getDay() === 0 ? 7 : now.getDay();  
+  const startOfLastTwoWeeks = new Date(now.setDate(now.getDate() - diffToSunday - 14)); 
+  startOfLastTwoWeeks.setHours(0, 0, 0, 0); 
+  const endOfLastTwoWeeks = new Date(startOfLastTwoWeeks);  
+  endOfLastTwoWeeks.setDate(startOfLastTwoWeeks.getDate() + 13); 
+  endOfLastTwoWeeks.setHours(23, 59, 59, 999); 
+  
+  return { startOfLastTwoWeeks, endOfLastTwoWeeks };
+}
+
+
+getThisMonthTimestamps() {
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).setHours(0, 0, 0, 0); // Start of this month
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).setHours(23, 59, 59, 999); // End of this month
+  return { startOfMonth, endOfMonth };
+}
+
+getThisYearTimestamps() {
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1).getTime(); // January 1st of this year
+  const endOfYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999).getTime(); // December 31st of this year
+  return { startOfYear, endOfYear };
+}
+
+// Helper function to get start and end of the last month
+getLastMonthTimestamps() {
+  const now = new Date();
+  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).setHours(0, 0, 0, 0); // Start of last month
+  const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0).setHours(23, 59, 59, 999); // End of last month
+  return { startOfLastMonth, endOfLastMonth };
+}
+
+
+getThisWeekTimestamps() {
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const diffToSunday = dayOfWeek === 0 ? 0 : dayOfWeek; 
+
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - diffToSunday);
+  startOfWeek.setHours(0, 0, 0, 0);
+  const endOfWeek = new Date(now);
+  endOfWeek.setDate(now.getDate() + (6 - dayOfWeek));
+  endOfWeek.setHours(0, 0, 0, 0); 
+  return { startOfWeek, endOfWeek };
+}
+
+
+getLastWeekTimestamps() {
+  const now = new Date();
+  const dayOfWeek = now.getDay(); 
+  const diffToSunday = dayOfWeek === 0 ? 7 : dayOfWeek;
+  const startOfLastWeek = new Date(now.setDate(now.getDate() - diffToSunday - 7)).setHours(0, 0, 0, 0);
+  const endOfLastWeek = new Date(now.setDate(now.getDate() + 6)).setHours(23, 59, 59, 999);
+  return { startOfLastWeek, endOfLastWeek };
+}
+
+
+
+
   // Method to extract mini table data
   async extractMiniTableData(data: any[], tableColumnIndex: number, index: number) {
     const tableData: any = {};
@@ -4667,7 +4877,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
       tempConditionHolder = this.allAdvancedExcelConfigurations && this.allAdvancedExcelConfigurations.advancedMiniTableFilter.formGroups.find((ele: any) => ele.name == currentForm);
       if (tempConditionHolder && tempConditionHolder.tables && Array.isArray(tempConditionHolder.tables) && tempConditionHolder.tables.length > 0) {
         for (let tab of tempConditionHolder.tables) {
-          const tempConditon = await this.buildConditionLocationString(tab.conditions);
+          const tempConditon = await this.buildConditionVerion2(tab.conditions);
           allFilterConditions[`${tab.tableName}`] = tempConditon;
         }
       }
@@ -4691,12 +4901,54 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
             const newTableRows = [];
             for (let tab of tableRows) {
               console.log("this.dyanmicFormDataArray ", this.dyanmicFormDataArray);
+              console.log("tab values are here ",tab);
               const filteredFormName = this.dyanmicFormDataArray[index][this.tableDataWithFormFilters[index].formFilter]?.find((element: any) => tableKey.startsWith(element.name)).validation.formName_table;
 
               console.log("filteredFormName ", filteredFormName);
               const tempTableKey = filteredFormName ? filteredFormName : null; // Add null check
               console.log("tempTableKey ", tempTableKey);
               if (tempTableKey) {
+
+
+                // if(allFilterConditions && allFilterConditions[tempTableKey] && allFilterConditions[tempTableKey].includes('LATEST 10')) {
+      
+                //   const pattern = /\b[\w.-]+ LATEST 10\b/g;
+                  
+                //   const match = allFilterConditions[tempTableKey].match(pattern);
+                //   // const key = match ? match[0].split(' ')[0] : null;  // Extract the key part
+      
+      
+                //   match.forEach((ele:any)=>{
+                //     const key = match ? ele.split(' ')[0] : null; 
+                    
+                //     console.log("Key is here ",key);
+      
+                //     if (key && tempMetaArray.every(item => item[`${key}`] && !isNaN(new Date(item[`${key}`])))) {
+        
+                //       tempMetaArray = tempMetaArray.sort((a, b) => new Date(b[key]) - new Date(a[key]));
+        
+                //       // Get the latest 10 packets
+                //       tempMetaArray = tempMetaArray.slice(0, 10);
+        
+                //       console.log("Latest 10 packets are here ",tempMetaArray);
+                //     } else {
+                //         console.error("Invalid or missing key for sorting");
+                //     }
+                //   })
+              
+                //   conditionalString = conditionalString.replace(pattern,'').trim();
+              
+                //   conditionalString = conditionalString.replace(/\s*(&&|\|\|)\s*/, '').trim();
+              
+                //   conditionalString = conditionalString.replace(/''/g, '');
+
+
+                // }
+
+
+
+
+
                 const res = await this.evaluateTemplate(allFilterConditions[tempTableKey], tab, '');
                 if (res) {
                   // if(this.isCustomMiniTable && this.allAdvancedExcelConfigurations && this.allAdvancedExcelConfigurations.miniCustomColumns){
@@ -4725,6 +4977,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
           // console.log("Table rows are here after evaluation ", tableRows);
 
           if (tableRows && Array.isArray(tableRows) && tableRows.length > 0) {
+
 
 
             if (this.isCustomMiniTable && this.allAdvancedExcelConfigurations && this.allAdvancedExcelConfigurations.advancedcustomMiniColumns.miniCustomColumns) {
