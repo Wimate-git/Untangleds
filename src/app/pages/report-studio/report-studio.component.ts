@@ -444,7 +444,8 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
         const tree_response_1 = JSON.parse(JSON.parse(JSON.stringify(tree_reponse[0].tree)))
 
 
-        this.validForms = this.permissionForm.filter((item: any) => item.permission.includes('Read') == true)
+     
+        this.validForms = this.permissionForm.filter((item: any) => item.permission.includes('Read') == true || item.permission.includes('All') == true)
         console.log("Valid forms are here ", this.validForms);
         const allowedForms = this.validForms.reduce((acc: string[], permission: any) => {
           return acc.concat(permission.dynamicForm);
@@ -2850,11 +2851,13 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    this.blobUrl = await this.blobService.createBlobUrl();
+      // ✅ Store PK & SK in `window` (for main app)
+      let formId = readData.PK ? readData.PK.split("#")[1] || "" : "";
+      let SK = readData.SK;
+
+    this.blobUrl = await this.blobService.createBlobUrl(formId);
     
-    // ✅ Store PK & SK in `window` (for main app)
-    let formId = readData.PK ? readData.PK.split("#")[1] || "" : "";
-    let SK = readData.SK;
+  
     
     window.pk = `${this.SK_clientID}#${formId}#main`;
     window.sk = typeof SK === 'number' ? SK : Number(SK);
