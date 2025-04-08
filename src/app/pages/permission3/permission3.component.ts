@@ -192,6 +192,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       'Xlsx data upload',
       'Xlsx data download',
       'Choose',
+      'Download QR code',
       'None',
 
     ]
