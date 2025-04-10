@@ -481,7 +481,8 @@ validateAndSubmit() {
           formatType: ['', Validators.required],
           filterDescription: [''],
           filterParameter: [[]],
-          XaxisFormat: ['']
+          XaxisFormat: [''],
+          CustomlineColor:['']
         });
   
         this.all_fields.push(newGroup);
@@ -1154,7 +1155,8 @@ repopulate_fields(getValues: any): FormArray {
           formatType: [configItem.formatType || '', Validators.required],
           filterParameter: this.fb.control(filterParameterValue),
           filterDescription: configItem.filterDescription || '',
-          XaxisFormat: this.fb.control(dateParameter)
+          XaxisFormat: this.fb.control(dateParameter),
+          CustomlineColor:[configItem.CustomlineColor || ''],
         })
       );
 
@@ -1606,7 +1608,7 @@ validateFormArray(): boolean {
 
 DrillDownTypeFields = [
   { value: 'Table', text: 'Table' },
-  { value: 'Multi Level', text: 'Multi Level' },
+  { value: 'Multi Level', text: 'Multi Level Drill Down' },
 ]
   onValueChange(selectedValue: any): void {
     console.log('selectedValue check', selectedValue[0].value);  // Log the selected value

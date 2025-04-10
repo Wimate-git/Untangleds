@@ -143,7 +143,7 @@ export class StackedBarConfigComponent {
 
   DrillDownTypeFields = [
     { value: 'Table', text: 'Table' },
-    { value: 'Multi Level', text: 'Multi Level' },
+    { value: 'Multi Level', text: 'Multi Level Drill Down' },
   ]
   onAdd_fieldsChange(event: Event): void {
     const input = event.target as HTMLInputElement;

@@ -301,7 +301,7 @@ export class FunnelChartConfigComponent implements OnInit{
   }
   DrillDownTypeFields = [
     { value: 'Table', text: 'Table' },
-    { value: 'Multi Level', text: 'Multi Level' },
+    { value: 'Multi Level', text: 'Multi Level Drill Down' },
   ]
   removeCondition(fieldIndex: number, conditionIndex: number) {
     const drillFieldsArray = this.createChart.get('drill_fields') as FormArray;

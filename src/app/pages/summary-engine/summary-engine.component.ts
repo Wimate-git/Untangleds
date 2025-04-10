@@ -258,6 +258,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   mapHeight: any[] = [];
   mapWidth: any[] = [];
 
+  liveDataFilterCheck:boolean=false
+
   center: google.maps.LatLngLiteral = { lat: 20.5937, lng: 78.9629 };
   zoom = 5; // Adjust the zoom level
 
@@ -1471,8 +1473,17 @@ Highcharts.chart('MixedChart', barchartOptions);
     console.log('Fullscreen enabled');
 }
 liveFilterDataProcess(liveFilterData:any){
-  console.log('liveFilterData',liveFilterData)
-  this.summaryService.updatelookUpData(liveFilterData)
+  console.log('liveFilterData from live check', liveFilterData);
+
+  if (liveFilterData && liveFilterData.length > 0) {
+    this.liveDataFilterCheck =  true
+      this.summaryService.updatelookUpData(liveFilterData);
+  } else {
+      console.log('liveFilterData is empty, skipping update');
+  }
+  
+
+  // this.summaryService.updatelookUpData(liveFilterData)
   this.liveDashboardDataFormat(liveFilterData)
 
 }
@@ -1774,7 +1785,8 @@ showDrillDownData(dynamicDrill:any,modalref:any){
       return;
   }else {
     setTimeout(() => {
-      this.modalService.open(modalref, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(modalref, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
     }, 500);
 
   }
@@ -1854,7 +1866,8 @@ showDrillDownData(dynamicDrill:any,modalref:any){
 
 helperTileClick(event:any,modalChart:any){
   console.log('event checking',event)
-  this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+  this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+    keyboard: false  });
 
 }
 
@@ -1982,7 +1995,9 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
         fullscreen: true,
 
         modalDialogClass:'p-9',
-        centered: true// Custom class for modal width
+        centered: true,// Custom class for modal width
+        backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  
       });
       
       
@@ -2184,7 +2199,9 @@ this.openModalHelpher(packet.dashboardIds).then((data) => {
         fullscreen: true,
 
         modalDialogClass:'p-9',
-        centered: true// Custom class for modal width
+        centered: true,// Custom class for modal width
+        backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  
       });
     } else {
       console.error('Invalid TemplateRef passed for modal:', modaref);
@@ -2611,9 +2628,9 @@ exitFullScreen(): void {
       }
       else if (item.grid_type === 'Columnchart') {
         const baseHeight = 400; // Base height for the chart
-        const extraHeight = 40; // Additional height for labels, etc.
+        // const extraHeight = 40; // Additional height for labels, etc.
   
-        this.chartHeight[index] = Math.max(0, itemComponentHeight + extraHeight); // Adjust height
+        this.chartHeight[index] = Math.max(0, itemComponentHeight ); // Adjust height
         this.chartWidth[index] = Math.max(0, itemComponentWidth);
   
         console.log(
@@ -3727,10 +3744,11 @@ this.http.post(apiUrl, requestBody).subscribe(
 
       if (this.summaryPermission.includes("All")) {
         console.log("Permission is 'All'. Fetching all dashboards...");
-        this.dashboardData = await this.fetchCompanyLookupdata(0);
+        this.dashboardData = await this.fetchCompanyLookupdata(1);
+        this.updateOptions();
       } else {
         console.log("Fetching specific dashboards...");
-        const allData = await this.fetchCompanyLookupdata(0);
+        const allData = await this.fetchCompanyLookupdata(1);
         this.dashboardData = allData.filter((dashboard: any) =>
           this.summaryPermission.includes(dashboard.P1)
         );
@@ -3907,7 +3925,9 @@ processFetchedData(result: any): void {
       fullscreen: true,
 
       modalDialogClass:'p-9',
-      centered: true
+      centered: true,
+      backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  
     });
     
     
@@ -4119,7 +4139,8 @@ setTimeout(() => {
 
   }
   openCreateContent(createcontent: any) {
-    this.modalService.open(createcontent, {fullscreen: true, modalDialogClass:'p-9', centered: true});
+    this.modalService.open(createcontent, {fullscreen: true, modalDialogClass:'p-9', centered: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
   }
 
   viewItem(id: string, receivePacket?: any): void {
@@ -4507,7 +4528,8 @@ justReadStyles(data:any,index:any){
 }
   helperFilter(data:any,index:any, KPIModal: TemplateRef<any>){
     if(data.grid_type=='filterTile'){
-    this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
 
     // Access the component instance and trigger `openKPIModal`
     setTimeout(() => {
@@ -4516,7 +4538,8 @@ justReadStyles(data:any,index:any){
     }, 500);
   }
   else if(data.grid_type=='tile'){
-    this.modalService.open(KPIModal, {fullscreen: true, modalDialogClass:'p-9', centered: true} );
+    this.modalService.open(KPIModal, {fullscreen: true, modalDialogClass:'p-9', centered: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  } );
 
     // Access the component instance and trigger `openKPIModal`
     setTimeout(() => {
@@ -4533,7 +4556,8 @@ justReadStyles(data:any,index:any){
 
 
     if(event.arg1.grid_type=='tile'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -4544,7 +4568,8 @@ justReadStyles(data:any,index:any){
     }
     else if(event.arg1.grid_type=='tileWithIcon'){
 
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -4557,7 +4582,8 @@ justReadStyles(data:any,index:any){
 
     
     else if(event.arg1.grid_type=='MultiTableWidget'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -4567,7 +4593,8 @@ justReadStyles(data:any,index:any){
       }, 500);
     }
     else if(event.arg1.grid_type=='logo'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -4577,7 +4604,8 @@ justReadStyles(data:any,index:any){
       }, 500);
     }
     else if(event.arg1.grid_type=='HTMLtile'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -4587,7 +4615,8 @@ justReadStyles(data:any,index:any){
       }, 500);
     }
     else if(event.arg1.grid_type=='TableWidget'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -4597,7 +4626,8 @@ justReadStyles(data:any,index:any){
       }, 500);
     }
     else if(event.arg1.grid_type=='Map'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
 
     
       // Access the component instance and trigger `openKPIModal`
@@ -4611,14 +4641,16 @@ justReadStyles(data:any,index:any){
     
     else if(event.arg1.grid_type=='tile2'){
       console.log('modal check',KPIModal)
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check', event)
       setTimeout(() => {
         this.tileConfig2Component.openKPIModal1(event.arg1, event.arg2)
       }, 500);
     }
     else if(event.arg1.grid_type=='tile3'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check', event)
   
       setTimeout(() => {
@@ -4627,14 +4659,16 @@ justReadStyles(data:any,index:any){
 
     }
     else if (event.arg1.grid_type=='tile4'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check', event)
       setTimeout(() => {
         this.tileConfig4Component?.openKPIModal3(event.arg1, event.arg2)
       }, 500);
     }
     else if(event.arg1.grid_type=='tile5'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check', event)
       setTimeout(() => {
         this.tileConfig5Component?.openKPIModal4(event.arg1, event.arg2)
@@ -4642,14 +4676,16 @@ justReadStyles(data:any,index:any){
 
     }
     else if(event.arg1.grid_type=='tile6'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check', event)
       setTimeout(() => {
         this.tileConfig6Component?.openKPIModal5(event.arg1, event.arg2)
       }, 500);
     }
     else if(event.arg1.grid_type=='title'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check', event)
       setTimeout(() => {
         this.titleConfigComponent.openTitleModal(event.arg1, event.arg2)
@@ -4658,7 +4694,8 @@ justReadStyles(data:any,index:any){
     }
 
     else if(event.arg1.grid_type=='chart'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig1Component.openChartModal1(event.arg1, event.arg2)
@@ -4667,7 +4704,8 @@ justReadStyles(data:any,index:any){
 
     }
     else if(event.arg1.grid_type=='semiDonut'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check', event)
       setTimeout(() => {
         this.SemiDonutConfigComponent.opensemiDonutModal(event.arg1, event.arg2)
@@ -4675,7 +4713,8 @@ justReadStyles(data:any,index:any){
 
     }
     else if(event.arg1.grid_type=='Stackedchart'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check', event)
       setTimeout(() => {
         this.StackedBarConfigComponent.openStackedChartModal(event.arg1, event.arg2)
@@ -4684,7 +4723,8 @@ justReadStyles(data:any,index:any){
     }
 
     else if(event.arg1.grid_type=='Piechart'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check', event)
       setTimeout(() => {
         this.PieChartConfigComponent.openPieChartModal(event.arg1, event.arg2)
@@ -4693,7 +4733,8 @@ justReadStyles(data:any,index:any){
     }
 
     else if(event.arg1.grid_type=='Linechart'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig2Component.openChartModal2(event.arg1, event.arg2)
@@ -4702,7 +4743,8 @@ justReadStyles(data:any,index:any){
     }
 
     else if(event.arg1.grid_type=='Funnelchart'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check', event)
       setTimeout(() => {
         this.FunnelChartConfigComponent.openFunnelChartModal(event.arg1, event.arg2)
@@ -4711,7 +4753,8 @@ justReadStyles(data:any,index:any){
     }
 
     else if(event.arg1.grid_type=='Columnchart'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig3Component.openChartModal3(event.arg1, event.arg2)
@@ -4719,7 +4762,8 @@ justReadStyles(data:any,index:any){
 
     }
     else if(event.arg1.grid_type=='mixedChart'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check', event)
       setTimeout(() => {
         this.MixedChartConfigComponent.openMixedChartModal(event.arg1, event.arg2)
@@ -4729,7 +4773,8 @@ justReadStyles(data:any,index:any){
 
     
     else if(event.arg1.grid_type=='Areachart'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig4Component.openChartModal4(event.arg1, event.arg2)
@@ -4737,7 +4782,8 @@ justReadStyles(data:any,index:any){
 
     }
     else if(event.arg1.grid_type=='Barchart'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig5Component.openChartModal5(event.arg1, event.arg2)
@@ -4746,7 +4792,8 @@ justReadStyles(data:any,index:any){
     }
     else if(event.arg1.grid_type=='dynamicTile'){
 
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check dynamic tile', event)
     
       // Access the component instance and trigger `openKPIModal`
@@ -4758,7 +4805,8 @@ justReadStyles(data:any,index:any){
 
 
     else if(event.arg1.grid_type=='title'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check dynamic tile', event)
     
       // Access the component instance and trigger `openKPIModal`
@@ -4769,7 +4817,8 @@ justReadStyles(data:any,index:any){
     }
 
     else if(event.arg1.grid_type=='filterTile'){
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check dynamic tile', event)
       console.log('event.arg1 checking',event.arg1)
       console.log('event.arg2 checking',event.arg2)
@@ -4785,7 +4834,8 @@ justReadStyles(data:any,index:any){
 
     else if(event.arg1.grid_type=='progressTile'){
       console.log('i am openining')
-      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check progress', event)
     
       // Access the component instance and trigger `openKPIModal`
@@ -4805,7 +4855,8 @@ justReadStyles(data:any,index:any){
     helperEditModalOpen(argument1:any,argument2:any,modalReference: TemplateRef<any>){
       console.log('i am entered to tile 1 edit modal')
       if(argument1.grid_type=='tile'){
-        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+          keyboard: false  });
   
       
         // Access the component instance and trigger `openKPIModal`
@@ -4816,7 +4867,8 @@ justReadStyles(data:any,index:any){
       }
       else if(argument1.grid_type=='tile2'){
         console.log('modal check',modalReference)
-      this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
       console.log('event check', event)
       setTimeout(() => {
         this.tileConfig2Component.openKPIModal1(argument1, argument2)
@@ -4825,7 +4877,8 @@ justReadStyles(data:any,index:any){
       }
 
       else if (argument1.grid_type=='dynamicTile'){
-        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+          keyboard: false  });
       console.log('event check dynamic tile', event)
     
       // Access the component instance and trigger `openKPIModal`
@@ -4837,7 +4890,8 @@ justReadStyles(data:any,index:any){
       }
 
       else if(argument1.grid_type=='title'){
-        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+          keyboard: false  });
         console.log('event check dynamic tile', event)
       
         // Access the component instance and trigger `openKPIModal`
@@ -4851,7 +4905,8 @@ justReadStyles(data:any,index:any){
 
       else if(argument1.grid_type=='tileWithIcon'){
 
-        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+          keyboard: false  });
   
       
         // Access the component instance and trigger `openKPIModal`
@@ -4862,7 +4917,8 @@ justReadStyles(data:any,index:any){
       }
       else if(argument1.grid_type=='progressTile'){
         console.log('i am openining')
-        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+          keyboard: false  });
         console.log('event check progress', event)
       
         // Access the component instance and trigger `openKPIModal`
@@ -4875,7 +4931,8 @@ justReadStyles(data:any,index:any){
 
 
       else if(argument1.grid_type=='chart'){
-        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+          keyboard: false  });
         console.log('event check', event)
         setTimeout(() => {
           this.ChartConfig1Component.openChartModal1(argument1, argument2)
@@ -4886,7 +4943,8 @@ justReadStyles(data:any,index:any){
 
 
       else if(argument1.grid_type=='Linechart'){
-        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+          keyboard: false  });
         console.log('event check', event)
         setTimeout(() => {
           this.ChartConfig2Component.openChartModal2(argument1, argument2)
@@ -4896,7 +4954,8 @@ justReadStyles(data:any,index:any){
 
 
       else if(argument1.grid_type=='Columnchart'){
-        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+          keyboard: false  });
         console.log('event check', event)
         setTimeout(() => {
           this.ChartConfig3Component.openChartModal3(argument1, argument2)
@@ -4904,7 +4963,8 @@ justReadStyles(data:any,index:any){
   
       }
       else if(argument1.grid_type=='Funnelchart'){
-        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+          keyboard: false  });
         console.log('event check', event)
         setTimeout(() => {
           this.FunnelChartConfigComponent.openFunnelChartModal(argument1, argument2)
@@ -4913,7 +4973,8 @@ justReadStyles(data:any,index:any){
       }
 
       else if(argument1.grid_type=='Piechart'){
-        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+          keyboard: false  });
         console.log('event check', event)
         setTimeout(() => {
           this.PieChartConfigComponent.openPieChartModal(argument1, argument2)
@@ -4922,7 +4983,8 @@ justReadStyles(data:any,index:any){
       }
 
       else if(argument1.grid_type=='Stackedchart'){
-        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+          keyboard: false  });
         console.log('event check', event)
         setTimeout(() => {
           this.StackedBarConfigComponent.openStackedChartModal(argument1, argument2)
@@ -4930,7 +4992,8 @@ justReadStyles(data:any,index:any){
   
       }
       else if(argument1.grid_type=='TableWidget'){
-        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+          keyboard: false  });
   
       
         // Access the component instance and trigger `openKPIModal`
@@ -5472,7 +5535,8 @@ console.log('selectedTab checking',this.selectedTab)
     });
   
     // Open modal for new entry
-    this.modalService.open(content, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(content, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
   }
   
 
@@ -5552,7 +5616,8 @@ console.log('selectedTab checking',this.selectedTab)
     }
 
     // Open modal for editing
-    this.modalService.open(content,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(content,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
   }
 
 
@@ -5642,7 +5707,20 @@ console.log('selectedTab checking',this.selectedTab)
   }
 
 
-
+  showValidationErrors:boolean=false
+  onSaveClick(): void {
+    this.showValidationErrors = true;  // Show error messages on Save
+  
+    // Perform validation check for required fields, uniqueness, and validity
+    if (this.createSummaryField.valid && !this.isDuplicateID && !this.isDuplicateName && this.isValidID) {
+      this.createNewSummary();  // Proceed with saving
+      // this.modal.dismiss();
+      this.modalService.dismissAll();
+    } else {
+      console.log("Form is invalid or there are duplicate values.");
+    }
+  }
+  
 
 
 
@@ -6265,53 +6343,128 @@ console.log('selectedTab checking',this.selectedTab)
   
 
 
-  checkUniqueIdentifier(enteredID: string): void {
-    if (!enteredID) {
-      this.errorForUniqueID = null; // Reset error if input is empty
-      this.isDuplicateID = false;
-      return;
-    }
+  // checkUniqueIdentifier(enteredID: string): void {
+  //   console.log('Entered Value check',enteredID)
+  //   if (!enteredID) {
+  //     this.errorForUniqueID = null; // Reset error if input is empty
+  //     this.isDuplicateID = false;
+  //     return;
+  //   }
 
-    const isDuplicateID = this.lookup_data_summaryCopy.some(item => item.P1 === enteredID);
-    console.log('Validation for ID:', enteredID, this.lookup_data_summaryCopy);
+  //   const isDuplicateID = this.lookup_data_summaryCopy.some(item => item.P1 === enteredID);
+  //   console.log('Validation for ID:', enteredID, this.lookup_data_summaryCopy);
 
-    if (isDuplicateID) {
-      this.errorForUniqueID = `ID "${enteredID}" is already Exist. Please enter a unique ID.`;
-      this.isDuplicateID = true; // Update the flag for the save button
-    } else {
-      this.errorForUniqueID = null;
-      this.isDuplicateID = false; // Reset the flag
-    }
-  }
+  //   if (isDuplicateID) {
+  //     this.errorForUniqueID = `ID "${enteredID}" is already Exist. Please enter a unique ID.`;
+  //     this.isDuplicateID = true; // Update the flag for the save button
+  //   } else{
+
+
+  //     this.errorForUniqueID = null;
+  //     this.isDuplicateID = false; 
+  //   }
+  // // Reset the flag
+
+  //   // else if(){
+
+  //   // }
+  // }
+  // onIDChange(event: Event): void {
+  //   let currentID = (event.target as HTMLInputElement).value;
+  //   console.log('currentID checking', currentID);
+  
+  //   // Trim the value first to remove any leading or trailing spaces
+  //   const trimmedID = currentID.trim();
+  
+  //   // Check if there are any spaces within the trimmed ID
+  //   const hasSpaces = trimmedID.includes(' ');
+  
+  //   if (hasSpaces) {
+  //     alert('i am triggerd spaces is there')
+  //     this.errorForUniqueID = 'Spaces are not allowed in the ID.';
+  //     this.isValidID = false;  // Mark ID as invalid due to spaces
+  //   } else {
+  //     // Regular expression to allow only alphanumeric characters and underscores
+  //     const validIDPattern = /^[a-zA-Z0-9_]+$/;
+  
+  //     if (!validIDPattern.test(trimmedID)) {
+  //       this.errorForUniqueID = 'Special characters (including spaces or slash) are not allowed. Use only letters, numbers, and underscores.';
+  //       this.isValidID = false;  // Mark ID as invalid
+  //     } else {
+  //       this.errorForUniqueID = null;  // Clear the error if input is valid
+  //       this.isValidID = true;  // Mark ID as valid
+  //     }
+  //   }
+  
+  //   // Validate only if the input value has changed
+  //   if (currentID !== this.previousValue) {
+  //     this.previousValue = currentID; // Update previous value
+  //     this.checkUniqueIdentifier(currentID); // Check for uniqueness if necessary
+  //   }
+  // }
+  
+  
+
+
   onIDChange(event: Event): void {
     let currentID = (event.target as HTMLInputElement).value;
-    console.log('currentID checking',currentID)
+    console.log('currentID checking', currentID);
   
-    // Check if spaces are present before or after trimming
-    const hasLeadingOrTrailingSpaces = currentID !== currentID.trim();
-    
-    if (hasLeadingOrTrailingSpaces) {
-      this.errorForUniqueID = 'Leading or trailing spaces are not allowed.';
+    // Trim the value first to remove any leading or trailing spaces
+    const trimmedID = currentID.trim();
+  
+    // Check if there are any spaces within the trimmed ID
+    const hasSpaces = trimmedID.includes(' ');
+  
+    if (hasSpaces) {
+      this.errorForUniqueID = 'Spaces are not allowed in the ID.';
       this.isValidID = false;  // Mark ID as invalid due to spaces
     } else {
       // Regular expression to allow only alphanumeric characters and underscores
       const validIDPattern = /^[a-zA-Z0-9_]+$/;
   
-      if (!validIDPattern.test(currentID.trim())) {
+      if (!validIDPattern.test(trimmedID)) {
         this.errorForUniqueID = 'Special characters (including spaces or slash) are not allowed. Use only letters, numbers, and underscores.';
         this.isValidID = false;  // Mark ID as invalid
       } else {
-        this.errorForUniqueID = null;  // Clear the error if input is valid
-        this.isValidID = true;  // Mark ID as valid
+        // Clear errors if the ID is valid
+        this.errorForUniqueID = null;
+        this.isValidID = true;
       }
+    }
+  
+    // Proceed to check for uniqueness only if no previous error occurred
+    if (!this.errorForUniqueID) {
+      this.checkUniqueIdentifier(currentID);
     }
   
     // Validate only if the input value has changed
     if (currentID !== this.previousValue) {
       this.previousValue = currentID; // Update previous value
-      this.checkUniqueIdentifier(currentID); // Check for uniqueness if necessary
     }
   }
+  
+  checkUniqueIdentifier(enteredID: string): void {
+    console.log('Entered Value check', enteredID);
+  
+    if (!enteredID) {
+      this.errorForUniqueID = null; // Reset error if input is empty
+      this.isDuplicateID = false;
+      return;
+    }
+  
+    const isDuplicateID = this.lookup_data_summaryCopy.some(item => item.P1 === enteredID);
+    console.log('Validation for ID:', enteredID, this.lookup_data_summaryCopy);
+  
+    if (isDuplicateID) {
+      this.errorForUniqueID = `ID "${enteredID}" already exists. Please enter a unique ID.`;
+      this.isDuplicateID = true; // Update the flag for the save button
+    } else {
+      this.errorForUniqueID = null;  // Clear error if the ID is unique
+      this.isDuplicateID = false;
+    }
+  }
+  
   
   
   
@@ -7363,7 +7516,8 @@ this.createSummaryField.patchValue({
           } else if (type === 'delete') {
             data.splice(findIndex, 1);
             this.lookup_data_summary = data;
-            this.cd.detectChanges();
+            window.location.reload()
+            this.cdr.detectChanges();
           }
   
           let updateData = {
@@ -8354,103 +8508,131 @@ refreshFunction(){
     this.createTitle.patchValue({ customLabel: inputValue }, { emitEvent: false });
   }
   openKPIModal(KPIModal: TemplateRef<any>,modal: any) {
-    this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(KPIModal, {       modalDialogClass: 'p-9',
+      centered: true,
+      fullscreen: true,
+      backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false   });
     modal.dismiss();
   }
 
-  openKPIModal1(KPIModal1: TemplateRef<any>,modal:any) {
-
-    this.modalService.open(KPIModal1,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+  openKPIModal1(KPIModal1: TemplateRef<any>, modal: any) {
+    this.modalService.open(KPIModal1, {
+      modalDialogClass: 'p-9',
+      centered: true,
+      fullscreen: true,
+      backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false      // Disable closing on escape key
+    });
+  
+    // Dismiss the modal from outside (not triggering backdrop click)
     modal.dismiss();
-
   }
+  
   openKPIModal2(KPIModal2: TemplateRef<any>,modal:any) {
   
-    this.modalService.open(KPIModal2, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(KPIModal2, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
  
 
   }
   openKPIModal3(KPIModal3: TemplateRef<any>,modal:any) {
-    this.modalService.open(KPIModal3, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(KPIModal3, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
   }
   openKPIModal4(KPIModal4: TemplateRef<any>,modal:any) {
-    this.modalService.open(KPIModal4, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(KPIModal4, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
   }
   opentileWithIcon(tileWithIconModal: TemplateRef<any>,modal:any) {
-    this.modalService.open(tileWithIconModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(tileWithIconModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
   }
 
   
   openKPIModal5(KPIModal5: TemplateRef<any>,modal:any) {
-    this.modalService.open(KPIModal5, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(KPIModal5, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
   }
   openTitleModal(TitleModal: TemplateRef<any>,modal:any) {
-    this.modalService.open(TitleModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(TitleModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
   }
 
 
   openProgressModal(ProgressTileModal: TemplateRef<any>,modal:any) {
-    this.modalService.open(ProgressTileModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(ProgressTileModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
   }
   openChartModal1(ChartModal1: TemplateRef<any>,modal:any) {
-    this.modalService.open(ChartModal1, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(ChartModal1, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
   }
 
 
   openFunnelChartModal1(FunnelChartModal: TemplateRef<any>,modal:any) {
-    this.modalService.open(FunnelChartModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(FunnelChartModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
   }
 
 
   openChartModal2(ChartModal2: TemplateRef<any>,modal:any) {
-    this.modalService.open(ChartModal2, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(ChartModal2, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
   }
 
   openChartModal3(ChartModal3: TemplateRef<any>,modal:any) {
-    this.modalService.open(ChartModal3, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(ChartModal3, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
   }
 
 
   openMixedChartModal(MixedChartModal: TemplateRef<any>,modal:any) {
-    this.modalService.open(MixedChartModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(MixedChartModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
   }
 
 
   opensemiDonutChartModal(semiDonutModal: TemplateRef<any>,modal:any){
-    this.modalService.open(semiDonutModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(semiDonutModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
 
   }
   openChartModal4(ChartModal4: TemplateRef<any>,modal:any) {
-    this.modalService.open(ChartModal4, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(ChartModal4, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
   }
 
   openChartModal5(ChartModal5: TemplateRef<any>,modal:any) {
-    this.modalService.open(ChartModal5, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(ChartModal5, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
   }
 
 
   openpieChartModal(pieChartModal: TemplateRef<any>,modal:any) {
-    this.modalService.open(pieChartModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(pieChartModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
   }
 
   openStackedChartModal(stackedBarChartModal: TemplateRef<any>,modal:any) {
-    this.modalService.open(stackedBarChartModal,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(stackedBarChartModal,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
   }
 
@@ -8459,21 +8641,25 @@ refreshFunction(){
 
   
   openCloneDashboard(stepperModal: TemplateRef<any>,modal:any) {
-    this.modalService.open(stepperModal, {  });
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
     modal.dismiss();
   }
   openDynamicTileModal(DynamicTileModal:TemplateRef<any>,modal:any){
-    this.modalService.open(DynamicTileModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(DynamicTileModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
 
   }
   openHTMLModalTile(htmlTileModal:TemplateRef<any>,modal:any){
-    this.modalService.open(htmlTileModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(htmlTileModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
 
   }
   openimageModal(imageModal:TemplateRef<any>,modal:any){
-    this.modalService.open(imageModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(imageModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
 
   }
@@ -8482,22 +8668,26 @@ refreshFunction(){
   
 
   openFilterModal(FilterModal:TemplateRef<any>,modal:any){
-    this.modalService.open(FilterModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(FilterModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
 
   }
   openTableModal(tableModal:TemplateRef<any>,modal:any){
-    this.modalService.open(tableModal,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(tableModal,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
 
   }
   openMapModal(MapModal:TemplateRef<any>,modal:any){
-    this.modalService.open(MapModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(MapModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
 
   }
   openMultiTableModal(MultiTableModal:TemplateRef<any>,modal:any){
-    this.modalService.open(MultiTableModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(MultiTableModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
     modal.dismiss();
 
   }
@@ -8514,7 +8704,8 @@ refreshFunction(){
   }
   helperInfo(event: any, templateref: any) {
     console.log('event checking', event);
-    this.modalService.open(templateref, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+    this.modalService.open(templateref, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
   
     setTimeout(() => {
       this.emitEvent = event;
@@ -8569,7 +8760,8 @@ refreshFunction(){
     }else if(this.isEditModeView == true){
       console.log('this.isEditModeView checking chart3', this.isEditModeView);
       setTimeout(() => {
-        this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+          keyboard: false  });
       }, 500);
    
     }
@@ -8641,7 +8833,8 @@ helperChartClickChart1(event: any, modalChart: any) {
     console.log('this.isEditModeView checking',this.isEditModeView)
     console.log("✅ columnVisibility has data, opening modal...");
     setTimeout(() => {
-      this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
     }, 500);
     
 
@@ -8701,7 +8894,8 @@ helperChartClickFunnel(event: any, modalChart: any) {
     console.log('this.isEditModeView checking',this.isEditModeView)
     console.log("✅ columnVisibility has data, opening modal...");
     setTimeout(() => {
-      this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
     }, 500);
     
 
@@ -8743,7 +8937,8 @@ helperChartClickFunnel(event: any, modalChart: any) {
         return;
     }else if(this.isEditModeView == true){
       setTimeout(() => {
-        this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+        this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+          keyboard: false  });
       }, 500);
 
     }
@@ -8802,9 +8997,14 @@ helperChartClickFunnel(event: any, modalChart: any) {
             if (permissionId !== "All") {
                 console.log("Stored permission ID:", permissionId);
                 this.loadData();
+            
+
                 this.spinner.hide('mainLoading')
             } else {
                 this.userPermission = permissionId;
+
+                this.isEditModeView = true
+                this.updateOptions()
                 console.log("this.userPermission checking", this.userPermission);
                 this.summaryDashboardUpdate = true;
                 this.loadData();
@@ -9010,7 +9210,8 @@ helperChartClickFunnel(event: any, modalChart: any) {
         iframe.contentWindow.postMessage({
           pk: window.pk,
           sk: window.sk,
-          clientId:this.SK_clientID
+          clientId:this.SK_clientID,
+          loginDetail :this.getLoggedUser
         }, "*");
         console.log("✅ Sent PK & SK to iframe via postMessage");
       } else {
@@ -9019,7 +9220,8 @@ helperChartClickFunnel(event: any, modalChart: any) {
     }, 1000);
 
     setTimeout(() => {
-      this.modalService.open(modalref,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,});
+      this.modalService.open(modalref,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
     }, 500);
 }
 

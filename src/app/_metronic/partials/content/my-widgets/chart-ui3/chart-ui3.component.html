@@ -3,20 +3,15 @@
 
 
 <div class="action-menu-container d-flex align-items-center"
-style="position: absolute; top: 10px; right: 10px; gap: 10px;z-index: 50;">
-<!-- Edit Button -->
-<!-- *ngIf="isEditModeView && storeDrillPacket.length > 0" -->
-
+style="position: absolute; top: 10px; right: 10px; gap: 10px;z-index: 50;"   >
 <button 
-  *ngIf="isEditModeView && isDrillPacketAvailable && enableDrillButton"
-  class="mat-icon-button btn btn-primary btn-icon btn-custom btn-active-light btn-active-color-primary w-50px h-30px w-md-40px h-md-30px mb-4"
+*ngIf="isEditModeView && isDrillPacketAvailable && enableDrillButton"
+class="mat-icon-button btn btn-primary btn-icon btn-custom btn-active-light btn-active-color-primary w-50px h-30px w-md-40px h-md-30px mb-4"
   style="transition: background-color 0.3s ease;margin-top: -2px;" 
-  (click)="toggleCheck(true,index)"
-  [disabled]="disable"
->
+
+  (click)="toggleCheck(true,index)">
   <i class="bi bi-arrow-left text-white" style="transition: color 0.3s ease;"></i>
 </button>
-
 <button 
 *ngIf="isEditModeView && isDrillPacketAvailable && enableDrillButton"
   class="mat-icon-button btn btn-success btn-icon btn-custom btn-active-light btn-active-color-primary w-50px h-30px w-md-40px h-md-30px mb-4" 
@@ -28,14 +23,15 @@ style="position: absolute; top: 10px; right: 10px; gap: 10px;z-index: 50;">
   <i class="bi bi-house-door text-white" style="transition: color 0.3s ease;"></i>
 </button>
 
-
-<button *ngIf="!isEditModeView && !hideButton && (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))" style="z-index: 50;"
+<!-- Edit Button -->
+<button *ngIf="!isEditModeView && !hideButton && (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)) " style="z-index: 50;"
      class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px"
      (click)="edit_each_tileUI(item, index)"
      aria-haspopup="menu"
      aria-expanded="false"
      style="background: none; border: none; cursor: pointer;">
-<i class="bi bi-pencil" style="color: var(--bs-body-color);"></i>
+     <i class="bi bi-pencil" style="color: var(--bs-body-color);"></i>
+
 </button>
 
 <button 
@@ -51,14 +47,20 @@ aria-expanded="false"
 </button>
 
 
-<!-- Display the boolean value -->
-<!-- <p>Check Status: {{ isChecked }}</p> -->
 
-
+<ngx-spinner 
+  bdColor="rgba(0, 0, 0, 0.8)" 
+  size="medium" 
+  color="#fff" 
+  [name]="'dataProcess' + index"  
+  type="square-jelly-box" 
+  [fullScreen]="true">
+  <p style="color: white">Data Processing, Please Wait....</p>
+</ngx-spinner>
 
 <!-- Dropdown Menu -->
 <div class="dropdown">
-<button *ngIf="!isEditModeView && (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))"
+<button *ngIf="!isEditModeView && (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)) "
        [matMenuTriggerFor]="menu"
        class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px">
  <i class="bi bi-three-dots-vertical" style="color: var(--bs-body-color);"></i>
@@ -83,9 +85,9 @@ aria-expanded="false"
      [matTooltip]="!isEditModeView ? 'Double-click to edit widget' : null"
      matTooltipPosition="above">
 
-  <div class="custom-label" *ngIf="item.custom_Label">
+  <!-- <div class="custom-label" *ngIf="item.custom_Label">
     {{ item.custom_Label }}
-  </div>
+  </div> -->
 
 </div>
 

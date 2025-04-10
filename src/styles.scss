@@ -87,3 +87,25 @@
 .cdk-overlay-container {
   z-index: 99999 !important;
 }
+
+
+
+
+.ngx-select__toggle {
+  border: 1px solid var(--bs-app-bg-color) !important;
+
+  background-color: var(--bs-gray-100) !important;
+  color: var(--bs-gray-700) !important;
+}
+
+.ngx-select__toggle .btn:not(.btn-outline):not(.btn-dashed):not(.btn-bordered):not(.border-hover):not(.border-active):not(.btn-flush):not(.btn-icon) {
+  border: 0;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+
+.p-multiselect {
+  border: none !important;
+  background-color: var(--bs-gray-100) !important;
+
+}

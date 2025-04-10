@@ -460,7 +460,7 @@ export class Chart1ConfigComponent implements OnInit {
   }
   DrillDownTypeFields = [
     { value: 'Table', text: 'Table' },
-    { value: 'Multi Level', text: 'Multi Level' },
+    { value: 'Multi Level', text: 'Multi Level Drill Down' },
   ]
 
   get drill_fields() {

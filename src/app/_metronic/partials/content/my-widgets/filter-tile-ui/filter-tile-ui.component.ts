@@ -21,6 +21,7 @@ export class FilterTileUiComponent implements OnInit{
   // @Output() customEvent2 = new EventEmitter<{ arg1: any; arg2: number }>();
   @Input()  all_Packet_store: any;
   @Input () hideButton:any
+  @Input() liveDataFilterCheck:any
   iframeUrl: any;
   selectedMarkerIndex: any;
   tile1Config: any;
@@ -44,23 +45,31 @@ export class FilterTileUiComponent implements OnInit{
   formattedFilterConditions: string[];
   ngOnInit(){
     console.log('item chacke',this.item.grid_details)
-    this.summaryService.lookUpData$.subscribe((data: any) => {
-      console.log('data check>>> filter ui', data);
+    console.log('liveDataFilterCheck checking',this.liveDataFilterCheck)
+    if (this.liveDataFilterCheck==true){
+      
+      this.appliedFilter = this.liveDataFilterCheck;
+
+
+    }else if(this.liveDataFilterCheck==false){
+      this.appliedFilter = this.liveDataFilterCheck;
+    }
+    // this.summaryService.lookUpData$.subscribe((data: any) => {
+    //   console.log('data check>>> filter ui', data);
   
-      // If data is present, consider the filter applied
-      this.appliedFilter = data && data.length > 0;
-      console.log('this.appliedFilter checking',this.appliedFilter)
+    //   // If data is present, consider the filter applied
+    //   this.appliedFilter = data && data.length > 0;
+    //   console.log('this.appliedFilter checking',this.appliedFilter)
 
-      if ((!data || data.length === 0) &&data != null) {
-        this.appliedFilter = false;
+    //   if ((!data || data.length === 0) &&data != null) {
+    //     this.appliedFilter = false;
 
-      }
+    //   }
   
-      // Trigger change detection
-      // this.cdRef.detectChanges();
-    });
+    //   // Trigger change detection
+    //   // this.cdRef.detectChanges();
+    // });
 
-    
 
   }
 
@@ -99,47 +108,14 @@ this.formattedFilterConditions = this.formatFilterConfig(this.parsedFilterTileCo
 console.log('this.formattedFilterConditions check',this.formattedFilterConditions)
   
   
-
-   
-   
-   
-    
-    // Split the description by '&&'
-    // let conditions = description.split('&&').map((cond: string) => cond.trim());
-    
-    // // Iterate over each condition to extract values
-    // let extractedValues: any[] = [];
-    
-    // conditions.forEach((condition: string) => {
-    //   // Use regex to capture the value after "=="
-    //   let regex = /\$\{[^\}]+\}==(['"]?)(.+?)\1/;
-    //   let match = condition.match(regex);
+if (this.liveDataFilterCheck==true){
       
-    //   if (match) {
-    //     let value = match[2].trim(); // Extract the value after ==
-    //     extractedValues.push(value); // Store the extracted value
-    //   }
-    // });
-    
-    // Assign the first extracted value to descriptionData
-    // if (extractedValues.length > 0) {
-    //   this.descriptionData = extractedValues[0];
-    //   console.log('this.descriptionData check', this.descriptionData);
-    // } else {
-    //   this.primaryValue = this.item.multi_value[0].value;
-    // }
-    
-    // // Log all extracted values
-    // console.log('Extracted Values:', extractedValues);
-    
+  this.appliedFilter = this.liveDataFilterCheck;
 
 
-
-
-
-  
- 
-
+}else if(this.liveDataFilterCheck==false){
+  this.appliedFilter = this.liveDataFilterCheck;
+}
   
 }
 

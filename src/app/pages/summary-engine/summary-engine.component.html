@@ -333,6 +333,8 @@
                       (customEvent1)="emitDuplicate($event)" 
                       (customEvent2)="emitDelete6($event)"
                         [filterTileHeight]="filterTileHeight[i]"
+                        [liveDataFilterCheck] ="liveDataFilterCheck"
+
   [filterTileWidth]="filterTileWidth[i]"
                       ></app-filter-tile-ui >
                  
@@ -1076,21 +1078,17 @@
            [readonly]="showModal"
            required
            (input)="onIDChange($event)">
-    <!-- Error Message -->
-    <span *ngIf="errorForUniqueID" style="color: #fc1900; font-size: 12px; font-weight: bold;">
-      {{ errorForUniqueID }}
+    
+    <!-- Error Message: Display only after clicking Save and if the field is invalid -->
+    <span *ngIf="showValidationErrors && (createSummaryField.get('summaryID')?.hasError('required') || errorForUniqueID)"
+          style="color: #fc1900; font-size: 12px; font-weight: bold;">
+      {{ errorForUniqueID || 'Summary ID is required' }}
     </span>
-    <div *ngIf="createSummaryField.get('summaryID')?.hasError('required') && createSummaryField.get('summaryID')?.touched"
-         class="invalid-feedback">
-      Summary ID is required
-    </div>
   </div>
   
   
   
-  
-  
-  
+
   <!-- Summary Name Input -->
   <div class="col-md-4">
     <label class="col-form-label fw-bold fs-6 required d-flex align-items-center">
@@ -1108,11 +1106,12 @@
            formControlName="summaryName"
            required
            (keyup)="checkUniqueName()">
-    <span *ngIf="errorForUniqueName" style="color: #fc1900;">{{ errorForUniqueName }}</span>
-    <div *ngIf="createSummaryField.get('summaryName')?.hasError('required') && createSummaryField.get('summaryName')?.touched"
-         class="invalid-feedback">
-      Summary Name is required
-    </div>
+    
+    <!-- Validation error for name -->
+    <span *ngIf="showValidationErrors && createSummaryField.get('summaryName')?.hasError('required') ||errorForUniqueName"
+          style="color: #fc1900; font-size: 12px; font-weight: bold;">
+     {{errorForUniqueName || 'Name is required'}} 
+    </span>
   </div>
   
   
@@ -1132,10 +1131,12 @@
            placeholder="Enter Summary Description"
            formControlName="summarydesc" 
            required>
-    <div *ngIf="createSummaryField.get('summarydesc')?.hasError('required') && createSummaryField.get('summarydesc')?.touched"
-         class="invalid-feedback">
-      Summary Description is required
-    </div>
+    
+    <!-- Validation error for description -->
+    <span *ngIf="showValidationErrors && createSummaryField.get('summarydesc')?.hasError('required')"
+          style="color: #fc1900; font-size: 12px; font-weight: bold;">
+      Description is required
+    </span>
   </div>
   
             </div>
@@ -1145,13 +1146,17 @@
   
             <div class="row mb-3">
               <div class="col-md-4">
-                <label class="col-form-label fw-bold fs-6 required" for="icon-select">Select an Icon:</label>
+                <label class="col-form-label fw-bold fs-6 required" for="icon-select required">Select an Icon:</label>
                 <select id="icon-select" formControlName="iconSelect" class="form-control" (change)="previewIcon($event)">
                   <option value="null">Select an option</option>
                   <ng-container *ngFor="let icon of iconsList">
                     <option [value]="icon.value">{{ icon.label }}</option>
                   </ng-container>
                 </select>
+                <span *ngIf="showValidationErrors && createSummaryField.get('iconSelect')?.hasError('required')"
+                style="color: #fc1900; font-size: 12px; font-weight: bold;">
+                Icon is required
+          </span>
               </div>
   
               <div class="col-md-4 d-flex align-items-center">
@@ -1212,20 +1217,6 @@
             
             </div>
   
-            <!-- JSON Data Input -->
-            <!-- <div class="row">
-              <div class="col-md-12">
-                <label class="col-form-label fw-bold fs-6 required">Grids</label>
-                <textarea class="form-control form-control-solid" placeholder="Enter JSON data"
-                  formControlName="jsonInputControl"
-                  style="resize: vertical; min-height: 100px; max-height: 300px;"></textarea>
-                <div
-                  *ngIf="createSummaryField.get('jsonInputControl')?.hasError('invalidJson') && createSummaryField.get('jsonInputControl')?.touched"
-                  class="text-danger">
-                  Please enter valid JSON data.
-                </div>
-              </div>
-            </div> -->
           </div>
         </form>
       </div>
@@ -1914,10 +1905,10 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
     <button *ngIf="selectedTab === 'add-dashboard' && !showModal"
     type="button"
     class="btn btn-primary"
-    [disabled]="createSummaryField.invalid || isDuplicateID || isDuplicateName || !isValidID"
-    (click)="createNewSummary(); modal.dismiss()">
+    (click)="onSaveClick()">
     Save
-  </button>
+</button>
+
   
 
   

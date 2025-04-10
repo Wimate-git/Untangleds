@@ -213,11 +213,29 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
     this.deleteEvent.emit(this.idInAction);
   }
 
+  // triggerFilter(): void {
+  //   fromEvent<KeyboardEvent>(document, 'keyup')
+  //     .pipe(
+  //       debounceTime(300),
+  //       map((event) => (event.target as HTMLInputElement).value.trim().toLowerCase())
+  //     )
+  //     .subscribe((value) => {
+  //       this.datatableElement.dtInstance.then((dtInstance) => {
+  //         dtInstance.search(value).draw();
+  //       });
+  //     });
+  // }
+
+
+
   triggerFilter(): void {
     fromEvent<KeyboardEvent>(document, 'keyup')
       .pipe(
         debounceTime(300),
-        map((event) => (event.target as HTMLInputElement).value.trim().toLowerCase())
+        map((event) => {
+          const target = event.target as HTMLInputElement;
+          return target ? target.value.trim().toLowerCase() : '';  // Return an empty string if target is undefined or not an input
+        })
       )
       .subscribe((value) => {
         this.datatableElement.dtInstance.then((dtInstance) => {
@@ -225,6 +243,7 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       });
   }
+  
 
   setupSweetAlert(): void {
     this.swalOptions = {

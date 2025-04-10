@@ -336,10 +336,15 @@ export class Chart3ConfigComponent implements OnInit{
       multiColorCheck: [true],
       dataLabelFontColor:[''],
       chartBackgroundColor1:[''],
-      chartBackgroundColor2:['']
+      chartBackgroundColor2:[''],
+      enableLegends:[],
 
 
 
+    });
+
+    this.createChart.get('enableLegends')?.valueChanges.subscribe((enable: boolean) => {
+console.log('enable checking from  chart3',enable)
     });
   
     // Subscribe to DrillDownType changes
@@ -368,12 +373,32 @@ export class Chart3ConfigComponent implements OnInit{
       this.addControls(fakeEvent, 'html');
       this.updateDrillFields();
     });
+
+
+    this.createChart.get('enableLegends')?.valueChanges.subscribe((enable: boolean) => {
+      this.toggleLegend(enable);
+    });
   }
   
   
 
   get drillFields(): FormArray {
     return this.createChart?.get('drill_fields') as FormArray || this.fb.array([]);
+  }
+
+
+  toggleLegend(enable: boolean) {
+    // Update the Highcharts legend property
+    this.defaultHighchartsOptionsJson.legend.enabled = enable;
+    this.defaultHighchartsOptionsJson.plotOptions.series.showInLegend = enable;
+  
+    // Update the form control storing the JSON config
+    this.createChart.patchValue({
+      highchartsOptionsJson: JSON.stringify(this.defaultHighchartsOptionsJson, null, 4)
+    });
+  
+    // If Highcharts is already initialized, update the chart dynamically
+
   }
   onCombinedAddFieldsChange(event: any): void {
     this.onAdd_fieldsChange(event);
@@ -519,6 +544,7 @@ export class Chart3ConfigComponent implements OnInit{
             XaxisFormat:[''],
             drillTypeFields:[[]],
             drillTypeCustomLable:[''],
+            CustomColumnColor:['']
          
           })
         );
@@ -607,6 +633,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
    
         // filterDescription: this.createChart.value.filterDescription || '',
         custom_Label: this.createChart.value.custom_Label || '',
+        enableLegends:this.createChart.value.enableLegends ||'',
   
         highchartsOptionsJson: this.chartFinalOptions,
         noOfParams: this.noOfParams || 0,  // Ensure noOfParams has a valid value
@@ -625,7 +652,8 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         DrillDownType:this.createChart.value.DrillDownType ||'',
         DrillFilter:this.createChart.value.DrillFilter ||'',
         DrillFilterLevel:this.createChart.value.DrillFilterLevel ||'',
-        multiColorCheck:this.createChart.value.multiColorCheck ,
+        multiColorCheck: this.createChart.value.multiColorCheck === true ? true : false,
+
         dataLabelFontColor:this.createChart.value.dataLabelFontColor,
         chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
         chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
@@ -686,13 +714,35 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
 }
 
 // Update the chart options dynamically
+// const updatedHighchartsOptionsJson = {
+//   ...tempParsed,
+//   title: {
+//     ...tempParsed.title,
+//     text: this.createChart.value.chart_title || ''  // Update the title dynamically
+//   }
+// };
+
 const updatedHighchartsOptionsJson = {
   ...tempParsed,
   title: {
     ...tempParsed.title,
-    text: this.createChart.value.chart_title || ''  // Update the title dynamically
+    text: this.createChart.value.chart_title || ''
+  },
+  legend: {
+    ...tempParsed.legend,
+    enabled: this.createChart.value.enableLegends // ✅ Ensure legend updates correctly
+  },
+  plotOptions: {
+    ...tempParsed.plotOptions,
+    series: {
+      ...tempParsed.plotOptions.series,
+      showInLegend: this.createChart.value.enableLegends // ✅ Ensure legend appears for series
+    }
   }
 };
+
+console.log('updatedHighchartsOptionsJson check', updatedHighchartsOptionsJson);
+this.chartFinalOptions =JSON.stringify(updatedHighchartsOptionsJson,null,4)
 console.log('updatedHighchartsOptionsJson check',updatedHighchartsOptionsJson)
 this.chartFinalOptions =JSON.stringify(updatedHighchartsOptionsJson,null,4)
 console.log('this.chartFinalOptions check',this.chartFinalOptions)
@@ -739,7 +789,8 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         multiColorCheck: this.createChart.value.multiColorCheck ,
         dataLabelFontColor:this.createChart.value.dataLabelFontColor,
         chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
-        chartBackgroundColor2:this.createChart.value.chartBackgroundColor2
+        chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
+        enableLegends: this.createChart.value.enableLegends || '',
 
 
 
@@ -769,7 +820,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
       this.dashboardChange.emit(this.grid_details);
   
       if (this.grid_details) {
-        this.updateSummary('','add_tile');
+        this.updateSummary(this.all_Packet_store,'update_tile');
 
       }
   
@@ -947,7 +998,8 @@ console.log('tempMetadata',tempMetadata)
     if(this.grid_details)
       {
       
-        this.updateSummary(this.all_Packet_store,'update_tile');
+        this.updateSummary('','add_tile')
+   
       }
 
     // Trigger change detection to ensure the UI updates
@@ -984,6 +1036,7 @@ openChartModal3(tile: any, index: number): void {
   console.log('Index checking:', index);
 
   if (tile) {
+    console.log('Coumn chart readBack Object Checking',tile)
     this.selectedTile = tile;
     this.editTileIndex = index ?? null;
     this.paramCount = tile.noOfParams;
@@ -1033,7 +1086,8 @@ openChartModal3(tile: any, index: number): void {
       multiColorCheck:tile.multiColorCheck,
       dataLabelFontColor:tile.dataLabelFontColor,
       chartBackgroundColor1:tile.chartBackgroundColor1,
-      chartBackgroundColor2:tile.chartBackgroundColor2
+      chartBackgroundColor2:tile.chartBackgroundColor2,
+      enableLegends:tile.enableLegends ||'',
     });
 
     // ✅ Populate all_fields and drill_fields separately
@@ -1140,7 +1194,8 @@ repopulate_fields(getValues: any): FormArray {
           undefinedCheckLabel: [configItem.undefinedCheckLabel || ''],
           custom_Label: [configItem.custom_Label || '', Validators.required],
           filterDescription: [configItem.filterDescription || ''],
-          XaxisFormat: this.fb.control(dateParameter)
+          XaxisFormat: this.fb.control(dateParameter),
+          CustomColumnColor:[configItem.CustomColumnColor ||'']
         })
       );
 
@@ -1949,6 +2004,171 @@ toggleCheckbox(theme: any): void {
 
 
 
+  // defaultHighchartsOptionsJson = {
+  //   chart: {
+  //     backgroundColor: 'var(--bs-body-bg)',
+  //     renderTo: 'scatter',
+  //     type: 'column',
+  //   },
+  //   exporting: {
+  //     enabled: false,
+  //   },
+  //   title: {
+  //     text: '',
+  //     style: {
+  //       color: 'var(--bs-body-color)',
+  //     },
+  //   },
+  //   subTitle: {
+  //     text: '',
+  //   },
+  //   xAxis: {
+  //     type: 'datetime',
+  //     labels: {
+  //       style: {
+  //         color: 'var(--bs-body-color)',
+  //       },
+  //     },
+  //     title: {
+  //       text: null,
+  //       style: {
+  //         color: 'var(--bs-body-color)',
+  //       },
+  //     },
+  //   },
+  //   yAxis: {
+  //     labels: {
+  //       style: {
+  //         color: 'var(--bs-body-color)',
+  //       },
+  //     },
+  //     title: {
+  //       text: null,
+  //       style: {
+  //         color: 'var(--bs-body-color)',
+  //       },
+  //     },
+  //   },
+  //   tooltip: {
+  //     shared: true,
+  //     useHTML: true,
+  //     backgroundColor: 'rgba(255, 255, 255, 0.85)',
+  //     borderColor: '#2c3e50',
+  //     borderRadius: 10,
+  //     borderWidth: 2,
+  //     shadow: true,
+  //     style: {
+  //       color: '#333',
+  //       fontSize: '14px',
+  //       fontFamily: 'Arial, sans-serif',
+  //     },
+  //     headerFormat: `
+  //       <div style="padding: 5px 10px; text-align: center;">
+  //         <span style="font-size: 16px; font-weight: bold; color: #2c3e50;">{point.x}</span>
+  //       </div>
+  //       <hr style="margin: 5px 0; border-color: #2c3e50;">
+  //     `,
+  //     pointFormat: `
+  //       <div style="padding: 5px 10px;">
+  //         <span style="color:{series.color}; font-weight: bold;">● {series.name}:</span>
+  //         <span style="font-weight: bold;">{point.y}</span>
+  //       </div>
+  //     `,
+  //     formatter: function (this: Highcharts.TooltipFormatterContextObject) {
+  //       if (this.points) {
+  //         let total = 0;
+  //         const pointsHtml = this.points.reduce((s, point) => {
+  //           const yValue = point.y !== null && point.y !== undefined ? point.y : 0;
+  //           total += yValue;
+  //           return (
+  //             s +
+  //             `<div style="color:${point.series.color}">● 
+  //                <span onclick="handleSeriesClick('${point.series.name}')"
+  //                      style="cursor: pointer; text-decoration: underline;">
+  //                  ${point.series.name}
+  //                </span>: <strong>${yValue}</strong>
+  //              </div>`
+  //           );
+  //         }, `<div style="text-align: center; font-weight: bold; color: #2c3e50;">${this.x}</div>`);
+  //         return (
+  //           pointsHtml +
+  //           `<hr style="margin: 5px 0; border-color: #2c3e50;">
+  //            <div style="text-align: right; color: #888;">Total: <strong>${total}</strong></div>`
+  //         );
+  //       } else {
+  //         const yValue = this.y !== null && this.y !== undefined ? this.y : 'N/A';
+  //         return `
+  //           <div style="text-align: center; font-weight: bold; color: #2c3e50;">${this.x}</div>
+  //           <div style="color:${this.series.color}">● 
+  //             <span onclick="handleSeriesClick('${this.series.name}')"
+  //                   style="cursor: pointer; text-decoration: underline;">
+  //               ${this.series.name}
+  //             </span>: <strong>${yValue}</strong>
+  //           </div>`;
+  //       }
+  //     }
+      
+  //   },
+  //   plotOptions: {
+  //     series: {
+  //       turboThreshold: 0,
+  //       marker: {
+  //         enabled: true,
+  //         radius: 7,
+  //       },
+  //       showInLegend: false,
+  //     },
+  //   },
+
+  //   legend: {
+  //     enabled: true,  // Ensures that the legend is displayed
+  //     layout: 'horizontal',
+  //     align: 'center',
+  //     verticalAlign: 'bottom',
+    
+  //   },
+  //   series: [
+  //     // Example series can be added here
+  //     // {
+  //     //   name: 'Example',
+  //     //   data: [100, 200, 300],
+  //     // },
+  //   ],
+  //   lineWidth: 2,
+  //   credits: {
+  //     enabled: false,
+  //   },
+  //   responsive: {
+  //     rules: [
+  //       {
+  //         condition: {
+  //           maxWidth: 10000,
+  //         },
+  //         chartOptions: {
+  //           legend: {
+  //             layout: 'horizontal',
+  //             align: 'center',
+  //             verticalAlign: 'bottom',
+  //             itemStyle: {
+  //               color: 'var(--bs-body-color)',
+  //             },
+  //           },
+  //         },
+  //       },
+  //     ],
+  //   },
+  // };
+  
+  // Add the global function for handling clicks
+  window: any['handleSeriesClick'] = function (seriesName: any) {
+    console.log('Clicked on series:', seriesName);
+    // Add your custom logic here, e.g., navigation or additional details
+  };
+  
+  
+
+
+
   defaultHighchartsOptionsJson = {
     chart: {
       backgroundColor: 'var(--bs-body-bg)',
@@ -1968,7 +2188,7 @@ toggleCheckbox(theme: any): void {
       text: '',
     },
     xAxis: {
-      type: 'datetime',
+      type: 'category', // Make sure it's category for proper x-axis labeling
       labels: {
         style: {
           color: 'var(--bs-body-color)',
@@ -2019,40 +2239,6 @@ toggleCheckbox(theme: any): void {
           <span style="font-weight: bold;">{point.y}</span>
         </div>
       `,
-      formatter: function (this: Highcharts.TooltipFormatterContextObject) {
-        if (this.points) {
-          let total = 0;
-          const pointsHtml = this.points.reduce((s, point) => {
-            const yValue = point.y !== null && point.y !== undefined ? point.y : 0;
-            total += yValue;
-            return (
-              s +
-              `<div style="color:${point.series.color}">● 
-                 <span onclick="handleSeriesClick('${point.series.name}')"
-                       style="cursor: pointer; text-decoration: underline;">
-                   ${point.series.name}
-                 </span>: <strong>${yValue}</strong>
-               </div>`
-            );
-          }, `<div style="text-align: center; font-weight: bold; color: #2c3e50;">${this.x}</div>`);
-          return (
-            pointsHtml +
-            `<hr style="margin: 5px 0; border-color: #2c3e50;">
-             <div style="text-align: right; color: #888;">Total: <strong>${total}</strong></div>`
-          );
-        } else {
-          const yValue = this.y !== null && this.y !== undefined ? this.y : 'N/A';
-          return `
-            <div style="text-align: center; font-weight: bold; color: #2c3e50;">${this.x}</div>
-            <div style="color:${this.series.color}">● 
-              <span onclick="handleSeriesClick('${this.series.name}')"
-                    style="cursor: pointer; text-decoration: underline;">
-                ${this.series.name}
-              </span>: <strong>${yValue}</strong>
-            </div>`;
-        }
-      }
-      
     },
     plotOptions: {
       series: {
@@ -2061,14 +2247,22 @@ toggleCheckbox(theme: any): void {
           enabled: true,
           radius: 7,
         },
+        showInLegend: true,  // Ensure legends are shown for each series
       },
     },
+    legend: {
+      enabled: true,
+      layout: 'horizontal',
+      align: 'center',
+      verticalAlign: 'bottom',
+      itemStyle: {
+        color: 'var(--bs-body-color)',  // Adjust the color to match your theme
+        fontSize: '14px',
+      },
+      itemMarginTop: 10,
+    },
     series: [
-      // Example series can be added here
-      // {
-      //   name: 'Example',
-      //   data: [100, 200, 300],
-      // },
+
     ],
     lineWidth: 2,
     credits: {
@@ -2095,14 +2289,6 @@ toggleCheckbox(theme: any): void {
     },
   };
   
-  // Add the global function for handling clicks
-  window: any['handleSeriesClick'] = function (seriesName: any) {
-    console.log('Clicked on series:', seriesName);
-    // Add your custom logic here, e.g., navigation or additional details
-  };
-  
-  
-
   // Method to initialize the chart using the form's JSON value
 initializeChart(): void {
   const highchartsOptionsJson = this.highchartsForm.value.highchartsOptionsJson;
@@ -2146,7 +2332,7 @@ FormatTypeValues = [
 
 DrillDownTypeFields = [
   { value: 'Table', text: 'Table' },
-  { value: 'Multi Level', text: 'Multi Level' },
+  { value: 'Multi Level', text: 'Multi Level Drill Down' },
 ]
 
 setUserSatus(){

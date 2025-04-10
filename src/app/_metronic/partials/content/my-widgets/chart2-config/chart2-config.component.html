@@ -4,7 +4,7 @@
   </div>
   <div class="container" *ngIf="createChart">
     <div class="row mb-3">
-      <div class="col-md-6 mb-3" [formGroup]="createChart">
+      <div class="col-md-4 mb-3" [formGroup]="createChart">
         <label class="col-lg-12 col-form-label fw-bold fs-6 required">Parameters
         </label>
         <input type="number" class="
@@ -16,7 +16,7 @@
             <div *ngIf="createChart.get('add_fields')?.errors?.required">Parameters is required.</div>
           </div>
       </div>
-      <div class="col-md-6 mb-3" [formGroup]="createChart">
+      <div class="col-md-4 mb-3" [formGroup]="createChart">
         <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Title </label>
   
         <input type="text" class="
@@ -29,64 +29,35 @@
                   </div>
   
       </div>
+
+
+      <div class="col-lg-3 col-md-3 col-sm-6 mb-4 mt-4" [formGroup]="createChart">
+        <div class="d-flex align-items-center">
+          <label for="toggleCheckLegend" class="col-form-label fw-bold fs-6  me-2">
+            Enable Multi Color
+          </label>
+          <div class="form-check form-switch">
+            <input
+            class="form-check-input"
+            type="checkbox"
+           
+        
+            formControlName="multiColorCheck"
+      
+            id="toggleCheckLegend"
+          >
+          
+          </div>
+        </div>
+      </div>
   
     </div>
 
-    <div class="row mb-3">
-      <div class="col-md-3 mb-3">
-        <div class="form-check form-switch">
-          <label for="multiColorCheck" class="col-lg-12 col-form-label fw-bold fs-6 mt-7">
-            Enable Multi Color
-          </label>
-          <input
-            class="form-check-input mt-10 mb-3 mb-lg-0"
-            type="checkbox"
-            formControlName="multiColorCheck"
-            id="multiColorCheck"
-            [checked]="createChart.get('multiColorCheck')?.value"
-    
-          />
-        </div>
-      </div>
+    <!-- <div class="row mb-3">
 
-      <div class="col-md-3 mt-5" [formGroup]="createChart">
-        <div class="color-picker-container d-flex align-items-center">
-          <label for="textColorPicker" class="col-form-label fw-bold fs-6">Data Label Font Color</label>
-          <input
-            id="textColorPicker"
-            type="color"
-            class="form-control-color"
-            title="Choose text color"
-            formControlName="dataLabelFontColor"
-          />
-        </div>
-      </div>
-      <div class="col-md-3 mt-5" [formGroup]="createChart">
-        <div class="color-picker-container d-flex align-items-center">
-          <label for="textColorPicker" class="col-form-label fw-bold fs-6 mb-0 me-2">BG Gradient Top Color</label>
-          <input
-            id="textColorPicker"
-            type="color"
-            class="form-control-color"
-            title="Choose text color"
-            formControlName="chartBackgroundColor1"
-          />
-        </div>
-      </div>
-      
-      <div class="col-md-3 mt-5" [formGroup]="createChart">
-        <div class="color-picker-container d-flex align-items-center">
-          <label for="textColorPicker" class="col-form-label fw-bold fs-6">BG Gradient Bottom Color</label>
-          <input
-            id="textColorPicker"
-            type="color"
-            class="form-control-color"
-            title="Choose text color"
-            formControlName="chartBackgroundColor2"
-          />
-        </div>
-      </div>
-     </div>
+
+
+     </div> -->
   </div>
   
   <!-- Modal body with Tabs -->
@@ -118,7 +89,7 @@
                   (click)="selectedSettingsTab('settings-tab')">Settings</a>
               </li>
             </div> -->
-            <div class="col-3" role="Advanced">
+            <div class="col-2" role="Advanced">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="advanced-tabpane" data-bs-toggle="tab" role="tab"
                   aria-controls="advanced-tab" aria-selected="false"
@@ -126,10 +97,18 @@
               </li>
             </div>
 
-            <div class="col-3" role="drill">
+            <div class="col-2" role="drill">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="drill-tab" data-bs-toggle="tab" role="tab"
                   aria-controls="drill-tab" aria-selected="false" (click)="selectedSettingsTab('drill-tab')">Drill Down Type</a>
+              </li>
+            </div>
+
+
+            <div class="col-2" role="Settings">
+              <li class="nav-item">
+                <a class="nav-link text-active-primary me-6" id="settings-tab" data-bs-toggle="tab" role="tab"
+                  aria-controls="settings-tab" aria-selected="false" (click)="selectedSettingsTab('settings-tab')">Settings</a>
               </li>
             </div>
           </ul>
@@ -191,12 +170,12 @@
                             <div *ngIf="field.get('primaryValue')?.errors?.required">Primary Value is required.</div>
                           </div>
                       </div>
-                      <div class="col-md-4 mb-3" *ngIf="all_fields.value[fieldIndex].primaryValue === 'Count'">
+                      <!-- <div class="col-md-4 mb-3" *ngIf="all_fields.value[fieldIndex].primaryValue === 'Count'">
                         <label for="constant" class="col-form-label fw-bold fs-6 required">Parameter Value</label>
                         <ngx-select id="primaryValue" [allowClear]="true" formControlName="parameterValue"
                         [items]="showStatusValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
                         (selectionChanges)="onValueChange($event)" class="w-100"  [disabled]="createChart.get('primaryValue')?.value !== 'count'" ></ngx-select>
-                      </div>
+                      </div> -->
   
   
   
@@ -304,26 +283,43 @@
                         </div>
                       </div>
 
-                      <div class="col-md-4 mb-3">
-                        <label for="parameterName" class="col-form-label fw-bold fs-6 ">Date Reference X axis</label>
-                        <p-multiSelect
-                          id="parameterName"
-                 
-                          formControlName="XaxisFormat"
-                          [options]="getDynamicDateParams(fieldIndex)"
-                          optionLabel="text"
-                          placeholder="Select Parameter"
-                      
-                         >
-                        </p-multiSelect>
-            
-                      </div>
+
                       <div class="col-md-4 mb-3" *ngIf = "shoRowData" >
                         <label for="constant" class="col-form-label fw-bold fs-6 required"></label>
                         <input id="constant" type="number" class="form-control form-control-solid"
                           placeholder="Select constant" formControlName="rowData"
                          />
                       </div>
+
+                      <div class="row d-flex align-items-center">
+                        <div class="col-md-6 mb-3">
+                          <label for="parameterName" class="col-form-label fw-bold fs-6">Date Reference X axis</label>
+                          <p-multiSelect
+                            id="parameterName"
+                            formControlName="XaxisFormat"
+                            [options]="getDynamicDateParams(fieldIndex)"
+                            optionLabel="text"
+                            placeholder="Select Parameter"
+                          ></p-multiSelect>
+                        </div>
+                      
+                        <div class="col-md-6 mb-3">
+                          <div class="color-picker-container d-flex align-items-center">
+                            <label for="textColorPicker" class="col-form-label fw-bold fs-6 ms-3">Select Line Color</label>
+                            <input
+                              id="textColorPicker"
+                              type="color"
+                              class="form-control-color ms-3"
+                              title="Choose text color"
+                              formControlName="CustomlineColor"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      
+                      
+                      
   
   
   
@@ -334,77 +330,7 @@
             </div>
   
             <!-- Settings Tab Content -->
-            <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab"
-              role="tabpanel" aria-labelledby="settings-tabpane">
-  <!-- 
-                    <div class="row g-3" [formGroup]="createChart" *ngIf="createChart">
-                      <div class="col-md-12 mb-3">
-                        <label class="col-form-label fw-bold fs-6 required">Themes:</label>
-                        <div class="color-boxes">
-                          <div *ngFor="let theme of themes" 
-                               class="color-box"
-                               [ngStyle]="{ 'background-image': theme.color }"
-                               (click)="toggleCheckbox(theme)"
-                               [class.checked]="theme.selected">
-                            <div *ngIf="theme.selected" class="checkmark">✔</div>
-                          </div>
-                        </div>
-                        
-                      </div>
-  
-                  
-                      <div class="col-md-6 mb-3">
-                        <label for="fontSize" class="col-form-label fw-bold fs-6 required">Font Size</label>
-                        <input id="fontSize" type="number" class="form-control form-control-solid"
-                          placeholder="Enter Font Size (e.g., 14)" formControlName="fontSize" min="8" max="72">
-                        <div *ngIf="createChart.get('fontSize')?.errors?.min || createChart.get('fontSize')?.errors?.max"
-                          class="text-danger mt-1">
-                          Font size must be between 8 and 72.
-                        </div>
-                      </div>
-  
-           
-                      <div class="col-md-6 mb-3">
-                        <label for="fontColor" class="col-form-label fw-bold fs-6 required">Font Color</label>
-                        <div class="d-flex align-items-center">
-                          <input id="fontColor" type="color" class="form-control form-control-color me-3"
-                            [value]="createChart.get('fontColor')?.value" (input)="onFontColorChange($event)"
-                            style="width: 50px; height: 38px; padding: 0; border-radius: 5px; border: 1px solid #ced4da;">
-                          <input type="text" class="form-control form-control-solid" formControlName="fontColor" readonly
-                            style="flex: 1;" placeholder="Selected Color Code">
-                        </div>
-                      </div>
-                    </div> -->
-                    <div class="row">
-  
-  
-  
-                      <div class="col-md-6 mb-3">
-                        <label for="custom_Label" class="col-form-label fw-bold fs-6  required">Custom Label</label>
-                        <input type="text" class="form-control form-control-solid"  name="custom_Label"
-                          formControlName="custom_Label">
-                      </div>
-    
-    
-                      <div class="col-md-6 mb-3">
-                        <label for="fontSize" class="col-form-label fw-bold fs-6 required">Font Size</label>
-                        <input
-                          id="fontSize"
-                          type="number"
-                          class="form-control form-control-solid"
-                          placeholder="Enter Font Size (e.g., 14)"
-                          formControlName="fontSize"
-                          min="8"
-                          max="72">
-                          <div *ngIf="createChart.get('fontSize')?.errors?.min || createChart.get('fontSize')?.errors?.max" class="text-danger mt-1">
-                            Font size must be between 8 and 72.
-                          </div>
-                      </div>
-                    </div>
-  
-  
-  
-            </div>
+
   
             <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'advanced-tab'}" id="advanced-tab"
             role="tabpanel" aria-labelledby="advanced-tabpane">
@@ -602,6 +528,60 @@
      
           </div>
           
+          <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'settings-tab'}" id="settings-tab"
+          role="tabpanel" aria-labelledby="settings-tab">
+  
+  
+          <div class="row mt-3">
+  
+            <div class="col-md-4 mt-5">
+              <div class="color-picker-container d-flex align-items-center">
+                <label for="textColorPicker" class="col-form-label fw-bold fs-6">Data Label Font Color</label>
+                <input
+                  id="textColorPicker"
+                  type="color"
+                  class="form-control-color"
+                  title="Choose text color"
+                  formControlName="dataLabelFontColor"
+                />
+              </div>
+            </div>
+            <div class="col-md-4 mt-5">
+              <div class="color-picker-container d-flex align-items-center">
+                <label for="textColorPicker" class="col-form-label fw-bold fs-6 mb-0 me-2">BG Gradient Top Color</label>
+                <input
+                  id="textColorPicker"
+                  type="color"
+                  class="form-control-color"
+                  title="Choose text color"
+                  formControlName="chartBackgroundColor1"
+                />
+              </div>
+            </div>
+            
+            <div class="col-md-4 mt-5">
+              <div class="color-picker-container d-flex align-items-center">
+                <label for="textColorPicker" class="col-form-label fw-bold fs-6">BG Gradient Bottom Color</label>
+                <input
+                  id="textColorPicker"
+                  type="color"
+                  class="form-control-color"
+                  title="Choose text color"
+                  formControlName="chartBackgroundColor2"
+                />
+              </div>
+            </div>
+           </div>
+  
+  
+  
+        
+   
+  
+        
+  
+     
+          </div>
           
           
           </div>

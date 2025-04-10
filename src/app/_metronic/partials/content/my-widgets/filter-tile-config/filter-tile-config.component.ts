@@ -1004,34 +1004,6 @@ makeTrueCheck:any = false
 
     console.log('conditionsFilter check inside the requestbody',conditionsFilter)
 
-
-    // const TypeFilter = fields.map((field: { conditions: any[]; parameterName: string }) => {
-    //   if (!field.conditions || !Array.isArray(field.conditions)) {
-    //     console.error('Invalid conditions in field:', field);
-    //     return [];
-    //   }
-  
-    //   return field.conditions.map((condition: any) => ({
-    //     formField: condition.formField || '',
-  
-    //     parameterName: condition.parameterName || '',
-    //     daysAgo: condition.daysAgo || '',
-    //     startDate: condition.startDate || '',
-    //     endDate: condition.endDate || '',
-    //     singleDate: condition.singleDate || '',
-    //             // daysAgo: this.createChart.value.daysAgo,
-    //     dateType: condition.dateType || '',
-
-
-    //     // Add date-related values conditionally
-       
-
-    //   }));
-    // });
-
-    // console.log('TypeFilter checking',TypeFilter)
-    // this.conditionFilterRead = TypeFilter
-  
     console.log('conditionsFilter checking', conditionsFilter);
   
     this.ConditionsFormat = conditionsFilter;

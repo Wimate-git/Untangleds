@@ -247,46 +247,40 @@ export class ProgressTileComponent implements OnInit{
   initializeTileFields(): void {
     const defaultTheme = { color: "linear-gradient(to right, #A1045A, #A1045A)", selected: true };
     this.selectedColor = defaultTheme.color;
-    console.log('i am initialize')
+    console.log('i am initialize');
+    
     // Initialize the form group
     this.createChart = this.fb.group({
-      add_fields:[''],
-      equation_param:[''],
-      all_fields:new FormArray([]),
-      equation_fields:new FormArray([]),
-
-  
+      add_fields: [''],
+      equation_param: [''],
+      all_fields: new FormArray([]),
+      equation_fields: new FormArray([]),
       widgetid: [this.generateUniqueId()],
-      chart_title:[''],
+      chart_title: [''],
       themeColor: [this.selectedColor, Validators.required],
       fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
-      fontColor: ['#ebeaea', Validators.required], 
+      fontColor: ['#ebeaea', Validators.required],
       toggleCheck: [false], // Default toggle state
-// Default unchecked
       dashboardIds: [''],
- 
-      miniForm:[''],
-      MiniTableNames:[''],
-      MiniTableFields:[''],
-      minitableEquation:[''],
-      EquationOperationMini:[''],
-      EquationDesc:[''],
-      columnVisibility:[[]],
-      ModuleNames:[''],
+      miniForm: [''],
+      MiniTableNames: [''],
+      MiniTableFields: [''],
+      minitableEquation: [''],
+      EquationOperationMini: [''],
+      EquationDesc: [''],
+      columnVisibility: [[]],
+      ModuleNames: [''],
       selectType: [''],
-      drillDownForm:['']
-    
-      // themeColor: ['#000000', Validators.required],
-  
-
-   
-  
-
-
+      drillDownForm: [''],
+      progressTileConfig: ['', Validators.required] // Set the default value to false
     });
-
-  
   }
+  
+  // onProgressTileConfigChange(event: any): void {
+  //   // Manually trigger validation on the progressTileConfig control
+  //   this.createChart.get('progressTileConfig')?.updateValueAndValidity();
+  // }
+  
 
   
   get constants() {
@@ -342,11 +336,27 @@ export class ProgressTileComponent implements OnInit{
     this.modal.dismiss();
   }
 
+  onProgressTileConfigChange(event: any) {
+    // Get the current state of the checkbox
+    const isChecked = event.target.checked;
+
+    this.createChart.get('progressTileConfig')?.updateValueAndValidity();
+  
+    if (isChecked) {
+      // When enabled, trigger the function to add the form controls with 2 parameters
+      this.addControls({ target: { value: '2' } }, 'html');
+    } else {
+      // Optionally, you can clear the form array if the checkbox is unchecked
+      this.clearFormArray();
+    }
+  }
+  
   addControls(event: any, _type: string) {
     console.log('Event received in addControls:', event);
   
     let noOfParams: any = '';
   
+    // Logic for parsing the event value
     if (_type === 'html' && event && event.target) {
       if (event.target.value >= 0) {
         noOfParams = JSON.parse(event.target.value);
@@ -390,7 +400,7 @@ export class ProgressTileComponent implements OnInit{
             selectedRangeType: ['', Validators.required],
             selectFromTime: [''],
             selectToTime: [''],
-            fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 14px
+            fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 20px
             filterForm: [''],
             filterParameter: [''],
             filterDescription: [''],
@@ -400,6 +410,7 @@ export class ProgressTileComponent implements OnInit{
         );
       }
     } else {
+      // Remove form controls if the number of configurations is reduced
       if (noOfParams !== "" && noOfParams !== undefined && noOfParams !== null) {
         for (let i = this.all_fields.length; i >= noOfParams; i--) {
           this.all_fields.removeAt(i);
@@ -409,6 +420,12 @@ export class ProgressTileComponent implements OnInit{
   
     this.noOfParams = noOfParams;
   }
+  
+  // Optional function to clear the form array when disabled
+  clearFormArray() {
+    this.all_fields.clear();
+  }
+  
   
   
   
@@ -477,7 +494,8 @@ export class ProgressTileComponent implements OnInit{
         columnVisibility:this.createChart.value.columnVisibility ||[],
         ModuleNames:this.createChart.value.ModuleNames ||'',
         drillDownForm:this.createChart.value.drillDownForm ||'',
-        add_fields:this.createChart.value.add_fields 
+        add_fields:this.createChart.value.add_fields ,
+        progressTileConfig:this.createChart.value.progressTileConfig
         // selectType: this.createChart.value.ModuleNames,
       };
   
@@ -570,6 +588,7 @@ export class ProgressTileComponent implements OnInit{
     // themeColor: this.createChart.value.themeColor,
     // fontColor: this.createChart.value.fontColor,
     tileConfig: this.createChart.value.all_fields,
+    progressTileConfig:this.createChart.value.progressTileConfig,
     // highchartsOptionsJson: this.chartFinalOptions,
     // filterForm:this.createChart.value.filterForm,
     // filterParameter:this.createChart.value.filterParameter,
@@ -989,6 +1008,8 @@ export class ProgressTileComponent implements OnInit{
       ModuleNames:tile.ModuleNames,
       columnVisibility: [parsedColumnVisibility] ,
       drillDownForm:tile.drillDownForm,
+      progressTileConfig:tile.progressTileConfig
+
 
     });
     this.selectedEquationParameterValue = parsedEquationParam;

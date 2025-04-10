@@ -223,6 +223,7 @@ export class PieChartConfigComponent {
       dataLabelFontColor:[''],
       chartBackgroundColor1:[''],
       chartBackgroundColor2:[''],
+ 
     });
   
     // Subscribe to DrillDownType changes
@@ -253,8 +254,28 @@ export class PieChartConfigComponent {
     });
 
 
+    this.createChart.get('enableLegends')?.valueChanges.subscribe((enable: boolean) => {
+      this.toggleLegend(enable);
+    });
+
+
   }
   
+
+
+  toggleLegend(enable: boolean) {
+    // Update the Highcharts legend property
+    this.defaultHighchartsOptionsJson.legend.enabled = enable;
+    this.defaultHighchartsOptionsJson.plotOptions.series.showInLegend = enable;
+  
+    // Update the form control storing the JSON config
+    this.createChart.patchValue({
+      highchartsOptionsJson: JSON.stringify(this.defaultHighchartsOptionsJson, null, 4)
+    });
+  
+    // If Highcharts is already initialized, update the chart dynamically
+
+  }
   getFormControlValue(selectedTextConfi:any): void {
     // const formlistControl = this.createChart.get('formlist');
     console.log('Formlist Control Value:', selectedTextConfi);
@@ -495,6 +516,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
         chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
         filterDescription:'',
+        enableLegends:this.createChart.value.enableLegends ||'',
     
       
 
@@ -554,11 +576,32 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
 }
 
 // Update the chart options dynamically
+// const updatedHighchartsOptionsJson = {
+//   ...tempParsed,
+//   title: {
+//     ...tempParsed.title,
+//     text: this.createChart.value.chart_title || ''  // Update the title dynamically
+//   }
+// };
+
+
+
 const updatedHighchartsOptionsJson = {
   ...tempParsed,
   title: {
     ...tempParsed.title,
-    text: this.createChart.value.chart_title || ''  // Update the title dynamically
+    text: this.createChart.value.chart_title || ''
+  },
+  legend: {
+    ...tempParsed.legend,
+    enabled: this.createChart.value.enableLegends // ✅ Ensure legend updates correctly
+  },
+  plotOptions: {
+    ...tempParsed.plotOptions,
+    series: {
+      ...tempParsed.plotOptions.series,
+      showInLegend: this.createChart.value.enableLegends // ✅ Ensure legend appears for series
+    }
   }
 };
 console.log('updatedHighchartsOptionsJson check',updatedHighchartsOptionsJson)
@@ -606,6 +649,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     dataLabelFontColor:this.createChart.value.dataLabelFontColor,
     chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
     chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
+    enableLegends: this.createChart.value.enableLegends || '',
 
       };
       console.log('updatedTile checking', updatedTile);
@@ -780,7 +824,8 @@ openPieChartModal(tile: any, index: number) {
       enableLegends:tile.enableLegends ||'',
       dataLabelFontColor:tile.dataLabelFontColor,
       chartBackgroundColor1:tile.chartBackgroundColor1,
-      chartBackgroundColor2:tile.chartBackgroundColor2
+      chartBackgroundColor2:tile.chartBackgroundColor2,
+  
     });
 
     // ✅ Populate all_fields and drill_fields separately
@@ -1966,7 +2011,7 @@ get drillFields(): FormArray {
 }
 DrillDownTypeFields = [
   { value: 'Table', text: 'Table' },
-  { value: 'Multi Level', text: 'Multi Level' },
+  { value: 'Multi Level', text: 'Multi Level Drill Down' },
 ]
 
 get drill_fields() {
