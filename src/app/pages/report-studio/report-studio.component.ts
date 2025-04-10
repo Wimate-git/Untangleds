@@ -176,6 +176,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
   lookup_data_Options: any = [];
   blobUrl: string = '';
   dateFilterOperator: any;
+  uniqueIDArrays: any = [];
 
 
   constructor(private fb: FormBuilder, private api: APIService, private configService: SharedService, private scheduleAPI: scheduleApiService,
@@ -3187,7 +3188,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     console.log("Response Time metadata is here ", metadata);
 
     if (template.includes('${}') || template == '') {
-      return true
+      return false
     }
 
     // Use regex to match variable-value pairs
@@ -4206,6 +4207,9 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
   async exportAllTablesAsExcel() {
 
+    //Store all the unique ids with respect to Mini tables
+   
+
 
     const excelSheets = this.reportsFeilds.value.excelSheets
 
@@ -4241,6 +4245,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
       // Use `map` instead of `forEach` to handle async operations properly
       const tableExports = await Promise.all(this.agGrids.toArray().map(async (gridInstance, index) => {
+        this.uniqueIDArrays = []
         const gridApi = gridInstance.api;
         const csvData = gridApi.getDataAsCsv();
         console.log("CSV data is here ", csvData);
@@ -4262,11 +4267,106 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
           let xlsxdata = data.map(row => row.filter((_: any, index: any) => !removeIndices.includes(index)));
 
+
+
+          try {
+            console.log("HEaders are here ", headers);
+
+            const tableColumnIndex = headers.indexOf('Mini Table');
+            console.log("Table column index is here ", tableColumnIndex);
+            if (tableColumnIndex !== -1) {
+              const tableData: any = await this.extractMiniTableData(data, tableColumnIndex, index);
+              console.log("Mini Table data is ", tableData);
+
+              console.log("Table form Name data is ", this.tableFormName);
+
+              for (const tableKey in tableData) {
+                const filteredFormName = this.tableFormName.find((item: any) => Object.keys(item)[0] === tableKey);
+
+                if (tableData.hasOwnProperty(tableKey)) {
+                  const miniTableData = tableData[tableKey];
+                  const miniTableSheet = XLSX.utils.aoa_to_sheet(miniTableData);
+                  let sheetName1: any
+                  if (filteredFormName[tableKey]) {
+                    sheetName1 = `${filteredFormName[tableKey]} ${this.tableDataWithFormFilters[index].formFilter}`;
+                  }
+                  sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
+
+
+
+                  if (excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0) {
+                    if (excelSheets.includes('miniTable')) {
+                      XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1);
+                    }
+
+                  }
+                  else {
+                    XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1);
+                  }
+                }
+              }
+            }
+          } catch (error) {
+            console.log("Error in processing mini table ", error);
+          }
+
+
+
+          try{
+            const trackLocationColumnIndex = headers.indexOf('TrackLocation');
+            if (trackLocationColumnIndex !== -1) {
+              // Await the trackLocation data
+
+              const trackLocationData: any = await this.extractTrackLocationData(data, trackLocationColumnIndex, index);
+              console.log("Track location data is here 99999", trackLocationData);
+
+              const trackLocationSheet = XLSX.utils.aoa_to_sheet(trackLocationData);
+              let sheetName1 = `TrackLocation ${this.tableDataWithFormFilters[index].formFilter}`;
+              sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
+
+
+              if (excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0) {
+                if (excelSheets.includes('trackLocation')) {
+                  XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
+                }
+              }
+              else {
+                XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
+              }
+            }
+          }
+          catch(error){
+            console.log("Error in trackLocation Excel ",error)
+          }
+
+
+
+
+          console.log("All the unique id are here ",this.uniqueIDArrays);
+
+          console.log("xlsx data is here ",xlsxdata);
+
+          if(this.uniqueIDArrays && this.uniqueIDArrays.length > 0){
+            const tempHeaderHolder = xlsxdata[0]
+
+            xlsxdata = xlsxdata.filter((row: any[]) =>
+              row.some((cell: any) => this.uniqueIDArrays.includes(cell))
+            );
+  
+            xlsxdata.unshift(tempHeaderHolder)
+          }
+
+        
+          console.log("xlsx data after filter is here ",xlsxdata);
+
           const ws = XLSX.utils.aoa_to_sheet(xlsxdata);
 
           // Add the worksheet to the workbook with the name of the formFilter
           let sheetName = this.tableDataWithFormFilters[index].formFilter;
           sheetName = sheetName.length > 30 ? sheetName.slice(0, 30) : sheetName;
+
+       
+
 
           if (excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0) {
             if (excelSheets.includes('mainForm')) {
@@ -4277,37 +4377,8 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
             XLSX.utils.book_append_sheet(wb, ws, sheetName);
           }
 
+          wb.SheetNames = [sheetName, ...wb.SheetNames.filter(name => name !== sheetName)];
 
-
-          try {
-
-            try{
-              const trackLocationColumnIndex = headers.indexOf('TrackLocation');
-              if (trackLocationColumnIndex !== -1) {
-                // Await the trackLocation data
-  
-                const trackLocationData: any = await this.extractTrackLocationData(data, trackLocationColumnIndex, index);
-                console.log("Track location data is here 99999", trackLocationData);
-  
-                const trackLocationSheet = XLSX.utils.aoa_to_sheet(trackLocationData);
-                let sheetName1 = `TrackLocation ${this.tableDataWithFormFilters[index].formFilter}`;
-                sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
-  
-  
-                if (excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0) {
-                  if (excelSheets.includes('trackLocation')) {
-                    XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
-                  }
-                }
-                else {
-                  XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
-                }
-              }
-            }
-            catch(error){
-              console.log("Error in trackLocation Excel ",error)
-            }
-          
 
             const approvalColumnIndex = headers.indexOf('Approval History');
             if (approvalColumnIndex !== -1) {
@@ -4359,46 +4430,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
 
 
-
-            console.log("HEaders are here ", headers);
-
-            const tableColumnIndex = headers.indexOf('Mini Table');
-            console.log("Table column index is here ", tableColumnIndex);
-            if (tableColumnIndex !== -1) {
-              const tableData: any = await this.extractMiniTableData(data, tableColumnIndex, index);
-              console.log("Mini Table data is ", tableData);
-
-              console.log("Table form Name data is ", this.tableFormName);
-
-              for (const tableKey in tableData) {
-                const filteredFormName = this.tableFormName.find((item: any) => Object.keys(item)[0] === tableKey);
-
-                if (tableData.hasOwnProperty(tableKey)) {
-                  const miniTableData = tableData[tableKey];
-                  const miniTableSheet = XLSX.utils.aoa_to_sheet(miniTableData);
-                  let sheetName1: any
-                  if (filteredFormName[tableKey]) {
-                    sheetName1 = `${filteredFormName[tableKey]} ${this.tableDataWithFormFilters[index].formFilter}`;
-                  }
-                  sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
-
-
-
-                  if (excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0) {
-                    if (excelSheets.includes('miniTable')) {
-                      XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1);
-                    }
-
-                  }
-                  else {
-                    XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1);
-                  }
-                }
-              }
-            }
-          } catch (error) {
-            console.log("Error in processing mini table and track Location ", error);
-          }
+         
 
           // Now that all sheets are added, we can loop through the sheets and apply the header styles
           wb.SheetNames.forEach(sheetName => {
@@ -4430,8 +4462,10 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
         }
 
 
-
       }));
+
+
+  
 
       // Generate the Excel file
       const excelFile = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
@@ -4970,15 +5004,22 @@ getLastWeekTimestamps() {
                   // }
                   newTableRows.push(tab);  // Add the row only if the condition is met
 
+                  this.uniqueIDArrays.push(tab.id)
                 }
               }
             }
 
             // Only keep rows that passed the filter
             tableRows = newTableRows;
+
+            console.log("Table rows are here after evaluation ", tableRows);
+
+
+            //When any filters is being applied such as advanced filter for mini table then get all the uniqueID that to be displayed
+            // this.uniqueIDArrays = [...this.uniqueIDArrays,...tableRows.map((item: any)=>item["id"])]
           }
 
-          // console.log("Table rows are here after evaluation ", tableRows);
+    
 
           if (tableRows && Array.isArray(tableRows) && tableRows.length > 0) {
 
@@ -5025,27 +5066,54 @@ getLastWeekTimestamps() {
 
     console.log('Iterated Table data is here ', tableData);
 
-    // Fetch dynamic form data labels and apply them
-    for (const item of Object.keys(tableData)) {
-      const filterData = this.dyanmicFormDataArray[index][this.tableDataWithFormFilters[index].formFilter]?.find((element: any) => item.startsWith(element.name));
 
+    for (const item of Object.keys(tableData)) {
+      const filterData = this.dyanmicFormDataArray[index][this.tableDataWithFormFilters[index].formFilter]?.find((element: any) =>
+        item.startsWith(element.name)
+      );
+    
       if (filterData && filterData.validation?.formName_table) {
         const tableFormName = filterData.validation.formName_table;
         const result = await this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${tableFormName}#main`, 1);
-
+    
         if (result && result.metadata) {
           this.tableFormName.push({ [item]: tableFormName });
-
+    
           const dynamicFormFields = JSON.parse(result.metadata).formFields;
-          let rowsHeader = tableData[item][0].map((i: any) => {
-            const res = dynamicFormFields.find((field: any) => field.name === i);
-            return res ? res.label : i;  // Apply label or keep the original header
+    
+          const orderedFieldNames = dynamicFormFields.map((field: any) => field.name);
+          const headerRow = tableData[item][0];
+          const dataRows = tableData[item].slice(1);
+    
+          const nameToLabel: Record<string, string> = {};
+          dynamicFormFields.forEach((field: any) => {
+            nameToLabel[field.name] = field.label;
           });
-
-          tableData[item][0] = rowsHeader;  // Replace headers with labels
+    
+          // Columns to exclude from unmatched ones
+          const removeMinitableHeaders = ['created_time', 'updated_time', 'uniqueId'];
+    
+          // Matched and unmatched columns
+          const matchedNames = orderedFieldNames.filter((name: any) => headerRow.includes(name));
+          const unmatchedNames = headerRow
+            .filter((name: any) => !matchedNames.includes(name))
+            .filter((name: any) => !removeMinitableHeaders.includes(name)); // exclude unwanted columns
+    
+          const finalColumnOrder = [ ...unmatchedNames,...matchedNames];
+          const finalHeaders = finalColumnOrder.map((name) => nameToLabel[name] || name);
+    
+          const reorderedRows = dataRows.map((row: any) =>
+            finalColumnOrder.map((name) => {
+              const idx = headerRow.indexOf(name);
+              return idx !== -1 ? row[idx] : null;
+            })
+          );
+    
+          tableData[item] = [finalHeaders, ...reorderedRows];
         }
       }
     }
+    
 
     console.log('After adding Labels Table data is here ', tableData);
 
@@ -5263,6 +5331,7 @@ getLastWeekTimestamps() {
           const isValid = await this.evaluateRowsTemplate(conditionalString, rowValues, tempHeaders);
           if (isValid) {
             trackLocationRows.push(rowValues);
+            this.uniqueIDArrays.push(rowValues[0])
           }
         }
         else {
