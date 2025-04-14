@@ -67,4 +67,15 @@
     transform: translateX(5px); /* Move icon slightly right on hover */
   }
   
-  
+  .custom-primary{
+    background-color:  #ff6f1e; 
+    color: #fff; 
+}
+
+.custom-primary:hover {
+    background-color: #ff6f1e; 
+    color: #fff; 
+    opacity: 1.0;
+    transform: translateY(-2px);
+    transition: 0.5s;
+  }

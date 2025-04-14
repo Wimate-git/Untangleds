@@ -23,7 +23,7 @@
         <span>Powered by</span> <mark style="background: none; color: #007bff;">Wimate</mark>
       </div> -->
 
-      <div class="text-muted fs-7 bounce mb-10" style="font-weight: bold; color: #333; background: #f8f9fa; padding: 5px 10px; border-radius: 5px;">
+      <div *ngIf="restrictMobileProvision != 'true'" class="text-muted fs-7 bounce mb-10" style="font-weight: bold; color: #333; background: #f8f9fa; padding: 5px 10px; border-radius: 5px;">
         <span>Powered by</span> 
         <a href="https://www.wimate.in/" target="_blank" style="text-decoration: none;">
             <mark style="background: none; color: #007bff;">Wimate</mark>
@@ -76,7 +76,7 @@
   <!--end::Body-->
 
   <!--begin::Aside-->
-  <div class="d-flex flex-lg-row-fluid w-lg-50 bgi-size-cover bgi-position-center order-1 order-lg-2"
+  <div *ngIf="restrictMobileProvision != 'true'"  class="d-flex flex-lg-row-fluid w-lg-50 bgi-size-cover bgi-position-center order-1 order-lg-2"
     [ngStyle]="{'background-image': 'url(' + backgroundUrl + ')'}">
     <!--begin::Content-->
     <div class="d-flex flex-column flex-center py-15 px-5 px-md-15 w-100">

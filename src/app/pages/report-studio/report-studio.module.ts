@@ -20,6 +20,7 @@ import { GoogleMapsModule } from '@angular/google-maps';
 import { DropdownModule } from "primeng/dropdown";
 import { AdvancedFilterComponent } from "./components/advanced-filter/advanced-filter.component";
 import { OverViewModalComponent } from "./over-view-modal/over-view-modal.component";
+import { CheckboxModule } from 'primeng/checkbox';
 
 
 
@@ -56,6 +57,8 @@ const routes: Routes = [
     MatMenuModule,
     MatTooltipModule,
     GoogleMapsModule,
+    CheckboxModule
+    
 ]
 })
 export class ReportStudioModule { }

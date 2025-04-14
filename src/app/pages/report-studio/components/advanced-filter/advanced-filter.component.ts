@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { APIService } from 'src/app/API.service';
@@ -17,6 +17,9 @@ export class AdvancedFilterComponent {
   @Input() selectedForms:any;
   @Input() userList:any;
   @Input() AdvancedExcelData:any
+  selectedFilter:any = [];
+  showTypes:any = []
+  miniTableEnableArrayList:any = []
 
   isModalOpen = false;
   config = {
@@ -39,6 +42,10 @@ export class AdvancedFilterComponent {
   SK_clientID: any;
   miniTableFormBuilderData: any = {};
   dateFilterOperator: any;
+
+
+  selectedMiniTableFilter:any = []
+  selectedEnabledMiniTableFilters: any;
 
   constructor(public modal: NgbActiveModal,private fb: FormBuilder,private cd:ChangeDetectorRef,private api:APIService,private configService:SharedService){}
 
@@ -66,7 +73,10 @@ export class AdvancedFilterComponent {
         advanceOption: ['all'],
         miniTableColumn:['all'],
         miniTableOptions: ['all'],
-        equationConditionText:['']
+        equationConditionText:[''],
+        filter_type:this.fb.array([]),
+        trackEnable:[''],
+        miniTableEnable:['']
       });
         
       
@@ -79,15 +89,80 @@ export class AdvancedFilterComponent {
       console.log("Parent data to be populated ")
       this.repopulateAllForm()
     }
+
+    console.log("Selected Forms are here ",this.selectedForms);
   }
 
 
+  clearFields(){
+    this.reportsFeildsAdvanced = this.fb.group({
+      addExcellOption:['all'],
+      advanceOption: ['all'],
+      miniTableColumn:['all'],
+      miniTableOptions: ['all'],
+      equationConditionText:[''],
+      filter_type:this.fb.array([]),
+      trackEnable:[''],
+      miniTableEnable:['']
+    });
 
-  repopulateAllForm(){
+
+    this.mainFormGroup.reset()
+    this.customLocationGroup.reset()
+    this.queryBuilderForm.reset()
+    this.customMiniColumns.reset()
+
+
+    this.mainFormGroup = this.fb.group({
+      dynamicConditions: this.fb.array([this.createConditionGroup()])  
+    });
+
+    this.customLocationGroup = this.fb.group({
+      customForms: this.fb.array([this.createCustomForm1()])
+    });
+
 
     this.initializeForm();
 
     this.initializeMiniTable();
+    this.selectedFilter = []
+    this.selectedEnabledMiniTableFilters= []
+  }
+
+  get formDataSelected(): FormArray {
+    return this.reportsFeildsAdvanced.get('filter_type') as FormArray;
+  }
+
+
+  getFormControl(index: number,item:any): FormControl {
+    return this.formDataSelected.at(index) as FormControl;
+  }
+
+
+
+  multiSelectChange(): void {
+    this.selectedFilter = []
+    this.selectedFilter.push(...this.reportsFeildsAdvanced.get('miniTableEnable')?.value)
+    this.selectedFilter.push(...this.reportsFeildsAdvanced.get('trackEnable')?.value)
+
+    this.selectedFilter = Array.from(new Set(this.selectedFilter.filter((item:any)=>item != '')))
+
+    console.log("selectedFilter ",this.selectedFilter);
+  }
+
+
+  multiSelectMiniTableChange(){
+    console.log("selectedMiniTableFilter ",this.selectedMiniTableFilter)
+  }
+
+
+  onMiniTableSelection(){
+    console.log("this.reportsFeildsAdvanced.get('filter_type') ",this.reportsFeildsAdvanced.get('filter_type')?.value)
+    this.selectedEnabledMiniTableFilters = this.reportsFeildsAdvanced.get('filter_type')?.value
+  }
+
+
+  repopulateAllForm(){
 
 
     const advancedreportsFeildsAdvanced = this.AdvancedExcelData.advancedreportsFeildsAdvanced
@@ -101,8 +176,29 @@ export class AdvancedFilterComponent {
       advanceOption: [advancedreportsFeildsAdvanced.advanceOption],
       miniTableColumn:[advancedreportsFeildsAdvanced.miniTableColumn],
       miniTableOptions: [advancedreportsFeildsAdvanced.miniTableOptions],
-      equationConditionText:[advancedreportsFeildsAdvanced.equationConditionText]
+      equationConditionText:[advancedreportsFeildsAdvanced.equationConditionText],
+      filter_type:[advancedreportsFeildsAdvanced.filter_type],
+      trackEnable:[advancedreportsFeildsAdvanced.trackEnable],
+      miniTableEnable:[advancedreportsFeildsAdvanced.miniTableEnable]
     });
+
+    this.initializeForm();
+
+    this.initializeMiniTable();
+
+
+    this.multiSelectChange()
+
+    let i = 0
+    this.selectedForms.forEach((index:any) => {
+      const defaultOptions = advancedreportsFeildsAdvanced.filter_type[i];
+      this.formDataSelected.at(i).setValue(defaultOptions);
+      i++
+    });
+
+    this.selectedEnabledMiniTableFilters = advancedreportsFeildsAdvanced.filter_type
+
+   
 
     if(advancedreportsFeildsAdvanced.advanceOption !== 'all'){
       this.populateAdvanceFilterForm(advancedLocationFilter)
@@ -434,7 +530,7 @@ async onMiniTableColumns(event:any,getValue:any,temp:any){
     const tableNames = form.dynamicForm
       .filter((item: any) => item.name.startsWith('table-'))
       .map((item: any) => item.validation.formName_table);
-  
+
 
     for (let table of tableNames) {
       const result = await this.api.GetMaster(
@@ -646,9 +742,9 @@ addFormGroup(form: any) {
       }
   })
 
-  tableName = tableName.map((ele:any)=>ele.validation.formName_table)
+  tableName = tableName.map((ele:any)=>{return {"tableFormName":ele.validation.formName_table,"tableLabel":ele.label}})
 
-  console.log("tableName are ",tableName);
+  // console.log("tableName are ",tableName);
 
   for(let table of tableName){
     this.addTable(this.formGroups.length - 1, table);
@@ -662,9 +758,10 @@ getTables(formGroupIndex: number): FormArray {
 }
 
 // Add a new table to a form group
-addTable(formGroupIndex: number, tableName: string) {
+addTable(formGroupIndex: number, tableName: any) {
   const table = this.fb.group({
-    tableName: [tableName],
+    tableLabel:[tableName.tableLabel],
+    tableName: [tableName.tableFormName],
     conditions: this.fb.array([])
   });
 
@@ -717,12 +814,15 @@ addTableForExistingData(formGroupIndex: number, table: any) {
 
   // Loop through all existing tables in the formGroup
   this.getTables(formGroupIndex).controls.forEach((existingTable: any) => {
-    if (existingTable.get('tableName').value === table.tableName) {
+    if (existingTable.get('tableLabel').value === table.tableLabel) {
       existingTableGroup = existingTable;  // Table already exists
     }
   });
 
   if (!existingTableGroup) {
+
+    console.log("table doesnt exist ",table);
+
     // If the table doesn't exist, add it
     const tableFormGroup = this.fb.group({
       tableName: [table.tableName],
@@ -742,6 +842,9 @@ addTableForExistingData(formGroupIndex: number, table: any) {
     // Get the existing conditions array
     const tableConditionsArray = existingTableGroup.get('conditions') as FormArray;
 
+    console.log("Escisting conditional array is ",tableConditionsArray);
+    console.log("tableConditionsArray ",tableConditionsArray);
+
     // Clear existing conditions (this replaces all of them)
     tableConditionsArray.clear();  // This clears the previous conditions
 
@@ -750,6 +853,9 @@ addTableForExistingData(formGroupIndex: number, table: any) {
       this.addConditionForExistingData(formGroupIndex, this.getTables(formGroupIndex).controls.indexOf(existingTableGroup), condition);
     });
   }
+
+
+  console.log("forms data after add tables for existing ",this.queryBuilderForm.value)
 }
 
 
@@ -828,25 +934,49 @@ addFormGroupCustom(formData:any){
   let tableName = formData.dynamicForm.filter((item:any)=>{
       if(item.name.startsWith('table-')){
         console.log("Item to be selected is ",item.validation.formName_table);
-        return item.validation.formName_table
+        return {tableLabel:item.label,tableName:item.validation.formName_table}
       }
     })
+
+
+    console.log("Before tableName are ",tableName);
+
+    const tableLabels = tableName.map((ele:any)=>ele.label)
+
+    const customTableName = tableName.map((ele:any)=>{return {"tableFormName":ele.validation.formName_table,"tableLabel":ele.label}})
 
     tableName = tableName.map((ele:any)=>ele.validation.formName_table)
 
     console.log("tableName are ",tableName);
 
-    for(let table of tableName){
-      console.log("this.formGroups.length ",this.miniCustomColumns.length - 1);
+    console.log("Form name is here ",formData.formName);
+
+    this.showTypes.push(JSON.parse(JSON.stringify({[formData.formName]:{"tableNames":tableName,"tableLabels":tableLabels}})))
+
+    console.log("this.showTypes ",this.showTypes);
+
+    try{
+      const formControls = this.showTypes.map(() => this.fb.control([]));
+      this.reportsFeildsAdvanced.setControl('filter_type', this.fb.array(formControls));
+    }
+    catch(error){
+      console.log("Error in reports Feilds Advanced ",error);
+    }
+   
+  
+
+    for(let table of customTableName){
+      console.log("this.formGroups.length ",table);
       this.addCustomTable(this.miniCustomColumns.length - 1, table);
     }
   }
 
 
 
-  addCustomTable(formGroupIndex: number, tableName: string) {
+  addCustomTable(formGroupIndex: number, tableName: any) {
     const table = this.fb.group({
-      tableName: [tableName],
+      tableLabel:[tableName.tableLabel],
+      tableName: [tableName.tableFormName],
       conditions: this.fb.array([])
     });
   
@@ -987,13 +1117,18 @@ addConditionForExistingData1(formGroupIndex: number, tableIndex: number, conditi
 
   saveConfiguration() {
 
+    console.log("this.reportsFeildsAdvanced ",this.reportsFeildsAdvanced.value);
+
     //Create an packet for all excel configurations
     const advacnedExcelConfiguration = {
       advancedreportsFeildsAdvanced: this.reportsFeildsAdvanced.value,
       advancedLocationFilter:this.mainFormGroup.value,
       advancedEquationFilter:this.customLocationGroup.value,
       advancedcustomMiniColumns:this.customMiniColumns.value,
-      advancedMiniTableFilter:this.queryBuilderForm.value
+      advancedMiniTableFilter:this.queryBuilderForm.value,
+      filter_type:this.reportsFeildsAdvanced.get('filter_type')?.value,
+      trackEnable:this.reportsFeildsAdvanced.get('trackEnable')?.value,
+      miniTableEnable:this.reportsFeildsAdvanced.get('miniTableEnable')?.value
     }
 
 

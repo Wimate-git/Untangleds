@@ -4,7 +4,7 @@ import { ClientLogoService } from './services/client-logo.service';
 import { LayoutService } from 'src/app/_metronic/layout/core/layout.service';
 import { Subscription } from 'rxjs';
 import { LayoutType } from 'src/app/_metronic/layout/core/configs/config';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 // const BODY_CLASSES = ['bgi-size-cover', 'bgi-position-center', 'bgi-no-repeat'];
 
@@ -33,8 +33,9 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   dynamicFields:any;
   client: any;
+  restrictMobileProvision: any = false;
 
-  constructor(private layout: LayoutService,private s3Service: S3ServiceService,private cd:ChangeDetectorRef,private getImage:ClientLogoService,private router: Router) {
+  constructor(private layout: LayoutService,private s3Service: S3ServiceService,private cd:ChangeDetectorRef,private getImage:ClientLogoService,private router: Router,private route:ActivatedRoute) {
     this.splashScreenLogoElement = document.getElementById('splash-screen-logo') as HTMLImageElement;
     this.linkElement = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
   }
@@ -87,6 +88,28 @@ export class AuthComponent implements OnInit, OnDestroy {
     }
 
     console.log("Client Logo is",this.clientLogo);
+
+
+    this.route.queryParams.subscribe((params) => {
+      this.restrictMobileProvision = params['restrict'];
+
+      console.log("restrictMobileProvision auth component",this.restrictMobileProvision);
+
+      localStorage.setItem('restrictMobileProvision',this.restrictMobileProvision)
+
+
+      this.cd.detectChanges()
+
+      // if (this.savedQuery) {
+        
+      // }
+    })
+
+
+
+
+
+
 
     this.cd.detectChanges()
     

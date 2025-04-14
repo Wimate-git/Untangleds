@@ -1,295 +1,375 @@
-  
-
-  <div class="modal-header">
-    <h4 class="modal-title">Advanced Excel Filters</h4>
-    <!-- Custom close button in the top-right corner -->
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.close()"></button>
-  </div>
-  <div class="modal-body">
+<div class="modal-header">
+  <h4 class="modal-title">Advanced Excel Filters</h4>
+  <!-- Custom close button in the top-right corner -->
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.close()"></button>
+</div>
+<div class="modal-body">
 
 
-    <form [formGroup]="reportsFeildsAdvanced">
+  <form [formGroup]="reportsFeildsAdvanced">
 
 
-        <div class="border-text">
+    <div style="display: flex;flex-direction: row;gap:10px;align-items: baseline;" class="mb-3">
+      <div class="flex items-center">
+        <p-checkbox inputId="trackEnable" formControlName="trackEnable" (onChange)="multiSelectChange()"
+          value="trackLocation" />
+        <label for="trackEnable" class="ms-1 fw-bold">Track Location</label>
+      </div>
+      <div class="flex items-center">
+        <p-checkbox inputId="miniTableEnable" formControlName="miniTableEnable" (onChange)="multiSelectChange()"
+          value="MiniTable" />
+        <label for="miniTableEnable" class="ms-1 fw-bold">Mini Table</label>
+      </div>
 
-            
+
+      <!-- <button type="submit" class="btn fw-bold btn-sm custom-primary" (click)="clearFields()" >Clear</button> -->
+    </div>
 
 
 
-            <div class="form-group row ps-2 mb-7 mt-7" style="text-align: start;">
-                <label class="required col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Advanced Filter</label>
-                <div class="col-3 d-flex gap-7 align-items-center">
-                <div class="form-check">
-                <input class="form-check-input" type="radio" id="advanceAllOption" formControlName="advanceOption" value="all" (change)="onAdvancedOptions($event,'html','create')">
-                <label class="form-check-label" for="filterAll">All</label>
+    <!-- [options]="locationPermissionArray" 
+          (onChange)="onModuleLocationSelect($event)" -->
+
+    <!-- *ngIf="selectedFilter.includes('Track Location')" -->
+
+    <!-- *ngIf="selectedFilter.includes('Mini Table')" -->
+
+
+
+    <div class="border-text" *ngIf="selectedFilter.includes('trackLocation')">
+
+
+      <div class="form-group row ps-2 mb-7 mt-7" style="text-align: start;">
+        <label class="required col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Advanced
+          Filter</label>
+        <div class="col-3 d-flex gap-7 align-items-center">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" id="advanceAllOption" formControlName="advanceOption"
+              value="all" (change)="onAdvancedOptions($event,'html','create')">
+            <label class="form-check-label" for="filterAll">All</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" id="advanceConditionOption" formControlName="advanceOption"
+              value="onCondition" (change)="onAdvancedOptions($event,'html','create')">
+            <label class="form-check-label" for="filterOnCondition">On Condition</label>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="card card-custom p-2 mt-5" style="background-color: #F5F7F8;display: flex;flex-direction: row;"
+        *ngIf="isFormAdvancedVisible">
+        <form [formGroup]="mainFormGroup">
+
+          <!-- Single Form with Dynamic Conditions -->
+          <div class="form-group" style="border: 1px solid green; padding: 10px; width: 600px; margin: 5px;">
+
+            <h5>{{ getFormTitle() }}</h5>
+
+            <div formArrayName="dynamicConditions">
+              <div *ngFor="let conditionItem of getConditions().controls; let conditionIndex=index"
+                [formGroupName]="conditionIndex">
+
+                <div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+
+                  <!-- Field Selection -->
+                  <div class="mb-3" style="width: 30%;">
+                    <label class="required">Choose Field</label>
+                    <select formControlName="field" class="form-control">
+                      <option value="" disabled selected>Choose Field</option>
+                      <option value="Date_and_time">Date and Type</option>
+                      <option value="label_id">Label</option>
+                      <option value="label_name">Label Name</option>
+                      <option value="latitude">Latitude</option>
+                      <option value="longitude">Longitude</option>
+                      <option value="name">Name</option>
+                      <option value="type">Type</option>
+                    </select>
+                  </div>
+
+                  <!-- Operator Selection -->
+                  <div class="mb-3" style="width: 30%;">
+                    <label class="required">Select Operator</label>
+                    <select formControlName="operator" class="form-control">
+                      <option value="" disabled selected>Choose operator</option>
+                      <option value="==">Equals</option>
+                      <option value=">">Not equals</option>
+                      <option value="includes">Contains</option>
+                      <option value="startsWith">Starts with</option>
+                      <option value="endsWith">Ends with</option>
+                      <option value=">">Greater than</option>
+                      <option value="<">Less than</option>
+                      <option value="<=">Less than or equal to</option>
+                      <option value=">=">Greater than or equal to</option>
+                    </select>
+                  </div>
+
+                  <!-- Value Input -->
+                  <div class="mb-3" style="width: 30%;">
+                    <label class="required">Input Value</label>
+
+                    <select *ngIf="isDropdownName(conditionIndex); else textInput" formControlName="value"
+                      class="form-control">
+                      <option value="" disabled>Choose an option</option>
+
+                      <!-- Check if the field is "Name", if yes, display userList -->
+                      <ng-container *ngIf="getSelectedFieldName(conditionIndex) === 'name'">
+                        <ng-container *ngIf="userList && userList.length > 0; else loading">
+                          <option *ngFor="let user of userList" [value]="user">{{ user }}</option>
+                        </ng-container>
+                        <ng-template #loading>
+                          <option disabled>Loading user list...</option>
+                        </ng-template>
+                      </ng-container>
+
+                    </select>
+                    <ng-template #textInput>
+                      <input type="text" formControlName="value" placeholder="Enter a value" class="form-control" />
+                    </ng-template>
+
+                  </div>
+
                 </div>
-                <div class="form-check">
-                <input class="form-check-input" type="radio" id="advanceConditionOption" formControlName="advanceOption" value="onCondition" (change)="onAdvancedOptions($event,'html','create')">
-                <label class="form-check-label" for="filterOnCondition">On Condition</label>
+
+                <!-- Between Operator (Optional) -->
+                <div *ngIf="conditionIndex < getConditions().length - 1" class="mb-3" style="width: 30%;">
+                  <label class="required">Between Operator</label>
+                  <select formControlName="logicalOperator" class="form-control">
+                    <option value="" disabled selected>Choose operator</option>
+                    <option value="&&">AND</option>
+                    <option value="||">OR</option>
+                  </select>
                 </div>
-                </div>
+
+                <!-- *ngIf="conditionIndex != 0"  -->
+
+                <!-- Remove Condition Button -->
+                <button type="button" class="btn btn-danger btn-sm mb-2"
+                  (click)="removeConditionItem(conditionIndex)">Remove Condition</button>
+              </div>
             </div>
 
+            <!-- Add Condition Button -->
+            <button type="button" class="btn btn-primary btn-sm" (click)="addNewCondition()">Add Condition</button>
 
-            <div class="card card-custom p-2 mt-5" style="background-color: #F5F7F8;display: flex;flex-direction: row;" *ngIf="isFormAdvancedVisible">
-                <form [formGroup]="mainFormGroup">
-        
-                    <!-- Single Form with Dynamic Conditions -->
-                    <div class="form-group" style="border: 1px solid green; padding: 10px; width: 600px; margin: 5px;">
-                
-                    <h5>{{ getFormTitle() }}</h5>
-                
-                    <div formArrayName="dynamicConditions">
-                        <div *ngFor="let conditionItem of getConditions().controls; let conditionIndex=index" [formGroupName]="conditionIndex">
-                
-                        <div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
-                            
-                            <!-- Field Selection -->
-                            <div class="mb-3" style="width: 30%;">
-                            <label class="required">Choose Field</label>
-                            <select formControlName="field" class="form-control">
-                                <option value="" disabled selected>Choose Field</option>
-                                <option value="Date_and_time">Date and Type</option>
-                                <option value="label_id">Label</option>
-                                <option value="label_name">Label Name</option>
-                                <option value="latitude">Latitude</option>
-                                <option value="longitude">Longitude</option>
-                                <option value="name">Name</option>
-                                <option value="type">Type</option>
-                            </select>                  
-                            </div>
-                
-                            <!-- Operator Selection -->
-                            <div class="mb-3" style="width: 30%;">
-                            <label class="required">Select Operator</label>
-                            <select formControlName="operator" class="form-control">
-                                <option value="" disabled selected>Choose operator</option>
-                                <option value="==">Equals</option>
-                                <option value=">">Not equals</option>
-                                <option value="includes">Contains</option>
-                                <option value="startsWith">Starts with</option>
-                                <option value="endsWith">Ends with</option>
-                                <option value=">">Greater than</option>
-                                <option value="<">Less than</option>
-                                <option value="<=">Less than or equal to</option>
-                                <option value=">=">Greater than or equal to</option>
-                            </select>
-                            </div>
-                
-                            <!-- Value Input -->
-                            <div class="mb-3" style="width: 30%;">
-                            <label class="required">Input Value</label>
-                            
-                            <select *ngIf="isDropdownName(conditionIndex); else textInput" 
-                            formControlName="value" 
-                            class="form-control">
-                        <option value="" disabled>Choose an option</option>
-                        
-                                <!-- Check if the field is "Name", if yes, display userList -->
-                                <ng-container *ngIf="getSelectedFieldName(conditionIndex) === 'name'">
-                                    <ng-container *ngIf="userList && userList.length > 0; else loading">
-                                    <option *ngFor="let user of userList" [value]="user">{{ user }}</option>
-                                    </ng-container>
-                                    <ng-template #loading>
-                                    <option disabled>Loading user list...</option>
-                                    </ng-template>
-                                </ng-container>
-                                
-                                </select>
-                            <ng-template #textInput>
-                                <input type="text" 
-                                    formControlName="value" 
-                                    placeholder="Enter a value" 
-                                    class="form-control" />
-                            </ng-template>
-                    
-                            </div>
-                
-                        </div>
-                
-                        <!-- Between Operator (Optional) -->
-                        <div *ngIf="conditionIndex < getConditions().length - 1" class="mb-3" style="width: 30%;">
-                            <label class="required">Between Operator</label>
-                            <select formControlName="logicalOperator" class="form-control">
-                            <option value="" disabled selected>Choose operator</option>
-                            <option value="&&">AND</option>
-                            <option value="||">OR</option>
-                            </select>
-                        </div>
-                
-                        <!-- Remove Condition Button -->
-                        <button *ngIf="conditionIndex != 0" type="button" class="btn btn-danger btn-sm mb-2" (click)="removeConditionItem(conditionIndex)">Remove Condition</button>
-                        </div>
-                    </div>
-                
-                    <!-- Add Condition Button -->
-                    <button type="button" class="btn btn-primary btn-sm" (click)="addNewCondition()">Add Condition</button>
-
-                     <!-- <button type="button" class="btn btn-secondary btn-sm" (click)="insertFieldIntoAdvancedCondition()">Insert into Advanced Condition</button> -->
-                     <div style="display: flex; justify-content: flex-end;">
-                        <button type="button" class="btn btn-secondary btn-sm" (click)="insertFieldIntoAdvancedCondition()">Insert into Advanced Condition</button>
-                    </div>
-                
-                    </div>
-
-                    
-                   
-                </form>
-
-                <div class="form-group" style="border: 1px solid green; padding: 10px; width: 600px; margin: 5px;">
-                    <label class="required col-form-label fw-bold">Advanced Condition</label>
-                    <textarea formControlName="equationConditionText" class="form-control"></textarea>
-                </div>
+            <!-- <button type="button" class="btn btn-secondary btn-sm" (click)="insertFieldIntoAdvancedCondition()">Insert into Advanced Condition</button> -->
+            <div style="display: flex; justify-content: flex-end;">
+              <button type="button" class="btn btn-secondary btn-sm" (click)="insertFieldIntoAdvancedCondition()">Insert
+                into Advanced Condition</button>
             </div>
 
-            
-        
+          </div>
 
 
-            <div class="form-group row ps-1" style="text-align: start;">
-                <div class="form-group row ps-4 mb-7">
-                <label class="required col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Add Excel Columns</label>
-                <div class="col-3 d-flex gap-7 align-items-center">
-                <div class="form-check">
-                <input class="form-check-input" type="radio" id="addExcellAllOption" formControlName="addExcellOption" value="all" (change)="onCustomColumns($event,'html','create')">
-                <label class="form-check-label" for="filterAll">All</label>
-                </div>
-                <div class="form-check">
-                <input class="form-check-input" type="radio" id="addExcellConditionOption" formControlName="addExcellOption" value="onCondition" (change)="onCustomColumns($event,'html','create')">
-                <label class="form-check-label" for="filterOnCondition">Selected</label>
-                </div>
-                </div>
-                </div>
+
+        </form>
+
+        <div class="form-group" style="border: 1px solid green; padding: 10px; width: 600px; margin: 5px;">
+          <label class="required col-form-label fw-bold">Advanced Condition</label>
+          <textarea formControlName="equationConditionText" class="form-control"></textarea>
+        </div>
+      </div>
+
+
+
+
+
+      <div class="form-group row ps-1" style="text-align: start;">
+        <div class="form-group row ps-4 mb-7">
+          <label class="required col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Add Excel
+            Columns</label>
+          <div class="col-3 d-flex gap-7 align-items-center">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="addExcellAllOption" formControlName="addExcellOption"
+                value="all" (change)="onCustomColumns($event,'html','create')">
+              <label class="form-check-label" for="filterAll">All</label>
             </div>
-        
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="addExcellConditionOption"
+                formControlName="addExcellOption" value="onCondition"
+                (change)="onCustomColumns($event,'html','create')">
+              <label class="form-check-label" for="filterOnCondition">Selected</label>
+            </div>
+          </div>
+        </div>
+      </div>
 
 
 
 
-        <form [formGroup]="customLocationGroup" class="card card-custom p-2" style="background-color: #F5F7F8;" *ngIf="addExcellOptions">
-            <div formArrayName="customForms" style="display: flex; flex-wrap: wrap;">
-                <div *ngFor="let form of customForms1().controls; let formIndex=index">
-                    <div [formGroupName]="formIndex" class="form-group" style="border: 1px solid blue; padding: 10px; width: 600px; margin: 5px;">
-                        <h5>{{ getCustomFormName1() }}</h5>
-        
-                        <div formArrayName="conditions">
-                            <div *ngFor="let conditionGroup of customConditions1().controls; let condIndex=index" [formGroupName]="condIndex">
-                                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;">
-                                    <div class="mb-3" style="width: 30%;">
-                                        <label class="required">Column Name</label>
-                                        <input type="text" formControlName="columnName" placeholder="Enter Column Name" class="form-control" />
-                                    </div>
-        
-                                    <div class="mb-3" style="width: 30%;">
-                                        <label class="required">Field Selected</label>
-                                        <select formControlName="field" class="form-control">
-                                            <option value="" disabled selected>Choose Field</option>
-                                            <option value="Date_and_time">Date and Time</option>
-                                            <option value="label_id">Label</option>
-                                            <option value="label_name">Label Name</option>
-                                            <option value="latitude">Latitude</option>
-                                            <option value="longitude">Longitude</option>
-                                            <option value="name">Name</option>
-                                            <option value="type">Type</option>
-                                        </select>
-                                    </div>
+
+      <form [formGroup]="customLocationGroup" class="card card-custom p-2" style="background-color: #F5F7F8;"
+        *ngIf="addExcellOptions">
+        <div formArrayName="customForms" style="display: flex; flex-wrap: wrap;">
+          <div *ngFor="let form of customForms1().controls; let formIndex=index">
+            <div [formGroupName]="formIndex" class="form-group"
+              style="border: 1px solid blue; padding: 10px; width: 600px; margin: 5px;">
+              <h5>{{ getCustomFormName1() }}</h5>
+
+              <div formArrayName="conditions">
+                <div *ngFor="let conditionGroup of customConditions1().controls; let condIndex=index"
+                  [formGroupName]="condIndex">
+                  <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;">
+                    <div class="mb-3" style="width: 30%;">
+                      <label class="required">Column Name</label>
+                      <input type="text" formControlName="columnName" placeholder="Enter Column Name"
+                        class="form-control" />
+                    </div>
+
+                    <div class="mb-3" style="width: 30%;">
+                      <label class="required">Field Selected</label>
+                      <select formControlName="field" class="form-control">
+                        <option value="" disabled selected>Choose Field</option>
+                        <option value="Date_and_time">Date and Time</option>
+                        <option value="label_id">Label</option>
+                        <option value="label_name">Label Name</option>
+                        <option value="latitude">Latitude</option>
+                        <option value="longitude">Longitude</option>
+                        <option value="name">Name</option>
+                        <option value="type">Type</option>
+                      </select>
+                    </div>
 
 
-                                    <div class="mb-3" style="width: 30%;">
-                                    <label class="required">Predefined Scripts</label>
-                                    <select formControlName="predefined" class="form-control"  [ngbTooltip]="'Select a predefined script to populate the equation field'">
-                                        <option value="km Difference">Distance Travelled</option>
-                                        <option value="time_taken_distance">Time Taken</option>
-        
-                                        <!-- <option value="days_difference">Days Difference</option> -->
-                                        <option value="none">None</option>
-                                    </select>                  
-                                    </div>
+                    <div class="mb-3" style="width: 30%;">
+                      <label class="required">Predefined Scripts</label>
+                      <select formControlName="predefined" class="form-control"
+                        [ngbTooltip]="'Select a predefined script to populate the equation field'">
+                        <option value="km Difference">Distance Travelled</option>
+                        <option value="time_taken_distance">Time Taken</option>
+
+                        <!-- <option value="days_difference">Days Difference</option> -->
+                        <option value="none">None</option>
+                      </select>
+                    </div>
 
 
 
 
-        
-                                    <!-- Button to Add Field to Equation -->
-                                    <div style="margin-top: 10px;" [ngStyle]="{ 'display': isEquationVisible1 ? 'block' : 'none' }">
-                                        <button type="button" class="btn btn-secondary btn-sm" (click)="insertFieldIntoEquation1(condIndex)">
-                                            Insert Field into Equation
-                                        </button>
-                                    </div>
+
+                    <!-- Button to Add Field to Equation -->
+                    <div style="margin-top: 10px;" [ngStyle]="{ 'display': isEquationVisible1 ? 'block' : 'none' }">
+                      <button type="button" class="btn btn-secondary btn-sm"
+                        (click)="insertFieldIntoEquation1(condIndex)">
+                        Insert Field into Equation
+                      </button>
+                    </div>
 
 
-                                    <div class="mb-3" style="width: 30%;">
-                                    <label class="required">Aggregate Functions</label>
-                                    <select formControlName="aggregate" class="form-control"  [ngbTooltip]="'Select an aggregate function which will apply for specific column'" >
-                                        <option value="" disabled selected>Select Aggregate</option>
-                                        <option value="SUM">SUM</option>
-                                        <option value="AVG">Average</option>
-                                    
-                                        <option value="MIN">Minimum</option>
-                                        <option value="MAX">Maximum</option>
-                                    </select>                  
-                                    </div>
-                
+                    <div class="mb-3" style="width: 30%;">
+                      <label class="required">Aggregate Functions</label>
+                      <select formControlName="aggregate" class="form-control"
+                        [ngbTooltip]="'Select an aggregate function which will apply for specific column'">
+                        <option value="" disabled selected>Select Aggregate</option>
+                        <option value="SUM">SUM</option>
+                        <option value="AVG">Average</option>
+
+                        <option value="MIN">Minimum</option>
+                        <option value="MAX">Maximum</option>
+                      </select>
+                    </div>
 
 
-        
-                                    <!-- <div class="mb-3" style="width: 100%; height: 40%;">
+
+
+                    <!-- <div class="mb-3" style="width: 100%; height: 40%;">
                                         <label class="required">Equation</label>
                                         <textarea formControlName="equationText" class="form-control"></textarea>
                                     </div> -->
 
 
-                                    <div class="mb-3" style="width: 100%; height: 40%;" [ngStyle]="{ 'display': isEquationVisible1 ? 'block' : 'none' }">
-                                      <label class="required">Equation</label>
-                                      <textarea formControlName="equationText" class="form-control" ></textarea>
-                                    </div>
-                                    
-                    
-                                    <button class="btn btn-sm btn-dark btn-advanced" type="button" (click)="toggleEquationField1()">
-                                      {{ isEquationVisible1 ? 'Hide Equation ' : 'Show Equation' }}
-                                      <i class="fas" [ngClass]="isEquationVisible1 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                                    </button>
-
-
-                                </div>
-                                <hr>
-                                <button *ngIf="condIndex != 0" type="button" class="btn btn-danger btn-sm mb-2" (click)="removeCustomCondition1(formIndex, condIndex)">Remove Column</button>
-                            </div>
-                    
-                        </div>
-        
-                        <button type="button" class="btn btn-primary btn-sm" (click)="addCustomCondition1()">Add Column</button>
+                    <div class="mb-3" style="width: 100%; height: 40%;"
+                      [ngStyle]="{ 'display': isEquationVisible1 ? 'block' : 'none' }">
+                      <label class="required">Equation</label>
+                      <textarea formControlName="equationText" class="form-control"></textarea>
                     </div>
+
+
+                    <button class="btn btn-sm btn-dark btn-advanced" type="button" (click)="toggleEquationField1()">
+                      {{ isEquationVisible1 ? 'Hide Equation ' : 'Show Equation' }}
+                      <i class="fas" [ngClass]="isEquationVisible1 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    </button>
+
+
+                  </div>
+                  <hr>
+
+                  <!-- *ngIf="condIndex != 0"  -->
+
+                  <button type="button" class="btn btn-danger btn-sm mb-2"
+                    (click)="removeCustomCondition1(formIndex, condIndex)">Remove Column</button>
                 </div>
+
+              </div>
+
+              <button type="button" class="btn btn-primary btn-sm" (click)="addCustomCondition1()">Add Column</button>
             </div>
-        </form>
+          </div>
+        </div>
+      </form>
     </div>
 
 
 
 
-    <div class="border-text1 mt-5" >
+    <div class="border-text1 mt-5" *ngIf="selectedFilter.includes('MiniTable')">
 
-        <div class="form-group row ps-1" style="text-align: start;">
-            <div class="form-group row ps-4 mb-7">
-                <label class="required col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Advanced Filter</label>
-                    <div class="col-3 d-flex gap-7 align-items-center">
-                        <div class="form-check">
-                                <input class="form-check-input" type="radio" id="miniTableAllOptions" formControlName="miniTableOptions" value="all" (change)="onMiniTableColumns($event,'html','create')">
-                                <label class="form-check-label" for="filterAll">All</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" id="miniTableOnconditionOptions" formControlName="miniTableOptions" value="onCondition" (change)="onMiniTableColumns($event,'html','create')">
-                        <label class="form-check-label" for="filterOnCondition">Selected</label>
-                    </div>
-                </div>
-            </div>
+
+      <!-- <div class="col-md-4 mb-7">
+        <label class="required fw-semibold fs-6 mb-2">Select Mini Table</label>
+        <div class="custom-multiselect">
+          <p-multiSelect [options]="showTypes" value="value" placeholder="Select Mini Table"
+            [(ngModel)]="selectedMiniTableFilter" formControlName="filter_type"
+            (onChange)="multiSelectMiniTableChange()">
+          </p-multiSelect>
         </div>
+      </div> -->
 
 
 
-        <!-- <form [formGroup]="queryBuilderForm"  class="card card-custom p-2" style="background-color: #F5F7F8;" *ngIf="addMiniTableFilters">
+      <div class="card card-custom p-2 mt-5">
+        <div class="row mb-2">
+          <div class="col-3" *ngFor="let item of showTypes; let i = index">
+            <label class="required">{{ selectedForms[i].formName }}</label>
+            <div class="custom-multiselect">
+              <p-multiSelect [options]="item[selectedForms[i].formName].tableLabels" (onChange)="onMiniTableSelection()" [formControl]="getFormControl(i,item)"
+                placeholder="Select Mini Table">
+              </p-multiSelect>
+            </div>
+          </div>
+        </div>
+      </div> 
+
+
+
+
+
+
+
+
+      <div class="form-group row ps-1" style="text-align: start;">
+        <div class="form-group row ps-4 mb-7">
+          <label class="required col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Advanced
+            Filter</label>
+          <div class="col-3 d-flex gap-7 align-items-center">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="miniTableAllOptions" formControlName="miniTableOptions"
+                value="all" (change)="onMiniTableColumns($event,'html','create')">
+              <label class="form-check-label" for="filterAll">All</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="miniTableOnconditionOptions"
+                formControlName="miniTableOptions" value="onCondition"
+                (change)="onMiniTableColumns($event,'html','create')">
+              <label class="form-check-label" for="filterOnCondition">Selected</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- <form [formGroup]="queryBuilderForm"  class="card card-custom p-2" style="background-color: #F5F7F8;" *ngIf="addMiniTableFilters">
             <div formArrayName="formGroups" style="display: flex; flex-direction: row;flex-wrap:warp; gap: 10px;">
               <div *ngFor="let formGroup of formGroups.controls; let formIndex=index" 
                    [formGroupName]="formIndex" 
@@ -370,38 +450,45 @@
           </form> -->
 
 
-          <form [formGroup]="queryBuilderForm"  class="card card-custom p-2" style="background-color: #F5F7F8;" *ngIf="addMiniTableFilters">
-            <div formArrayName="formGroups" style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px;">
-              <div *ngFor="let formGroup of formGroups.controls; let formIndex=index" 
-                   [formGroupName]="formIndex" 
-                   class="form-group" style="border: 1px solid blue; padding: 10px; width: 100%; margin: 5px;">
-                
-                <h4>{{formGroup.get('name')?.value}}</h4>
-                
-                <div formArrayName="tables" style="display: flex; flex-wrap: wrap; gap: 10px;">
-                  <div *ngFor="let table of getTables(formIndex).controls; let tableIndex=index"
-                       [formGroupName]="tableIndex" 
-                       style="flex: 0 0 48%; border: 1px solid gray; padding: 10px; display: flex; flex-wrap: wrap; flex-direction: column; gap: 10px;width:540px">
-                    <h5>{{table.get('tableName')?.value}}</h5>
-                    
-                    <div formArrayName="conditions" style="display: flex; flex-wrap: wrap; gap: 10px;">
-                      <div style="width:100%" *ngFor="let condition of getConditions1(formIndex, tableIndex).controls; let condIndex=index"
-                           [formGroupName]="condIndex">
-                        
-                        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                          <div class="mb-3" style="width: 30%;">
-                            <label>Field</label>
-                            <!-- <input type="text" formControlName="field" class="form-control"> -->
-                            <select formControlName="field" class="form-control">
-                              <option value="" selected disabled>Select Field</option>
-                              <option *ngFor="let field of miniTableFormBuilderData[table.get('tableName')?.value]" [value]="field.name" >{{ field.label }}</option>
-                            </select>       
-                            
-                          </div>
-                          
-                          <div class="mb-3" style="width: 30%;">
-                            <label>Operator</label>
-                            <!-- <select formControlName="operator" class="form-control">
+      <form [formGroup]="queryBuilderForm" class="card card-custom p-2" style="background-color: #F5F7F8;"
+        *ngIf="addMiniTableFilters">
+        <div formArrayName="formGroups" style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px;">
+          <div *ngFor="let formGroup of formGroups.controls; let formIndex=index" [formGroupName]="formIndex"
+            class="form-group" style="border: 1px solid blue; padding: 10px; width: 100%; margin: 5px;">
+
+            <h4>{{formGroup.get('name')?.value}}</h4>
+
+            <div formArrayName="tables" style="display: flex; flex-wrap: wrap; gap: 10px;">
+              <div *ngFor="let table of getTables(formIndex).controls; let tableIndex=index"
+                [formGroupName]="tableIndex" [ngStyle]="{
+                  display: selectedEnabledMiniTableFilters && selectedEnabledMiniTableFilters[formIndex] &&
+                           selectedEnabledMiniTableFilters[formIndex].includes(table.get('tableLabel')?.value)
+                           ? 'flex' : 'none'
+                }"
+
+                style="flex: 0 0 48%; border: 1px solid gray; padding: 10px; display: flex; flex-wrap: wrap; flex-direction: column; gap: 10px;width:540px">
+                <h5>{{table.get('tableLabel')?.value}}</h5>
+
+                <div formArrayName="conditions" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                  <div style="width:100%"
+                    *ngFor="let condition of getConditions1(formIndex, tableIndex).controls; let condIndex=index"
+                    [formGroupName]="condIndex">
+
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                      <div class="mb-3" style="width: 30%;">
+                        <label>Field</label>
+                        <!-- <input type="text" formControlName="field" class="form-control"> -->
+                        <select formControlName="field" class="form-control">
+                          <option value="" selected disabled>Select Field</option>
+                          <option *ngFor="let field of miniTableFormBuilderData[table.get('tableName')?.value]"
+                            [value]="field.name">{{ field.label }}</option>
+                        </select>
+
+                      </div>
+
+                      <div class="mb-3" style="width: 30%;">
+                        <label>Operator</label>
+                        <!-- <select formControlName="operator" class="form-control">
                               <option value="" disabled selected>Select operator</option>
                               <option value="==">Equals</option>
                               <option value=">">Not equals</option>
@@ -416,50 +503,48 @@
 
 
 
-                            <ng-container *ngIf="isDateField(formIndex,tableIndex,condIndex)">
-                              <select formControlName="operator" placeholder="Select date type" class="form-control">
-                                <option value="" disabled selected>Select operator</option>
-                                <option value="is">is</option>
-                              <option value=">=">&gt;=</option>
-                              <option value="<=">&lt;=</option>
-                              <option value="between">between</option>
-                              <option value="between time">between time</option>
-                              <option value="less than days ago">less than days ago</option>
-                              <option value="more than days ago">more than days ago</option>
-                              <option value="in the past">in the past</option>
-                              <option value="days ago">days ago</option>
-                              <option value="today">today</option>
-                              <option value="yesterday">yesterday</option>
-                              <option value="this week">this week</option>
-                              <option value="last week">last week</option>
-                              <option value="last 2 weeks">last 2 weeks</option>
-                              <option value="this month">this month</option>
-                              <option value="last month">last month</option>
-                              <option value="this year">this year</option>
-                              <option value="any">any</option>
-                              <!-- <option value="latest 10">latest 10</option> -->
-                              </select>
-                            </ng-container>
-              
-              
-              
-              
-                            <ng-container *ngIf="!isDateField(formIndex,tableIndex,condIndex)">
-                              <select formControlName="operator" placeholder="Select operator" class="form-control">
-                                <option value="" disabled selected>Select operator</option>
-                                <option value="==">Equals</option>
-                                <option value=">">Not equals</option>
-                                <option value="includes">Contains</option>
-                                <option value="startsWith">Starts with</option>
-                                <option value="endsWith">Ends with</option>
-                                <option value=">">Greater than</option>
-                                <option value="<">Less than</option>
-                                <option value="<=">Less than equals to</option>
-                                <option value=">=">Greater than equals to</option>
-                              </select>
-                            </ng-container>
+                        <ng-container *ngIf="isDateField(formIndex,tableIndex,condIndex)">
+                          <select formControlName="operator" placeholder="Select date type" class="form-control">
+                            <option value="" disabled selected>Select operator</option>
+                            <option value="is">is</option>
+                            <option value=">=">&gt;=</option>
+                            <option value="<=">&lt;=</option>
+                            <option value="between">between</option>
+                            <option value="between time">between time</option>
+                            <option value="less than days ago">less than days ago</option>
+                            <option value="more than days ago">more than days ago</option>
+                            <option value="in the past">in the past</option>
+                            <option value="days ago">days ago</option>
+                            <option value="today">today</option>
+                            <option value="yesterday">yesterday</option>
+                            <option value="this week">this week</option>
+                            <option value="last week">last week</option>
+                            <option value="last 2 weeks">last 2 weeks</option>
+                            <option value="this month">this month</option>
+                            <option value="last month">last month</option>
+                            <option value="this year">this year</option>
+                            <option value="any">any</option>
+                            <!-- <option value="latest 10">latest 10</option> -->
+                          </select>
+                        </ng-container>
 
-              
+
+
+
+                        <ng-container *ngIf="!isDateField(formIndex,tableIndex,condIndex)">
+                          <select formControlName="operator" placeholder="Select operator" class="form-control">
+                            <option value="" disabled selected>Select operator</option>
+                            <option value="==">Equals</option>
+                            <option value=">">Not equals</option>
+                            <option value="includes">Contains</option>
+                            <option value="startsWith">Starts with</option>
+                            <option value="endsWith">Ends with</option>
+                            <option value=">">Greater than</option>
+                            <option value="<">Less than</option>
+                            <option value="<=">Less than equals to</option>
+                            <option value=">=">Greater than equals to</option>
+                          </select>
+                        </ng-container>
 
 
 
@@ -469,201 +554,235 @@
 
 
 
-                          </div>
+
+
+                      </div>
 
 
 
-                          <ng-container class="mb-3" style="width: 30%;" *ngIf="isDropdown(formIndex,tableIndex,condIndex) == 'date'">
-          
-                            <div *ngIf="dateFilterConfig[dateFilterOperator]?.showDate">
-                              <label class="required">Value</label>
-                                <input type="date" formControlName="val1" class="form-control">
-                          </div>
-                      
-                          <div *ngIf="dateFilterConfig[dateFilterOperator]?.showStartDate" class="mb-7">
-                            <label class="required">Start and End Date</label>
-                          
-                                    <input [type]="dateFilterConfig[dateFilterOperator]?.isBetweenTime ? 'datetime-local' : 'date'" formControlName="val1" class="form-control">
-                            <br>
-                                    <input [type]="dateFilterConfig[dateFilterOperator]?.isBetweenTime ? 'datetime-local' : 'date'" formControlName="val2" class="form-control">
-                          </div>
-                      
-                      
-                          <div  *ngIf="dateFilterConfig[dateFilterOperator]?.showDaysAgo" class="mb-7">
-                            <label class="required">Value</label>
-                                      <input type="number" formControlName="val1" class="form-control" placeholder="Enter number of days">
-                          </div>
-                          </ng-container>
+                      <ng-container class="mb-3" style="width: 30%;"
+                        *ngIf="isDropdown(formIndex,tableIndex,condIndex) == 'date'">
 
-
-
-
-
-                          
-                          <ng-container *ngIf="isDropdown(formIndex,tableIndex,condIndex) != 'date'">
-                            <div class="mb-3" style="width: 30%;">
-                              <label>Value</label>
-                              <input type="text" formControlName="value" class="form-control">
-                            </div>
-                          </ng-container>
-                          
-                       
-                          
+                        <div *ngIf="dateFilterConfig[dateFilterOperator]?.showDate">
+                          <label class="required">Value</label>
+                          <input type="date" formControlName="val1" class="form-control">
                         </div>
 
-                           <div class="mb-3" style="width: 30%;" *ngIf="condIndex < getConditions1(formIndex, tableIndex).length - 1">
-                            <label>Logical Operator</label>
-                            <select formControlName="logicalOperator" class="form-control">
-                              <option value="" disabled selected>Select operator</option>
-                              <option value="&&">AND</option>
-                              <option value="||">OR</option>
-                            </select>
-                          </div>
+                        <div *ngIf="dateFilterConfig[dateFilterOperator]?.showStartDate" class="mb-7">
+                          <label class="required">Start and End Date</label>
+
+                          <input
+                            [type]="dateFilterConfig[dateFilterOperator]?.isBetweenTime ? 'datetime-local' : 'date'"
+                            formControlName="val1" class="form-control">
+                          <br>
+                          <input
+                            [type]="dateFilterConfig[dateFilterOperator]?.isBetweenTime ? 'datetime-local' : 'date'"
+                            formControlName="val2" class="form-control">
+                        </div>
 
 
-                      <div style="display: flex;flex-direction: row;gap:10px">
-                          <button type="button" 
-                            class="btn btn-danger btn-sm"
-                            *ngIf="getConditions1(formIndex, tableIndex).length > 1"
-                            (click)="removeCondition(formIndex, tableIndex, condIndex)">
-                          Remove
-                        </button>
+                        <div *ngIf="dateFilterConfig[dateFilterOperator]?.showDaysAgo" class="mb-7">
+                          <label class="required">Value</label>
+                          <input type="number" formControlName="val1" class="form-control"
+                            placeholder="Enter number of days">
+                        </div>
+                      </ng-container>
 
 
-                        <button type="button" 
-                            class="btn btn-primary btn-sm"
-                            (click)="addCondition(formIndex, tableIndex)">
-                            Add Condition
-                        </button>
-                      </div>
-                        
-                      
 
 
-                      </div>
-                      
-                    
+
+
+                      <ng-container *ngIf="isDropdown(formIndex,tableIndex,condIndex) != 'date'">
+                        <div class="mb-3" style="width: 30%;">
+                          <label>Value</label>
+                          <input type="text" formControlName="value" class="form-control">
+                        </div>
+                      </ng-container>
+
+
+
                     </div>
+
+                    <div class="mb-3" style="width: 30%;"
+                      *ngIf="condIndex < getConditions1(formIndex, tableIndex).length - 1">
+                      <label>Logical Operator</label>
+                      <select formControlName="logicalOperator" class="form-control">
+                        <option value="" disabled selected>Select operator</option>
+                        <option value="&&">AND</option>
+                        <option value="||">OR</option>
+                      </select>
+                    </div>
+
+                    <!-- *ngIf="getConditions1(formIndex, tableIndex).length > 1" -->
+
+                    <div style="display: flex;flex-direction: row;gap:10px">
+                      <button type="button" class="btn btn-danger btn-sm"
+                     
+                        (click)="removeCondition(formIndex, tableIndex, condIndex)">
+                        Remove
+                      </button>
+
+
+                     
+                    </div>
+
+                    
+
+
+
+
                   </div>
+
+                  <button type="button" class="btn btn-primary btn-sm"
+                    (click)="addCondition(formIndex, tableIndex)">
+                    Add Condition
+                  </button>
+
+
                 </div>
               </div>
             </div>
-          </form>
-          
-
-          <div class="form-group row ps-1" style="text-align: start;">
-            <div class="form-group row ps-4 mb-7">
-                <label class="required col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Add Custom Mini Table Columns</label>
-                    <div class="col-3 d-flex gap-7 align-items-center">
-                        <div class="form-check">
-                                <input class="form-check-input" type="radio" id="miniTableCustom" formControlName="miniTableColumn" value="all" (change)="onMiniCustomColumns($event,'html','create')">
-                                <label class="form-check-label" for="filterAll">All</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" id="miniTableCustomOncondition" formControlName="miniTableColumn" value="onCondition" (change)="onMiniCustomColumns($event,'html','create')">
-                        <label class="form-check-label" for="filterOnCondition">Selected</label>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
-    
-    
-    
-    
-        <form [formGroup]="customMiniColumns" class="card card-custom p-2" style="background-color: #F5F7F8;" *ngIf="addMiniTableCustomColumns">
-            <div formArrayName="miniCustomColumns" style="display: flex; flex-direction: row;flex-wrap:warp; gap: 10px;">
-    
-              <div *ngFor="let customColumn of miniCustomColumns.controls; let formIndex=index" [formGroupName]="formIndex" class="form-group" style="border: 1px solid blue; padding: 10px; width: 50%;">
-                <h5>{{ customColumn.get('name')?.value }}</h5>
-                
-                <div formArrayName="tables" style="display: flex; flex-wrap: wrap; gap: 10px;">
-      
-                  <div *ngFor="let table of getCustomTables(formIndex).controls; let tableIndex=index" [formGroupName]="tableIndex" style="width: 100%; display: flex; flex-wrap: wrap; gap: 10px;">
-                    <div style="flex: 1; border: 1px solid gray; padding: 10px; display: flex;flex-wrap: wrap; flex-direction: column; gap: 10px;">
-                      <h5>{{ table.get('tableName')?.value }}</h5>
-          
-                  
-                      <div formArrayName="conditions" style="display: flex; flex-wrap: wrap; gap: 10px;">
-                        <div *ngFor="let condition of getCustomConditions(formIndex, tableIndex).controls; let condIndex=index" [formGroupName]="condIndex" >
-                        
-                        
-                        <div style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%;">
-                            <div class="mb-3" style="flex: 1; min-width: 200px;">
-                                <label class="required">Column Name</label>
-                                <input type="text" formControlName="columnName" placeholder="Enter Column Name" class="form-control" />
-                              </div>
-              
-                     
-                              <div class="mb-3" style="flex: 1; min-width: 200px;">
-                                <label class="required">Field Selected</label>
-                                <!-- <select formControlName="field" class="form-control">
+      </form>
+
+
+      <div class="form-group row ps-1" style="text-align: start;">
+        <div class="form-group row ps-4 mb-7">
+          <label class="required col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Add Custom Mini
+            Table Columns</label>
+          <div class="col-3 d-flex gap-7 align-items-center">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="miniTableCustom" formControlName="miniTableColumn"
+                value="all" (change)="onMiniCustomColumns($event,'html','create')">
+              <label class="form-check-label" for="filterAll">All</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="miniTableCustomOncondition"
+                formControlName="miniTableColumn" value="onCondition"
+                (change)="onMiniCustomColumns($event,'html','create')">
+              <label class="form-check-label" for="filterOnCondition">Selected</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+
+      <form [formGroup]="customMiniColumns" class="card card-custom p-2" style="background-color: #F5F7F8;"
+        *ngIf="addMiniTableCustomColumns">
+        <div formArrayName="miniCustomColumns" style="display: flex; flex-direction: row;flex-wrap:warp; gap: 10px;">
+
+          <div *ngFor="let customColumn of miniCustomColumns.controls; let formIndex=index" [formGroupName]="formIndex"
+            class="form-group" style="border: 1px solid blue; padding: 10px; width: 50%;">
+            <h5>{{ customColumn.get('name')?.value }}</h5>
+
+            <div formArrayName="tables" style="display: flex; flex-wrap: wrap; gap: 10px;">
+
+              <div *ngFor="let table of getCustomTables(formIndex).controls; let tableIndex=index"
+                [formGroupName]="tableIndex" style="width: 100%; display: flex; flex-wrap: wrap; gap: 10px;">
+                <div  [ngStyle]="{
+                  display:selectedEnabledMiniTableFilters && selectedEnabledMiniTableFilters[formIndex] &&
+                           selectedEnabledMiniTableFilters[formIndex].includes(table.get('tableLabel')?.value)
+                           ? 'flex' : 'none'
+                }"
+                  style="flex: 1; border: 1px solid gray; padding: 10px; display: flex;flex-wrap: wrap; flex-direction: column; gap: 10px;">
+                  <h5>{{ table.get('tableLabel')?.value }}</h5>
+
+
+                  <div formArrayName="conditions" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    <div
+                      *ngFor="let condition of getCustomConditions(formIndex, tableIndex).controls; let condIndex=index"
+                      [formGroupName]="condIndex">
+
+
+                      <div style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%;">
+                        <div class="mb-3" style="flex: 1; min-width: 200px;">
+                          <label class="required">Column Name</label>
+                          <input type="text" formControlName="columnName" placeholder="Enter Column Name"
+                            class="form-control" />
+                        </div>
+
+
+                        <div class="mb-3" style="flex: 1; min-width: 200px;">
+                          <label class="required">Field Selected</label>
+                          <!-- <select formControlName="field" class="form-control">
                                   <option value="" disabled selected>Choose Field</option>
                                 </select> -->
 
 
-                                <select formControlName="field" class="form-control">
-                                  <option value="" disabled selected>Choose Field</option>
-                                  <option *ngFor="let field of miniTableFormBuilderData[table.get('tableName')?.value]" [value]="field.name" >{{ field.label }}</option>
-                                </select>  
-                              </div>
-              
-                 
-                              <div class="mb-3" style="flex: 1; min-width: 200px;">
-                                <label class="required">Predefined Scripts</label>
-                                <select formControlName="predefined" class="form-control" [ngbTooltip]="'Select a predefined script to populate the equation field'">
-                                  <option value="none">None</option>
-                                </select>                  
-                              </div>
-              
-                         
-                              <div style="margin-top: 10px; width: 100%;" [ngStyle]="{ 'display': isEquationVisible2 ? 'block' : 'none' }">
-                                <button type="button"  class="btn btn-secondary btn-sm"  (click)="insertFieldIntoEquationMiniTable(formIndex,tableIndex,condIndex)" >Insert Field into Equation</button>
-                              </div>
-              
-                    
-        
-                              <div class="mb-3" style="flex: 1; min-width: 200px; width: 100%;" [ngStyle]="{ 'display': isEquationVisible2 ? 'block' : 'none' }">
-                                <label class="required">Equation</label>
-                                <textarea formControlName="equationText" class="form-control"  rows="1"></textarea>
-
-                              
-                              </div>
-                              
-                              
-                              <div class="mb-3"style="min-width: 200px; width: 100%;">
-                                <button  class="btn btn-sm btn-dark btn-advanced" type="button" (click)="toggleEquationField2()">
-                                  {{ isEquationVisible2 ? 'Hide Equation ' : 'Show Equation' }}
-                                  <i class="fas" [ngClass]="isEquationVisible2 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                                </button>
-                              </div>
-                              
-
-
-                           
+                          <select formControlName="field" class="form-control">
+                            <option value="" disabled selected>Choose Field</option>
+                            <option *ngFor="let field of miniTableFormBuilderData[table.get('tableName')?.value]"
+                              [value]="field.name">{{ field.label }}</option>
+                          </select>
                         </div>
 
-                              <button type="button" 
-                              class="btn btn-danger btn-sm"
-                              *ngIf="getCustomConditions(formIndex, tableIndex).length > 1"
-                              (click)="removeCustomCondition(formIndex, tableIndex, condIndex)">
-                          Remove
-                          </button>
-                          
-                       </div>
 
-                               
-                        <button type="button" 
-                        class="btn btn-primary btn-sm"
-                        (click)="addCustomCondition(formIndex, tableIndex)">
-                        Add Condition
-                      </button>
+                        <div class="mb-3" style="flex: 1; min-width: 200px;">
+                          <label class="required">Predefined Scripts</label>
+                          <select formControlName="predefined" class="form-control"
+                            [ngbTooltip]="'Select a predefined script to populate the equation field'">
+                            <option value="none">None</option>
+                          </select>
+                        </div>
+
+
+                        <div style="margin-top: 10px; width: 100%;"
+                          [ngStyle]="{ 'display': isEquationVisible2 ? 'block' : 'none' }">
+                          <button type="button" class="btn btn-secondary btn-sm"
+                            (click)="insertFieldIntoEquationMiniTable(formIndex,tableIndex,condIndex)">Insert Field into
+                            Equation</button>
+                        </div>
+
+
+
+                        <div class="mb-3" style="flex: 1; min-width: 200px; width: 100%;"
+                          [ngStyle]="{ 'display': isEquationVisible2 ? 'block' : 'none' }">
+                          <label class="required">Equation</label>
+                          <textarea formControlName="equationText" class="form-control" rows="1"></textarea>
+
+
+                        </div>
+
+
+                        <div class="mb-3" style="min-width: 200px; width: 100%;">
+                          <button class="btn btn-sm btn-dark btn-advanced" type="button"
+                            (click)="toggleEquationField2()">
+                            {{ isEquationVisible2 ? 'Hide Equation ' : 'Show Equation' }}
+                            <i class="fas" [ngClass]="isEquationVisible2 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                          </button>
+                        </div>
+
+
+
+
                       </div>
+
+                      <!-- *ngIf="getCustomConditions(formIndex, tableIndex).length > 1" -->
+
+                      <button type="button" class="btn btn-danger btn-sm"
+              
+                        (click)="removeCustomCondition(formIndex, tableIndex, condIndex)">
+                        Remove
+                      </button>
+
                     </div>
+
+
+                    <button type="button" class="btn btn-primary btn-sm"
+                      (click)="addCustomCondition(formIndex, tableIndex)">
+                      Add Condition
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
-          </form>
+          </div>
+        </div>
+      </form>
 
 
 
@@ -672,23 +791,21 @@
 
 
     </div>
-           
 
 
 
 
 
-  
-      
-      
-
-    </form>
-
-  </div>
-
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
-    <button type="button" class="btn btn-primary" (click)="saveConfiguration()">Save Configuration</button>
-  </div>
 
 
+
+
+
+  </form>
+
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
+  <button type="button" class="btn btn-primary" (click)="saveConfiguration()">Save Configuration</button>
+</div>

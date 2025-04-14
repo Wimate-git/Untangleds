@@ -38,6 +38,7 @@ export class ForgotPasswordComponent implements OnInit {
   filterUser: any = []
   selectedUser: any;
   errorForInvalidName: any = '';
+  restrictMobileProvision: any;
   constructor(private fb: FormBuilder, private authService: AuthService,
     private cd:ChangeDetectorRef,private api:APIService, private router:Router,private DynamicApi:DynamicApiService,private toast:MatSnackBar,  private auditTrail:AuditTrailService) {
     this.isLoading$ = this.authService.isLoading$;
@@ -47,6 +48,12 @@ export class ForgotPasswordComponent implements OnInit {
     this.initForm();
 
     this.initialize_form()
+
+    //For Mobile login provisions provided
+    this.restrictMobileProvision = localStorage.getItem('restrictMobileProvision')
+    console.log("this.restrictMobileProvision Forgot component",this.restrictMobileProvision);
+
+    this.cd.detectChanges()
   }
 
   // convenience getter for easy access to form fields
@@ -355,7 +362,9 @@ async confirmNewPassword() {
         confirmButtonText: 'Okay'
     }).then((result)=>{
       if(result.isConfirmed){
+        if(this.restrictMobileProvision){
         this.router.navigate(['/auth/login']);
+        }
       }
     })
 

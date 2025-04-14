@@ -5423,9 +5423,13 @@ getLastWeekTimestamps() {
     ];
 
 
+    console.log("custom.equationText ",custom.equationText)
+
     if (custom && custom.equationText && custom.equationText != '') {
       timeCalculations = JSON.parse(custom.equationText)
     }
+
+    console.log("timeCalculations ",timeCalculations);
 
     for (const calc of timeCalculations) {
       if (currentType === calc.matchType) {
