@@ -240,7 +240,7 @@ type="square-jelly-box"
 
 
                           <div class="mb-3" style="width: 30%;">
-                            <label class="col-form-label fw-bold fs-6 required">Select Field</label>
+                            <label class="col-createChart-label fw-bold fs-6 required">Select Field</label>
                             <ngx-select [items]="dynamicParamMap.get(fieldIndex) || []"
                                         formControlName="formField"
                                         optionValueField="value"
@@ -254,21 +254,19 @@ type="square-jelly-box"
 <!-- Hide these fields if foundField.type is 'date' -->
 <ng-container *ngIf="!conditionfilter[fieldIndex]?.[conditionIndex]?.fieldTypeCheck">
   <div class="mb-3" style="width: 30%;">
-    <label class="col-form-label fw-bold fs-6 required">Operator</label>
-    <select formControlName="operator" placeholder="Select operator" class="form-control">
-      <option value="" disabled selected>Select operator</option>
-      <option value="All">All</option>
-      <option value="==">Equals</option>
-      <option value="!=">Not equals</option>
-      <option value=">">Greater than</option>
-      <option value="<">Less than</option>
-      <option value="<=">Less than equals to</option>
-      <option value=">=">Greater than equals to</option>
-    </select>
+    <label class="col-createChart-label fw-bold fs-6 required">Operator</label>
+    <ngx-select formControlName="operator"
+                [items]="operatorOptions"
+                optionValueField="value"
+                optionTextField="label"
+                placeholder="Select operator"
+                [allowClear]="true">
+    </ngx-select>
   </div>
+  
 
   <div class="mb-3" style="width: 30%;">
-    <label class="col-form-label fw-bold fs-6 required">Value</label>
+    <label class="col-createChart-label fw-bold fs-6 required">Value</label>
 
     <!-- Check if data exists -->
     <ng-container *ngIf="globalFieldData[fieldIndex] && globalFieldData[fieldIndex][conditionIndex];">
@@ -311,7 +309,7 @@ type="square-jelly-box"
 <div class="col-lg-6 col-md-6 col-sm-12" 
      *ngIf="conditionfilter[fieldIndex]?.[conditionIndex]?.fieldTypeCheck">
   <div class="form-group row align-items-center">
-    <label for="dateTypeSelect" class="col-form-label fw-bold fs-6 required">Date Filter</label>
+    <label for="dateTypeSelect" class="col-createChart-label fw-bold fs-6 required">Date Filter</label>
 
     <div class="col-lg-8 col-md-8 col-sm-8">
       <select 
@@ -428,7 +426,7 @@ type="square-jelly-box"
                             
                           </div>
                           <div class="col-md-4 mb-3" *ngIf = enableParameterName>
-                            <label for="parameterName" class="col-form-label fw-bold fs-6 "></label>
+                            <label for="parameterName" class="col-createChart-label fw-bold fs-6 "></label>
                             <input
                               id="parameterName"
                               type="number"
@@ -437,7 +435,7 @@ type="square-jelly-box"
                               formControlName="parameterName">
                           </div>
                           <div class="col-md-4 mb-3" *ngIf = enableParameterName>
-                            <label for="fieldLabel" class="col-form-label fw-bold fs-6 "></label>
+                            <label for="fieldLabel" class="col-createChart-label fw-bold fs-6 "></label>
                             <input
                               id="fieldLabel"
                               type="number"
@@ -463,7 +461,7 @@ type="square-jelly-box"
                             class="mb-3"
                             style="width: 30%;"
                           >
-                            <label class="col-form-label fw-bold fs-6 required">Between Operator</label>
+                            <label class="col-createChart-label fw-bold fs-6 required">Between Operator</label>
                             <select
                               formControlName="operatorBetween"
                               (change)="betweenoperator($event)"
@@ -506,7 +504,7 @@ type="square-jelly-box"
                 <div class="row g-3" [formGroup]="createChart">
                   <!-- Existing Themes Section -->
                   <div class="col-md-12 mb-3">
-                    <label class="col-form-label fw-bold fs-6 required">Themes:</label>
+                    <label class="col-createChart-label fw-bold fs-6 required">Themes:</label>
                     <div class="color-boxes">
                       <div
                         *ngFor="let theme of themes"
@@ -523,7 +521,7 @@ type="square-jelly-box"
               
                   <!-- Font Size Input -->
                   <div class="col-md-6 mb-3">
-                    <label for="fontSize" class="col-form-label fw-bold fs-6 required">Font Size</label>
+                    <label for="fontSize" class="col-createChart-label fw-bold fs-6 required">Font Size</label>
                     <input
                       id="fontSize"
                       type="number"
@@ -541,7 +539,7 @@ type="square-jelly-box"
               
                   <!-- Font Color Input -->
                   <div class="col-md-6 mb-3">
-                    <label for="fontColor" class="col-form-label fw-bold fs-6 required">Font Color</label>
+                    <label for="fontColor" class="col-createChart-label fw-bold fs-6 required">Font Color</label>
                     <div class="d-flex align-items-center">
                       <!-- Color Picker Input -->
                       <input

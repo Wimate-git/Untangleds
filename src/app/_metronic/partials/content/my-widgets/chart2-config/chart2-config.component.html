@@ -5,7 +5,7 @@
   <div class="container" *ngIf="createChart">
     <div class="row mb-3">
       <div class="col-md-4 mb-3" [formGroup]="createChart">
-        <label class="col-lg-12 col-form-label fw-bold fs-6 required">Parameters
+        <label class="col-lg-12 col-createChart-label fw-bold fs-6 required">Parameters
         </label>
         <input type="number" class="
                           form-control form-control-lg form-control-solid
@@ -17,7 +17,7 @@
           </div>
       </div>
       <div class="col-md-4 mb-3" [formGroup]="createChart">
-        <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Title </label>
+        <label class="col-lg-12 col-createChart-label fw-bold fs-6 required"> Title </label>
   
         <input type="text" class="
                     form-control form-control-lg form-control-solid
@@ -33,7 +33,7 @@
 
       <div class="col-lg-3 col-md-3 col-sm-6 mb-4 mt-4" [formGroup]="createChart">
         <div class="d-flex align-items-center">
-          <label for="toggleCheckLegend" class="col-form-label fw-bold fs-6  me-2">
+          <label for="toggleCheckLegend" class="col-createChart-label fw-bold fs-6  me-2">
             Enable Multi Color
           </label>
           <div class="form-check form-switch">
@@ -156,7 +156,7 @@
                       </div> -->
   
                       <div class="col-md-4 mb-3">
-                        <label for="primaryValue" class="col-form-label fw-bold fs-6 required">
+                        <label for="primaryValue" class="col-createChart-label fw-bold fs-6 required">
                           Primary Value
                           <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top"
                             title="Show Value As">
@@ -171,7 +171,7 @@
                           </div>
                       </div>
                       <!-- <div class="col-md-4 mb-3" *ngIf="all_fields.value[fieldIndex].primaryValue === 'Count'">
-                        <label for="constant" class="col-form-label fw-bold fs-6 required">Parameter Value</label>
+                        <label for="constant" class="col-createChart-label fw-bold fs-6 required">Parameter Value</label>
                         <ngx-select id="primaryValue" [allowClear]="true" formControlName="parameterValue"
                         [items]="showStatusValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
                         (selectionChanges)="onValueChange($event)" class="w-100"  [disabled]="createChart.get('primaryValue')?.value !== 'count'" ></ngx-select>
@@ -180,20 +180,20 @@
   
   
                       <div class="col-md-4 mb-3" *ngIf="all_fields.value[fieldIndex].primaryValue === 'Constant'">
-                        <label for="constant" class="col-form-label fw-bold fs-6 required">Constant</label>
+                        <label for="constant" class="col-createChart-label fw-bold fs-6 required">Constant</label>
                         <input id="constant" type="number" class="form-control form-control-solid"
                           placeholder="Select constant" formControlName="constantValue"
                           [disabled]="createChart.get('primaryValue')?.value !== 'Constant'" />
                       </div>
                       <div class="col-md-4 mb-3" >
-                        <label  class="col-form-label fw-bold fs-6 ">Undefined Format</label>
+                        <label  class="col-createChart-label fw-bold fs-6 ">Undefined Format</label>
                         <input id="undefinedCheckLabel" type="text" class="form-control form-control-solid" placeholder="Enter Value"
                           formControlName="undefinedCheckLabel">
                       </div>
   
   
                       <div class="col-md-4 mb-3">
-                        <label for="groupByFormat" class="col-form-label fw-bold fs-6 required">Group By Format</label>
+                        <label for="groupByFormat" class="col-createChart-label fw-bold fs-6 required">Group By Format</label>
                         <input id="groupByFormat" type="text" class="form-control form-control-solid"
                         placeholder="Select GroupByFormat" [formControlName]="'groupByFormat'"
                         (click)="openModalCalender(fieldIndex)" readonly>
@@ -204,19 +204,19 @@
                       </div>
   
                       <div class="col-md-4 mb-3" *ngIf="showIdField">
-                        <label for="id" class="col-form-label fw-bold fs-6 required">ID</label>
+                        <label for="id" class="col-createChart-label fw-bold fs-6 required">ID</label>
                         <input id="id" type="number" class="form-control form-control-solid" placeholder="Enter ID"
                           formControlName="widgetid">
                       </div>
   
                       <div class="col-md-4 mb-3" *ngIf="shouldShowProcessedValue">
-                        <label for="processed_value" class="col-form-label fw-bold fs-6 required">Processed Value</label>
+                        <label for="processed_value" class="col-createChart-label fw-bold fs-6 required">Processed Value</label>
                         <input id="processed_value" type="text" class="form-control form-control-solid"
                           placeholder="Enter Processed Value" formControlName="processed_value">
                       </div>
   
                       <!-- <div class="col-md-4 mb-3">
-                        <label for="rangeCalendarTimeRight" class="col-form-label fw-bold fs-6">Pre Defined Date
+                        <label for="rangeCalendarTimeRight" class="col-createChart-label fw-bold fs-6">Pre Defined Date
                           Range</label>
                         <input id="rangeCalendarCenter" type="text" class="form-control" readonly
                           ngxDaterangepickerBootstrap [formControl]="datePickerControl" [drops]="dropsDown"
@@ -226,7 +226,7 @@
                       </div> -->
   
                       <div class="col-md-4 mb-3">
-                        <label class="col-form-label fw-bold fs-6 required">Date Range Label</label>
+                        <label class="col-createChart-label fw-bold fs-6 required">Date Range Label</label>
                         <ngx-select id="primaryValue" [allowClear]="true" formControlName="selectedRangeType"
                         [items]="showCustomValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
                         (selectionChanges)="onValueSelect($event)" class="w-100"   ></ngx-select>
@@ -236,17 +236,17 @@
                      
                       </div>
                       <div class="col-md-4 mb-3">
-                        <label for="timeInput" class="col-form-label fw-bold fs-6 ">From Time</label>
+                        <label for="timeInput" class="col-createChart-label fw-bold fs-6 ">From Time</label>
                         <input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"
                           formControlName="selectFromTime">
                       </div>
                       <div class="col-md-4 mb-3">
-                        <label for="timeInput" class="col-form-label fw-bold fs-6 ">To Time</label>
+                        <label for="timeInput" class="col-createChart-label fw-bold fs-6 ">To Time</label>
                         <input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"
                           formControlName="selectToTime">
                       </div>
                       <div class="col-md-4">
-                        <label for="columnVisibility" class="fw-bold fs-6 ">column Visibility</label>
+                        <label for="columnVisibility" class="col-createChart-label fw-bold fs-6">column Visibility</label>
                         <p-multiSelect
                           id="columnVisibility"
                           formControlName="columnVisibility"
@@ -258,7 +258,7 @@
                         ></p-multiSelect>
                       </div>
                       <div class="col-md-4 mb-3">
-                        <label for="custom_Label" class="col-form-label fw-bold fs-6  required">Custom Label</label>
+                        <label for="custom_Label" class="col-createChart-label fw-bold fs-6  required">Custom Label</label>
                         <input type="text" class="form-control form-control-solid"  name="custom_Label"
                           formControlName="custom_Label">
                           <div *ngIf="field.get('custom_Label')?.touched && field.get('custom_Label')?.invalid" class="text-danger">
@@ -266,7 +266,7 @@
                           </div>
                       </div>
                       <div class="col-md-4 mb-3">
-                        <label for="parameterName" class="col-form-label fw-bold fs-6 required">Format Type</label>
+                        <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Format Type</label>
                         <ngx-select
                           id="parameterName"
                           [allowClear]="true"
@@ -285,7 +285,7 @@
 
 
                       <div class="col-md-4 mb-3" *ngIf = "shoRowData" >
-                        <label for="constant" class="col-form-label fw-bold fs-6 required"></label>
+                        <label for="constant" class="col-createChart-label fw-bold fs-6 required"></label>
                         <input id="constant" type="number" class="form-control form-control-solid"
                           placeholder="Select constant" formControlName="rowData"
                          />
@@ -293,7 +293,7 @@
 
                       <div class="row d-flex align-items-center">
                         <div class="col-md-6 mb-3">
-                          <label for="parameterName" class="col-form-label fw-bold fs-6">Date Reference X axis</label>
+                          <label for="parameterName" class="col-createChart-label fw-bold fs-6">Date Reference X axis</label>
                           <p-multiSelect
                             id="parameterName"
                             formControlName="XaxisFormat"
@@ -305,7 +305,7 @@
                       
                         <div class="col-md-6 mb-3">
                           <div class="color-picker-container d-flex align-items-center">
-                            <label for="textColorPicker" class="col-form-label fw-bold fs-6 ms-3">Select Line Color</label>
+                            <label for="textColorPicker" class="col-createChart-label fw-bold fs-6 ms-3">Select Line Color</label>
                             <input
                               id="textColorPicker"
                               type="color"
@@ -338,7 +338,7 @@
          
               <form [formGroup]="createChart">
                 <div class="form-group">
-                  <label for="jsonInput" class="col-form-label fw-bold fs-6">Highcharts Options:</label>
+                  <label for="jsonInput" class="col-createChart-label fw-bold fs-6">Highcharts Options:</label>
                   <textarea id="jsonInput" class="form-control" rows="8" formControlName="highchartsOptionsJson"
                             placeholder="Enter Highcharts options as JSON"></textarea>
                 </div>
@@ -387,7 +387,7 @@
               
                 <!-- Custom Label -->
                 <!-- <div class="col-md-5">
-                  <label for="custom_Label" class="col-form-label fw-bold fs-6 required">Custom Label</label>
+                  <label for="custom_Label" class="col-createChart-label fw-bold fs-6 required">Custom Label</label>
                   <input
                     type="text"
                     class="form-control form-control-solid"
@@ -420,7 +420,7 @@
           <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'drill-tab'}" id="drill-tab"
           role="tabpanel" aria-labelledby="drill-tabpane">
           <div class="col-md-4 mb-3">
-            <label for="parameterName" class="col-form-label fw-bold fs-6 ">Format Type</label>
+            <label for="parameterName" class="col-createChart-label fw-bold fs-6 ">Format Type</label>
             <ngx-select
               id="parameterName"
               [allowClear]="true"
@@ -453,7 +453,7 @@
         <!-- Form Row: Select Field, Custom Label, and Remove Button on the same row -->
         <div class="row g-3 align-items-center" style="border: 2px solid rgb(157, 159, 159); padding: 10px; margin: 5px; border-radius: 5px;">
           <div class="col-md-4">
-            <label for="drillTypeLabel" class="col-form-label fw-bold fs-6 required">Custom Label</label>
+            <label for="drillTypeLabel" class="col-createChart-label fw-bold fs-6 required">Custom Label</label>
             <input
               type="text"
               class="form-control form-control-solid"
@@ -465,7 +465,7 @@
           
           <!-- Select Field -->
           <div class="col-md-4">
-            <label class="col-form-label fw-bold fs-6 required">Select Field</label>
+            <label class="col-createChart-label fw-bold fs-6 required">Select Field</label>
             <ngx-select
               [items]="dynamicParamMap.get(fieldIndex) || []"
               formControlName="drillTypeFields"
@@ -478,7 +478,7 @@
           <!-- Custom Label -->
 
           <div class="col-md-4 mb-3">
-            <label for="primaryValue" class="col-form-label fw-bold fs-6 required">
+            <label for="primaryValue" class="col-createChart-label fw-bold fs-6 required">
               Primary Value
               <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top"
                 title="Show Value As">
@@ -536,7 +536,7 @@
   
             <div class="col-md-4 mt-5">
               <div class="color-picker-container d-flex align-items-center">
-                <label for="textColorPicker" class="col-form-label fw-bold fs-6">Data Label Font Color</label>
+                <label for="textColorPicker" class="col-createChart-label fw-bold fs-6">Data Label Font Color</label>
                 <input
                   id="textColorPicker"
                   type="color"
@@ -548,7 +548,7 @@
             </div>
             <div class="col-md-4 mt-5">
               <div class="color-picker-container d-flex align-items-center">
-                <label for="textColorPicker" class="col-form-label fw-bold fs-6 mb-0 me-2">BG Gradient Top Color</label>
+                <label for="textColorPicker" class="col-createChart-label fw-bold fs-6 mb-0 me-2">BG Gradient Top Color</label>
                 <input
                   id="textColorPicker"
                   type="color"
@@ -561,7 +561,7 @@
             
             <div class="col-md-4 mt-5">
               <div class="color-picker-container d-flex align-items-center">
-                <label for="textColorPicker" class="col-form-label fw-bold fs-6">BG Gradient Bottom Color</label>
+                <label for="textColorPicker" class="col-createChart-label fw-bold fs-6">BG Gradient Bottom Color</label>
                 <input
                   id="textColorPicker"
                   type="color"

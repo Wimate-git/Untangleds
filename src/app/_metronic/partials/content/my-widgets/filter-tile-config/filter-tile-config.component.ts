@@ -408,6 +408,15 @@ makeTrueCheck:any = false
   }
 
   
+  operatorOptions = [
+    { value: "All", label: "All" },
+    { value: "==", label: "Equals" },
+    { value: "!=", label: "Not equals" },
+    { value: ">", label: "Greater than" },
+    { value: "<", label: "Less than" },
+    { value: "<=", label: "Less than equals to" },
+    { value: ">=", label: "Greater than equals to" }
+  ];
   
 
   convertTo12HourFormat(time: string): string {

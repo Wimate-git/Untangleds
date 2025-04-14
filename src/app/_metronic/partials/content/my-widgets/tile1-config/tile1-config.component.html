@@ -51,7 +51,7 @@
                 <div class="row g-3">
                   <!-- Form Fields -->
                   <div class="col-md-4 mb-3">
-                    <label for="formlist" class="col-form-label fw-bold fs-6 required">
+                    <label for="formlist" class="col-createChart-label fw-bold fs-6 required">
                       Forms
                       <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
                         <i class="bi bi-info-circle fs-5"></i>
@@ -76,7 +76,7 @@
                   </div>
             
                   <div class="col-md-4 mb-3">
-                    <label for="parameterName" class="col-form-label fw-bold fs-6 required">Form Fields</label>
+                    <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields</label>
                     <ngx-select
                       id="parameterName"
                       [allowClear]="true"
@@ -94,7 +94,7 @@
                   </div>
 
                   <div class="col-md-4 mb-3">
-                    <label  class="col-form-label fw-bold fs-6 required">Format Type</label>
+                    <label  class="col-createChart-label fw-bold fs-6 required">Format Type</label>
                     <ngx-select
                       id="formatType"
                       [allowClear]="true"
@@ -114,7 +114,7 @@
 
             
                   <!-- <div class="col-md-4 mb-3">
-                    <label for="groupBy" class="col-form-label fw-bold fs-6 required">Group By</label>
+                    <label for="groupBy" class="col-createChart-label fw-bold fs-6 required">Group By</label>
                     <ngx-select
                       id="groupBy"
                       [allowClear]="true"
@@ -128,7 +128,7 @@
                   </div> -->
             
                   <div class="col-md-4 mb-3">
-                    <label for="primaryValue" class="col-form-label fw-bold fs-6 required">
+                    <label for="primaryValue" class="col-createChart-label fw-bold fs-6 required">
                       Primary Value
                       <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Show Value As">
                         <i class="bi bi-info-circle fs-5"></i>
@@ -152,7 +152,7 @@
                   </div>
             
                   <div class="col-md-4 mb-3" *ngIf="primaryValue?.value === 'Constant'">
-                    <label for="constant" class="col-form-label fw-bold fs-6 required">Constant</label>
+                    <label for="constant" class="col-createChart-label fw-bold fs-6 required">Constant</label>
                     <input
                       id="constant"
                       type="number"
@@ -162,7 +162,7 @@
                   </div>
             
                   <div class="col-md-4 mb-3">
-                    <label for="groupByFormat" class="col-form-label fw-bold fs-6 required">Group By Format</label>
+                    <label for="groupByFormat" class="col-createChart-label fw-bold fs-6 required">Group By Format</label>
                     <input
                       id="groupByFormat"
                       type="text"
@@ -177,7 +177,7 @@
                   </div>
             
                   <div class="col-md-4 mb-3" *ngIf="showIdField">
-                    <label for="id" class="col-form-label fw-bold fs-6 required">ID</label>
+                    <label for="id" class="col-createChart-label fw-bold fs-6 required">ID</label>
                     <input
                       id="id"
                       type="number"
@@ -187,7 +187,7 @@
                   </div>
             
                   <div class="col-md-4 mb-3" *ngIf="shouldShowProcessedValue">
-                    <label for="processed_value" class="col-form-label fw-bold fs-6 required">Processed Value</label>
+                    <label for="processed_value" class="col-createChart-label fw-bold fs-6 required">Processed Value</label>
                     <input
                       id="processed_value"
                       type="text"
@@ -197,7 +197,7 @@
                   </div>
             
                   <!-- <div class="col-md-4 mb-3">
-                    <label for="rangeCalendarTimeRight" class="col-form-label fw-bold fs-6">Pre Defined Date Range</label>
+                    <label for="rangeCalendarTimeRight" class="col-createChart-label fw-bold fs-6">Pre Defined Date Range</label>
                     <input
                       id="rangeCalendarCenter"
                       type="text"
@@ -215,7 +215,7 @@
                   </div> -->
             
                   <!-- <div class="col-md-4 mb-3">
-                    <label  class="col-form-label fw-bold fs-6 required">Date Range Label</label>
+                    <label  class="col-createChart-label fw-bold fs-6 required">Date Range Label</label>
                     <ngx-select
                     id="selectedRangeType"
                     [allowClear]="true"
@@ -231,17 +231,17 @@
                   </div> -->
           
                   <div class="col-md-4 mb-3">
-                  <label for="timeInput" class="col-form-label fw-bold fs-6 ">From Time</label>
+                  <label for="timeInput" class="col-createChart-label fw-bold fs-6 ">From Time</label>
 <input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"     formControlName="selectFromTime">
                   </div>
                   <div class="col-md-4 mb-3">
-                    <label for="timeInput" class="col-form-label fw-bold fs-6 ">To Time</label>
+                    <label for="timeInput" class="col-createChart-label fw-bold fs-6 ">To Time</label>
   <input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"     formControlName="selectToTime">
                     </div>
 
 
                     <div class="col-md-4 mb-3">
-                      <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Module Names</label>
+                      <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Module Names</label>
                       <ngx-select
                     
                         [allowClear]="true"
@@ -259,7 +259,7 @@
 
 
                     <div  class="col-md-4 mb-3">
-                      <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Redirect To</label>
+                      <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Redirect To</label>
                       <ngx-select
                      
                         [allowClear]="true"
@@ -279,7 +279,7 @@
 <!-- Select Type -->
 <div *ngIf="isSummaryDashboardSelected" class="col-md-4">
   <div class="d-flex flex-column">
-    <label for="dashboardIds" class="col-form-label fw-bold fs-6">Select Redirection Type</label>
+    <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Select Redirection Type</label>
     <ngx-select
       id="selectType"
       [allowClear]="true"
@@ -314,7 +314,7 @@
                       <!-- Custom Label -->
                       <div class="col-md-4">
                         <div class="d-flex flex-column">
-                          <label for="custom_Label" class="col-form-label fw-bold fs-6 required">Custom Label</label>
+                          <label for="custom_Label" class="col-createChart-label fw-bold fs-6 required">Custom Label</label>
                           <input
                             type="text"
                             class="form-control form-control-solid"
@@ -330,7 +330,7 @@
                     </div>
                     
                     <div class="col-md-4 mb-3" *ngIf = "shoRowData" >
-                      <label for="constant" class="col-form-label fw-bold fs-6 "></label>
+                      <label for="constant" class="col-createChart-label fw-bold fs-6 "></label>
                       <input id="constant" type="number" class="form-control form-control-solid"
                         placeholder="Select constant" formControlName="rowData"
                        />
@@ -387,7 +387,7 @@
                 <div class="row g-3">
                   <!-- Existing Themes Section -->
                   <div class="col-md-12 mb-3">
-                    <label class="col-form-label fw-bold fs-6 required">Themes:</label>
+                    <label class="col-createChart-label fw-bold fs-6 required">Themes:</label>
                     <div class="color-boxes">
                       <div
                         *ngFor="let theme of themes"
@@ -406,7 +406,7 @@
               
                   <!-- Font Size Input -->
                   <div class="col-md-4 mb-3">
-                    <label for="fontSize" class="col-form-label fw-bold fs-6 ">Font Size Label</label>
+                    <label for="fontSize" class="col-createChart-label fw-bold fs-6 ">Font Size Label</label>
                     <input
                       id="fontSize"
                       type="number"
@@ -422,7 +422,7 @@
               
                   <!-- Font Color Input -->
                   <div class="col-md-4 mb-3">
-                    <label for="fontColor" class="col-form-label fw-bold fs-6 ">Font Color Label</label>
+                    <label for="fontColor" class="col-createChart-label fw-bold fs-6 ">Font Color Label</label>
                     <div class="d-flex align-items-center">
                       <!-- Color Picker Input -->
                       <input
@@ -445,7 +445,7 @@
 
                   <div class="col-md-4">
                     <div class="d-flex flex-column">
-                      <label for="dashboardIds" class="col-form-label fw-bold fs-6">Font Type Label</label>
+                      <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Font Type Label</label>
                       <ngx-select
                         id="selectType"
                         [allowClear]="true"
@@ -463,7 +463,7 @@
 
 
                   <div class="col-md-4 mb-3">
-                    <label for="fontSizeValue" class="col-form-label fw-bold fs-6 ">Font Size Value</label>
+                    <label for="fontSizeValue" class="col-createChart-label fw-bold fs-6 ">Font Size Value</label>
                     <input
                       id="fontSizeValue"
                       type="number"
@@ -479,7 +479,7 @@
               
                   <!-- Font Color Input -->
                   <div class="col-md-4 mb-3">
-                    <label for="fontColorValue" class="col-form-label fw-bold fs-6 ">Font Color Value</label>
+                    <label for="fontColorValue" class="col-createChart-label fw-bold fs-6 ">Font Color Value</label>
                     <div class="d-flex align-items-center">
                       <!-- Color Picker Input -->
                       <input
@@ -502,7 +502,7 @@
 
                   <div class="col-md-4">
                     <div class="d-flex flex-column">
-                      <label for="dashboardIds" class="col-form-label fw-bold fs-6">Font Type Value</label>
+                      <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Font Type Value</label>
                       <ngx-select
                         id="selectType"
                         [allowClear]="true"
@@ -530,7 +530,7 @@
                   <div [formGroup]="createKPIWidget">
                   <div class="row">
                     <div class="col-md-6" [formGroup]="createKPIWidget">
-                      <label class="col-lg-12 col-form-label fw-bold fs-6 ">Equation Count
+                      <label class="col-lg-12 col-createChart-label fw-bold fs-6 ">Equation Count
                       </label>
                       <input type="number" class="
                                         form-control form-control-lg form-control-solid
@@ -554,7 +554,7 @@
               <div class="row g-3 align-items-center mb-4">
                 <!-- Forms Field -->
                 <div class="col-md-4 d-flex flex-column">
-                  <label for="formlist" class="col-form-label fw-bold fs-6 mb-2">
+                  <label for="formlist" class="col-createChart-label fw-bold fs-6 mb-2">
                     Forms
                     <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
                       <i class="bi bi-info-circle fs-5"></i>
@@ -588,7 +588,7 @@
               
                 <!-- Operation Field -->
                 <div class="col-md-4 d-flex flex-column">
-                  <label for="primaryValue" class="col-form-label fw-bold fs-6 mb-2">
+                  <label for="primaryValue" class="col-createChart-label fw-bold fs-6 mb-2">
                     Operation
                     <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Show Value As">
                       <i class="bi bi-info-circle fs-5"></i>
@@ -642,7 +642,7 @@
               <div class="row">
   
               <div class="col-md-4 mb-3">
-                <label for="formlist" class="col-form-label fw-bold fs-6 ">
+                <label for="formlist" class="col-createChart-label fw-bold fs-6 ">
                   Forms
                   <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
                     <i class="bi bi-info-circle fs-5"></i>
@@ -664,7 +664,7 @@
               </div>
   
               <div class="col-md-4 mb-3">
-                <label for="formlist" class="col-form-label fw-bold fs-6 ">
+                <label for="formlist" class="col-createChart-label fw-bold fs-6 ">
                   Mini Table Name
                   <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
                     <i class="bi bi-info-circle fs-5"></i>
@@ -698,7 +698,7 @@
           </div>
         </div>
         <div class="col-md-4 d-flex flex-column">
-          <label for="primaryValue" class="col-form-label fw-bold fs-6 mb-2">
+          <label for="primaryValue" class="col-createChart-label fw-bold fs-6 mb-2">
             Operation
             <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Show Value As">
               <i class="bi bi-info-circle fs-5"></i>

@@ -7,7 +7,7 @@
 
       <div class="row">
         <div class="col-md-6" >
-          <label class="col-lg-12 col-form-label fw-bold fs-6 ">Parameters
+          <label class="col-lg-12 col-createChart-label fw-bold fs-6 ">Parameters
           </label>
           <input type="number" class="
                             form-control form-control-lg form-control-solid
@@ -18,7 +18,7 @@
             </div>
         </div>
         <div class="col-md-6" [formGroup]="createChart">
-          <label class="col-lg-12 col-form-label fw-bold fs-6 required"> Title </label>
+          <label class="col-lg-12 col-createChart-label fw-bold fs-6 required"> Title </label>
     
           <input type="text" class="
                       form-control form-control-lg form-control-solid
@@ -34,7 +34,7 @@
   
           <div class="col-lg-12 form-check form-switch">
   
-            <label class="col-lg-12 col-form-label fw-bold fs-6  mt-7">Enable Redirect</label>
+            <label class="col-lg-12 col-createChart-label fw-bold fs-6  mt-7">Enable Redirect</label>
   
             <input class="form-check-input mt-10 mb-3 mb-lg-0" formControlName="redirectionEnabled"
               type="checkbox">
@@ -56,7 +56,7 @@
       <!-- <div class="row mb-3">
       <div class="col-md-4 mb-3">
         <div class="col-lg-12 form-check form-switch">
-        <label for="toggleCheck" class="col-lg-12 col-form-label fw-bold fs-6  mt-7">Enable Redirect</label>
+        <label for="toggleCheck" class="col-lg-12 col-createChart-label fw-bold fs-6  mt-7">Enable Redirect</label>
         <input class="form-check-input mt-10 mb-3 mb-lg-0" type="checkbox" formControlName="toggleCheck" id="toggleCheck" />
         <span>{{ createChart.get('toggleCheck')?.value ? 'Enabled' : 'Disabled' }}</span>
       </div>
@@ -67,7 +67,7 @@
 
 
         <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
-          <label for="dashboardIds" class="col-form-label fw-bold fs-6">Summary Dashboard Id</label>
+          <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Summary Dashboard Id</label>
           <ngx-select
             id="dashboardIds"
             [allowClear]="true"
@@ -82,7 +82,7 @@
       
      
         <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
-          <label for="selectType" class="col-form-label fw-bold fs-6">Select Type</label>
+          <label for="selectType" class="col-createChart-label fw-bold fs-6">Select Type</label>
           <ngx-select
             id="selectType"
             [allowClear]="true"
@@ -292,7 +292,7 @@
   </div>
 </div>
 <div class="col-md-4" *ngIf="isFieldVisible">
-  <label class="col-lg-12 col-form-label fw-bold fs-6"></label>
+  <label class="col-lg-12 col-createChart-label fw-bold fs-6"></label>
   <input type="number" class="
                     form-control form-control-lg form-control-solid
                     mb-3 mb-lg-0" name="add_Markers" formControlName="add_Markers"
@@ -327,7 +327,7 @@
   </textarea>
 </div>
 <div class="col-md-4 mb-3" *ngIf="showIdField">
-  <label for="id" class="col-form-label fw-bold fs-6 "></label>
+  <label for="id" class="col-createChart-label fw-bold fs-6 "></label>
   <input
     id="id"
     type="number"
@@ -342,7 +342,7 @@
   
   
                       <!-- <div class="col-md-4 mb-3">
-                        <label for="groupByFormat" class="col-form-label fw-bold fs-6 required">Group By Format</label>
+                        <label for="groupByFormat" class="col-createChart-label fw-bold fs-6 required">Group By Format</label>
                         <input id="groupByFormat" type="text" class="form-control form-control-solid"
                         placeholder="Select GroupByFormat" [formControlName]="'groupByFormat'"
                         (click)="openModalCalender(fieldIndex)" readonly>
@@ -352,7 +352,7 @@
 
   
                       <!-- <div class="col-md-4 mb-3">
-                        <label for="rangeCalendarTimeRight" class="col-form-label fw-bold fs-6">Pre Defined Date
+                        <label for="rangeCalendarTimeRight" class="col-createChart-label fw-bold fs-6">Pre Defined Date
                           Range</label>
                         <input id="rangeCalendarCenter" type="text" class="form-control" readonly
                           ngxDaterangepickerBootstrap [formControl]="datePickerControl" [drops]="dropsDown"

@@ -99,7 +99,7 @@
                 (dblclick)="
                 (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)) &&
                 (item.grid_type === 'tile' 
-                  ? (!isEditModeView ? helperEditModalOpen(item, i, KPIModal) : null) 
+                  ? (!isEditModeView ? helperEditModalOpen(item, i, KPIModal,false) : null) 
                   : item.grid_type === 'dynamicTile' 
                     ? (!isEditModeView && !hideButton ? helperEditModalOpen(item, i, DynamicTileModal) : null) 
                     : item.grid_type === 'tile2' 
@@ -1055,14 +1055,14 @@
           <div class="container" [formGroup]="createSummaryField">
             <div class="row mb-3">
               <div class="col-12">
-                <!-- <label class="col-form-label fw-bold fs-6 required">Add Dashboard</label> -->
+                <!-- <label class="col-createChart-label fw-bold fs-6 required">Add Dashboard</label> -->
               </div>
             </div>
             <div class="row">
               <!-- Summary ID Input -->
   <!-- Summary ID Input -->
   <div class="col-md-4">
-    <label class="col-form-label fw-bold fs-6 required d-flex align-items-center">
+    <label class="col-createChart-label fw-bold fs-6 required d-flex align-items-center">
       ID
       <span class="fs-4 text-primary"
             data-bs-toggle="tooltip"
@@ -1091,7 +1091,7 @@
 
   <!-- Summary Name Input -->
   <div class="col-md-4">
-    <label class="col-form-label fw-bold fs-6 required d-flex align-items-center">
+    <label class="col-createChart-label fw-bold fs-6 required d-flex align-items-center">
       Name 
       <span class="ms-2 text-primary" 
             data-bs-toggle="tooltip" 
@@ -1117,7 +1117,7 @@
   
   <!-- Summary Description Input -->
   <div class="col-md-4">
-    <label class="col-form-label fw-bold fs-6 required d-flex align-items-center">
+    <label class="col-createChart-label fw-bold fs-6 required d-flex align-items-center">
       Description 
       <span class="ms-2 text-primary" 
             data-bs-toggle="tooltip" 
@@ -1146,18 +1146,23 @@
   
             <div class="row mb-3">
               <div class="col-md-4">
-                <label class="col-form-label fw-bold fs-6 required" for="icon-select required">Select an Icon:</label>
-                <select id="icon-select" formControlName="iconSelect" class="form-control" (change)="previewIcon($event)">
-                  <option value="null">Select an option</option>
-                  <ng-container *ngFor="let icon of iconsList">
-                    <option [value]="icon.value">{{ icon.label }}</option>
-                  </ng-container>
-                </select>
+                <label class="col-createChart-label fw-bold fs-6 required" for="icon-select">Select an Icon:</label>
+                <ngx-select 
+                  id="icon-select"
+                  formControlName="iconSelect"
+                  [items]="iconsList"
+                  optionValueField="value"
+                  optionTextField="label"
+                  (selectionChanges)="previewIcon($event)"
+                  [allowClear]="true"
+                  placeholder="Select an Icon">
+                </ngx-select>
                 <span *ngIf="showValidationErrors && createSummaryField.get('iconSelect')?.hasError('required')"
-                style="color: #fc1900; font-size: 12px; font-weight: bold;">
-                Icon is required
-          </span>
+                      style="color: #fc1900; font-size: 12px; font-weight: bold;">
+                  Icon is required
+                </span>
               </div>
+              
   
               <div class="col-md-4 d-flex align-items-center">
                 <p class="fw-bold fs-6 mb-0 me-2">Selected Icon:</p>
@@ -1176,7 +1181,7 @@
                         <!-- Enable Dashboard Filter -->
                         <div class="col-lg-4 col-md-4 col-sm-6 mb-4 mt-4">
                           <div class="d-flex align-items-center">
-                            <label for="toggleCheck" class="col-form-label fw-bold fs-6  me-2">
+                            <label for="toggleCheck" class="col-createChart-label fw-bold fs-6  me-2">
                               Live Dashboard 
                             </label>
                             <div class="form-check form-switch">
@@ -1197,7 +1202,7 @@
 
                         <div class="col-lg-4 col-md-4 col-sm-6 mb-4 mt-4">
                           <div class="d-flex align-items-center">
-                            <label for="toggleCheck" class="col-form-label fw-bold fs-6  me-2">
+                            <label for="toggleCheck" class="col-createChart-label fw-bold fs-6  me-2">
                             Always Full Screen
                             </label>
                             <div class="form-check form-switch">
@@ -1227,7 +1232,7 @@
         <div class="container" [formGroup]="createSummaryField">
           <div class="row">
             <div class="col-md-6 centered-dropdown-container">
-              <label class="col-form-label fw-bold fs-6">Widget Types</label>
+              <label class="col-createChart-label fw-bold fs-6">Widget Types</label>
               <ngx-select
                 [allowClear]="true"
                 name="icon"
@@ -1885,7 +1890,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
           <div class="container">
             <div class="row mb-3">
               <div class="col-12">
-                <label class="col-form-label fw-bold fs-6">Autoflow Config</label>
+                <label class="col-createChart-label fw-bold fs-6">Autoflow Config</label>
               </div>
             </div>
             <div class="row">
@@ -2128,7 +2133,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
       <div class="card-body pt-0">
         <div class="row g-3"> <!-- g-3 adds consistent gap between columns -->
           <div class="col-md-4"> <!-- Column for the first dropdown -->
-            <label class="col-form-label fw-bold fs-6">Forms</label>
+            <label class="col-createChart-label fw-bold fs-6">Forms</label>
             <ngx-select
               [allowClear]="true"
               name="icon"
@@ -2142,7 +2147,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
             </ngx-select>
           </div>
           <div class="col-md-4">
-            <label for="parameterName" class="col-form-label fw-bold fs-6">Parameter</label>
+            <label for="parameterName" class="col-createChart-label fw-bold fs-6">Parameter</label>
             <ngx-select
               id="parameterName"
               [allowClear]="true"
@@ -2156,7 +2161,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
             </ngx-select>
           </div>
           <div class="col-md-4"> <!-- Column for the first dropdown -->
-            <label class="col-form-label fw-bold fs-6 required">Value</label>
+            <label class="col-createChart-label fw-bold fs-6 required">Value</label>
             <ngx-select
                 [allowClear]="true"
                 name="primary-icon"
@@ -2172,7 +2177,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
         </div>
   
         <div class="col-md-4" *ngIf="value1?.value === 'Constant'">
-          <label for="constant12" class="col-form-label fw-bold fs-6 required">Constant</label>
+          <label for="constant12" class="col-createChart-label fw-bold fs-6 required">Constant</label>
           <input
             id="constant6"
             type="number"
@@ -2183,7 +2188,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
           />
         </div>
         <div class="col-md-4" *ngIf="value1?.value && value1?.value !== 'Constant'">
-          <label for="percentageValue" class="col-form-label fw-bold fs-6 required">Percentage</label>
+          <label for="percentageValue" class="col-createChart-label fw-bold fs-6 required">Percentage</label>
           <div style="display: flex; align-items: center;">
               <input
                   id="percentageValue"
@@ -2199,7 +2204,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
       
     
           <!-- <div class="col-md-4"> 
-            <label class="col-form-label fw-bold fs-6 required">Group By</label>
+            <label class="col-createChart-label fw-bold fs-6 required">Group By</label>
             <ngx-select
               [allowClear]="true"
               name="icon"
@@ -2217,7 +2222,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   
   
               <div class="col-md-4"> <!-- Column for the first dropdown -->
-                <label class="col-form-label fw-bold fs-6 required">Target</label>
+                <label class="col-createChart-label fw-bold fs-6 required">Target</label>
                 <ngx-select
                     [allowClear]="true"
                     name="primary-icon"
@@ -2234,7 +2239,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   
   
             <div class="col-md-4" *ngIf="Target1?.value === 'Constant'">
-              <label for="constant12" class="col-form-label fw-bold fs-6 required">Constant</label>
+              <label for="constant12" class="col-createChart-label fw-bold fs-6 required">Constant</label>
               <input
                 id="constant6"
                 type="number"
@@ -2245,7 +2250,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
               />
             </div>
             <div class="col-md-4" *ngIf="Target1?.value && Target1?.value !== 'Constant'">
-              <label for="percentageValue" class="col-form-label fw-bold fs-6 required">Percentage</label>
+              <label for="percentageValue" class="col-createChart-label fw-bold fs-6 required">Percentage</label>
               <div style="display: flex; align-items: center;">
                   <input
                       id="percentageValueTarget"
@@ -2260,7 +2265,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
           </div>
   
             <div class="col-md-4"> <!-- Column for the first dropdown -->
-              <label class="col-form-label fw-bold fs-6 required">Max Range</label>
+              <label class="col-createChart-label fw-bold fs-6 required">Max Range</label>
               <ngx-select
                   [allowClear]="true"
                   name="primary-icon"
@@ -2274,7 +2279,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
               </ngx-select>
           </div>
           <div class="col-md-4" *ngIf="MaxRange1?.value === 'Constant'">
-            <label for="constant12" class="col-form-label fw-bold fs-6 required">Constant</label>
+            <label for="constant12" class="col-createChart-label fw-bold fs-6 required">Constant</label>
             <input
               id="constant6"
               type="number"
@@ -2285,7 +2290,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
             />
           </div>
           <div class="col-md-4" *ngIf="MaxRange1?.value && MaxRange1?.value !== 'Constant'">
-            <label for="percentageValue" class="col-form-label fw-bold fs-6 required">Percentage</label>
+            <label for="percentageValue" class="col-createChart-label fw-bold fs-6 required">Percentage</label>
             <div style="display: flex; align-items: center;">
                 <input
                     id="percentageValueMaxRange"
@@ -2301,7 +2306,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
       
       
                 <div class="col-md-4">
-                  <label for="groupByFormat" class="col-form-label fw-bold fs-6 required">GroupByFormat</label>
+                  <label for="groupByFormat" class="col-createChart-label fw-bold fs-6 required">GroupByFormat</label>
                   <input
                     id="groupByFormat"
                     type="text"
@@ -2315,7 +2320,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
                 </div>
   
                 <div class="col-md-4" *ngIf="showIdField">
-                  <label for="id" class="col-form-label fw-bold fs-6 required">ID</label>
+                  <label for="id" class="col-createChart-label fw-bold fs-6 required">ID</label>
                   <input
                     id="id"
                     type="number"

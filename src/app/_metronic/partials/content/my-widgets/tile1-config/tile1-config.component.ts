@@ -568,7 +568,7 @@ export class Tile1ConfigComponent implements OnInit {
   
         themeColor: this.createKPIWidget.value.themeColor,
         fontSize: `${this.createKPIWidget.value.fontSize}px`,
-        fontColor: this.createKPIWidget.value.fontColor,
+        fontColor: this.createKPIWidget.value.fontColor || '#040101',
  
         custom_Label:this.createKPIWidget.value.custom_Label,
         // EquationFormList:this.createKPIWidget.value.EquationFormList,
@@ -592,8 +592,8 @@ export class Tile1ConfigComponent implements OnInit {
         EquationOperationMini:this.createKPIWidget.value.EquationOperationMini,
         fontSizeValue:`${this.createKPIWidget.value.fontSizeValue}px`,
         fontColorValue:this.createKPIWidget.value.fontColorValue,
-        FontTypeValue:this.createKPIWidget.value.FontTypeValue,
-        FontTypeLabel:this.createKPIWidget.value.FontTypeLabel,
+        FontTypeValue:this.createKPIWidget.value.FontTypeValue ||'',
+        FontTypeLabel:this.createKPIWidget.value.FontTypeLabel ||'',
    
 
 
@@ -699,7 +699,7 @@ export class Tile1ConfigComponent implements OnInit {
         endDate: this.createKPIWidget.value.endDate ||'',
         themeColor: this.createKPIWidget.value.themeColor,
         fontSize: `${this.createKPIWidget.value.fontSize}px`,
-        fontColor: this.createKPIWidget.value.fontColor ||'',
+        fontColor: this.createKPIWidget.value.fontColor ||'#040101',
         selectFromTime: this.createKPIWidget.value.selectFromTime,
         selectToTime: this.createKPIWidget.value.selectToTime,
         dashboardIds: this.createKPIWidget.value.dashboardIds ||'',
@@ -724,8 +724,8 @@ export class Tile1ConfigComponent implements OnInit {
         ModuleNames:this.createKPIWidget.value.ModuleNames||'',
         columnVisibility:this.createKPIWidget.value.columnVisibility,
         fontSizeValue:`${this.createKPIWidget.value.fontSizeValue}px`,
-        fontColorValue:this.createKPIWidget.value.fontColorValue,
-        FontTypeValue:this.createKPIWidget.value.FontTypeValue,
+        fontColorValue:this.createKPIWidget.value.fontColorValue || '#040101',
+        FontTypeValue:this.createKPIWidget.value.FontTypeValue ||'',
         FontTypeLabel:this.createKPIWidget.value.FontTypeLabel ||''
 
 

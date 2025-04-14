@@ -480,11 +480,11 @@ export class Chart1ConfigComponent implements OnInit {
       });
       event.target.value = 1;  // Reset to 1 if invalid value (0 or negative) is entered
     } else if (value > 1) {
-      this.toast.open("Only one form array can be generated", "Check again", {
-        duration: 5000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top',
-      });
+      // this.toast.open("Only one form array can be generated", "Check again", {
+      //   duration: 5000,
+      //   horizontalPosition: 'right',
+      //   verticalPosition: 'top',
+      // });
       event.target.value = 1;  // Reset to 1 if a value greater than 1 is entered
     }
   
@@ -695,11 +695,11 @@ export class Chart1ConfigComponent implements OnInit {
       );
     } else if (this.createChart.value.all_fields.length > 0) {
       // Ensure we don't add more fields if one already exists
-      this.toast.open("Only one form array can be generated", "Check again", {
-        duration: 5000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top',
-      });
+      // this.toast.open("Only one form array can be generated", "Check again", {
+      //   duration: 5000,
+      //   horizontalPosition: 'right',
+      //   verticalPosition: 'top',
+      // });
     }
   
     // Update noOfParams for use in addTile

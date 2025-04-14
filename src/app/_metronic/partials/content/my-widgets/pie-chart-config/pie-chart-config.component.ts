@@ -2031,11 +2031,11 @@ onCombinedAddFieldsChange(event: any): void {
     });
     event.target.value = 1;  // Reset to 1 if invalid value (0 or negative) is entered
   } else if (value > 1) {
-    this.toast.open("Only one form array can be generated", "Check again", {
-      duration: 5000,
-      horizontalPosition: 'right',
-      verticalPosition: 'top',
-    });
+    // this.toast.open("Only one form array can be generated", "Check again", {
+    //   duration: 5000,
+    //   horizontalPosition: 'right',
+    //   verticalPosition: 'top',
+    // });
     event.target.value = 1;  // Reset to 1 if a value greater than 1 is entered
   }
 

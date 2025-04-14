@@ -1407,6 +1407,7 @@ Highcharts.chart('MixedChart', barchartOptions);
   @ViewChild('dataTableModalDynamicTile', { static: false }) dataTableModalDynamicTile: TemplateRef<any>;
   @ViewChild('TitleModal', { static: false }) TitleModal: TemplateRef<any>;
   handleClick(item: any, i: number, $event: any) {
+
     console.log('item is checking from handleclick',item)
     console.log('index is checking from i',i)
     if (item.grid_type === 'filterTile') {
@@ -2377,7 +2378,7 @@ exitFullScreen(): void {
         enabled: !this.isEditModeView, // Draggable only in edit mode
         stop: () => {
           console.log('Grid moved');
-          this.isGirdMoved = true; // Set flag to indicate grid was moved
+          // this.isGirdMoved = true; // Set flag to indicate grid was moved
         },
       },
       resizable: {
@@ -2389,6 +2390,7 @@ exitFullScreen(): void {
       },
       itemInitCallback: this.onItemInit.bind(this),
       itemResizeCallback: this.itemResize.bind(this),
+      // itemChangeCallback: this.onPositionChange.bind(this),
       // itemResizeCallbackMap: this.itemResizeMap.bind(this),
       itemChangeCallback: () => {
         console.log('Grid item changed');
@@ -2460,6 +2462,13 @@ exitFullScreen(): void {
   //   this.gridChanged = true; // Set to true if the layout has changed (dragged/resized)
   // }
 
+  onPositionChange(item: GridsterItem) {
+    if (item) {
+      this.isGirdMoved = true
+    }
+  }
+
+
   onGridChange(): void {
     console.log('Grid change detected');
     this.isGirdMoved = true; // Set the grid state to moved
@@ -2514,6 +2523,13 @@ exitFullScreen(): void {
   }
 
   public itemResize(item: GridsterItem, itemComponent: GridsterItemComponentInterface): void {
+    // alert('grid is moved')
+    console.log('item resized')
+    if(item){
+      console.log('item is there or not',item)
+      // this.isGirdMoved = true;
+    }
+
     if (!this.chartHeight || !this.chartWidth) {
       // Initialize height and width arrays for all dashboard items
       this.chartHeight = new Array(this.dashboard.length).fill('');
@@ -2529,6 +2545,7 @@ exitFullScreen(): void {
     const index = this.dashboard.indexOf(item as GridsterItem);
   
     if (index !== -1) {
+            // this.isGirdMoved = true;
       const itemComponentWidth = itemComponent.width;
       const itemComponentHeight = itemComponent.height;
   
@@ -2582,8 +2599,6 @@ exitFullScreen(): void {
         );
       }
 
-      
-      
       else if (item.grid_type === 'chart') {
         const baseHeight = 400; // Base height for the chart
         // const extraHeight = 40; // Additional height for labels, etc.
@@ -2609,11 +2624,6 @@ exitFullScreen(): void {
         );
       }
 
-
-
-
-
-      
       else if (item.grid_type === 'Funnelchart') {
         const baseHeight = 400; // Base height for the chart
         // const extraHeight = 40; // Additional height for labels, etc.
@@ -2738,7 +2748,6 @@ exitFullScreen(): void {
         );
       }
 
-
       else if (item.grid_type === 'progressTile') {
         // const topMargin = 20; // Define the top margin value
       
@@ -2798,6 +2807,14 @@ exitFullScreen(): void {
     } else {
       console.warn('Item not found in dashboard array');
     }
+
+
+    // const config = item.grid_type;
+    // if (config) {
+    //   (this as any)[config.height][index] = itemComponent.height - config.heightOffset;
+    //   (this as any)[config.width][index] = itemComponent.width - config.widthOffset;
+    //   this.isGirdMoved = true;
+    // }
   }
   private redrawChart(index: number): void {
     const chartId = `lineChart${index + 1}`; // Assuming your chart container ID follows this pattern
@@ -2951,6 +2968,7 @@ exitFullScreen(): void {
 
     this.loadPinnedItems();
     this.setCheck();
+    this.updateOptions();
 
   }
 
@@ -3410,7 +3428,7 @@ this.fetchSummaryMain(id)
     this.assignGridMode = this.isEditModeView 
     console.log('this.assignGridMode',this.assignGridMode)
     // Update options based on the retrieved mode
-    this.updateOptions();
+ 
 
     // Trigger change detection to reflect changes in the UI
     this.cdr.detectChanges();
@@ -3498,6 +3516,7 @@ this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
        this.storeSummaryMainData = parsedMetadata
         console.log('parsedMetadata check', this.storeSummaryMainData);
         const readFullScreenCheck = this.storeSummaryMainData.fullScreenModeCheck
+
         // const readFormControl =this.createSummaryField.get('fullScreenModeCheck')?.value
         // console.log('readFormControl checking',readFormControl)
         if(readFullScreenCheck==true){
@@ -4151,6 +4170,7 @@ setTimeout(() => {
   
     const checkP11 = receivePacket?.P11 ?? false;
     console.log('checkP11 checking', checkP11);
+          this.isGirdMoved = false;
   
     // Always include isFullScreen in queryParams
     let queryParams: any = {
@@ -4852,7 +4872,8 @@ justReadStyles(data:any,index:any){
     
     }
 
-    helperEditModalOpen(argument1:any,argument2:any,modalReference: TemplateRef<any>){
+    helperEditModalOpen(argument1:any,argument2:any,modalReference: TemplateRef<any>,gridCheck?:any){
+      // this.isGirdMoved = gridCheck;
       console.log('i am entered to tile 1 edit modal')
       if(argument1.grid_type=='tile'){
         this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
@@ -5572,21 +5593,25 @@ console.log('selectedTab checking',this.selectedTab)
   }
 
   previewIcon(event: any) {
+    console.log('event checking from preview', event);
+  
+    // Access the selected option from the event
+    const selectedValue = event[0]?.value; // The selected value (e.g., 'youtube')
+  
     // Find the icon based on the selected value
-    const selectedIcon = this.iconsList.find((packet: any) => {
-      return packet.value === this.createSummaryField.get('iconSelect')?.value;
-    });
-
+    const selectedIcon = this.iconsList.find((packet: any) => packet.value === selectedValue);
+  
     // Perform a deep copy if selectedIcon is found
     if (selectedIcon) {
       this.previewObjDisplay = JSON.parse(JSON.stringify(selectedIcon)); // Deep copy
-      console.log(" this.previewObjDisplay ", this.previewObjDisplay);
+      console.log("this.previewObjDisplay", this.previewObjDisplay);
     } else {
       console.warn("No matching icon found.");
     }
-    this.cdr.detectChanges()
+  
+    this.cdr.detectChanges();
   }
-
+  
   private handleEditModalHtml(getValues: any, content: any): void {
     console.log('getValues checking for ', getValues);
     if (getValues) {
@@ -6744,7 +6769,7 @@ console.log('selectedTab checking',this.selectedTab)
       },
       columns: [
         {
-          title: '<span style="color: black;">Dashboard ID</span>',
+          title: '<span style="color: black;">ID</span>',
           data: 'P1',
           render: (data, type, full) => {
             const colorClasses = ['success', 'info', 'warning', 'danger'];
@@ -7074,8 +7099,9 @@ console.log('Serialized Query Params:', serializedQueryParams);
           add_multiTable:'Table Widget Added',
           update_multiTable:'Table Widget Updated',
           query_applied:'Query Applied',
-          addPin:'Pin Updated'
-        }[actionKey] || 'Dashboard changes saved';
+          addPin:'Pin Updated',
+          Save:'Dashboard changes saved'
+        }[actionKey] || 'Summary Updated';
   
         console.log('Action key condition check:', actionKey);
   
@@ -7478,46 +7504,54 @@ this.createSummaryField.patchValue({
   
         // Find the index of the item with the matching id
         let findIndex = data.findIndex((obj) => obj[Object.keys(obj)[0]].P1 === id);
+        console.log('findIndex checking',findIndex)
   
         if (findIndex !== -1) { // If item found
           if (type === 'update') {
-            // Preserve the original createdDate and createdUser in the data
-            const existingItem = data[findIndex][`L${findIndex + 1}`];
-            item.P5 = existingItem.P5 || item.P5; // Preserve createdDate
-            item.P6 = existingItem.P6 || item.P6; // Preserve createdUser
-  
             data[findIndex][`L${findIndex + 1}`] = item;
   
             // Create a new array to store the re-arranged data without duplicates
             const newData = [];
-  
+          
+            // Loop through each object in the data array
             for (let i = 0; i < data.length; i++) {
-              const originalKey = Object.keys(data[i])[0];
-              const newKey = `L${i + 1}`;
-  
+              const originalKey = Object.keys(data[i])[0]; // Get the original key (e.g., L1, L2, ...)
+              const newKey = `L${i + 1}`; // Generate the new key based on the current index
+          
+              // Check if the original key exists before renaming
               if (originalKey) {
+                // Create a new object with the new key and the data from the original object
                 const newObj = { [newKey]: data[i][originalKey] };
+          
+                // Check if the new key already exists in the newData array
                 const existingIndex = newData.findIndex(obj => Object.keys(obj)[0] === newKey);
-  
+          
                 if (existingIndex !== -1) {
+                  // Merge the properties of the existing object with the new object
                   Object.assign(newData[existingIndex][newKey], data[i][originalKey]);
                 } else {
+                  // Add the new object to the newData array
                   newData.push(newObj);
                 }
               } else {
                 console.error(`Original key not found for renaming in data[${i}].`);
+                // Handle the error or log a message accordingly
               }
             }
-  
+          
+            // Replace the original data array with the newData array
             data = newData;
             this.lookup_data_summary = data;
             this.refreshFunction();
             this.cd.detectChanges();
+                  
           } else if (type === 'delete') {
+            // Remove the item at the found index
+            
             data.splice(findIndex, 1);
             this.lookup_data_summary = data;
-            window.location.reload()
-            this.cdr.detectChanges();
+            this.refreshFunction();
+            this.cd.detectChanges();
           }
   
           let updateData = {

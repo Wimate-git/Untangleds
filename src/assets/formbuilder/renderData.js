@@ -1,4 +1,12 @@
 
+
+let ClientId =""
+let all_response_data=[];
+let clientid_ = ""
+var loginDetail ;
+var permissionId;
+var input_structure = []
+
 async function getDynamicFormDetails(formName,clientid_){
   const requestBody = {
     "table_name": "master",
@@ -34,6 +42,7 @@ async function getDynamicFormDetails(formName,clientid_){
 
       const FormData_FromDB = responseData;
       formDynamicFields = FormData_FromDB.metadata.formFields;
+      input_structure = formDynamicFields;
 
       if (formDynamicFields.length > 0) {
         let extract_table_configuration = checkTableConfiguration(formDynamicFields)
@@ -108,314 +117,650 @@ function getColumnClass(columnWidth) {
  }
  
  
- 
-async function generateFormView(dynamic_input, data_form_db = {}) {
+ let all_data_db = [];
+ async function generateFormView(dynamic_input, data_form_db = {}) {
 
-var tabContent
-var contentElement
-var formContainer
-
-let all_data_db = data_form_db;
-
-Edit_first_load_flag = true
-
-// if (isProjectUrl) {
-// tabContent = document.querySelector(`#kt_ecommerce_customer_${form_name_pro.replace(/\s+/g, '_').toLowerCase()}`);
-// contentElement = tabContent.querySelector(".fw-bold");
-// contentElement.innerHTML = '';
-// }
-
-//if (formFlag == true) {
-formContainer = document.getElementById('dynamic-form');
-
-formContainer.innerHTML = '';
-// }
-
-// console.log('dynamic_input :', dynamic_input);
-console.log('data_form_db_view :', data_form_db);
-
-let row = document.createElement('div');
-row.classList.add('row', 'g-9', 'mb-7');
-let currentWidth = 0;
-
-dynamic_input.forEach((input, index) => {
-    // const colClass = getColumnClass(input.columnWidth);
-
-    var colClass
-    if (input.type !== 'table') {
-        colClass = getColumnClass(input.columnWidth);
-    }
-
-    let valueFromDB = data_form_db[input.name] || '';
-    const hide_input = input.validation && input.validation.hide ? 'd-none' : '';
-
-    // Calculate the cumulative column width
-    currentWidth += input.columnWidth;
-
-    // If the current width exceeds 12, start a new row
-    if (currentWidth > 12) {
-        formContainer.appendChild(row);
-        row = document.createElement('div');
-        row.classList.add('row', 'g-9', 'mb-7');
-        currentWidth = input.columnWidth; // Reset current width to the current column width
-    }
-
-    let inputField = '';
-    let inputValidation = input.validation || {};
-    let isDisabled = inputValidation.disabled === false ? 'disabled' : '';
-    // let hideClass = inputValidation.hide ? 'd-none' : ''; // Use Bootstrap's d-none class to hide elements
-    const canvasStyle = isDisabled ? 'pointer-events: none; opacity: 0.6;' : ''; // Disable canvas interaction if disabled
-
-    const column = document.createElement('div');
-    column.className = `${colClass} ${hide_input}`;
-    column.id = `column-${input.name}`; // Assign an ID to the column for show/hide
-
-    if (input.type === 'nikhil') {
-
-    } else if (input.type === 'checkbox') {
-        const optionElements = input.options.map(option => {
-            const optionKey = Object.keys(option)[0];
-            const optionValue = option[optionKey];
-            const isChecked = data_form_db[optionKey] ? 'checked' : '';
-
-            return `
-              <div class="form-check mt-3">
-              <input class="form-check-input checkbox_${input.name}" type="checkbox" id="${optionKey}" name="${optionKey}" value="${optionValue}" ${isChecked} ${isDisabled}>
-              <label class="form-check-label text-gray-800 font-normal" for="${optionKey}">${optionValue}</label>
-              </div>
-              <div class="error-message" id="${input.name}-error"></div>
-              `;
-        }).join('');
-
-        inputField = `${optionElements}`;
-    } else if (input.type === 'radio') {
-        const optionElements = input.options.map(option => {
-            const optionKey = Object.keys(option)[0];
-            const optionValue = option[optionKey];
-            const isChecked = data_form_db[input.name] === optionValue ? 'checked' : '';
-
-            return `
-              <div class="form-check mt-3">
-              <input class="form-check-input radio_${input.name}" type="radio" id="${optionKey}" name="${input.name}" value="${optionValue}" ${isChecked} ${isDisabled}>
-              <label class="form-check-label text-gray-800 font-normal" for="${optionKey}">${optionValue}</label>
-              </div>
-              <div class="error-message" id="${input.name}-error"></div>
-              `;
-        }).join('');
-
-        inputField = `${optionElements}`;
-    } else if (input.name.split("-")[0] == 'signature') {
-        inputField = `
-          <div class="container signature-container ${input.name}">
-          <canvas id="${input.name}-signature-pad" class="signature-pad" width="${input.columnWidth - 1}50" height="200" style="border: 2px solid #d3d3d3; border-radius: 5px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); ${canvasStyle}"></canvas>
-          <input type="hidden" name="${input.name}" id="${input.name}" ${isDisabled}>
-          <button type="button" id="${input.name}-clear-signature" class="btn btn-secondary mt-2" ${isDisabled}>Clear</button>
-          </div>
-          <div class="error-message" id="${input.name}-error"></div>
+  var tabContent
+  var contentElement
+  var formContainer
+  
+  all_data_db = data_form_db.metadata;
+  
+  Edit_first_load_flag = true
+  
+  // if (isProjectUrl) {
+  // tabContent = document.querySelector(`#kt_ecommerce_customer_${form_name_pro.replace(/\s+/g, '_').toLowerCase()}`);
+  // contentElement = tabContent.querySelector(".fw-bold");
+  // contentElement.innerHTML = '';
+  // }
+  
+  //if (formFlag == true) {
+  formContainer = document.getElementById('dynamic-form');
+  formContainer.innerHTML = '';
+  // }
+  
+  // console.log('dynamic_input :', dynamic_input);
+  console.log('data_form_db_view :', data_form_db);
+  
+  let row = document.createElement('div');
+  row.classList.add('row', 'g-9', 'mb-7');
+  let currentWidth = 0;
+  
+  dynamic_input.forEach((input, index) => {
+      // const colClass = getColumnClass(input.columnWidth);
+      console.log('input checking from form View',input)
+  
+      var colClass
+      if (input.type !== 'table') {
+          colClass = getColumnClass(input.columnWidth);
+      }
+  
+      let valueFromDB = all_data_db[input.name] || '';
+      const hide_input = input.validation && input.validation.hide ? 'd-none' : '';
+  
+      // Calculate the cumulative column width
+      currentWidth += input.columnWidth;
+  
+      // If the current width exceeds 12, start a new row
+      if (currentWidth > 12) {
+          formContainer.appendChild(row);
+          row = document.createElement('div');
+          row.classList.add('row', 'g-9', 'mb-7');
+          currentWidth = input.columnWidth; // Reset current width to the current column width
+      }
+  
+      let inputField = '';
+      let inputValidation = input.validation || {};
+      let isDisabled = inputValidation.disabled === false ? 'disabled' : '';
+      console.log('isDisabled checking from formView',isDisabled)
+      // let hideClass = inputValidation.hide ? 'd-none' : ''; // Use Bootstrap's d-none class to hide elements
+      const canvasStyle = isDisabled ? 'pointer-events: none; opacity: 0.6;' : ''; // Disable canvas interaction if disabled
+  
+      const column = document.createElement('div');
+      column.className = `${colClass} ${hide_input}`;
+      column.id = `column-${input.name}`; // Assign an ID to the column for show/hide
+  
+      if (input.type === 'tokyo') {
+  
+          // optionConfiguration = false
+          // let options = input.options;
+          // options.sort()
+          // console.log('options_static :', options)
+          // if (inputValidation.user) {
+          //     // if (array_user_info) {
+          //     // optionConfiguration = true
+          //     // options = array_user_info.map(user => user[0]); // Assuming user name is at index 0
+          //     // console.log('options :', options)
+          //     // options.sort()
+          //     // options = options.map((city, index) => ({
+          //     // key: `key_${index + 1}`,
+          //     // value: [city]
+          //     // }));
+          //     // }
+          // }
+          // if (inputValidation.lookup) {
+          //     options = check_table_configuration(input)
+          //     console.log('options_check_table_configuration :', options)
+          //     optionConfiguration = true
+  
+          //     // options.sort((a, b) => {
+          //     // const nameA = Object.values(a)[0].toLowerCase(); // Extracting company name
+          //     // const nameB = Object.values(b)[0].toLowerCase(); // Extracting company name
+          //     // return nameA.localeCompare(nameB); // Compare names alphabetically
+          //     // });
+  
+          //     options.sort((a, b) => {
+          //         // Get the first value of the objects, which may be undefined or not a string
+          //         const valueA = Object.values(a)[0];
+          //         const valueB = Object.values(b)[0];
+  
+          //         // Ensure the values are strings and fall back to an empty string if undefined or not a string
+          //         const nameA = valueA && typeof valueA === 'string' ? valueA.toLowerCase() : '';
+          //         const nameB = valueB && typeof valueB === 'string' ? valueB.toLowerCase() : '';
+  
+          //         return nameA.localeCompare(nameB); // Compare names alphabetically
+          //     });
+  
+          //     options = options.map(obj => {
+          //         let key = Object.keys(obj)[0]
+          //         let value = obj[key]
+          //         return {
+          //             key,
+          //             value
+          //         };
+  
+          //     });
+          // }
+  
+          // const isMultiSelect = input.name.startsWith('multi-select');
+  
+          // new_options = []
+          // operation_type_option = ''
+  
+          // if (inputValidation.isUniqueOption) {
+          //     if (options.some(item => typeof item === 'object' && item !== null)) {
+  
+          //         const seenValues = new Set();
+  
+          //         options = options.map(option => {
+          //             const filteredValues = option.value.filter(value => {
+          //                 if (!seenValues.has(value)) {
+          //                     seenValues.add(value);
+          //                     return true;
+          //                 }
+          //                 return false;
+          //             });
+          //             return {
+          //                 ...option,
+          //                 value: filteredValues
+          //             };
+          //         }).filter(option => option.value.length > 0);
+  
+                  
+          //     }
+  
+          // }
+  
+  
+  
+          // if (isMultiSelect == false) {
+          //     // check_option_validation_disable_hide(input.name)
+          // }
+          // options.sort()
+          // console.log("options_configuration :", options);
+          // if (new_options.length > 0) {
+  
+          //     if (optionConfiguration) {
+  
+          //         inputField = `
+          //             <select id="${input.name}" name="${input.name}"
+          //             class="form-select form-select-solid dynamic-select"
+          //             data-control="select2" data-placeholder="Select an option..." data-allow-clear="true"
+          //             ${isMultiSelect ? 'multiple' : ''} ${isDisabled}>
+          //             ${!isMultiSelect ? '<option value="" selected disabled>Select an option</option>' : ''}
+  
+          //             ${options.map(option => {
+          //             // Check if the option should be disabled or hidden
+          //             let isOptionDisabled = options.includes(option.value) && !new_options.includes(option.value);
+          //             let optionTag = `<option value="${option.value}" data-secondary="${option.key}" ${option.value === valueFromDB ? 'selected' : ''}>${option.value}</option>`;
+  
+          //             if (operation_type_option === 'disable' && isOptionDisabled) {
+          //             // Disable the option if "disable" condition is met
+          //             return `<option value="${option.value}" data-secondary="${option.key}" ${option.value === valueFromDB ? 'selected' : ''} disabled>${option.value}</option>`;
+          //             }
+          //             else if (operation_type_option === 'hide' && isOptionDisabled) {
+          //             // Hide the option if "hide" condition is met
+          //             return ''; // Return empty string to effectively remove the option
+          //             }
+          //             return optionTag;
+          //             }).join('')}
+  
+          //             </select>
+          //             <div class="error-message" id="${input.name}-error"></div>
+          //             `;
+          //                         } else {
+          //                             inputField = `
+          //             <select id="${input.name}" name="${input.name}"
+          //             class="form-select form-select-solid dynamic-select"
+          //             data-control="select2" data-placeholder="Select an option..." data-allow-clear="true"
+          //             ${isMultiSelect ? 'multiple' : ''} ${isDisabled}>
+          //             ${!isMultiSelect ? '<option value="" selected disabled>Select an option</option>' : ''}
+  
+          //             ${options.map(option => {
+          //             // Check if the option should be disabled or hidden
+          //             let isOptionDisabled = options.includes(option) && !new_options.includes(option);
+          //             let optionTag = `<option value="${option}" ${option === valueFromDB ? 'selected' : ''}>${option}</option>`;
+  
+          //             if (operation_type_option === 'disable' && isOptionDisabled) {
+          //             // Disable the option if "disable" condition is met
+          //             return `<option value="${option}" ${option === valueFromDB ? 'selected' : ''} disabled>${option}</option>`;
+          //             }
+          //             else if (operation_type_option === 'hide' && isOptionDisabled) {
+          //             // Hide the option if "hide" condition is met
+          //             return ''; // Return empty string to effectively remove the option
+          //             }
+  
+          //             return optionTag;
+          //             }).join('')}
+  
+          //             </select>
+          //             <div class="error-message" id="${input.name}-error"></div>
+          //             `;
+          //     }
+          // } else {
+  
+          //     // if (optionConfiguration) {
+  
+          //     // inputField = `
+          //     // <select id="${input.name}" name="${input.name}"
+          //     // class="form-select form-select-solid dynamic-select"
+          //     // data-control="select2" data-placeholder="Select an option..." data-allow-clear="true"
+          //     // ${isMultiSelect ? 'multiple' : ''} ${isDisabled}>
+  
+          //     // ${!isMultiSelect ? '<option value="" selected disabled>Select an option</option>' : ''}
+  
+          //     // ${options.map(option => `<option value="${option.value}" data-secondary="${option.key}" ${option.value === valueFromDB ? 'selected' : ''}>${option.value}</option>`).join('')}
+  
+          //     // </select>
+          //     // <div class="error-message" id="${input.name}-error"></div>
+          //     // `;
+          //     // }
+          //     if (optionConfiguration) {
+          //         console.log('data-secondary_options_2nd :', options);
+          //         inputField = `
+          //           <select id="${input.name}" name="${input.name}" class="form-select form-select-solid dynamic-select"
+          //           data-control="select2" data-placeholder="Select an option..." data-allow-clear="true"
+          //           ${isMultiSelect ? 'multiple' : ''} ${isDisabled}>
+          //           ${!isMultiSelect ? '<option value="" selected disabled>Select an option</option>' : ''}
+  
+          //           ${options.map(optionObject => {
+          //           // Get the key dynamically
+          //           const key = Object.keys(optionObject).find(k => k !== "value");
+          //           const keyValue = optionObject[key];
+  
+          //           // Extract values (flatten the array if nested)
+          //           const values = optionObject.value.flat();
+  
+          //           console.log('key:', keyValue); // Debugging: log the dynamic key
+          //           console.log('values:', values); // Debugging: log the flattened values
+  
+          //           // Generate <option> tags
+          //           return values.map(value => `<option value="${value}" data-secondary="${keyValue}" ${value === valueFromDB ? 'selected' : ''}>${value}</option>`).join('');
+          //           }).join('')}
+          //           </select>
+          //           <div class="error-message" id="${input.name}-error"></div>
+          //           `;
+          //                       } else {
+          //                           inputField = `
+          //           <select id="${input.name}" name="${input.name}"
+          //           class="form-select form-select-solid dynamic-select"
+          //           data-control="select2" data-placeholder="Select an option..." data-allow-clear="true"
+          //           ${isMultiSelect ? 'multiple' : ''} ${isDisabled}>
+  
+          //           ${!isMultiSelect ? '<option value="" selected disabled>Select an option</option>' : ''}
+  
+          //           ${options.map(option => `<option value="${option}" ${option === valueFromDB ? 'selected' : ''}>${option}</option>`).join('')}
+  
+          //           </select>
+          //           <div class="error-message" id="${input.name}-error"></div>
+          //           `;
+          //     }
+          // }
+      } else if (input.type === 'checkbox') {
+          const optionElements = input.options.map(option => {
+              const optionKey = Object.keys(option)[0];
+              const optionValue = option[optionKey];
+              const isChecked = data_form_db[optionKey] ? 'checked' : '';
+  
+              return `
+                <div class="form-check mt-3">
+                <input class="form-check-input checkbox_${input.name}" type="checkbox" id="${optionKey}" name="${optionKey}" value="${optionValue}" ${isChecked} ${isDisabled}>
+                <label class="form-check-label text-gray-800 font-normal" for="${optionKey}">${optionValue}</label>
+                </div>
+                <div class="error-message" id="${input.name}-error"></div>
+                `;
+          }).join('');
+  
+          inputField = `${optionElements}`;
+      } else if (input.type === 'radio') {
+          const optionElements = input.options.map(option => {
+              const optionKey = Object.keys(option)[0];
+              const optionValue = option[optionKey];
+              const isChecked = data_form_db[input.name] === optionValue ? 'checked' : '';
+  
+              return `
+                <div class="form-check mt-3">
+                <input class="form-check-input radio_${input.name}" type="radio" id="${optionKey}" name="${input.name}" value="${optionValue}" ${isChecked} ${isDisabled}>
+                <label class="form-check-label text-gray-800 font-normal" for="${optionKey}">${optionValue}</label>
+                </div>
+                <div class="error-message" id="${input.name}-error"></div>
+                `;
+          }).join('');
+  
+          inputField = `${optionElements}`;
+      } else if (input.name.split("-")[0] == 'signature') {
+          inputField = `
+            <div class="container signature-container ${input.name}">
+            <canvas id="${input.name}-signature-pad" class="signature-pad" width="${input.columnWidth - 1}50" height="200" style="border: 2px solid #d3d3d3; border-radius: 5px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); ${canvasStyle}"></canvas>
+            <input type="hidden" name="${input.name}" id="${input.name}" ${isDisabled}>
+            <button type="button" id="${input.name}-clear-signature" class="btn btn-secondary mt-2" ${isDisabled}>Clear</button>
+            </div>
+            <div class="error-message" id="${input.name}-error"></div>
+            `;
+      } else if (input.type === 'textarea') {
+          inputField = `
+            <textarea class="form-control form-control-solid" id="${input.name}"
+            placeholder="${input.placeholder}" name="${input.name}" rows="4"
+            style="background-color: #fff; color: #000;" ${isDisabled}>${valueFromDB}</textarea>
+            <div class="error-message" id="${input.name}-error"></div>
+            `;
+      } 
+      // else if (input.type === 'file') {
+      //     inputField = `
+      //       <input type="${input.type}" class="input-field form-control file-upload"
+      //       placeholder="${input.placeholder}" name="${input.name}" value="${valueFromDB}"
+      //       id="${input.name}" data-visit="${input.name}" ${isDisabled} />
+      //       <div class="row g-9 mb-7">
+      //       <div class="col-md-12 fv-row">
+      //       <button type="button" class="btn btn-light-primary me-3 file-download mt-5"
+      //       data-visit="${input.name}" name="file_${input.name}">
+      //       <i class="ki-duotone ki-arrows-circle fs-2">
+      //       <span class="path1"></span><span class="path2"></span>
+      //       </i> Files
+      //       </button>
+      //       <div id="downloadLink${input.name}"></div>
+      //       </div>
+      //       </div>
+      //       <div class="error-message" id="${input.name}-error"></div>
+      //       `;
+      // }
+       else if (input.type == 'Empty Placeholder') {
+          inputField = `
+            <input type="${input.type}" class="input-field form-control"
+            placeholder="${input.placeholder}" name="${input.name}" id="${input.name}"
+            style="visibility: hidden;"/>
+            `;
+      }
+  
+      // Handle "heading" type
+      else if (input.type === 'heading') {
+  
+          const fontSize = input.validation.font_size || 'medium';
+          const fontStyle = input.validation.font_style || 'normal';
+          const alignment = input.validation.alignment_heading || 'left';
+  
+          const fontSizeValue =
+              fontSize === 'small' ? '1rem' :
+              fontSize === 'medium' ? '1.5rem' :
+              fontSize === 'large' ? '2rem' : '2.5rem';
+  
+          const fontWeight = fontStyle.includes('bold') ? 'bold' : 'normal';
+          const fontStyleValue = fontStyle.includes('italic') ? 'italic' : 'normal';
+          const textDecoration = fontStyle.includes('underline') ? 'underline' : 'none';
+  
+          column.innerHTML = `
+  <div id="${input.name}" style="
+  font-size: ${fontSizeValue};
+  text-align: ${alignment};
+  font-weight: ${fontWeight};
+  font-style: ${fontStyleValue};
+  text-decoration: ${textDecoration};
+  margin-bottom: 1rem;">
+  ${input.label}
+  </div>
+  `;
+      } else if (input.type === 'table') {
+          column.innerHTML = creatTableInForm(input) // form_table.js
+      }
+      //  else if (input.type == 'password') {
+      //     inputField = `
+      //       <div class="position-relative">
+      //       <input type="${input.type}" class="input-field form-control pr-5"
+      //       placeholder="${input.placeholder}" name="${input.name}"
+      //       value="${valueFromDB}" id="${input.name}" ${isDisabled}
+      //       style="padding-right: 40px;" />
+      //       <i id="${input.name}-icon"
+      //       class="bi bi-eye position-absolute"
+      //       style="top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer;"
+      //       onclick="togglePasswordVisibility('${input.name}')"></i>
+      //       </div>
+      //       <div class="error-message" id="${input.name}-error"></div>
+      //       `;
+      // } else if (input.type === 'map') {
+      //     const latName = `${input.name}-latitude`;
+      //     const lonName = `${input.name}-longitude`;
+  
+      //     valueFromDB = data_form_db[lonName] || '';
+  
+      //     inputField = `
+      //       <div class="d-flex align-items-center gap-2">
+      //       <input type="text" class="form-control" id="${latName}" placeholder="Latitude" name="${latName}" value="${data_form_db[latName] || ''}"/>
+      //       <input type="text" class="form-control" id="${lonName}" placeholder="Longitude" name="${lonName}" value="${data_form_db[lonName] || ''}"/>
+      //       <button type="button" class="btn btn-info btn-lg d-flex align-items-center justify-content-center"
+      //       style="height: 43px;" onclick="openMapModal('${latName}', '${lonName}')">
+      //       <i class="fas fa-map-marker-alt"></i>
+      //       </button>
+      //       </div>
+      //       <div class="error-message" id="${input.name}-error"></div>
+      //       `;
+      // } else if (input.type === 'button') {
+      //     inputField = `
+      //       <button type="button" class="btn btn-${input.validation.btnColor} w-100" id='${input.name}' name='${input.name}' ${isDisabled}>${input.label}</button>
+      //       <div class="error-message" id="${input.name}-error"></div>
+      //       `;
+      // } 
+      else if (input.type !== 'table' && input.type !== 'map' && input.type !== 'button' && input.type !== 'file') {
+          inputField = `
+            <input type="text" class="input-field form-control"
+            placeholder="${input.placeholder}" name="${input.name}" value="${valueFromDB}"
+            id="${input.name}" ${isDisabled} />
+            <div class="error-message" id="${input.name}-error"></div>
+            `;
+      }
+  
+      // Wrap the entire column including inputField and error message
+  
+      // column.className = `${colClass} ${hideClass} form-group`; // Include Bootstrap column class and d-none if hidden
+  
+      if (input.type !== 'table') {
+          column.className = `${colClass} ${hide_input}`;
+      }
+      column.id = `column-${input.name}`;
+  
+      if (input.type !== 'Empty Placeholder' && input.type !== 'heading' && input.type !== 'table' &&
+          input.type !== 'button') {
+          column.innerHTML = `
+          <label class="fs-6 fw-semibold mb-2 ${inputValidation.required ? 'required' : ''}">${input.label}</label>
+          ${inputField}
           `;
-    } else if (input.type === 'textarea') {
-        inputField = `
-          <textarea class="form-control form-control-solid" id="${input.name}"
-          placeholder="${input.placeholder}" name="${input.name}" rows="4"
-          style="background-color: #fff; color: #000;" ${isDisabled}>${valueFromDB}</textarea>
-          <div class="error-message" id="${input.name}-error"></div>
+              } else if (input.type == 'Empty Placeholder' || input.type == 'button') {
+                  column.innerHTML = `
+          <label class="fs-6 fw-semibold mb-2" style="visibility: hidden;">${input.label}</label>
+          ${inputField}
           `;
-    } 
-
-     else if (input.type == 'Empty Placeholder') {
-        inputField = `
-          <input type="${input.type}" class="input-field form-control"
-          placeholder="${input.placeholder}" name="${input.name}" id="${input.name}"
-          style="visibility: hidden;"/>
-          `;
-    }
-
-    // Handle "heading" type
-    else if (input.type === 'heading') {
-
-        const fontSize = input.validation.font_size || 'medium';
-        const fontStyle = input.validation.font_style || 'normal';
-        const alignment = input.validation.alignment_heading || 'left';
-
-        const fontSizeValue =
-            fontSize === 'small' ? '1rem' :
-            fontSize === 'medium' ? '1.5rem' :
-            fontSize === 'large' ? '2rem' : '2.5rem';
-
-        const fontWeight = fontStyle.includes('bold') ? 'bold' : 'normal';
-        const fontStyleValue = fontStyle.includes('italic') ? 'italic' : 'normal';
-        const textDecoration = fontStyle.includes('underline') ? 'underline' : 'none';
-
-        column.innerHTML = `
-<div id="${input.name}" style="
-font-size: ${fontSizeValue};
-text-align: ${alignment};
-font-weight: ${fontWeight};
-font-style: ${fontStyleValue};
-text-decoration: ${textDecoration};
-margin-bottom: 1rem;">
-${input.label}
-</div>
-`;
-    } else if (input.type === 'table') {
-        column.innerHTML = creatTableInForm(input) // form_table.js
-    }
-    
-    else if (input.type !== 'table' && input.type !== 'map' && input.type !== 'button' && input.type !== 'file') {
-        inputField = `
-          <input type="text" class="input-field form-control"
-          placeholder="${input.placeholder}" name="${input.name}" value="${valueFromDB}"
-          id="${input.name}" ${isDisabled} />
-          <div class="error-message" id="${input.name}-error"></div>
-          `;
-    }
-
-    // Wrap the entire column including inputField and error message
-
-    // column.className = `${colClass} ${hideClass} form-group`; // Include Bootstrap column class and d-none if hidden
-
-    if (input.type !== 'table') {
-        column.className = `${colClass} ${hide_input}`;
-    }
-    column.id = `column-${input.name}`;
-
-    if (input.type !== 'Empty Placeholder' && input.type !== 'heading' && input.type !== 'table' &&
-        input.type !== 'button') {
-        column.innerHTML = `
-        <label class="fs-6 fw-semibold mb-2 ${inputValidation.required ? 'required' : ''}">${input.label}</label>
-        ${inputField}
-        `;
-            } else if (input.type == 'Empty Placeholder' || input.type == 'button') {
-                column.innerHTML = `
-        <label class="fs-6 fw-semibold mb-2" style="visibility: hidden;">${input.label}</label>
-        ${inputField}
-        `;
-    }
-
-    row.appendChild(column);
-
-    // Append row to form container if the row is filled or it's the last element
-    if (currentWidth >= 12 || index === dynamic_input.length - 1) {
-
-        // if (formFlag == true) {
-        formContainer.appendChild(row);
-        //}
-
-        // if (isProjectUrl) {
-        // contentElement.appendChild(row);
-        // createBtn(contentElement)
-        // }
-
-        // row = document.createElement('div');
-        // row.classList.add('row', 'g-9', 'mb-7');
-        // currentWidth = 0;
-    }
-
-});
-
-const allow_unique_input = ['text', 'number', 'email', 'textarea', 'password', 'date', 'time', 'datetime-local']
-
-setTimeout(() => {
-    for (let index = 0; index < dynamic_input.length; index++) {
-        const input = dynamic_input[index];
-        const element = document.getElementById(input.name);
-        const selectElement = $(`#${input.name}`);
-
-        
-
-        if (element && input.type !== 'checkbox' && input.type !== 'email') {
-            element.addEventListener('input', function() {
-                const name = element.name;
-                const value = element.value;
-                all_data_db[name] = value;
-            
-                // validateInput(input, element);
-            });
-        }
-
+      }
+  
+      row.appendChild(column);
+  
+      // Append row to form container if the row is filled or it's the last element
+      if (currentWidth >= 12 || index === dynamic_input.length - 1) {
+  
+          // if (formFlag == true) {
+          formContainer.appendChild(row);
+          //}
+  
+          // if (isProjectUrl) {
+          // contentElement.appendChild(row);
+          // createBtn(contentElement)
+          // }
+  
+          // row = document.createElement('div');
+          // row.classList.add('row', 'g-9', 'mb-7');
+          // currentWidth = 0;
+      }
+  
+  });
+  
+  const allow_unique_input = ['text', 'number', 'email', 'textarea', 'password', 'date', 'time', 'datetime-local']
+  
+  setTimeout(() => {
+      for (let index = 0; index < dynamic_input.length; index++) {
+          const input = dynamic_input[index];
+          const element = document.getElementById(input.name);
+          const selectElement = $(`#${input.name}`);
+  
+      
        
-        if (input.type === 'table') {
-            if (Object.keys(data_form_add.dynamic_table_values).length !== 0) {
-                const tableData = all_form_data_table.find(
-                    (form) => form.formLabel === input.validation.formName_table
-                );
-
-                const tableFields = tableData.formFields;
-                const tableId = `${input.name}-table`;
-                const tableValueData = data_form_add.dynamic_table_values[tableId] || [];
-
-                if (tableValueData.length > 0) {
-                    populateTablesFromData(tableId, tableFields, tableValueData);
-                }
+         
+  
+          if (element && input.type !== 'checkbox' && input.type !== 'email') {
+              element.addEventListener('input', function() {
+                  const name = element.name;
+                  const value = element.value;
+                  all_data_db[name] = value;
+              
+                  // validateInput(input, element);
+              });
+          }
+  
+          // const element_textarea = document.getElementById(input.name);
+          // if (input.type === 'textarea') {
+          //     element_textarea.addEventListener('textarea', function() {
+          //         const name = element.name;
+          //         const value = element.value;
+          //         all_data_db[name] = value;
+  
+          //         if (input.work_flow_validation) {
+          //             if (editedFieldRules.length > 0 && editedFieldRules[0].actionsList) {
+          //                 applyFieldRulesOnchange(editedFieldRules);
+          //             }
+          //         }
+          //         validateInput(input, element_textarea);
+          //     });
+          // }
+  
+          // if (input.type === 'checkbox') {
+          //     if (input.options && input.options.length) {
+          //         input.options.forEach(option => {
+          //             const checkboxName = Object.keys(option)[0];
+          //             const checkboxElement = document.getElementById(checkboxName);
+  
+          //             if (checkboxElement) {
+          //                 checkboxElement.addEventListener('input', function() {
+          //                     const name = element.name;
+          //                     const value = element.value;
+          //                     all_data_db[name] = value;
+  
+          //                     if (input.work_flow_validation) {
+          //                         if (editedFieldRules.length > 0 && editedFieldRules[0].actionsList) {
+          //                             applyFieldRulesOnchange(editedFieldRules);
+          //                         }
+          //                     }
+          //                     validateInput(input, checkboxElement);
+          //                 });
+          //             }
+          //         });
+          //     }
+          // }
+  
+          if (input.type === 'table') {
+            if(data_form_add.hasOwnProperty('dynamic_table_values') ){
+              if (Object.keys(data_form_add.dynamic_table_values).length !== 0) {
+                  const tableData = all_form_data_table.find(
+                      (form) => form.formLabel === input.validation.formName_table
+                  );
+  
+                  const tableFields = tableData.formFields;
+                  const tableId = `${input.name}-table`;
+                  const tableValueData = data_form_add.dynamic_table_values[tableId] || [];
+  
+                  if (tableValueData.length > 0) {
+                      populateTablesFromData(tableId, tableFields, tableValueData);
+                  }
+              }
             }
-        }
-
-       
-    }
-
-    $('.file-upload').each(function(i, element) {
-        $(element).on('change', function(event) {
-            var visitType = $(this).data('visit');
-            var fileInput = this;
-            fileupload_cloud(event, fileInput, visitType);
-        });
-    });
-
-    $('.file-download').each(function(i, element) {
-        $(element).on('click', function(event) {
-            var visitType = $(this).data('visit');
-            var fileInput = this;
-            filedownload_cloud(visitType, fileInput);
-        });
-    });
-
-}, 100);
-
-// if (trackLocation.length > 0) {
-// createHistoryTable()
-// }
-// const approvalHistory = extractApprovalHistory(all_response_data);
-
-// if (approvalHistory.length > 0) {
-// generateApprovelHistoryTable(approvalHistory)
-// }
-if (all_data_db.trackLocation) {
-  trackLocation = all_data_db.trackLocation
-}
-if (all_data_db.trackHistoryTable) {
-  trackHistoryTable = all_data_db.trackHistoryTable
-}
-
-
-if (all_data_db.trackLocation.length > 0) {
-  createHistoryTable(all_data_db.trackLocation)
-}
-if (all_data_db.trackHistoryTable.length > 0) {
-  createHistoryTable(all_data_db.trackHistoryTable)
-}
-const approvalHistory = extractApprovalHistory(all_data_db, "status");
-const approvalHistoryNew = extractApprovalHistory(all_data_db, "history");
-
-if (approvalHistory.length > 0) {
-  generateApprovelHistoryTable(approvalHistory, 'Status')
-}
-if (approvalHistoryNew.length > 0) {
-  generateApprovelHistoryTable(approvalHistoryNew, 'History')
-}
-// hideLoadingSpinner();
-disableAllInputs();
-// populateTargetOption()
-}
+          }
+  
+          // if (allow_unique_input.includes(input.type)) {
+          //     element.addEventListener('input', function() {
+          //         const name = element.name;
+          //         const value = element.value;
+          //     });
+          // }
+  
+          // if (allow_unique_input.includes(input.type) && input.validation && input.validation.unique) {
+          //     element.addEventListener('blur', function() {
+          //         const name = element.name;
+          //         const value = element.value.trim();
+  
+          //         if (value) {
+          //             function checkIdAndValue(id, value) {
+          //                 return extract_lookup_key_value.some((obj) => obj[id] === value);
+          //             }
+  
+          //             const isDuplicate = checkIdAndValue(name, value);
+  
+          //             if (isDuplicate) {
+          //                 element.value = '';
+          //                 Swal.fire({
+          //                     icon: 'warning',
+          //                     title: 'Warning',
+          //                     text: 'Duplicate Data Found',
+          //                 });
+          //             }
+          //         }
+          //     });
+          // }
+      }
+  
+      $('.file-upload').each(function(i, element) {
+          $(element).on('change', function(event) {
+              var visitType = $(this).data('visit');
+              var fileInput = this;
+              fileupload_cloud(event, fileInput, visitType);
+          });
+      });
+  
+      $('.file-download').each(function(i, element) {
+          $(element).on('click', function(event) {
+              var visitType = $(this).data('visit');
+              var fileInput = this;
+              filedownload_cloud(visitType, fileInput);
+          });
+      });
+  
+  }, 100);
+  
+  if (all_data_db.trackLocation) {
+    trackLocation = all_data_db.trackLocation
+  }
+  if (all_data_db.trackHistoryTable) {
+    trackHistoryTable = all_data_db.trackHistoryTable
+  }
+  
+  
+  if (all_data_db.hasOwnProperty('trackLocation') && all_data_db.trackLocation.length > 0) {
+    createHistoryTable(all_data_db.trackLocation);
+  }
+  
+  // Check if 'trackHistoryTable' key exists and has length greater than 0
+  if (all_data_db.hasOwnProperty('trackHistoryTable') && all_data_db.trackHistoryTable.length > 0) {
+    createHistoryTable(all_data_db.trackHistoryTable);
+  }
+  const approvalHistory = extractApprovalHistory(all_response_data, "status");
+  const approvalHistoryNew = extractApprovalHistory(all_response_data, "history");
+  
+  if (approvalHistory.length > 0) {
+    generateApprovelHistoryTable(approvalHistory, 'Status')
+  }
+  if (approvalHistoryNew.length > 0) {
+    generateApprovelHistoryTable(approvalHistoryNew, 'History')
+  }
+  
+  // if (trackLocation.length > 0) {
+  // createHistoryTable()
+  // }
+  // const approvalHistory = extractApprovalHistory(all_response_data);
+  
+  // if (approvalHistory.length > 0) {
+  // generateApprovelHistoryTable(approvalHistory)
+  // }
+  
+  // hideLoadingSpinner();
+  disableAllInputs();
+  // populateTargetOption()
+  }
+  
 
 function disableAllInputs() {
   // Get all input, textarea, and button elements inside the #dynamic-form div
   const elements = document.querySelectorAll('#dynamic-form input, #dynamic-form textarea, #dynamic-form button');
   console.log('elements checking',elements)
-  renderDynamicForm(elements);
+  // renderDynamicForm(elements);
 
   // Loop through each element and disable it
   elements.forEach(element => {
-    element.disabled = false;
+    element.disabled = true;
     element.style.color = 'black';  // Set text color to black
     // element.style.backgroundColor = '#f0f0f0'; // Optional: set background color
   });
@@ -1295,6 +1640,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
 // ✅ Listen for PK & SK from Angular via postMessage
 window.addEventListener("message", (event) => {
+  console.log('event checking from formView',event)
     if (event.data.pk && event.data.sk) {
         window.pk = event.data.pk;
         window.sk = event.data.sk;
@@ -1309,6 +1655,11 @@ window.addEventListener("message", (event) => {
 // ✅ Ensure `handleCardClick()` Waits for PK & SK
   async function handleCardClick(eventData) {
     console.log('eventData checking',eventData)
+
+     loginDetail = eventData.data.loginDetail
+    console.log('Stored loginDetail',loginDetail)
+    permissionId = loginDetail.permission_ID;
+
 
  
      
@@ -1349,9 +1700,12 @@ window.addEventListener("message", (event) => {
 
         console.log("✅ Extracted formName from PK: " + formName);
 
-        let ClientId= eventData.data.clientId
+        ClientId= eventData.data.clientId;
+        console.log('ClientId from formView',ClientId)
+        clientid_ =  ClientId
         // ✅ Fetch Form & Approval Data
         await getDynamicFormDetails(formName,ClientId);
+        await work_flow_validation_all(formName);
         await getApprovalMainPkDetails(pkFromAngular, skFromAngular);
         
   
@@ -1401,7 +1755,9 @@ async function getApprovalMainPkDetails(pkDetails,skDetails){
       console.log('response of getApprovalMainPkDetails', JSON.stringify(responseData,null,2));
   
       const metadata = responseData.metadata;  // Get the metadata from the response
+      all_response_data = responseData
       data_form_add = metadata;
+      all_data_db  = responseData
       const labels = {};  // Object to store the matched labels and values
   
       // Iterate through formDynamicFields to match the name with metadata keys
@@ -1443,8 +1799,8 @@ async function getApprovalMainPkDetails(pkDetails,skDetails){
       //   // Append the row to the table body
       //   // tableBody.appendChild(row);
       // }
-  
-      await generateFormView(formDynamicFields,data_form_add);
+      await applyFieldRules(editedFieldRules);
+      // await generateFormView(formDynamicFields,data_form_add);
       
     } else {
       console.log("No body in the response : getApprovalMainPkDetails" );
@@ -1829,3 +2185,590 @@ async function getApprovalMainPkDetails(pkDetails,skDetails){
     });
   }
 
+
+
+  const get_work_flow_api = 'https://iy5kihshy9.execute-api.ap-south-1.amazonaws.com/s1/Workflow-to-FormEngine-dev-lambda0'
+
+
+var copy_workflow_datas = [];
+var permissionType = ['user', 'permission']
+
+function applyFieldRules(FieldRules_data) {
+ // Check if actionsList exists and is an array before proceeding
+ // // console.log(('edit_flag :', Edit_flag);
+ // console.log('FieldRules_data :', FieldRules_data);
+
+ copy_workflow_datas = FieldRules_data
+
+ form_inputs_generating_forms = JSON.parse(JSON.stringify(input_structure));
+
+
+ // if (!FieldRules_data || !Array.isArray(FieldRules_data[0].actionsList)) {
+ if (!FieldRules_data || !Array.isArray(FieldRules_data) || !FieldRules_data[0] || !Array.isArray(FieldRules_data[0].actionsList)) {
+
+ generateFormView(form_inputs_generating_forms, all_data_db);
+
+ console.warn("Warning : actionsList is undefined or not an array.");
+ return; // Exit function if actionsList is missing or not an array
+ }
+
+
+ for (const action of FieldRules_data[0].actionsList) {
+
+ // Hide :
+
+ if (action.actionType === 'fieldRules' && action.hide) {
+
+ console.log('add_condition_action_hide :', action.hide);
+
+ if (action.hide.userType && ['field', 'user', 'permission'].includes(action.hide.userType) &&
+ action.hide.fields && action.hide.accessList.length > 0) {
+ extractAllwaysCondition(form_inputs_generating_forms, action.hide.accessList)
+ }
+
+ if (action.hide.conditionType === 'onCondition') {
+
+ let conditionString = action.hide.conditionString;
+
+ let isPermissionType = true
+
+ // For User, Permission :
+
+ if (action.hide.accessList && permissionType.includes(action.hide.userType)) {
+ if (action.hide.accessList.length > 0) {
+ if (action.hide.accessList && (action.hide.accessList.includes(loginDetail.username) ||
+ action.hide.accessList.includes(permissionId)) && permissionType.includes(action.hide.userType)) {
+ isPermissionType = true
+ }
+ else {
+ isPermissionType = false
+ }
+ }
+ else {
+ isPermissionType = true
+ }
+ }
+
+ // For Fields :
+
+ if (action.hide.accessList && ['field'].includes(action.hide.userType)) {
+
+ var valuesArray = []
+
+ valuesArray = action.hide.accessList.reduce((acc, key) => {
+ if (Edit_flag && all_data_db[key]) {
+ if (key.startsWith("multi-select")) {
+ // Split values only for multi-select keys
+ let values = all_data_db[key].split(',');
+ acc.push(...values);
+ }
+ else {
+ // Push the entire value for other keys
+ acc.push(all_data_db[key]);
+ }
+ }
+ else {
+ isPermissionType = false
+ }
+ return acc;
+ }, []);
+
+ // console.log('valuesArray :', valuesArray);
+
+ if (valuesArray.length > 0) {
+ if (valuesArray.includes(loginDetail.username)) {
+ isPermissionType = true
+ }
+ else {
+ isPermissionType = false
+ }
+ }
+ }
+
+ let isConditionTrue = extract_conditionString(conditionString, all_data_db, form_inputs_generating_forms)
+
+ // If the condition is true, proceed to hide the specified fields
+ if (isPermissionType && isConditionTrue && Array.isArray(action.hide.fields)) {
+ action.hide.fields.forEach(fieldToHide => {
+ const fieldName = fieldToHide.split('.').pop(); // Get the actual field name like email-1729675012371
+ // console.log('created_onCondition :', fieldName);
+ // Find the field in dynamic_input and ensure validation exists
+ const field = form_inputs_generating_forms.find(input => input.name === fieldName);
+ // // console.log(('field_data :', field);
+ if (field && field.validation) {
+ field.validation.hide = true;
+ }
+ });
+ }
+
+ // False Condition :
+
+ if (isPermissionType && isConditionTrue == false && Array.isArray(action.hide.falseConditionShow)) {
+
+ action.hide.falseConditionShow.forEach(fieldToShow => {
+ const fieldName = fieldToShow.split('.').pop(); // Get the actual field name like email-1729675012371
+
+ const field = form_inputs_generating_forms.find(input => input.name === fieldName);
+ // // console.log(('field_data :', field);
+ if (field && field.validation) {
+ field.validation.hide = false;
+ }
+ });
+ }
+
+ }
+
+ else if (action.hide.conditionType === 'Always') {
+ // If the condition is true, proceed to hide the specified fields
+
+ let isPermissionType = true
+
+ if (action.hide.accessList && permissionType.includes(action.hide.userType)) {
+ if (action.hide.accessList.length > 0) {
+ if (action.hide.accessList && (action.hide.accessList.includes(loginDetail.username) ||
+ action.hide.accessList.includes(permissionId)) && permissionType.includes(action.hide.userType)) {
+ isPermissionType = true
+ }
+ else {
+ isPermissionType = false
+ }
+ }
+ else {
+ isPermissionType = true
+ }
+ }
+
+ // For Fields :
+ // console.log('1_isPermissionType_always_hide :',isPermissionType);
+ if (action.hide.accessList && ['field'].includes(action.hide.userType)) {
+
+ var valuesArray = []
+
+ valuesArray = action.hide.accessList.reduce((acc, key) => {
+ if (Edit_flag && all_data_db[key]) {
+ if (key.startsWith("multi-select")) {
+ // Split values only for multi-select keys
+ let values = all_data_db[key].split(',');
+ acc.push(...values);
+ }
+ else {
+ // Push the entire value for other keys
+ acc.push(all_data_db[key]);
+ }
+ }
+ else {
+ isPermissionType = false
+ }
+ return acc;
+ }, []);
+ // console.log('valuesArray :', valuesArray);
+ if (valuesArray.length > 0) {
+ if (valuesArray.includes(loginDetail.username)) {
+ isPermissionType = true
+ }
+ else {
+ isPermissionType = false
+ }
+ }
+ }
+ // console.log('2_isPermissionType_always_hide :',isPermissionType);
+ if (isPermissionType && Array.isArray(action.hide.fields)) {
+ action.hide.fields.forEach(fieldToHide => {
+ const fieldName = fieldToHide.split('.').pop(); // Get the actual field name like email-1729675012371
+ // console.log('created_Always :', fieldName);
+ // Find the field in dynamic_input and ensure validation exists
+ const field = form_inputs_generating_forms.find(input => input.name === fieldName);
+ // // console.log(('field_data :', field);
+
+ if (field && field.validation) {
+ field.validation.hide = true;
+ }
+ });
+ }
+ }
+
+ }
+
+ // Show :
+
+ else if (action.actionType === 'fieldRules' && action.show) {
+
+ if (action.show.userType && ['field', 'user', 'permission'].includes(action.show.userType) &&
+ action.show.accessList && action.show.accessList.length > 0) {
+ extractAllwaysCondition(form_inputs_generating_forms, action.show.accessList)
+ }
+
+ if (action.show.conditionType === 'onCondition') {
+
+ let conditionString = action.show.conditionString;
+
+ let isPermissionType = true
+ if (action.show.accessList && permissionType.includes(action.show.userType)) {
+ if (action.show.accessList.length > 0) {
+ if (action.show.accessList && (action.show.accessList.includes(loginDetail.username) ||
+ action.show.accessList.includes(permissionId)) && permissionType.includes(action.show.userType)) {
+ isPermissionType = true
+ }
+ else {
+ isPermissionType = false
+ }
+ }
+ else {
+ isPermissionType = true
+ }
+ }
+
+ // For Fields :
+
+ if (action.show.accessList && ['field'].includes(action.show.userType)) {
+
+ var valuesArray = []
+
+ valuesArray = action.show.accessList.reduce((acc, key) => {
+ if (Edit_flag && all_data_db[key]) {
+ if (key.startsWith("multi-select")) {
+ // Split values only for multi-select keys
+ let values = all_data_db[key].split(',');
+ acc.push(...values);
+ }
+ else {
+ // Push the entire value for other keys
+ acc.push(all_data_db[key]);
+ }
+ }
+ else {
+ isPermissionType = false
+ }
+ return acc;
+ }, []);
+
+ // console.log('valuesArray :', valuesArray);
+ if (valuesArray.length > 0) {
+ if (valuesArray.includes(loginDetail.username)) {
+ isPermissionType = true
+ }
+ else {
+ isPermissionType = false
+ }
+ }
+ }
+
+ let isConditionTrue = extract_conditionString(conditionString, all_data_db, form_inputs_generating_forms)
+
+ // If the condition is true, proceed to show the specified fields
+ if (isPermissionType && isConditionTrue && Array.isArray(action.show.fields)) {
+ action.show.fields.forEach(fieldToHide => {
+ const fieldName = fieldToHide.split('.').pop(); // Get the actual field name like email-1729675012371
+
+ // Find the field in dynamic_input and ensure validation exists
+ const field = form_inputs_generating_forms.find(input => input.name === fieldName);
+ // // console.log(('field_data :', field);
+ if (field && field.validation) {
+ field.validation.hide = false;
+ }
+ });
+ }
+
+ // False Condition :
+
+ if (isPermissionType && isConditionTrue == false && Array.isArray(action.show.falseConditionHide)) {
+
+ action.show.falseConditionHide.forEach(fieldToHide => {
+ // console.log('new_logic_show_fieldName_onCondition_remove :', fieldToHide);
+ const fieldName = fieldToHide.split('.').pop(); // Get the actual field name like email-1729675012371
+ const field = form_inputs_generating_forms.find(input => input.name === fieldName);
+
+ if (field && field.validation) {
+ field.validation.hide = true;
+ }
+ });
+ }
+
+ }
+
+ else if (action.show.conditionType === 'Always') {
+ // If the condition is true, proceed to show the specified fields
+
+ let isPermissionType = true
+ if (action.show.accessList && permissionType.includes(action.show.userType)) {
+ if (action.show.accessList.length > 0) {
+ if (action.show.accessList && (action.show.accessList.includes(loginDetail.username) ||
+ action.show.accessList.includes(permissionId)) && permissionType.includes(action.show.userType)) {
+ isPermissionType = true
+ }
+ else {
+ isPermissionType = false
+ }
+ }
+ else {
+ isPermissionType = true
+ }
+ }
+
+ // For Fields :
+
+ if (action.show.accessList && ['field'].includes(action.show.userType)) {
+
+ var valuesArray = []
+
+ valuesArray = action.show.accessList.reduce((acc, key) => {
+
+ if (Edit_flag && all_data_db[key]) {
+ if (key.startsWith("multi-select")) {
+ // Split values only for multi-select keys
+ let values = all_data_db[key].split(',');
+ acc.push(...values);
+ }
+ else {
+ // Push the entire value for other keys
+ acc.push(all_data_db[key]);
+ }
+ }
+ else {
+ isPermissionType = false
+ }
+ return acc;
+ }, []);
+ // console.log('valuesArray :', valuesArray);
+ if (valuesArray.length > 0) {
+ if (valuesArray.includes(loginDetail.username)) {
+ isPermissionType = true
+ }
+ else {
+ isPermissionType = false
+ }
+ }
+ }
+
+ if (isPermissionType && Array.isArray(action.show.fields)) {
+ action.show.fields.forEach(fieldToHide => {
+ const fieldName = fieldToHide.split('.').pop(); // Get the actual field name like email-1729675012371
+ // Find the field in dynamic_input and ensure validation exists
+ const field = form_inputs_generating_forms.find(input => input.name === fieldName);
+ // // console.log(('field_data :', field);
+ if (field && field.validation) {
+ field.validation.hide = false;
+ }
+ });
+ }
+ }
+ }
+
+ }
+ generateFormView(form_inputs_generating_forms, all_data_db);
+}
+
+function extract_conditionString(conditionString, all_data_db, form_inputs_generating_forms) {
+ // Replace the placeholders in conditionString with actual values from all_data_db
+ var extractKey
+ const regex = /\${([^}]+)}/g; // Matches patterns like ${ID.text-1728721601943}
+ conditionString = conditionString.replace(regex, (match, key) => {
+ const dataKey = key.split('.').pop(); // Extract the actual key like text-1728721601943
+ // console.log('dataKey :', dataKey);
+ extractKey = dataKey
+ // console.log('extractKey :', extractKey);
+ form_inputs_generating_forms.forEach(item => {
+ if (item.name === extractKey) {
+ item.work_flow_validation = true;
+ }
+ });
+
+ return `'${all_data_db[dataKey] || ''}'`; // Replace with corresponding value from all_data_db
+ });
+
+ // Evaluate the condition
+ let isConditionTrue = false;
+ try {
+ isConditionTrue = eval(conditionString); // Evaluating the condition
+ }
+ catch (error) {
+ console.error('Error evaluating condition: ', error);
+ }
+ return isConditionTrue
+}
+
+function extractAllwaysCondition(form_inputs_generating_forms, fields) {
+
+ form_inputs_generating_forms.forEach(item => {
+ if (fields.includes(item.name)) {
+ item.work_flow_validation = true;
+ }
+ });
+}
+
+async function work_flow_validation_all(form_name) {
+ //let condition = ['Created', 'Edited', 'Created_or_Edited']
+ let condition = ['Created_or_Edited']
+
+ // for (const record of condition) {
+ // // console.log('record_data :', record);
+ await get_all_work_flow_validation('Created_or_Edited', form_name)
+ // }
+}
+
+
+var all_data_work_flow = []
+
+// Create :
+
+var createdFieldRules = []
+
+var createdLoadOfForm = []
+var createdSuccessfulSubmission = []
+
+// Edit :
+
+var editedFieldRules = []
+
+var editedLoadOfForm = []
+var editedSuccessfulSubmission = []
+
+
+async function get_all_work_flow_validation(type, form_name) {
+
+ const requestBody = {
+ "table_name": 'master',
+ "FormName": form_name, // form name
+ "FormEvent": type, // Created_or_Edited
+ "RecordEvent": 'Field Rules', // Load of the Form
+ // "clientId": clientid_,
+ "clientId": clientid_,
+ }
+
+ try {
+ 
+
+ const response = await fetch(get_work_flow_api, {
+ method: 'POST',
+ headers: {
+ 'Content-Type': 'application/json',
+ 'x-api-key': 'kzUreDYgmB8jUwsniUREa6ggTxIg8bi82zmfjuvZ'
+ },
+ body: JSON.stringify(requestBody)
+ });
+
+ if (!response.ok) {
+ throw new Error('Network response was not ok');
+ }
+
+ // // console.log(("response:", response);
+
+ const response_data = await response.json();
+ // // console.log(("Response_data :", response_data);
+
+
+ if (response_data && response_data.data && response_data.data.length > 0 && response_data.data[0].metadata) {
+ // // console.log(('final_data_ans :', response_data);
+ all_data_work_flow = response_data.data[0].metadata
+
+ const metadataOnly = response_data.data.map(item => item.metadata);
+ // // console.log(('metadataOnly :', metadataOnly);
+
+
+ // Filter for "Created" or "Created_or_Edited"
+ const createdOrCreatedEdited = metadataOnly.filter(item =>
+ item.recordEvent === "Created" || item.recordEvent === "Created_or_Edited"
+ );
+
+ // Filter for "Edited" or "Created_or_Edited"
+ const editedOrCreatedEdited = metadataOnly.filter(item =>
+ item.recordEvent === "Edited" || item.recordEvent === "Created_or_Edited"
+ );
+
+ // Further filter by formEvent for createdOrCreatedEdited
+ createdFieldRules = createdOrCreatedEdited.filter(item => item.formEvent === "Field Rules");
+ createdLoadOfForm = createdOrCreatedEdited.filter(item => item.formEvent === "Load of the Form");
+ createdSuccessfulSubmission = createdOrCreatedEdited.filter(item => item.formEvent === "Successfull form Submission");
+
+
+ // Further filter by formEvent for editedOrCreatedEdited
+ editedFieldRules = editedOrCreatedEdited.filter(item => item.formEvent === "Field Rules");
+ editedLoadOfForm = editedOrCreatedEdited.filter(item => item.formEvent === "Load of the Form");
+ editedSuccessfulSubmission = editedOrCreatedEdited.filter(item => item.formEvent === "Successfull form Submission");
+
+ editedFieldRules.forEach(item => {
+ item.actionsList = item.actionsList.sort((a, b) => {
+ // Extract conditionType and prioritize 'Always'
+ const aConditionType = a.show ? a.show.conditionType : a.hide ? a.hide.conditionType : a.disable ? a.disable.conditionType : a.enable ? a.enable.conditionType : a.onChange ? a.onChange.conditionType : a.setInputValues ? a.setInputValues.conditionType : '';
+ const bConditionType = b.show ? b.show.conditionType : b.hide ? b.hide.conditionType : b.disable ? b.disable.conditionType : b.enable ? b.enable.conditionType : b.onChange ? b.onChange.conditionType : b.setInputValues ? b.setInputValues.conditionType : '';
+
+ if (aConditionType === 'Always' && bConditionType !== 'Always') return -1;
+ if (aConditionType !== 'Always' && bConditionType === 'Always') return 1;
+ return 0; // Same conditionType, no change
+ });
+ });
+
+ // Creat :
+
+ createdFieldRules = mergeData(createdFieldRules)
+ createdFieldRules = createdFieldRules.filter(item => item !== null);
+
+ // Sorting the actionsList by conditionType and actionType
+ createdFieldRules.forEach(item => {
+ item.actionsList = item.actionsList.sort((a, b) => {
+
+ const aConditionType = a.hide ? a.hide.conditionType : a.show ? a.show.conditionType : a.disable ? a.disable.conditionType : a.enable ? a.enable.conditionType : a.onChange ? a.onChange.conditionType : a.setInputValues ? a.setInputValues.conditionType : '';
+ const bConditionType = b.hide ? b.hide.conditionType : b.show ? b.show.conditionType : b.disable ? b.disable.conditionType : b.enable ? b.enable.conditionType : b.onChange ? b.onChange.conditionType : b.setInputValues ? b.setInputValues.conditionType : '';
+
+ if (aConditionType === 'Always' && bConditionType !== 'Always') return -1;
+ if (aConditionType !== 'Always' && bConditionType === 'Always') return 1;
+ return 0; // Same conditionType, no change
+ });
+ });
+
+ createdLoadOfForm = mergeData(createdLoadOfForm)
+ createdLoadOfForm = createdLoadOfForm.filter(item => item !== null);
+
+ createdSuccessfulSubmission = mergeData(createdSuccessfulSubmission)
+ createdSuccessfulSubmission = createdSuccessfulSubmission.filter(item => item !== null);
+
+ // Edit :
+
+ editedFieldRules = mergeData(editedFieldRules)
+ editedFieldRules = editedFieldRules.filter(item => item !== null);
+
+ editedLoadOfForm = mergeData(editedLoadOfForm)
+ editedLoadOfForm = editedLoadOfForm.filter(item => item !== null);
+
+ editedSuccessfulSubmission = mergeData(editedSuccessfulSubmission)
+ editedSuccessfulSubmission = editedSuccessfulSubmission.filter(item => item !== null);
+
+ 
+ }
+ else if (response_data && response_data.statusCode === 409) {
+ 
+ // Swal.fire({ icon: 'error', title: 'Error', text: 'Not able to get item. Please try again.' });
+ }
+ else {
+ 
+ // Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to get item. Please try again.' });
+ }
+ }
+ catch (error) {
+
+ console.error('Error:', error);
+ // Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to get item. Please try again.' });
+ } finally {
+ // Hide loading spinner
+
+ // // console.log(('outside_running');
+ }
+}
+
+
+
+
+function mergeData(createdFieldRules) {
+
+    // Merge only the actions for the first "Created" record event
+    const firstRecord = createdFieldRules.reduce((result, rule) => {
+        if (!result) {
+            result = { ...rule, actionsList: [...rule.actionsList] };
+        }
+        else if (result) {
+            result.actionsList.push(...rule.actionsList);
+        }
+        return result;
+    }, null);
+    return [firstRecord]
+}

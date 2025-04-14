@@ -15,7 +15,7 @@
             <div class="col-md-3">
 
             <div class="mb-3">
-              <label for="fontSelector" class="col-form-label fw-bold fs-6 me-2 ">Font Type:</label>
+              <label for="fontSelector" class="col-createChart-label fw-bold fs-6 me-2 ">Font Type:</label>
               <div class="d-flex align-items-center gap-2">
               <button
               type="button"
@@ -54,7 +54,7 @@
             <div class="col-md-3">
               <!-- Alignment Buttons -->
               <div class="mb-3">
-                <label for="fontSelector" class="col-form-label fw-bold fs-6 me-2">Font Align:</label>
+                <label for="fontSelector" class="col-createChart-label fw-bold fs-6 me-2">Font Align:</label>
                 <div class="d-flex align-items-center gap-2">
                 <button
                   type="button"
@@ -87,7 +87,7 @@
             <div class="col-md-3">
               <!-- Font Family Selector -->
               <div class="mb-3">
-                <label for="fontSelector" class="col-form-label fw-bold fs-6">Choose Font Style:</label>
+                <label for="fontSelector" class="col-createChart-label fw-bold fs-6">Choose Font Style:</label>
                 <select
                   id="fontSelector"
                   class="form-select"
@@ -127,9 +127,9 @@
             <div class="col-md-3">
               <!-- Font Size Selector -->
               <div class="mb-3">
-                <!-- <label  class="col-form-label fw-bold fs-6 required">Date Range Label</label> -->
+                <!-- <label  class="col-createChart-label fw-bold fs-6 required">Date Range Label</label> -->
         
-              <label for="fontSelector" class="col-form-label fw-bold fs-6">Choose Font Size:</label>
+              <label for="fontSelector" class="col-createChart-label fw-bold fs-6">Choose Font Size:</label>
               <select
               class="form-select "
               (change)="onFontSizeChange($event)"
@@ -171,7 +171,7 @@
               <div class="col-md-6">
               <!-- Background Color Picker -->
               <div class="color-picker-container ">
-                <label for="bgColorPicker" class="col-form-label fw-bold fs-6">Choose Background Color:</label>
+                <label for="bgColorPicker" class="col-createChart-label fw-bold fs-6">Choose Background Color:</label>
                 <input
                   id="bgColorPicker"
                   type="color"
@@ -187,7 +187,7 @@
               <!-- Text Color Picker -->
               <div class="col-md-6">
               <div class="color-picker-container ">
-                <label for="textColorPicker" class="col-form-label fw-bold fs-6">Choose Text Color:</label>
+                <label for="textColorPicker" class="col-createChart-label fw-bold fs-6">Choose Text Color:</label>
                 <input
                   id="textColorPicker"
                   type="color"
@@ -203,7 +203,7 @@
             <div class="row">
 
               <div class="col-md-4 mb-3">
-                <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Module Names</label>
+                <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Module Names</label>
                 <ngx-select
                   id="parameterName"
                   [allowClear]="true"
@@ -221,7 +221,7 @@
   
   
               <div class="col-md-4 mb-3">
-                <label for="dashboardIds" class="col-form-label fw-bold fs-6 ">Redirect To</label>
+                <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Redirect To</label>
                 <ngx-select
                   id="parameterName"
                   [allowClear]="true"
@@ -239,7 +239,7 @@
                 <!-- Select Type -->
                 <div class="col-md-4">
                   <div class="d-flex flex-column">
-                    <label for="dashboardIds" class="col-form-label fw-bold fs-6">Select Type</label>
+                    <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Select Type</label>
                     <ngx-select
                       id="selectType"
                       [allowClear]="true"
@@ -264,7 +264,7 @@
             
             <!-- Name Container -->
             <div class="col-md-12" style="padding: 10px; border-radius: 8px;">
-              <label class="col-form-label fw-bold fs-6 required">Name</label>
+              <label class="col-createChart-label fw-bold fs-6 required">Name</label>
               <div
                 formControlName="customLabel"
                 contenteditable="true"

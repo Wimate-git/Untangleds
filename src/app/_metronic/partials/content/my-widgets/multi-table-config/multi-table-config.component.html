@@ -47,7 +47,7 @@
             <div class="row g-3">
               <!-- Form Fields -->
               <div class="col-md-4 mb-3">
-                <label for="formlist" class="col-form-label fw-bold fs-6 required">
+                <label for="formlist" class="col-createChart-label fw-bold fs-6 required">
                   Forms
                   <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
                     <i class="bi bi-info-circle fs-5"></i>
@@ -71,7 +71,7 @@
         
             
               <div class="col-md-4 mb-3">
-                <label for="parameterName" class="col-form-label fw-bold fs-6 required">Form Fields</label>
+                <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields</label>
                 <div class="custom-multiselect">
                   <p-multiSelect
                     [options]="listofDynamicParam"
@@ -85,17 +85,17 @@
               </div>
 
               <div class="col-md-4 mb-3">
-                <label for="custom_Label" class="col-form-label fw-bold fs-6  required">Custom Label</label>
+                <label for="custom_Label" class="col-createChart-label fw-bold fs-6  required">Custom Label</label>
                 <input type="text" class="form-control form-control-solid"  name="custom_Label"
                   formControlName="custom_Label">
               </div>
               <div class="col-md-4 mb-3" *ngIf="!hideRowDataField">
-                <label for="custom_Label" class="col-form-label fw-bold fs-6 required">Row Data</label>
+                <label for="custom_Label" class="col-createChart-label fw-bold fs-6 required">Row Data</label>
                 <input type="text" class="form-control form-control-solid" name="custom_Label"
                   formControlName="rowData">
               </div>
               <div class="col-md-4 mb-3">
-                <label for="groupByFormat" class="col-form-label fw-bold fs-6 required">Group By Format</label>
+                <label for="groupByFormat" class="col-createChart-label fw-bold fs-6 required">Group By Format</label>
                 <input
                   id="groupByFormat"
                   type="text"
@@ -152,7 +152,7 @@
           
             <!-- Custom Label -->
             <!-- <div class="col-md-5">
-              <label for="custom_Label1" class="col-form-label fw-bold fs-6 required">Custom Label</label>
+              <label for="custom_Label1" class="col-createChart-label fw-bold fs-6 required">Custom Label</label>
               <input
                 type="text"
                 class="form-control form-control-solid"
@@ -187,7 +187,7 @@
         >
           <div class="row g-3 align-items-end mb-4">
             <div class="col-md-4">
-              <label for="constant-{{ i }}" class="col-form-label fw-bold fs-6 ">Column Label</label>
+              <label for="constant-{{ i }}" class="col-createChart-label fw-bold fs-6 ">Column Label</label>
               <input
                 id="constant-{{ i }}"
                 type="text"
@@ -260,7 +260,7 @@
             <div class="row">
 
             <div class="col-md-4 mb-3">
-              <label for="formlist" class="col-form-label fw-bold fs-6 ">
+              <label for="formlist" class="col-createChart-label fw-bold fs-6 ">
                 Forms
                 <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
                   <i class="bi bi-info-circle fs-5"></i>
@@ -282,7 +282,7 @@
             </div>
 
             <div class="col-md-4 mb-3">
-              <label for="formlist" class="col-form-label fw-bold fs-6 ">
+              <label for="formlist" class="col-createChart-label fw-bold fs-6 ">
                 Mini Table Name
                 <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
                   <i class="bi bi-info-circle fs-5"></i>
@@ -316,7 +316,7 @@
         </div>
       </div>
       <div class="col-md-4 d-flex flex-column">
-        <label for="primaryValue" class="col-form-label fw-bold fs-6 mb-2">
+        <label for="primaryValue" class="col-createChart-label fw-bold fs-6 mb-2">
           Operation
           <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Show Value As">
             <i class="bi bi-info-circle fs-5"></i>
