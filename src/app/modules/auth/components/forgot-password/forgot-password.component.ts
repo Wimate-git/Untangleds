@@ -45,13 +45,17 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.initForm();
-
-    this.initialize_form()
 
     //For Mobile login provisions provided
     this.restrictMobileProvision = localStorage.getItem('restrictMobileProvision')
     console.log("this.restrictMobileProvision Forgot component",this.restrictMobileProvision);
+
+
+    this.initForm();
+
+    this.initialize_form()
+
+ 
 
     this.cd.detectChanges()
   }

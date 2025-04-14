@@ -44,6 +44,22 @@ export class AuthComponent implements OnInit, OnDestroy {
     // BODY_CLASSES.forEach((c) => document.body.classList.add(c));
 
 
+    this.route.queryParams.subscribe((params) => {
+      this.restrictMobileProvision = params['restrict'];
+
+      console.log("restrictMobileProvision auth component",this.restrictMobileProvision);
+
+      localStorage.setItem('restrictMobileProvision',this.restrictMobileProvision)
+
+
+      this.cd.detectChanges()
+
+      // if (this.savedQuery) {
+        
+      // }
+    })
+
+
     this.logoUrl = 'https://assets-untangleds.s3.ap-south-1.amazonaws.com/Wimate_Logo.png';
 
     this.untangledImage = 'https://assets-untangleds.s3.ap-south-1.amazonaws.com/untangled-project.png'
@@ -90,20 +106,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     console.log("Client Logo is",this.clientLogo);
 
 
-    this.route.queryParams.subscribe((params) => {
-      this.restrictMobileProvision = params['restrict'];
-
-      console.log("restrictMobileProvision auth component",this.restrictMobileProvision);
-
-      localStorage.setItem('restrictMobileProvision',this.restrictMobileProvision)
-
-
-      this.cd.detectChanges()
-
-      // if (this.savedQuery) {
-        
-      // }
-    })
+   
 
 
 
