@@ -366,8 +366,12 @@ async confirmNewPassword() {
         confirmButtonText: 'Okay'
     }).then((result)=>{
       if(result.isConfirmed){
-        if(this.restrictMobileProvision){
+        if(this.restrictMobileProvision != 'true'){
         this.router.navigate(['/auth/login']);
+        }
+        else{
+          this.showVerificationFields = false
+          this.cd.detectChanges()
         }
       }
     })
