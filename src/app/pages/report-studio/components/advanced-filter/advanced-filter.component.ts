@@ -145,10 +145,73 @@ export class AdvancedFilterComponent {
     this.selectedFilter.push(...this.reportsFeildsAdvanced.get('miniTableEnable')?.value)
     this.selectedFilter.push(...this.reportsFeildsAdvanced.get('trackEnable')?.value)
 
+    //Clear the form if the checkbox is deselected
+    console.log(this.reportsFeildsAdvanced.get('miniTableEnable')?.value,this.reportsFeildsAdvanced.get('trackEnable')?.value);
+
+    if(this.reportsFeildsAdvanced.get('miniTableEnable')?.value == ''){
+      this.reportsFeildsAdvanced.get('miniTableColumn')?.setValue('all')
+      this.reportsFeildsAdvanced.get('miniTableOptions')?.setValue('all')
+
+      console.log("Selected Forms are here ",this.selectedForms);
+
+      this.queryBuilderForm.reset()
+      this.customMiniColumns.reset()
+
+      this.showTypes = []
+      this.selectedEnabledMiniTableFilters = []
+      this.addMiniTableCustomColumns = false
+      this.addMiniTableFilters = false
+      
+      this.initializeForm();
+
+      this.initializeMiniTable();
+      this.initializeFormControls1()
+    }
+
+    console.log("Selected Forms are here outside ",this.selectedForms);
+
+    if(this.reportsFeildsAdvanced.get('trackEnable')?.value == ''){
+      this.reportsFeildsAdvanced.get('equationConditionText')?.setValue('')
+      this.reportsFeildsAdvanced.get('advanceOption')?.setValue('all')
+      this.reportsFeildsAdvanced.get('addExcellOption')?.setValue('all')
+
+      this.isFormAdvancedVisible = false
+      this.addExcellOptions = false
+
+      this.mainFormGroup = this.fb.group({
+        dynamicConditions: this.fb.array([this.createConditionGroup()])  
+      });
+  
+      this.customLocationGroup = this.fb.group({
+        customForms: this.fb.array([this.createCustomForm1()])
+      });
+    }
+
     this.selectedFilter = Array.from(new Set(this.selectedFilter.filter((item:any)=>item != '')))
 
     console.log("selectedFilter ",this.selectedFilter);
   }
+
+
+    // Helper function to initialize form controls dynamically based on dropdown count
+    initializeFormControls1(): void {
+      const formArray = this.reportsFeildsAdvanced.get('filter_type') as FormArray;
+  
+      // Clear out the FormArray if any existing controls exist
+      while (formArray.length) {
+        formArray.removeAt(0);
+      }
+  
+  
+      // Loop over the new data and add FormControls
+      this.selectedForms.forEach((dropdownData: any[], i: any) => {
+  
+        // Create a new FormControl with the selected values (or empty array if no selection)
+        formArray.push(this.fb.control([]));
+      });
+  
+      // console.log('Form Controls Initialized:', this.reportsFeilds.value);
+    }
 
 
   multiSelectMiniTableChange(){
@@ -162,7 +225,7 @@ export class AdvancedFilterComponent {
   }
 
 
-  repopulateAllForm(){
+  async repopulateAllForm(){
 
 
     const advancedreportsFeildsAdvanced = this.AdvancedExcelData.advancedreportsFeildsAdvanced
@@ -212,14 +275,14 @@ export class AdvancedFilterComponent {
 
 
     if(advancedreportsFeildsAdvanced.miniTableOptions != 'all'){
-      this.onMiniTableColumns('onCondition','edit','')
+      await this.onMiniTableColumns('onCondition','edit','')
       this.repopulateCustomMiniFilter(advancedMiniTableFilter.formGroups)
       this.addMiniTableFilters = true
     }
 
 
     if(advancedreportsFeildsAdvanced.miniTableColumn != 'all'){
-      this.onMiniCustomColumns('onCondition','edit','')
+      await this.onMiniCustomColumns('onCondition','edit','')
       this.repopulateCustomMiniFilter1(advancedcustomMiniColumns.miniCustomColumns)
       this.addMiniTableCustomColumns = true
     }
@@ -856,6 +919,8 @@ addTableForExistingData(formGroupIndex: number, table: any) {
 
 
   console.log("forms data after add tables for existing ",this.queryBuilderForm.value)
+
+  this.cd.detectChanges()
 }
 
 

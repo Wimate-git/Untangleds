@@ -5108,6 +5108,9 @@ getLastWeekTimestamps() {
               return idx !== -1 ? row[idx] : null;
             })
           );
+
+          console.log("Final Headers ",finalHeaders);
+          console.log("reorderedRows are here  ",reorderedRows);
     
           tableData[item] = [finalHeaders, ...reorderedRows];
         }
