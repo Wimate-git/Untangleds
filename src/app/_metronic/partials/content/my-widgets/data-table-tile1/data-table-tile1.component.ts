@@ -22,6 +22,7 @@ export class DataTableTile1Component {
   pageSizeOptions = [10, 25, 50, 100];
 
   @Output() dataTableCellInfo = new EventEmitter<any>();
+  rowClass: 'clickable-row'
   
 
   //   [responseRowData]="responseRowData"
@@ -86,9 +87,11 @@ this.parseChartConfig(this.storeDrillDown)
       field: column.value,
       sortable: true,
       filter: true,
-      resizable: true
+      resizable: true,
+      cellClass: 'pointer-cursor'  // Add this class to the cells
     }));
   }
+  
 
   // closeModal(): void {
   //   this.modalClose.emit();
@@ -332,4 +335,11 @@ this.parseChartConfig(this.storeDrillDown)
         }, 500);
       }
       
+
+      getRowClass(params:any) {
+        if (params.node && params.node.data && params.node.data.clickable) {
+          return 'ag-row-clickable'; // Add the class for clickable rows
+        }
+        return '';
+      }
 }

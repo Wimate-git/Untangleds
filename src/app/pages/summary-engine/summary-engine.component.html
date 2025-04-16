@@ -211,7 +211,7 @@
                   <div *ngIf="item.grid_type === 'TableWidget'" >
                     <app-table-widget-ui [item]="item" [index]="i" (customEvent)="helperTile($event,tableModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store"     [summaryDashboardUpdate]="summaryDashboardUpdate" 
                     [summaryDashboardView]="summaryDashboardView" 
-                    [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" [liveDataTableTile]="liveDataTableTile"></app-table-widget-ui>
+                    [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" [liveDataTableTile]="liveDataTableTile" (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"></app-table-widget-ui>
                   </div>
                   
 
@@ -767,6 +767,11 @@
   [fullScreen]="true">
   <p style="color: white">Loading Data, please wait...</p>
   </ngx-spinner>
+
+
+
+
+
   <ngx-spinner 
   *ngIf="isLoading" 
   bdColor="rgba(0, 0, 0, 0.8)" 
@@ -778,6 +783,26 @@
   [fullScreen]="true">
   <p style="color: white">Data Processing, Please Wait....</p>
   </ngx-spinner>
+
+
+
+
+
+  <ngx-spinner 
+  *ngIf="isLoading" 
+  bdColor="rgba(0, 0, 0, 0.8)" 
+  size="medium" 
+  color="#fff" 
+
+  name="FormView"
+  type="square-jelly-box" 
+  [fullScreen]="true">
+  <p style="color: white">Form View Opening, Please Wait....</p>
+  </ngx-spinner>
+
+
+
+
   <ngx-spinner 
   *ngIf="isLoading" 
   bdColor="rgba(0, 0, 0, 0.8)" 
@@ -1580,6 +1605,44 @@
                 </div>
               </button>
             </div>
+            
+          </div>
+
+
+
+          <div class="row">
+
+
+
+            <div class="col-md-12">
+              <!-- Bar Chart Button -->
+              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7 disabled-button"  style="border: 0px; display: block; width: 100%;">
+                <div class="container">
+                  <!-- Column Chart Container -->
+                  <div class="chart-container ">
+                    <h2>{{ title }}</h2>
+                    <div id="barwithTable" style="width: 100%; height: 400px;"></div>
+                  </div>
+                  
+                
+                  <!-- Table Container -->
+                  <div class="table-container">
+                    <!-- <h3>Conversion Breakdown</h3> -->
+                    <ag-grid-angular
+                      style="width: 100%; height: 300px;"
+                      class="ag-theme-alpine"
+                      [columnDefs]="columnDefs"
+                      [rowData]="rowData">
+                    </ag-grid-angular>
+                  </div>
+                </div>
+                
+                
+                
+              </button>
+            </div>
+
+
             
           </div>
 

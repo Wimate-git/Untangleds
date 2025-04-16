@@ -249,11 +249,10 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   permissionIdLocal: any;
   idInputSubject: any;
   previousValue: string;
-  columnDefs: any;
+
   private gridApi!: GridApi;
   private gridColumnApi!: Column;
   columnApi: any;
-  rowData: { location: string; 'text-1732683302774': string; '1732683476': string; }[];
   extractUserName: any;
   mapHeight: any[] = [];
   mapWidth: any[] = [];
@@ -733,6 +732,78 @@ Highcharts.chart('MixedChart', barchartOptions);
     };
     Highcharts.chart('columnChart', barchartOptions);
   }
+
+
+  title = 'Column Chart with Table';
+
+  // Column chart setup
+  createCalumnWithTableChart() {
+    // Prepare x-axis categories from the row data
+    const categories = ['LEADS CREATED', 'CONVERTED TO POTENTIAL', 'DEALS WON'];
+  
+    // Prepare series data from the row data
+    const seriesData = this.rowData.map((row) => ({
+      name: row.activityType,  // Activity Type (e.g., Task, Event, Call)
+      data: [row.leadsCreated, row.convertedToPotential, row.dealsWon], // Data for each category
+    }));
+  
+    const barchartOptions: any = {
+      chart: {
+        type: 'column', // Column chart for vertical bars
+      },
+      title: {
+        text: 'Lead Conversion Funnel',
+      },
+      xAxis: {
+        categories: categories, // Set categories to stages of conversion
+      },
+      yAxis: {
+        title: {
+          text: 'Values',
+        },
+      },
+      series: seriesData, // Pass the series data dynamically
+      credits: {
+        enabled: false, // Disable the Highcharts credits
+      },
+      legend: {
+        enabled: false, // Hide the legend
+      },
+      plotOptions: {
+        column: {
+          dataLabels: {
+            enabled: false, // Disable data labels on columns
+            style: {
+              fontSize: '12px', // Adjust font size of data labels
+            },
+          },
+        },
+      },
+    };
+  
+    // Render the chart in the 'barwithTable' div
+    Highcharts.chart('barwithTable', barchartOptions);
+  }
+  
+  
+
+
+  // AG-Grid column definitions
+  columnDefs: ColDef[] = [
+    { headerName: 'Activity Type', field: 'activityType' },
+    { headerName: 'Leads Created', field: 'leadsCreated' },
+    { headerName: 'Converted to Potential', field: 'convertedToPotential' },
+    { headerName: 'Deals Won', field: 'dealsWon' },
+    { headerName: 'Conversion Rate', field: 'conversionRate' },
+  ];
+
+  // AG-Grid row data
+  rowData = [
+    { activityType: 'Task', leadsCreated: 10, convertedToPotential: 1, dealsWon: 1, conversionRate: '10.0%' },
+    { activityType: 'Event', leadsCreated: 105, convertedToPotential: 29, dealsWon: 20, conversionRate: '19.0%' },
+    { activityType: 'Call', leadsCreated: 413, convertedToPotential: 47, dealsWon: 41, conversionRate: '9.9%' },
+    { activityType: 'None', leadsCreated: 984, convertedToPotential: 126, dealsWon: 118, conversionRate: '12.0%' },
+  ];
 
 
   createPieChart1() {
@@ -1967,22 +2038,6 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
       // }
     });
 
-
-    // this.openModalHelpher(packet.dashboardIds).then((data) => {
-    //   console.log('✅ this.all_Packet_store permissions:', data);
-    //   const readMainData = data;
-    //   console.log('readMainData checking', readMainData);
-    //   this.storeCheck = readMainData.fullScreenModeCheck;
-    //   console.log('this.storeCheck checking', this.storeCheck);
-    // });
-    // this.openModalHelpher(packet.dashboardIds).then((data) => {
-    //   console.log('✅ this.all_Packet_store permissions:', data);
-    //   const readMainData = data;
-    //   console.log('readMainData checking', readMainData);
-    //   this.storeCheck = readMainData.fullScreenModeCheck;
-    //   console.log('this.storeCheck checking', this.storeCheck);
-    // });
-
     console.log('packet checking from queryparams', packet);
     this.modalCheck = packet.selectType;
 
@@ -2000,10 +2055,6 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
         backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  
       });
-      
-      
-      
-
 
       const queryParams = new URLSearchParams();
 
@@ -2081,10 +2132,11 @@ this.fetchCompanyLookupdataOnit(1)
       console.log('Matching Packet:', matchingPacket);
           this.storeCheck = matchingPacket.P11
           console.log('this.storeCheck check from setmoduleId',this.storeCheck)
-    queryParams.append('isFullScreen', String(this.storeCheck));
+    queryParams.append('isFullScreen', 'true');
       const finalUrl = `${window.location.origin}/summary-engine/${modulePath}?${queryParams.toString()}`;
 
       this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
+
       
       
       console.log('this.currentiframeUrl checking', this.currentiframeUrl);
@@ -3440,18 +3492,7 @@ this.fetchSummaryMain(id)
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', this.applyTheme.bind(this));
     // this.fetchCalender()
    
-         this.rowData = [
-        {
-          'location': 'India',
-          'text-1732683302774': '+91',
-          '1732683476': '2023-12-31'
-        },
-        {
-          'location': 'USA',
-          'text-1732683302774': '+1',
-          '1732683476': '2023-12-30'
-        }
-      ];
+
 
 
 
@@ -4049,6 +4090,10 @@ setTimeout(() => {
 
 setTimeout(() => {
   this.createStackedChart1()
+}, 500);
+
+setTimeout(() => {
+  this.createCalumnWithTableChart()
 }, 500);
 
  
@@ -9215,6 +9260,10 @@ helperChartClickFunnel(event: any, modalChart: any) {
     'x-api-key': 'p2FIIEi4cA2unoJhRIA137vRdGEuJCCi5hV6Vc11'
   });
   async readdataTableCellInfo(readData: any, modalref: any) {
+    this.isLoading = true;
+
+    this.spinner.show('FormView')
+
     console.log('readData from parent:', readData);
 
     if (!readData?.data) {
@@ -9257,6 +9306,8 @@ helperChartClickFunnel(event: any, modalChart: any) {
       this.modalService.open(modalref,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
     }, 500);
+    this.isLoading = false;
+    this.spinner.hide('FormView')
 }
 
 

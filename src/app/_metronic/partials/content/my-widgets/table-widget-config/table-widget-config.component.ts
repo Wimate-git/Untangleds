@@ -100,6 +100,7 @@ this.initializeTileFields()
       filterParameter1:[''],
       // custom_Label1:[''],
       filterDescription1:[''],
+      enableRowCal:['']
   
     });
   }
@@ -141,7 +142,8 @@ this.initializeTileFields()
     { value: 'max', text: 'Maximum' },
     { value: 'average', text: 'Average' },
     { value: 'latest', text: 'Latest' },
-    { value: 'previous', text: 'Previous' }
+    { value: 'previous', text: 'Previous' },
+    { value: 'default', text: 'Default' }
   ];
   
 
@@ -304,6 +306,7 @@ this.initializeTileFields()
       table_rowConfig: this.createKPIWidget.value.all_fields || [],
       // custom_Label1:this.createKPIWidget.value.custom_Label1,
       filterDescription1:this.createKPIWidget.value.filterDescription1,
+      enableRowCal:this.createKPIWidget.value.enableRowCal
       // PredefinedScripts:this.createKPIWidget.value.PredefinedScripts
 
     };
@@ -427,10 +430,33 @@ this.initializeTileFields()
   }
   
   handleChange(event: any) {
+    console.log('checking event value',event.value)
+
     // Call both functions onChange
-    this.addControls(event.value, 'ts');
+
     this.parameterValue(event);
+    this.CustomRowCal();
   }
+
+  CustomRowCal() {
+    const readrowCalCheck = this.createKPIWidget.get('enableRowCal')?.value;
+    const formArray = this.createKPIWidget.get('all_fields') as FormArray;
+    const readFormFieldsControl = this.createKPIWidget.get('form_data_selected')?.value
+    console.log('readFormFieldsControl checking',readFormFieldsControl)
+  
+    if (readrowCalCheck === true) {
+      formArray.controls.forEach((control) => {
+        control.enable(); // Enable the controls if checkbox is checked
+      });
+      this.addControls(readFormFieldsControl, 'ts'); // Call addControls when enabled
+    } else {
+      formArray.controls.forEach((control) => {
+        control.disable(); // Disable the controls if checkbox is unchecked
+      });
+    }
+  }
+  
+  
   
   validateAndUpdate() {
     if (this.createKPIWidget.invalid) {
@@ -557,6 +583,7 @@ this.initializeTileFields()
         custom_Label: tile.custom_Label,
         filterParameter1: parsedFilterParameter1, // Parsed array
         filterDescription1: tile.filterDescription1,
+        enableRowCal:tile.enableRowCal,
         all_fields: this.repopulate_fields(tile),
         // custom_Label1: tile.custom_Label1,
       });
@@ -683,6 +710,7 @@ this.initializeTileFields()
         filterParameter1: this.createKPIWidget.value.filterParameter1 ||'', // Parsed array
         filterDescription1: this.createKPIWidget.value.filterDescription1 ||'',
         table_rowConfig: this.createKPIWidget.value.all_fields || '',
+        enableRowCal:this.createKPIWidget.value.enableRowCal || ''
         // custom_Label1: this.createKPIWidget.value.custom_Label1,
       };
   

@@ -319,10 +319,30 @@
 
           <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'custom-row'}" id="custom-row"
           role="tabpanel" aria-labelledby="customRow-tabpane">
+
+          <div class="col-lg-3 col-md-3 col-sm-6 mb-4 mt-4">
+            <div class="d-flex align-items-center">
+              <label for="toggleCheckLegend" class="col-createChart-label fw-bold fs-6 me-2">
+                Enable Row Calculation
+              </label>
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  (change)="CustomRowCal()"
+                  formControlName="enableRowCal"
+                  id="toggleCheckLegend"
+                >
+              </div>
+            </div>
+          </div>
+          
+
+
           <form [formGroup]="createKPIWidget">
             <div formArrayName="all_fields">
               <div *ngFor="let field of all_fields.controls; let fieldIndex=index">
-                <div [formGroupName]="fieldIndex"
+                <div *ngIf="createKPIWidget.get('enableRowCal')?.value" [formGroupName]="fieldIndex"
                   style="border: 2px solid rgb(201, 228, 239); padding: 10px; margin: 5px;border-radius: 5px;">
                   <div class="row g-3">
                     <div class="col-md-4 mb-3">
@@ -340,7 +360,7 @@
                         placeholder="Select Type">
                       </ngx-select>
                     </div>
-                    
+          
                     <div class="col-md-4">
                       <div class="d-flex flex-column">
                         <label for="rowLabel" class="col-createChart-label fw-bold fs-6 ">Row Label</label>
@@ -351,9 +371,9 @@
                           name="rowLabel"
                           formControlName="rowLabel"
                         />
-                   
                       </div>
                     </div>
+          
                     <div class="col-md-4 mb-3">
                       <label for="rowUnit" class="col-createChart-label fw-bold fs-6 ">
                         Row Unit
@@ -369,17 +389,12 @@
                         placeholder="Select Unit">
                       </ngx-select>
                     </div>
-                    
-
-
                   </div>
-   
                 </div>
               </div>
             </div>
-
-
           </form>
+          
           
         </div>
   

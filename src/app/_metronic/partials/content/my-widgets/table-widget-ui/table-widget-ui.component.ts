@@ -8,7 +8,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AgGridAngular } from 'ag-grid-angular';
-import { GridApi ,Column} from 'ag-grid-community';
+import { GridApi ,Column, RowClassParams} from 'ag-grid-community';
 
 import * as XLSX from 'xlsx';  
 
@@ -44,6 +44,7 @@ export class TableWidgetUiComponent implements OnInit{
   tableDataWithFormFilters: any = [];
   @ViewChildren(AgGridAngular) agGrids!: QueryList<AgGridAngular>;
   pageSizeOptions = [10, 25, 50, 100];
+  @Output() dataTableCellInfo = new EventEmitter<any>();
   
   
   @Output() customEvent = new EventEmitter<{ arg1: any; arg2: number }>();
@@ -78,6 +79,7 @@ export class TableWidgetUiComponent implements OnInit{
     filter: true, // Enable filtering
     enableColMove: true
   };
+  pinnedBottomRowData: any[];
   autoSizeAllColumns() {
     const allColumnIds: string[] = [];
     this.columnApi.getAllColumns().forEach((column: { getId: () => string; }) => {
@@ -301,6 +303,8 @@ export class TableWidgetUiComponent implements OnInit{
 }
 
 
+
+
 ngOnInit(){
   console.log('item chacke',this.item.grid_details)
   this.summaryService.lookUpData$.subscribe((data: any)=>{
@@ -478,8 +482,45 @@ createtableWidget(mapWidgetData?:any){
     this.finalColumns = this.columnDefs
   
     // Parse row data
+    // this.rowData = JSON.parse(this.item.rowData);
+    // console.log('this.rowData from table Tile', this.rowData);
+
+
+      // After parsing your row data and setting the rowData
+  try {
+    // Parse row data
     this.rowData = JSON.parse(this.item.rowData);
-    console.log('this.rowData', this.rowData);
+    console.log('this.rowData from table Tile', this.rowData);
+
+    const enableRowCal = this.item.enableRowCal
+    console.log('enableRowCal checking',enableRowCal)
+    if(enableRowCal==true){
+
+    if (this.rowData && this.rowData.length > 0) {
+      const lastRow = this.rowData[this.rowData.length - 1]; // Get the last row
+
+      // Set pinned row data to pin the last row
+      this.pinnedBottomRowData = [{
+        ...lastRow,
+        style: { backgroundColor: '#f0f0f0' } // Add custom style for the pinned row
+      }];
+    
+      
+
+      // Log the pinned row data
+      console.log('Pinned bottom row data:', this.pinnedBottomRowData);
+    } else {
+      console.warn('No rows found in rowData.');
+    }
+
+    }
+
+    // Check if rowData has rows and pin the last row
+
+  } catch (error) {
+    console.error('Error parsing row data:', error);
+  }
+
   } catch (error) {
     console.error('Error parsing table data:', error);
   }
@@ -488,12 +529,21 @@ createtableWidget(mapWidgetData?:any){
 
 
 }
+
+getRowStyle = ({ node }: RowClassParams): { [key: string]: string } | undefined => 
+  node.rowPinned ? { fontWeight: 'bold', backgroundColor: 'lightblue' } : undefined;
+
+
+
+
+
 onGridReady(params: any): void {
   this.gridApi = params.api; // Initialize Grid API
   this.gridColumnApi = params.columnApi; // Initialize Column API
   params.api.sizeColumnsToFit(); 
   console.log('Grid API initialized:', this.gridApi); // Debugging
 }
+
 
 
 
@@ -822,6 +872,26 @@ get shouldShowButton(): boolean {
 
   
 
+  }
+
+
+
+  clickLock = false;
+  onCellClick(eventData: any) {
+    if (this.clickLock) {
+      console.log("Click ignored: Already processing a click.");
+      return; // Ignore repeated clicks
+    }
+  
+    this.clickLock = true; // Lock the click
+    console.log("eventData check for", eventData);
+  
+    this.dataTableCellInfo.emit(eventData);
+  
+    // Unlock click after a short delay (e.g., 500ms)
+    setTimeout(() => {
+      this.clickLock = false;
+    }, 500);
   }
   
 
