@@ -108,6 +108,11 @@ const Routing: Routes = [
     loadChildren: () => import('./location-management/location-management.module').then((m) => m.LocationManagementModule),
   },
 
+  {
+    path:'mqtt',
+    loadChildren: () => import('./mqtt/mqtt.module').then((m) => m.MQTTModule),
+  },
+
   
 
   {
