@@ -1,0 +1,294 @@
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true"><p style="color: white" >Loading… please enjoy this virtual cup of coffee! ☕ </p></ngx-spinner>
+  
+<div class="card card-custom">
+    <div class="card-header border-0 pt-6">
+        <h2>MQTT Configuration</h2>
+    </div>
+    <div class="card-header border-0 pt-0">
+
+        <!--begin::Card title-->
+        <div class="card-title">
+
+        <div class="d-flex align-items-center position-relative my-1">
+            <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
+            <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12"
+                placeholder="Search Mqtt">
+        </div> 
+        
+    </div>
+        <!--begin::Card title-->
+
+        <!--begin::Card toolbar-->
+        <div class="card-toolbar">
+            <!--begin::Toolbar-->
+            <div class="d-flex justify-content-end">
+
+                <!--begin::Add user-->
+                <a [ngbTooltip]="'Add new user'" type="button" class="btn btn-primary" data-action="create">
+                    Add
+                </a>
+                <!--end::Add user-->
+                </div>
+                <!--end::Toolbar-->
+            <!-- </div> -->
+            <!--end::Card toolbar-->
+        </div>
+    </div>
+    <!-- <div class="card-body pt-0"> -->
+    <div class="card-body pt-0">
+        <app-crud-user [componentSource]="'app-mqtt'" [datatableConfig]="datatableConfig" route="/mqtt" (deleteEvent)="delete($event)" (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent" [modal]="openMQTTModal"></app-crud-user>
+    </div>
+</div>
+
+
+
+<ng-template #openMQTTModal let-modal>
+    <form [formGroup]="createMQTTField" (ngSubmit)="onSubmit($event)">
+        <div class="modal-header">
+            <h4 *ngIf="!editOperation" class="modal-title" id="modal-basic-title">Add New MQTT</h4>
+            <h4 *ngIf="editOperation" class="modal-title" id="modal-basic-title">Edit Existing MQTT</h4>
+         
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+
+
+        <div class="modal-body">
+            <div class="d-flex flex-column scroll-y p-9"  id="kt_modal_update_customer_scroll"
+                data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}"
+                data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_update_customer_header"
+                data-kt-scroll-wrappers="#kt_modal_update_customer_scroll" data-kt-scroll-offset="300px">
+                <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+
+
+                    <div class="container mb-4">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="fw-semibold fs-6 mb-2 required"> Id</label>
+
+    
+                                <input required type="text" formControlName="mqttId" #value 
+                                class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Mqtt Id" (keyup)="uniquePKValue(value.value)"/>
+                                <div *ngIf="uniqueKeyFounded==true"
+                                    class="fv-plugins-message-container invalid-feedback">
+                                    Duplicate Id not allowed
+                                </div>
+                            </div>
+    
+                            <div class="col-md-3">
+                                <label class="fw-semibold fs-6 mb-2 required"> Name</label>
+                                <input type="text" formControlName="mqttName"
+                                    class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Mqtt Name" />
+                            </div>
+
+
+                            <div class="col-md-3">
+                                <label class="fw-semibold fs-6 mb-2 required"> Host</label>
+    
+                                <select class="form-select form-select-solid form-select-lg fw-bold"
+                                    formControlName="mqttHost" placeholder="select Mqtt Host">
+                                    <option value="" disabled="true"> Select Host</option>
+                                    <option value="mqtt://">mqtt://</option>
+                                    <option value="mqtts://">mqtts://</option>
+                                    <option value="ws://">ws://</option>
+                                    <option value="wss://">wss://</option>
+                                </select>
+                            </div>
+
+
+                            <div class="col-md-3">
+                                <label class="fw-semibold fs-6 mb-2 required"> Url</label>
+                                <input type="text" formControlName="mqttHostUrl"
+                                    class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Mqtt Url" />
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="container mb-4">
+                        <div class="row">
+                           
+                            <div class="col-md-6">
+                                <label class="fw-semibold fs-6 mb-2 required">Manual Override Topic</label>
+
+                                <input type="text" formControlName="mqttTopic"
+                                    class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Mqtt Topic" />
+
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <label class="fw-semibold fs-6 mb-2 required">Send Data Topic</label>
+
+                                <input type="text" formControlName="mqttTopicSend"
+                                    class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Mqtt Send Topic" />
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="container mb-4">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="fw-semibold fs-6 mb-2 required"> Port</label>
+
+                                <input type="number" formControlName="mqttPort"
+                                    class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Mqtt Port" />
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="fw-semibold fs-6 mb-2 required"> Username</label>
+
+                                <input type="text" formControlName="mqttUsername"
+                                    class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Mqtt Username" />
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="fw-semibold fs-6 mb-2 required"> Password</label>
+
+                                <input type="text" formControlName="mqttPassword"
+                                    class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Mqtt Password" />
+                            </div>
+
+
+                            <div class="col-md-3 mt-7">
+                                <label class="fw-semibold fs-6 me-2"> SSL/TLS</label>
+    
+                                <div class="form-check form-check-inline col-form-label">
+                                    <input class="form-check-input" type="radio" (change)="SLLTLSEvent($event)" #value
+                                        formControlName="mqttsslOrtls" id="inlineCheckbox1" value="on">
+                                    <label class="form-check-label" for="inlineCheckbox1">On</label>
+                                </div>
+                                <div class="form-check form-check-inline col-form-label">
+                                    <input class="form-check-input"  #value (change)="SLLTLSEvent($event)" type="radio"
+                                        formControlName="mqttsslOrtls" id="inlineCheckbox2" value="off">
+                                    <label class="form-check-label" for="inlineCheckbox2">Off</label>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- (change)="SLLTLSEvent($event)" -->
+                    <!-- (change)="SLLTLSEvent($event)" -->
+
+                    <div class="container mb-4" *ngIf="createMQTTField.get('mqttsslOrtls')?.value=='on'">
+                        <div class="row">
+                  
+                                <!-- *ngIf="createMQTTField.get('mqttcertificate')?.value=='self_Signed' && createMQTTField.get('mqttsslOrtls')?.value=='on'" -->
+                                <div class="col-md-6" >
+
+                                    <label class="fw-semibold fs-6 mb-2 me-2"> Certificate</label>
+    
+                                    <!-- (change)="CertificateEvent(value.value)" -->
+                                    <div class="form-check form-check-inline col-form-label">
+                                        <input class="form-check-input" type="radio"
+                                             #value 
+                                            formControlName="mqttcertificate" id="inlineCheckbox1" value="CA_Signed_Server">
+                                        <label class="form-check-label" for="inlineCheckbox1">CA Signed Server</label>
+                                    </div>
+    
+                                    <!-- (change)="CertificateEvent(value.value)" -->
+                                    <div class="form-check form-check-inline col-form-label">
+                                        <input class="form-check-input"  #value
+                                            type="radio" formControlName="mqttcertificate" id="inlineCheckbox2"
+                                            value="self_Signed">
+                                        <label class="form-check-label" for="inlineCheckbox2">self Signed</label>
+                                    </div>
+    
+                                </div>
+                        </div>
+                    </div>
+
+                    <div class="container mb-4"   *ngIf="createMQTTField.get('mqttcertificate')?.value=='self_Signed' && createMQTTField.get('mqttsslOrtls')?.value=='on'">
+                        <div class="row">
+                            <!-- *ngIf="createMQTTField.get('mqttsslOrtls')?.value=='on'" -->
+                           
+
+                            <!-- *ngIf="createMQTTField.get('mqttcertificate')?.value=='CA_Signed_Server' " -->
+                            <!-- <div ></div> -->
+                            <div class="col-md-3">
+                                <label class="fw-semibold fs-6 mb-2 required">CA File</label>
+
+                                <input type="text" formControlName="mqttCAFileString"
+                                    class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="CA File" />
+
+                            </div>
+                            <div class="col-md-3">
+                                <label class="fw-semibold fs-6 mb-2 required">Client Certificate
+                                    File</label>
+
+                                <input type="text" formControlName="mqttClientCertificate"
+                                    class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Client Certificate File" />
+
+                            </div>
+                            <div class="col-md-3">
+                                <label class="fw-semibold fs-6 mb-2 required">Client key file</label>
+
+                                <input type="text" formControlName="mqttClientkey"
+                                    class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                                    placeholder="Client key " />
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    
+                   
+
+
+
+
+
+
+
+                    <div class="modal-footer flex-center">
+                        <!--begin::Button-->
+                        <button type="reset" id="kt_modal_update_customer_cancel" class="btn btn-light me-3"
+                            (click)="modal.dismiss('cancel')" >
+                            Discard
+                        </button>
+                        <!--end::Button-->
+            
+                        <!--begin::Button-->
+                        <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary"
+                        [attr.data-kt-indicator]="isLoading ? 'on' : 'off'" [disabled]="createMQTTField.invalid || uniqueKeyFounded">
+                            <span *ngIf="!editOperation" class="indicator-label">
+                                Submit
+                            </span>
+                            <span *ngIf="editOperation"  class="indicator-label">
+                                Update
+                            </span>
+                            <span class="indicator-progress">
+                                Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                            </span>
+                        </button>
+                        <!--end::Button-->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+
+    </form>
+</ng-template>
+
+
+<!-- swal is not yet implemented -->
+<swal #noticeSwal [swalOptions]="swalOptions">
+</swal>
+
+<!-- [disabled]="createUserField.invalid || errorForUniqueID != '' || errorForUniqueEmail != '' || errorForInvalidEmail != '' || errorForInvalidName != '' || errorForUniqueUserID != '' || errorForUniqueID != '' || errorForUniquemobileID != ''" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'" -->
