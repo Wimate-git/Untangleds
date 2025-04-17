@@ -32,11 +32,13 @@
         <div class="table-heading text-align-center">
           <h3>{{ FormName }}</h3> <!-- Binding FormName here -->
         </div>
-        <div class="ag-theme-alpine" style="width: 100%; height: 600px;">
+        <div class="ag-theme-alpine" style="width: 100%; height: 520px;">
           <ag-grid-angular
             [rowData]="responseRowData"
+            [domLayout]="'normal'"
             [columnDefs]="columnDefs"
             [defaultColDef]="defaultColDef"
+            [paginationPageSizeSelector]="pageSizeOptions"
             [pagination]="true"
             [paginationPageSize]="10"
             style="width: 100%; height: 100%;"

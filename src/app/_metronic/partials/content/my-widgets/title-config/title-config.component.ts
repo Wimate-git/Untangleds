@@ -365,16 +365,16 @@ updateTitle() {
     // Extract the updated values from the form
     const updatedTitle = {
       ...this.dashboard[this.editTitleIndex], // Retain existing properties
-      customLabel: this.createTitle.value.customLabel,
-      themeColor: this.createTitle.value.themeColor,
-      fontFamily: this.createTitle.value.fontFamily,
-      fontSize: this.createTitle.value.fontSize,
-      textAlign: this.createTitle.value.textAlign,
-      fontWeight: this.createTitle.value.fontWeight,
-      textColor: this.createTitle.value.textColor,
-      ModuleNames:this.createTitle.value.ModuleNames,
-      dashboardIds:this.createTitle.value.dashboardIds,
-      selectType:this.createTitle.value.selectType
+      customLabel: this.createTitle.value.customLabel ||'',
+      themeColor: this.createTitle.value.themeColor ||'',
+      fontFamily: this.createTitle.value.fontFamily ||'',
+      fontSize: this.createTitle.value.fontSize ||'',
+      textAlign: this.createTitle.value.textAlign ||'',
+      fontWeight: this.createTitle.value.fontWeight ||'',
+      textColor: this.createTitle.value.textColor ||'',
+      ModuleNames:this.createTitle.value.ModuleNames ||'',
+      dashboardIds:this.createTitle.value.dashboardIds ||'',
+      selectType:this.createTitle.value.selectType ||''
     };
 
     // Update the dashboard

@@ -754,19 +754,18 @@ get shouldShowButton(): boolean {
       },
     };
   
-    // Dynamically extract column headers from rowData
+    // Dynamically extract column headers from finalColumns (ensuring these are correct)
     const columnHeaders = this.finalColumns.map((column: any) => column.headerName);
+    console.log('columnHeaders checking from table',columnHeaders)
     const columnFields = this.finalColumns.map((column: any) => column.field);
-    console.log('columnFields checking',columnFields)
-    // const columns = Object.keys(this.rowData[0] || {});
-    // console.log('columns checking',columns)
-
+    console.log('columnFields checking from table', columnFields);
+  
     if (columnHeaders.length === 0) {
       console.error('No columns available for export.');
       return;
     }
   
-    // Adjust page size dynamically
+    // Adjust page size dynamically based on the number of columns
     const columnCount = columnFields.length;
     docDefinition.pageSize =
       columnCount <= 6
@@ -789,8 +788,8 @@ get shouldShowButton(): boolean {
   
     // Add header row
     tableBody.push(
-      columnFields.map((col: any) => ({
-        text: col,
+      columnHeaders.map((col: any) => ({
+        text: col, // Use column headers directly
         style: 'tableHeader',
       }))
     );
@@ -799,16 +798,19 @@ get shouldShowButton(): boolean {
     this.rowData.forEach((row: Record<string, any>, index: number) => {
       const rowData = columnFields.map((col: string | number) => {
         const cellData = row[col];
-        console.log('cellData checking',cellData)
+        console.log('cellData checking', cellData);
   
+        // Check for missing or undefined values
         if (cellData === null || cellData === undefined) {
           return ''; // Treat null/undefined as empty string
         }
   
+        // If the cell data is an object, convert to string
         if (typeof cellData === 'object') {
           return JSON.stringify(cellData); // Convert objects to string
         }
   
+        // Handle base64 images
         if (typeof cellData === 'string' && cellData.includes('data:image')) {
           return {
             image: cellData,
@@ -829,7 +831,7 @@ get shouldShowButton(): boolean {
       table: {
         body: tableBody,
         headerRows: 1,
-        widths: Array(columnFields.length).fill('auto'),
+        widths: Array(columnFields.length).fill('auto'), // Set column widths dynamically (can also be custom)
       },
       layout: {
         fillColor: (rowIndex: number) => {
@@ -841,12 +843,13 @@ get shouldShowButton(): boolean {
   
     // Error handling during PDF generation
     try {
-      pdfMake.createPdf(docDefinition).download(`${this.formName}`+'.pdf');
+      pdfMake.createPdf(docDefinition).download(`${this.formName}` + '.pdf');
     } catch (error) {
       console.error('Error generating PDF:', error);
-      // alert('Failed to generate PDF. Please try again.');
+      // Optionally show an alert or message here
     }
   }
+  
   
   
   

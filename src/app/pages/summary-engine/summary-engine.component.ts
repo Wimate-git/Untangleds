@@ -357,6 +357,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   isMainLoading =true
   modalWidth: any;
   readFormName: any;
+  sendFullScreenCheck: boolean;
 
   createPieChart() {
     const chartOptions: any = {
@@ -1828,7 +1829,25 @@ hideModal() {
 }
 
 
+ @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    // Adjust the menu position when the window is resized
+    this.adjustMenuPosition();
+  }
 
+  private adjustMenuPosition() {
+    const screenHeight = window.innerHeight;
+
+    for (let i = 3; i <= 12; i++) {
+      const menuItem = this.el.nativeElement.querySelector(`.myMenu-open:checked ~ .myMenu-item:nth-child(${i})`);
+
+      if (menuItem) {
+        const translateY = (i - 2) * (screenHeight * 0.1); // Adjust the multiplier for spacing
+
+        this.renderer.setStyle(menuItem, 'transform', `translate3d(0, ${translateY}px, 0)`);
+      }
+    }
+  }
 
 
 fetchCalender(){
@@ -1857,9 +1876,16 @@ showDrillDownData(dynamicDrill:any,modalref:any){
       return;
   }else {
     setTimeout(() => {
-      this.modalService.open(modalref, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
-        keyboard: false  });
+      this.modalService.open(modalref, {  
+        modalDialogClass: 'p-9',  
+        centered: true,  
+        fullscreen: true,   
+        backdrop: 'static', // Disable closing on backdrop click
+        keyboard: false,
+        windowClass: 'custom-modal-height' // Custom class for height adjustment
+      });
     }, 500);
+    
 
   }
 
@@ -3006,7 +3032,7 @@ exitFullScreen(): void {
   constructor(private summaryConfiguration: SharedService, private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector, private auditTrail: AuditTrailService,
     private spinner: NgxSpinnerService, private zone: NgZone,private http: HttpClient,  private sanitizer: DomSanitizer, // Inject DomSanitizer
-    private titleService: Title, private summaryService: SummaryEngineService,private blobService: BlobService,private renderer: Renderer2,private authservice: AuthService, private fullscreenService: FullscreenService,
+    private titleService: Title, private summaryService: SummaryEngineService,private blobService: BlobService,private renderer: Renderer2,private authservice: AuthService, private fullscreenService: FullscreenService,private el: ElementRef
   ) {
     this.resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
@@ -3105,7 +3131,7 @@ exitFullScreen(): void {
   
     // this.spinner.hide('mainLoading');
     this.addFromService()
-
+    // this.adjustMenuPosition();
   
 
     console.log("this.lookup_data_summary1", this.lookup_data_summary1)
@@ -3251,7 +3277,7 @@ exitFullScreen(): void {
   async ngOnInit() {
     // this.isMainLoading=true
    
-    this.spinner.show('mainLoading')
+
     this.route.data.subscribe(data => {
       this.titleService.setTitle(data['title']); // Set tab title dynamically
     });
@@ -3270,49 +3296,6 @@ exitFullScreen(): void {
     // if (isFullscreen) {
     //   this.enterFullscreenMode(); // Your logic to make it fullscreen (e.g., adding class, resizing layout etc.)
     // }
-
-
-console.log('this.route checing on top',this.route)
-
-this.fetchCompanyLookupdata(1)
-    .then((data: any) => {
-      console.log("Final lookup data received in ngOnInit:", data);
-      // Use `data` as needed here
-    })
-    .catch((error: any) => {
-      console.error("Error fetching lookup data:", error);
-    });
-
-const fullUrl = this.router.routerState.snapshot.url; // Get full URL string
-  const segments = fullUrl.split('/'); // Split by '/'
-
-  const summaryIndex = segments.indexOf('summary-engine');
-  if (summaryIndex !== -1 && segments.length > summaryIndex + 1) {
-    const id = segments[summaryIndex + 1]; // Get the next segment after 'summary-engine'
-    console.log('Extracted ID:', id);
-
-this.fetchSummaryMain(id)
-
-  }
-
-
-
-
-    
-     this.fetchUserPermissions(1)
-    // console.log('readPermission_Id checking initialize',readPermission_Id)
-    
-    this.initializeCompanyFields();
-  
-
-    console.log('this.getLoggedUser check', this.getLoggedUser)
-
-  
-
-    this.initializeTileFields6()
-  
-    this.addFromService()
-
     this.route.paramMap.subscribe(params => {
       this.routeId = params.get('id');
       if (this.routeId) {
@@ -3470,6 +3453,61 @@ this.fetchSummaryMain(id)
       // Use this.itemId to fetch and display item details
     });
 
+console.log('this.route checing on top',this.route)
+if (this.userId && this.userPass) {
+  console.log('this.userId checking ngOnINIT',this.userId)
+  
+  // Show the spinner if both userId and userPass have values
+  this.spinner.show('mainLoading');
+} else {
+  // Hide the spinner if either userId or userPass is missing
+  this.spinner.hide('mainLoading');
+}
+
+
+// this.spinner.show('mainLoading')
+
+this.fetchCompanyLookupdata(1)
+    .then((data: any) => {
+      console.log("Final lookup data received in ngOnInit:", data);
+      // Use `data` as needed here
+    })
+    .catch((error: any) => {
+      console.error("Error fetching lookup data:", error);
+    });
+
+const fullUrl = this.router.routerState.snapshot.url; // Get full URL string
+  const segments = fullUrl.split('/'); // Split by '/'
+
+  const summaryIndex = segments.indexOf('summary-engine');
+  if (summaryIndex !== -1 && segments.length > summaryIndex + 1) {
+    const id = segments[summaryIndex + 1]; // Get the next segment after 'summary-engine'
+    console.log('Extracted ID:', id);
+
+this.fetchSummaryMain(id)
+
+  }
+
+
+
+
+    
+     this.fetchUserPermissions(1)
+    // console.log('readPermission_Id checking initialize',readPermission_Id)
+    
+    this.initializeCompanyFields();
+  
+
+    console.log('this.getLoggedUser check', this.getLoggedUser)
+
+  
+
+    this.initializeTileFields6()
+  
+    this.addFromService()
+
+
+
  
 
 
@@ -3512,6 +3550,9 @@ this.fetchSummaryMain(id)
 });
   
 this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
+
+this.sendFullScreenCheck = this.isFullScreen
+console.log('this.sendFullScreenCheck  checking',this.sendFullScreenCheck )
 
 // this.handlePin()
 // document.removeEventListener('keydown', this.handleKeyDown);
@@ -5484,7 +5525,8 @@ justReadStyles(data:any,index:any){
 
   bindDataToGridster(data: any) {
     console.log('bindDataToGridster data checking', data);
-
+  
+    // Check if data is an object and has the 'jsonData' property as an array
     if (data && typeof data === 'object' && Array.isArray(data.jsonData)) {
       this.dashboard = data.jsonData.map((item: any, index: number) => {
         return {
@@ -5493,15 +5535,22 @@ justReadStyles(data:any,index:any){
           y: Math.floor(index / 6),
           x: (index % 6) * 2,
           title: `Item ${index + 1}`, // Adjust as necessary
-          // Include all data properties without hardcoding
           ...item // Spread the item properties into the dashboard item
         };
       });
       console.log('this.dashboard for gridster check', this.dashboard);
     } else {
-      console.error('Expected data to contain jsonData array, but got:', data);
+      // Additional check for data structure
+      if (!data) {
+        console.error('Data is null or undefined');
+      } else if (typeof data !== 'object') {
+        console.error('Expected data to be an object, but got:', typeof data);
+      } else if (!Array.isArray(data.jsonData)) {
+        console.error('Expected data.jsonData to be an array, but got:', data.jsonData);
+      }
     }
   }
+  
 
   getProperties(item: any): Array<{ key: string, value: any }> {
     return Object.entries(item).map(([key, value]) => ({

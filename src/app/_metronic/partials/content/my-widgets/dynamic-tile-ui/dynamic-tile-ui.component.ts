@@ -44,13 +44,14 @@ export class DynamicTileUiComponent implements OnInit{
   ngOnInit(){
     // console.log('item chacke',this.item.grid_details)
     this.summaryService.lookUpData$.subscribe((data: any)=>{
-      console.log('data check>>>',data)
+      console.log('data check>>> from dynamicTile',data)
  let tempCharts:any=[]
 data.forEach((packet: any,matchedIndex:number) => {
   
   if(packet.grid_type == 'dynamicTile'&& this.index==matchedIndex && packet.id === this.item.id){
     tempCharts[matchedIndex] = packet
-    this.dynamicTileFormat(packet)
+    console.log('packet checking from dynamic Tile',packet)
+    this.dynamicTileFormat(packet,'live')
 
   }
 });
@@ -66,25 +67,77 @@ data.forEach((packet: any,matchedIndex:number) => {
 
   }
 
-  dynamicTileFormat(dinamicTileresponse?:any){
+  // dynamicTileFormat(dinamicTileresponse?:any){
 
-    console.log('dinamicTileresponse check',dinamicTileresponse)
-    if(dinamicTileresponse){
-      this.parsedTileConfig = JSON.parse(dinamicTileresponse.tileConfig)
-      console.log('this.parsedTileConfig check',this.parsedTileConfig)
-      this.equationProcessValue = JSON.parse(dinamicTileresponse.equationProcess)
-      console.log('this.equationProcessValue checking',this.equationProcessValue)
-    }else
-    console.log('this.item checking dynamic',this.item )
-    this.parsedTileConfig = JSON.parse(this.item.tileConfig)
-    console.log('this.parsedTileConfig check',this.parsedTileConfig)
-    this.equationProcessValue = this.item.equationProcess
-    console.log('this.equationProcessValue checking',this.equationProcessValue)
+  //   console.log('dinamicTileresponse check',dinamicTileresponse)
+  //   if(dinamicTileresponse){
+  //     this.parsedTileConfig = JSON.parse(dinamicTileresponse.tileConfig)
+  //     console.log('this.parsedTileConfig check',this.parsedTileConfig)
+  //     this.equationProcessValue = JSON.parse(dinamicTileresponse.equationProcess)
+  //     console.log('this.equationProcessValue checking',this.equationProcessValue)
+  //   }else
+  //   console.log('this.item checking dynamic',this.item )
+  //   this.parsedTileConfig = JSON.parse(this.item.tileConfig)
+  //   console.log('this.parsedTileConfig check',this.parsedTileConfig)
+  //   this.equationProcessValue = this.item.equationProcess
+  //   console.log('this.equationProcessValue checking',this.equationProcessValue)
+  // }
+
+
+
+  dynamicTileFormat(dinamicTileresponse?: any,receiveflag?:string) {
+    if(receiveflag=='live'){
+      if (dinamicTileresponse) {
+        // Check if tileConfig and equationProcess are valid JSON strings before parsing
+        if (dinamicTileresponse.tileConfig) {
+          try {
+            this.parsedTileConfig = JSON.parse(dinamicTileresponse.tileConfig);
+            console.log('this.parsedTileConfig check', this.parsedTileConfig);
+          } catch (error) {
+            console.error('Error parsing tileConfig:', error);
+            this.parsedTileConfig = {}; // Provide a fallback value if parsing fails
+          }
+        } else {
+          console.warn('tileConfig is empty or missing');
+          this.parsedTileConfig = {}; // Provide a fallback value
+        }
+    
+        if (dinamicTileresponse.equationProcess) {
+          try {
+            this.equationProcessValue = JSON.parse(dinamicTileresponse.equationProcess);
+            console.log('this.equationProcessValue checking', this.equationProcessValue);
+          } catch (error) {
+            console.error('Error parsing equationProcess:', error);
+            this.equationProcessValue = {}; // Provide a fallback value if parsing fails
+          }
+        } else {
+          console.warn('equationProcess is empty or missing');
+          this.equationProcessValue = {}; // Provide a fallback value
+        }
+      }
+
+    }else if(receiveflag=='dbData'){
+      console.log('this.item checking dynamic', this.item);
+      try {
+        this.parsedTileConfig = JSON.parse(this.item.tileConfig);
+        console.log('this.parsedTileConfig check', this.parsedTileConfig);
+      } catch (error) {
+        console.error('Error parsing tileConfig from this.item:', error);
+        this.parsedTileConfig = {}; // Provide a fallback value if parsing fails
+      }
+  
+      this.equationProcessValue = this.item.equationProcess;
+      console.log('this.equationProcessValue checking', this.equationProcessValue);
+    }
+    console.log('dinamicTileresponse check', dinamicTileresponse);
+  
+
   }
+  
 
   ngAfterViewInit(){
     setTimeout(() => {
-      this.dynamicTileFormat()
+      // this.dynamicTileFormat('','dbData')
     }, 500);
   
 

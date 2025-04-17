@@ -251,8 +251,8 @@ this.parseChartConfig(this.storeDrillDown)
       
         // Add header row
         tableBody.push(
-          columnFields.map((col: any) => ({
-            text: col,
+          columnHeaders.map((col: any) => ({
+            text: col, // Use column headers directly
             style: 'tableHeader',
           }))
         );

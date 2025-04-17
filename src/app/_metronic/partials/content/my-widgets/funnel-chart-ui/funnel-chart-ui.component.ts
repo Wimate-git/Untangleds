@@ -147,8 +147,14 @@ onBarClick(event: Highcharts.PointClickEventObject, index: any): void {
         // Emit action
         this.emitChartConfigTable.emit(this.formTableConfig);
         this.sendCellInfo.emit(event);
-        this.counter = 0; // Reset counter after emitting
+        this.counter--; // Reset counter after emitting
     }
+
+
+    if(storeconditionsLength === undefined){
+      this.enableDrillButton = false
+
+}
 
     // Show the spinner while API is processing
     const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
@@ -448,7 +454,13 @@ console.log('this.gridOptions checking from chart',this.gridOptions)
     localStorage.setItem('isFullScreen', JSON.stringify(true));
     const modulePath = this.item.dashboardIds; // Adjust with your module route
     console.log('modulePath checking from chart',modulePath)
-    const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}`;
+    localStorage.setItem('isFullScreen', 'true');
+
+    // Retrieve and use it later
+    const isFullScreen = localStorage.getItem('isFullScreen') === 'true';
+    
+    // Now you can use `isFullScreen` in your logic
+    const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}&isFullScreen=${isFullScreen}`; 
     this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(window.location.origin +"/summary-engine/"+ modulePath+queryParams);
  this.selectedMarkerIndex = index
  if (selectType === 'NewTab') {
@@ -471,6 +483,7 @@ console.log('this.gridOptions checking from chart',this.gridOptions)
       // alert(`${this.mobileChartWidth}, 'X',${this.mobileChartHeight}`)
   }
   toggleCheck(isChecked: boolean,index:any) {
+    this.counter =0; 
     this.isChecked = isChecked;
     console.log('this.isChecked checking', this.isChecked);
     console.log('this.storeDrillFilter  checking from initial',this.storeDrillFilter )
@@ -582,6 +595,7 @@ console.log('this.gridOptions checking from chart',this.gridOptions)
   }
 
   homeCheck(isChecked: boolean,index:any) {
+    this.counter =0; 
   
     this.isHomeChecked = isChecked;
     console.log('this.isChecked checking', this.isHomeChecked);

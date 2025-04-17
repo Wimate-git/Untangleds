@@ -72,7 +72,7 @@ export class ChartUi1Component implements OnChanges,OnInit {
   storeRedirectionCheck: any;
 
   isDrillPacketAvailable: any;
-  enableDrillButton: boolean;
+  enableDrillButton: boolean =true;
   
 ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui', this.all_Packet_store);
@@ -132,7 +132,7 @@ updateDrillButtonState() {
   
 //           formName:this.item.chartConfig.formlist
 //           }
-//           this.counter=0
+//      
 //           const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
         
 //           // Prepare the request body
@@ -221,6 +221,7 @@ updateDrillButtonState() {
 
 
 toggleCheck(isChecked: boolean, index: any) {
+  this.counter =0; 
   this.isChecked = isChecked;
   console.log('this.isChecked checking', this.isChecked);
   console.log('this.storeDrillFilter checking from initial', this.storeDrillFilter);
@@ -242,7 +243,7 @@ toggleCheck(isChecked: boolean, index: any) {
         columnVisibility: extractcolumnVisibility,
         formName: this.item.chartConfig.formlist
       };
-      this.counter = 0;
+
       
       const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
       
@@ -313,7 +314,7 @@ toggleCheck(isChecked: boolean, index: any) {
 
 onBarClick(event: Highcharts.PointClickEventObject,index:any): void {
   console.log('event check for donut chart', event);
-  // this.counter=0
+
 if(this.isEditModeView==true){
   this.enableDrillButton = true
   console.log('i am in editmode',this.isEditModeView)
@@ -364,15 +365,21 @@ if(this.isEditModeView==true){
   //   return;
   // }
 
-
+console.log('storeconditionsLength checking',storeconditionsLength)
+console.log('this.counter checking',this.counter)
   if (storeconditionsLength === this.counter || storeconditionsLength === undefined) {
     console.log('Emitting action, either conditions are empty or second bar clicked');
     
     // Emit action
-    this.enableDrillButton = false
+    // this.enableDrillButton = false
     this.emitChartConfigTable.emit(this.formTableConfig);
     this.sendCellInfo.emit(event);
-    this.counter = 0; // Reset counter after emitting
+    this.counter--; 
+}
+
+if(storeconditionsLength === undefined){
+      this.enableDrillButton = false
+
 }
 
   // Proceed with API request
@@ -400,7 +407,7 @@ if(this.isEditModeView==true){
   this.http.post(apiUrl, requestBody).subscribe(
     (response: any) => {
         if (response?.statusCode === 200) {
-            console.log('Lambda function triggered successfully:', response);
+            console.log('Lambda function triggered successfully chart1 drilldown', response);
             this.checkResBody = response.body;
             this.parsedResBody.push(JSON.parse(this.checkResBody));
             console.log('this.parsedResBody checking', this.parsedResBody);
@@ -659,8 +666,17 @@ console.log('this.gridOptions checking from chart',this.gridOptions)
     localStorage.setItem('isFullScreen', JSON.stringify(true));
     const modulePath = this.item.dashboardIds; // Adjust with your module route
     console.log('modulePath checking from chart',modulePath)
-    const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}`;
-    this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(window.location.origin +"/summary-engine/"+ modulePath+queryParams);
+    // queryParams.append('isFullScreen', 'true');
+// Set isFullScreen to true in local storage
+localStorage.setItem('isFullScreen', 'true');
+
+// Retrieve and use it later
+const isFullScreen = localStorage.getItem('isFullScreen') === 'true';
+
+// Now you can use `isFullScreen` in your logic
+const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}&isFullScreen=${isFullScreen}`; 
+this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(window.location.origin + "/summary-engine/" + modulePath + queryParams);
+
  this.selectedMarkerIndex = index
  if (selectType === 'NewTab') {
   // Open in a new tab
@@ -682,6 +698,7 @@ console.log('this.gridOptions checking from chart',this.gridOptions)
       // alert(`${this.mobileChartWidth}, 'X',${this.mobileChartHeight}`)
   }
   homeCheck(isChecked: boolean,index:any) {
+    this.counter =0; 
   
     this.isHomeChecked = isChecked;
     console.log('this.isChecked checking', this.isHomeChecked);
@@ -701,7 +718,7 @@ console.log('this.gridOptions checking from chart',this.gridOptions)
               columnVisibility:extractcolumnVisibility,
               formName:this.item.chartConfig.formlist
               }
-              this.counter=0
+      
               // this.emitChartConfigTable.emit(this.formTableConfig); 
         
         
