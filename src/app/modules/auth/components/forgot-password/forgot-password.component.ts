@@ -174,7 +174,10 @@ async forgotCognitoPass() {
 
   console.log("Filtered user is ",this.filterUser);
 
-  this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.filterUser[0].P2)
+  if(this.filterUser && this.filterUser[0] && this.filterUser[0].P2){
+    this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.filterUser[0].P2)
+  }
+
 
   if(authuser.includes('@')){
    
