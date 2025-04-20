@@ -263,38 +263,47 @@
             
             
             <!-- Name Container -->
-            <div class="col-md-12" style="padding: 10px; border-radius: 8px;">
-              <label class="col-createChart-label fw-bold fs-6 required">Name</label>
-              <div
-                formControlName="customLabel"
-                contenteditable="true"
-                class="form-control form-control-solid"
-                [style.font-family]="createTitle.value.fontFamily"
-                [style.font-size]="createTitle.value.fontSize"
-                [style.font-weight]="createTitle.value.fontWeight"
-                [style.font-style]="createTitle.value.fontStyle"
-                [style.text-decoration]="createTitle.value.textDecoration"
-                [style.background-color]="createTitle.value.themeColor"
-                [style.color]="createTitle.value.textColor"
-                [style.direction]="'ltr'"
-                [style.white-space]="'pre-wrap'"
-                [style.overflow]="'auto'"
-                [style.text-align]="createTitle.value.textAlign" 
-                (input)="updateCustomLabel($event)"
-                [textContent]="createTitle.value.customLabel"
-              >
-              </div>
-            
-              <!-- Validation Feedback -->
-              <div
-                class="invalid-feedback"
-                *ngIf="createTitle.get('customLabel')?.invalid && createTitle.get('customLabel')?.touched"
-                style="padding: 5px; border-radius: 5px;"
-              >
-                Title Name is required
-              </div>
+            <div
+            class="col-md-6 mb-3"
+            style="padding: 10px; border-radius: 8px;"
+          >
+            <label class="col-form-label fw-bold fs-6 required">Name</label>
+            <input
+              formControlName="customLabel"
+        type="text" name="customLabel"
+              class="form-control form-control-solid"
+   
+          
+      
+            >
+
+          
+            <!-- Validation Feedback -->
+            <div
+              class="invalid-feedback"
+              *ngIf="createTitle.get('customLabel')?.invalid && createTitle.get('customLabel')?.touched"
+              style="padding: 5px; border-radius: 5px;"
+            >
+              Title Name is required
             </div>
-            
+          </div>
+
+          <div class="row rounded" [style.backgroundColor]="createTitle.value.themeColor">
+            <!-- Display the parameterName -->
+            <div class="col-md-12 mt-3"
+          
+            [style.font-size]="createTitle.value.fontSize" 
+            [style.font-weight]="createTitle.value.fontWeight" 
+            [style.text-align]="createTitle.value.textAlign" 
+            [style.color]="createTitle.value.textColor"
+            [style.font-family]="createTitle.value.fontFamily"
+      
+            >
+            {{ createTitle.value.customLabel }}
+          </div>
+            <!-- Display processed_value from multi_value -->
+          </div>
+    
             
           
           

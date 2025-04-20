@@ -624,6 +624,10 @@ input[type="color"]:focus {
   border-radius: 4px;
 }
 
+.form-control[contenteditable="true"] {
+  white-space: pre-wrap; /* Ensure wrapping happens correctly */
+  overflow-wrap: break-word; /* Prevent long words from breaking the layout */
+}
 
 
 

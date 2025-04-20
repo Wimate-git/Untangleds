@@ -261,6 +261,38 @@ toggleItalic(): void {
   });
 }
 
+updateCustomLabel(event: any) {
+  const updatedValue = event.target.innerHTML; // Get the HTML content
+  const selection = window.getSelection(); // Get the current selection
+  const range = selection?.getRangeAt(0); // Get the current range
+
+  this.createTitle.get('customLabel')?.setValue(updatedValue); // Update the form control value
+
+  // Check if range and selection are defined before trying to set cursor position
+  if (selection && range) {
+    setTimeout(() => {
+      range.setStart(range.endContainer, range.endOffset); // Move the cursor to the end
+      range.setEnd(range.endContainer, range.endOffset);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }, 0); // Wait for the DOM to update before setting the cursor position
+  }
+}
+
+handleKeyDown(event: KeyboardEvent) {
+  // Check if the pressed key is Backspace or Delete
+  if (event.key === 'Backspace' || event.key === 'Delete') {
+    const content = this.createTitle.value.customLabel;
+
+    // Ensure that content is not empty
+    if (!content && this.createTitle.get('customLabel')?.touched) {
+      this.createTitle.get('customLabel')?.setValue('');
+    }
+  }
+}
+
+
+
 toggleUnderline(): void {
   const currentDecoration = this.createTitle.value.textDecoration;
   this.createTitle.patchValue({
@@ -303,12 +335,12 @@ updateTextColor(event: Event): void {
     }
   }
 
-  updateCustomLabel(event: Event): void {
-    const inputValue = (event.target as HTMLElement).innerText;
+  // updateCustomLabel(event: Event): void {
+  //   const inputValue = (event.target as HTMLElement).innerText;
     
-    // Update the form control value without triggering Angular's change detection unnecessarily
-    this.createTitle.patchValue({ customLabel: inputValue }, { emitEvent: false });
-  }
+  //   // Update the form control value without triggering Angular's change detection unnecessarily
+  //   this.createTitle.patchValue({ customLabel: inputValue }, { emitEvent: false });
+  // }
   addTile(key: any) {
  if (key === 'title') {
     const titleStyles = this.createTitle.value;
