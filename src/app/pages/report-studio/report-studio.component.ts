@@ -2431,7 +2431,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
           }else if (isApprovalHistory) {
             cellRenderer = this.dynamicModalRenderer;
           }else if (isOverview){
-            cellRenderer = this.showOverview;
+            cellRenderer  = (params: any) => this.showOverview(params,this.getLoggedUser);
           }
           
           
@@ -2476,7 +2476,15 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     // Iterate through all rows and identify dynamic columns based on data presence
     rowData.forEach(row => {
 
-      if(this.visibiltyflag && row.hasOwnProperty('Form View')){
+      console.log("Row is here to be manipuated ",row);
+
+      if(!this.visibiltyflag && row.hasOwnProperty('Form View')){
+        row['Form View'] = {
+          PK:row.PK,
+          SK:row.SK
+        }
+      }
+      else if(this.visibiltyflag && row.hasOwnProperty('Form View')){
         row['Form View'] = {
           PK:row.PK,
           SK:row.SK
@@ -2621,7 +2629,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     return null;
   }
 
-  showOverview(params: any) {
+  showOverview(params: any, loginDetail:any) {
     if (params && params.value) {
       const coordinates = params.value;
 
@@ -2647,7 +2655,8 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
         // Dispatch a custom event with location data
         const event = new CustomEvent('showOverview', {
           detail: { PK: coordinates.PK,
-                    SK: coordinates.SK
+                    SK: coordinates.SK,
+                    loginDetail:loginDetail
            }
         });
         window.dispatchEvent(event);
@@ -2873,7 +2882,8 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
         iframe.contentWindow.postMessage({
           pk: window.pk,
           sk: window.sk,
-          clientId:this.SK_clientID
+          clientId:this.SK_clientID,
+          loginDetail:this.getLoggedUser
         }, "*");
         console.log("✅ Sent PK & SK to iframe via postMessage");
       } else {
@@ -5074,10 +5084,11 @@ getLastWeekTimestamps() {
     
       if (filterData && filterData.validation?.formName_table) {
         const tableFormName = filterData.validation.formName_table;
+        const tableLabel = filterData.label
         const result = await this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${tableFormName}#main`, 1);
     
         if (result && result.metadata) {
-          this.tableFormName.push({ [item]: tableFormName });
+          this.tableFormName.push({ [item]: tableLabel });
     
           const dynamicFormFields = JSON.parse(result.metadata).formFields;
     

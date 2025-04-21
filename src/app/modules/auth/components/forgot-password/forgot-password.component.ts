@@ -31,6 +31,7 @@ export class ForgotPasswordComponent implements OnInit {
 
   confirmPassword: FormGroup;
   showVerificationFields = false;
+  passwordChangedMobileFlag = false 
 
   // private fields
   private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
@@ -373,7 +374,7 @@ async confirmNewPassword() {
         this.router.navigate(['/auth/login']);
         }
         else{
-          this.showVerificationFields = false
+          this.passwordChangedMobileFlag = true
           this.cd.detectChanges()
         }
       }
