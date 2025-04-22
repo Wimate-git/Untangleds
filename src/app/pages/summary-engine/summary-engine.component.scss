@@ -1174,6 +1174,7 @@ gridster-item {
   .datatable-container {
     overflow-x: auto; /* Enable horizontal scrolling */
     -webkit-overflow-scrolling: touch; /* Smooth scrolling for mobile */
+    overflow-y: auto;
   }
 
   .datatable-container table {
@@ -1188,6 +1189,7 @@ gridster-item {
     text-overflow: ellipsis; /* Adds ellipsis when the content is too long */
     overflow: hidden; /* Hides overflowed content */
   }
+  
 }
 
 .disabled-button:disabled {
@@ -1237,7 +1239,23 @@ gridster-item {
   display: block; /* Show when hovering over the gridster item */
 }
 
+.table.gy-5 th, .table.gy-5 td {
+  padding-top: 0.1rem;
+  padding-bottom: 0.1rem;
+}
 
+/* Style the custom DataTable options */
+.datatable-options {
+  margin-bottom: 20px; /* Space between controls and the table */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#datatable-length,
+#datatable-search {
+  margin-right: 20px;
+}
 
 
 

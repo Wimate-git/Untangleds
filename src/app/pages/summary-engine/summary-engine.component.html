@@ -73,7 +73,7 @@
                 *ngFor="let item of dashboard; let i = index;"
                 [item]="item"
                 [style.background]="item.themeColor"
-                [attr.data-bs-target]="item.grid_type === 'filterTile' ?'#filterDashModal':null"
+                [attr.data-bs-target]="item.grid_type === 'filterTile' && (summaryDashboardView && summaryDashboardUpdate || summaryDashboardUpdate) ? '#filterDashModal' : null"
                 [attr.data-bs-toggle]="'modal'"
                 [ngClass]="{
                 
@@ -1028,7 +1028,7 @@
   
   
   <ng-template #summaryModal let-modal>
-    <div class="modal-header" style="max-width: 1040px; display: flex; justify-content: space-between; align-items: flex-start;">
+    <div class="modal-header" style="max-width: 1500px; display: flex; justify-content: space-between; align-items: flex-start;">
       <h2 class="modal-title">{{ showHeading ? 'Add Summary' : 'Edit Summary' }}</h2>
       <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
     </div>

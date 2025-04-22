@@ -1478,12 +1478,18 @@ Highcharts.chart('MixedChart', barchartOptions);
   @ViewChild('dataTableModalTile2', { static: false }) dataTableModalTile2: TemplateRef<any>;
   @ViewChild('dataTableModalDynamicTile', { static: false }) dataTableModalDynamicTile: TemplateRef<any>;
   @ViewChild('TitleModal', { static: false }) TitleModal: TemplateRef<any>;
-  handleClick(item: any, i: number, $event: any) {
+  handleClick(item: any, i: number, event: MouseEvent) {
 
     console.log('item is checking from handleclick',item)
     console.log('index is checking from i',i)
     if (item.grid_type === 'filterTile') {
-      this.justReadStyles(item, i);
+      if (this.summaryDashboardView && this.summaryDashboardUpdate || this.summaryDashboardUpdate){
+        this.justReadStyles(item, i);
+      }
+   
+  
+
+   
     } else if (item.grid_type === 'tile') {
       if (this.isEditModeView && !this.hideButton && (this.summaryDashboardUpdate || this.summaryDashboardView)) {
         console.log('Triggering the function'); // Log to confirm condition
@@ -1724,7 +1730,7 @@ invokeHelperDashboard(item: any, index: number, template: any,modaref:any): void
     
   
           case '': // Assuming 'Drill Down' is the expected value for drill-down cases
-          // this.redirectModule(item);
+          this.redirectModule(item);
           break;
     
         default:
@@ -3150,6 +3156,7 @@ exitFullScreen(): void {
       new Tooltip(tooltipTriggerEl);
     });
 
+
     // $(document).on('click', '[data-action="view"]', (event) => {
     //   const id = $(event.target).closest('[data-id]').attr('data-id');
     //   console.log('id checking summary',id)
@@ -3161,6 +3168,18 @@ exitFullScreen(): void {
 
     // this.createPieChart()
     
+
+
+  // Move DataTable controls outside the table
+  const dataTable = $('#dataTable').DataTable();
+
+  // Append the page length dropdown to a custom div outside the table
+  const dtLength = $(dataTable.table().container()).find('.dataTables_length');
+  $('#datatable-length').append(dtLength);
+
+  // Append the search box to a custom div outside the table
+  const dtSearch = $(dataTable.table().container()).find('.dataTables_filter');
+  $('#datatable-search').append(dtSearch);
   
   }
 
@@ -6835,11 +6854,14 @@ console.log('selectedTab checking',this.selectedTab)
                   .map((item: any) => JSON.stringify(item)) // Stringify the object to make it unique
               )
             ).map((item: any) => JSON.parse(item)); // Parse back to object
+
+            console.log('filteredData checkinbg',filteredData)
   
             console.log("Filtered Data after permissions and search:", filteredData);
   
             // Implement pagination by slicing the filtered data
             const paginatedData = filteredData.slice(start, start + length);
+            console.log('paginatedData checking',paginatedData)
   
             callback({
               draw: dataTablesParameters.draw,
@@ -7026,7 +7048,7 @@ console.log('value checking summary',value)
     if (this.all_Packet_store) {
       this.allCompanyDetails = {
         ...this.allCompanyDetails, // Preserve existing data
-        summaryID: this.allCompanyDetails.summaryID || this.all_Packet_store.summaryID,
+        summaryID: this.allCompanyDetails.summaryID || this.all_Packet_store.summaryID || value.P1,
         summaryName: this.allCompanyDetails.summaryName || this.all_Packet_store.summaryName,
         summaryDesc: this.allCompanyDetails.summaryDesc || this.all_Packet_store.summaryDesc,
         iconObject: this.allCompanyDetails.iconObject || this.all_Packet_store.iconObject,
@@ -7034,12 +7056,23 @@ console.log('value checking summary',value)
         fullScreenModeCheck:this.allCompanyDetails.fullScreenModeCheck ||''
       };
       console.log('Updated allCompanyDetails with Packet Store:', this.allCompanyDetails);
+    }else{
+      this.allCompanyDetails = {
+        ...this.allCompanyDetails, // Preserve existing data
+        summaryID:  value.P1,
+        summaryName: value.P2,
+        summaryDesc:value.P3,
+        iconObject: value.P4,
+        LiveDashboard:value.P5,
+        fullScreenModeCheck:value.P6
+      };
+
     }
   
     // Ensure critical fields have default fallbacks without altering existing logic
-    this.allCompanyDetails.summaryID = this.allCompanyDetails.summaryID ;
-    this.allCompanyDetails.summaryName = this.allCompanyDetails.summaryName ;
-    this.allCompanyDetails.summaryDesc = this.allCompanyDetails.summaryDesc ;
+    this.allCompanyDetails.summaryID = this.allCompanyDetails.summaryID || value.P1;
+    this.allCompanyDetails.summaryName = this.allCompanyDetails.summaryName || value.P2;
+    this.allCompanyDetails.summaryDesc = this.allCompanyDetails.summaryDesc ||value.P3;
 
   
     console.log('Final allCompanyDetails:', this.allCompanyDetails);

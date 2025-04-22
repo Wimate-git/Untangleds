@@ -76,22 +76,28 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.dtOptions = {
-      dom: `<"row"<"col-sm-6"l><"col-sm-6"f>>` +
-        `<"row"<"col-sm-12"tr>>` +
-        `<"row"<"col-sm-12"p>>`,
-        
+      dom: `<"row"<"col-sm-6"l><"col-sm-6"f>>` +  // Length changing (l) and Search (f)
+           `<"row"<"col-sm-12"tr>>` +              // Table (t)
+           `<"row"<"col-sm-12"p>>` +               // Pagination (p)
+           `<"row"<"col-sm-12"i>>`,                // Information (i) — Add this row for info
+      
       processing: true,
       language: {
-        processing: `<span class="spinner-border spinner-border-sm align-middle"></span> Loading...`
+        processing: `<span class="spinner-border spinner-border-sm align-middle"></span> Loading...`,
+        info: "Showing _START_ to _END_ of _TOTAL_ entries",  // Customize the info text
       },
+      
       ...this.datatableConfig,
+      
       buttons: [
         { extend: 'colvis', text: 'Column Visibility', className: 'btn btn-secondary' },
         { extend: 'excel', text: 'Export to Excel', className: 'btn btn-success' }
       ],
-    order:false,
+      
+      order: false,
       ordering: false,
     };
+    
 
     this.renderActionColumn();
     this.setupSweetAlert();
@@ -110,6 +116,54 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log('summaryDashboardView check from crudSummary',this.summaryDashboardView)
   }
 
+  // renderActionColumn(): void {
+  //   const actionColumn = {
+  //     sortable: false,
+  //     sorting: false,
+  //     title: '<span style="color: black;">Actions</span>',
+  //     render: (data: any, type: any, full: any) => {
+  //       // Convert values to booleans if they are strings
+  //       const summaryDashboardUpdate = this.summaryDashboardUpdate === 'true' || this.summaryDashboardUpdate === true;
+  //       const summaryDashboardView = this.summaryDashboardView === 'true' || this.summaryDashboardView === true;
+  //       const userPermission = this.userPermission; // Assuming userPermission is a string
+  
+  //       // Debugging logs
+  //       console.log('summaryDashboardUpdate:', summaryDashboardUpdate);
+  //       console.log('summaryDashboardView:', summaryDashboardView);
+  //       console.log('userPermission:', userPermission);
+  
+  //       const editButton = `
+  //         <button class="btn btn-icon btn-active-light-primary" data-action="edit" data-id="${full.P1}">
+  //           <i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i>
+  //         </button>`;
+  
+  //       let deleteButton = ''; // Default to hidden
+  
+  //       // Condition to show delete button if:
+  //       // 1. summaryDashboardUpdate === true AND summaryDashboardView === true
+  //       // 2. OR userPermission === 'all'
+  //       if ((summaryDashboardUpdate === true && summaryDashboardView === true) || userPermission === 'All') {
+  //         deleteButton = `
+  //           <button class="btn btn-icon btn-active-light-primary" data-action="delete" data-id="${full.P1}">
+  //             <i class="ki-duotone ki-trash fs-3">
+  //               <span class="path1"></span><span class="path2"></span>
+  //               <span class="path3"></span><span class="path4"></span><span class="path5"></span>
+  //             </i>
+  //           </button>`;
+  //       }
+  
+  //       console.log('Delete Button:', deleteButton); // Check if it’s being created correctly
+  
+  //       return `${editButton} ${deleteButton}`;
+  //     }
+  //   };
+  
+  //   if (this.dtOptions.columns) {
+  //     this.dtOptions.columns.push(actionColumn);
+  //   }
+  // }
+  
+  
   renderActionColumn(): void {
     const actionColumn = {
       sortable: false,
@@ -120,35 +174,50 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
         const summaryDashboardUpdate = this.summaryDashboardUpdate === 'true' || this.summaryDashboardUpdate === true;
         const summaryDashboardView = this.summaryDashboardView === 'true' || this.summaryDashboardView === true;
         const userPermission = this.userPermission; // Assuming userPermission is a string
-  
+    
         // Debugging logs
         console.log('summaryDashboardUpdate:', summaryDashboardUpdate);
         console.log('summaryDashboardView:', summaryDashboardView);
         console.log('userPermission:', userPermission);
-  
+    
         const editButton = `
           <button class="btn btn-icon btn-active-light-primary" data-action="edit" data-id="${full.P1}">
             <i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i>
           </button>`;
-  
+    
         let deleteButton = ''; // Default to hidden
-  
+    
         // Condition to show delete button if:
         // 1. summaryDashboardUpdate === true AND summaryDashboardView === true
         // 2. OR userPermission === 'all'
+        // if ((summaryDashboardUpdate === true && summaryDashboardView === true) || userPermission === 'All') {
+        //   deleteButton = `
+        //     <button class="btn btn-icon btn-active-light-danger" data-action="delete" data-id="${full.P1}">
+        //       <i class="ki-duotone ki-trash fs-3">
+        //         <span class="path1"></span><span class="path2"></span>
+        //         <span class="path3"></span><span class="path4"></span><span class="path5"></span>
+        //       </i>
+        //     </button>`;
+        // }
+    
+
         if ((summaryDashboardUpdate === true && summaryDashboardView === true) || userPermission === 'All') {
           deleteButton = `
-            <button class="btn btn-icon btn-active-light-primary" data-action="delete" data-id="${full.P1}">
-              <i class="ki-duotone ki-trash fs-3">
+            <button class="btn btn-icon btn-active-light-danger" data-action="delete" data-id="${full.P1}">
+              <i class="ki-duotone ki-trash fs-3 icon-danger">
                 <span class="path1"></span><span class="path2"></span>
                 <span class="path3"></span><span class="path4"></span><span class="path5"></span>
               </i>
             </button>`;
         }
-  
+        
         console.log('Delete Button:', deleteButton); // Check if it’s being created correctly
-  
-        return `${editButton} ${deleteButton}`;
+    
+        // Wrap buttons in a container with d-flex to display them side by side
+        return `
+          <div class="d-flex justify-content-start">
+            ${editButton} ${deleteButton}
+          </div>`;
       }
     };
   
@@ -156,8 +225,6 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
       this.dtOptions.columns.push(actionColumn);
     }
   }
-  
-  
   
   
 

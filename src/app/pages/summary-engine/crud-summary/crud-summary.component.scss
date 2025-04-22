@@ -1,0 +1,47 @@
+.datatable-container {
+   /* Adjust the height as needed */
+    overflow-y: auto;
+  }
+  
+
+.table.gy-5 th, .table.gy-5 td {
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+}
+
+/* Make the DataTable search fixed at the top */
+/* Make the DataTable filter (search) and header fixed */
+.dataTables_wrapper .dataTables_filter {
+    position: sticky;
+    top: 0;
+    background-color: white; /* Optional: background for visibility */
+    z-index: 10; /* Ensure search bar stays above other table elements */
+    padding: 10px;
+  }
+  
+  .table-responsive {
+    position: relative;
+  }
+  
+  table.dataTable thead th {
+    position: sticky;
+    top: 0;
+    background-color: white; /* Optional: background for visibility */
+    z-index: 5; /* Ensure header stays above table rows */
+  }
+  
+  /* Set the table body to be scrollable */
+  .dataTables_scrollBody {
+    max-height: 400px; /* Adjust this to control the maximum height of the table body */
+    overflow-y: auto; /* Makes only the body scrollable */
+  }
+  
+  /* Optional: Add padding to avoid overlap */
+  .dataTables_wrapper {
+    padding-top: 40px; /* Adjust according to the height of your fixed elements */
+  }
+  
+  .icon-danger {
+    color: #dc3545; /* Red color */
+  }
+  
