@@ -7022,137 +7022,249 @@ console.log('selectedTab checking',this.selectedTab)
   
   //   this.validateAndSubmit(tempObj, key);
   // }
-  updateSummary(value: any,key: any,pinValue?:any) {
-    if(key=='addPin'){
-      this.PinCheck =pinValue
-      console.log('PinCheck from updateSummary',this.PinCheck)
-    }
-console.log('value checking summary',value)
+//   updateSummary(value: any,key: any,pinValue?:any) {
+//     if(key=='addPin'){
+//       this.PinCheck =pinValue
+//       console.log('PinCheck from updateSummary',this.PinCheck)
+//     }
+// console.log('value checking summary',value)
 
   
-    console.log('this.getLoggedUser check update', this.getLoggedUser);
+//     console.log('this.getLoggedUser check update', this.getLoggedUser);
   
-    // Extract username for later use
-    this.extractUserName = this.getLoggedUser.username;
-    console.log('this.extractUserName checking', this.extractUserName);
+//     // Extract username for later use
+//     this.extractUserName = this.getLoggedUser.username;
+//     console.log('this.extractUserName checking', this.extractUserName);
   
-    console.log('all_Packet_store checking', this.all_Packet_store);
+//     console.log('all_Packet_store checking', this.all_Packet_store);
   
-    // Construct allCompanyDetails if missing
-    if (!this.allCompanyDetails) {
-      this.allCompanyDetails = this.constructAllCompanyDetails();
-      console.log('Constructed allCompanyDetails:', this.allCompanyDetails);
-    }
+//     // Construct allCompanyDetails if missing
+//     if (!this.allCompanyDetails) {
+//       this.allCompanyDetails = this.constructAllCompanyDetails();
+//       console.log('Constructed allCompanyDetails:', this.allCompanyDetails);
+//     }
   
-    // Only populate missing fields to avoid overwriting existing values
-    if (this.all_Packet_store) {
-      this.allCompanyDetails = {
-        ...this.allCompanyDetails, // Preserve existing data
-        summaryID: this.allCompanyDetails.summaryID || this.all_Packet_store.summaryID || value.P1,
-        summaryName: this.allCompanyDetails.summaryName || this.all_Packet_store.summaryName,
-        summaryDesc: this.allCompanyDetails.summaryDesc || this.all_Packet_store.summaryDesc,
-        iconObject: this.allCompanyDetails.iconObject || this.all_Packet_store.iconObject,
-        LiveDashboard:this.allCompanyDetails.LiveDashboard ||'',
-        fullScreenModeCheck:this.allCompanyDetails.fullScreenModeCheck ||''
-      };
-      console.log('Updated allCompanyDetails with Packet Store:', this.allCompanyDetails);
-    }else{
-      this.allCompanyDetails = {
-        ...this.allCompanyDetails, // Preserve existing data
-        summaryID:  value.P1,
-        summaryName: value.P2,
-        summaryDesc:value.P3,
-        iconObject: value.P4,
-        LiveDashboard:value.P5,
-        fullScreenModeCheck:value.P6
-      };
-
-    }
-  
-    // Ensure critical fields have default fallbacks without altering existing logic
-    this.allCompanyDetails.summaryID = this.allCompanyDetails.summaryID || value.P1;
-    this.allCompanyDetails.summaryName = this.allCompanyDetails.summaryName || value.P2;
-    this.allCompanyDetails.summaryDesc = this.allCompanyDetails.summaryDesc ||value.P3;
+//     // Only populate missing fields to avoid overwriting existing values
+//     if (this.all_Packet_store) {
+//       this.allCompanyDetails = {
+//         ...this.allCompanyDetails, // Preserve existing data
+//         summaryID: this.allCompanyDetails.summaryID || this.all_Packet_store.summaryID || value.P1,
+//         summaryName: this.allCompanyDetails.summaryName || this.all_Packet_store.summaryName,
+//         summaryDesc: this.allCompanyDetails.summaryDesc || this.all_Packet_store.summaryDesc,
+//         iconObject: this.allCompanyDetails.iconObject || this.all_Packet_store.iconObject,
+//         LiveDashboard:this.allCompanyDetails.LiveDashboard ||'',
+//         fullScreenModeCheck:this.allCompanyDetails.fullScreenModeCheck ||''
+//       };
+//       console.log('Updated allCompanyDetails with Packet Store:', this.allCompanyDetails);
+//     }
 
   
-    console.log('Final allCompanyDetails:', this.allCompanyDetails);
+//     // Ensure critical fields have default fallbacks without altering existing logic
+//     this.allCompanyDetails.summaryID = this.allCompanyDetails.summaryID ||value.P1
+//     this.allCompanyDetails.summaryName = this.allCompanyDetails.summaryName 
+//     this.allCompanyDetails.summaryDesc = this.allCompanyDetails.summaryDesc 
+
   
-    // Enable summaryID field
-    this.createSummaryField.get('summaryID')?.enable();
+//     console.log('Final allCompanyDetails:', this.allCompanyDetails);
   
-    // Format dashboard tiles
-    this.formattedDashboard = this.formatDashboardTiles(this.dashboard) || [];
-    console.log('Formatted Dashboard:', this.formattedDashboard);
+//     // Enable summaryID field
+//     this.createSummaryField.get('summaryID')?.enable();
   
-    // Set timestamps and users
-    const originalCreatedDate =
-      this.allCompanyDetails.crDate || Math.ceil(new Date().getTime() / 1000);
-    const originalCreatedUser =
-      this.allCompanyDetails.createdUser || this.getLoggedUser.username;
+//     // Format dashboard tiles
+//     this.formattedDashboard = this.formatDashboardTiles(this.dashboard) || [];
+//     console.log('Formatted Dashboard:', this.formattedDashboard);
   
-    const updatedDate = Math.ceil(new Date().getTime() / 1000);
+//     // Set timestamps and users
+//     const originalCreatedDate =
+//       this.allCompanyDetails.crDate || Math.ceil(new Date().getTime() / 1000);
+//     const originalCreatedUser =
+//       this.allCompanyDetails.createdUser || this.getLoggedUser.username;
   
-    // Construct tempObj for validation and submission
-    let serializedQueryParams = JSON.stringify(this.updatedQueryPramas);
-console.log('Serialized Query Params:', serializedQueryParams);
-    let tempObj = {
-      PK: `${this.SK_clientID}#${this.allCompanyDetails.summaryID}#summary#main`,
-      SK: 1,
-      metadata: JSON.stringify({
-        ...this.allCompanyDetails,
-        grid_details: this.formattedDashboard,
-      // Include params here
-      }),
-    };
+//     const updatedDate = Math.ceil(new Date().getTime() / 1000);
   
-    console.log('TempObj being validated and submitted:', tempObj);
+//     // Construct tempObj for validation and submission
+//     let serializedQueryParams = JSON.stringify(this.updatedQueryPramas);
+// console.log('Serialized Query Params:', serializedQueryParams);
+//     let tempObj = {
+//       PK: `${this.SK_clientID}#${this.allCompanyDetails.summaryID}#summary#main`,
+//       SK: 1,
+//       metadata: JSON.stringify({
+//         ...this.allCompanyDetails,
+//         grid_details: this.formattedDashboard,
+//       // Include params here
+//       }),
+//     };
   
-    // Validate and submit the object
-    this.validateAndSubmit(tempObj, key);
+//     console.log('TempObj being validated and submitted:', tempObj);
   
-    // Prepare items for fetchTimeMachineById
-    const items = {
-      P1: this.allCompanyDetails.summaryID || value.P1,
-      P2: this.allCompanyDetails.summaryName || value.P2,
-      P3: this.allCompanyDetails.summaryDesc || value.P3,
-      P4: updatedDate || value.P4,
-      P5: originalCreatedDate || value.P5,
-      P6: originalCreatedUser || value.P6,
-      P7: this.extractUserName || value.P7,
-      P8: this.previewObjDisplay ? JSON.stringify(this.previewObjDisplay) : value.P8,
-      P9: this.allCompanyDetails.iconSelect || value.P9,
-      P10: this.allCompanyDetails.PinCheck || this.PinCheck,
-      P11:this.allCompanyDetails.fullScreenModeCheck ||value.P11
-    };
+//     // Validate and submit the object
+//     this.validateAndSubmit(tempObj, key);
+  
+//     // Prepare items for fetchTimeMachineById
+//     const items = {
+//       P1: this.allCompanyDetails.summaryID || value.P1,
+//       P2: this.allCompanyDetails.summaryName || value.P2,
+//       P3: this.allCompanyDetails.summaryDesc || value.P3,
+//       P4: updatedDate || value.P4,
+//       P5: originalCreatedDate || value.P5,
+//       P6: originalCreatedUser || value.P6,
+//       P7: this.extractUserName || value.P7,
+//       P8: this.previewObjDisplay ? JSON.stringify(this.previewObjDisplay) : value.P8,
+//       P9: this.allCompanyDetails.iconSelect || value.P9,
+//       P10: this.allCompanyDetails.PinCheck || this.PinCheck,
+//       P11:this.allCompanyDetails.fullScreenModeCheck ||value.P11
+//     };
     
   
-    console.log('Items prepared for fetchTimeMachineById:', items);
-    const UserDetails = {
-      "User Name": this.userdetails,
-      "Action": "Updated",
-      "Module Name": "Summary Dashboard",
-      "Form Name": "Summary Dashboard",
-      "Description": "Dashboard is Updated",
-      "User Id": this.userdetails,
-      "Client Id": this.SK_clientID,
-      "created_time": Date.now(),
-      "updated_time": Date.now()
-    }
+//     console.log('Items prepared for fetchTimeMachineById:', items);
+//     const UserDetails = {
+//       "User Name": this.userdetails,
+//       "Action": "Updated",
+//       "Module Name": "Summary Dashboard",
+//       "Form Name": "Summary Dashboard",
+//       "Description": "Dashboard is Updated",
+//       "User Id": this.userdetails,
+//       "Client Id": this.SK_clientID,
+//       "created_time": Date.now(),
+//       "updated_time": Date.now()
+//     }
 
-    this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+//     this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
   
-    // Trigger fetchTimeMachineById
-    if (items.P1) {
-      console.log('check items inupdate',items)
-      this.fetchTimeMachineById(1, items.P1, 'update', items);
-    } else {
-      console.warn('fetchTimeMachineById skipped: Missing summaryID (P1).');
-    }
+//     // Trigger fetchTimeMachineById
+//     if (items.P1) {
+//       console.log('check items inupdate',items)
+//       this.fetchTimeMachineById(1, items.P1, 'update', items);
+//     } else {
+//       console.warn('fetchTimeMachineById skipped: Missing summaryID (P1).');
+//     }
   
-    // Trigger change detection
-    this.cd.detectChanges();
+//     // Trigger change detection
+//     this.cd.detectChanges();
+//   }
+  
+
+
+updateSummary(value: any,key: any,pinValue?:any) {
+  if(key=='addPin'){
+    this.PinCheck =pinValue
+    console.log('PinCheck from updateSummary',this.PinCheck)
   }
+console.log('value checking summary',value)
+
+
+  console.log('this.getLoggedUser check update', this.getLoggedUser);
+
+  // Extract username for later use
+  this.extractUserName = this.getLoggedUser.username;
+  console.log('this.extractUserName checking', this.extractUserName);
+
+  console.log('all_Packet_store checking', this.all_Packet_store);
+
+  // Construct allCompanyDetails if missing
+  if (!this.allCompanyDetails) {
+    this.allCompanyDetails = this.constructAllCompanyDetails();
+    console.log('Constructed allCompanyDetails:', this.allCompanyDetails);
+  }
+
+  // Only populate missing fields to avoid overwriting existing values
+  if (this.all_Packet_store) {
+    this.allCompanyDetails = {
+      ...this.allCompanyDetails, // Preserve existing data
+      summaryID: this.allCompanyDetails.summaryID || this.all_Packet_store.summaryID,
+      summaryName: this.allCompanyDetails.summaryName || this.all_Packet_store.summaryName,
+      summaryDesc: this.allCompanyDetails.summaryDesc || this.all_Packet_store.summaryDesc,
+      iconObject: this.allCompanyDetails.iconObject || this.all_Packet_store.iconObject,
+      LiveDashboard:this.allCompanyDetails.LiveDashboard ||'',
+      fullScreenModeCheck:this.allCompanyDetails.fullScreenModeCheck ||''
+    };
+    console.log('Updated allCompanyDetails with Packet Store:', this.allCompanyDetails);
+  }
+
+  // Ensure critical fields have default fallbacks without altering existing logic
+  this.allCompanyDetails.summaryID = this.allCompanyDetails.summaryID ;
+  this.allCompanyDetails.summaryName = this.allCompanyDetails.summaryName ;
+  this.allCompanyDetails.summaryDesc = this.allCompanyDetails.summaryDesc ;
+
+
+  console.log('Final allCompanyDetails:', this.allCompanyDetails);
+
+  // Enable summaryID field
+  this.createSummaryField.get('summaryID')?.enable();
+
+  // Format dashboard tiles
+  this.formattedDashboard = this.formatDashboardTiles(this.dashboard) || [];
+  console.log('Formatted Dashboard:', this.formattedDashboard);
+
+  // Set timestamps and users
+  const originalCreatedDate =
+    this.allCompanyDetails.crDate || Math.ceil(new Date().getTime() / 1000);
+  const originalCreatedUser =
+    this.allCompanyDetails.createdUser || this.getLoggedUser.username;
+
+  const updatedDate = Math.ceil(new Date().getTime() / 1000);
+
+  // Construct tempObj for validation and submission
+  let serializedQueryParams = JSON.stringify(this.updatedQueryPramas);
+console.log('Serialized Query Params:', serializedQueryParams);
+  let tempObj = {
+    PK: `${this.SK_clientID}#${this.allCompanyDetails.summaryID}#summary#main`,
+    SK: 1,
+    metadata: JSON.stringify({
+      ...this.allCompanyDetails,
+      grid_details: this.formattedDashboard,
+    // Include params here
+    }),
+  };
+
+  console.log('TempObj being validated and submitted:', tempObj);
+
+  // Validate and submit the object
+  this.validateAndSubmit(tempObj, key);
+
+  // Prepare items for fetchTimeMachineById
+  const items = {
+    P1: this.allCompanyDetails.summaryID || value.P1,
+    P2: this.allCompanyDetails.summaryName || value.P2,
+    P3: this.allCompanyDetails.summaryDesc || value.P3,
+    P4: updatedDate || value.P4,
+    P5: originalCreatedDate || value.P5,
+    P6: originalCreatedUser || value.P6,
+    P7: this.extractUserName || value.P7,
+    P8: this.previewObjDisplay ? JSON.stringify(this.previewObjDisplay) : value.P8,
+    P9: this.allCompanyDetails.iconSelect || value.P9,
+    P10: this.allCompanyDetails.PinCheck || this.PinCheck,
+    P11:this.allCompanyDetails.fullScreenModeCheck ||value.P11
+  };
   
+
+  console.log('Items prepared for fetchTimeMachineById:', items);
+  const UserDetails = {
+    "User Name": this.userdetails,
+    "Action": "Updated",
+    "Module Name": "Summary Dashboard",
+    "Form Name": "Summary Dashboard",
+    "Description": "Dashboard is Updated",
+    "User Id": this.userdetails,
+    "Client Id": this.SK_clientID,
+    "created_time": Date.now(),
+    "updated_time": Date.now()
+  }
+
+  this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+
+  // Trigger fetchTimeMachineById
+  if (items.P1) {
+    console.log('check items inupdate',items)
+    this.fetchTimeMachineById(1, items.P1, 'update', items);
+  } else {
+    console.warn('fetchTimeMachineById skipped: Missing summaryID (P1).');
+  }
+
+  // Trigger change detection
+  this.cd.detectChanges();
+}
+
   
   handlePin(receiveItem: any) {
     console.log('receiveItem check:', receiveItem);
@@ -7162,6 +7274,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
     this.PinValue = Date.now(); // This will store the current epoch time
   
     console.log("Latest Epoch Timestamp:", this.PinValue);
+    console.log('checking griddetails',this.dashboard)
   
     // Read summary ID from formGroup
     const readSummaryId = this.createSummaryField.get('summaryID')?.value;

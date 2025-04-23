@@ -282,7 +282,7 @@ export class Tile1ConfigComponent implements OnInit {
       minitableEquation:[''],
       EquationOperationMini:[''],
       fontSizeValue:[20, [Validators.required, Validators.min(8), Validators.max(72)]],
-      fontColorValue:['#ebeaea', Validators.required],
+      fontColorValue:['#ebeaea', ],
       FontTypeValue:['bold'],
       FontTypeLabel:['bold']
 
@@ -591,7 +591,7 @@ export class Tile1ConfigComponent implements OnInit {
         minitableEquation:this.createKPIWidget.value.minitableEquation,
         EquationOperationMini:this.createKPIWidget.value.EquationOperationMini,
         fontSizeValue:`${this.createKPIWidget.value.fontSizeValue}px`,
-        fontColorValue:this.createKPIWidget.value.fontColorValue,
+        fontColorValue:this.createKPIWidget.value.fontColorValue ||'#ebeaea',
         FontTypeValue:this.createKPIWidget.value.FontTypeValue ||'',
         FontTypeLabel:this.createKPIWidget.value.FontTypeLabel ||'',
    
@@ -724,7 +724,7 @@ export class Tile1ConfigComponent implements OnInit {
         ModuleNames:this.createKPIWidget.value.ModuleNames||'',
         columnVisibility:this.createKPIWidget.value.columnVisibility,
         fontSizeValue:`${this.createKPIWidget.value.fontSizeValue}px`,
-        fontColorValue:this.createKPIWidget.value.fontColorValue || '#040101',
+        fontColorValue:this.createKPIWidget.value.fontColorValue || '#ebeaea',
         FontTypeValue:this.createKPIWidget.value.FontTypeValue ||'',
         FontTypeLabel:this.createKPIWidget.value.FontTypeLabel ||''
 
