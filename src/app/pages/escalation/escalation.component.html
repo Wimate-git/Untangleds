@@ -1,30 +1,29 @@
-
 <ng-template #exampleModal let-modal>
     <form [formGroup]="notificationForm" (ngSubmit)="onSubmit($event)">
         <div class="modal-header">
             <h4 *ngIf="showHeading" class="modal-title" id="modal-basic-title">Notification Matrix Setup</h4>
-            <h4 *ngIf="!showHeading" class="modal-title" id="modal-basic-title">Edit Notification Matrix Configuration</h4>
+            <h4 *ngIf="!showHeading" class="modal-title" id="modal-basic-title">Edit Notification Matrix Configuration
+            </h4>
             <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
         </div>
 
         <div class="modal-body">
-            <div class="d-flex flex-column scroll-y p-9" id="kt_modal_update_customer_scroll"
-            data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}"
-            data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_update_customer_header"
-            data-kt-scroll-wrappers="#kt_modal_update_customer_scroll" data-kt-scroll-offset="300px">
-            <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
-                    <div class="container ">
+            <div class="d-flex flex-column scroll-y p-9" id="kt_modal_update_customer_scroll" data-kt-scroll="true"
+                data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto"
+                data-kt-scroll-dependencies="#kt_modal_update_customer_header"
+                data-kt-scroll-wrappers="#kt_modal_update_customer_scroll" data-kt-scroll-offset="300px">
+                <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
+                    <div class="container mb-10">
                         <div class="row mb-5">
 
 
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="required fw-semibold fs-6 mb-2"> Notification Matrix ID</label>
 
                                 <input type="text" class="
                                   form-control form-control-lg form-control-solid
                                   mb-3 mb-lg-0
-                                " placeholder="Enter ID" name="id" formControlName="PK"
-                                    required
+                                " placeholder="Enter ID" name="id" formControlName="PK" required
                                     (keyup)="checkUniqueID(notificationForm.get('PK')?.value)">
 
                                 <span style="color: #fc1900;">{{errorForUniqueLabel}}</span>
@@ -36,7 +35,7 @@
                                 </div>
 
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="required fw-semibold fs-6 mb-2">Label</label>
 
                                 <input type="text" min="1" class="
@@ -47,7 +46,7 @@
 
                             </div>
 
-                            <div class="col-md-4" style="display: none;">
+                            <div class="col-md-3" style="display: none;">
                                 <label class="fw-semibold fs-6 mb-2">target</label>
 
                                 <input type="text" min="1" class="
@@ -59,21 +58,60 @@
                             </div>
 
 
-                            <div class="col-md-4">
-                                <label class="required fw-semibold fs-6 mb-2">Total Escalation Levels (Min : 1; Max : 10)</label>
+                            <div class="col-md-3">
+                                <label class="fw-semibold fs-6 mb-2">Select Form</label>
+                                <div class="w-100">
+                                  <p-dropdown 
+                                    class="w-100"
+                                    [style]="{ width: '100%' }"
+                                    [options]="formsToDisplay"
+                                    [(ngModel)]="selectedForm"
+                                    formControlName="form_permission"
+                                    name="model"
+                                    [filter]="true"
+                                    [showClear]="true"
+                                    placeholder="Select a Form" (onChange)="showDynamicUserList()">
+                                    
+                                    <!-- Selected Item Template -->
+                                    <ng-template let-selectedOption pTemplate="selectedItem">
+                                      <div class="d-flex align-items-center w-100">
+                                        <div class="flex-grow-1">{{ selectedOption }}</div>
+                                      </div>
+                                    </ng-template>
+                              
+                                    <!-- Option List Template -->
+                                    <ng-template let-form pTemplate="item">
+                                      <div class="d-flex align-items-center w-100">
+                                        <div class="flex-grow-1">{{ form }}</div>
+                                      </div>
+                                    </ng-template>
+                                  </p-dropdown>
+                                </div>
+                              </div>
+                              
+                              
+                              
+
+
+                            <div class="col-md-3">
+                                <label class="required fw-semibold fs-6 mb-2">Total Escalation Levels (Min : 1; Max :
+                                    10)</label>
 
                                 <input min="1" max="10" class="
                                 form-control form-control-lg form-control-solid
                                 mb-3 mb-lg-0
-                              " placeholder="Enter Total Escalation Levels" name="description" type="number" (change)="onTotalEscalationLevelsChange($event)" (keyup)="onTotalEscalationLevelsChange($event)" formControlName="totalEscalationLevels" (wheel)="disableScroll($event)">
+                              " placeholder="Enter Total Escalation Levels" name="description" type="number"
+                                    (change)="onTotalEscalationLevelsChange($event)"
+                                    (keyup)="onTotalEscalationLevelsChange($event)"
+                                    formControlName="totalEscalationLevels" (wheel)="disableScroll($event)">
 
-                              <div *ngIf="
+                                <div *ngIf="
                               notificationForm.get('totalEscalationLevels')?.hasError('required') &&
                               notificationForm.get('totalEscalationLevels')?.touched ||
                               totEscLvl
                            " class="fv-plugins-message-container invalid-feedback">
-                                 Total Escalation Levels is required and should be between 1 and 10.
-                                 </div> 
+                                    Total Escalation Levels is required and should be between 1 and 10.
+                                </div>
                             </div>
 
                             <!-- <div class="col-md-4">
@@ -88,128 +126,133 @@
 
                         </div>
                     </div>
-                    
+
                     <div class="container mb-5">
                         <div formArrayName="levels" *ngIf="levels?.length">
                             <div *ngFor="let level of levels.controls; let i = index" [formGroupName]="i">
                                 <br>
-                              <h3>Level {{i+1}}</h3>
+                                <h3>Level {{i+1}}</h3>
 
 
 
-                              <label class="required fw-semibold fs-6 mb-2"> Users</label>
-                        <div class="custom-multiselect">
-                        <!-- <ng-multiselect-dropdown style="
-                        display: inline-block; 
-                        width: 100%;
-                        padding: 0px ;
-                        margin-bottom: 0;
-                        font-weight: 0px;
-                        line-height: 1.52857143;
-                        text-align: left;
-                        vertical-align: middle;
-                        cursor: pointer;
-                        background-image: none;
-                        border-radius: 4px;
-                      
-                    " class="form-select form-select-solid form-select-lg fw-bold"
-                            [placeholder]="'Select Users'"
-                            [settings]="dropdownSettings" [data]="clientNames"
-                            (onSelect) ="onModuleSelect(i,$event)"
-                            (onDeSelect)="onDeSelect(i, $event)"
-                            (onSelectAll) = "onSelectAll(i, $event)"
-                            (onDeSelectAll)="onDeSelectAll(i)"
-                            formControlName="userIDs"
-                            required>
-                        </ng-multiselect-dropdown> -->
+                                <label class="required fw-semibold fs-6 mb-2"> Users</label>
+                                <div class="custom-multiselect">
+                          
 
 
-                        <p-multiSelect
-                        [options]="clientNames" 
-                        optionLabel="PK" 
-                        placeholder="Add UserID"
-                        (onChange)="onModuleSelect(i, $event)"
-                        (onSelectAllChange)="onSelectAll(i, $event)"
-                        formControlName="userIDs"
-                        required>
-                    </p-multiSelect>
+                                  <p-multiSelect [options]="clientNames" optionLabel="label" placeholder="Add UserID"
+                                        (onChange)="onModuleSelect(i, $event)"
+                                        (onSelectAllChange)="onSelectAll(i, $event)" formControlName="userIDs" required>
+                                    </p-multiSelect>
 
 
-                    <!-- (onDeSelectAllChange)="onDeSelectAll(i)" -->
-                    <!-- (onDeSelect)="onDeSelect(i, $event)"
-                    (onSelectAllChange)="onSelectAll(i, $event)"  -->
+<!-- 
+                                    //    (onSelectAllChange)="onSelectAllFields(i, $event)" -->
+                                    <br><br>
+                                    <label class="required fw-semibold fs-6 mb-2">Escalation Time</label>
 
-
-                        <br><br>
-                        <label class="required fw-semibold fs-6 mb-2">Escalation Time</label>
-
-                        <input type="text" (keypress)="keyPress($event)" class="
+                                    <input type="text" (keypress)="keyPress($event)" class="
                         form-control form-control-lg form-control-solid
                         mb-3 mb-lg-0
-                      " placeholder="Enter Escalation Time in minutes" name="model" formControlName="escalationTime" required>
+                      " placeholder="Enter Escalation Time in minutes" name="model" formControlName="escalationTime"
+                                        required>
 
-                      <br>
-                      <label class="required fw-semibold fs-6 mb-2">Escalation Level Comment</label>
+                                    <br>
+                                    <label class="required fw-semibold fs-6 mb-2">Escalation Level Comment</label>
 
-                        <input type="text" min="1" class="
+                                    <input type="text" min="1" class="
                         form-control form-control-lg form-control-solid
                         mb-3 mb-lg-0
                       " placeholder="Enter Escalation Level Comment" name="model" formControlName="comments" required>
-                        
-                      <br>
-                              <!-- User permissions -->
-                              <div formArrayName="permissions">
-                                <div *ngFor="let permissionControl of getPermissions(i).controls; let j = index" [formGroupName]="j">
 
-                                <tr>
-                                    <label class="col-lg-12 col-form-label fw-bold fs-6 ">{{ permissionControl.value.userID }}</label>
-                                </tr>
-                                <tr style="display: flex;flex-wrap: wrap;row-gap: 5px;">
-                                    <td class="w-125px"><div class="form-check form-check-solid"><input class="form-check-input" type="checkbox" formControlName="enableSMS" />Enable SMS</div> </td>
-                                    <td class="w-125px"><div class="form-check form-check-solid"><input class="form-check-input" type="checkbox" formControlName="enableEmail" /> Enable Email</div></td>
-                                    <td class="w-125px"><div class="form-check form-check-solid"><input class="form-check-input" type="checkbox" formControlName="enableTelegram" />Enable Telegram</div></td>
-                                    <td class="w-125px"><div class="form-check form-check-solid"><input class="form-check-input" type="checkbox" formControlName="enableType1" />Enable Type 1</div></td>
-                                    <td class="w-125px"><div class="form-check form-check-solid"><input class="form-check-input" type="checkbox" formControlName="enableType2" />Enable Type 2</div></td>
-                                    <td class="w-125px"><div class="form-check form-check-solid"><input class="form-check-input" type="checkbox" formControlName="enableType3" />Enable Type 3</div></td>
-                                    <td class="w-125px"><div class="form-check form-check-solid"><input class="form-check-input" type="checkbox" formControlName="enableType4" />Enable Type 4</div></td>
-                                    <td class="w-125px"><div class="form-check form-check-solid"><input class="form-check-input" type="checkbox" formControlName="enableType5" />Enable Type 5</div></td>
-                                </tr>
+                                    <br>
+                                    <!-- User permissions -->
+                                    <div formArrayName="permissions">
+                                        <div *ngFor="let permissionControl of getPermissions(i).controls; let j = index"
+                                            [formGroupName]="j">
+
+                                            <tr>
+                                                <label class="col-lg-12 col-form-label fw-bold fs-6 ">{{
+                                                    permissionControl.value.userID }}</label>
+                                            </tr>
+                                            <tr style="display: flex;flex-wrap: wrap;row-gap: 5px;">
+                                                <td class="w-125px">
+                                                    <div class="form-check form-check-solid"><input
+                                                            class="form-check-input" type="checkbox"
+                                                            formControlName="enableSMS" />Enable SMS</div>
+                                                </td>
+                                                <td class="w-125px">
+                                                    <div class="form-check form-check-solid"><input
+                                                            class="form-check-input" type="checkbox"
+                                                            formControlName="enableEmail" /> Enable Email</div>
+                                                </td>
+                                                <td class="w-125px">
+                                                    <div class="form-check form-check-solid"><input
+                                                            class="form-check-input" type="checkbox"
+                                                            formControlName="enableTelegram" />Enable Telegram</div>
+                                                </td>
+                                                <td class="w-125px">
+                                                    <div class="form-check form-check-solid"><input
+                                                            class="form-check-input" type="checkbox"
+                                                            formControlName="enableType1" />Enable Type 1</div>
+                                                </td>
+                                                <td class="w-125px">
+                                                    <div class="form-check form-check-solid"><input
+                                                            class="form-check-input" type="checkbox"
+                                                            formControlName="enableType2" />Enable Type 2</div>
+                                                </td>
+                                                <td class="w-125px">
+                                                    <div class="form-check form-check-solid"><input
+                                                            class="form-check-input" type="checkbox"
+                                                            formControlName="enableType3" />Enable Type 3</div>
+                                                </td>
+                                                <td class="w-125px">
+                                                    <div class="form-check form-check-solid"><input
+                                                            class="form-check-input" type="checkbox"
+                                                            formControlName="enableType4" />Enable Type 4</div>
+                                                </td>
+                                                <td class="w-125px">
+                                                    <div class="form-check form-check-solid"><input
+                                                            class="form-check-input" type="checkbox"
+                                                            formControlName="enableType5" />Enable Type 5</div>
+                                                </td>
+                                            </tr>
+                                        </div>
+                                    </div>
+
+
+                                    <br><br>
                                 </div>
-                              </div>
-
-                              
-                              <br><br>
                             </div>
-                          </div>
-                    </div>
-                
+                        </div>
+
 
 
                         <div *ngIf="
                      notificationForm.get('users')?.hasError('required') &&
                      notificationForm.get('users')?.touched
                   " class="fv-plugins-message-container invalid-feedback">
-                        user is required
-                        </div> 
+                            user is required
+                        </div>
 
                     </div>
-                    
-                    <div class="modal-footer flex-center">
+
+                    <div class="modal-footer flex-center" [ngStyle]="{'margin-top':levels.length == 0?'100px':'0px'}">
                         <!--begin::Button-->
                         <button type="reset" id="kt_modal_update_customer_cancel" class="btn btn-light me-3"
                             (click)="modal.dismiss('cancel')">
                             Discard
                         </button>
                         <!--end::Button-->
-            
+
                         <!--begin::Button-->
-                        <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary"
-                        [disabled]="notificationForm.invalid || errorForUniqueID=='id already exists' 
-                        ||errorForUniqueLabel == 'id already exists'" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+                        <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary" [disabled]="notificationForm.invalid || errorForUniqueID=='id already exists' 
+                        ||errorForUniqueLabel == 'id already exists'"
+                            [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
                             <span *ngIf="!editOperation" class="indicator-label">
                                 Submit
                             </span>
-                            <span *ngIf="editOperation"  class="indicator-label">
+                            <span *ngIf="editOperation" class="indicator-label">
                                 Update
                             </span>
                             <span class="indicator-progress">
@@ -218,54 +261,56 @@
                         </button>
                         <!--end::Button-->
                     </div>
-               
+
                 </div>
             </div>
         </div>
 
     </form>
 </ng-template>
-  
 
-    <div class="card card-custom">
-        <div class="card-header border-0 pt-6">
-            <h2>Escalation Matrix Setup</h2>
-        </div>
-        <div class="card-header border-0 pt-0">
-    
-            <!--begin::Card title-->
-            <div class="card-title">
-    
+
+<div class="card card-custom">
+    <div class="card-header border-0 pt-6">
+        <h2>Escalation Matrix Setup</h2>
+    </div>
+    <div class="card-header border-0 pt-0">
+
+        <!--begin::Card title-->
+        <div class="card-title">
+
             <div class="d-flex align-items-center position-relative my-1">
                 <app-keenicon name="magnifier" class="fs-3 position-absolute ms-5"></app-keenicon>
                 <input type="text" data-action="matrix_filter" class="form-control form-control-solid w-250px ps-12"
                     placeholder="Search MatricID">
-            </div> 
-            
-        </div>
-            <!--begin::Card title-->
-    
-            <!--begin::Card toolbar-->
-            <div class="card-toolbar">
-                <!--begin::Toolbar-->
-                <div class="d-flex justify-content-end">
-                    <!--begin::Add user-->
-                    <button type="button" class="btn btn-primary" data-action="create">
-                        Add
-                    </button>
-                    <!--end::Add user-->
-                    </div>
-                    <!--end::Toolbar-->
-                <!-- </div> -->
-                <!--end::Card toolbar-->
             </div>
+
         </div>
-        <!-- <div class="card-body pt-0"> -->
-        <div class="card-body pt-0">
-            <app-crud-user [componentSource]="'app-configuration'" [datatableConfig]="datatableConfig" route="/escalation" (deleteEvent)="delete($event)" (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent" [modal]="exampleModal"></app-crud-user>
+        <!--begin::Card title-->
+
+        <!--begin::Card toolbar-->
+        <div class="card-toolbar">
+            <!--begin::Toolbar-->
+            <div class="d-flex justify-content-end">
+                <!--begin::Add user-->
+                <button type="button" class="btn btn-primary" data-action="create">
+                    Add
+                </button>
+                <!--end::Add user-->
+            </div>
+            <!--end::Toolbar-->
+            <!-- </div> -->
+            <!--end::Card toolbar-->
         </div>
     </div>
-    
-    <!-- swal is not yet implemented -->
-    <swal #noticeSwal [swalOptions]="swalOptions">
-    </swal>
+    <!-- <div class="card-body pt-0"> -->
+    <div class="card-body pt-0">
+        <app-crud-user [componentSource]="'app-configuration'" [datatableConfig]="datatableConfig" route="/escalation"
+            (deleteEvent)="delete($event)" (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent"
+            [modal]="exampleModal"></app-crud-user>
+    </div>
+</div>
+
+<!-- swal is not yet implemented -->
+<swal #noticeSwal [swalOptions]="swalOptions">
+</swal>

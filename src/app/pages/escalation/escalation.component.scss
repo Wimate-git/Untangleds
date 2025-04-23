@@ -20,3 +20,9 @@
   max-height: 80vh; /* Adjust the height as per your requirements */
   overflow-y: auto; /* Enables vertical scrolling */
 }
+
+
+::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item {
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+}

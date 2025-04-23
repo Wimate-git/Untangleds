@@ -9,6 +9,7 @@ import { NgbCollapseModule, NgbDropdownModule, NgbModule, NgbNavModule, NgbToolt
 import { Crud2Module } from "src/app/modules/crud2/crud.module";
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SweetAlert2Module } from "@sweetalert2/ngx-sweetalert2";
+import { DropdownModule } from 'primeng/dropdown';
 
 
 
@@ -35,6 +36,7 @@ import { SweetAlert2Module } from "@sweetalert2/ngx-sweetalert2";
     NgbModule,
     Crud2Module,
     MultiSelectModule,
+    DropdownModule,
     SweetAlert2Module.forChild(),
 ]
 })

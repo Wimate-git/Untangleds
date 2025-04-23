@@ -108,6 +108,17 @@ export class EscalationComponent implements OnInit {
   lookup_users: any = [];
   editOperation: boolean = false;
   username: any;
+  permissionID: any;
+  formIDPermission: any;
+  locationPermission: any;
+  companyID: any;
+  permissionForm: any;
+  validForms: any;
+  filtermatchedData: any[];
+  formsToDisplay: any[];
+  selectedFormFields: any = [];
+  lookup_data_Options: any = [];
+  getDerivedArrayList: any = [];
 
 
   constructor(private fb: FormBuilder,
@@ -118,6 +129,9 @@ export class EscalationComponent implements OnInit {
 
 
 
+    formsList:any=[];
+
+    selectedForm: any;
 
 
 
@@ -132,6 +146,8 @@ export class EscalationComponent implements OnInit {
     this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
 
     this.Lookupdata=[]
+
+    this.checkPermissions()
     
     this.addFromService()
 
@@ -141,6 +157,264 @@ export class EscalationComponent implements OnInit {
    
   }
 
+
+
+  async checkPermissions() {
+
+
+
+    try {
+      await this.api.GetMaster(this.SK_clientID + "#dynamic_form#lookup", 1).then((result: any) => {
+        if (result) {
+          const helpherObj = JSON.parse(result.options);
+
+          // Corrected the map function
+          this.formsList = helpherObj.map((item: any) => (item[0]));
+
+          console.log("Form list is here ", this.formsList);
+        }
+      });
+    } catch (err) {
+      console.log("Error fetching the dynamic form data ", err);
+    }
+
+
+    //Get the user configuratyion
+    const userResponse = await this.api.GetMaster(`${this.username}#user#main`, 1);
+
+    if (userResponse && userResponse.metadata) {
+
+      console.log("userResponse.metadata ", userResponse.metadata);
+
+      const tempHolder = JSON.parse(userResponse.metadata)
+      this.permissionID = tempHolder.permission_ID
+      this.formIDPermission = tempHolder.form_permission
+      this.locationPermission = tempHolder.location_permission
+      this.companyID = tempHolder.companyID
+    }
+
+
+
+    const keyLocation = Array.isArray(this.locationPermission) && this.locationPermission.length === 1 && this.locationPermission[0] === "All" ? "All" : "Not all";
+    const keyDevices = Array.isArray(this.formIDPermission) && this.formIDPermission.length === 1 && this.formIDPermission[0] === "All" ? "All" : "Not all";
+
+
+
+
+
+    if (this.permissionID !== 'All') {
+
+      const permisson_response = await this.api.GetMaster(this.SK_clientID + '#permission#' + this.permissionID + '#main', 1);
+      const permission_data = permisson_response && JSON.parse(JSON.parse(JSON.stringify(permisson_response.metadata)))
+      this.permissionForm = permission_data && JSON.parse(permission_data.dynamicEntries)   // Dymaic Entries 
+      console.log("PERMISSION FORM:", this.permissionForm)
+
+      const result = await this.api.GetMaster(`${this.SK_clientID}#${this.companyID}#location#main`, 1)
+      if (result) {
+        console.log("TREE RESPONSE:", JSON.parse(JSON.parse(JSON.stringify(result.metadata))))
+
+        const tree_reponse = JSON.parse(JSON.parse(JSON.stringify(result.metadata)))
+
+        console.log("TREE RESPONSE 2:", JSON.parse(JSON.parse(JSON.stringify(tree_reponse[0].tree))))
+
+        const tree_response_1 = JSON.parse(JSON.parse(JSON.stringify(tree_reponse[0].tree)))
+
+
+     
+        this.validForms = this.permissionForm.filter((item: any) => item.permission.includes('Read') == true || item.permission.includes('All') == true)
+        console.log("Valid forms are here ", this.validForms);
+        const allowedForms = this.validForms.reduce((acc: string[], permission: any) => {
+          return acc.concat(permission.dynamicForm);
+        }, []);
+        console.log("ALLOW FORMS:", allowedForms)
+
+
+
+        console.log("keyLocation ,keyDevices ", keyLocation, keyDevices);
+
+        if (`${keyLocation}-${keyDevices}` == "Not all-Not all" || `${keyLocation}-${keyDevices}` == "Not all-All") {
+
+          const returnValueTree = await this.modifyList(this.locationPermission, this.formIDPermission, tree_response_1);
+
+          console.log("FilterValuetreee", returnValueTree)
+
+          if (returnValueTree.length > 0) {
+            // Extracting text for nodes with node_type "device"
+            this.filtermatchedData = returnValueTree
+              .filter((node: any) => node.node_type === "device")
+              .flatMap((node: any) => node.text || []);
+            console.log("jsonModified_in_service_final", this.filtermatchedData);
+          }
+          if (returnValueTree.length == 0) {
+            this.filtermatchedData = []
+          }
+
+
+          console.log("GROUP LIST:", this.filtermatchedData)
+
+          this.filtermatchedData = this.filtermatchedData.filter((item: any) => allowedForms.includes(item))
+
+
+          this.formsToDisplay = this.filtermatchedData
+
+        }
+        else if (`${keyLocation}-${keyDevices}` == "All-All") {
+
+
+
+          let matchingItems = []
+          if (allowedForms.includes('All')) {
+            matchingItems = this.formsList;
+          }
+          else {
+            matchingItems = allowedForms
+          }
+
+          this.formsToDisplay = matchingItems
+        }
+        else {
+          this.filtermatchedData = this.formIDPermission
+
+          this.formsToDisplay = this.filtermatchedData.filter((ele: any) => allowedForms.includes(ele))
+        }
+      }
+
+    }
+    else {
+      const keyLocation = Array.isArray(this.locationPermission) && this.locationPermission.length === 1 && this.locationPermission[0] === "All" ? "All" : "Not all";
+      const keyDevices = Array.isArray(this.formIDPermission) && this.formIDPermission.length === 1 && this.formIDPermission[0] === "All" ? "All" : "Not all";
+
+      if (`${keyLocation}-${keyDevices}` == "All-All") {
+        this.formsToDisplay = this.formsList
+      }
+
+      this.api.GetMaster(`${this.SK_clientID}#${this.companyID}#location#main`, 1).then(async (result) => {
+        if (result) {
+          console.log("TREE RESPONSE:", JSON.parse(JSON.parse(JSON.stringify(result.metadata))))
+
+          const tree_reponse = JSON.parse(JSON.parse(JSON.stringify(result.metadata)))
+
+          console.log("TREE RESPONSE 2:", JSON.parse(JSON.parse(JSON.stringify(tree_reponse[0].tree))))
+
+          const tree_response_1 = JSON.parse(JSON.parse(JSON.stringify(tree_reponse[0].tree)))
+
+          const keyLocation = Array.isArray(this.locationPermission) && this.locationPermission.length === 1 && this.locationPermission[0] === "All" ? "All" : "Not all";
+          const keyDevices = Array.isArray(this.formIDPermission) && this.formIDPermission.length === 1 && this.formIDPermission[0] === "All" ? "All" : "Not all";
+
+          if (`${keyLocation}-${keyDevices}` !== "All-All") {
+
+            const returnValueTree = await this.modifyList(this.locationPermission, this.formIDPermission, tree_response_1);
+
+            console.log("FilterValuetreee", returnValueTree)
+
+            if (returnValueTree.length > 0) {
+              // Extracting text for nodes with node_type "device"
+              this.filtermatchedData = returnValueTree
+                .filter((node: any) => node.node_type === "device")
+                .flatMap((node: any) => node.text || []);
+              console.log("jsonModified_in_service_final", this.filtermatchedData);
+            }
+            if (returnValueTree.length == 0) {
+              this.filtermatchedData = []
+            }
+
+            this.formsToDisplay = this.filtermatchedData
+
+          }
+
+        }
+      })
+    }
+
+
+    // this.formsToDisplay = this.formsToDisplay.filter((item:any) => item != 'All')
+
+    console.log("Permission is being checked and the forms to display are ", this.formsToDisplay);
+
+
+    this.cd.detectChanges()
+
+  }
+
+
+  async modifyList(locationPermission: any, formPermission: any, originalArray: Node[]): Promise<Node[]> {
+    const keyLocation = Array.isArray(this.locationPermission) && locationPermission.length === 1 && locationPermission[0] === "All" ? "All" : "Not all";
+    const keyDevices = Array.isArray(this.formIDPermission) && formPermission.length === 1 && formPermission[0] === "All" ? "All" : "Not all";
+
+    console.log("modifyList:", `${keyLocation}-${keyDevices}`);
+
+    switch (`${keyLocation}-${keyDevices}`) {
+      case "All-All":
+        return [];
+      case "Not all-All":
+        return this.calculateNodesToShow(locationPermission, originalArray);
+      case "All-Not all":
+        return this.calculateNodesToShow(formPermission, originalArray);
+      case "Not all-Not all":
+        const data1 = await this.calculateNodesToShow(locationPermission, originalArray);
+        const data2 = await this.calculateNodesToShow(formPermission, data1);
+        return data2;
+      default:
+        console.log("Unrecognized case");
+        return [];
+    }
+  }
+
+
+
+
+  async calculateNodesToShow(permissions: any, originalData: Node[]): Promise<Node[]> {
+    let nodeMap = this.enhanceNodeMap(originalData);
+    let nodesToShow: Node[] = [];
+    permissions && permissions.forEach((permission: string) => {
+      const keyText = "text_" + permission;
+      const nodes = nodeMap[keyText] || [];
+
+      nodes.forEach((permittedNode: Node) => {
+        if (permittedNode && !nodesToShow.includes(permittedNode)) {
+          nodesToShow.push(permittedNode);
+          this.collectDescendants(permittedNode, nodesToShow, originalData);
+          this.markAncestors(permittedNode, nodesToShow, originalData);
+        }
+      });
+    });
+    return nodesToShow.filter((v: any, i, a) => a.findIndex((t: any) => t.id === v.id) === i);
+  }
+
+
+
+  enhanceNodeMap(originalData: Node[]): Record<string, Node[]> {
+    let nodeMap: Record<string, Node[]> = {};
+    originalData.forEach((node: any) => {
+      const textKey = "text_" + node.text;
+
+      if (!nodeMap[textKey]) {
+        nodeMap[textKey] = [];
+      }
+      nodeMap[textKey].push(node);
+    });
+    return nodeMap;
+  }
+
+  collectDescendants(node: any, result: Node[], originalData: Node[]): void {
+    let children = originalData.filter((n: any) => n.parent === node.id);
+    children.forEach((child) => {
+      if (!result.includes(child)) {
+        result.push(child);
+        this.collectDescendants(child, result, originalData);
+      }
+    });
+  }
+
+  markAncestors(node: any, result: Node[], originalData: Node[]): void {
+    if (node.parent !== "#") {
+      const parentNode = originalData.find((n: any) => n.id === node.parent);
+      if (parentNode && !result.includes(parentNode)) {
+        result.push(parentNode);
+        this.markAncestors(parentNode, result, originalData);
+      }
+    }
+  }
 
 
   onSubmit(event:any){
@@ -205,23 +479,27 @@ export class EscalationComponent implements OnInit {
     await this.fetchAllUsers(1,this.SK_clientID+"#user"+"#lookup")
 
     this.clientNames = this.lookup_users.map((item:any)=>{
-      return {PK:item.P1}
+      return {PK:item.P1,type:'User',label:item.P1}
     })
    
   }
 
   initializeDeviceFields() {
+    this.selectedForm = ''
     this.notificationForm=this.fb.group({
       PK: ['', Validators.required],
       SK: [''],
       label: ['', Validators.required],
       target: [''],
+      form_permission:['', Validators.required],
       totalEscalationLevels: ['', [Validators.required, Validators.min(1), Validators.max(10)]],
       createdTime: [''],
       updatedTime:[''],
       //levels: this.fb.array([])
       levels: this.fb.array([])
     });
+
+    this.notificationForm.get('form_permission').patchValue([])
     console.log("INITS:",this.notificationForm)
 
   }
@@ -392,6 +670,7 @@ console.log("PARRAY3:",permissionsArray)
       createdTime: `${Math.ceil(((new Date()).getTime())/1000)}`,
       updatedTime: `${Math.ceil(((new Date()).getTime())/1000)}`,
       totalEscalationLevels: this.notificationForm.value.totalEscalationLevels,
+      form_permission:this.notificationForm.value.form_permission,
       levels: JSON.stringify(final_levels),
       escalationTime: escalationTime,
       comments: JSON.stringify(comments),
@@ -487,6 +766,24 @@ console.log("PARRAY3:",permissionsArray)
     })
   }
 
+
+
+  async showDynamicUserList(){
+    console.log("selectedForm ",this.selectedForm);
+    const result = await this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${this.selectedForm}#main`, 1);
+
+    if (result) {
+      let tempResult = JSON.parse(result.metadata || '').formFields;
+      console.log("All the formFields are here ",tempResult);
+      this.selectedFormFields = tempResult.filter((field:any)=>field.validation?.user === true || field.validation?.isDerivedUser === true).map((item:any)=>{return {PK:item.name,type:'isUserList',label:item.label}})
+      console.log("All the users fields are here ",this.selectedFormFields);
+  
+      this.clientNames = [...this.clientNames,...this.selectedFormFields]
+    }
+
+
+    this.cd.detectChanges()
+  }
 
   async createLookUpRdt(item: any, pageNumber: number,tempclient:any){
     try {
@@ -598,6 +895,7 @@ console.log("PARRAY3:",permissionsArray)
           delete this.duplicate['PK']
           console.log("edit field:",this.notificationForm)
           this.notificationForm.get('PK')?.disable();
+          this.showDynamicUserList()
           this.changeDetection();
         }
       }).catch((err) => {
@@ -916,6 +1214,7 @@ console.log("PARRAY3:",permissionsArray)
 
     
   }
+
   
   onDeSelect(levelIndex: number, option: any) {
     // Get the current values of the userIDs control at this level
@@ -1277,6 +1576,7 @@ console.log("PARRAY3:",permissionsArray)
           SK: dataFromDb.SK,
           label: dataFromDb.label,
           target: dataFromDb.target,
+          form_permission: dataFromDb.form_permission,
           totalEscalationLevels: dataFromDb.totalEscalationLevels,
           escalationTime: dataFromDb.escalationTime,
           comments: dataFromDb.comments,
