@@ -7333,14 +7333,14 @@ console.log('Serialized Query Params:', serializedQueryParams);
           update: 'Summary updated',
           update_Dashboard: 'Dashboard Filteration is updated',
           filter_add: 'Dashboard Filteration is added',
-
-          add_table:'Table Widget Added',
-          update_table:'Table Widget Updated',
-          add_multiTable:'Table Widget Added',
-          update_multiTable:'Table Widget Updated',
-          query_applied:'Query Applied',
-          addPin:'Pin Updated',
-          Save:'Dashboard changes saved'
+  
+          add_table: 'Table Widget Added',
+          update_table: 'Table Widget Updated',
+          add_multiTable: 'Table Widget Added',
+          update_multiTable: 'Table Widget Updated',
+          query_applied: 'Query Applied',
+          addPin: 'Pin Updated',
+          Save: 'Dashboard changes saved'
         }[actionKey] || 'Summary Updated';
   
         console.log('Action key condition check:', actionKey);
@@ -7357,28 +7357,26 @@ console.log('Serialized Query Params:', serializedQueryParams);
             if (actionKey === 'add_map' || actionKey === 'update_map') {
               window.location.reload(); // Reloads the current window
             } else if (actionKey === 'update_Dashboard' || actionKey === 'filter_add') {
-     
+  
             }
-            else if (actionKey === 'add_table' || actionKey === 'update_table'){
+            else if (actionKey === 'add_table' || actionKey === 'update_table') {
               window.location.reload();
-        
             }
-            else if(actionKey === 'add_multiTable' || actionKey === 'update_multiTable'){
-          
-
-            }else if(actionKey === 'addPin'){
+            else if (actionKey === 'add_multiTable' || actionKey === 'update_multiTable') {
+  
+            } else if (actionKey === 'addPin') {
               window.location.reload();
-
             }
           }
         });
-        this.cdr.detectChanges()
+        this.cdr.detectChanges();
+  
         // Additional logic for 'update'
         if (actionKey === 'update') {
           this.route.paramMap.subscribe(params => {
             this.routeId = params.get('id');
             if (this.routeId) {
-            this.openModalHelpher(this.routeId);
+              this.openModalHelpher(this.routeId);
               this.editButtonCheck = false;
               console.log('Route ID found, opening modal:', this.routeId);
             }
@@ -7391,17 +7389,21 @@ console.log('Serialized Query Params:', serializedQueryParams);
         throw new Error('Invalid response structure');
       }
     }).catch(err => {
-      console.error('Error:', err);
-      Swal.fire({
-        position: 'top-end',
-        icon: 'error',
-        title: `Failed to ${actionKey} summary`,
-        text: err.message,
-        showConfirmButton: false,
-        timer: 1500
-      });
+      // Skip error message for 'addPin' action
+      if (actionKey !== 'addPin') {
+        console.error('Error:', err);
+        Swal.fire({
+          position: 'top-end',
+          icon: 'error',
+          title: `Failed to ${actionKey} summary`,
+          text: err.message,
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }
     });
   }
+  
   
   
   
