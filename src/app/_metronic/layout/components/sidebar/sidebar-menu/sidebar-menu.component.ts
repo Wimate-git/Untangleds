@@ -257,6 +257,7 @@ export class SidebarMenuComponent implements OnInit,OnDestroy {
       'Form Group',
       'Project Configuration',
       'Location Management',
+      'MQTT'
     ];
     return configModules.some((module) => this.hasPermission(module));
   }

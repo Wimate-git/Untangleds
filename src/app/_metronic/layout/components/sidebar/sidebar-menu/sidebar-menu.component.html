@@ -171,7 +171,7 @@
     </div>
 
 
-    <div class="menu-item">
+    <div class="menu-item" *ngIf="hasPermission('MQTT')">
       <a class="menu-link without-sub" routerLinkActive="active" routerLink="/mqtt">
         <span class="menu-bullet">
           <i class="fa-solid fa-wifi"></i>

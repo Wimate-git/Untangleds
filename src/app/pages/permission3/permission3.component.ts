@@ -109,6 +109,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     { name: 'Company', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'User Management', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Permission', view: false, update: false, xlsxView: false, xlsxUpdate: false },
+    { name: 'MQTT', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Form Group', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Location Management', view: false, update: false, xlsxView: false, xlsxUpdate: false },
     { name: 'Project Configuration', view: false, update: false, xlsxView: false, xlsxUpdate: false },
