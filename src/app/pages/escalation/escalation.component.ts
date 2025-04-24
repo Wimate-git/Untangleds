@@ -604,7 +604,7 @@ export class EscalationComponent implements OnInit {
       filteredList.push({
             "userID": userID,
             "enableSMS": false,
-            "enableEmail": false,
+            "enableEmail": true,
             "enableTelegram": false,
             "enableType1": false,
             "enableType2": false,
@@ -702,8 +702,9 @@ console.log("PARRAY3:",permissionsArray)
         var item={
           P1:this.notificationForm.value.PK,
           P2:this.allDatas.label,
-          P3:Math.ceil(((new Date()).getTime())/1000)
-      }
+          P3:this.allDatas.form_permission,
+          P4:Math.ceil(((new Date()).getTime())/1000)
+        }
 
         // var element={
         //   PK:this.allDatas.PK,
@@ -1008,6 +1009,7 @@ console.log("PARRAY3:",permissionsArray)
     this.allDatas = {
       label: this.notificationForm.value.label,
       updatedTime: `${Math.ceil(((new Date()).getTime())/1000)}`,
+      form_permission:this.notificationForm.value.form_permission,
       totalEscalationLevels: this.notificationForm.value.totalEscalationLevels,
       levels: JSON.stringify(final_levels),
       escalationTime: escalationTime,
@@ -1044,7 +1046,8 @@ console.log("PARRAY3:",permissionsArray)
         var item={
           P1:this.notificationForm.controls.PK.value,
           P2:this.allDatas.label,
-          P3:Math.ceil(((new Date()).getTime())/1000)
+          P3:this.allDatas.form_permission,
+          P4:Math.ceil(((new Date()).getTime())/1000)
         }
 
         console.log("lookup data ",item);
@@ -1330,7 +1333,10 @@ console.log("PARRAY3:",permissionsArray)
           title: 'Label', data: 'P2' // Added a new column for phone numbers
         },
         {
-          title: 'Updated', data: 'P3', render: function (data) {
+          title: 'Selected Form', data: 'P3' // Added a new column for phone numbers
+        },
+        {
+          title: 'Updated', data: 'P4', render: function (data) {
             const date = new Date(data * 1000).toLocaleDateString() + " " + new Date(data * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
             // const date = new Date(data * 1000);
@@ -1609,8 +1615,8 @@ console.log("PARRAY3:",permissionsArray)
                   if (element !== null && element !== undefined) {
                     // Extract values from each element and push them to lookup_data_user
                     const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
-                    const { P1, P2, P3 } = element[key]; // Extract values from the nested object
-                    this.lookup_data_notification.push({ P1, P2, P3 }); // Push an array containing P1, P2, P3, P4, P5, P6
+                    const { P1, P2, P3 ,P4} = element[key]; // Extract values from the nested object
+                    this.lookup_data_notification.push({ P1, P2, P3 ,P4}); // Push an array containing P1, P2, P3, P4, P5, P6
                     console.log("d2 =", this.lookup_data_notification);
                   } else {
                     break;
@@ -1618,7 +1624,7 @@ console.log("PARRAY3:",permissionsArray)
                 }
   
                 // Sort the lookup_data_user array based on P5 values in descending order
-                this.lookup_data_notification.sort((a: { P5: number; }, b: { P5: number; }) => b.P5 - a.P5);
+                this.lookup_data_notification.sort((a: { P4: number; }, b: { P4: number; }) => b.P4 - a.P4);
                 console.log("Lookup sorting", this.lookup_data_notification);
   
                 // Continue fetching recursively
