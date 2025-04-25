@@ -71,6 +71,7 @@ export class EscalationComponent implements OnInit {
   swalOptions: SweetAlertOptions = {};
 
   errorForUniqueLabel: string;
+  errorForUniqueNotificationLabel:string;
   errorForUniqueID: string;
   data: Promise<void | ({ __typename: "Client"; PK: string; SK: string; clientID?: string | null | undefined; clientName?: string | null | undefined; clientDesc?: string | null | undefined; clientLogo1?: string | null | undefined; clientLogo2?: string | null | undefined; enableClient?: boolean | null | undefined; email?: boolean | null | undefined; sms?: boolean | null | undefined; telegram?: boolean | null | undefined; healthCheck?: boolean | null | undefined; deviceTimeout?: boolean | null | undefined; alertTimeout?: boolean | null | undefined; mobile?: string | null | undefined; emailID?: string | null | undefined; telegramID?: string | null | undefined; metadata?: string | null | undefined; updated?: string | null | undefined; } | null)[] | undefined>;
   Lookupdata: any;
@@ -119,6 +120,7 @@ export class EscalationComponent implements OnInit {
   selectedFormFields: any = [];
   lookup_data_Options: any = [];
   getDerivedArrayList: any = [];
+  listofNMLabels: any;
 
 
   constructor(private fb: FormBuilder,
@@ -769,22 +771,33 @@ console.log("PARRAY3:",permissionsArray)
 
 
 
-  async showDynamicUserList(){
-    console.log("selectedForm ",this.selectedForm);
+  async showDynamicUserList() {
+    console.log("selectedForm ", this.selectedForm);
     const result = await this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${this.selectedForm}#main`, 1);
-
+  
     if (result) {
       let tempResult = JSON.parse(result.metadata || '').formFields;
-      console.log("All the formFields are here ",tempResult);
-      this.selectedFormFields = tempResult.filter((field:any)=>field.validation?.user === true || field.validation?.isDerivedUser === true).map((item:any)=>{return {PK:item.name,type:'isUserList',label:item.label}})
-      console.log("All the users fields are here ",this.selectedFormFields);
+      console.log("All the formFields are here ", tempResult);
+      
+      this.selectedFormFields = tempResult
+        .filter((field: any) => field.validation?.user === true || field.validation?.isDerivedUser === true)
+        .map((item: any) => ({ PK: item.name, type: 'isUserList', label: item.label }));
   
-      this.clientNames = [...this.clientNames,...this.selectedFormFields]
+      console.log("All the user fields are here ", this.selectedFormFields);
+  
+      this.clientNames = [...this.clientNames, ...this.selectedFormFields];
+  
+      // Remove duplicates by PK
+      this.clientNames = [
+        ...new Map(this.clientNames.map((item: { PK: any; }) => [item.PK, item])).values()
+      ];
     }
 
-
-    this.cd.detectChanges()
+    console.log("Client Names are here ",this.clientNames);
+  
+    this.cd.detectChanges();
   }
+  
 
   async createLookUpRdt(item: any, pageNumber: number,tempclient:any){
     try {
@@ -865,6 +878,7 @@ console.log("PARRAY3:",permissionsArray)
       this.showHeading = true;
       this.errorForUniqueLabel = '';
       this.errorForUniqueID = '';
+      this.errorForUniqueNotificationLabel = ''
 
       this.initializeDeviceFields()
     }
@@ -927,6 +941,26 @@ console.log("PARRAY3:",permissionsArray)
       }
     }
   }
+
+
+  checkUniqueLabels(getLabel: any){
+    this.errorForUniqueNotificationLabel = '';
+    for (let uniqueID = 0; uniqueID < this.listofNMLabels.length; uniqueID++) {
+      if (getLabel.toLowerCase() == this.listofNMLabels[uniqueID].toLowerCase()) {
+        this.errorForUniqueNotificationLabel = "Label already exists";
+        break
+      }
+      else{
+        this.errorForUniqueNotificationLabel=''
+      }
+    }
+  }
+
+
+
+
+
+
   isButtonDisabled(): boolean{
     console.log(this.duplicate, this.notificationForm.value)
     var check= JSON.stringify(this.duplicate) == JSON.stringify(this.notificationForm.value) ? true : false;
@@ -1647,6 +1681,7 @@ console.log("PARRAY3:",permissionsArray)
 
 
             this.listofNMIds = this.lookup_data_notification.map((item:any)=>item.P1)
+            this.listofNMLabels = this.lookup_data_notification.map((item:any)=>item.P2)
 
            console.log("All the unique id are here ",this.listofNMIds);
 
@@ -1723,6 +1758,4 @@ console.log("PARRAY3:",permissionsArray)
         });
     });
   }
-
-
 }

@@ -41,7 +41,15 @@
                                 <input type="text" min="1" class="
                                 form-control form-control-lg form-control-solid
                                 mb-3 mb-lg-0
-                              " placeholder="Enter label" name="model" formControlName="label">
+                              " placeholder="Enter label" name="model" formControlName="label"  (keyup)="checkUniqueLabels(notificationForm.get('label')?.value)">
+
+                              <span style="color: #fc1900;">{{errorForUniqueNotificationLabel}}</span>
+                              <div *ngIf="
+                                  notificationForm.get('label')?.hasError('required') &&
+                                  notificationForm.get('label')?.touched
+                              " class="fv-plugins-message-container invalid-feedback">
+                                  Notification Matrix Lable is required
+                              </div>
 
 
                             </div>
@@ -59,9 +67,9 @@
 
 
                             <div class="col-md-3">
-                                <label class="fw-semibold fs-6 mb-2">Select Form</label>
+                                <label class="fw-semibold fs-6 mb-2 required">Select Form</label>
                                 <div class="w-100">
-                                  <p-dropdown 
+                                  <p-dropdown required
                                     class="w-100"
                                     [style]="{ width: '100%' }"
                                     [options]="formsToDisplay"
@@ -70,7 +78,8 @@
                                     name="model"
                                     [filter]="true"
                                     [showClear]="true"
-                                    placeholder="Select a Form" (onChange)="showDynamicUserList()">
+                                    placeholder="Select a Form" (onChange)="showDynamicUserList()"
+                                    >
                                     
                                     <!-- Selected Item Template -->
                                     <ng-template let-selectedOption pTemplate="selectedItem">
@@ -151,7 +160,7 @@
                                     <br><br>
                                     <label class="required fw-semibold fs-6 mb-2">Escalation Time</label>
 
-                                    <input type="text" min="1" (keypress)="keyPress($event)" class="
+                                    <input type="number" min="1" (keypress)="keyPress($event)" class="
                         form-control form-control-lg form-control-solid
                         mb-3 mb-lg-0
                       " placeholder="Enter Escalation Time in minutes" name="model" formControlName="escalationTime"
@@ -246,9 +255,9 @@
                         <!--end::Button-->
 
                         <!--begin::Button-->
-                        <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary" [disabled]="notificationForm.invalid || errorForUniqueID=='id already exists' 
-                        ||errorForUniqueLabel == 'id already exists'"
-                            [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+                        <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary" 
+                            [attr.data-kt-indicator]="isLoading ? 'on' : 'off'" [disabled]="notificationForm.invalid || errorForUniqueID=='id already exists' 
+                        ||errorForUniqueLabel == 'id already exists'">
                             <span *ngIf="!editOperation" class="indicator-label">
                                 Submit
                             </span>
@@ -314,3 +323,8 @@
 <!-- swal is not yet implemented -->
 <swal #noticeSwal [swalOptions]="swalOptions">
 </swal>
+
+
+
+<!-- [disabled]="notificationForm.invalid || errorForUniqueID=='id already exists' 
+                        ||errorForUniqueLabel == 'id already exists'" -->
