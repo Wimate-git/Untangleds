@@ -5,6 +5,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { APIService } from 'src/app/API.service';
 import { SharedService } from 'src/app/pages/shared.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-advanced-filter',
@@ -45,7 +46,7 @@ export class AdvancedFilterComponent {
 
 
   selectedMiniTableFilter:any = []
-  selectedEnabledMiniTableFilters: any;
+  selectedEnabledMiniTableFilters: any = [];
 
   constructor(public modal: NgbActiveModal,private fb: FormBuilder,private cd:ChangeDetectorRef,private api:APIService,private configService:SharedService){}
 
@@ -76,7 +77,8 @@ export class AdvancedFilterComponent {
         equationConditionText:[''],
         filter_type:this.fb.array([]),
         trackEnable:[''],
-        miniTableEnable:['']
+        miniTableEnable:[''],
+        mergeEnable:['']
       });
         
       
@@ -103,7 +105,8 @@ export class AdvancedFilterComponent {
       equationConditionText:[''],
       filter_type:this.fb.array([]),
       trackEnable:[''],
-      miniTableEnable:['']
+      miniTableEnable:[''],
+      mergeEnable:['']
     });
 
 
@@ -222,6 +225,10 @@ export class AdvancedFilterComponent {
   onMiniTableSelection(){
     console.log("this.reportsFeildsAdvanced.get('filter_type') ",this.reportsFeildsAdvanced.get('filter_type')?.value)
     this.selectedEnabledMiniTableFilters = this.reportsFeildsAdvanced.get('filter_type')?.value
+
+    if(this.selectedEnabledMiniTableFilters.length == 0){
+      this.reportsFeildsAdvanced.get('miniTableOptions')?.patchValue('All')
+    }
   }
 
 
@@ -242,7 +249,8 @@ export class AdvancedFilterComponent {
       equationConditionText:[advancedreportsFeildsAdvanced.equationConditionText],
       filter_type:[advancedreportsFeildsAdvanced.filter_type],
       trackEnable:[advancedreportsFeildsAdvanced.trackEnable],
-      miniTableEnable:[advancedreportsFeildsAdvanced.miniTableEnable]
+      miniTableEnable:[advancedreportsFeildsAdvanced.miniTableEnable],
+      mergeEnable:[advancedreportsFeildsAdvanced.mergeEnable]
     });
 
     this.initializeForm();
@@ -581,6 +589,14 @@ async onMiniTableColumns(event:any,getValue:any,temp:any){
     this.addMiniTableFilters = false
     return
   }
+
+  // if(this.selectedForms && Array.isArray(this.selectedForms) && this.selectedForms.length == 0){
+  //   Swal.fire({
+  //     title:"Please select mini tables to continue"
+  //   })
+  // }
+
+
   
   this.reportsFeildsAdvanced.get('miniTableOptions')?.patchValue('onCondition')
 
@@ -1193,7 +1209,8 @@ addConditionForExistingData1(formGroupIndex: number, tableIndex: number, conditi
       advancedMiniTableFilter:this.queryBuilderForm.value,
       filter_type:this.reportsFeildsAdvanced.get('filter_type')?.value,
       trackEnable:this.reportsFeildsAdvanced.get('trackEnable')?.value,
-      miniTableEnable:this.reportsFeildsAdvanced.get('miniTableEnable')?.value
+      miniTableEnable:this.reportsFeildsAdvanced.get('miniTableEnable')?.value,
+      mergeEnable:this.reportsFeildsAdvanced.get('mergeEnable')?.value
     }
 
 

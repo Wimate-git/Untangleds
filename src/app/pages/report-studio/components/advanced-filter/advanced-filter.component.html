@@ -347,8 +347,8 @@
 
 
 
-      <div class="form-group row ps-1" style="text-align: start;">
-        <div class="form-group row ps-4 mb-7">
+      <!-- <div class="form-group row ps-1" style="text-align: start;">
+        <div class="form-group row ps-4 mb-7 flex">
           <label class="required col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Advanced
             Filter</label>
           <div class="col-3 d-flex gap-7 align-items-center">
@@ -364,8 +364,47 @@
               <label class="form-check-label" for="filterOnCondition">Selected</label>
             </div>
           </div>
+          <div class="flex items-center">
+            <p-checkbox inputId="trackEnable" formControlName="trackEnable" (onChange)="multiSelectChange()"
+              value="trackLocation" />
+            <label for="trackEnable" class="ms-1 fw-bold">Track Location</label>
+          </div>
+        </div>
+      </div> -->
+
+
+      <div class="form-group row ps-2 mt-5 mb-5 me-2" style="text-align: start;">
+        <div class="d-flex align-items-center gap-4 flex-wrap">
+      
+          <!-- Label -->
+          <label class="required fw-bold mb-0">Advanced Filter</label>
+      
+          <!-- Radio Buttons -->
+          <div class="d-flex gap-4 align-items-center mb-0">
+            <div class="form-check mb-0">
+              <input class="form-check-input" type="radio" id="miniTableAllOptions" formControlName="miniTableOptions"
+                value="all" (change)="onMiniTableColumns($event,'html','create')">
+              <label class="form-check-label" for="miniTableAllOptions">All</label>
+            </div>
+      
+            <div class="form-check mb-0">
+              <input class="form-check-input" type="radio" id="miniTableOnconditionOptions" formControlName="miniTableOptions"
+                value="onCondition" (change)="onMiniTableColumns($event,'html','create')">
+              <label class="form-check-label" for="miniTableOnconditionOptions">Selected</label>
+            </div>
+          </div>
+      
+          <!-- Checkbox -->
+          <div class="d-flex align-items-center mb-0 ms-auto" [ngbTooltip]="'When enabled, mini table data will be merged into the main Excel export sheet instead of separate sheet.'" *ngIf="reportsFeildsAdvanced.get('miniTableOptions')?.value != 'all'">
+            <p-checkbox inputId="mergeEnable" formControlName="mergeEnable"
+              value="mergeOption"></p-checkbox>
+            <label for="mergeEnable" class="ms-2 fw-bold mb-0" >Merge</label>
+          </div>
+      
         </div>
       </div>
+      
+      
 
 
 

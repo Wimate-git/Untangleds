@@ -953,7 +953,7 @@ console.log("PARRAY3:",permissionsArray)
   
 
   keyPress(event: any) {
-    const pattern = /['1-9'\+\\ ]/;
+    const pattern = /['0-9'\+\\ ]/;
 
     let inputChar = String.fromCharCode(event.charCode);
     // console.log('inputchar',inputChar);

@@ -650,7 +650,7 @@
               <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
 
 
-                <app-saved-query [editOperation]="showHeading" [savedModulePacket]="savedModulePacket" [listofSavedIds]="listofSavedIds" [tableState]="tableTempState" (closeModal)="dismissModal(modal)"></app-saved-query> 
+                <app-saved-query [editOperation]="showHeading" [savedModulePacket]="savedModulePacket" [listofSavedIds]="listofSavedIds" [tableState]="tableTempState" (closeModal)="dismissModal(modal)" (saveOrEdit)="clearFeilds()"></app-saved-query> 
 
               </div>
             </div>

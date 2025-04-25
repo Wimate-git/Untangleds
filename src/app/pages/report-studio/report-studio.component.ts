@@ -28,6 +28,7 @@ import { AdvancedFilterComponent } from './components/advanced-filter/advanced-f
 import { AuditTrailService } from '../services/auditTrail.service';
 import { Title } from '@angular/platform-browser';
 import { BlobService } from '../summary-engine/blob.service';
+import * as ExcelJS from 'exceljs';
 
 interface ListItem {
   [key: string]: {
@@ -2476,8 +2477,6 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     // Iterate through all rows and identify dynamic columns based on data presence
     rowData.forEach(row => {
 
-      console.log("Row is here to be manipuated ",row);
-
       if(!this.visibiltyflag && row.hasOwnProperty('Form View')){
         row['Form View'] = {
           PK:row.PK,
@@ -4218,12 +4217,11 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
   async exportAllTablesAsExcel() {
 
     //Store all the unique ids with respect to Mini tables
-   
-
-
     const excelSheets = this.reportsFeilds.value.excelSheets
 
     this.spinner.show()
+
+    console.log("this.allAdvancedExcelConfigurations ",this.allAdvancedExcelConfigurations);
 
 
     try {
@@ -4248,152 +4246,423 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
       console.log("Error while setting flags ", error);
     }
 
-
-
-    try {
-      const wb = XLSX.utils.book_new();
-
-      // Use `map` instead of `forEach` to handle async operations properly
-      const tableExports = await Promise.all(this.agGrids.toArray().map(async (gridInstance, index) => {
-        this.uniqueIDArrays = []
-        const gridApi = gridInstance.api;
-        const csvData = gridApi.getDataAsCsv();
-        console.log("CSV data is here ", csvData);
-        let data = this.csvToArray(csvData || '');
-
-        console.log('CSV data after converting array ', data);
-
-        if (data && data[0]) {
-          let headers = data && data[0] && data[0].map((header: string) => header.replace(/[\r\n]+/g, '').replace(/^"|"$/g, '').trim());
-
-          const headersToRemove = ['Dynamic Table Values', 'TrackLocation', 'Approval History', 'Approval Status','Form View','Mini Table'];
-          const removeIndices = headers
-            .map((header: string, index: any) => headersToRemove.includes(header) || header.includes('Signature') ? index : -1)
-            .filter((index: number) => index !== -1);
-
-          console.log("Removing indexes is here ",removeIndices);
-
-          const xlsxheaders = headers.filter((header: any, index: any) => !removeIndices.includes(index));
-
-          let xlsxdata = data.map(row => row.filter((_: any, index: any) => !removeIndices.includes(index)));
-
-
-
-          try {
-            console.log("HEaders are here ", headers);
-
-            const tableColumnIndex = headers.indexOf('Mini Table');
-            console.log("Table column index is here ", tableColumnIndex);
-            if (tableColumnIndex !== -1) {
-              const tableData: any = await this.extractMiniTableData(data, tableColumnIndex, index);
-              console.log("Mini Table data is ", tableData);
-
-              console.log("Table form Name data is ", this.tableFormName);
-
-              for (const tableKey in tableData) {
-                const filteredFormName = this.tableFormName.find((item: any) => Object.keys(item)[0] === tableKey);
-
-                if (tableData.hasOwnProperty(tableKey)) {
-                  const miniTableData = tableData[tableKey];
-                  const miniTableSheet = XLSX.utils.aoa_to_sheet(miniTableData);
-                  let sheetName1: any
-                  if (filteredFormName[tableKey]) {
-                    sheetName1 = `${filteredFormName[tableKey]} ${this.tableDataWithFormFilters[index].formFilter}`;
-                  }
-                  sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
-
-
-
-                  if (excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0) {
-                    if (excelSheets.includes('miniTable')) {
-                      XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1);
+    if(this.allAdvancedExcelConfigurations && this.allAdvancedExcelConfigurations.advancedreportsFeildsAdvanced && this.allAdvancedExcelConfigurations.advancedreportsFeildsAdvanced.mergeEnable && this.allAdvancedExcelConfigurations.advancedreportsFeildsAdvanced.mergeEnable.includes('mergeOption')){
+      try{
+        console.log("this.dyanmicFormDataArray ", this.dyanmicFormDataArray);
+    
+        const wb = XLSX.utils.book_new();
+        const tableExports = await Promise.all(this.agGrids.toArray().map(async (gridInstance, index) => {
+          this.uniqueIDArrays = []
+          const gridApi = gridInstance.api;
+          const csvData = gridApi.getDataAsCsv();
+          let data = this.csvToArray(csvData || '');
+          if (data && data[0]) {
+            let headers = data[0].map((header: string) =>
+              header.replace(/[\r\n]+/g, '').replace(/^"|"$/g, '').trim()
+            );
+          
+            const headersToRemove = ['Dynamic Table Values', 'TrackLocation', 'Approval History', 'Approval Status', 'Form View', 'Mini Table'];
+            const removeIndices = headers
+              .map((header: string, index: any) =>
+                headersToRemove.includes(header) || header.includes('Signature') ? index : -1
+              )
+              .filter((index: number) => index !== -1);
+          
+            console.log("Removing indexes is here ", removeIndices);
+          
+            const xlsxheaders = headers.filter((_: any, index: any) => !removeIndices.includes(index));
+            let xlsxdata = data.map(row => row.filter((_: any, index: any) => !removeIndices.includes(index)));
+          
+            try {
+              const tableColumnIndex = headers.indexOf('Mini Table');
+              const uniqueID = this.dyanmicFormDataArray[index][`${this.tableDataWithFormFilters[index].formFilter}`].find((item: any) => {
+                return item.validation?.unique === true;
+              });
+              
+              // Store the original header length for later use in styling
+              const mainHeadersLength = xlsxdata[0].length;
+              
+              // Maps to store mini table column structures
+              const miniTableColumnsMap: { [tableKey: string]: string[] } = {};
+              // Array to store the order of mini tables for consistent column ordering
+              const miniTableOrder: string[] = [];
+              // Store main data rows by ID for easy access
+              const mainDataById: { [id: string]: any[] } = {};
+              // Track merge ranges for each main table column
+              const mergeCells: { s: { r: number, c: number }, e: { r: number, c: number } }[] = [];
+              // Track the row mapping between main table IDs and excel row numbers
+              const idToRowMapping: { [id: string]: number[] } = {};
+    
+              if (tableColumnIndex !== -1) {
+                const tableData: any = await this.extractMiniTableData(data, tableColumnIndex, index);
+                console.log("Mini Table data is ", tableData);
+                console.log("Table form Name data is ", this.tableFormName);
+          
+                if (this.uniqueIDArrays && this.uniqueIDArrays.length > 0) {
+                  const tempHeaderHolder = xlsxdata[0];
+                  xlsxdata = xlsxdata.filter((row: any[]) =>
+                    row.some((cell: any) => this.uniqueIDArrays.includes(cell))
+                  );
+                  xlsxdata.unshift(tempHeaderHolder);
+                }
+                
+                // First, let's build up our main data map by unique ID
+                const mainIdIndex = xlsxdata[0].findIndex((h: string) => h === uniqueID.label);
+                if (mainIdIndex !== -1) {
+                  for (let i = 1; i < xlsxdata.length; i++) {
+                    const row = xlsxdata[i];
+                    const id = row[mainIdIndex];
+                    if (id) {
+                      mainDataById[id] = [...row];
                     }
-
                   }
-                  else {
-                    XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1);
+                } else {
+                  console.error("Unique ID column not found in main data");
+                  return;
+                }
+                
+                // First pass: Discover all mini tables and their structures
+                for (const tableKey in tableData) {
+                  miniTableOrder.push(tableKey);
+                  
+                  const miniTableRows = tableData[tableKey];
+                  if (!miniTableRows || miniTableRows.length < 1) continue;
+                  
+                  const miniTableHeaders = miniTableRows[0];
+                  const idIndexInMini = miniTableHeaders.findIndex((h: string) => h === 'id');
+                  if (idIndexInMini === -1) continue;
+                  
+                  // Store headers without 'id' column
+                  miniTableColumnsMap[tableKey] = miniTableHeaders.filter((h: string) => h !== 'id');
+                }
+                
+                // Create master headers list
+                let finalHeaders = [...xlsxdata[0]]; // Start with main table headers
+                
+                // Add all mini table columns in consistent order
+                miniTableOrder.forEach(tableKey => {
+                  const tableHeaders = miniTableColumnsMap[tableKey] || [];
+                  // Add table name prefix to avoid column name collisions
+                  const prefixedHeaders = tableHeaders.map(h => `${h}`);
+                  finalHeaders = [...finalHeaders, ...prefixedHeaders];
+                });
+                
+                // Initialize our final data set with headers
+                let finalData = [finalHeaders];
+                
+                // Count mini table records per ID to prepare for cell merging
+                const recordsPerMainId: { [id: string]: number } = {};
+                
+                miniTableOrder.forEach(tableKey => {
+                  if (!tableData[tableKey] || tableData[tableKey].length < 2) return;
+                  
+                  const miniTableRows = tableData[tableKey];
+                  const miniTableHeaders = miniTableRows[0];
+                  const miniTableData = miniTableRows.slice(1);
+                  
+                  const idIndexInMini = miniTableHeaders.findIndex((h: string) => h === 'id');
+                  if (idIndexInMini === -1) return;
+                  
+                  // Count records per main ID
+                  miniTableData.forEach((row: { [x: string]: any; }) => {
+                    const id = row[idIndexInMini];
+                    if (!recordsPerMainId[id]) {
+                      recordsPerMainId[id] = 1;
+                    } else {
+                      recordsPerMainId[id]++;
+                    }
+                  });
+                });
+                
+                // Now build the final data set with one row per mini table record
+                let currentRowIndex = 1; // Start after header row
+                
+                // Loop through each mini table
+                for (const tableKey of miniTableOrder) {
+                  if (!tableData[tableKey] || tableData[tableKey].length < 2) continue;
+                  
+                  const miniTableRows = tableData[tableKey];
+                  const miniTableHeaders = miniTableRows[0];
+                  const miniTableData = miniTableRows.slice(1);
+                  
+                  const idIndexInMini = miniTableHeaders.findIndex((h: string) => h === 'id');
+                  if (idIndexInMini === -1) continue;
+                  
+                  // Group mini table records by main ID
+                  const recordsByMainId: { [id: string]: any[][] } = {};
+                  
+                  miniTableData.forEach((row: any[]) => {
+                    const id = row[idIndexInMini];
+                    if (!recordsByMainId[id]) {
+                      recordsByMainId[id] = [];
+                    }
+                    const dataWithoutId = row.filter((_: any, i: number) => i !== idIndexInMini);
+                    recordsByMainId[id].push(dataWithoutId);
+                  });
+                  
+                  // Process each main ID
+                  for (const [id, records] of Object.entries(recordsByMainId)) {
+                    if (!mainDataById[id]) continue;
+                    
+                    // Track where this ID's rows start
+                    idToRowMapping[id] = idToRowMapping[id] || [];
+                    const startRow = currentRowIndex;
+                    
+                    // For each mini table record of this ID
+                    records.forEach((record, recordIndex) => {
+                      let newRow = [...mainDataById[id]]; // Start with main data
+                      
+                      // For each mini table in our order
+                      miniTableOrder.forEach(tk => {
+                        if (tk === tableKey) {
+                          // This is our current table - add the record
+                          newRow.push(...record);
+                        } else {
+                          // Different table - add empty placeholders
+                          const emptyValues = Array(miniTableColumnsMap[tk]?.length || 0).fill('');
+                          newRow.push(...emptyValues);
+                        }
+                      });
+                      
+                      // Add this row to our final data
+                      finalData.push(newRow);
+                      idToRowMapping[id].push(currentRowIndex);
+                      currentRowIndex++;
+                    });
+                    
+                    // If we added multiple rows for this ID, we need merge cells for main data
+                    if (records.length > 1) {
+                      // For each main data column
+                      for (let colIdx = 0; colIdx < mainHeadersLength; colIdx++) {
+                        // Add a merge range
+                        mergeCells.push({
+                          s: { r: startRow, c: colIdx },
+                          e: { r: currentRowIndex - 1, c: colIdx }
+                        });
+                      }
+                    }
+                  }
+                }
+                
+                // Handle main table rows that don't have any mini table records
+                const processedIds = new Set(Object.keys(idToRowMapping));
+                
+                Object.entries(mainDataById).forEach(([id, mainRow]) => {
+                  if (!processedIds.has(id)) {
+                    let newRow = [...mainRow];
+                    
+                    // Add empty cells for all mini table columns
+                    miniTableOrder.forEach(tk => {
+                      const emptyValues = Array(miniTableColumnsMap[tk]?.length || 0).fill('');
+                      newRow.push(...emptyValues);
+                    });
+                    
+                    finalData.push(newRow);
+                    currentRowIndex++;
+                  }
+                });
+                
+                // Replace original data with our new structure
+                xlsxdata = finalData;
+              }
+          
+              console.log("xlsx data after filter is here ", xlsxdata);
+          
+              // Create the worksheet
+              const ws = XLSX.utils.aoa_to_sheet(xlsxdata);
+              const fixedWidth = 20;    
+              ws['!cols'] = xlsxdata[0].map(() => ({ wch: fixedWidth }));
+              
+              // Apply cell merging for main table columns
+              if (!ws['!merges']) ws['!merges'] = [];
+              mergeCells.forEach(mergeRange => {
+                ws['!merges']?.push(mergeRange);
+              });
+              
+              // Define color scheme for tables
+              // Main form gets one consistent color for both headers and cells
+              const mainFormColor = "CCE8FF"; // Light blue for main form
+              const mainHeaderColor = "94B4C1"; // Darker blue for headers
+              
+              // Mini tables get their own distinct colors
+              const miniTableColors:any = {
+                A: {
+                  header: "FFCCCC", // Soft red for table A header
+                  cell: "FFE6E6"    // Lighter red for table A cells
+                },
+                B: {
+                  header: "CCFFCC", // Soft green for table B header
+                  cell: "E6FFE6"    // Lighter green for table B cells
+                },
+                C: {
+                  header: "FFFFCC", // Soft yellow for table C header
+                  cell: "FFFFE6"    // Lighter yellow for table C cells
+                },
+                D: {
+                  header: "CCCCFF", // Soft purple for table D header
+                  cell: "E6E6FF"    // Lighter purple for table D cells
+                }
+              };
+              
+              // Create a mapping of column indices to their respective mini table
+              // The key fix for multiple mini tables
+              const columnMiniTableMap = [];
+              
+              // First, map all main table columns
+              for (let i = 0; i < mainHeadersLength; i++) {
+                columnMiniTableMap.push('main');
+              }
+              
+              // Then map each mini table's columns with the correct table identifier
+              let currentColIndex = mainHeadersLength;
+              miniTableOrder.forEach((tableKey, tableIndex) => {
+                const columns = miniTableColumnsMap[tableKey] || [];
+                const tableColorKey = String.fromCharCode(65 + (tableIndex % 4)); // A, B, C, D
+                
+                for (let i = 0; i < columns.length; i++) {
+                  columnMiniTableMap.push(tableColorKey);
+                  currentColIndex++;
+                }
+              });
+              
+              console.log("Column to mini table mapping:", columnMiniTableMap);
+              
+              // Initialize cell styles if not present
+              if(!ws['!cols']) ws['!cols'] = [];
+              
+              // Apply styling to cells
+              for (let rowIdx = 0; rowIdx < xlsxdata.length; rowIdx++) {
+                for (let colIdx = 0; colIdx < xlsxdata[0].length; colIdx++) {
+                  const cellRef = XLSX.utils.encode_cell({r: rowIdx, c: colIdx});
+                  // if(!ws[cellRef]) ws[cellRef] = { v: xlsxdata[rowIdx][colIdx] };
+                  if (!ws[cellRef]) {
+                    ws[cellRef] = { v: xlsxdata[rowIdx][colIdx] ?? '' };
+                  }
+                  if(!ws[cellRef].s) ws[cellRef].s = {};
+                  
+                  // Center all cells - this applies to both header and data cells
+                  ws[cellRef].s.alignment = { horizontal: "center", vertical: "center" };
+                  
+                  // Apply font style
+                  ws[cellRef].s.font = { bold: rowIdx === 0 }; // Bold for headers only
+                  
+                  // Get the table identifier for this column
+                  const tableIdentifier = columnMiniTableMap[colIdx];
+                  
+                  // Apply borders to all cells
+                  ws[cellRef].s.border = {
+                    top: { style: 'thin' },
+                    left: { style: 'thin' },
+                    bottom: { style: 'thin' },
+                    right: { style: 'thin' }
+                  };
+                  
+                  // Apply the appropriate color based on the table identifier
+                  if (tableIdentifier === 'main') {
+                    // Main form cells
+                    if (rowIdx === 0) {
+                      // Header row - darker blue
+                      ws[cellRef].s.fill = { 
+                        fgColor: { rgb: mainHeaderColor } 
+                      };
+                    } else {
+                      // Data cells - lighter blue
+                      ws[cellRef].s.fill = { 
+                        fgColor: { rgb: mainFormColor } 
+                      };
+                    }
+                  } else {
+                    // Mini table cells - use the corresponding color scheme
+                    if (miniTableColors[tableIdentifier]) {
+                      if (rowIdx === 0) {
+                        // Header cell
+                        ws[cellRef].s.fill = { 
+                          fgColor: { rgb: miniTableColors[tableIdentifier].header } 
+                        };
+                      } else {
+                        // Data cell
+                        ws[cellRef].s.fill = { 
+                          fgColor: { rgb: miniTableColors[tableIdentifier].cell } 
+                        };
+                      }
+                    }
                   }
                 }
               }
-            }
-          } catch (error) {
-            console.log("Error in processing mini table ", error);
-          }
-
-
-
-          try{
-            const trackLocationColumnIndex = headers.indexOf('TrackLocation');
-            if (trackLocationColumnIndex !== -1) {
-              // Await the trackLocation data
-
-              const trackLocationData: any = await this.extractTrackLocationData(data, trackLocationColumnIndex, index);
-              console.log("Track location data is here 99999", trackLocationData);
-
-              const trackLocationSheet = XLSX.utils.aoa_to_sheet(trackLocationData);
-              let sheetName1 = `TrackLocation ${this.tableDataWithFormFilters[index].formFilter}`;
-              sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
-
-
+              
+              // Ensure merged cells are also properly styled
+              if (ws['!merges']) {
+                ws['!merges'].forEach(range => {
+                  // Get the style from the top-left cell of the merge range
+                  const topLeftCellRef = XLSX.utils.encode_cell({r: range.s.r, c: range.s.c});
+                  const topLeftStyle = ws[topLeftCellRef]?.s || {};
+                  
+                  // Apply this style to all cells in the merge range
+                  for (let r = range.s.r; r <= range.e.r; r++) {
+                    for (let c = range.s.c; c <= range.e.c; c++) {
+                      if (r === range.s.r && c === range.s.c) continue; // Skip the top-left cell
+                      
+                      const cellRef = XLSX.utils.encode_cell({r, c});
+                      if(!ws[cellRef]) ws[cellRef] = { v: '' }; // Ensure cell exists
+                      ws[cellRef].s = {...topLeftStyle}; // Copy the style
+                    }
+                  }
+                });
+              }
+          
+              // Add the worksheet to the workbook with the name of the formFilter
+              let sheetName = this.tableDataWithFormFilters[index].formFilter;
+              sheetName = sheetName.length > 30 ? sheetName.slice(0, 30) : sheetName;
+          
               if (excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0) {
-                if (excelSheets.includes('trackLocation')) {
+                if (excelSheets.includes('mainForm')) {
+                  XLSX.utils.book_append_sheet(wb, ws, sheetName);
+                }
+              } else {
+                XLSX.utils.book_append_sheet(wb, ws, sheetName);
+              }
+          
+              wb.SheetNames = [sheetName, ...wb.SheetNames.filter(name => name !== sheetName)];
+            }
+            catch (error) {
+              console.error("Error while merging mini table data:", error);
+            }
+
+
+            try{
+              const trackLocationColumnIndex = headers.indexOf('TrackLocation');
+              if (trackLocationColumnIndex !== -1) {
+                // Await the trackLocation data
+  
+                const trackLocationData: any = await this.extractTrackLocationData(data, trackLocationColumnIndex, index);
+                console.log("Track location data is here 99999", trackLocationData);
+  
+                const trackLocationSheet = XLSX.utils.aoa_to_sheet(trackLocationData);
+                this.styleHeaderRow(trackLocationSheet);
+                let sheetName1 = `TrackLocation ${this.tableDataWithFormFilters[index].formFilter}`;
+                sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
+  
+  
+                if (excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0) {
+                  if (excelSheets.includes('trackLocation')) {
+                    XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
+                  }
+                }
+                else {
                   XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
                 }
               }
-              else {
-                XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
-              }
             }
-          }
-          catch(error){
-            console.log("Error in trackLocation Excel ",error)
-          }
-
-
-
-
-          console.log("All the unique id are here ",this.uniqueIDArrays);
-
-          console.log("xlsx data is here ",xlsxdata);
-
-          if(this.uniqueIDArrays && this.uniqueIDArrays.length > 0){
-            const tempHeaderHolder = xlsxdata[0]
-
-            xlsxdata = xlsxdata.filter((row: any[]) =>
-              row.some((cell: any) => this.uniqueIDArrays.includes(cell))
-            );
-  
-            xlsxdata.unshift(tempHeaderHolder)
-          }
-
-        
-          console.log("xlsx data after filter is here ",xlsxdata);
-
-          const ws = XLSX.utils.aoa_to_sheet(xlsxdata);
-
-          // Add the worksheet to the workbook with the name of the formFilter
-          let sheetName = this.tableDataWithFormFilters[index].formFilter;
-          sheetName = sheetName.length > 30 ? sheetName.slice(0, 30) : sheetName;
-
-       
-
-
-          if (excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0) {
-            if (excelSheets.includes('mainForm')) {
-              XLSX.utils.book_append_sheet(wb, ws, sheetName);
+            catch(error){
+              console.log("Error in trackLocation Excel ",error)
             }
-          }
-          else {
-            XLSX.utils.book_append_sheet(wb, ws, sheetName);
-          }
-
-          wb.SheetNames = [sheetName, ...wb.SheetNames.filter(name => name !== sheetName)];
 
 
             const approvalColumnIndex = headers.indexOf('Approval History');
             if (approvalColumnIndex !== -1) {
               const approvalData = this.extractApprovalData(data, approvalColumnIndex, index);
               const approvalSheet = XLSX.utils.aoa_to_sheet(approvalData);
+              this.styleHeaderRow(approvalSheet);
               let sheetName1 = `Approval History ${this.tableDataWithFormFilters[index].formFilter}`;
               sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
 
@@ -4407,9 +4676,6 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
               else {
                 XLSX.utils.book_append_sheet(wb, approvalSheet, sheetName1);
               }
-
-
-
             }
 
 
@@ -4419,6 +4685,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
               if (approvalColumnIndex !== -1) {
                 const approvalData = this.extractApprovalHistoryData(data, approvalColumnIndex, index);
                 const approvalSheet = XLSX.utils.aoa_to_sheet(approvalData);
+                this.styleHeaderRow(approvalSheet);
                 let sheetName1 = `Approval Status ${this.tableDataWithFormFilters[index].formFilter}`;
                 sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
 
@@ -4438,61 +4705,263 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
               console.log("Error in Approval Status ", error);
             }
 
+          }
+        }));
 
-
-         
-
-          // Now that all sheets are added, we can loop through the sheets and apply the header styles
-          wb.SheetNames.forEach(sheetName => {
-            const ws = wb.Sheets[sheetName];
-
-            // Apply styles to the header row (Row 0) for the current sheet
-            for (let i = 0; i < xlsxheaders.length; i++) {
-              const cellAddress = { r: 0, c: i };  // Row 0 (header row)
-              const cellRef = XLSX.utils.encode_cell(cellAddress);
-
-              if (!ws[cellRef]) ws[cellRef] = {};  // Ensure the cell exists
-
-              // Apply styles to header cells
-              ws[cellRef].s = {
-                fill: {
-                  fgColor: { rgb: 'FFA500' }  // Orange background
-                },
-                font: {
-                  color: { rgb: 'FFFFFF' },   // White font color
-                  bold: true                  // Bold text
-                },
-                alignment: {
-                  horizontal: 'center',      // Center header text
-                  vertical: 'center'
-                }
-              };
-            }
-          });
-        }
-
-
-      }));
-
-
+        
+        // Generate the Excel file with cell styles enabled
+        const excelFile = XLSX.write(wb, { bookType: 'xlsx', type: 'array', cellStyles: true });
+        
+        // Create a Blob and trigger the download
+        const blob = new Blob([excelFile], { type: 'application/octet-stream' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${this.selectedForms[0]}${this.selectedForms.length > 1 ? `(${this.selectedForms.length})...` : ''}.xlsx`;
+        link.click();
+      }
+      catch(error){
+        console.log("Error while merging xlsx ", error);
+      }
+    }
+    else{
+      try {
+        const wb = XLSX.utils.book_new();
   
-
-      // Generate the Excel file
-      const excelFile = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-
-      // Create a Blob and trigger the download
-      const blob = new Blob([excelFile], { type: 'application/octet-stream' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `${this.selectedForms[0]}${this.selectedForms.length > 1 ? `(${this.selectedForms.length})...` : ''}.xlsx`;
-      link.click();
+        // Use `map` instead of `forEach` to handle async operations properly
+        const tableExports = await Promise.all(this.agGrids.toArray().map(async (gridInstance, index) => {
+          this.uniqueIDArrays = []
+          const gridApi = gridInstance.api;
+          const csvData = gridApi.getDataAsCsv();
+          // console.log("CSV data is here ", csvData);
+          let data = this.csvToArray(csvData || '');
+  
+          // console.log('CSV data after converting array ', data);
+  
+          if (data && data[0]) {
+            let headers = data && data[0] && data[0].map((header: string) => header.replace(/[\r\n]+/g, '').replace(/^"|"$/g, '').trim());
+  
+            const headersToRemove = ['Dynamic Table Values', 'TrackLocation', 'Approval History', 'Approval Status','Form View','Mini Table'];
+            const removeIndices = headers
+              .map((header: string, index: any) => headersToRemove.includes(header) || header.includes('Signature') ? index : -1)
+              .filter((index: number) => index !== -1);
+  
+            // console.log("Removing indexes is here ",removeIndices);
+  
+            const xlsxheaders = headers.filter((header: any, index: any) => !removeIndices.includes(index));
+  
+            let xlsxdata = data.map(row => row.filter((_: any, index: any) => !removeIndices.includes(index)));
+  
+  
+  
+            try {
+              console.log("HEaders are here ", headers);
+  
+              const tableColumnIndex = headers.indexOf('Mini Table');
+              console.log("Table column index is here ", tableColumnIndex);
+              if (tableColumnIndex !== -1) {
+                const tableData: any = await this.extractMiniTableData(data, tableColumnIndex, index);
+                console.log("Mini Table data is ", tableData);
+  
+                console.log("Table form Name data is ", this.tableFormName);
+  
+                for (const tableKey in tableData) {
+                  const filteredFormName = this.tableFormName.find((item: any) => Object.keys(item)[0] === tableKey);
+  
+                  if (tableData.hasOwnProperty(tableKey)) {
+                    const miniTableData = tableData[tableKey];
+                    const miniTableSheet = XLSX.utils.aoa_to_sheet(miniTableData);
+                    let sheetName1: any
+                    if (filteredFormName[tableKey]) {
+                      sheetName1 = `${filteredFormName[tableKey]} ${this.tableDataWithFormFilters[index].formFilter}`;
+                    }
+                    sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
+  
+  
+  
+                    if (excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0) {
+                      if (excelSheets.includes('miniTable')) {
+                        XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1);
+                      }
+  
+                    }
+                    else {
+                      XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1);
+                    }
+                  }
+                }
+              }
+            } catch (error) {
+              console.log("Error in processing mini table ", error);
+            }
+  
+  
+  
+            try{
+              const trackLocationColumnIndex = headers.indexOf('TrackLocation');
+              if (trackLocationColumnIndex !== -1) {
+                // Await the trackLocation data
+  
+                const trackLocationData: any = await this.extractTrackLocationData(data, trackLocationColumnIndex, index);
+                console.log("Track location data is here 99999", trackLocationData);
+  
+                const trackLocationSheet = XLSX.utils.aoa_to_sheet(trackLocationData);
+                let sheetName1 = `TrackLocation ${this.tableDataWithFormFilters[index].formFilter}`;
+                sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
+  
+  
+                if (excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0) {
+                  if (excelSheets.includes('trackLocation')) {
+                    XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
+                  }
+                }
+                else {
+                  XLSX.utils.book_append_sheet(wb, trackLocationSheet, sheetName1);
+                }
+              }
+            }
+            catch(error){
+              console.log("Error in trackLocation Excel ",error)
+            }
+  
+  
+  
+  
+            console.log("All the unique id are here ",this.uniqueIDArrays);
+  
+            console.log("xlsx data is here ",xlsxdata);
+  
+            if(this.uniqueIDArrays && this.uniqueIDArrays.length > 0){
+              const tempHeaderHolder = xlsxdata[0]
+  
+              xlsxdata = xlsxdata.filter((row: any[]) =>
+                row.some((cell: any) => this.uniqueIDArrays.includes(cell))
+              );
+    
+              xlsxdata.unshift(tempHeaderHolder)
+            }
+  
+          
+            console.log("xlsx data after filter is here ",xlsxdata);
+  
+            const ws = XLSX.utils.aoa_to_sheet(xlsxdata);
+  
+            // Add the worksheet to the workbook with the name of the formFilter
+            let sheetName = this.tableDataWithFormFilters[index].formFilter;
+            sheetName = sheetName.length > 30 ? sheetName.slice(0, 30) : sheetName;
+  
+         
+  
+  
+            if (excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0) {
+              if (excelSheets.includes('mainForm')) {
+                XLSX.utils.book_append_sheet(wb, ws, sheetName);
+              }
+            }
+            else {
+              XLSX.utils.book_append_sheet(wb, ws, sheetName);
+            }
+  
+            wb.SheetNames = [sheetName, ...wb.SheetNames.filter(name => name !== sheetName)];
+  
+  
+              const approvalColumnIndex = headers.indexOf('Approval History');
+              if (approvalColumnIndex !== -1) {
+                const approvalData = this.extractApprovalData(data, approvalColumnIndex, index);
+                const approvalSheet = XLSX.utils.aoa_to_sheet(approvalData);
+                let sheetName1 = `Approval History ${this.tableDataWithFormFilters[index].formFilter}`;
+                sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
+  
+  
+                if (excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0) {
+                  if (excelSheets.includes('approvalHistory')) {
+                    XLSX.utils.book_append_sheet(wb, approvalSheet, sheetName1);
+                  }
+  
+                }
+                else {
+                  XLSX.utils.book_append_sheet(wb, approvalSheet, sheetName1);
+                }
+  
+  
+  
+              }
+  
+  
+  
+              try {
+                const approvalColumnIndex = headers.indexOf('Approval Status');
+                if (approvalColumnIndex !== -1) {
+                  const approvalData = this.extractApprovalHistoryData(data, approvalColumnIndex, index);
+                  const approvalSheet = XLSX.utils.aoa_to_sheet(approvalData);
+                  let sheetName1 = `Approval Status ${this.tableDataWithFormFilters[index].formFilter}`;
+                  sheetName1 = sheetName1.length > 30 ? sheetName1.slice(0, 30) : sheetName1;
+  
+  
+                  if (excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0) {
+                    if (excelSheets.includes('approvalStatus')) {
+                      XLSX.utils.book_append_sheet(wb, approvalSheet, sheetName1);
+                    }
+                  }
+                  else {
+                    XLSX.utils.book_append_sheet(wb, approvalSheet, sheetName1);
+                  }
+                }
+  
+              }
+              catch (error) {
+                console.log("Error in Approval Status ", error);
+              }
+  
+  
+  
+           
+  
+            // Now that all sheets are added, we can loop through the sheets and apply the header styles
+            wb.SheetNames.forEach(sheetName => {
+              const ws = wb.Sheets[sheetName];
+  
+              // Apply styles to the header row (Row 0) for the current sheet
+              for (let i = 0; i < xlsxheaders.length; i++) {
+                const cellAddress = { r: 0, c: i };  // Row 0 (header row)
+                const cellRef = XLSX.utils.encode_cell(cellAddress);
+  
+                if (!ws[cellRef]) ws[cellRef] = {};  // Ensure the cell exists
+  
+                // Apply styles to header cells
+                ws[cellRef].s = {
+                  fill: {
+                    fgColor: { rgb: 'FFA500' }  // Orange background
+                  },
+                  font: {
+                    color: { rgb: 'FFFFFF' },   // White font color
+                    bold: true                  // Bold text
+                  },
+                  alignment: {
+                    horizontal: 'center',      // Center header text
+                    vertical: 'center'
+                  }
+                };
+              }
+            });
+          }
+        }));
+  
+        // Generate the Excel file
+        const excelFile = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  
+        // Create a Blob and trigger the download
+        const blob = new Blob([excelFile], { type: 'application/octet-stream' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${this.selectedForms[0]}${this.selectedForms.length > 1 ? `(${this.selectedForms.length})...` : ''}.xlsx`;
+        link.click();
+      }
+  
+      catch (err) {
+        console.log("Error creating excell file ", err);
+        this.spinner.hide()
+      }
     }
-
-    catch (err) {
-      console.log("Error creating excell file ", err);
-      this.spinner.hide()
-    }
-
 
     try {
       const UserDetails = {
@@ -4791,6 +5260,39 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 }
 
 
+async styleHeaderRow(ws: XLSX.WorkSheet) {
+  const headerRow = ws['!ref'] ? XLSX.utils.decode_range(ws['!ref']).s.r : 0;
+  const range = XLSX.utils.decode_range(ws['!ref'] || '');
+
+  for (let c = range.s.c; c <= range.e.c; ++c) {
+    const cellRef = XLSX.utils.encode_cell({ r: headerRow, c });
+    if (!ws[cellRef]) continue;
+
+    if (!ws[cellRef].s) ws[cellRef].s = {};
+
+    ws[cellRef].s = {
+      ...ws[cellRef].s,
+      font: {
+        color: { rgb: "FFFFFF" }, // White font
+        bold: true
+      },
+      fill: {
+        fgColor: { rgb: "FFA500" } // Orange background
+      },
+      alignment: {
+        horizontal: "center",
+        vertical: "center"
+      },
+      border: {
+        top: { style: 'thin' },
+        bottom: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' }
+      }
+    };
+  }
+}
+
 
 
 
@@ -4923,10 +5425,11 @@ getLastWeekTimestamps() {
     if (this.isFormMiniOptionFilterVisible) {
       currentForm = this.tableDataWithFormFilters[index]["formFilter"];
       tempConditionHolder = this.allAdvancedExcelConfigurations && this.allAdvancedExcelConfigurations.advancedMiniTableFilter.formGroups.find((ele: any) => ele.name == currentForm);
+      console.log("tempConditionHolder ",tempConditionHolder);
       if (tempConditionHolder && tempConditionHolder.tables && Array.isArray(tempConditionHolder.tables) && tempConditionHolder.tables.length > 0) {
-        for (let tab of tempConditionHolder.tables) {
+        for (let tab of tempConditionHolder.tables) {          
           const tempConditon = await this.buildConditionVerion2(tab.conditions);
-          allFilterConditions[`${tab.tableName}`] = tempConditon;
+          allFilterConditions[`${tab.tableLabel}`] = tempConditon;
         }
       }
     }
@@ -4950,7 +5453,7 @@ getLastWeekTimestamps() {
             for (let tab of tableRows) {
               console.log("this.dyanmicFormDataArray ", this.dyanmicFormDataArray);
               console.log("tab values are here ",tab);
-              const filteredFormName = this.dyanmicFormDataArray[index][this.tableDataWithFormFilters[index].formFilter]?.find((element: any) => tableKey.startsWith(element.name)).validation.formName_table;
+              const filteredFormName = this.dyanmicFormDataArray[index][this.tableDataWithFormFilters[index].formFilter]?.find((element: any) => tableKey.startsWith(element.name)).label;
 
               console.log("filteredFormName ", filteredFormName);
               const tempTableKey = filteredFormName ? filteredFormName : null; // Add null check
@@ -5570,18 +6073,18 @@ getLastWeekTimestamps() {
 
 
   csvToArray(csv: string): any[] {
-    console.log("Starting csvToArray function...");
+    // console.log("Starting csvToArray function...");
 
     // Split the CSV string by newlines (\r?\n) and map each row using splitCsv
     const rows = csv
       .split(/\r/)  // Split by both \n (Unix) and \r\n (Windows) line breaks
       .map((row, index) => {
-        console.log(`Processing row #${index + 1}:`, row);
+        // console.log(`Processing row #${index + 1}:`, row);
         return this.splitCsv(row);  // Convert each row into an array using splitCsv
       })
       .filter(row => row.length > 0);  // Filter out any empty rows
 
-    console.log("Rows after splitting and filtering:", rows);
+    // console.log("Rows after splitting and filtering:", rows);
 
     return rows;
   }
@@ -5602,7 +6105,7 @@ getLastWeekTimestamps() {
       result.push(match[1] || match[2]); // Add the match to the result
     }
 
-    console.log("Final split result:", result);
+    // console.log("Final split result:", result);
 
     return result;
   }

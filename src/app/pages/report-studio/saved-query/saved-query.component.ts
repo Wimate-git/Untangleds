@@ -25,6 +25,7 @@ interface ListItem {
 export class SavedQueryComponent implements OnInit {
 
   @Output() closeModal: EventEmitter<void> = new EventEmitter<void>();
+  @Output() saveOrEdit: EventEmitter<void> = new EventEmitter<void>();
   displayModule = false;
   @Input() editOperation:boolean;
   @Input() savedModulePacket:any = []
@@ -149,6 +150,7 @@ export class SavedQueryComponent implements OnInit {
     }
     console.log("Module form submitted");
     this.closeModal.emit();
+    this.saveOrEdit.emit()
   }
 
 
