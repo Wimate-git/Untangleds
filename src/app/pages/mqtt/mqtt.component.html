@@ -73,6 +73,12 @@
                                     class="fv-plugins-message-container invalid-feedback">
                                     Duplicate Id not allowed
                                 </div>
+                                <div *ngIf="
+                                createMQTTField.get('mqttId')?.hasError('required') &&
+                                createMQTTField.get('mqttId')?.touched
+                                " class="fv-plugins-message-container invalid-feedback">
+                                    MQTT Id is required
+                                </div> 
                             </div>
     
                             <div class="col-md-3">
@@ -80,6 +86,13 @@
                                 <input type="text" formControlName="mqttName"
                                     class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
                                     placeholder="Mqtt Name" />
+                                
+                                    <div *ngIf="
+                                    createMQTTField.get('mqttName')?.hasError('required') &&
+                                    createMQTTField.get('mqttName')?.touched
+                                    " class="fv-plugins-message-container invalid-feedback">
+                                        MQTT Name is required
+                                    </div> 
                             </div>
 
 
@@ -94,6 +107,13 @@
                                     <option value="ws://">ws://</option>
                                     <option value="wss://">wss://</option>
                                 </select>
+
+                                <div *ngIf="
+                                createMQTTField.get('mqttHost')?.hasError('required') &&
+                                createMQTTField.get('mqttHost')?.touched
+                                " class="fv-plugins-message-container invalid-feedback">
+                                    MQTT Host is required
+                                </div> 
                             </div>
 
 
@@ -102,7 +122,17 @@
                                 <input type="text" formControlName="mqttHostUrl"
                                     class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
                                     placeholder="Mqtt Url" />
+
+                                    <div *ngIf="
+                                    createMQTTField.get('mqttHostUrl')?.hasError('required') &&
+                                    createMQTTField.get('mqttHostUrl')?.touched
+                                    " class="fv-plugins-message-container invalid-feedback">
+                                        MQTT URL is required
+                                    </div> 
+                                
+
                             </div>
+
 
                         </div>
                     </div>
@@ -112,21 +142,35 @@
                         <div class="row">
                            
                             <div class="col-md-6">
-                                <label class="fw-semibold fs-6 mb-2 required">Manual Override Topic</label>
+                                <label class="fw-semibold fs-6 mb-2 required">Write Topic</label>
 
                                 <input type="text" formControlName="mqttTopic"
                                     class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
                                     placeholder="Mqtt Topic" />
 
+                                    <div *ngIf="
+                                    createMQTTField.get('mqttTopic')?.hasError('required') &&
+                                    createMQTTField.get('mqttTopic')?.touched
+                                    " class="fv-plugins-message-container invalid-feedback">
+                                        Write Topic is required
+                                    </div> 
+
                             </div>
 
 
                             <div class="col-md-6">
-                                <label class="fw-semibold fs-6 mb-2 required">Send Data Topic</label>
+                                <label class="fw-semibold fs-6 mb-2 required">Read Topic</label>
 
                                 <input type="text" formControlName="mqttTopicSend"
                                     class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
                                     placeholder="Mqtt Send Topic" />
+
+                                    <div *ngIf="
+                                    createMQTTField.get('mqttTopicSend')?.hasError('required') &&
+                                    createMQTTField.get('mqttTopicSend')?.touched
+                                    " class="fv-plugins-message-container invalid-feedback">
+                                        Read Topic is required
+                                    </div> 
 
                             </div>
                         </div>
@@ -140,6 +184,15 @@
                                 <input type="number" formControlName="mqttPort"
                                     class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
                                     placeholder="Mqtt Port" />
+
+
+                                    <div *ngIf="
+                                    createMQTTField.get('mqttPort')?.hasError('required') &&
+                                    createMQTTField.get('mqttPort')?.touched
+                                    " class="fv-plugins-message-container invalid-feedback">
+                                        MQTT Port is required
+                                    </div> 
+
                             </div>
 
                             <div class="col-md-3">
@@ -148,6 +201,13 @@
                                 <input type="text" formControlName="mqttUsername"
                                     class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
                                     placeholder="Mqtt Username" />
+
+                                    <div *ngIf="
+                                    createMQTTField.get('mqttUsername')?.hasError('required') &&
+                                    createMQTTField.get('mqttUsername')?.touched
+                                    " class="fv-plugins-message-container invalid-feedback">
+                                        MQTT Username is required
+                                    </div> 
                             </div>
 
                             <div class="col-md-3">
@@ -156,6 +216,13 @@
                                 <input type="text" formControlName="mqttPassword"
                                     class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
                                     placeholder="Mqtt Password" />
+
+                                    <div *ngIf="
+                                    createMQTTField.get('mqttPassword')?.hasError('required') &&
+                                    createMQTTField.get('mqttPassword')?.touched
+                                    " class="fv-plugins-message-container invalid-feedback">
+                                        MQTT Password is required
+                                    </div> 
                             </div>
 
 
@@ -222,6 +289,13 @@
                                     class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
                                     placeholder="CA File" />
 
+                                    <div *ngIf="
+                                    createMQTTField.get('mqttCAFileString')?.hasError('required') &&
+                                    createMQTTField.get('mqttCAFileString')?.touched
+                                    " class="fv-plugins-message-container invalid-feedback">
+                                        CA File is required
+                                    </div> 
+
                             </div>
                             <div class="col-md-3">
                                 <label class="fw-semibold fs-6 mb-2 required">Client Certificate
@@ -231,13 +305,28 @@
                                     class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
                                     placeholder="Client Certificate File" />
 
+                                    <div *ngIf="
+                                    createMQTTField.get('mqttClientCertificate')?.hasError('required') &&
+                                    createMQTTField.get('mqttClientCertificate')?.touched
+                                    " class="fv-plugins-message-container invalid-feedback">
+                                        Certificate
+                                        File is required
+                                    </div> 
+
                             </div>
                             <div class="col-md-3">
                                 <label class="fw-semibold fs-6 mb-2 required">Client key file</label>
 
                                 <input type="text" formControlName="mqttClientkey"
                                     class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
-                                    placeholder="Client key " />
+                                    placeholder="Client key "/>
+
+                                    <div *ngIf="
+                                    createMQTTField.get('mqttClientkey')?.hasError('required') &&
+                                    createMQTTField.get('mqttClientkey')?.touched
+                                    " class="fv-plugins-message-container invalid-feedback">
+                                        key file is required
+                                    </div> 
 
                             </div>
                         </div>
@@ -263,7 +352,7 @@
             
                         <!--begin::Button-->
                         <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary"
-                        [attr.data-kt-indicator]="isLoading ? 'on' : 'off'" [disabled]="createMQTTField.invalid || uniqueKeyFounded">
+                        [attr.data-kt-indicator]="isLoading ? 'on' : 'off'" >
                             <span *ngIf="!editOperation" class="indicator-label">
                                 Submit
                             </span>
@@ -280,6 +369,9 @@
 
             </div>
         </div>
+
+
+        <!-- [disabled]="createMQTTField.invalid || uniqueKeyFounded" -->
 
 
 

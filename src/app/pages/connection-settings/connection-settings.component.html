@@ -80,6 +80,13 @@
                                 <input type="number" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
                                     placeholder="Enter Version" name="version" formControlName="version" required
                                     >
+
+                                <div *ngIf="
+                                    createConnectionField.get('version')?.hasError('required') &&
+                                    createConnectionField.get('version')?.touched
+                                " class="fv-plugins-message-container invalid-feedback">
+                                    Version is required
+                                </div>
                             </div>
 
 
@@ -88,6 +95,13 @@
                                 <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
                                     placeholder="Enter Username" name="username" formControlName="username" 
                                     required >
+
+                                <div *ngIf="
+                                    createConnectionField.get('username')?.hasError('required') &&
+                                    createConnectionField.get('username')?.touched
+                                " class="fv-plugins-message-container invalid-feedback">
+                                    Username is required
+                                </div>
                             </div>
 
 
@@ -101,6 +115,13 @@
                                 <input type="text" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
                                     placeholder="Enter Password" name="password" formControlName="password" 
                                     required >
+
+                                <div *ngIf="
+                                    createConnectionField.get('password')?.hasError('required') &&
+                                    createConnectionField.get('password')?.touched
+                                " class="fv-plugins-message-container invalid-feedback">
+                                    Password is required
+                                </div>
                             </div>
 
 
@@ -118,6 +139,14 @@
                                     required>
                                     </p-multiSelect>
                                 </div>
+
+                            <div *ngIf="
+                                createConnectionField.get('configurationType')?.hasError('required') &&
+                                createConnectionField.get('configurationType')?.touched
+                            " class="fv-plugins-message-container invalid-feedback">
+                                Configuration Type is required
+                            </div>
+
                             </div>
                         </div>
                     </div>
@@ -157,11 +186,13 @@
                                 <label class="required fw-semibold fs-6 mb-2">Priority</label>
                                 <input type="number" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
                                     placeholder="Enter Priority" name="telegramPriority" formControlName="telegramPriority" required> 
-                                <!-- <div *ngIf="createConnectionField.get('smsNumber')?.hasError('required') &&
-                                            createConnectionField.get('smsNumber')?.touched"
-                                    class="fv-plugins-message-container invalid-feedback">
-                                    Balance is required
-                                </div> -->
+                               
+                                <div *ngIf="
+                                createConnectionField.get('telegramPriority')?.hasError('required') &&
+                                createConnectionField.get('telegramPriority')?.touched
+                            " class="fv-plugins-message-container invalid-feedback">
+                                Priority is required
+                            </div>
                             </div>
 
 
@@ -213,6 +244,12 @@
                                     class="fv-plugins-message-container invalid-feedback">
                                     Balance is required
                                 </div> -->
+                                <div *ngIf="
+                                           createConnectionField.get('smsPriority')?.hasError('required') &&
+                                           createConnectionField.get('smsPriority')?.touched 
+                                      " class="fv-plugins-message-container invalid-feedback">
+                                        SMS Priority is required
+                                    </div>
                             </div>
                            
 
@@ -350,6 +387,12 @@
                                     class="fv-plugins-message-container invalid-feedback">
                                     Balance is required
                                 </div> -->
+                                <div *ngIf="
+                                createConnectionField.get('whatsAppPriority')?.hasError('required') &&
+                                createConnectionField.get('whatsAppPriority')?.touched 
+                           " class="fv-plugins-message-container invalid-feedback">
+                             whatsApp Priority is required
+                         </div>
                             </div>
 
 
@@ -386,7 +429,7 @@
                                 <span style="color: #fc1900;">{{errorForInvalidEmail}}</span>
                                 <div *ngIf="
                               createConnectionField.get('email')?.hasError('required') &&
-                              createConnectionField.get('email')?.touched && createConnectionField.get('email')?.errors?.pattern
+                              createConnectionField.get('email')?.touched
                             " class="fv-plugins-message-container invalid-feedback">
                                     Email ID is required
                                    
@@ -398,6 +441,12 @@
                                 <label class="required fw-semibold fs-6 mb-2">Priority</label>
                                 <input type="number" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
                                     placeholder="Enter Priority" name="emailPriority" formControlName="emailPriority" required>
+                                    <div *ngIf="
+                                       createConnectionField.get('emailPriority')?.hasError('required') &&
+                                       createConnectionField.get('emailPriority')?.touched 
+                                  " class="fv-plugins-message-container invalid-feedback">
+                                   Email Priority is required
+                                </div>
                             </div>
 
                             <div class="col-md-4">
@@ -490,6 +539,12 @@
                                     class="fv-plugins-message-container invalid-feedback">
                                     Balance is required
                                 </div> -->
+                                <div *ngIf="
+                                       createConnectionField.get('pushPriority')?.hasError('required') &&
+                                       createConnectionField.get('pushPriority')?.touched 
+                                  " class="fv-plugins-message-container invalid-feedback">
+                                   Push Priority is required
+                                </div>
                             </div>
 
 
@@ -567,7 +622,7 @@
         
                     <!--begin::Button-->
                     <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary"
-                    [disabled]="createConnectionField.invalid" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+                         [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
                         <span *ngIf="!editOperation" class="indicator-label">
                             Submit
                         </span>

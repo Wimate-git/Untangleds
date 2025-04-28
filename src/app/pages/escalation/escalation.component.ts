@@ -420,6 +420,12 @@ export class EscalationComponent implements OnInit {
 
 
   onSubmit(event:any){
+
+    if (this.notificationForm.invalid || this.errorForUniqueID=='id already exists' || this.errorForUniqueLabel == 'id already exists' || this.errorForUniqueNotificationLabel != '') {
+      this.markAllFieldsTouched(this.notificationForm);
+      return;
+    }
+
      
     console.log("Submitted is clicked ",event);
     if(event.type == 'submit' && this.editOperation == false){
@@ -430,6 +436,18 @@ export class EscalationComponent implements OnInit {
     }
   }
 
+
+  markAllFieldsTouched(formGroup: FormGroup | FormArray): void {
+    Object.keys(formGroup.controls).forEach(field => {
+      const control = formGroup.get(field);
+      if (control instanceof FormControl) {
+        control.markAsTouched({ onlySelf: true });
+      } else if (control instanceof FormGroup || control instanceof FormArray) {
+        this.markAllFieldsTouched(control);
+      }
+    });
+  }
+  
 
 
   delete(id: number) {
@@ -931,7 +949,7 @@ console.log("PARRAY3:",permissionsArray)
     //console.log(this.listofNMIds)
     this.errorForUniqueLabel = '';
     for (let uniqueID = 0; uniqueID < this.listofNMIds.length; uniqueID++) {
-      if (getLabel.toLowerCase() == this.listofNMIds[uniqueID].toLowerCase()) {
+      if (getLabel.toLowerCase().trim() == this.listofNMIds[uniqueID].toLowerCase().trim()) {
         this.errorForUniqueID='id already exists'
         this.errorForUniqueLabel = "ID already exists";
         break
@@ -946,7 +964,7 @@ console.log("PARRAY3:",permissionsArray)
   checkUniqueLabels(getLabel: any){
     this.errorForUniqueNotificationLabel = '';
     for (let uniqueID = 0; uniqueID < this.listofNMLabels.length; uniqueID++) {
-      if (getLabel.toLowerCase() == this.listofNMLabels[uniqueID].toLowerCase()) {
+      if (getLabel.toLowerCase().trim() == this.listofNMLabels[uniqueID].toLowerCase().trim()) {
         this.errorForUniqueNotificationLabel = "Label already exists";
         break
       }

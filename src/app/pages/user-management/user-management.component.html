@@ -262,7 +262,7 @@
                                         <span style="color: #fc1900;">{{errorForInvalidEmail}}</span>
                                         <div *ngIf="
                                       createUserField.get('email')?.hasError('required') &&
-                                      createUserField.get('email')?.touched && createUserField.get('email')?.errors?.pattern
+                                      createUserField.get('email')?.touched 
                                     " class="fv-plugins-message-container invalid-feedback">
                                             Email is required
                                            
@@ -270,6 +270,7 @@
         
                                     </div>
         
+                                    <!-- && createUserField.get('email')?.errors?.pattern -->
         
         
         
@@ -382,6 +383,13 @@
                                                 {{ item }}
                                             </option>
                                         </select>
+
+                                        <div *ngIf="
+                                        createUserField.get('permission_ID')?.hasError('required') &&
+                                        createUserField.get('permission_ID')?.touched
+                                      " class="fv-plugins-message-container invalid-feedback">
+                                              Permission ID is required
+                                          </div>
                                     </div>
         
         
@@ -406,6 +414,13 @@
                                         required>
                                         </p-multiSelect>
                                     </div>
+
+                                    <div *ngIf="
+                                    createUserField.get('location_permission')?.hasError('required') &&
+                                    createUserField.get('location_permission')?.touched
+                                  " class="fv-plugins-message-container invalid-feedback">
+                                          Location Permission is required
+                                      </div>
                                 </div>
                                
         
@@ -440,6 +455,13 @@
                                             required>
                                             </p-multiSelect>
                                         </div>
+
+                                        <div *ngIf="
+                                        createUserField.get('form_permission')?.hasError('required') &&
+                                        createUserField.get('form_permission')?.touched
+                                      " class="fv-plugins-message-container invalid-feedback">
+                                              Form Permission is required
+                                          </div>
                                     </div>
 
 
@@ -729,7 +751,7 @@
                     
                                 <!--begin::Button-->
                                 <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary"
-                                [disabled]="createUserField.invalid || errorForUniqueID != '' || errorForUniqueEmail != '' || errorForInvalidEmail != '' || errorForInvalidName != '' || errorForUniqueUserID != '' || errorForUniqueID != '' || errorForUniquemobileID != ''" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+                            [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
                                     <span *ngIf="!editOperation" class="indicator-label">
                                         Submit
                                     </span>
@@ -751,6 +773,10 @@
                 </div>
                 <!--end::User form-->
             </div>
+
+            <!-- [disabled]="createUserField.invalid || errorForUniqueID != '' || errorForUniqueEmail != '' || errorForInvalidEmail != '' || errorForInvalidName != '' || errorForUniqueUserID != '' || errorForUniqueID != '' || errorForUniquemobileID != ''" -->
+
+
 
     </form>
 

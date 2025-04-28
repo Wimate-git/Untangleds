@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, OnInit, ViewChild } from "@angular/core";
-import { AbstractControl, AsyncValidatorFn, FormArray, FormGroup, UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
+import { AbstractControl, AsyncValidatorFn, FormArray, FormControl, FormGroup, UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { SafeResourceUrl } from "@angular/platform-browser";
 import { getCurrentUser } from "aws-amplify/auth";
@@ -145,6 +145,12 @@ export class ClientComponent implements OnInit {
 
     async onSubmit(event:any){
 
+      if (this.createClientField.invalid || this.errorForUniqueID !='' || this.validEmail == false) {
+        this.markAllFieldsTouched(this.createClientField);
+        return;
+      }
+
+      console.log("markAllFieldsTouched ",event);
 
       this.uploadFiles()
 
@@ -157,6 +163,20 @@ export class ClientComponent implements OnInit {
         this.updateClient(this.createClientField.value,'editClient')
       }
     }
+
+
+
+  markAllFieldsTouched(formGroup: FormGroup | FormArray): void {
+    Object.keys(formGroup.controls).forEach(field => {
+      const control = formGroup.get(field);
+      if (control instanceof FormControl) {
+        control.markAsTouched({ onlySelf: true });
+      } else if (control instanceof FormGroup || control instanceof FormArray) {
+        this.markAllFieldsTouched(control);
+      }
+    });
+  }
+
 
     
     constructor(private fb: UntypedFormBuilder,private cd:ChangeDetectorRef,private api: APIService,private toast: MatSnackBar,private companyconfig:SharedService,private S3service:S3bucketService,private http: HttpClient,private auditTrail:AuditTrailService){

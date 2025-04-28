@@ -149,7 +149,7 @@
                         createCompanyField.get('clientID')?.hasError('required') &&
                         createCompanyField.get('clientID')?.touched
                       " class="fv-plugins-message-container invalid-feedback">
-                            clientID is required
+                            Client ID is required
                         </div>
 
                     </div>
@@ -204,7 +204,7 @@
                             form-control form-control-lg form-control-solid
                             mb-3 mb-lg-0
                           " placeholder="Enter mobile number" name="mobile" formControlName="mobile"
-                          minlength=10 maxlength=10 (keyup)="keyPress($event)" required>
+                          minlength=10 maxlength=10 pattern="^\d{10}$" (keyup)="keyPress($event)" required>
 
                           <span style="color: #fc1900;">{{errorForMobile}}</span>
                         <div *ngIf="
@@ -347,8 +347,7 @@
     
                 <!--begin::Button-->
                 <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary"
-                [disabled]="createCompanyField.invalid || errorForUniqueID =='Company ID already exists' ||
-                errorForInvalidEmail == 'Invalid Email Address'" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+                     [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
                     <span *ngIf="!editOperation" class="indicator-label">
                         Submit
                     </span>
@@ -362,6 +361,9 @@
                 <!--end::Button-->
             </div>
 
+
+            <!-- [disabled]="createCompanyField.invalid || errorForUniqueID =='Company ID already exists' ||
+            errorForInvalidEmail == 'Invalid Email Address'" -->
 
 
 

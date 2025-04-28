@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, OnInit, ViewChild } from '@angular/core';
-import { UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Config } from 'datatables.net';
 import { SharedService } from '../shared.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -155,8 +155,14 @@ export class CompanyComponent implements OnInit{
 
 
   onSubmit(event:any){
+
+    if (this.createCompanyField.invalid || this.errorForUniqueID =='Company ID already exists' ||
+      this.errorForInvalidEmail == 'Invalid Email Address') {
+      this.markAllFieldsTouched(this.createCompanyField);
+      return;
+    }
      
-    console.log("Submitted is clicked ",event);
+    console.log("All fields have been filled completly ",event);
     if(event.type == 'submit' && this.editOperation == false){
       this.createNewCompany('')
     }
@@ -165,6 +171,17 @@ export class CompanyComponent implements OnInit{
     }
   }
 
+
+  markAllFieldsTouched(formGroup: FormGroup | FormArray): void {
+    Object.keys(formGroup.controls).forEach(field => {
+      const control = formGroup.get(field);
+      if (control instanceof FormControl) {
+        control.markAsTouched({ onlySelf: true });
+      } else if (control instanceof FormGroup || control instanceof FormArray) {
+        this.markAllFieldsTouched(control);
+      }
+    });
+  }
 
 
   async showTable() {

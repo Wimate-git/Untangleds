@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Config } from 'datatables.net';
 import { UserService } from 'src/app/_fake/services/user-service';
 import { SharedService } from '../shared.service';
@@ -457,6 +457,12 @@ export class MqttComponent {
 
 
   onSubmit(event: any) {
+
+    if (this.createMQTTField.invalid || this.uniqueKeyFounded) {
+      this.markAllFieldsTouched(this.createMQTTField);
+      return;
+    }
+
     console.log("Submitted is clicked ", event);
     if (event.type == 'submit' && this.editOperation == false) {
       this.createNewMQTT('', 'html')
@@ -464,6 +470,18 @@ export class MqttComponent {
     else {
       this.updateMQTT(this.createMQTTField.value, 'editUser')
     }
+  }
+
+
+  markAllFieldsTouched(formGroup: FormGroup | FormArray): void {
+    Object.keys(formGroup.controls).forEach(field => {
+      const control = formGroup.get(field);
+      if (control instanceof FormControl) {
+        control.markAsTouched({ onlySelf: true });
+      } else if (control instanceof FormGroup || control instanceof FormArray) {
+        this.markAllFieldsTouched(control);
+      }
+    });
   }
 
 

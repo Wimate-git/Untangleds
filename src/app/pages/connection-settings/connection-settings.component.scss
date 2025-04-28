@@ -67,3 +67,13 @@
     max-height: 70vh; /* Adjust the height as per your requirements */
     overflow-y: auto; /* Enables vertical scrolling */
   }
+
+
+  input.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched,
+p-multiSelect.ng-invalid.ng-touched{
+  border: 2px solid #fc1900 !important;
+  background-color: #fff3f3;
+  animation: shakeY 0.4s ease;
+}

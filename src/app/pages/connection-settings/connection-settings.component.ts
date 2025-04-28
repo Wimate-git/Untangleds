@@ -4,7 +4,7 @@ import Swal, { SweetAlertOptions } from 'sweetalert2';
 import { SwalComponent } from '@sweetalert2/ngx-sweetalert2';
 import { Config } from 'datatables.net';
 import { Crud2Module } from "../../modules/crud2/crud.module";
-import { FormArray, FormBuilder, FormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, UntypedFormGroup, Validators } from '@angular/forms';
 import { APIService } from 'src/app/API.service';
 import { SharedService } from '../shared.service';
 import { DynamicApiService } from '../dynamic-api.service';
@@ -209,7 +209,7 @@ commChangeTracker(event:any){
 
 
         // Update button state based on the form's validity
-        this.toggleSubmitButton();
+        // this.toggleSubmitButton();
       console.log("Is form valid " ,this.createConnectionField.valid);
 
   }
@@ -525,7 +525,7 @@ toggleSubmitButton(): void {
     console.log('getID', getID);
     this.errorForUniqueID = '';
     for (let uniqueID = 0; uniqueID < this.listofSK.length; uniqueID++) {
-      if (getID.target.value == this.listofSK[uniqueID]) {
+      if (getID.target.value.toLowerCase().trim() == this.listofSK[uniqueID].toLowerCase().trim()) {
         this.errorForUniqueID = "Communication ID already exists";
       }
     }
@@ -822,10 +822,13 @@ toggleSubmitButton(): void {
   }
 
   onSubmit(event:any){
-     
-    console.log("Submitted is clicked ",event);
 
-    //Enabling all the disabled fields
+    if (this.createConnectionField.invalid || this.errorForUniqueID != '' || this.errorForUniquemobileID != '' || this.errorForUniqueWhatsappmobileID != '' || this.errorForInvalidEmail != '') {
+      this.markAllFieldsTouched(this.createConnectionField);
+      return;
+    }
+    
+
     this.createConnectionField.get('comtnID')?.enable()
     if(event.type == 'submit' && this.editOperation == false){
       this.createNewCommunication('')
@@ -833,6 +836,18 @@ toggleSubmitButton(): void {
     else{
       this.updateCommunication(this.createConnectionField.value,'editCompany')
     }
+  }
+
+
+  markAllFieldsTouched(formGroup: FormGroup | FormArray): void {
+    Object.keys(formGroup.controls).forEach(field => {
+      const control = formGroup.get(field);
+      if (control instanceof FormControl) {
+        control.markAsTouched({ onlySelf: true });
+      } else if (control instanceof FormGroup || control instanceof FormArray) {
+        this.markAllFieldsTouched(control);
+      }
+    });
   }
 
 

@@ -28,8 +28,8 @@
 
                                 <span style="color: #fc1900;">{{errorForUniqueLabel}}</span>
                                 <div *ngIf="
-                                    notificationForm.get('id')?.hasError('required') &&
-                                    notificationForm.get('id')?.touched
+                                    notificationForm.get('PK')?.hasError('required') &&
+                                    notificationForm.get('PK')?.touched
                                 " class="fv-plugins-message-container invalid-feedback">
                                     Notification Matrix ID is required
                                 </div>
@@ -82,7 +82,7 @@
                                     >
                                     
                                     <!-- Selected Item Template -->
-                                    <ng-template let-selectedOption pTemplate="selectedItem">
+                                    <ng-template  let-selectedOption pTemplate="selectedItem">
                                       <div class="d-flex align-items-center w-100">
                                         <div class="flex-grow-1">{{ selectedOption }}</div>
                                       </div>
@@ -95,6 +95,12 @@
                                       </div>
                                     </ng-template>
                                   </p-dropdown>
+                                </div>
+                                <div *ngIf="
+                                    notificationForm.get('form_permission')?.hasError('required') &&
+                                    notificationForm.get('form_permission')?.touched
+                                " class="fv-plugins-message-container invalid-feedback">
+                                    Select Form field is required
                                 </div>
                               </div>
                               
@@ -155,6 +161,16 @@
                                     </p-multiSelect>
 
 
+                                    <div *ngIf="
+                                    level.get('userIDs')?.hasError('required') &&
+                                    level.get('userIDs')?.touched
+                                " class="fv-plugins-message-container invalid-feedback">
+                                   Users is required
+                                </div>
+
+
+
+
 <!-- 
                                     //    (onSelectAllChange)="onSelectAllFields(i, $event)" -->
                                     <br><br>
@@ -166,6 +182,13 @@
                       " placeholder="Enter Escalation Time in minutes" name="model" formControlName="escalationTime"
                                         required>
 
+                                        <div *ngIf="
+                                        level.get('escalationTime')?.hasError('required') &&
+                                        level.get('escalationTime')?.touched
+                                    " class="fv-plugins-message-container invalid-feedback">
+                                       Escalation Time is required
+                                    </div>
+
                                     <br>
                                     <label class="required fw-semibold fs-6 mb-2">Escalation Level Comment</label>
 
@@ -173,6 +196,15 @@
                         form-control form-control-lg form-control-solid
                         mb-3 mb-lg-0
                       " placeholder="Enter Escalation Level Comment" name="model" formControlName="comments" required>
+
+                            
+                            <div *ngIf="
+                            level.get('comments')?.hasError('required') &&
+                            level.get('comments')?.touched
+                        " class="fv-plugins-message-container invalid-feedback">
+                            Comments is required
+                        </div>
+
 
                                     <br>
                                     <!-- User permissions -->
@@ -256,8 +288,7 @@
 
                         <!--begin::Button-->
                         <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary" 
-                            [attr.data-kt-indicator]="isLoading ? 'on' : 'off'" [disabled]="notificationForm.invalid || errorForUniqueID=='id already exists' 
-                        ||errorForUniqueLabel == 'id already exists'">
+                            [attr.data-kt-indicator]="isLoading ? 'on' : 'off'" >
                             <span *ngIf="!editOperation" class="indicator-label">
                                 Submit
                             </span>
@@ -277,6 +308,10 @@
 
     </form>
 </ng-template>
+
+<!-- 
+[disabled]="notificationForm.invalid || errorForUniqueID=='id already exists' 
+                        ||errorForUniqueLabel == 'id already exists'" -->
 
 
 <div class="card card-custom">
@@ -323,8 +358,3 @@
 <!-- swal is not yet implemented -->
 <swal #noticeSwal [swalOptions]="swalOptions">
 </swal>
-
-
-
-<!-- [disabled]="notificationForm.invalid || errorForUniqueID=='id already exists' 
-                        ||errorForUniqueLabel == 'id already exists'" -->

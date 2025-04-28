@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
-import { FormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, UntypedFormGroup, Validators } from '@angular/forms';
 import { Config } from 'datatables.net';
 import moment from 'moment';
 import { IUserModel, UserService, userInterface } from 'src/app/_fake/services/user-service';
@@ -295,13 +295,29 @@ rdtListWorkAround :any =[{
 
   onSubmit(event:any){
      
-    console.log("Submitted is clicked ",event);
+    if (this.createUserField.invalid || this.errorForUniqueID != '' || this.errorForUniqueEmail != '' || this.errorForInvalidEmail != '' || this.errorForInvalidName != '' || this.errorForUniqueUserID != '' || this.errorForUniqueID != '' || this.errorForUniquemobileID != '') {
+      this.markAllFieldsTouched(this.createUserField);
+      return;
+    }
+
     if(event.type == 'submit' && this.editOperation == false){
       this.createNewUser('','html')
     }
     else{
       this.updateUser(this.createUserField.value,'editUser')
     }
+  }
+
+
+  markAllFieldsTouched(formGroup: FormGroup | FormArray): void {
+    Object.keys(formGroup.controls).forEach(field => {
+      const control = formGroup.get(field);
+      if (control instanceof FormControl) {
+        control.markAsTouched({ onlySelf: true });
+      } else if (control instanceof FormGroup || control instanceof FormArray) {
+        this.markAllFieldsTouched(control);
+      }
+    });
   }
 
   
@@ -1083,7 +1099,7 @@ rdtListWorkAround :any =[{
       if(this.dataUser.username == tempUser && this.editOperation){
 
       }
-      else if (tempUser.toLowerCase() == this.listofSK[uniqueID].toLowerCase()) {
+      else if (tempUser.toLowerCase().trim() == this.listofSK[uniqueID].toLowerCase().trim()) {
         this.createUserField.setErrors({ invalidForm: true });
         this.errorForUniqueID = "User Name already exists";
       }

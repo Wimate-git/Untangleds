@@ -510,7 +510,7 @@
                 
                             <!--begin::Button-->
                             <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary"
-                            [disabled]="createClientField.invalid || errorForUniqueID !='' || validEmail == false" [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
+                             [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
                                 <span *ngIf="!editOperation" class="indicator-label">
                                     Submit
                                 </span>
@@ -545,7 +545,10 @@
                     </div>
                 </div>
             </div>
-                      
+            
+            
+<!-- 
+            [disabled]="createClientField.invalid || errorForUniqueID !='' || validEmail == false" -->
               
     
             
