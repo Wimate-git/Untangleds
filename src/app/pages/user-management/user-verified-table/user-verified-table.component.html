@@ -5,12 +5,12 @@
   </div>
 
   <div class="approval-history-list">
-    <!-- Check if unverifiedUsers array is empty -->
+    <!-- Show if no users -->
     <div *ngIf="unverifiedUsers.length === 0" class="error-message">
       <p>No unconfirmed users found.</p>
     </div>
 
-    <!-- If there are users, display the table -->
+    <!-- Table of users -->
     <table *ngIf="unverifiedUsers.length > 0" class="approval-table">
       <thead>
         <tr>
@@ -20,9 +20,8 @@
           <th>Verification</th>
         </tr>
       </thead>
-
       <tbody>
-        <tr *ngFor="let user of unverifiedUsers" class="approval-row">
+        <tr *ngFor="let user of paginatedUsers" class="approval-row">
           <td>{{ user.username }}</td>
           <td>{{ user.email }}</td>
           <td class="status">
@@ -35,5 +34,16 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-controls" *ngIf="totalPages > 1">
+      <button class="arrow-btn" [disabled]="page === 1" (click)="previousPage()">
+        &#8592;
+      </button>
+      <span class="page-label">Page {{ page }} of {{ totalPages }}</span>
+      <button class="arrow-btn" [disabled]="page === totalPages" (click)="nextPage()">
+        &#8594;
+      </button>
+    </div>
   </div>
 </div>

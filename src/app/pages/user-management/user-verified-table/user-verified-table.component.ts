@@ -111,9 +111,33 @@ export class UserVerifiedTableComponent{
     return item;
   });
 
-
 }
 
+
+
+page: number = 1;
+pageSize: number = 10; // You can change this to show more rows per page
+
+get paginatedUsers() {
+  const start = (this.page - 1) * this.pageSize;
+  return this.unverifiedUsers.slice(start, start + this.pageSize);
+}
+
+get totalPages() {
+  return Math.ceil(this.unverifiedUsers.length / this.pageSize);
+}
+
+nextPage() {
+  if (this.page < this.totalPages) {
+    this.page++;
+  }
+}
+
+previousPage() {
+  if (this.page > 1) {
+    this.page--;
+  }
+}
 
 
 }
