@@ -577,28 +577,41 @@ if(data){
   }
   createStackedBarChart(chartdata?:any) {
 
-    console.log(' Initializing Pie Chart for ', chartdata);
-    if(chartdata){
-      const chartOptionsCopy = JSON.parse(chartdata.highchartsOptionsJson);
-      console.log('data check from initialiaze',chartOptionsCopy)
-      chartOptionsCopy.series = chartOptionsCopy.series.map((series: any) => {
-        return {
-          ...series,
-          data: series.data.map((value: any, index: number) => ({
-            y: value, // Data value
-            name: series.name, // Series name (optional)
-            customIndex: index, // Custom property to track index
-            events: {
-              click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event,this.index),
-            },
-          })),
-        };
-      });
-    
-      // Initialize the Highcharts pie chart
-      Highcharts.chart(`pieChart${this.index + 1}`, chartOptionsCopy);
 
-    }else {
+
+
+    console.log(' Initializing Pie Chart for ', chartdata);
+if (chartdata) {
+  const chartOptionsCopy = JSON.parse(chartdata.highchartsOptionsJson);
+  console.log('Data check from initialize', chartOptionsCopy);
+  
+  // Apply the event to the series directly (outside of data.map)
+  chartOptionsCopy.series = chartOptionsCopy.series.map((series: any) => {
+    return {
+      ...series,
+      events: {
+        click: (event: any) => {
+          const category = event.point.category;
+          const seriesName = event.point.series.name;
+          const value = event.point.y;
+          
+          console.log('Click event triggered!');
+          console.log('Category:', category);
+          console.log('Series Name:', seriesName);
+          console.log('Value:', value);
+          
+          // Call your custom handler function
+          this.onBarClick(event, this.index);
+        }
+      }
+    };
+  });
+
+  // Initialize the Highcharts pie chart
+  Highcharts.chart(`pieChart${this.index + 1}`, chartOptionsCopy);
+}
+
+   else {
       console.log('this.items checkinh',this.item)
       const extractOptions = this.item.highchartsOptionsJson
       console.log('extractOptions checking',extractOptions)
