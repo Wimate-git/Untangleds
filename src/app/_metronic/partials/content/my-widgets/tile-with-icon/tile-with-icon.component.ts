@@ -581,8 +581,8 @@ export class TileWithIconComponent implements OnInit{
 
         rowData:this.createKPIWidget.value.rowData || '',
         ModuleNames:this.createKPIWidget.value.ModuleNames,
-        selectFromTime: this.createKPIWidget.value.selectFromTime,
-        selectToTime: this.createKPIWidget.value.selectToTime,
+        selectFromTime: this.createKPIWidget.value.selectFromTime ||'',
+        selectToTime: this.createKPIWidget.value.selectToTime ||'',
         formatType: this.createKPIWidget.value.formatType,
  
         noOfParams: this.noOfParams || 0,
@@ -692,8 +692,8 @@ export class TileWithIconComponent implements OnInit{
         themeColor: this.createKPIWidget.value.themeColor,
         fontSize: `${this.createKPIWidget.value.fontSize}px`,
         fontColor: this.createKPIWidget.value.fontColor,
-        selectFromTime: this.createKPIWidget.value.selectFromTime,
-        selectToTime: this.createKPIWidget.value.selectToTime,
+        selectFromTime: this.createKPIWidget.value.selectFromTime ||'',
+        selectToTime: this.createKPIWidget.value.selectToTime ||'',
         dashboardIds: this.createKPIWidget.value.dashboardIds ||'',
         selectType: this.createKPIWidget.value.selectType ||'',
         filterParameter: this.createKPIWidget.value.filterParameter,
@@ -1483,14 +1483,25 @@ fetchDynamicFormDataConfig(value: any) {
         console.log('formFields check',formFields)
 
         // Initialize the list with formFields labels
-        this.columnVisisbilityFields = formFields.map((field: any) => {
-          console.log('field check',field)
+        // this.columnVisisbilityFields = formFields.map((field: any) => {
+        //   console.log('field check',field)
+        //   return {
+        //     value: field.name,
+        //     text: field.label
+        //   };
+        // });
+        this.columnVisisbilityFields = formFields
+        .filter((field: any) => {
+          // Filter out fields with type "heading" or with an empty placeholder
+          return field.type !== "heading" && field.type !== 'Empty Placeholder';
+        })
+        .map((field: any) => {
+          console.log('field check', field);
           return {
             value: field.name,
             text: field.label
           };
         });
-
         // Include created_time and updated_time
         if (parsedMetadata.created_time) {
           this.columnVisisbilityFields.push({
@@ -1555,8 +1566,20 @@ fetchDynamicFormDataConfig(value: any) {
           console.log('formFields check',formFields)
 
           // Initialize the list with formFields labels
-          this.listofDynamicParam = formFields.map((field: any) => {
-            console.log('field check',field)
+          // this.listofDynamicParam = formFields.map((field: any) => {
+          //   console.log('field check',field)
+          //   return {
+          //     value: field.name,
+          //     text: field.label
+          //   };
+          // });
+          this.listofDynamicParam  = formFields
+          .filter((field: any) => {
+            // Filter out fields with type "heading" or with an empty placeholder
+            return field.type !== "heading" && field.type !== 'Empty Placeholder';
+          })
+          .map((field: any) => {
+            console.log('field check', field);
             return {
               value: field.name,
               text: field.label

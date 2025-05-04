@@ -31,6 +31,10 @@
     <!-- Last Updated Time: {{lastUpdatedTime}} -->
   </button>
 
+
+  
+  
+
 </div>
 
 
@@ -238,6 +242,14 @@
 
 
 
+                    <div *ngIf="item.grid_type === 'dailChart'"  >
+                      <app-gauge-chart-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,gaugeChartModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
+                 
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-gauge-chart-ui>
+                    </div>
+
+
+
 
 
                     <div *ngIf="item.grid_type === 'Stackedchart'"  >
@@ -289,6 +301,8 @@
                     <div *ngIf="item.grid_type === 'title'" >
                       <app-title-ui     [item]="item" 
                       [index]="i" 
+                      [titleHeight]="titleHeight"
+                      [titleWidth]="titleWidth"
                     
                       [isEditModeView]="isEditModeView" 
                       [hideButton]="hideButton" 
@@ -482,68 +496,68 @@
   
   <!-- <h1 *ngIf="!editButtonCheck">iam landing page</h1> -->
   <div class="row">
-  <div class="col-xl-7" *ngIf="!editButtonCheck">
-    <!-- Begin Engage widget 9 -->
-    <div class="card h-lg-100" style="background: linear-gradient(112.14deg, #183462 0%, #183462 100%)">
-      <!-- Begin Body -->
-      <div class="card-body">
-        <!-- Begin Row -->
-        <div class="row align-items-center">
-          <!-- Begin Left Column -->
-          <div class="col-sm-7 pe-0 mb-5 mb-sm-0">
-            <!-- Begin Wrapper -->
-            <div class="d-flex justify-content-between h-100 flex-column pt-5 pb-2 ps-4 pe-4">
-              <!-- Begin Container -->
-              <div class="mb-4 ms-3">
-                <!-- Begin Title -->
-                <h1 class="fs-2x fw-bold text-white">Summary Dashboard</h1>
-                <h4 class="fs-4 fw-semibold text-white ms-1">Unleash the Power of Data with Intuitive Dashboards!</h4>
-  
-                <!-- End Title -->
+    <div class="col-xl-7" *ngIf="!editButtonCheck">
+      <!-- Begin Engage widget 9 -->
+      <div class="card h-lg-100" style="background: linear-gradient(112.14deg, #183462 0%, #183462 100%)">
+        <!-- Begin Body -->
+        <div class="card-body">
+          <!-- Begin Row -->
+          <div class="row align-items-center">
+            <!-- Begin Left Column -->
+            <div class="col-sm-7 pe-0 mb-5 mb-sm-0">
+              <!-- Begin Wrapper -->
+              <div class="d-flex justify-content-between h-100 flex-column pt-5 pb-2 ps-4 pe-4">
+                <!-- Begin Container -->
+                <div class="mb-4 ms-3">
+                  <!-- Begin Title -->
+                  <h1 class="fs-2x fw-bold text-white">Summary Dashboard</h1>
+                  <h4 class="fs-4 fw-semibold text-white ms-1">Unleash the Power of Data with Intuitive Dashboards!</h4>
+    
+                  <!-- End Title -->
+                </div>
+                
+                <!-- End Container -->
+                <div class="d-flex align-items-center gap-4 ms-3" style="text-align: left;">
+                  <!-- Begin Create Button -->
+    <!-- Begin Create Button -->
+    <button data-bs-toggle="tooltip" *ngIf="summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)" title="Create Dashboard"
+        class="btn bg-success text-white fw-semibold d-flex align-items-center" (click)="openModal('new', null, summaryModal)">
+        <i class="bi bi-plus-square-fill fs-3 text-white me-2"></i>Create
+    </button>
+    <!-- End Create Button -->
+    
+                  <!-- End Create Button -->
+                  
+                  <!-- Begin Location Button -->
+                  <button type="button" data-bs-toggle="modal" data-bs-target="#myModalLocation"
+                      class="btn  bg-primary text-white fw-semibold d-flex align-items-center">
+                      <i class="bi bi-geo-alt fs-3 text-white me-2"></i> Location
+                  </button>
+                  <!-- End Location Button -->
               </div>
               
-              <!-- End Container -->
-              <div class="d-flex align-items-center gap-4 ms-3" style="text-align: left;">
-                <!-- Begin Create Button -->
-  <!-- Begin Create Button -->
-  <button data-bs-toggle="tooltip" *ngIf="summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)" title="Create Dashboard"
-      class="btn bg-success text-white fw-semibold d-flex align-items-center" (click)="openModal('new', null, summaryModal)">
-      <i class="bi bi-plus-square-fill fs-3 text-white me-2"></i>Create
-  </button>
-  <!-- End Create Button -->
-  
-                <!-- End Create Button -->
-                
-                <!-- Begin Location Button -->
-                <button type="button" data-bs-toggle="modal" data-bs-target="#myModalLocation"
-                    class="btn  bg-primary text-white fw-semibold d-flex align-items-center">
-                    <i class="bi bi-geo-alt fs-3 text-white me-2"></i> Location
-                </button>
-                <!-- End Location Button -->
+                <!-- Begin Button Container -->
+    
+                <!-- End Button Container -->
+              </div>
+              <!-- End Wrapper -->
             </div>
-            
-              <!-- Begin Button Container -->
-  
-              <!-- End Button Container -->
+            <!-- End Left Column -->
+    
+            <!-- Begin Right Column -->
+            <div class="col-sm-5 text-center">
+              <!-- Begin Illustration -->
+              <img src="./assets/media/svg/illustrations/easy/1.svg" class="h-200px h-lg-250px my-n6" alt="">
+              <!-- End Illustration -->
             </div>
-            <!-- End Wrapper -->
+            <!-- End Right Column -->
           </div>
-          <!-- End Left Column -->
-  
-          <!-- Begin Right Column -->
-          <div class="col-sm-5 text-center">
-            <!-- Begin Illustration -->
-            <img src="./assets/media/svg/illustrations/easy/1.svg" class="h-200px h-lg-250px my-n6" alt="">
-            <!-- End Illustration -->
-          </div>
-          <!-- End Right Column -->
+          <!-- End Row -->
         </div>
-        <!-- End Row -->
+        <!-- End Body -->
       </div>
-      <!-- End Body -->
+      <!-- End Engage widget 9 -->
     </div>
-    <!-- End Engage widget 9 -->
-  </div>
   
   
   <div class="col-xl-5" *ngIf="!editButtonCheck && !shouldHideYouTube()">
@@ -589,7 +603,9 @@
             <thead>
               <tr class="fs-7 fw-bold text-gray-500 border-bottom-0">
                 <th class="fw-bold text-dark fs-4">Id</th>
-                <th class="text-start fw-bold text-dark fs-4">Name</th>
+                <th class="text-start fw-bold text-dark fs-4 ">Name</th>
+
+
                 <th class="text-start fw-bold text-dark fs-4">Description</th>
                 <th class="text-start fw-bold text-dark fs-4">Updated</th>
                 <th class="text-start fw-bold text-dark fs-4">Created</th>
@@ -602,22 +618,14 @@
             <!--begin::Table body-->
             <tbody *ngIf="lookup_data_summaryCopy && lookup_data_summaryCopy.length > 0; else noDataTemplate">
               <tr *ngFor="let item of filterDuplicates(lookup_data_summaryCopy) ">
-                <td>
+                <!-- <td>
                   <div class="d-flex align-items-center">
                     <span class="text-gray-500 fw-semibold d-block fs-7 me-2">
-                      <!-- <div class="symbol symbol-50px me-5">
-                        <span [class]="item.parsedIcon?.class2">
-                          <app-keenicon [name]="item.parsedIcon?.value" [class]="item.parsedIcon?.class1"
-                            style="display: contents;"></app-keenicon>
-                        </span>
-                      </div> -->
+      
                     
                       <div class="symbol symbol-50px me-5 position-relative">
                         <span [class]="item.parsedIcon?.class2" class="position-relative">
-                          <!-- Pin Icon (Overlayed at the Top) -->
                      
-                  
-                          <!-- Main Keen Icon -->
                           <app-keenicon 
                             [name]="item.parsedIcon?.value" 
                             [class]="item.parsedIcon?.class1"
@@ -652,18 +660,54 @@
                     </div>
                   </div>
                 </td>
-                <td class="text-start">
-                  <span class="text-gray-600 fw-bold fs-6" (click)="viewItem(item.P1,item); $event.preventDefault()">{{ item.P2 }}</span>
+                <td class="text-start wrap-text">
+                  <span class="col-md-3 text-gray-600 fw-bold fs-6" (click)="viewItem(item.P1,item); $event.preventDefault()">{{ item.P2 }}</span>
+                </td> -->
+
+
+
+
+                <td class="wrap-text1">
+                  <div class="d-flex align-items-center">
+                    <span class="text-gray-500 fw-semibold d-block fs-7 me-1"> <!-- Reduced margin from me-2 to me-1 -->
+                      <div class="symbol symbol-50px me-3 position-relative"> <!-- Reduced margin here too -->
+                        <span [class]="item.parsedIcon?.class2" class="position-relative">
+                          <app-keenicon 
+                            [name]="item.parsedIcon?.value" 
+                            [class]="item.parsedIcon?.class1"
+                            style="display: contents;">
+                          </app-keenicon>
+                        </span>
+                      </div>
+                    </span>
+                    <div class="d-flex justify-content-start flex-column">
+                      <a class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6"
+                         (click)="viewItem(item.P1,item); $event.preventDefault()">
+                        {{ item.P1 }}
+                        <app-keenicon *ngIf="item.P10" 
+                                      name="pin" 
+                                      class="pin-icon fs-2">
+                        </app-keenicon>
+                      </a>
+                    </div>
+                  </div>
                 </td>
-                <td class="text-start">
+                <td class="text-start wrap-text">
+                  <span class="col-md-3 text-gray-600 fw-bold fs-6" 
+                        (click)="viewItem(item.P1,item); $event.preventDefault()">
+                    {{ item.P2 }}
+                  </span>
+                </td>
+                
+                <td class="text-start wrap-text">
                   <span class="text-gray-600 fw-bold fs-6" (click)="viewItem(item.P1,item); $event.preventDefault()">{{ item.P3 }}</span>
                 </td>
-                <td class="text-start">
+                <td class="text-start wrap-text">
                   <span class="text-gray-600 fw-bold fs-6" style="padding-left: 5px;" (click)="viewItem(item.P1,item); $event.preventDefault()">
                     {{ convertToIST(item.P4) }}
                   </span>
                 </td>
-                <td class="text-start">
+                <td class="text-start wrap-text">
                   <span class="text-gray-600 fw-bold fs-6" (click)="viewItem(item.P1,item); $event.preventDefault()">
                     {{ convertToIST(item.P5) }}
                   </span>
@@ -681,35 +725,7 @@
                     (click)="togglePin(item)">
                     <i [ngClass]="pinnedItems.get(item.P1) ? 'bi bi-pin-fill fs-2 text-primary' : 'bi bi-pin fs-2 text-muted'"></i>
                   </button>
-                  
-                  
-                  
-             
-                    
-              
-                    
-         
-
-                    <!-- <div class="dropdown">
-                      <button 
-                        [matMenuTriggerFor]="menu"
-                        class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px">
-                        <i class="fa fa-chevron-down" style="color: var(--bs-body-color);"></i>
-                      </button>
-                    
-                      <mat-menu #menu="matMenu" class="mat-elevation-z4">
-                        <button mat-menu-item (click)="handlePin(item)">
-                          <i class="bi bi-pin fs-4"></i>
-                          <span>Pin</span>
-                        </button>
-                        <button mat-menu-item (click)="handleUnpin(item)">
-                          <i class="bi bi-pin-angle fs-4"></i> 
-                          <span>UnPin</span>
-                        </button>
-                      </mat-menu>
-                    </div> -->
-                    
-                    
+           
              
                   </td>
                   
@@ -942,10 +958,19 @@
   <ng-template #content let-modal>
 
     <div class="modal-content p-9">
+  
+
       <div class="modal-header">
         <h4 class="modal-title">Summary Configuration</h4>
-        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        <div class="d-flex align-items-center position-relative ms-auto">
+          <app-keenicon name="magnifier" class="fs-3 position-absolute ms-2"></app-keenicon>
+          <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12" placeholder="Search Dashboards">
+        </div>
+        <button type="button" class="btn-close ms-3" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
       </div>
+      
+ 
+
       <div class="modal-body">
         <div class="card-body pt-0">
           <app-crud-summary
@@ -963,6 +988,7 @@
           <table #dataTable class="table table-striped table-bordered"></table>
         </div>
       </div>
+      
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
       </div>
@@ -1519,7 +1545,7 @@
             <div class="col-md-6">
               <!-- Bar Chart Button -->
               <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7" style="border: 0px; display: block; width: 100%;">
-                <div id="pieChart1" style="width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;" 
+                <div id="pieChartOfficial" style="width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;" 
                 (click)="openpieChartModal(pieChartModal, modal)">
                 </div>
               </button>
@@ -1533,6 +1559,14 @@
               </button>
             </div>
 
+
+
+
+
+
+
+
+            <!-- gaugeChart -->
             
             <!-- <div class="col-md-6">
        
@@ -1545,6 +1579,17 @@
 
 
   
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <!-- Bar Chart Button -->
+              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7" style="border: 0px; display: block; width: 100%;">
+                <div id="DailChart" style="width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;" 
+                (click)="opengaugeChartModal(gaugeChartModal, modal)">
+                </div>
+              </button>
+            </div>
           </div>
 
 
@@ -1967,6 +2012,31 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   
   <!-- Modal Footer -->
   <div class="modal-footer">
+
+<!-- Button to Download Dashboard -->
+<button *ngIf="selectedTab === 'add-dashboard' && showModal" 
+        [ngbTooltip]="'Download Dashboard In Json Format'" 
+        type="button" class="btn fw-bold btn-translateyr" 
+        (click)="fetchSummaryDashboardConfig(routeId)" 
+        style="background-color: #ff6f1e; color: white;">
+  Download Dashboard
+</button>
+
+<!-- Button to trigger file selection for Import Dashboard -->
+<button *ngIf="selectedTab === 'add-dashboard' && showModal"  
+        [ngbTooltip]="'Import Dashboard In Json Format'" 
+        type="button" class="btn fw-bold btn-success" 
+        (click)="fileInput.click()">
+  Import Dashboard
+</button>
+
+
+<!-- Hidden file input -->
+<input #fileInput type="file" style="display: none;" (change)="onFileSelectedfromSystem($event)" />
+
+
+
+    
     <!-- <button type="button" class="btn btn-danger" (click)="modal.dismiss()">Cancel</button> -->
     
     <!-- Conditionally display the Save button for Add Summary -->
@@ -2545,6 +2615,13 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
     ></app-nested-table>
   </ng-template>
 
+
+  <ng-template #miniTableView let-modal>
+    <app-mini-table-view-tile1
+    [miniTableData]="miniTableData" [emitEvent]="emitEvent" [SK_clientID]="SK_clientID" [FormNameMini]="FormNameMini"
+    ></app-mini-table-view-tile1>
+  </ng-template>
+
   <ng-template #dataTableModal let-modal>
     <app-data-table-show
     [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"  (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
@@ -2577,6 +2654,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   [all_Packet_store]="all_Packet_store"
   [storeDrillDown]="storeDrillDown"
   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
+  (sendFormNameForMini)="helperForName($event)"
 
     ></app-data-table-tile1>
   </ng-template>
@@ -2639,6 +2717,14 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   <ng-template #ProgressTileModal let-modal >
   
     <app-progress-tile  [dashboard]="dashboard" (dashboardChange)="getGridDetails2($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver2($event)" ></app-progress-tile>
+  
+  </ng-template>
+
+
+
+  <ng-template #gaugeChartModal let-modal >
+  
+    <app-gauge-chart-config  [dashboard]="dashboard" (dashboardChange)="getGridDetails2($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver2($event)" ></app-gauge-chart-config>
   
   </ng-template>
   </div>

@@ -230,20 +230,19 @@
                   ></ngx-select>
                   </div> -->
           
-                  <div class="col-md-4 mb-3">
+                  <!-- <div class="col-md-4 mb-3">
                   <label for="timeInput" class="col-createChart-label fw-bold fs-6 ">From Time</label>
 <input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"     formControlName="selectFromTime">
                   </div>
                   <div class="col-md-4 mb-3">
                     <label for="timeInput" class="col-createChart-label fw-bold fs-6 ">To Time</label>
   <input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"     formControlName="selectToTime">
-                    </div>
+                    </div> -->
 
 
                     <div class="col-md-4 mb-3">
                       <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Module Names</label>
                       <ngx-select
-                    
                         [allowClear]="true"
                         formControlName="ModuleNames"
                         [items]="showModuleNames"
@@ -251,17 +250,16 @@
                         optionTextField="text"
                         placeholder="Select Parameter"
                         (selectionChanges)="moduleSelection($event)"
-                    
-                        style="width: 100%;">
+                        style="width: 100%;"
+                      >
                       </ngx-select>
                     </div>
 
 
 
-                    <div  class="col-md-4 mb-3">
+                    <div *ngIf="createKPIWidget.controls.selectType.value !== 'drill down'" class="col-md-4 mb-3">
                       <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Redirect To</label>
                       <ngx-select
-                     
                         [allowClear]="true"
                         formControlName="dashboardIds"
                         [items]="dynamicIDArray"
@@ -269,15 +267,15 @@
                         optionTextField="text"
                         placeholder="Select Parameter"
                         (selectionChanges)="dynamicRedirectChanged($event)"
-                    
-                        style="width: 100%;">
+                        style="width: 100%;"
+                      >
                       </ngx-select>
                     </div>
                     <div class="row g-3 align-items-center">
                       <!-- Select Type -->
 <!-- Select Type -->
 <!-- Select Type -->
-<div *ngIf="isSummaryDashboardSelected" class="col-md-4">
+<div *ngIf="isSummaryDashboardSelected && createKPIWidget.controls.ModuleNames.value === 'Summary Dashboard'" class="col-md-4">
   <div class="d-flex flex-column">
     <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Select Redirection Type</label>
     <ngx-select
@@ -293,6 +291,23 @@
     </ngx-select>
   </div>
 </div>
+
+<!-- Conditionally display this block based on selected Redirection Type -->
+<!-- <div *ngIf="createKPIWidget.controls.selectType.value !== 'drill down'" class="col-md-4 mb-3">
+  <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Redirect To</label>
+  <ngx-select
+    [allowClear]="true"
+    formControlName="dashboardIds"
+    [items]="dynamicIDArray"
+    optionValueField="value"
+    optionTextField="text"
+    placeholder="Select Parameter"
+    (selectionChanges)="dynamicRedirectChanged($event)"
+    style="width: 100%;"
+  >
+  </ngx-select>
+</div> -->
+
 
 <!-- Column Visibility (Shown only if 'drill down' is selected) -->
 <div class="col-md-4" style="margin-top:30px;" *ngIf="showColumnVisibility">
@@ -749,7 +764,7 @@
       
           </div>
       
-          <div class="modal-footer" style="margin-top: 20px;">
+          <div class="modal-footer" style="margin-top:200px">
             <button type="button" class="btn btn-secondary" (click)="modal.dismiss()"  >Discard</button>
             <button 
             type="button" 

@@ -580,8 +580,8 @@ export class Tile1ConfigComponent implements OnInit {
 
         rowData:this.createKPIWidget.value.rowData || '',
         ModuleNames:this.createKPIWidget.value.ModuleNames,
-        selectFromTime: this.createKPIWidget.value.selectFromTime,
-        selectToTime: this.createKPIWidget.value.selectToTime,
+        selectFromTime: this.createKPIWidget.value.selectFromTime ||'',
+        selectToTime: this.createKPIWidget.value.selectToTime ||'',
         formatType: this.createKPIWidget.value.formatType,
  
         noOfParams: this.noOfParams || 0,
@@ -700,8 +700,8 @@ export class Tile1ConfigComponent implements OnInit {
         themeColor: this.createKPIWidget.value.themeColor,
         fontSize: `${this.createKPIWidget.value.fontSize}px`,
         fontColor: this.createKPIWidget.value.fontColor ||'#040101',
-        selectFromTime: this.createKPIWidget.value.selectFromTime,
-        selectToTime: this.createKPIWidget.value.selectToTime,
+        selectFromTime: this.createKPIWidget.value.selectFromTime ||'',
+        selectToTime: this.createKPIWidget.value.selectToTime ||'',
         dashboardIds: this.createKPIWidget.value.dashboardIds ||'',
         selectType: this.createKPIWidget.value.selectType ||'',
         filterParameter: this.createKPIWidget.value.filterParameter,
@@ -1514,52 +1514,52 @@ getFormControlValue(selectedTextConfi:any): void {
   this.fetchDynamicFormDataConfig(selectedTextConfi);
 }
 
-fetchDynamicFormDataConfig(value: any) {
-  console.log("Data from lookup:", value);
+// fetchDynamicFormDataConfig(value: any) {
+//   console.log("Data from lookup:", value);
 
-  this.api
-    .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
-    .then((result: any) => {
-      if (result && result.metadata) {
-        const parsedMetadata = JSON.parse(result.metadata);
-        console.log('parsedMetadata check dynamic',parsedMetadata)
-        const formFields = parsedMetadata.formFields;
-        console.log('formFields check',formFields)
+//   this.api
+//     .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
+//     .then((result: any) => {
+//       if (result && result.metadata) {
+//         const parsedMetadata = JSON.parse(result.metadata);
+//         console.log('parsedMetadata check dynamic',parsedMetadata)
+//         const formFields = parsedMetadata.formFields;
+//         console.log('formFields check',formFields)
 
-        // Initialize the list with formFields labels
-        this.columnVisisbilityFields = formFields.map((field: any) => {
-          console.log('field check',field)
-          return {
-            value: field.name,
-            text: field.label
-          };
-        });
+//         // Initialize the list with formFields labels
+//         this.columnVisisbilityFields = formFields.map((field: any) => {
+//           console.log('field check',field)
+//           return {
+//             value: field.name,
+//             text: field.label
+//           };
+//         });
 
-        // Include created_time and updated_time
-        if (parsedMetadata.created_time) {
-          this.columnVisisbilityFields.push({
-            value: parsedMetadata.created_time.toString(),
-            text: 'Created Time' // You can customize the label here if needed
-          });
-        }
+//         // Include created_time and updated_time
+//         if (parsedMetadata.created_time) {
+//           this.columnVisisbilityFields.push({
+//             value: parsedMetadata.created_time.toString(),
+//             text: 'Created Time' // You can customize the label here if needed
+//           });
+//         }
 
-        if (parsedMetadata.updated_time) {
-          this.columnVisisbilityFields.push({
-            value: parsedMetadata.updated_time.toString(),
-            text: 'Updated Time' // You can customize the label here if needed
-          });
-        }
+//         if (parsedMetadata.updated_time) {
+//           this.columnVisisbilityFields.push({
+//             value: parsedMetadata.updated_time.toString(),
+//             text: 'Updated Time' // You can customize the label here if needed
+//           });
+//         }
 
-        console.log('Transformed dynamic parameters config', this.columnVisisbilityFields);
+//         console.log('Transformed dynamic parameters config', this.columnVisisbilityFields);
 
-        // Trigger change detection to update the view
-        this.cdr.detectChanges();
-      }
-    })
-    .catch((err) => {
-      console.log("Can't fetch", err);
-    });
-}
+//         // Trigger change detection to update the view
+//         this.cdr.detectChanges();
+//       }
+//     })
+//     .catch((err) => {
+//       console.log("Can't fetch", err);
+//     });
+// }
 
 
 
@@ -1579,6 +1579,70 @@ fetchDynamicFormDataConfig(value: any) {
   //     this.shouldShowProcessedValue = true; // Show Processed Value field
   //   }
   // }
+
+
+
+
+
+
+  fetchDynamicFormDataConfig(value: any) {
+    console.log("Data from lookup:", value);
+  
+    this.api
+      .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
+      .then((result: any) => {
+        if (result && result.metadata) {
+          const parsedMetadata = JSON.parse(result.metadata);
+          console.log('parsedMetadata check dynamic', parsedMetadata);
+          const formFields = parsedMetadata.formFields;
+          console.log('formFields check', formFields);
+  
+          // Initialize the list with formFields labels, filtering out "heading" type and "Empty Placeholder"
+          this.columnVisisbilityFields = formFields
+            .filter((field: any) => {
+              // Filter out fields with type "heading" or with an empty placeholder
+              return field.type !== "heading" && field.type !== 'Empty Placeholder';
+            })
+            .map((field: any) => {
+              console.log('field check', field);
+              return {
+                value: field.name,
+                text: field.label
+              };
+            });
+  
+          // Include created_time and updated_time if available
+          if (parsedMetadata.created_time) {
+            this.columnVisisbilityFields.push({
+              value: parsedMetadata.created_time.toString(),
+              text: 'Created Time' // You can customize the label here if needed
+            });
+          }
+  
+          if (parsedMetadata.updated_time) {
+            this.columnVisisbilityFields.push({
+              value: parsedMetadata.updated_time.toString(),
+              text: 'Updated Time' // You can customize the label here if needed
+            });
+          }
+          if (parsedMetadata.updated_time) {
+            this.columnVisisbilityFields.push({
+              value: `dynamic_table_values`,
+              text: 'Dynamic Table Values' // You can customize the label here if needed
+            });
+            
+          }
+          console.log('Transformed dynamic parameters config', this.columnVisisbilityFields);
+  
+          // Trigger change detection to update the view
+          this.cdr.detectChanges();
+        }
+      })
+      .catch((err) => {
+        console.log("Can't fetch", err);
+      });
+  }
+  
   
   onMouseEnter(): void {
     this.isHovered = true;
@@ -1599,8 +1663,21 @@ fetchDynamicFormDataConfig(value: any) {
           console.log('formFields check',formFields)
 
           // Initialize the list with formFields labels
-          this.listofDynamicParam = formFields.map((field: any) => {
-            console.log('field check',field)
+          // this.listofDynamicParam = formFields.map((field: any) => {
+          //   console.log('field check',field)
+          //   return {
+          //     value: field.name,
+          //     text: field.label
+          //   };
+          // });
+
+          this.listofDynamicParam = formFields
+          .filter((field: any) => {
+            // Filter out fields with type "heading" or with an empty placeholder
+            return field.type !== "heading" && field.type !== 'Empty Placeholder';
+          })
+          .map((field: any) => {
+            console.log('field check', field);
             return {
               value: field.name,
               text: field.label
@@ -1621,6 +1698,8 @@ fetchDynamicFormDataConfig(value: any) {
               text: 'Updated Time' // You can customize the label here if needed
             });
           }
+
+
 
           console.log('Transformed dynamic parameters:', this.listofDynamicParam);
 
@@ -2268,6 +2347,7 @@ showModuleNames = [
     this.isSummaryDashboardSelected = true;
   } else {
     this.isSummaryDashboardSelected = false;
+    this.createKPIWidget.controls.selectType.setValue('');
   }
   console.log('selectedValue checking',selectedValue)
   switch (selectedValue) {

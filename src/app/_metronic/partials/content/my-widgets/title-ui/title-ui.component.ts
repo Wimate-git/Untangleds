@@ -19,6 +19,8 @@ export class TitleUiComponent {
   @Input() hidingLink:any;
   @Input() isFullscreen: boolean = false; 
   @Input () hideButton:any
+  @Input() titleHeight:any
+  @Input() titleWidth:any
 
 
   ngOnChanges(changes: SimpleChanges): void {

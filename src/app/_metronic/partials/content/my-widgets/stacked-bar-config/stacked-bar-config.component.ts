@@ -243,6 +243,7 @@ export class StackedBarConfigComponent {
       dataLabelFontColor:[''],
       chartBackgroundColor1:[''],
       chartBackgroundColor2:[''],
+      ChartTypeSelection:['bar']
       // multiColorCheck: [true]
     });
   
@@ -250,6 +251,11 @@ export class StackedBarConfigComponent {
     this.createChart.get('DrillDownType')?.valueChanges.subscribe(() => {
       this.updateDrillFields();
     });
+
+    this.createChart.get('ChartTypeSelection')?.valueChanges.subscribe((selectedChartType: string) => {
+      this.updateChartType(selectedChartType);
+    });
+
   
     // Subscribe to add_fields changes
     this.createChart.get('add_fields')?.valueChanges.subscribe((val: any) => {
@@ -279,6 +285,17 @@ export class StackedBarConfigComponent {
     this.fetchDynamicFormDataConfig(selectedTextConfi);
   }
 
+  updateChartType(selectedChartType: string): void {
+    this.defaultHighchartsOptionsJson.chart.type = selectedChartType;
+  
+    // Reinitialize or update the chart here
+    // For example, if you're using Highcharts to render the chart:
+    this.createChart.patchValue({
+      highchartsOptionsJson: JSON.stringify(this.defaultHighchartsOptionsJson, null, 4)
+    });
+    Highcharts.chart('chartContainer', this.defaultHighchartsOptionsJson);
+  }
+  
   fetchDynamicFormDataConfig(value: any) {
     console.log("Data from lookup:", value);
 
@@ -292,8 +309,20 @@ export class StackedBarConfigComponent {
           console.log('formFields check',formFields)
 
           // Initialize the list with formFields labels
-          this.columnVisisbilityFields = formFields.map((field: any) => {
-            console.log('field check',field)
+          // this.columnVisisbilityFields = formFields.map((field: any) => {
+          //   console.log('field check',field)
+          //   return {
+          //     value: field.name,
+          //     text: field.label
+          //   };
+          // });
+          this.columnVisisbilityFields = formFields
+          .filter((field: any) => {
+            // Filter out fields with type "heading" or with an empty placeholder
+            return field.type !== "heading" && field.type !== 'Empty Placeholder';
+          })
+          .map((field: any) => {
+            console.log('field check', field);
             return {
               value: field.name,
               text: field.label
@@ -421,7 +450,10 @@ export class StackedBarConfigComponent {
     });
   }
 
-
+  chartTypeOptions=[    
+    { value: 'bar', text: ' Bar' },
+    { value: 'column', text: 'Column' },
+   ]
       
   getFormArrayControls(field: AbstractControl | null): AbstractControl[] {
     if (field) {
@@ -446,11 +478,18 @@ export class StackedBarConfigComponent {
           const parsedMetadata = JSON.parse(result.metadata);
           const formFields = parsedMetadata.formFields;
 
-          // Prepare parameter list
-          const dynamicParamList = formFields.map((field: any) => ({
-            value: field.name,
-            text: field.label,
-          }));
+          const dynamicParamList  = formFields
+          .filter((field: any) => {
+            // Filter out fields with type "heading" or with an empty placeholder
+            return field.type !== "heading" && field.type !== 'Empty Placeholder';
+          })
+          .map((field: any) => {
+            console.log('field check', field);
+            return {
+              value: field.name,
+              text: field.label
+            };
+          });
 
           // Add created_time and updated_time
           if (parsedMetadata.created_time) {
@@ -564,13 +603,92 @@ export class StackedBarConfigComponent {
     }
   }
 
+  // addControls(event: any, _type: string) {
+  //   const getConfigCount =this.createChart.get('add_fields')?.value
+  //   console.log('getConfigCount checking',getConfigCount)
+  //   console.log('event check', event);
+  
+  //   let noOfParams: any = '';
+  
+  //   if (_type === 'html' && event && event.target) {
+  //     if (event.target.value >= 0) {
+  //       noOfParams = JSON.parse(event.target.value);
+  //     } else {
+  //       return this.toast.open("Negative values not allowed", "Check again", {
+  //         duration: 5000,
+  //         horizontalPosition: 'right',
+  //         verticalPosition: 'top',
+  //       });
+  //     }
+  //   } else if (_type === 'ts') {
+  //     if (event >= 0) {
+  //       noOfParams = event;
+  //     }
+  //   }
+  //   console.log('noOfParams check', noOfParams);
+  
+  //   // Update all_fields based on noOfParams
+  //   if (this.createChart.value.all_fields.length < noOfParams) {
+  //     const firstFieldValues = this.getFormArrayValues();
+  //     for (let i = this.all_fields.length; i < noOfParams; i++) {
+  //       const newGroup = this.fb.group({
+  //         formlist: [ firstFieldValues.formlist || '', Validators.required],
+  //         parameterName: [ firstFieldValues.parameterName || '', Validators.required],
+
+  //         primaryValue: [firstFieldValues.primaryValue || '', Validators.required],
+  //         groupByFormat: [firstFieldValues.groupByFormat || '', Validators.required],
+
+   
+  //         selectedRangeType: [firstFieldValues.selectedRangeType || '', Validators.required], 
+  //         columnVisibility:[firstFieldValues.columnVisibility || []],
+
+  //         formatType:[firstFieldValues.formatType || '', Validators.required],
+  //         undefinedCheckLabel:[firstFieldValues.undefinedCheckLabel || ''],
+  //         custom_Label:[firstFieldValues.custom_Label || '', Validators.required],
+  //         XaxisFormat:[firstFieldValues.XaxisFormat || ''],
+  //         drillTypeFields:[firstFieldValues.drillTypeFields || []],
+  //         drillTypeCustomLable:[firstFieldValues.drillTypeCustomLable || ''],
+  //         // selectFromTime: [''],
+  //         // selectToTime: [''],
+  //         parameterValue:[''],
+  //         constantValue: [''],
+  //         processed_value: ['234567'],
+  //         rowData:[''],
+  //         selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
+
+  //         filterParameter:[[]],
+  //         filterDescription:[''],
+   
+  //         CustomColumnColor:['']
+       
+  //       })
+  //       this.all_fields.push(newGroup);
+  //       console.log('this.all_fields check', this.all_fields);
+  
+  //       // After adding a new form group, subscribe to value changes
+  //       this.subscribeToValueChanges(i);
+  //       console.log('this.all_fields check', this.all_fields);
+  //       console.log('this.all_fields check', this.all_fields);
+  //     }
+  //   } else {
+  //     if (noOfParams !== "" && noOfParams !== undefined && noOfParams !== null) {
+  //       for (let i = this.all_fields.length; i >= noOfParams; i--) {
+  //         this.all_fields.removeAt(i);
+  //       }
+  //     }
+  //   }
+  
+  //   // Update noOfParams for use in addTile
+  //   this.noOfParams = noOfParams;
+  // }
+
+
   addControls(event: any, _type: string) {
-    const getConfigCount =this.createChart.get('add_fields')?.value
-    console.log('getConfigCount checking',getConfigCount)
     console.log('event check', event);
   
-    let noOfParams: any = '';
+    let noOfParams: number = 0; // Default to 0 to handle edge cases
   
+    // Handle HTML type event
     if (_type === 'html' && event && event.target) {
       if (event.target.value >= 0) {
         noOfParams = JSON.parse(event.target.value);
@@ -581,60 +699,58 @@ export class StackedBarConfigComponent {
           verticalPosition: 'top',
         });
       }
-    } else if (_type === 'ts') {
+    } else if (_type === 'ts') { // Handle TypeScript event
       if (event >= 0) {
         noOfParams = event;
       }
     }
+  
     console.log('noOfParams check', noOfParams);
   
-    // Update all_fields based on noOfParams
-    if (this.createChart.value.all_fields.length < noOfParams) {
+    // If the current form array has fewer items than noOfParams, add new controls
+    if (this.all_fields.length < noOfParams) {
       for (let i = this.all_fields.length; i < noOfParams; i++) {
+        // Access the first field value safely or use defaults if the array is empty
+        const firstFieldValues = this.all_fields.length > 0 ? this.all_fields.at(0).value : {};
+        
         this.all_fields.push(
           this.fb.group({
-            formlist: ['', Validators.required],
-            parameterName: [[], Validators.required],
-            // groupBy: ['', Validators.required],
-            primaryValue: ['', Validators.required],
-            groupByFormat: ['', Validators.required],
+            formlist: [firstFieldValues.formlist || '', Validators.required],
+            parameterName: [firstFieldValues.parameterName || [], Validators.required],
+            primaryValue: [firstFieldValues.primaryValue || '', Validators.required],
+            groupByFormat: [firstFieldValues.groupByFormat || '', Validators.required],
             constantValue: [''],
             processed_value: ['234567'],
             selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
-     
-            selectedRangeType: ['',Validators.required],
+            selectedRangeType: [firstFieldValues.selectedRangeType || '', Validators.required],
             selectFromTime: [''],
             selectToTime: [''],
-            parameterValue:[''],
-            columnVisibility:[[]],
-            rowData:[''],
-            formatType:['',Validators.required],
-            undefinedCheckLabel:[''],
-            custom_Label:['',Validators.required],
-            filterParameter:[[]],
-            filterDescription:[''],
-            XaxisFormat:['']
-
-            
-
-       
-
+            parameterValue: [''],
+            columnVisibility: [[]],
+            rowData: [''],
+            formatType: [firstFieldValues.formatType || '', Validators.required],
+            undefinedCheckLabel: [''],
+            custom_Label: [firstFieldValues.custom_Label || '', Validators.required],
+            filterParameter: [[]],
+            filterDescription: [''],
+            XaxisFormat: [''],
+            drillTypeFields: [[]],
+            drillTypeCustomLable: [''],
+            CustomColumnColor: ['']
           })
         );
         console.log('this.all_fields check', this.all_fields);
       }
-    } else {
-      if (noOfParams !== "" && noOfParams !== undefined && noOfParams !== null) {
-        for (let i = this.all_fields.length; i >= noOfParams; i--) {
-          this.all_fields.removeAt(i);
-        }
+    } else if (this.all_fields.length > noOfParams) {
+      // Remove extra fields if the array length is greater than noOfParams
+      for (let i = this.all_fields.length - 1; i >= noOfParams; i--) {
+        this.all_fields.removeAt(i);
       }
     }
-  
-    // Update noOfParams for use in addTile
+
+    // Update noOfParams for future use
     this.noOfParams = noOfParams;
   }
-
   onValue() {
   const getConfigCount = this.createChart.get('add_fields')?.value;
   console.log('getConfigCount checking from oncHange', getConfigCount);
@@ -644,122 +760,438 @@ export class StackedBarConfigComponent {
     return this.createChart.get('all_fields') as FormArray;
   }
 
+  getFormArrayValues() {
+    // Check if form array has at least one element
+    if (this.createChart.value.all_fields.length > 0) {
+      // Get the first form group
+      const firstField = this.createChart.value.all_fields[0];
+  
+      // Extract the desired values from the first form group
+      const formValues = {
+        groupByFormat: firstField.groupByFormat,
+        selectedRangeType: firstField.selectedRangeType,
+        parameterName:firstField.parameterName,
+        formlist:firstField.formlist,
+        formatType:firstField.formatType,
+        custom_Label:firstField.custom_Label,
+        primaryValue:firstField.primaryValue,
+        columnVisibility:firstField.columnVisibility,
+        XaxisFormat:firstField.XaxisFormat,
+        drillTypeFields:firstField.drillTypeFields,
+        drillTypeCustomLable:firstField.drillTypeCustomLable,
+        undefinedCheckLabel:firstField.undefinedCheckLabel
+
+
+
+      };
+  
+      console.log('Extracted values from the first form group:', formValues);
+      return formValues;  // Returning or processing the extracted values
+    } else {
+      console.log('Form array is empty');
+      return { groupByFormat: '', selectedRangeType: '' ,formatType:'',formlist:'',parameterName:'',primaryValue:'',custom_Label:'',columnVisibility:'',undefinedCheckLabel:'',drillTypeCustomLable:'',drillTypeFields:'',XaxisFormat:''};  // Return default empty values
+    }
+  }
+  subscribeToValueChanges(fieldIndex: number) {
+    const group = this.all_fields.at(fieldIndex);
+    
+    // Subscribe to groupByFormat field value changes
+    group.get('groupByFormat')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new groupByFormat value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('groupByFormat')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+  
+    // Subscribe to selectedRangeType field value changes
+    group.get('selectedRangeType')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('selectedRangeType')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+    group.get('formatType')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('formatType')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+
+    group.get('formlist')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('formlist')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+    group.get('parameterName')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('parameterName')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+
+
+
+    group.get('primaryValue')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('primaryValue')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+    group.get('custom_Label')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('custom_Label')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+    group.get('columnVisibility')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('columnVisibility')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+
+    group.get('undefinedCheckLabel')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('undefinedCheckLabel')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+
+
+    group.get('drillTypeCustomLable')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('drillTypeCustomLable')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+
+    group.get('drillTypeFields')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('drillTypeFields')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+
+    group.get('XaxisFormat')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('XaxisFormat')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+
+    
+    
+  }
+
   generateUniqueId(): number {
     this.widgetIdCounter++;
     return Date.now() + this.widgetIdCounter; // Use timestamp and counter for uniqueness
   }
   
 
-  addTile(key: any) {
-    console.log('this.noOfParams check', this.noOfParams);
+//   addTile(key: any) {
+//     console.log('this.noOfParams check', this.noOfParams);
   
-    // Only proceed if the key is 'chart'
-    if (key === 'Stackedchart') {
-      const uniqueId = this.generateUniqueId();
-      console.log('this.createChart.value:', this.createChart.value);  // Log form values for debugging
+//     // Only proceed if the key is 'chart'
+//     if (key === 'Stackedchart') {
+//       const uniqueId = this.generateUniqueId();
+//       console.log('this.createChart.value:', this.createChart.value);  // Log form values for debugging
   
-      // Check for highchartsOptionsJson
-      let highchartsOptionsJson = this.createChart.value.highchartsOptionsJson || {};
+//       // Check for highchartsOptionsJson
+//       let highchartsOptionsJson = this.createChart.value.highchartsOptionsJson || {};
       
-      // Update highchartsOptionsJson
+//       // Update highchartsOptionsJson
 
 
-// If it's stringified, parse it to an object first
-if (typeof highchartsOptionsJson === 'string') {
-  highchartsOptionsJson = JSON.parse(highchartsOptionsJson);
+// // If it's stringified, parse it to an object first
+// if (typeof highchartsOptionsJson === 'string') {
+//   highchartsOptionsJson = JSON.parse(highchartsOptionsJson);
+// }
+
+// // Update the chart options dynamically
+// const updatedHighchartsOptionsJson = {
+//   ...highchartsOptionsJson,
+//   title: {
+//     ...highchartsOptionsJson.title,
+//     text: this.createChart.value.chart_title || ''  // Update the title dynamically
+//   }
+// };
+// console.log('updatedHighchartsOptionsJson check',updatedHighchartsOptionsJson)
+// this.chartFinalOptions =JSON.stringify(updatedHighchartsOptionsJson,null,4)
+// console.log('this.chartFinalOptions check',this.chartFinalOptions)
+    
+  
+//       // Create the new tile object with all the required properties
+//       const newTile = {
+//         id: uniqueId,
+//         x: 0,
+//         y: 0,
+//         rows: 20,
+//         cols: 20,
+//         rowHeight: 100,
+//         colWidth: 100,
+//         fixedColWidth: true,
+//         fixedRowHeight: true,
+//         grid_type: 'Stackedchart',
+  
+//         chart_title: this.createChart.value.chart_title || '',  // Ensure this value exists
+//         fontSize: `${this.createChart.value.fontSize || 16}px`,  // Provide a fallback font size
+//         themeColor: 'var(--bs-body-bg)',  // Default theme color
+//         chartConfig: this.createChart.value.all_fields || [],  // Default to empty array if missing
+//         filterForm: this.createChart.value.filterForm || {},
+//         // filterParameter: this.createChart.value.filterParameter || {},
+//         // filterDescription: this.createChart.value.filterDescription || '',
+//         custom_Label: this.createChart.value.custom_Label || '',
+//         toggleCheck: this.createChart.value.toggleCheck ||'',
+//         dashboardIds: this.createChart.value.dashboardIds||'',
+//         selectType: this.createChart.value.selectType ||'',
+//         miniForm:this.createChart.value.miniForm || '',
+//         MiniTableNames:this.createChart.value.MiniTableNames ||'',
+//         MiniTableFields:this.createChart.value.MiniTableFields ,
+//         minitableEquation:this.createChart.value.minitableEquation,
+//         EquationOperationMini:this.createChart.value.EquationOperationMini,
+//         add_fields:this.createChart.value.add_fields,
+//         DrillConfig:this.createChart.value.drill_fields || [],
+//         DrillDownType:this.createChart.value.DrillDownType ||'',
+//         DrillFilter:this.createChart.value.DrillFilter ||'',
+//         DrillFilterLevel:this.createChart.value.DrillFilterLevel ||'',
+//         dataLabelFontColor:this.createChart.value.dataLabelFontColor,
+//         chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
+//         chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
+//         filterDescription:'',
+//         ChartTypeSelection:this.createChart.value.ChartTypeSelection,
+    
+      
+
+  
+//         highchartsOptionsJson: this.chartFinalOptions,
+//         noOfParams: this.noOfParams || 0,  // Ensure noOfParams has a valid value
+
+//       };
+  
+//       // Log the new tile object to verify it's being created correctly
+//       console.log('New Tile Object:', newTile);
+  
+//       // Initialize dashboard array if it doesn't exist
+//       if (!this.dashboard) {
+//         console.log('Initializing dashboard array');
+//         this.dashboard = [];
+//       }
+  
+//       // Push the new tile to the dashboard array
+//       this.dashboard.push(newTile);
+//       console.log('Updated Dashboard:', this.dashboard);  // Log updated dashboard
+  
+//       // Emit the updated dashboard array
+//       this.grid_details = this.dashboard;
+//       this.dashboardChange.emit(this.grid_details);
+  
+//       // Optionally update the summary if required
+//       if (this.grid_details) {
+//         this.updateSummary('','add_tile');
+//       }
+  
+//       // Optionally reset the form fields after adding the tile
+//       this.createChart.patchValue({
+//         widgetid: uniqueId,
+//         chart_title: '',  // Reset chart title field (or leave it if needed)
+//         highchartsOptionsJson: {},  // Reset chart options (or leave it if needed)
+//       });
+//     }
+//   }
+  
+
+
+addTile(key: any) {
+  console.log('this.noOfParams check', this.noOfParams);
+
+  if (key === 'Stackedchart') {
+    const uniqueId = this.generateUniqueId();
+    console.log('this.createChart.value:', this.createChart.value);
+
+    // Parse highchartsOptionsJson if it's a string
+    let highchartsOptionsJson = this.createChart.value.highchartsOptionsJson || {};
+    if (typeof highchartsOptionsJson === 'string') {
+      highchartsOptionsJson = JSON.parse(highchartsOptionsJson);
+    }
+
+    // Define the click event handler
+    const clickEventHandler = (event: { point: { category: any; series: { name: any }; y: any } }) => {
+      const category = event.point.category;
+      const seriesName = event.point.series.name;
+      const value = event.point.y;
+
+      console.log('check click event for stacked bar chart', event);
+      // Example: Trigger any Angular method here
+      // this.onBarClick(seriesName, category, value);
+    };
+
+    // Update the chart options without attaching the click event handler
+    const updatedHighchartsOptionsJson = {
+      ...highchartsOptionsJson,
+      title: {
+        ...highchartsOptionsJson.title,
+        text: this.createChart.value.chart_title || '',
+      },
+      plotOptions: {
+        ...highchartsOptionsJson.plotOptions,
+        series: {
+          ...highchartsOptionsJson.plotOptions?.series,
+          events: {}, // Leave events empty for now
+        },
+      },
+    };
+
+    console.log('updatedHighchartsOptionsJson check', updatedHighchartsOptionsJson);
+
+    // Stringify the chart options
+    const chartOptionsStringified = JSON.stringify(updatedHighchartsOptionsJson);
+
+    // Create the new tile object
+    const newTile = {
+      id: uniqueId,
+      x: 0,
+      y: 0,
+      rows: 20,
+      cols: 20,
+      rowHeight: 100,
+      colWidth: 100,
+      fixedColWidth: true,
+      fixedRowHeight: true,
+      grid_type: 'Stackedchart',
+      chart_title: this.createChart.value.chart_title || '',
+      fontSize: `${this.createChart.value.fontSize || 16}px`,
+      themeColor: 'var(--bs-body-bg)',
+      chartConfig: this.createChart.value.all_fields || [],
+      filterForm: this.createChart.value.filterForm || {},
+      custom_Label: this.createChart.value.custom_Label || '',
+      toggleCheck: this.createChart.value.toggleCheck || '',
+      dashboardIds: this.createChart.value.dashboardIds || '',
+      selectType: this.createChart.value.selectType || '',
+      miniForm: this.createChart.value.miniForm || '',
+      MiniTableNames: this.createChart.value.MiniTableNames || '',
+      MiniTableFields: this.createChart.value.MiniTableFields,
+      minitableEquation: this.createChart.value.minitableEquation,
+      EquationOperationMini: this.createChart.value.EquationOperationMini,
+      add_fields: this.createChart.value.add_fields,
+      DrillConfig: this.createChart.value.drill_fields || [],
+      DrillDownType: this.createChart.value.DrillDownType || '',
+      DrillFilter: this.createChart.value.DrillFilter || '',
+      DrillFilterLevel: this.createChart.value.DrillFilterLevel || '',
+      dataLabelFontColor: this.createChart.value.dataLabelFontColor,
+      chartBackgroundColor1: this.createChart.value.chartBackgroundColor1,
+      chartBackgroundColor2: this.createChart.value.chartBackgroundColor2,
+      filterDescription: '',
+      ChartTypeSelection: this.createChart.value.ChartTypeSelection,
+      highchartsOptionsJson: chartOptionsStringified, // Store the stringified chart options
+      noOfParams: this.noOfParams || 0,
+    };
+
+    console.log('New Tile Object:', newTile);
+
+    // Initialize dashboard array if it doesn't exist
+    if (!this.dashboard) {
+      console.log('Initializing dashboard array');
+      this.dashboard = [];
+    }
+
+    // Push the new tile to the dashboard array
+    this.dashboard.push(newTile);
+    console.log('Updated Dashboard:', this.dashboard);
+
+    // Emit the updated dashboard array
+    this.grid_details = this.dashboard;
+    this.dashboardChange.emit(this.grid_details);
+
+    // Optionally update the summary if required
+    if (this.grid_details) {
+      this.updateSummary('', 'add_tile');
+    }
+
+    // Optionally reset the form fields after adding the tile
+    this.createChart.patchValue({
+      widgetid: uniqueId,
+      chart_title: '',
+      highchartsOptionsJson: {},
+    });
+
+    // Reattach the click event handler after the tile is added
+    const lastTile = this.dashboard[this.dashboard.length - 1];
+    const parsedOptions = JSON.parse(lastTile.highchartsOptionsJson);
+    parsedOptions.plotOptions.series.events.click = clickEventHandler;
+
+    // Update the tile with the reattached event handler
+    lastTile.highchartsOptionsJson = parsedOptions;
+    console.log('Reattached click event handler:', lastTile.highchartsOptionsJson);
+  }
 }
 
-// Update the chart options dynamically
-const updatedHighchartsOptionsJson = {
-  ...highchartsOptionsJson,
-  title: {
-    ...highchartsOptionsJson.title,
-    text: this.createChart.value.chart_title || ''  // Update the title dynamically
-  }
-};
-console.log('updatedHighchartsOptionsJson check',updatedHighchartsOptionsJson)
-this.chartFinalOptions =JSON.stringify(updatedHighchartsOptionsJson,null,4)
-console.log('this.chartFinalOptions check',this.chartFinalOptions)
-    
-  
-      // Create the new tile object with all the required properties
-      const newTile = {
-        id: uniqueId,
-        x: 0,
-        y: 0,
-        rows: 20,
-        cols: 20,
-        rowHeight: 100,
-        colWidth: 100,
-        fixedColWidth: true,
-        fixedRowHeight: true,
-        grid_type: 'Stackedchart',
-  
-        chart_title: this.createChart.value.chart_title || '',  // Ensure this value exists
-        fontSize: `${this.createChart.value.fontSize || 16}px`,  // Provide a fallback font size
-        themeColor: 'var(--bs-body-bg)',  // Default theme color
-        chartConfig: this.createChart.value.all_fields || [],  // Default to empty array if missing
-        filterForm: this.createChart.value.filterForm || {},
-        // filterParameter: this.createChart.value.filterParameter || {},
-        // filterDescription: this.createChart.value.filterDescription || '',
-        custom_Label: this.createChart.value.custom_Label || '',
-        toggleCheck: this.createChart.value.toggleCheck ||'',
-        dashboardIds: this.createChart.value.dashboardIds||'',
-        selectType: this.createChart.value.selectType ||'',
-        miniForm:this.createChart.value.miniForm || '',
-        MiniTableNames:this.createChart.value.MiniTableNames ||'',
-        MiniTableFields:this.createChart.value.MiniTableFields ,
-        minitableEquation:this.createChart.value.minitableEquation,
-        EquationOperationMini:this.createChart.value.EquationOperationMini,
-        add_fields:this.createChart.value.add_fields,
-        DrillConfig:this.createChart.value.drill_fields || [],
-        DrillDownType:this.createChart.value.DrillDownType ||'',
-        DrillFilter:this.createChart.value.DrillFilter ||'',
-        DrillFilterLevel:this.createChart.value.DrillFilterLevel ||'',
-        dataLabelFontColor:this.createChart.value.dataLabelFontColor,
-        chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
-        chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
-        filterDescription:'',
-    
-      
 
-  
-        highchartsOptionsJson: this.chartFinalOptions,
-        noOfParams: this.noOfParams || 0,  // Ensure noOfParams has a valid value
 
-      };
-  
-      // Log the new tile object to verify it's being created correctly
-      console.log('New Tile Object:', newTile);
-  
-      // Initialize dashboard array if it doesn't exist
-      if (!this.dashboard) {
-        console.log('Initializing dashboard array');
-        this.dashboard = [];
-      }
-  
-      // Push the new tile to the dashboard array
-      this.dashboard.push(newTile);
-      console.log('Updated Dashboard:', this.dashboard);  // Log updated dashboard
-  
-      // Emit the updated dashboard array
-      this.grid_details = this.dashboard;
-      this.dashboardChange.emit(this.grid_details);
-  
-      // Optionally update the summary if required
-      if (this.grid_details) {
-        this.updateSummary('','add_tile');
-      }
-  
-      // Optionally reset the form fields after adding the tile
-      this.createChart.patchValue({
-        widgetid: uniqueId,
-        chart_title: '',  // Reset chart title field (or leave it if needed)
-        highchartsOptionsJson: {},  // Reset chart options (or leave it if needed)
-      });
-    }
-  }
-  
+
+
+
   
   onFontColorChange(event: Event): void {
     const color = (event.target as HTMLInputElement).value;
@@ -825,6 +1257,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     dataLabelFontColor:this.createChart.value.dataLabelFontColor,
     chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
     chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
+    ChartTypeSelection:this.createChart.value.ChartTypeSelection,
 
     // filterForm:this.createChart.value.filterForm,
     // filterParameter:this.createChart.value.filterParameter,
@@ -952,15 +1385,129 @@ themes = [
 ];
 
 
+// openStackedChartModal(tile: any, index: number) {
+//   console.log('Index checking:', index); // Log the index
+
+//   if (tile) {
+//     this.selectedTile = tile;
+//     this.editTileIndex = index ?? null;
+//     this.paramCount = tile.noOfParams;
+//     this.highchartsOptionsJson = JSON.parse(tile.highchartsOptionsJson);
+
+//     const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14;
+
+//     let parsedFilterParameter = [];
+//     try {
+//       parsedFilterParameter = tile.filterParameterLine ? JSON.parse(tile.filterParameterLine) : [];
+//     } catch (error) {
+//       console.error('Error parsing filterParameter:', error);
+//     }
+
+//     let parsedMiniTableFields = [];
+//     try {
+//       parsedMiniTableFields = typeof tile.MiniTableFields === 'string'
+//         ? JSON.parse(tile.MiniTableFields)
+//         : tile.MiniTableFields;
+//     } catch (error) {
+//       console.error('Error parsing MiniTableFields:', error);
+//     }
+
+//     // ✅ Initialize form group and valueChanges
+//     this.initializeTileFields();
+
+//     // ✅ Now patch values into the form
+//     this.createChart.patchValue({
+//       add_fields: tile.add_fields,
+//       chart_title: tile.chart_title,
+//       highchartsOptionsJson: JSON.stringify(this.highchartsOptionsJson, null, 4),
+//       custom_Label: tile.custom_Label,
+//       fontSize: fontSizeValue,
+//       filterDescription: tile.filterDescription,
+//       filterForm: tile.filterForm,
+//       filterFormList: tile.filterFormList,
+//       filterParameterLine: parsedFilterParameter,
+//       miniForm: tile.miniForm || '',
+//       MiniTableNames: tile.MiniTableNames || '',
+//       MiniTableFields: parsedMiniTableFields,
+//       minitableEquation: tile.minitableEquation,
+//       EquationOperationMini: tile.EquationOperationMini,
+//       dashboardIds: tile.dashboardIds,
+//       toggleCheck: tile.toggleCheck,
+//       selectType: tile.selectType,
+//       DrillDownType: tile.DrillDownType,
+//       multiColorCheck:tile.multiColorCheck,
+//       dataLabelFontColor:tile.dataLabelFontColor,
+//       chartBackgroundColor1:tile.chartBackgroundColor1,
+//       chartBackgroundColor2:tile.chartBackgroundColor2,
+//       ChartTypeSelection:tile.ChartTypeSelection
+//     });
+
+//     // ✅ Populate all_fields and drill_fields separately
+//     this.all_fields.clear(); // Clear existing FormArray
+//     const populatedAllFields = this.repopulate_fields(tile);
+//     // populatedAllFields.controls.forEach(control => this.all_fields.push(control));
+
+//     this.drill_fields.clear(); // Clear existing FormArray
+//     const populatedDrillFields = this.repopulateDrill_fields(tile);
+//     populatedDrillFields.controls.forEach(control => this.drill_fields.push(control));
+
+//     // ✅ Manually trigger addControls and updateDrillFields once
+//     const fakeEvent = { target: { value: tile.add_fields } };
+//     this.addControls(fakeEvent, 'html');
+//     this.updateDrillFields();
+
+//     this.isEditMode = true;
+//   } else {
+//     this.selectedTile = null;
+//     this.isEditMode = false;
+//     this.createChart.reset();
+//   }
+
+//   this.cdr.detectChanges();
+// }
+
 openStackedChartModal(tile: any, index: number) {
-  console.log('Index checking:', index); // Log the index
+  console.log('Index checking:', index);
 
   if (tile) {
     this.selectedTile = tile;
     this.editTileIndex = index ?? null;
     this.paramCount = tile.noOfParams;
-    this.highchartsOptionsJson = JSON.parse(tile.highchartsOptionsJson);
 
+    // Step 1: Parse the highchartsOptionsJson from the tile
+    let parsedHighchartsOptionsJson;
+    try {
+      parsedHighchartsOptionsJson = JSON.parse(tile.highchartsOptionsJson);
+    } catch (error) {
+      console.error('Error parsing highchartsOptionsJson:', error);
+      return;
+    }
+
+    // Step 2: Type assertion to tell TypeScript this is an object with `plotOptions` (for access)
+    const highchartsOptionsJson = parsedHighchartsOptionsJson as { 
+      plotOptions: { series: { events: { click: Function } } };
+    };
+
+    // Step 3: Check if `plotOptions` and `series` exist before trying to add the event handler
+    if (highchartsOptionsJson?.plotOptions?.series) {
+      // Step 4: Reattach the event handler
+      const clickEventHandler = function (event: { point: { category: any; series: { name: any; }; y: any; }; }) {
+        const category = event.point.category;
+        const seriesName = event.point.series.name;
+        const value = event.point.y;
+        console.log('check click event for stacked bar chart', event);
+      };
+
+      // Reattach the click event handler
+      highchartsOptionsJson.plotOptions.series.events = {
+        click: clickEventHandler
+      };
+    } else {
+      console.error('Invalid structure for plotOptions or series.');
+      return;
+    }
+
+    // Step 5: Proceed with setting up the form and other operations
     const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14;
 
     let parsedFilterParameter = [];
@@ -979,14 +1526,14 @@ openStackedChartModal(tile: any, index: number) {
       console.error('Error parsing MiniTableFields:', error);
     }
 
-    // ✅ Initialize form group and valueChanges
+    // Initialize form group and valueChanges
     this.initializeTileFields();
 
-    // ✅ Now patch values into the form
+    // Patch the values into the form
     this.createChart.patchValue({
       add_fields: tile.add_fields,
       chart_title: tile.chart_title,
-      highchartsOptionsJson: JSON.stringify(this.highchartsOptionsJson, null, 4),
+      highchartsOptionsJson: JSON.stringify(highchartsOptionsJson, null, 4),
       custom_Label: tile.custom_Label,
       fontSize: fontSizeValue,
       filterDescription: tile.filterDescription,
@@ -1002,22 +1549,21 @@ openStackedChartModal(tile: any, index: number) {
       toggleCheck: tile.toggleCheck,
       selectType: tile.selectType,
       DrillDownType: tile.DrillDownType,
-      multiColorCheck:tile.multiColorCheck,
-      dataLabelFontColor:tile.dataLabelFontColor,
-      chartBackgroundColor1:tile.chartBackgroundColor1,
-      chartBackgroundColor2:tile.chartBackgroundColor2
+      multiColorCheck: tile.multiColorCheck,
+      dataLabelFontColor: tile.dataLabelFontColor,
+      chartBackgroundColor1: tile.chartBackgroundColor1,
+      chartBackgroundColor2: tile.chartBackgroundColor2,
+      ChartTypeSelection: tile.ChartTypeSelection
     });
 
-    // ✅ Populate all_fields and drill_fields separately
+    // Populate fields and drill fields
     this.all_fields.clear(); // Clear existing FormArray
     const populatedAllFields = this.repopulate_fields(tile);
-    // populatedAllFields.controls.forEach(control => this.all_fields.push(control));
-
     this.drill_fields.clear(); // Clear existing FormArray
     const populatedDrillFields = this.repopulateDrill_fields(tile);
     populatedDrillFields.controls.forEach(control => this.drill_fields.push(control));
 
-    // ✅ Manually trigger addControls and updateDrillFields once
+    // Manually trigger addControls and updateDrillFields
     const fakeEvent = { target: { value: tile.add_fields } };
     this.addControls(fakeEvent, 'html');
     this.updateDrillFields();
@@ -1031,6 +1577,7 @@ openStackedChartModal(tile: any, index: number) {
 
   this.cdr.detectChanges();
 }
+
 
 
 
@@ -1168,8 +1715,8 @@ repopulate_fields(getValues: any): FormArray {
           groupByFormat: [configItem.groupByFormat || '', Validators.required],
           constantValue: [configItem.constantValue || ''],
           selectedRangeType: [configItem.selectedRangeType || '', Validators.required],
-          selectFromTime: [configItem.selectFromTime || ''],
-          selectToTime: [configItem.selectToTime || ''],
+          // selectFromTime: [configItem.selectFromTime || ''],
+          // selectToTime: [configItem.selectToTime || ''],
           parameterValue: [configItem.parameterValue || ''],
           columnVisibility: this.fb.control(columnVisibility),
           filterParameter: this.fb.control(filterParameterValue),
@@ -1944,6 +2491,19 @@ toggleCheckbox(theme: any): void {
           style: {
             fontSize: '1em',
             textOutline: 'none',
+          },
+        },
+        events: {
+          click: function (event: { point: { category: any; series: { name: any; }; y: any; }; }) {
+            const category = event.point.category;
+            const seriesName = event.point.series.name;
+            const value = event.point.y;
+
+            // Handle the click event here
+            console.log('check click event for stacked bar chart',event);
+
+            // Example: You can trigger any Angular method from here
+            // For instance: this.onBarClick(seriesName, category, value);
           },
         },
       },

@@ -3,6 +3,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engine.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-tile-ui1',
@@ -58,28 +59,7 @@ export class TileUi1Component implements OnInit{
     console.log('dashboardChange tile1 ui',this.all_Packet_store)
     console.log('this.liveDataTile check',this.liveDataTile)
     console.log('this.queryParamsSend checking',this.queryParamsSend)
- 
 
-
-
-
-
-
-
-
-  
-
-    
-
-   
-
-   
-
-
-  
- 
-
-  
 }
 
 
@@ -105,29 +85,58 @@ get shouldShowButton(): boolean {
     this.check = this.isButtonVisible;
     console.log('this.check checking',this.check)
 
-      this.summaryService.lookUpData$.subscribe((data: any)=>{
-        console.log('data check>>> tileui1',data)
-   let tempCharts:any=[]
-  data.forEach((packet: any,matchedIndex:number) => {
+  //     this.summaryService.lookUpData$.subscribe((data: any)=>{
+  //       console.log('data check>>> tileui1',data)
+  //  let tempCharts:any=[]
+  // data.forEach((packet: any,matchedIndex:number) => {
     
-    if(packet.grid_type == 'tile'&& this.index==matchedIndex && packet.id === this.item.id){
-      tempCharts[matchedIndex] = packet
-      console.log('packet checking response data',packet)
-      this.formatTile(packet)
+  //   if(packet.grid_type == 'tile'&& this.index==matchedIndex && packet.id === this.item.id){
+  //     tempCharts[matchedIndex] = packet
+  //     console.log('packet checking response data',packet)
+      
+  //     this.formatTile(packet)
   
-    }
-  });
+  //   }
+  // });
   
   
   
         
-        // console.log("✅ Matched Charts:", matchedCharts);
+  //       // console.log("✅ Matched Charts:", matchedCharts);
         
       
         
         
-      })
+  //     })
     
+
+
+  this.summaryService.lookUpData$.subscribe((data: any) => {
+    console.log('data check>>> tileui1', data);
+    let tempCharts: any[] = [];
+    let duplicateIds: Set<any> = new Set(); // Set to keep track of duplicate ids
+
+    data.forEach((packet: any, matchedIndex: number) => {
+        if (packet.grid_type == 'tile' && this.index == matchedIndex && packet.id === this.item.id) {
+            if (duplicateIds.has(packet.id)) {
+                // If a duplicate is found, show SweetAlert but continue processing
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Duplicate ID Found',
+                    text: `The ID '${packet.id}' is duplicated in the data. Processing continues.`,
+                });
+            } else {
+                duplicateIds.add(packet.id); // Add the id to the set to track duplicates
+            }
+            
+            tempCharts[matchedIndex] = packet;
+            console.log('packet checking response data', packet);
+            this.formatTile(packet);
+        }
+    });
+});
+
+
 
 
 

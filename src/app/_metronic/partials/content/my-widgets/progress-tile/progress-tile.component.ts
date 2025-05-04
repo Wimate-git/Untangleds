@@ -398,8 +398,8 @@ export class ProgressTileComponent implements OnInit{
             processed_value: [''],
             selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
             selectedRangeType: ['', Validators.required],
-            selectFromTime: [''],
-            selectToTime: [''],
+            // selectFromTime: [''],
+            // selectToTime: [''],
             fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 20px
             filterForm: [''],
             filterParameter: [''],
@@ -1079,8 +1079,8 @@ repopulate_fields(getValues: any) {
           groupByFormat: [parsedtileConfig[i].groupByFormat || '', Validators.required],
           constantValue: [parsedtileConfig[i].constantValue || ''],
           selectedRangeType: [parsedtileConfig[i].selectedRangeType || '', Validators.required],
-          selectFromTime: [parsedtileConfig[i].selectFromTime || ''],
-          selectToTime: [parsedtileConfig[i].selectToTime || ''],
+          // selectFromTime: [parsedtileConfig[i].selectFromTime || ''],
+          // selectToTime: [parsedtileConfig[i].selectToTime || ''],
           filterDescription: [parsedtileConfig[i].filterDescription || ''],
           custom_Label: [parsedtileConfig[i].custom_Label || '', Validators.required],
           fontSize: [parsedtileConfig[i].fontSize || 14, [Validators.required, Validators.min(8), Validators.max(72)]],
@@ -2787,8 +2787,21 @@ fetchDynamicFormDataDrill(value: any) {
         console.log('formFields check',formFields)
 
         // Initialize the list with formFields labels
-        this.columnVisisbilityFields = formFields.map((field: any) => {
-          console.log('field check',field)
+        // this.columnVisisbilityFields = formFields.map((field: any) => {
+        //   console.log('field check',field)
+        //   return {
+        //     value: field.name,
+        //     text: field.label
+        //   };
+        // });
+
+        this.columnVisisbilityFields = formFields
+        .filter((field: any) => {
+          // Filter out fields with type "heading" or with an empty placeholder
+          return field.type !== "heading" && field.type !== 'Empty Placeholder';
+        })
+        .map((field: any) => {
+          console.log('field check', field);
           return {
             value: field.name,
             text: field.label

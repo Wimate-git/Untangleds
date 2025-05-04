@@ -48,7 +48,7 @@ export class TableWidgetConfigComponent implements OnInit,AfterViewInit{
   @ViewChild('calendarModal') calendarModal: any;
   selectedTabset: string = 'dataTab';
   dynamicParamMap = new Map<number, any[]>();
-  selectedParameterValue: string;
+  selectedParameterValue: any;
 
   dynamicConditions: FormGroup[] = [];
   showRemoveButton:boolean = false;
@@ -194,62 +194,86 @@ this.initializeTileFields()
   // }
   
 
+
+
+
   onAdd1(): void {
-    // Get existing text from filterDescription
-    let existingText = this.createKPIWidget.get('filterDescription')?.value?.trim() || '';
-    const getFormFelds = this.createKPIWidget.get('filterParameter')?.value;
-    console.log('getFormFelds checking', getFormFelds);
-  
-    // Capture the selected parameters
-    const selectedParameters = this.selectedParameterValueDupli;
-    console.log('selectedParameters checking', selectedParameters);
+    let existingText = this.createKPIWidget.get('filterDescription1')?.value?.trim() || '';
+    const getFormFields = this.createKPIWidget.get('filterParameter')?.value;
+    console.log('getFormFields checking', getFormFields);
+    const selectedParameters = getFormFields;
+    console.log('selectedParameters values from table widget', selectedParameters);
   
     let newEquationParts: string[] = [];
+    let staticParts: string[] = [];  // To store the static parts like == '12344'
+    
+    // Preserve the static parts of the equation (e.g., "=='12344'")
+    existingText = existingText.replace(/(\$\{[^\}]+\})(=='[^\']+')/g, (match: any, param: any, value: string) => {
+      staticParts.push(value);  // Store the static part
+      return `${param}==__STATIC_PART__`;  // Replace static parts with a placeholder
+    });
   
+    // Process the dynamic fields (the ones like Date Issued-${date-1732769545031})
     if (Array.isArray(selectedParameters)) {
-      // Format the selected parameters and filter out already existing ones
-      newEquationParts = selectedParameters
-        .map(param => `${param.text}-\${${param.value}}`)
-        .filter(paramString => !existingText.includes(paramString));
+      const selectedStrings = selectedParameters.map(param => `${param.text}-\${${param.value}}`);
+      console.log('selectedStrings checking from table', selectedStrings);
+  
+      // Remove any equation parts that are no longer selected
+      const existingStrings = existingText.split(' && ');  // Split into array
+      const updatedStrings = existingStrings.filter((part: string) => selectedStrings.includes(part)); // Filter to only keep selected ones
+  
+      // Add new equation parts (selected ones that are not already in the equation)
+      newEquationParts = selectedStrings.filter(paramString => !updatedStrings.includes(paramString));
+  
+      // Join them back into the equation string, only modifying the selected parts
+      existingText = updatedStrings.join(' && ');
     } else if (selectedParameters) {
+      // If it's a single parameter
       let paramString = `${selectedParameters.text}-\${${selectedParameters.value}}`;
+  
+      // Only add if not already present
       if (!existingText.includes(paramString)) {
         newEquationParts.push(paramString);
       }
+  
+      // Remove the existing parameter if it's no longer selected
+      existingText = existingText.split(' && ').filter((part: string) => part !== paramString).join(' && ');
     } else {
       console.warn('No parameters selected or invalid format:', selectedParameters);
-      return; // No update needed
+      return;
     }
   
-    if (newEquationParts.length === 0) {
+    if (newEquationParts.length === 0 && existingText.trim() === '') {
       console.log('No new unique parameters to add.');
-      return; // Nothing new to add
+      return;
     }
   
-    // Trim and remove extra spaces from the existing text
+    // Clean up spaces and format the equation string
     existingText = existingText.replace(/\s+/g, ' ').trim();
-    console.log('existingText before', existingText);
-    console.log('Filtered newEquationParts:', newEquationParts);
-  
-    // Construct the new equation string
+    console.log('existingText checking from table', existingText);
     const newEquation = newEquationParts.join(' && ');
   
-    // Append new equation to existing text properly
+    // Append new equation parts
     existingText = existingText ? `${existingText} && ${newEquation}` : newEquation;
   
-    // Ensure we don't have redundant `&&`
+    // Remove any consecutive "&&" and clean formatting
     existingText = existingText.replace(/&&\s*&&/g, '&&').trim();
   
-    console.log('Updated Equation:', existingText);
+    // Reinsert the static parts into the formatted equation string
+    existingText = existingText.replace(/__STATIC_PART__/g, () => staticParts.shift() || '');
   
-    // Update the form control with the corrected equation
+    // Patch the value of the form control directly
     this.createKPIWidget.patchValue({
-      filterDescription: existingText,
+      filterDescription1: existingText,
     });
   
-    // Ensure UI updates properly
+    // Trigger change detection to update the UI
     this.cdr.detectChanges();
   }
+
+
+  
+
 
 
 
@@ -384,8 +408,13 @@ this.initializeTileFields()
           console.log('formFields check',formFields)
 
           // Initialize the list with formFields labels
-          this.listofDynamicParam = formFields.map((field: any) => {
-            console.log('field check',field)
+          this.listofDynamicParam   = formFields
+          .filter((field: any) => {
+            // Filter out fields with type "heading" or with an empty placeholder
+            return field.type !== "heading" && field.type !== 'Empty Placeholder';
+          })
+          .map((field: any) => {
+            console.log('field check', field);
             return {
               value: field.name,
               text: field.label
@@ -900,65 +929,170 @@ this.initializeTileFields()
     this.conditions.removeAt(index);
   }
 
-  dynamicparameterValue1(event: any): void {
-    console.log('Event check for dynamic param:', event);
+  // dynamicparameterValue1(event: any): void {
+  //   console.log('Event check for dynamic param:', event);
   
-    if (event && event.value && Array.isArray(event.value)) {
-      const valuesArray = event.value;
+  //   if (event && event.value && Array.isArray(event.value)) {
+  //     const valuesArray = event.value;
   
-      if (valuesArray.length === 1) {
-        // Handle single selection
-        const singleItem = valuesArray[0];
-        const { value, text } = singleItem; // Destructure value and text
-        console.log('Single Selected Item:', { value, text });
+  //     if (valuesArray.length === 1) {
+  //       // Handle single selection
+  //       const singleItem = valuesArray[0];
+  //       const { value, text } = singleItem; // Destructure value and text
+  //       console.log('Single Selected Item:', { value, text });
   
-        // Update the form control with the single value (object)
-        const filterParameter = this.createKPIWidget.get('filterParameter1');
-        if (filterParameter) {
-          filterParameter.setValue([{ value, text }]); // Store as an array of objects
-          this.cdr.detectChanges(); // Trigger change detection
-        }
+  //       // Update the form control with the single value (object)
+  //       const filterParameter = this.createKPIWidget.get('filterParameter1');
+  //       if (filterParameter) {
+  //         filterParameter.setValue([{ value, text }]); // Store as an array of objects
+  //         this.cdr.detectChanges(); // Trigger change detection
+  //       }
   
-        // Store the single selected parameter
-        this.selectedParameterValueDupli = { value, text };
-      } else {
-        // Handle multiple selections
-        const formattedValuesdupli = valuesArray.map((item: any) => {
-          const { value, text } = item; // Destructure value and text
-          return { value, text }; // Create an object with value and text
-        });
+  //       // Store the single selected parameter
+  //       this.selectedParameterValueDupli = { value, text };
+  //     } else {
+  //       // Handle multiple selections
+  //       const formattedValuesdupli = valuesArray.map((item: any) => {
+  //         const { value, text } = item; // Destructure value and text
+  //         return { value, text }; // Create an object with value and text
+  //       });
   
-        console.log('Formatted Multiple Items:', formattedValuesdupli);
+  //       console.log('Formatted Multiple Items:', formattedValuesdupli);
   
-        // Update the form control with the concatenated values (array of objects)
-        const filterParameter = this.createKPIWidget.get('filterParameter1');
-        if (filterParameter) {
-          filterParameter.setValue(formattedValuesdupli);
-          this.cdr.detectChanges(); // Trigger change detection
-        }
+  //       // Update the form control with the concatenated values (array of objects)
+  //       const filterParameter = this.createKPIWidget.get('filterParameter1');
+  //       if (filterParameter) {
+  //         filterParameter.setValue(formattedValuesdupli);
+  //         this.cdr.detectChanges(); // Trigger change detection
+  //       }
   
-        // Store the multiple selected parameters
-        this.selectedParameterValueDupli = formattedValuesdupli;
-      }
-    } else if (event && event.itemValue) {
-      // Handle the case where `itemValue` exists
-      const { value, text } = event.itemValue;
-      console.log('Single Selected Item from itemValue:', { value, text });
+  //       // Store the multiple selected parameters
+  //       this.selectedParameterValueDupli = formattedValuesdupli;
+  //     }
+  //   } else if (event && event.itemValue) {
+  //     // Handle the case where `itemValue` exists
+  //     const { value, text } = event.itemValue;
+  //     console.log('Single Selected Item from itemValue:', { value, text });
   
+  //     // Update the form control with the single value (object)
+  //     const filterParameter = this.createKPIWidget.get('filterParameter1');
+  //     if (filterParameter) {
+  //       filterParameter.setValue([{ value, text }]); // Store as an array of objects
+  //       this.cdr.detectChanges(); // Trigger change detection
+  //     }
+  
+  //     // Store the single selected parameter
+  //     this.selectedParameterValueDupli = { value, text };
+  //   } else {
+  //     console.warn('Invalid event structure:', event);
+  //   }
+  // }
+
+
+
+//   dynamicparameterValue1(event: any): void {
+//     console.log('Event check for dynamic param:', event);
+
+//     if (event && event.value && Array.isArray(event.value)) {
+//         const valuesArray = event.value;
+
+//         if (valuesArray.length === 1) {
+//             // Handle single selection
+//             const singleItem = valuesArray[0];
+//             const { value, text } = singleItem; // Destructure value and text
+//             console.log('Single Selected Item:', { value, text });
+
+//             // Update the form control with the single value (object)
+//             const filterParameter = this.createKPIWidget.get('filterParameter1');
+//             if (filterParameter) {
+//                 filterParameter.setValue([{ value, text }]); // Store as an array of objects
+//                 this.cdr.detectChanges(); // Trigger change detection
+//             }
+
+//             // Store the single selected parameter
+//             this.selectedParameterValueDupli = { value, text };
+//         } else {
+//             // Handle multiple selections
+//             const formattedValuesdupli = valuesArray.map((item: any) => {
+//                 const { value, text } = item; // Destructure value and text
+//                 return { value, text }; // Create an object with value and text
+//             });
+
+//             console.log('Formatted Multiple Items:', formattedValuesdupli);
+
+//             // Update the form control with the concatenated values (array of objects)
+//             const filterParameter = this.createKPIWidget.get('filterParameter1');
+//             if (filterParameter) {
+//                 filterParameter.setValue(formattedValuesdupli);
+//                 this.cdr.detectChanges(); // Trigger change detection
+//             }
+
+//             // Store the multiple selected parameters
+//             this.selectedParameterValueDupli = formattedValuesdupli;
+//         }
+//     } else if (event && event.itemValue) {
+//         // Handle the case where `itemValue` exists
+//         const { value, text } = event.itemValue;
+//         console.log('Single Selected Item from itemValue:', { value, text });
+
+//         // Update the form control with the single value (object)
+//         const filterParameter = this.createKPIWidget.get('filterParameter1');
+//         if (filterParameter) {
+//             filterParameter.setValue([{ value, text }]); // Store as an array of objects
+//             this.cdr.detectChanges(); // Trigger change detection
+//         }
+
+//         // Store the single selected parameter
+//         this.selectedParameterValueDupli = { value, text };
+//     } else {
+//         console.warn('Invalid event structure:', event);
+//     }
+// }
+
+dynamicparameterValue1(event: any): void {
+  console.log('Event check for dynamic param:', event);
+
+  if (event && event.value && Array.isArray(event.value)) {
+    const valuesArray = event.value;
+
+    if (valuesArray.length === 1) {
+      // Handle single selection
+      const singleItem = valuesArray[0];
+      const { value, text } = singleItem; // Destructure value and text
+      console.log('Single Selected Item:', { value, text });
+
       // Update the form control with the single value (object)
-      const filterParameter = this.createKPIWidget.get('filterParameter1');
+      const filterParameter = this.createKPIWidget.get('filterParameter');
       if (filterParameter) {
         filterParameter.setValue([{ value, text }]); // Store as an array of objects
         this.cdr.detectChanges(); // Trigger change detection
       }
-  
+
       // Store the single selected parameter
-      this.selectedParameterValueDupli = { value, text };
+      this.selectedParameterValue = { value, text };
     } else {
-      console.warn('Invalid event structure:', event);
+      // Handle multiple selections
+      const formattedValues = valuesArray.map((item: any) => {
+        const { value, text } = item; // Destructure value and text
+        return { value, text }; // Create an object with value and text
+      });
+
+      console.log('Formatted Multiple Items:', formattedValues);
+
+      // Update the form control with the concatenated values (array of objects)
+      const filterParameter = this.createKPIWidget.get('filterParameter');
+      if (filterParameter) {
+        filterParameter.setValue(formattedValues);
+        this.cdr.detectChanges(); // Trigger change detection
+      }
+
+      // Store the multiple selected parameters
+      this.selectedParameterValue = formattedValues;
     }
+  } else {
+    console.warn('Invalid event structure:', event);
   }
-  
+}
   predefinedList = [
     {value:'Progress',text:'Progress'},
     {value:'Rating',text:'Rating'},

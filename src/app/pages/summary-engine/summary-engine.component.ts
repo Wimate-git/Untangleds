@@ -74,6 +74,8 @@ import { MixedChartConfigComponent } from 'src/app/_metronic/partials/content/my
 import * as CryptoJS from 'crypto-js';
 import { FullscreenService } from '../report-studio/services/fullscreen.service';
 import { SemiDonutConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/semi-donut-config/semi-donut-config.component';
+import { GaugeChartUiComponent } from 'src/app/_metronic/partials/content/my-widgets/gauge-chart-ui/gauge-chart-ui.component';
+import { GaugeChartConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/gauge-chart-config/gauge-chart-config.component';
 
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
@@ -182,6 +184,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   
 
   @ViewChild(StackedBarConfigComponent, { static: false }) StackedBarConfigComponent: StackedBarConfigComponent;
+  @ViewChild(GaugeChartConfigComponent, { static: false }) GaugeChartConfigComponent: GaugeChartConfigComponent;
   @ViewChild(PieChartConfigComponent, { static: false }) PieChartConfigComponent: PieChartConfigComponent;
   
   @ViewChild(Chart2ConfigComponent, { static: false }) ChartConfig2Component: Chart2ConfigComponent;
@@ -358,6 +361,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   modalWidth: any;
   readFormName: any;
   sendFullScreenCheck: boolean;
+  summaryDashboardData: any;
+  summaryDashboardDataFetch: any;
 
   createPieChart() {
     const chartOptions: any = {
@@ -871,7 +876,7 @@ Highcharts.chart('MixedChart', barchartOptions);
       ],
     };
   
-    Highcharts.chart('pieChart1', chartOptions);
+    Highcharts.chart('pieChartOfficial', chartOptions);
   }
 
 
@@ -964,6 +969,72 @@ Highcharts.chart('MixedChart', barchartOptions);
   }
 
 
+
+
+
+
+
+
+  createDailChart() {
+    const chartOptions: any = {
+      chart: {
+        type: 'gauge'
+      },
+      title: {
+        text: 'Speedometer'
+      },
+      pane: {
+        startAngle: -150,
+        endAngle: 150,
+        background: [{
+     
+          innerRadius: '60%',
+          outerRadius: '100%',
+          shape: 'arc'
+        }]
+      },
+      tooltip: {
+        enabled: false
+      },
+      yAxis: {
+        min: 0,
+        max: 200,
+        lineWidth: 0,
+        tickInterval: 20,
+        minorTickInterval: 'auto',
+        tickColor: '#aaa',
+        labels: {
+          distance: -30,
+          rotation: 'auto'
+        },
+        title: {
+          text: 'Speed'
+        },
+        plotBands: [{
+          from: 0,
+          to: 120,
+          color: '#55BF3B' // green
+        }, {
+          from: 120,
+          to: 160,
+          color: '#DDDF0D' // yellow
+        }, {
+          from: 160,
+          to: 200,
+          color: '#DF5353' // red
+        }]
+      },
+      series: [{
+        name: 'Speed',
+        data: [80], // This is the value to be displayed on the dial
+        tooltip: {
+          valueSuffix: ' km/h'
+        }
+      }]
+    };
+  
+    Highcharts.chart('DailChart', chartOptions);
+  }
   // @HostListener('window:scroll', ['$event'])
   // onWindowScroll(event: Event) {
   //   this.showMenuForTimeout();
@@ -1221,6 +1292,10 @@ Highcharts.chart('MixedChart', barchartOptions);
 
 
   showToolbar = false; // Initially hidden
+
+
+
+  
 
   toggleToolbar() {
     this.showToolbar = !this.showToolbar; // Toggle visibility
@@ -2683,6 +2758,20 @@ exitFullScreen(): void {
         );
       }
 
+
+      else if (item.grid_type === 'dailChart') {
+        const baseHeight = 400; // Base height for the chart
+        // const extraHeight = 40; // Additional height for labels, etc.
+  
+        this.chartHeight[index] = Math.max(0, itemComponentHeight); // Adjust height
+        this.chartWidth[index] = Math.max(0, itemComponentWidth);
+  
+        console.log(
+          `Updated chart dimensions at index ${index}:`,
+          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        );
+      }
+
       else if (item.grid_type === 'chart') {
         const baseHeight = 400; // Base height for the chart
         // const extraHeight = 40; // Additional height for labels, etc.
@@ -2809,9 +2898,11 @@ exitFullScreen(): void {
       }
       else if (item.grid_type === 'title') {
         // const topMargin = 20; // Define the top margin value
+
+         const extraHeight = 40;
       
         // Adjust height and width with the top margin
-        this.titleHeight[index] = itemComponentHeight ; // Subtract additional top margin
+        this.titleHeight[index] = itemComponentHeight+extraHeight ; // Subtract additional top margin
         this.titleWidth[index] = itemComponentWidth ; // Subtract margin/padding for width
       
         console.log(
@@ -3509,7 +3600,7 @@ this.fetchSummaryMain(id)
 
 
 
-
+this.filterDuplucateIds(this.routeId)
     
      this.fetchUserPermissions(1)
     // console.log('readPermission_Id checking initialize',readPermission_Id)
@@ -4155,6 +4246,11 @@ setTimeout(() => {
 setTimeout(() => {
   this.createCalumnWithTableChart()
 }, 500);
+setTimeout(() => {
+  this.createDailChart()
+}, 500);
+
+
 
  
      
@@ -4847,6 +4943,17 @@ justReadStyles(data:any,index:any){
 
     }
 
+    else if(event.arg1.grid_type=='dailChart'){
+      this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false  });
+      console.log('event check from dail chart', event)
+      setTimeout(() => {
+        this.GaugeChartConfigComponent.opengaugeChartModal(event.arg1, event.arg2)
+      }, 500);
+
+    }
+    
+
     else if(event.arg1.grid_type=='Piechart'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
@@ -5117,6 +5224,23 @@ justReadStyles(data:any,index:any){
         }, 500);
   
       }
+
+
+
+      else if(argument1.grid_type=='dailChart'){
+        this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+          keyboard: false  });
+        console.log('event check', event)
+        setTimeout(() => {
+          this.GaugeChartConfigComponent.opengaugeChartModal(argument1, argument2)
+        }, 500);
+  
+      }
+
+
+
+
+      
       else if(argument1.grid_type=='TableWidget'){
         this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
           keyboard: false  });
@@ -6049,8 +6173,7 @@ console.log('selectedTab checking',this.selectedTab)
       crDate: createdDate,
       upDate: updatedDate,
       createdUser: this.getLoggedUser.username, // Set the creator's username
-
-    };
+};
   
     console.log('Summary data:', this.allCompanyDetails);
   
@@ -6918,10 +7041,16 @@ console.log('selectedTab checking',this.selectedTab)
         {
           title: '<span style="color: black;">Name</span>',
           data: 'P2',
+          render: function (data) {
+            return `<div class="wrap-text">${data}</div>`; // Wrap text here
+          }
         },
         {
           title: '<span style="color: black;">Description</span>',
           data: 'P3',
+          render: function (data) {
+            return `<div class="wrap-text">${data}</div>`; // Wrap text here
+          }
         },
         {
           title: '<span style="color: black;">Updated</span>',
@@ -6938,7 +7067,7 @@ console.log('selectedTab checking',this.selectedTab)
               hour: '2-digit',
               minute: '2-digit',
             });
-            return `${formattedDate} ${formattedTime}`;
+            return `<div class="wrap-text">${formattedDate} ${formattedTime}</div>`; // Apply wrap-text here
           },
         },
         {
@@ -6956,28 +7085,34 @@ console.log('selectedTab checking',this.selectedTab)
               hour: '2-digit',
               minute: '2-digit',
             });
-            return `${formattedDate} ${formattedTime}`;
+            return `<div class="wrap-text">${formattedDate} ${formattedTime}</div>`; // Wrap text here
           },
         },
         {
           title: '<span style="color: black;">Created UserName</span>',
           data: 'P6',
+          render: function (data) {
+            return `<div class="wrap-text">${data}</div>`; // Wrap text here
+          },
         },
         {
           title: '<span style="color: black;">Updated UserName</span>',
           data: 'P7',
+          render: function (data) {
+            return `<div class="wrap-text">${data}</div>`; // Wrap text here
+          },
         },
+        // Other columns...
       ],
-      createdRow: (row: Node, data: any) => {
-        $(row).find('.view-item').on('click', () => {
-          this.SummaryIdRedirect(data.P1); // Call the function with P1 value
-        });
-        
-      },
       
-      pageLength: 10,
-     // Set default page size to 10
-    };
+      
+    createdRow: (row: Node, data: any) => {
+      $(row).find('.view-item').on('click', () => {
+        this.SummaryIdRedirect(data.P1); // Call the function with P1 value
+      });
+    },
+    pageLength: 10, // Set default page size to 10
+  };
   }
   
   
@@ -7195,6 +7330,21 @@ console.log('value checking summary',value)
   // Format dashboard tiles
   this.formattedDashboard = this.formatDashboardTiles(this.dashboard) || [];
   console.log('Formatted Dashboard:', this.formattedDashboard);
+if (key !=='addPin'){
+
+  if (this.formattedDashboard.length === 0) {
+    Swal.fire({
+      position: 'top-end',
+      icon: 'error',
+      title: 'At least 2 widgets are required for Summary Dashboard update.',
+      showConfirmButton: false,
+      timer: 1500
+    });
+    return; // Exit the function without performing validation
+  }
+}
+
+
 
   // Set timestamps and users
   const originalCreatedDate =
@@ -7340,7 +7490,9 @@ console.log('Serialized Query Params:', serializedQueryParams);
           update_multiTable: 'Table Widget Updated',
           query_applied: 'Query Applied',
           addPin: 'Pin Updated',
-          Save: 'Dashboard changes saved'
+          Save: 'Dashboard changes saved',
+          importUpdate:'Summary Dashboard Imported',
+          editSummary:'Dashboard Configuration Updated'
         }[actionKey] || 'Summary Updated';
   
         console.log('Action key condition check:', actionKey);
@@ -7366,6 +7518,11 @@ console.log('Serialized Query Params:', serializedQueryParams);
   
             } else if (actionKey === 'addPin') {
               window.location.reload();
+            }else if(actionKey === 'importUpdate'){
+              window.location.reload();
+            }else if (actionKey === 'editSummary'){
+              window.location.reload();
+
             }
           }
         });
@@ -7784,7 +7941,19 @@ this.createSummaryField.patchValue({
             // Replace the original data array with the newData array
             data = newData;
             this.lookup_data_summary = data;
+            const assignData =data
+            let updateData = {
+              PK: tempClient,
+              SK: response.SK,
+              options: JSON.stringify(assignData),
+            };
+    
+            await this.api.UpdateMaster(updateData);
             this.refreshFunction();
+            // setTimeout(() => {
+            //   location.reload()
+            // }, 1000);
+      
             this.cd.detectChanges();
                   
           } else if (type === 'delete') {
@@ -7792,17 +7961,21 @@ this.createSummaryField.patchValue({
             
             data.splice(findIndex, 1);
             this.lookup_data_summary = data;
+            const assignUpdatedData = data
+            let updateData = {
+              PK: tempClient,
+              SK: response.SK,
+              options: JSON.stringify(assignUpdatedData),
+            };
+    
+            await this.api.UpdateMaster(updateData);
             this.refreshFunction();
+        
+            location.reload()
             this.cd.detectChanges();
           }
-  
-          let updateData = {
-            PK: tempClient,
-            SK: response.SK,
-            options: JSON.stringify(data),
-          };
-  
-          await this.api.UpdateMaster(updateData);
+  console.log('lookup data check from summary',data)
+
           
         } else { // If item not found
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -8912,6 +9085,15 @@ refreshFunction(){
     modal.dismiss();
   }
 
+  opengaugeChartModal(gaugeChartModal: TemplateRef<any>,modal:any) {
+    this.modalService.open(gaugeChartModal,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
+    modal.dismiss();
+  }
+
+
+
+  
 
 
 
@@ -9026,7 +9208,7 @@ refreshFunction(){
     // ✅ Step 3: Extract columnVisibility safely
     const columnVisibility = this.chartDataConfigExport.columnVisibility;
     console.log('columnVisibility checking',columnVisibility)
-    const columnVisibilityRead = columnVisibility[0].columnVisibility
+    const columnVisibilityRead = columnVisibility
     console.log('columnVisibilityRead checki',columnVisibilityRead)
   
     // ✅ Step 4: Ensure columnVisibility exists and has values
@@ -9393,7 +9575,8 @@ helperChartClickFunnel(event: any, modalChart: any) {
       tileWithIcon:{ width: this.tileWidth, height: this.tileHeight, heightOffset: 80, widthOffset: 30},
       semiDonut:{width:this.chartWidth, height:this.chartHeight, heightOffset: 10, widthOffset: 30 },
       Piechart:{ width: this.chartWidth, height: this.chartHeight, heightOffset: 10, widthOffset: 30  },
-      Stackedchart:{ width: this.chartWidth, height: this.chartHeight, heightOffset: 10, widthOffset: 30  }
+      Stackedchart:{ width: this.chartWidth, height: this.chartHeight, heightOffset: 10, widthOffset: 30  },
+      dailChart:{width: this.chartWidth, height: this.chartHeight, heightOffset: 10, widthOffset: 30 }
  
       // filterTileHeight:any []=[];
       // filterTileWidth:any []=[];
@@ -9569,9 +9752,324 @@ helperChartClickFunnel(event: any, modalChart: any) {
     localStorage.setItem('pinnedItems', JSON.stringify(Array.from(this.pinnedItems.entries())));
   }
   
+
+
+
+  fetchSummaryDashboardConfig(dashboardId: any) {
+    console.log('dashboardId received', dashboardId);
   
+    this.api
+      .GetMaster(`${this.SK_clientID}#${dashboardId}#summary#main`, 1)
+      .then((result: any) => {
+        if (result && result.metadata) {
+          const parsedMetadata = JSON.parse(result.metadata);
+          this.summaryDashboardData = parsedMetadata;
+          console.log('summary dashboard Data', this.summaryDashboardData);
+  
+  
+  
+          // Export the data as a .json file
+          this.exportToJson(this.summaryDashboardData);
+        } else {
+          console.log('No data found');
+        }
+      })
+      .catch((err) => {
+        console.log("Can't fetch", err);
+      });
+  }
+  
+  exportToJson(data: any) {
+    const jsonData = JSON.stringify(data, null, 4);  // Convert data to JSON with pretty formatting
+  
+    const blob = new Blob([jsonData], { type: 'application/json;charset=utf-8;' });  // Ensure UTF-8 encoding for the file
+    const link = document.createElement('a');  // Create a download link
+  
+    // Ensure that the link is not opened by any browser, but triggered as a download
+    if (link.download !== undefined) {
+      // Create a URL for the Blob
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'summary_dashboard_data.json');  // Set the file name
+      link.style.visibility = 'hidden';  // Make sure the link is not visible
+      document.body.appendChild(link);  // Append the link to the body
+  
+      link.click();  // Trigger the download by simulating a click event
+  
+      document.body.removeChild(link);  // Clean up by removing the link from the DOM
+      window.URL.revokeObjectURL(url);  // Release the object URL after the download
+    } else {
+      // Fallback for older browsers (though modern browsers should support Blob and download attributes)
+      console.error('Download feature not supported in this browser.');
+    }
+  }
+  
+  
+  onFileSelectedfromSystem(event: any): void {
+    const file = event.target.files[0]; // Get the first selected file
+
+    if (file) {
+      console.log('File selected:', file);
+      // You can process the file here
+      // For example, reading the content of the file:
+      this.readFileContent(file);
+    } else {
+      console.error('No file selected');
+    }
+  }
+  readFileContent(file: File) {
+    const reader = new FileReader();
+  
+    reader.onload = () => {
+      const fileContent = reader.result as string; // Ensure the fileContent is treated as a string
+  
+      try {
+        // Parse the file content to get a JavaScript object
+        const parsedContent = JSON.parse(fileContent);
+        console.log('Parsed content:', parsedContent);
+  
+        // Exclude the specified properties: summaryID, summaryName, summaryDesc
+        const { summaryID, summaryName, summaryDesc, ...filteredContent } = parsedContent;
+  
+        console.log('Filtered content (without summaryID, summaryName, summaryDesc):', filteredContent);
+        this.updateimporteddashboardData(filteredContent,'importUpdate')
+
+
+  
+        // Now extract the grid_details
+        // const extractGridDetails = filteredContent.grid_details;
+  
+        // // Log the grid_details
+        // console.log('Grid Details:', extractGridDetails);
+  
+        // // You can process the grid details here
+        // // For example, you could do something like:
+        // if (extractGridDetails && extractGridDetails.length > 0) {
+        //   // Handle the grid details if available
+        //   extractGridDetails.forEach((gridDetail: any, index: number) => {
+        //     console.log(`Grid Detail ${index + 1}:`, gridDetail);
+        //   });
+        // } else {
+        //   console.log('No grid details found in the file.');
+        // }
+  
+      } catch (error) {
+        console.error('Error parsing JSON:', error);
+      }
+    };
+  
+    reader.readAsText(file); // Read the file as text (ideal for JSON files)
+  }
   
 
+  updateimporteddashboardData(importData:any,key:any) {
+    // if(key=='addPin'){
+    //   this.PinCheck =pinValue
+    //   console.log('PinCheck from updateSummary',this.PinCheck)
+    // }
+  // console.log('value checking summary',value)
+  
+  
+    console.log('this.getLoggedUser check update', this.getLoggedUser);
+  
+    // Extract username for later use
+    this.extractUserName = this.getLoggedUser.username;
+    console.log('this.extractUserName checking', this.extractUserName);
+  
+    console.log('all_Packet_store checking', this.all_Packet_store);
+  
+    // Construct allCompanyDetails if missing
+    if (!this.allCompanyDetails) {
+      this.allCompanyDetails = this.constructAllCompanyDetails();
+      console.log('Constructed allCompanyDetails:', this.allCompanyDetails);
+    }
+  
+    // Only populate missing fields to avoid overwriting existing values
+    if (this.all_Packet_store) {
+      this.allCompanyDetails = {
+        ...this.allCompanyDetails, // Preserve existing data
+        summaryID: this.allCompanyDetails.summaryID || this.all_Packet_store.summaryID,
+        summaryName: this.allCompanyDetails.summaryName || this.all_Packet_store.summaryName,
+        summaryDesc: this.allCompanyDetails.summaryDesc || this.all_Packet_store.summaryDesc,
+        iconObject: importData.iconObject ||'',
+        LiveDashboard:importData.LiveDashboard ||'',
+        fullScreenModeCheck:importData.fullScreenModeCheck ||''
+      };
+      console.log('Updated allCompanyDetails with Packet Store:', this.allCompanyDetails);
+    }
+  
+    // Ensure critical fields have default fallbacks without altering existing logic
+    this.allCompanyDetails.summaryID = this.allCompanyDetails.summaryID ;
+    this.allCompanyDetails.summaryName = this.allCompanyDetails.summaryName ;
+    this.allCompanyDetails.summaryDesc = this.allCompanyDetails.summaryDesc ;
+  
+  
+    console.log('Final allCompanyDetails:', this.allCompanyDetails);
+  
+    // Enable summaryID field
+    this.createSummaryField.get('summaryID')?.enable();
+  
+    // Format dashboard tiles
+    this.formattedDashboard = this.formatDashboardTiles(importData.grid_details) || [];
+    console.log('Formatted Dashboard:', this.formattedDashboard);
+
+  
+    if (this.formattedDashboard.length === 0) {
+      Swal.fire({
+        position: 'top-end',
+        icon: 'error',
+        title: 'At least 2 widgets are required for Summary Dashboard update.',
+        showConfirmButton: false,
+        timer: 1500
+      });
+      return; // Exit the function without performing validation
+    }
+
+  
+  
+  
+    // Set timestamps and users
+    const originalCreatedDate =
+      this.allCompanyDetails.crDate || Math.ceil(new Date().getTime() / 1000);
+    const originalCreatedUser =
+      this.allCompanyDetails.createdUser || this.getLoggedUser.username;
+  
+    const updatedDate = Math.ceil(new Date().getTime() / 1000);
+  
+    // Construct tempObj for validation and submission
+    let serializedQueryParams = JSON.stringify(this.updatedQueryPramas);
+  console.log('Serialized Query Params:', serializedQueryParams);
+    let tempObj = {
+      PK: `${this.SK_clientID}#${this.allCompanyDetails.summaryID}#summary#main`,
+      SK: 1,
+      metadata: JSON.stringify({
+        ...this.allCompanyDetails,
+        grid_details: this.formattedDashboard,
+      // Include params here
+      }),
+    };
+  
+    console.log('TempObj being validated and submitted:', tempObj);
+  
+    // Validate and submit the object
+    this.validateAndSubmit(tempObj, key);
+  
+    // Prepare items for fetchTimeMachineById
+    const items = {
+      P1: this.allCompanyDetails.summaryID ,
+      P2: this.allCompanyDetails.summaryName,
+      P3: this.allCompanyDetails.summaryDesc ,
+      P4: updatedDate ,
+      P5: originalCreatedDate ,
+      P6: originalCreatedUser ,
+      P7: this.extractUserName ,
+      P8: this.previewObjDisplay ? JSON.stringify(this.previewObjDisplay) : '',
+      P9: importData.iconSelect ,
+      P10: importData.PinCheck ,
+      P11:importData.fullScreenModeCheck 
+    };
+    
+  
+    console.log('Items prepared for fetchTimeMachineById:', items);
+    const UserDetails = {
+      "User Name": this.userdetails,
+      "Action": "Updated",
+      "Module Name": "Summary Dashboard",
+      "Form Name": "Summary Dashboard",
+      "Description": "Dashboard is Updated",
+      "User Id": this.userdetails,
+      "Client Id": this.SK_clientID,
+      "created_time": Date.now(),
+      "updated_time": Date.now()
+    }
+  
+    this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+  
+    // Trigger fetchTimeMachineById
+    if (items.P1) {
+      console.log('check items inupdate',items)
+      this.fetchTimeMachineById(1, items.P1, 'update', items);
+    } else {
+      console.warn('fetchTimeMachineById skipped: Missing summaryID (P1).');
+    }
+  
+    // Trigger change detection
+    this.cd.detectChanges();
+  }
+
+
+  filterDuplucateIds(routerId: any) {
+    console.log('dashboardId received', routerId);
+  
+    this.api
+      .GetMaster(`${this.SK_clientID}#${routerId}#summary#main`, 1)
+      .then((result: any) => {
+        if (result && result.metadata) {
+          const parsedMetadata = JSON.parse(result.metadata);
+          this.summaryDashboardDataFetch = parsedMetadata;
+          const extractGridDetails = this.summaryDashboardDataFetch.grid_details;
+          console.log('summary extractGridDetails', extractGridDetails);
+  
+          // Extract the IDs from grid details
+          const ids = extractGridDetails.map((item: any) => item.id);
+  
+          // Check for duplicate IDs
+          const duplicateIds = this.findDuplicates(ids);
+          console.log('duplicateIds checking', duplicateIds);
+  
+          // If duplicateIds contains undefined or is empty, don't show the alert
+          const filteredDuplicates = duplicateIds.filter(id => id !== undefined && id !== null);
+  
+          // Only show the SweetAlert if duplicates are found (non-undefined)
+          if (filteredDuplicates.length > 0) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Duplicate IDs Found',
+              text: `The following IDs are duplicates: ${filteredDuplicates.join(', ')}`,
+              position: 'top-end', // This positions the alert in the top right corner
+              showConfirmButton: false,
+              timer: 3000, // The alert will disappear after 3 seconds
+            });
+          } else {
+            console.log('No duplicates found or duplicates are undefined');
+          }
+  
+        } else {
+          console.log('No data found');
+        }
+      })
+      .catch((err) => {
+        console.log("Can't fetch", err);
+      });
+  }
+  
+  findDuplicates(arr: any[]) {
+    const seen = new Set();
+    const duplicates: any[] = [];
+    arr.forEach((item) => {
+      if (seen.has(item)) {
+        duplicates.push(item);
+      } else {
+        seen.add(item);
+      }
+    });
+    return duplicates;
+  }
+  
+  
+  
+  
+  // Helper function to find duplicates in an array
+
+  
+
+
+// fetchSummaryDashboardConfig(dashboardId: any) {
+  
+// }
+
+
+  
 }
 
 

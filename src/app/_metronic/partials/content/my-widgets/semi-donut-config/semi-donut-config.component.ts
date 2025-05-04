@@ -1284,10 +1284,24 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
           console.log('formFields type check data',formFields)
 
           // Prepare parameter list
-          const dynamicParamList = formFields.map((field: any) => ({
-            value: field.name,
-            text: field.label,
-          }));
+          // const dynamicParamList = formFields.map((field: any) => ({
+          //   value: field.name,
+          //   text: field.label,
+          // }));
+
+
+          const dynamicParamList  = formFields
+          .filter((field: any) => {
+            // Filter out fields with type "heading" or with an empty placeholder
+            return field.type !== "heading" && field.type !== 'Empty Placeholder';
+          })
+          .map((field: any) => {
+            console.log('field check', field);
+            return {
+              value: field.name,
+              text: field.label
+            };
+          });
 
           // Add created_time and updated_time
           if (parsedMetadata.created_time) {

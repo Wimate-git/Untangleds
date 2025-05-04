@@ -39,19 +39,35 @@
     </div>
   
     <div class="row mb-3">
-      <div class="col-md-4 mb-3">
+      <div class="col-md-3 mb-3">
         <div class="col-lg-12 form-check form-switch">
-        <label for="toggleCheck" class="col-lg-12 col-createChart-label fw-bold fs-6  mt-7">Enable Redirect</label>
+        <label for="toggleCheck" class="col-lg-12 col-createChart-label fw-bold fs-6  mt-7">Enable Redirection</label>
         <input class="form-check-input mt-10 mb-3 mb-lg-0" type="checkbox" formControlName="toggleCheck" id="toggleCheck" />
         <span>{{ createChart.get('toggleCheck')?.value ? 'Enabled' : 'Disabled' }}</span>
       </div>
       </div>
+
+      <div  class="col-md-3 mb-3">
+        <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Chart Type</label>
+        <ngx-select
+          id="dashboardIds"
+          [allowClear]="true"
+          formControlName="ChartTypeSelection"
+          [items]="chartTypeOptions"
+          optionValueField="value"
+          optionTextField="text"
+          placeholder="Select Chart Type"
+          style="width: 100%;">
+        </ngx-select>
+      </div>
+
+
       
       <!-- Conditionally Render Dashboard Ids Field -->
     
     
     
-        <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
+        <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-3 mb-3">
           <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Redirect To</label>
           <ngx-select
             id="dashboardIds"
@@ -66,7 +82,7 @@
         </div>
       
         <!-- Conditionally Render Select Type Field -->
-        <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-4 mb-3">
+        <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-3 mb-3">
           <label for="selectType" class="col-createChart-label fw-bold fs-6">Select Type</label>
           <ngx-select
             id="selectType"
@@ -192,13 +208,13 @@
                             <div *ngIf="field.get('primaryValue')?.errors?.required">Primary Value is required.</div>
                           </div>
                       </div>
-                      <div class="col-md-4 mb-3" *ngIf="all_fields.value[fieldIndex].primaryValue === 'Count'">
+                      <!-- <div class="col-md-4 mb-3" *ngIf="all_fields.value[fieldIndex].primaryValue === 'Count'">
                         <label for="constant" class="col-createChart-label fw-bold fs-6 required">Parameter Value</label>
                         <ngx-select id="primaryValue" [allowClear]="true" formControlName="parameterValue"
                         [items]="showStatusValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
                         (selectionChanges)="onValueChange($event)" class="w-100"  [disabled]="createChart.get('primaryValue')?.value !== 'count'" ></ngx-select>
                       </div>
-  
+   -->
   
   
                       <div class="col-md-4 mb-3" *ngIf="all_fields.value[fieldIndex].primaryValue === 'Constant'">
@@ -257,7 +273,7 @@
                         </div>
                      
                       </div>
-                      <div class="col-md-4 mb-3">
+                      <!-- <div class="col-md-4 mb-3">
                         <label for="timeInput" class="col-createChart-label fw-bold fs-6 ">From Time</label>
                         <input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"
                           formControlName="selectFromTime">
@@ -266,7 +282,7 @@
                         <label for="timeInput" class="col-createChart-label fw-bold fs-6 ">To Time</label>
                         <input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"
                           formControlName="selectToTime">
-                      </div>
+                      </div> -->
                       <div class="col-md-4">
                         <label for="columnVisibility" class="fw-bold fs-6 ">column Visibility</label>
                         <p-multiSelect
@@ -774,6 +790,11 @@
               <div class="title">Any</div>
               <div class="example">E.g., Any</div>
             </div>
+            <div class="list-item" (click)="selectValue('Last financial year', modal)" (mouseenter)="showTooltip('Last financial year')"
+            (mouseleave)="hideTooltip()">
+            <div class="title">Last financial year</div>
+            <div class="example">E.g., Data from the last financial year</div>
+          </div>
             </div>
           
             <div class="list-column">
@@ -817,6 +838,11 @@
                 <div class="title">Last 5 Weeks</div>
                 <div class="example">E.g., Data for the last 5 weeks</div>
               </div>
+              <div class="list-item" (click)="selectValue('This financial year', modal)" (mouseenter)="showTooltip('This financial year')"
+              (mouseleave)="hideTooltip()">
+              <div class="title">This financial year</div>
+              <div class="example">E.g., Data for the this financial year</div>
+            </div>
             </div>
           </div>
           

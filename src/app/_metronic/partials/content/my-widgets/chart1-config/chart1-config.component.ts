@@ -22,6 +22,22 @@ interface FormField {
   validation?: any;
 }
 
+interface HighchartsOptions {
+  chart: any;
+  credits: any;
+  exporting: any;
+  legend: any;
+  plotOptions: any;
+  responsive: any;
+  series: Array<{
+    data: any[];  // Explicitly define the type of data
+    name: string;
+    [key: string]: any; // Other properties can be added here as needed
+  }>;
+  title: any;
+  tooltip: any;
+}
+
 @Component({
   selector: 'app-chart1-config',
 
@@ -578,13 +594,18 @@ export class Chart1ConfigComponent implements OnInit {
           console.log('formFields check',formFields)
 
           // Initialize the list with formFields labels
-          this.columnVisisbilityFields = formFields.map((field: any) => {
-            console.log('field check',field)
-            return {
-              value: field.name,
-              text: field.label
-            };
-          });
+          this.columnVisisbilityFields = formFields
+            .filter((field: any) => {
+              // Filter out fields with type "heading" or with an empty placeholder
+              return field.type !== "heading" && field.type !== 'Empty Placeholder';
+            })
+            .map((field: any) => {
+              console.log('field check', field);
+              return {
+                value: field.name,
+                text: field.label
+              };
+            });
 
           // Include created_time and updated_time
           if (parsedMetadata.created_time) {
@@ -680,8 +701,8 @@ export class Chart1ConfigComponent implements OnInit {
           processed_value: ['234567'],
           selectedColor: [this.selectedColor || '#FFFFFF'],
           selectedRangeType: ['', Validators.required],
-          selectFromTime: [''],
-          selectToTime: [''],
+          // selectFromTime: [''],
+          // selectToTime: [''],
           parameterValue: [''],
           columnVisibility: [[]],
           rowData: [''],
@@ -830,7 +851,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
       this.createChart.patchValue({
         widgetid: uniqueId,
         chart_title: '',  // Reset chart title field (or leave it if needed)
-        highchartsOptionsJson: {},  // Reset chart options (or leave it if needed)
+ // Reset chart options (or leave it if needed)
       });
     }
   }
@@ -1036,10 +1057,12 @@ openChartModal1(tile: any, index: number): void {
 
   if (tile) {
     this.selectedTile = tile;
-    console.log('tile checking from chartmodal1',tile)
+    console.log('tile checking from chartmodal1', tile);
     this.editTileIndex = index ?? null;
     this.paramCount = tile.noOfParams;
-    this.highchartsOptionsJson = JSON.parse(tile.highchartsOptionsJson);
+
+    // Deep clone the highchartsOptionsJson to avoid mutation
+    this.highchartsOptionsJson = this.deepClone(tile.highchartsOptionsJson);
 
     const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14;
 
@@ -1062,11 +1085,13 @@ openChartModal1(tile: any, index: number): void {
     // ✅ Initialize form group and valueChanges
     this.initializeTileFields();
 
-    // ✅ Now patch values into the form
+    console.log('this.highchartsOptionsJson checking from chart1', this.highchartsOptionsJson);
+    
+    // Now patch the form values
     this.createChart.patchValue({
       add_fields: tile.add_fields,
       chart_title: tile.chart_title,
-      highchartsOptionsJson: JSON.stringify(this.highchartsOptionsJson, null, 4),
+      highchartsOptionsJson: this.highchartsOptionsJson,  // Pass the deep clone of highchartsOptionsJson
       custom_Label: tile.custom_Label,
       fontSize: fontSizeValue,
       filterDescription: tile.filterDescription,
@@ -1082,16 +1107,15 @@ openChartModal1(tile: any, index: number): void {
       toggleCheck: tile.toggleCheck,
       selectType: tile.selectType,
       DrillDownType: tile.DrillDownType,
-      enableLegends:tile.enableLegends ||'',
-      dataLabelFontColor:tile.dataLabelFontColor,
-      chartBackgroundColor1:tile.chartBackgroundColor1,
-      chartBackgroundColor2:tile.chartBackgroundColor2
+      enableLegends: tile.enableLegends || '',
+      dataLabelFontColor: tile.dataLabelFontColor,
+      chartBackgroundColor1: tile.chartBackgroundColor1,
+      chartBackgroundColor2: tile.chartBackgroundColor2
     });
 
     // ✅ Populate all_fields and drill_fields separately
     this.all_fields.clear(); // Clear existing FormArray
     const populatedAllFields = this.repopulate_fields(tile);
-    // populatedAllFields.controls.forEach(control => this.all_fields.push(control));
 
     this.drill_fields.clear(); // Clear existing FormArray
     const populatedDrillFields = this.repopulateDrill_fields(tile);
@@ -1110,6 +1134,13 @@ openChartModal1(tile: any, index: number): void {
   }
 
   this.cdr.detectChanges();
+}
+
+
+
+// Deep clone function to preserve data integrity
+ deepClone(obj: any): any {
+  return JSON.parse(JSON.stringify(obj));
 }
 
 
@@ -1182,8 +1213,8 @@ repopulate_fields(getValues: any): FormArray {
           groupByFormat: [configItem.groupByFormat || '', Validators.required],
           constantValue: [configItem.constantValue || ''],
           selectedRangeType: [configItem.selectedRangeType || '', Validators.required],
-          selectFromTime: [configItem.selectFromTime || ''],
-          selectToTime: [configItem.selectToTime || ''],
+          // selectFromTime: [configItem.selectFromTime || ''],
+          // selectToTime: [configItem.selectToTime || ''],
           parameterValue: [configItem.parameterValue || ''],
           columnVisibility: this.fb.control(columnVisibility),
           filterParameter: this.fb.control(filterParameterValue),
@@ -1358,11 +1389,24 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
           console.log('formFields type check data',formFields)
 
           // Prepare parameter list
-          const dynamicParamList = formFields.map((field: any) => ({
-            value: field.name,
-            text: field.label,
-          }));
+          // const dynamicParamList = formFields.map((field: any) => ({
+          //   value: field.name,
+          //   text: field.label,
+          // }));
 
+
+         const dynamicParamList = formFields
+          .filter((field: any) => {
+            // Filter out fields with type "heading" or with an empty placeholder
+            return field.type !== "heading" && field.type !== 'Empty Placeholder';
+          })
+          .map((field: any) => {
+            console.log('field check', field);
+            return {
+              value: field.name,
+              text: field.label
+            };
+          });
           // Add created_time and updated_time
           if (parsedMetadata.created_time) {
             dynamicParamList.push({

@@ -44,4 +44,7 @@
   .icon-danger {
     color: #dc3545; /* Red color */
   }
-  
+  /* Hide the search field visually */
+.dataTables_filter {
+  display: none;
+}

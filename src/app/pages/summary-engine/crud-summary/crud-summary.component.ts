@@ -76,27 +76,30 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.dtOptions = {
-      dom: `<"row"<"col-sm-6"l><"col-sm-6"f>>` +  // Length changing (l) and Search (f)
-           `<"row"<"col-sm-12"tr>>` +              // Table (t)
-           `<"row"<"col-sm-12"p>>` +               // Pagination (p)
-           `<"row"<"col-sm-12"i>>`,                // Information (i) — Add this row for info
-      
+      dom:  // Length changing (l)
+           `<"row"<"col-sm-12"tr>>` +  // Table (t)
+           `<"row"<"col-sm-12"p>>` +   // Pagination (p)
+           `<"row"<"col-sm-12"i>>`,    // Information (i) — Add this row for info
+    
       processing: true,
       language: {
         processing: `<span class="spinner-border spinner-border-sm align-middle"></span> Loading...`,
         info: "Showing _START_ to _END_ of _TOTAL_ entries",  // Customize the info text
       },
-      
+    
       ...this.datatableConfig,
-      
+    
       buttons: [
         { extend: 'colvis', text: 'Column Visibility', className: 'btn btn-secondary' },
         { extend: 'excel', text: 'Export to Excel', className: 'btn btn-success' }
       ],
-      
+    
       order: false,
       ordering: false,
+      searching: true, // Keep the search functionality enabled
     };
+    
+    
     
 
     this.renderActionColumn();

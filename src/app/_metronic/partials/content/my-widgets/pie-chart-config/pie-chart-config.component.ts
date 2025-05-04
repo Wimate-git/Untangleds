@@ -295,8 +295,21 @@ export class PieChartConfigComponent {
           console.log('formFields check',formFields)
 
           // Initialize the list with formFields labels
-          this.columnVisisbilityFields = formFields.map((field: any) => {
-            console.log('field check',field)
+          // this.columnVisisbilityFields = formFields.map((field: any) => {
+          //   console.log('field check',field)
+          //   return {
+          //     value: field.name,
+          //     text: field.label
+          //   };
+          // });
+
+          this.columnVisisbilityFields = formFields
+          .filter((field: any) => {
+            // Filter out fields with type "heading" or with an empty placeholder
+            return field.type !== "heading" && field.type !== 'Empty Placeholder';
+          })
+          .map((field: any) => {
+            console.log('field check', field);
             return {
               value: field.name,
               text: field.label
@@ -399,8 +412,8 @@ export class PieChartConfigComponent {
             selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
      
             selectedRangeType: ['',Validators.required],
-            selectFromTime: [''],
-            selectToTime: [''],
+            // selectFromTime: [''],
+            // selectToTime: [''],
             parameterValue:[''],
             columnVisibility:[[]],
             rowData:[''],
@@ -922,8 +935,8 @@ repopulate_fields(getValues: any): FormArray {
           groupByFormat: [configItem.groupByFormat || '', Validators.required],
           constantValue: [configItem.constantValue || ''],
           selectedRangeType: [configItem.selectedRangeType || '', Validators.required],
-          selectFromTime: [configItem.selectFromTime || ''],
-          selectToTime: [configItem.selectToTime || ''],
+          // selectFromTime: [configItem.selectFromTime || ''],
+          // selectToTime: [configItem.selectToTime || ''],
           parameterValue: [configItem.parameterValue || ''],
           columnVisibility: this.fb.control(columnVisibility),
           filterParameter: this.fb.control(filterParameterValue),
@@ -2254,10 +2267,18 @@ fetchDynamicFormData(value: any, index: number) {
         console.log('formFields type check data',formFields)
 
         // Prepare parameter list
-        const dynamicParamList = formFields.map((field: any) => ({
-          value: field.name,
-          text: field.label,
-        }));
+        const dynamicParamList  = formFields
+        .filter((field: any) => {
+          // Filter out fields with type "heading" or with an empty placeholder
+          return field.type !== "heading" && field.type !== 'Empty Placeholder';
+        })
+        .map((field: any) => {
+          console.log('field check', field);
+          return {
+            value: field.name,
+            text: field.label
+          };
+        });
 
         // Add created_time and updated_time
         if (parsedMetadata.created_time) {

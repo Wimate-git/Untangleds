@@ -58,16 +58,17 @@ console.log('this.FormName',this.FormName)
   }
 
   parseChartConfig(chartDataConfigExport:any) {
+    console.log('chartDataConfigExport checking',chartDataConfigExport)
     if (!chartDataConfigExport || !Array.isArray(chartDataConfigExport.columnVisibility)) {
       console.error('Invalid chartDataConfigExport format:', this.chartDataConfigExport);
       return;
     }
   
     try {
-      const flattenedColumnVisibility = chartDataConfigExport.columnVisibility.flatMap((col: any) => col.columnVisibility || []);
-      console.log('Flattened Column Visibility:', flattenedColumnVisibility);
+      // const flattenedColumnVisibility = chartDataConfigExport.columnVisibility.flatMap((col: any) => col.columnVisibility || []);
+      // console.log('Flattened Column Visibility:', flattenedColumnVisibility);
   
-      this.columnDefs = this.createColumnDefs(flattenedColumnVisibility);
+      this.columnDefs = this.createColumnDefs(chartDataConfigExport.columnVisibility);
       console.log('Generated Column Definitions:', this.columnDefs);
     } catch (e) {
       console.error('Error processing chartDataConfigExport:', e);

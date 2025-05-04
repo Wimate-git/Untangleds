@@ -1076,8 +1076,13 @@ generateUniqueId(): number {
           console.log('formFields check',formFields)
 
           // Initialize the list with formFields labels
-          this.listofDynamicParam = formFields.map((field: any) => {
-            console.log('field check',field)
+          this.listofDynamicParam = formFields
+          .filter((field: any) => {
+            // Filter out fields with type "heading" or with an empty placeholder
+            return field.type !== "heading" && field.type !== 'Empty Placeholder';
+          })
+          .map((field: any) => {
+            console.log('field check', field);
             return {
               value: field.name,
               text: field.label
@@ -1651,14 +1656,26 @@ generateUniqueId(): number {
           console.log('formFields check',formFields)
   
           // Initialize the list with formFields labels
-          this.columnVisisbilityFields = formFields.map((field: any) => {
-            console.log('field check',field)
+          // this.columnVisisbilityFields = formFields.map((field: any) => {
+          //   console.log('field check',field)
+          //   return {
+          //     value: field.name,
+          //     text: field.label
+          //   };
+          // });
+  
+          this.columnVisisbilityFields = formFields
+          .filter((field: any) => {
+            // Filter out fields with type "heading" or with an empty placeholder
+            return field.type !== "heading" && field.type !== 'Empty Placeholder';
+          })
+          .map((field: any) => {
+            console.log('field check', field);
             return {
               value: field.name,
               text: field.label
             };
           });
-  
           // Include created_time and updated_time
           if (parsedMetadata.created_time) {
             this.columnVisisbilityFields.push({

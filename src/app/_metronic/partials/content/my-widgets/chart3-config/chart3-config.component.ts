@@ -355,6 +355,7 @@ console.log('enable checking from  chart3',enable)
     // Subscribe to add_fields changes
     this.createChart.get('add_fields')?.valueChanges.subscribe((val: any) => {
       if (val === null || val === undefined || val === '') return;
+      console.log('value check from chart3',val)
   
       const parsedVal = parseInt(val, 10);
       if (isNaN(parsedVal)) return;
@@ -494,11 +495,90 @@ console.log('enable checking from  chart3',enable)
     }
   }
 
+  // addControls(event: any, _type: string) {
+  //   console.log('event check', event);
+  
+  //   let noOfParams: any = '';
+  
+  //   if (_type === 'html' && event && event.target) {
+  //     if (event.target.value >= 0) {
+  //       noOfParams = JSON.parse(event.target.value);
+  //     } else {
+  //       return this.toast.open("Negative values not allowed", "Check again", {
+  //         duration: 5000,
+  //         horizontalPosition: 'right',
+  //         verticalPosition: 'top',
+  //       });
+  //     }
+  //   } else if (_type === 'ts') {
+  //     if (event >= 0) {
+  //       noOfParams = event;
+  //     }
+  //   }
+  //   console.log('noOfParams check', noOfParams);
+  
+  //   // Update all_fields based on noOfParams
+  //   if (this.createChart.value.all_fields.length < noOfParams) {
+  //     const firstFieldValues = this.getFormArrayValues();
+  //     for (let i = this.all_fields.length; i < noOfParams; i++) {
+  //       const newGroup = this.fb.group({
+  //           formlist: [ firstFieldValues.formlist || '', Validators.required],
+  //           parameterName: [ firstFieldValues.parameterName || '', Validators.required],
+ 
+  //           primaryValue: [firstFieldValues.primaryValue || '', Validators.required],
+  //           groupByFormat: [firstFieldValues.groupByFormat || '', Validators.required],
+
+     
+  //           selectedRangeType: [firstFieldValues.selectedRangeType || '', Validators.required], 
+  //           columnVisibility:[firstFieldValues.columnVisibility || []],
+  
+  //           formatType:[firstFieldValues.formatType || '', Validators.required],
+  //           undefinedCheckLabel:[firstFieldValues.undefinedCheckLabel || ''],
+  //           custom_Label:[firstFieldValues.custom_Label || '', Validators.required],
+  //           XaxisFormat:[firstFieldValues.XaxisFormat || ''],
+  //           drillTypeFields:[firstFieldValues.drillTypeFields || []],
+  //           drillTypeCustomLable:[firstFieldValues.drillTypeCustomLable || ''],
+  //           // selectFromTime: [''],
+  //           // selectToTime: [''],
+  //           parameterValue:[''],
+  //           constantValue: [''],
+  //           processed_value: ['234567'],
+  //           rowData:[''],
+  //           selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
+ 
+  //           filterParameter:[[]],
+  //           filterDescription:[''],
+     
+  //           CustomColumnColor:['']
+         
+  //         })
+  //         this.all_fields.push(newGroup);
+  //         console.log('this.all_fields check', this.all_fields);
+    
+  //         // After adding a new form group, subscribe to value changes
+  //         this.subscribeToValueChanges(i);
+  //       console.log('this.all_fields check', this.all_fields);
+  //     }
+  //   } else {
+  //     if (noOfParams !== "" && noOfParams !== undefined && noOfParams !== null) {
+  //       for (let i = this.all_fields.length; i >= noOfParams; i--) {
+  //         this.all_fields.removeAt(i);
+  //       }
+  //     }
+  //   }
+  
+  //   // Update noOfParams for use in addTile
+  //   this.noOfParams = noOfParams;
+  // }
+
+
+
   addControls(event: any, _type: string) {
     console.log('event check', event);
   
-    let noOfParams: any = '';
+    let noOfParams: number = 0; // Default to 0 to handle edge cases
   
+    // Handle HTML type event
     if (_type === 'html' && event && event.target) {
       if (event.target.value >= 0) {
         noOfParams = JSON.parse(event.target.value);
@@ -509,68 +589,250 @@ console.log('enable checking from  chart3',enable)
           verticalPosition: 'top',
         });
       }
-    } else if (_type === 'ts') {
+    } else if (_type === 'ts') { // Handle TypeScript event
       if (event >= 0) {
         noOfParams = event;
       }
     }
+  
     console.log('noOfParams check', noOfParams);
   
-    // Update all_fields based on noOfParams
-    if (this.createChart.value.all_fields.length < noOfParams) {
+    // If the current form array has fewer items than noOfParams, add new controls
+    if (this.all_fields.length < noOfParams) {
       for (let i = this.all_fields.length; i < noOfParams; i++) {
+        // Access the first field value safely or use defaults if the array is empty
+        const firstFieldValues = this.all_fields.length > 0 ? this.all_fields.at(0).value : {};
+        
         this.all_fields.push(
           this.fb.group({
-            formlist: ['', Validators.required],
-            parameterName: [[], Validators.required],
- 
-            primaryValue: ['', Validators.required],
-            groupByFormat: ['', Validators.required],
+            formlist: [firstFieldValues.formlist || '', Validators.required],
+            parameterName: [firstFieldValues.parameterName || [], Validators.required],
+            primaryValue: [firstFieldValues.primaryValue || '', Validators.required],
+            groupByFormat: [firstFieldValues.groupByFormat || '', Validators.required],
             constantValue: [''],
             processed_value: ['234567'],
             selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
-     
-            selectedRangeType: ['',Validators.required],
+            selectedRangeType: [firstFieldValues.selectedRangeType || '', Validators.required],
             selectFromTime: [''],
             selectToTime: [''],
-            parameterValue:[''],
-            columnVisibility:[[]],
-            rowData:[''],
-            formatType:['',Validators.required],
-            undefinedCheckLabel:[''],
-            custom_Label:['',Validators.required],
-            filterParameter:[[]],
-            filterDescription:[''],
-            XaxisFormat:[''],
-            drillTypeFields:[[]],
-            drillTypeCustomLable:[''],
-            CustomColumnColor:['']
-         
+            parameterValue: [''],
+            columnVisibility: [[]],
+            rowData: [''],
+            formatType: [firstFieldValues.formatType || '', Validators.required],
+            undefinedCheckLabel: [''],
+            custom_Label: [firstFieldValues.custom_Label || '', Validators.required],
+            filterParameter: [[]],
+            filterDescription: [''],
+            XaxisFormat: [''],
+            drillTypeFields: [[]],
+            drillTypeCustomLable: [''],
+            CustomColumnColor: ['']
           })
         );
         console.log('this.all_fields check', this.all_fields);
       }
-    } else {
-      if (noOfParams !== "" && noOfParams !== undefined && noOfParams !== null) {
-        for (let i = this.all_fields.length; i >= noOfParams; i--) {
-          this.all_fields.removeAt(i);
-        }
+    } else if (this.all_fields.length > noOfParams) {
+      // Remove extra fields if the array length is greater than noOfParams
+      for (let i = this.all_fields.length - 1; i >= noOfParams; i--) {
+        this.all_fields.removeAt(i);
       }
     }
-  
-    // Update noOfParams for use in addTile
+
+    // Update noOfParams for future use
     this.noOfParams = noOfParams;
   }
+
   get all_fields() {
     return this.createChart.get('all_fields') as FormArray;
   }
-
+  getFormArrayValues() {
+    // Check if form array has at least one element
+    if (this.createChart.value.all_fields.length > 0) {
+      // Get the first form group
+      const firstField = this.createChart.value.all_fields[0];
   
+      // Extract the desired values from the first form group
+      const formValues = {
+        groupByFormat: firstField.groupByFormat,
+        selectedRangeType: firstField.selectedRangeType,
+        parameterName:firstField.parameterName,
+        formlist:firstField.formlist,
+        formatType:firstField.formatType,
+        custom_Label:firstField.custom_Label,
+        primaryValue:firstField.primaryValue,
+        columnVisibility:firstField.columnVisibility,
+        XaxisFormat:firstField.XaxisFormat,
+        drillTypeFields:firstField.drillTypeFields,
+        drillTypeCustomLable:firstField.drillTypeCustomLable,
+        undefinedCheckLabel:firstField.undefinedCheckLabel
+
+
+
+      };
+  
+      console.log('Extracted values from the first form group:', formValues);
+      return formValues;  // Returning or processing the extracted values
+    } else {
+      console.log('Form array is empty');
+      return { groupByFormat: '', selectedRangeType: '' ,formatType:'',formlist:'',parameterName:'',primaryValue:'',custom_Label:'',columnVisibility:'',undefinedCheckLabel:'',drillTypeCustomLable:'',drillTypeFields:'',XaxisFormat:''};  // Return default empty values
+    }
+  }
+  subscribeToValueChanges(fieldIndex: number) {
+    const group = this.all_fields.at(fieldIndex);
+    
+    // Subscribe to groupByFormat field value changes
+    group.get('groupByFormat')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new groupByFormat value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('groupByFormat')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+  
+    // Subscribe to selectedRangeType field value changes
+    group.get('selectedRangeType')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('selectedRangeType')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+    group.get('formatType')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('formatType')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+
+    group.get('formlist')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('formlist')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+    group.get('parameterName')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('parameterName')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+
+
+
+    group.get('primaryValue')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('primaryValue')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+    group.get('custom_Label')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('custom_Label')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+    group.get('columnVisibility')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('columnVisibility')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+
+    group.get('undefinedCheckLabel')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('undefinedCheckLabel')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+
+
+    group.get('drillTypeCustomLable')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('drillTypeCustomLable')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+
+    group.get('drillTypeFields')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('drillTypeFields')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+
+    group.get('XaxisFormat')?.valueChanges.subscribe((value) => {
+      if (value) {
+        // Update all form groups with the new selectedRangeType value, except the current one
+        for (let i = 0; i < this.all_fields.length; i++) {
+          const innerGroup = this.all_fields.at(i);
+          if (i !== fieldIndex) {
+            innerGroup.get('XaxisFormat')?.setValue(value, { emitEvent: false });
+          }
+        }
+      }
+    });
+
+    
+    
+  }
 
   get drill_fields() {
     return this.createChart.get('drill_fields') as FormArray;
   }
-  
+
 
   generateUniqueId(): number {
     this.widgetIdCounter++;
@@ -1184,8 +1446,8 @@ repopulate_fields(getValues: any): FormArray {
           groupByFormat: [configItem.groupByFormat || '', Validators.required],
           constantValue: [configItem.constantValue || ''],
           selectedRangeType: [configItem.selectedRangeType || '', Validators.required],
-          selectFromTime: [configItem.selectFromTime || ''],
-          selectToTime: [configItem.selectToTime || ''],
+          // selectFromTime: [configItem.selectFromTime || ''],
+          // selectToTime: [configItem.selectToTime || ''],
           parameterValue: [configItem.parameterValue || ''],
           columnVisibility: this.fb.control(columnVisibility),
           filterParameter: this.fb.control(filterParameterValue),
@@ -1409,10 +1671,18 @@ repopulateDrill_fields(getValues: any): FormArray {
           const formFields = parsedMetadata.formFields;
 
           // Prepare parameter list
-          const dynamicParamList = formFields.map((field: any) => ({
-            value: field.name,
-            text: field.label,
-          }));
+          const dynamicParamList = formFields
+          .filter((field: any) => {
+            // Filter out fields with type "heading" or with an empty placeholder
+            return field.type !== "heading" && field.type !== 'Empty Placeholder';
+          })
+          .map((field: any) => {
+            console.log('field check', field);
+            return {
+              value: field.name,
+              text: field.label
+            };
+          });
 
           // Add created_time and updated_time
           if (parsedMetadata.created_time) {
@@ -1700,14 +1970,26 @@ repopulateDrill_fields(getValues: any): FormArray {
           console.log('formFields check',formFields)
 
           // Initialize the list with formFields labels
-          this.columnVisisbilityFields = formFields.map((field: any) => {
-            console.log('field check',field)
+          // this.columnVisisbilityFields = formFields.map((field: any) => {
+          //   console.log('field check',field)
+          //   return {
+          //     value: field.name,
+          //     text: field.label
+          //   };
+          // });
+
+          this.columnVisisbilityFields = formFields
+          .filter((field: any) => {
+            // Filter out fields with type "heading" or with an empty placeholder
+            return field.type !== "heading" && field.type !== 'Empty Placeholder';
+          })
+          .map((field: any) => {
+            console.log('field check', field);
             return {
               value: field.name,
               text: field.label
             };
           });
-
           // Include created_time and updated_time
           if (parsedMetadata.created_time) {
             this.columnVisisbilityFields.push({

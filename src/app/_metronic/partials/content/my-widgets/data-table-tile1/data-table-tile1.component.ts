@@ -22,7 +22,10 @@ export class DataTableTile1Component {
   pageSizeOptions = [10, 25, 50, 100];
 
   @Output() dataTableCellInfo = new EventEmitter<any>();
+  @Output() sendFormNameForMini = new EventEmitter<any>();
   rowClass: 'clickable-row'
+  modalData: any[] = [];
+  iconCellRenderer: (params: any) => string; 
   
 
   //   [responseRowData]="responseRowData"
@@ -46,13 +49,33 @@ export class DataTableTile1Component {
   gridColumnApi: any;
 
 
-  constructor(private modalService: NgbModal) {}
+  constructor(private modalService: NgbModal) {
+    this.iconCellRenderer = function (params) {
+      // Check if 'dynamic_table_values' exists and is not empty
+      if (params.data.dynamic_table_values && Object.keys(params.data.dynamic_table_values).some(key => params.data.dynamic_table_values[key].length > 0)) {
+        // If conditions are met, return the icon HTML
+        return `<i class="bi bi-table" style="color: #204887; font-size: 25px;"></i>`;
+      } else {
+        // If conditions are not met, return an empty string
+        return '';
+      }
+    };
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
 console.log('modalData check',this.storeDrillDown)
 console.log('columnDefs check',this.all_Packet_store)
 this.FormName = this.storeDrillDown.formlist
+console.log('this.storeDrillDown checking datatable tile1',this.storeDrillDown)
 console.log('this.FormName for drill name',this.FormName)
+// this.extractRowData = JSON.parse(this.item.rowData)
+// console.log('this.extractRowData checking',this.extractRowData)
+// console.log('this.extractRowData checking from',this.extractRowData)
+// this.sendminiTableData.emit(this.extractRowData)
+
+// this.extractFormName = this.item.formlist
+// console.log('this.extractFormName',this.extractFormName)
+this.sendFormNameForMini.emit(this.FormName)
 
 this.parseChartConfig(this.storeDrillDown)
 
@@ -88,7 +111,8 @@ this.parseChartConfig(this.storeDrillDown)
       sortable: true,
       filter: true,
       resizable: true,
-      cellClass: 'pointer-cursor'  // Add this class to the cells
+      cellClass: 'pointer-cursor' , // Add this class to the cells
+      cellRenderer: (column.value === 'dynamic_table_values') ? this.iconCellRenderer : undefined,
     }));
   }
   
@@ -341,5 +365,13 @@ this.parseChartConfig(this.storeDrillDown)
           return 'ag-row-clickable'; // Add the class for clickable rows
         }
         return '';
+      }
+
+      isModalOpen = false;
+
+      onRowClick(event: any): void {
+        console.log('Row clicked:', event.data);
+        this.modalData = [event.data]; // Pass the clicked row data to the modal
+        this.isModalOpen = true;
       }
 }

@@ -88,6 +88,9 @@ import { MixedChartUiComponent } from './mixed-chart-ui/mixed-chart-ui.component
 import { SemiDonutConfigComponent } from './semi-donut-config/semi-donut-config.component';
 import { SemiDonutUiComponent } from './semi-donut-ui/semi-donut-ui.component';
 import { DataTablePieChartComponent } from './data-table-pie-chart/data-table-pie-chart.component';
+import { GaugeChartConfigComponent } from './gauge-chart-config/gauge-chart-config.component';
+import { GaugeChartUiComponent } from './gauge-chart-ui/gauge-chart-ui.component';
+import { MiniTableViewTile1Component } from './mini-table-view-tile1/mini-table-view-tile1.component';
 
 
 
@@ -153,7 +156,11 @@ import { DataTablePieChartComponent } from './data-table-pie-chart/data-table-pi
     MixedChartUiComponent,
     SemiDonutConfigComponent,
  SemiDonutUiComponent ,
- DataTablePieChartComponent
+ DataTablePieChartComponent,
+ GaugeChartConfigComponent,
+ GaugeChartConfigComponent,
+ GaugeChartUiComponent,
+ MiniTableViewTile1Component
     
 
 
@@ -190,6 +197,7 @@ import { DataTablePieChartComponent } from './data-table-pie-chart/data-table-pi
     GoogleMapsModule ,
     HttpClientModule,
     NgxSpinnerModule,
+   
 
 
   
@@ -259,7 +267,10 @@ import { DataTablePieChartComponent } from './data-table-pie-chart/data-table-pi
     MixedChartConfigComponent,
     MixedChartUiComponent,
     SemiDonutConfigComponent,
-    SemiDonutUiComponent,DataTablePieChartComponent
+    SemiDonutUiComponent,DataTablePieChartComponent,
+    GaugeChartConfigComponent,
+    GaugeChartUiComponent,
+    MiniTableViewTile1Component
     
   
 

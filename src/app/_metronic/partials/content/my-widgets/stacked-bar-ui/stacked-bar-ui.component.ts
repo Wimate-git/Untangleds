@@ -523,7 +523,7 @@ export class StackedBarUiComponent {
     
       // Loop through the data array
       dataArray.forEach((packet: any, matchedIndex: number) => {
-        console.log('packet: stacked bar Chart', packet); // Log each packet to ensure it is as expected
+        console.log('packet:', packet); // Log each packet to ensure it is as expected
     
         // If data is a single item, skip the check for this.index == matchedIndex
         if (packet.grid_type == 'Stackedchart' && packet.id === this.item.id) {
@@ -533,14 +533,14 @@ export class StackedBarUiComponent {
               tempCharts[matchedIndex] = packet;
               setTimeout(() => {
                 this.createStackedBarChart(packet);
-              }, 1500);
+              }, 1000);
             }
           } else {
             // For single data, do not check index, just use the packet
             tempCharts[0] = packet;
             setTimeout(() => {
               this.createStackedBarChart(packet);
-            }, 1500);
+            }, 1000);
           }
         }
       });

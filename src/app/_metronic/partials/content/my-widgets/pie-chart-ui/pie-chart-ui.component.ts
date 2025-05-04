@@ -18,6 +18,35 @@ interface CustomPoint {
   y: number;
   colorIndex: number;
 }
+
+
+interface FormTableConfig {
+  columnVisibility: Array<{
+    formlist: string;
+    parameterName: string[];
+    primaryValue: string;
+    groupByFormat: string;
+    constantValue: string;
+    // Include other properties as needed
+  }>;
+  formName?: string;
+}
+interface ColumnVisibility {
+  formlist: string;
+  parameterName: string[];
+  primaryValue: string;
+  groupByFormat: string;
+  constantValue: string;
+  // Add other properties that are part of the object
+}
+interface storeColumnVisibility {
+  formlist: string;
+  parameterName: string[];
+  primaryValue: string;
+  groupByFormat: string;
+  constantValue: string;
+  columnVisibility: string[]; // This expects an array of strings
+}
 @Component({
   selector: 'app-pie-chart-ui',
 
@@ -56,7 +85,7 @@ export class PieChartUiComponent implements OnChanges,OnInit{
   @Output() emitChartConfigTable = new EventEmitter<any>();
   @Input() eventFilterConditions : any
   
-  formTableConfig: {};
+  // formTableConfig: {};
   isChecked: boolean = false;
   counter: number=0;
   isHomeChecked:boolean = false;
@@ -68,6 +97,7 @@ export class PieChartUiComponent implements OnChanges,OnInit{
   isDrillPacketAvailable: any;
   storeRedirectionCheck: any;
   enableDrillButton: boolean;
+  formTableConfig: FormTableConfig = { columnVisibility: [] };
   
 ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui', this.all_Packet_store);
@@ -92,7 +122,7 @@ ngOnChanges(changes: SimpleChanges): void {
   ngAfterViewInit(){
     setTimeout(() => {
       this.createPieChart()
-    }, 500);
+    }, 1000);
 
   
 
@@ -177,14 +207,14 @@ ngOnChanges(changes: SimpleChanges): void {
               tempCharts[matchedIndex] = packet;
               setTimeout(() => {
                 this.createPieChart(packet);
-              }, 1000);
+              }, 1500);
             }
           } else {
             // For single data, do not check index, just use the packet
             tempCharts[0] = packet;
             setTimeout(() => {
               this.createPieChart(packet);
-            }, 1000);
+            }, 1500);
           }
         }
       });
@@ -216,47 +246,59 @@ if(data){
 
     console.log(' Initializing Pie Chart for ', chartdata);
     if(chartdata){
-      const chartOptionsCopy = JSON.parse(chartdata.highchartsOptionsJson);
-      console.log('data check from initialiaze',chartOptionsCopy)
-      chartOptionsCopy.series = chartOptionsCopy.series.map((series: any) => {
-        return {
-          ...series,
-          data: series.data.map((point: any, index: number) => ({
-            name: point[0], // First element as name
-            y: point[1],    // Second element as value
-            customIndex: index,
-            events: {
-              click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event,this.index),
-            },
-          })),
-        };
-      });
-    
-      // Initialize the Highcharts pie chart
-      Highcharts.chart(`pieChart${this.index + 1}`, chartOptionsCopy);
-
-    }else{
+       const chartOptionsCopy = JSON.parse(chartdata.highchartsOptionsJson);
+            console.log('data check from initialiaze',chartOptionsCopy)
+            const readOptions = chartOptionsCopy; // Use chartOptionsCopy directly
+            console.log('readOptions checking from chart1', readOptions);
+            readOptions.series = readOptions.series.map((series: any) => {
+              return {
+                ...series,
+                data: series.data.map((point: any, index: number) => ({
+                  name: point.name,         // Directly access the name property
+                  y: point.y,               // Directly access the y property (value)
+                  customIndex: index,       // Custom index for the point
+                  selected: point.selected, // Directly access the selected property
+                  sliced: point.sliced,  
+                  events: {
+                    click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event,this.index),
+                  },
+                })),
+              };
+            });
+          
+            // Initialize the Highcharts pie chart
+            Highcharts.chart(`pieChart${this.index + 1}`, readOptions);
+    }
+    else {
+      // Create a deep copy of the original chart options by stringifying and parsing it
       const chartOptionsCopy = JSON.parse(this.item.highchartsOptionsJson);
-
-      console.log('chartOptionsCopy else condition',chartOptionsCopy)
-
-      chartOptionsCopy.series = chartOptionsCopy.series.map((series: any) => {
+      console.log('chartOptionsCopy with preserved properties:', chartOptionsCopy);
+    
+      // Since chartOptionsCopy is already an object, no need to parse it again
+      const readOptions = chartOptionsCopy; // Use chartOptionsCopy directly
+      console.log('readOptions checking from chart1', readOptions);
+    
+      // Modify the series data with necessary transformations
+      readOptions.series = readOptions.series.map((series: any) => {
+        console.log('readOptions.series checking',readOptions.series)
         return {
           ...series,
           data: series.data.map((point: any, index: number) => ({
-            name: point[0], // First element as name
-            y: point[1],    // Second element as value
-            customIndex: index,
+            name: point.name,         // Directly access the name property
+            y: point.y,               // Directly access the y property (value)
+            customIndex: index,       // Custom index for the point
+            selected: point.selected, // Directly access the selected property
+            sliced: point.sliced,     // Directly access the sliced property
+    
             events: {
-              click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event,this.index),
+              click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event, this.index),
             },
           })),
         };
       });
     
-      // Initialize the Highcharts pie chart
+      // Initialize the Highcharts pie chart once
       Highcharts.chart(`pieChart${this.index + 1}`, chartOptionsCopy);
-
     }
 
     // Ensure that each chart gets a unique copy of the options
@@ -481,13 +523,134 @@ console.log('this.gridOptions checking from chart',this.gridOptions)
     // }
   
   
-    if (storeconditionsLength === this.counter || storeconditionsLength === undefined) {
-      console.log('Emitting action, either conditions are empty or second bar clicked');
+  //   if (storeconditionsLength === this.counter || storeconditionsLength === undefined) {
+  //     console.log('Emitting action, either conditions are empty or second bar clicked');
       
-      // Emit action
+  //     // Emit action
+  //     this.emitChartConfigTable.emit(this.formTableConfig);
+  //     this.sendCellInfo.emit(event);
+  //     this.counter--; // Reset counter after emitting
+  // }
+
+    if (storeconditionsLength === this.counter || storeconditionsLength === undefined) {
+      console.log('storeconditionsLength checking from donut',storeconditionsLength)
+      console.log('this.counter checking from donut',this.counter)
+      console.log('Emitting action, either conditions are empty or second bar clicked');
+      console.log('this.formTableConfig checking from donut',this.formTableConfig)
+      console.log('this.formTableConfig checking from donut', this.formTableConfig);
+      console.log('access columnVisibility',this.formTableConfig.columnVisibility);
+      const storeObject = this.formTableConfig.columnVisibility
+      const storeColumnVisibility:any =this.formTableConfig.columnVisibility[0]
+      console.log('storeColumnVisibility checking',storeColumnVisibility)
+     const columnVisibility = storeColumnVisibility?.columnVisibility || [];
+     console.log('columnVisibility check from donut',columnVisibility)
+     if (!columnVisibility.length) {
+      // Show SweetAlert with the updated message if columnVisibility is empty or undefined
+      Swal.fire({
+          icon: 'warning',
+          title: 'Final Stage',
+          text: 'columnVisibility is not configured.',
+          confirmButtonText: 'OK'
+      });
+      this.counter--; 
+  } 
+  else {
+      // Proceed with emitting events if columnVisibility is valid
       this.emitChartConfigTable.emit(this.formTableConfig);
       this.sendCellInfo.emit(event);
-      this.counter--; // Reset counter after emitting
+      this.counter--; 
+  
+  
+  
+  
+  
+      const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+    
+      const requestBody = {
+        body: JSON.stringify({
+          clientId: this.SK_clientID,
+          routeId: this.routeId,
+          widgetId: this.item.id,
+          chartData: pointData,
+          MsgType: 'DrillDown',
+          permissionId: this.permissionIdRequest,
+          permissionList: this.readFilterEquation,
+          userName: this.userdetails,
+          conditions: this.eventFilterConditions || [],
+          DrillFilter: this.storeDrillFilter || '',
+          DrillFilterLevel: this.DrillFilterLevel || ''
+        }),
+      };
+    
+      console.log('requestBody checking chart1Drilldown', requestBody);
+    
+      // Send a POST request to the Lambda function
+      this.http.post(apiUrl, requestBody).subscribe(
+        (response: any) => {
+            if (response?.statusCode === 200) {
+                console.log('Lambda function triggered successfully chart1 drilldown', response);
+                this.checkResBody = response.body;
+                this.parsedResBody.push(JSON.parse(this.checkResBody));
+                console.log('this.parsedResBody checking', this.parsedResBody);
+    
+                this.parsedResBody.forEach((item, index) => {
+                    if (Object.keys(item).includes('ChartData')) {
+                        this.parseChartData = JSON.parse(item.ChartData);
+                        console.log(`this.parseChartDatav checking at index ${index}`, this.parseChartData);
+                        this.storeDrillFilter = this.parseChartData.DrillFilter;
+                        this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
+    
+                        this.summaryService.updatelookUpData(this.parseChartData);
+                    } else {
+                        this.processedData = JSON.parse(item.rowdata);
+                        console.log(`this.processedData check at index ${index}`, this.processedData);
+                        this.paresdDataEmit.emit(this.processedData);
+                    }
+            
+                });
+                // Hide the spinner after API processing
+                this.spinner.hide('dataProcess' + index);
+            } else {
+                // Hide the spinner in case of an error
+                this.spinner.hide('dataProcess' + index);
+                console.error('Unexpected statusCode:', response?.statusCode);
+                Swal.fire({
+                    title: 'Error!',
+                    text: `Unexpected response received (Status Code: ${response?.statusCode}).`,
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        },
+        (error: any) => {
+            // Hide the spinner if there's an error
+            this.spinner.hide('dataProcess' + index);
+            console.error('Error triggering Lambda function:', error);
+    
+            if (error.status === 404) {
+                console.log('Received 404 error - stopping loading and showing error message.');
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Data not found. Please check your inputs and try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Failed to trigger the Lambda function. Please try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+    );
+  }
+  
+  
+      // this.emitChartConfigTable.emit(this.formTableConfig);
+      // this.sendCellInfo.emit(event);
+      // this.counter--; 
   }
 
   if(storeconditionsLength === undefined){

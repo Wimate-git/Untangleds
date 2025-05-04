@@ -226,7 +226,7 @@
               ></ngx-select>
               </div> -->
       
-              <div class="col-md-4 mb-3">
+              <!-- <div class="col-md-4 mb-3">
               <label for="timeInput" class="col-createChart-label fw-bold fs-6 ">From Time</label>
 <input type="time" class="form-control form-control-solid" id="timeInput" name="timeInput"     formControlName="selectFromTime">
               </div>
@@ -255,7 +255,7 @@
   
   
   
-                  <div class="col-md-3 mb-3">
+                  <div *ngIf="createKPIWidget.controls.selectType.value !== 'drill down'" class="col-md-3 mb-3">
                     <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Redirect To</label>
                     <ngx-select
                    
@@ -291,7 +291,7 @@
 
 
 
-              </div>
+              </div> -->
 
                 <div class="row g-3 align-items-center">
                   <!-- Select Type -->
@@ -715,7 +715,7 @@
   
       </div>
   
-      <div class="modal-footer" style="margin-top: 20px;">
+      <div class="modal-footer" style="margin-top:200px">
         <button type="button" class="btn btn-secondary" (click)="modal.dismiss()"  >Discard</button>
         <button 
         type="button" 

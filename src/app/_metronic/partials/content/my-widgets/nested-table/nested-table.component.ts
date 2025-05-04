@@ -136,34 +136,7 @@ if (changes.emitEvent && changes.emitEvent.currentValue) {
   }
 
 
-  async fetchMiniTableData(item: any) {
-    try {
-        this.extractedTables = []; // Initialize as an empty array to prevent undefined errors
 
-        const resultMain: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#" + item + "#main", 1);
-        if (resultMain) {
-            console.log('forms chaecking', resultMain);
-            const helpherObjmain = JSON.parse(resultMain.metadata);
-            console.log('helpherObjmain checking', helpherObjmain);
-
-            const extractFormFields = helpherObjmain.formFields;
-
-            // Ensure extractedTables is set properly
-            this.extractedTables = Object.values(extractFormFields).filter((item: any) =>
-                typeof item === 'object' &&
-                item !== null &&
-                'name' in item &&
-                typeof item.name === 'string' &&
-                item.name.startsWith("table-")
-            );
-
-            console.log('Extracted Table Records:', this.extractedTables);
-            return this.extractedTables;
-        }
-    } catch (err) {
-        console.log("Error fetching the dynamic form data", err);
-    }
-}
 
 async processEvent(event: EmitEvent) {
   console.log('event', event);
@@ -273,7 +246,34 @@ async processEvent(event: EmitEvent) {
 
 
 
+async fetchMiniTableData(item: any) {
+  try {
+      this.extractedTables = []; // Initialize as an empty array to prevent undefined errors
 
+      const resultMain: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#" + item + "#main", 1);
+      if (resultMain) {
+          console.log('forms chaecking', resultMain);
+          const helpherObjmain = JSON.parse(resultMain.metadata);
+          console.log('helpherObjmain checking', helpherObjmain);
+
+          const extractFormFields = helpherObjmain.formFields;
+
+          // Ensure extractedTables is set properly
+          this.extractedTables = Object.values(extractFormFields).filter((item: any) =>
+              typeof item === 'object' &&
+              item !== null &&
+              'name' in item &&
+              typeof item.name === 'string' &&
+              item.name.startsWith("table-")
+          );
+
+          console.log('Extracted Table Records:', this.extractedTables);
+          return this.extractedTables;
+      }
+  } catch (err) {
+      console.log("Error fetching the dynamic form data", err);
+  }
+}
 
 
 
