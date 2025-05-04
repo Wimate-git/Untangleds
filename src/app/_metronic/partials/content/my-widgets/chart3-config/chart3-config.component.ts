@@ -1022,7 +1022,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
 
 
    
-    chart_title: this.createChart.value.chart_title,
+    chart_title: this.createChart.value.chart_title ||'',
 
     filterDescription:this.createChart.value.filterDescription ||'',
     // fontSize: this.createChart.value.fontSize,
@@ -1045,13 +1045,13 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     // filterParameter:this.createChart.value.filterParameter,
     // filterDescription:this.createChart.value.filterDescription,
     // Include noOfParams
-    noOfParams:this.dashboard[this.editTileIndex].noOfParams,
+    noOfParams:this.dashboard[this.editTileIndex].noOfParams ||'',
          DrillConfig:this.createChart.value.drill_fields || [],
         DrillDownType:this.createChart.value.DrillDownType ||'',
-        multiColorCheck: this.createChart.value.multiColorCheck ,
-        dataLabelFontColor:this.createChart.value.dataLabelFontColor,
-        chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
-        chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
+        multiColorCheck: this.createChart.value.multiColorCheck ||'',
+        dataLabelFontColor:this.createChart.value.dataLabelFontColor ||'',
+        chartBackgroundColor1:this.createChart.value.chartBackgroundColor1 ||'',
+        chartBackgroundColor2:this.createChart.value.chartBackgroundColor2 ||'',
         enableLegends: this.createChart.value.enableLegends || '',
 
 

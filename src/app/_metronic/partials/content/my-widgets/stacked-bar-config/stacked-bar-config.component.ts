@@ -1235,7 +1235,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
 
 
    
-    chart_title: this.createChart.value.chart_title,
+    chart_title: this.createChart.value.chart_title ||'',
     // fontSize: this.createChart.value.fontSize,
     // themeColor: this.createChart.value.themeColor,
     // fontColor: this.createChart.value.fontColor,
@@ -1254,10 +1254,10 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     add_fields:this.createChart.value.add_fields ||'',
     DrillConfig:this.createChart.value.drill_fields || [],
     DrillDownType:this.createChart.value.DrillDownType ||'',
-    dataLabelFontColor:this.createChart.value.dataLabelFontColor,
-    chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
-    chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
-    ChartTypeSelection:this.createChart.value.ChartTypeSelection,
+    dataLabelFontColor:this.createChart.value.dataLabelFontColor ||'',
+    chartBackgroundColor1:this.createChart.value.chartBackgroundColor1 ||'',
+    chartBackgroundColor2:this.createChart.value.chartBackgroundColor2 ||'',
+    ChartTypeSelection:this.createChart.value.ChartTypeSelection ||'',
 
     // filterForm:this.createChart.value.filterForm,
     // filterParameter:this.createChart.value.filterParameter,

@@ -634,7 +634,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
 
 
    
-    chart_title: this.createChart.value.chart_title,
+    chart_title: this.createChart.value.chart_title ||'',
     // fontSize: this.createChart.value.fontSize,
     // themeColor: this.createChart.value.themeColor,
     // fontColor: this.createChart.value.fontColor,
@@ -657,11 +657,11 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     // filterParameter:this.createChart.value.filterParameter,
     // filterDescription:this.createChart.value.filterDescription,
     // Include noOfParams
-    noOfParams:this.dashboard[this.editTileIndex].noOfParams,
+    noOfParams:this.dashboard[this.editTileIndex].noOfParams ||'',
 
-    dataLabelFontColor:this.createChart.value.dataLabelFontColor,
-    chartBackgroundColor1:this.createChart.value.chartBackgroundColor1,
-    chartBackgroundColor2:this.createChart.value.chartBackgroundColor2,
+    dataLabelFontColor:this.createChart.value.dataLabelFontColor ||'',
+    chartBackgroundColor1:this.createChart.value.chartBackgroundColor1 || '',
+    chartBackgroundColor2:this.createChart.value.chartBackgroundColor2 || '',
     enableLegends: this.createChart.value.enableLegends || '',
 
       };
