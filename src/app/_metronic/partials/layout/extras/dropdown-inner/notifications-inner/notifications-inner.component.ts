@@ -3,6 +3,7 @@ import { LayoutService } from '../../../../../layout';
 import { APIService } from 'src/app/API.service';
 // import { formatDistanceToNow } from 'date-fns';
 import { Router } from '@angular/router';
+import { NotificationService } from 'src/app/pages/services/notification/notification.service';
 
 
 export type NotificationsTabsType =
@@ -30,13 +31,14 @@ export class NotificationsInnerComponent implements OnInit {
   main_table_data: any[] = [];
   id: string;
   notification: any[];
-  count =0
+  count = 0
   // logs: Array<LogModel> = defaultLogs;
   constructor(
     private api: APIService,
-    private router : Router
-    
-  ) {}
+    private router: Router,
+    private nObserve: NotificationService//2 may
+
+  ) { }
 
   async ngOnInit(): Promise<void> {
 
@@ -47,118 +49,122 @@ export class NotificationsInnerComponent implements OnInit {
 
     this.login_detail = localStorage.getItem('userAttributes')
 
-      this.loginDetail_string = JSON.parse(this.login_detail)
-      console.log("AFTER JSON STRINGIFY", this.loginDetail_string)
+    this.loginDetail_string = JSON.parse(this.login_detail)
+    console.log("AFTER JSON STRINGIFY", this.loginDetail_string)
 
-      this.client = this.loginDetail_string.clientID
-      this.user = this.loginDetail_string.username
+    this.client = this.loginDetail_string.clientID
+    this.user = this.loginDetail_string.username
 
-      // const today = new Date(); // Current date
-      //   const todayepoch = today.getTime();
+    // const today = new Date(); // Current date
+    //   const todayepoch = today.getTime();
 
-      //   const fiveYearsAgo = new Date();
-      //   fiveYearsAgo.setFullYear(today.getFullYear() - 1); // Subtract 2 years
-      //   const epochTime = fiveYearsAgo.getTime();
-
-
-      
-      // const requestBody = {
-      //   "operation": "Between",
-      //   "pk": `${this.client}#app notification#${this.user}#main`,
-      //   "sk1": epochTime,
-      //   "sk2": todayepoch,
-      //   "ascending": false,
-      //   "limit": 100,
-      //   "lastEvaluatedKey": null
-      // };
+    //   const fiveYearsAgo = new Date();
+    //   fiveYearsAgo.setFullYear(today.getFullYear() - 1); // Subtract 2 years
+    //   const epochTime = fiveYearsAgo.getTime();
 
 
-      // // this.notification(1)
 
-      // await this.fetchAllData(requestBody)
+    // const requestBody = {
+    //   "operation": "Between",
+    //   "pk": `${this.client}#app notification#${this.user}#main`,
+    //   "sk1": epochTime,
+    //   "sk2": todayepoch,
+    //   "ascending": false,
+    //   "limit": 100,
+    //   "lastEvaluatedKey": null
+    // };
 
 
-      this.fetchNotification();
+    // // this.notification(1)
+
+    // await this.fetchAllData(requestBody)
+
+
+    this.fetchNotification();
 
   }
 
 
-  async fetchNotification(){
+  async fetchNotification() {
+
+    this.main_table_data = []
+    // this.nObserve.setNotificationCount(0)
+    // this.nObserve.setUnreadNotification(0)
 
     const today = new Date(); // Current date
-        const todayepoch = today.getTime();
+    const todayepoch = today.getTime();
 
-        const fiveYearsAgo = new Date();
-        fiveYearsAgo.setFullYear(today.getFullYear() - 1); // Subtract 2 years
-        const epochTime = fiveYearsAgo.getTime();
-
-
-      
-      const requestBody = {
-        "operation": "Between",
-        "pk": `${this.client}#app notification#${this.user}#main`,
-        "sk1": epochTime,
-        "sk2": todayepoch,
-        "ascending": false,
-        "limit": 100,
-        "lastEvaluatedKey": null
-      };
+    const fiveYearsAgo = new Date();
+    fiveYearsAgo.setFullYear(today.getFullYear() - 1); // Subtract 2 years
+    const epochTime = fiveYearsAgo.getTime();
 
 
-      // this.notification(1)
 
-      await this.fetchAllData(requestBody)
+    const requestBody = {
+      "operation": "Between",
+      "pk": `${this.client}#app notification#${this.user}#main`,
+      "sk1": epochTime,
+      "sk2": todayepoch,
+      "ascending": false,
+      "limit": 100,
+      "lastEvaluatedKey": null
+    };
 
-  
+
+    // this.notification(1)
+
+    await this.fetchAllData(requestBody)
+
+
   }
 
-reloadComponentEveryMinute() {
-  setTimeout(async () => {
-    console.log("AFTER ! MIN")
+  reloadComponentEveryMinute() {
+    setTimeout(async () => {
+      console.log("AFTER ! MIN")
 
-    this.count = 1
+      this.count = 1
 
-    // window.location.reload();
+      // window.location.reload();
 
-    this.notification = this.main_table_data
+      this.notification = this.main_table_data
 
-    console.log("length Notification main_Table_data:",this.notification.length,this.main_table_data.length)
-    // if(this.main_table_data.length > this.notification.length){
+      console.log("length Notification main_Table_data:", this.notification.length, this.main_table_data.length)
+      // if(this.main_table_data.length > this.notification.length){
 
-    //   this.playNotificationSound();
-    // }
-       this.main_table_data =[]
-    await this.fetchNotification();
+      //   this.playNotificationSound();
+      // }
 
-    this.reloadComponentEveryMinute();
+      await this.fetchNotification();
 
-  }, 60000); // 60,000 ms = 1 minute
-}
+      this.reloadComponentEveryMinute();
 
-
-formatDate(timestamp: number): string {
-  const now = new Date().getTime();
-  const diff = Math.floor((now - timestamp) / 1000);
-  const days = Math.floor(diff / 86400);
-  const months = Math.floor(days / 30); // Assuming an average of 30 days in a month
-  const years = Math.floor(days / 365); // More accurate for years
-  
-  if (diff < 60) {
-    return `${diff} second${diff !== 1 ? 's' : ''} ago`;
-  } else if (diff < 3600) {
-    return `${Math.floor(diff / 60)} minute${Math.floor(diff / 60) !== 1 ? 's' : ''} ago`;
-  } else if (diff < 86400) {
-    return `${Math.floor(diff / 3600)} hour${Math.floor(diff / 3600) !== 1 ? 's' : ''} ago`;
-  } else if (days < 30) { 
-    return `${days} day${days !== 1 ? 's' : ''} ago`;
-  } else if (months < 12) {
-    return `${months} month${months !== 1 ? 's' : ''} ago`;
-  } else {
-    return `${years} year${years !== 1 ? 's' : ''} ago`;
+    }, 60000); // 60,000 ms = 1 minute
   }
-}
 
-  async fetchAllData(requestBody:any) {
+
+  formatDate(timestamp: number): string {
+    const now = new Date().getTime();
+    const diff = Math.floor((now - timestamp) / 1000);
+    const days = Math.floor(diff / 86400);
+    const months = Math.floor(days / 30); // Assuming an average of 30 days in a month
+    const years = Math.floor(days / 365); // More accurate for years
+
+    if (diff < 60) {
+      return `${diff} second${diff !== 1 ? 's' : ''} ago`;
+    } else if (diff < 3600) {
+      return `${Math.floor(diff / 60)} minute${Math.floor(diff / 60) !== 1 ? 's' : ''} ago`;
+    } else if (diff < 86400) {
+      return `${Math.floor(diff / 3600)} hour${Math.floor(diff / 3600) !== 1 ? 's' : ''} ago`;
+    } else if (days < 30) {
+      return `${days} day${days !== 1 ? 's' : ''} ago`;
+    } else if (months < 12) {
+      return `${months} month${months !== 1 ? 's' : ''} ago`;
+    } else {
+      return `${years} year${years !== 1 ? 's' : ''} ago`;
+    }
+  }
+
+  async fetchAllData(requestBody: any) {
 
     fetch('https://gx2xgbmus8.execute-api.ap-south-1.amazonaws.com/test', {
       method: 'POST',
@@ -210,19 +216,19 @@ formatDate(timestamp: number): string {
     audio.play().catch(error => console.error("Error playing notification sound:", error));
   }
 
-  
+
   processData(notification_data: any[]) {
 
     console.log("DATA:", notification_data)
 
-    if(this.count > 0){
+    if (this.count > 0) {
 
-    if(this.notification.length < notification_data.length){
+      if (this.notification.length < notification_data.length) {
 
-      this.playNotificationSound()
+        this.playNotificationSound()
 
+      }
     }
-  }
 
     this.app_notification = notification_data
 
@@ -233,52 +239,151 @@ formatDate(timestamp: number): string {
     this.alerts = this.app_notification.map(item => ({
       title: item.metadata.ID,
       description: item.metadata.message,
+      SK: item.SK,
       // time: formatDistanceToNow(new Date(item.metadata.createdTime), { addSuffix: true }),  // Converts timestamp to readable date
       time: this.formatDate(item.metadata.createdTime),
       // icon: 'icons/duotune/technology/teh008.svg', // Example icon, you might want to vary it
       state: 'primary', // Example state, this might also be dynamic based on your conditions
-      isSelected:item.metadata.seen_flag,
-      formID:item.metadata.formID,
-      uniqueID:item.metadata.uniqueID
+      isSelected: item.metadata.seen_flag,
+      formID: item.metadata.formID,
+      uniqueID: item.metadata.uniqueID
     }));
 
 
-    console.log("THIS ALERTS:",this.alerts.length)
+
+    // console.log("THIS ALERTS:",this.alerts.length)
+    console.log('this.alerts :>> ', this.alerts);
+
+    let flg = 0
+    console.log('this.app_notification :>> ', this.app_notification);//2 may
+
+    this.alerts.forEach((item) => {
+      if (item.isSelected === false) {
+        flg += 1
+      }
+
+    })
+
+    this.nObserve.setNotificationCount(this.alerts.length)
+    this.nObserve.setUnreadNotification(flg)
+
+    console.log('this.nObserve :>>getNotificationCount- ', this.nObserve.getNotificationCount());
+    console.log('this.nObserve :>>getUnreadNotification- ', this.nObserve.getUnreadNotification());
+
   }
-  
+
+  get newNotification() {
+    return this.nObserve.getUnreadNotification()
+  }
 
   setActiveTabId(tabId: NotificationsTabsType) {
     this.activeTabId = tabId;
   }
 
   toggleSelection(alert: any) {
+    let temp = this.nObserve.getUnreadNotification();
+    if (temp >= 1 && alert.isSelected === false) {
+      temp -= 1;
+      this.nObserve.setUnreadNotification(temp)
+    }
 
-    // console.log((alert.title).split('#')[1])
+    if (alert.isSelected === false) {
+      this.markAsRead(alert.SK);
+    }
+
+
 
     let epohc = this.extractEpochTime(alert.title)
     console.log(epohc)
 
     let recordId = {
       "type": "view",  //  "view", "create"
-      "fields":{
-      "wfnl.single-select-1732769559973": "Closed",
-      "ewfefw.single-select-1732770321368": "Repair",
-      "ewfm.single-select-1732780036906": "15122",  // Customer ID 
-      "webfkh.single-select-1732780036907": "32061259",  //  Equipment ID 
-      "wfegiy.single-select-1732780036908": "1000747",  //   Contract ID 
+      "fields": {
+        "wfnl.single-select-1732769559973": "Closed",
+        "ewfefw.single-select-1732770321368": "Repair",
+        "ewfm.single-select-1732780036906": "15122",  // Customer ID 
+        "webfkh.single-select-1732780036907": "32061259",  //  Equipment ID 
+        "wfegiy.single-select-1732780036908": "1000747",  //   Contract ID 
       },
       "mainTableKey": alert.uniqueID, // web_1736503505722
     }
 
-    console.log(recordId)
+    console.log('clicked alert :>> ', alert);
+
+    console.log('recordId :>> ', recordId);
 
     this.id = 'Forms'
     this.router.navigate([`view-dreamboard/${this.id}/${alert.formID}&recordId=${JSON.stringify(JSON.stringify(recordId))}`]);
 
+    console.log(`redirect link--> view-dreamboard/${this.id}/${alert.formID}&recordId=${JSON.stringify(JSON.stringify(recordId))}`);
 
-    alert.isSelected = !alert.isSelected;
+    alert.isSelected = true;
+
+
 
     console.log(alert)
+
+
+  }
+  markAsRead(uniqueID: any) {
+
+    const item = this.app_notification.find(item => item.SK === uniqueID);
+
+    try {
+
+      if (item) {
+        console.log('item found :>> ', item);
+        item.metadata.main_seen_flag = true;
+        item.metadata.seen_flag = true;
+
+
+        const requestBody = {
+          "table_name": 'master',
+          "newItem": item,
+
+          "newItem_lookup": {
+            "PK": this.client + '#app notification#' + this.user + '#' + 'lookup',
+            "options": [item.metadata.updatedTime, item.metadata.main_seen_flag, item.metadata.seen_flag, item.metadata.message, item.metadata.ID],
+            "metadata": {}
+          },
+          "PK_key": "PK",
+          "SK_key": "SK",
+          "type": "add_request_lookup_main"
+        }
+
+        fetch('https://iy5kihshy9.execute-api.ap-south-1.amazonaws.com/s1/crud', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': 'p2FIIEi4cA2unoJhRIA137vRdGEuJCCi5hV6Vc11'
+          },
+          body: JSON.stringify(requestBody)
+        }).then(response => {
+          if (!response.ok) {
+
+            throw new Error('Network response was not ok');
+          }
+          // // console.log("response:", response);
+          return response.json();
+        })
+          .then(data => {
+            console.log('data changed :>> ', data);
+          })
+        this.fetchNotification();
+        console.log('requestBody :>> ', requestBody);
+      } else {
+
+        console.error('requested id not found in notification');
+
+      }
+
+    } catch (error) {
+      console.error('error occured in markAsRead:>> ', error);
+    }
+
+
+
+
 
 
   }
@@ -286,7 +391,7 @@ formatDate(timestamp: number): string {
   extractEpochTime(data: string) {
     const match = data.match(/(\d+)/);
     return match ? match[1] : null;
-}
+  }
 }
 
 interface AlertModel {
@@ -295,9 +400,9 @@ interface AlertModel {
   time: string;
   // icon: string;
   state: 'primary' | 'danger' | 'warning' | 'success' | 'info';
-  isSelected:boolean,
-  formID:string,
-  uniqueID:string,
+  isSelected: boolean,
+  formID: string,
+  uniqueID: string,
 }
 
 // const defaultAlerts: Array<AlertModel> = [

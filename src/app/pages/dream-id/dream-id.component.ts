@@ -40,11 +40,12 @@ export class DreamIdComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
     private auditTrail: AuditTrailService,
-    private titleService:Title
-  ){
+    private titleService: Title
+  ) {
 
 
-   this.titleService.setTitle('Modules') }
+    this.titleService.setTitle('Modules')
+  }
 
   async ngOnInit() {
 
@@ -125,7 +126,7 @@ export class DreamIdComponent implements OnInit {
           // Handle query parameters such as formId and recordId
           this.formId = queryParams.get('formId');
           this.recordId = queryParams.get('recordId');
-
+          console.log('recordId from dreamboard:>> ', this.recordId);
           let params_url = '';
 
           if (this.formId && this.formId.length > 0) {
@@ -177,9 +178,9 @@ export class DreamIdComponent implements OnInit {
               "created_time": Date.now(),
               "updated_time": Date.now()
             }
-      
-            this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
-      
+
+            this.auditTrail.mappingAuditTrailData(UserDetails, this.client)
+
 
             // Build the URL based on whether formId is provided or not
             this.url = `https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/` + this.url_result +
@@ -187,7 +188,7 @@ export class DreamIdComponent implements OnInit {
               `&loginDetail=${JSON.stringify(JSON.stringify(this.loginDetail_string))}` +
               `&userPermissions=${userPermissions}` +
               `&theme=${this.theme}` +
-              params_url + `&project=${JSON.stringify((this.project))}`+
+              params_url + `&project=${JSON.stringify((this.project))}` +
               `&cacheBuster=${cacheBustingToken}`;
 
 
@@ -199,7 +200,8 @@ export class DreamIdComponent implements OnInit {
             this.iframeSrc = ''; // Temporarily clear the iframeSrc
             // this.changeDetection.detectChanges(); // Trigger change detection
             this.iframeSrc = this.send_data; // Assign the updated URL
-          // this.changeDetection.detectChanges();
+            console.log('this.send_data :>> ', this.send_data);
+            // this.changeDetection.detectChanges();
             this.changeDetection.detectChanges();
           });
         });
@@ -279,17 +281,17 @@ export class DreamIdComponent implements OnInit {
             console.log("URL RES", this.url_result);
             const timestamp = new Date().getTime();
 
-            // Build the URL based on whether formId is provided or not
+            // Build the URL based on whether formId is provided or not//5 may change
             this.url = `https://dreamboard-dynamic.s3.ap-south-1.amazonaws.com/` + this.url_result +
               `?t=${timestamp}` +
               `&loginDetail=${JSON.stringify(JSON.stringify(this.loginDetail_string))}` +
               `&userPermissions=${userPermissions}` +
               `&theme=${this.theme}` +
-              JSON.stringify(JSON.stringify(params_url)) + `&project=${JSON.stringify((this.project))}`+
+              params_url + `&project=${JSON.stringify((this.project))}` +
               `&cacheBuster=${cacheBustingToken}`;
 
 
-
+            console.log('this.url :>> ', this.url);
             this.send_data = this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
             this.iframeSrc = this.send_data;
             console.log(this.send_data);

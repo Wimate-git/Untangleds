@@ -31,13 +31,18 @@
 
 <!--begin::Notifications-->
 <div class="app-navbar-item" [ngClass]="itemClass">
- 
+
   <div [ngClass]="btnClass" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent"
     data-kt-menu-placement="bottom-end">
-    <app-keenicon name="notification-status" class="fs-2"></app-keenicon>
+    <app-keenicon name="notification-status" class="fs-2"> </app-keenicon>
+   
+      
   </div>
+  <!-- <span class="notification-badge">
+    12
+  </span> -->
   <app-notifications-inner></app-notifications-inner>
- 
+
 </div>
 <!--end::Notifications-->
 
@@ -66,21 +71,23 @@
 
 <!--begin::Theme mode-->
 <div class="app-navbar-item" [ngClass]="itemClass">
-  <app-theme-mode-switcher [toggleBtnClass]="btnClass" toggleBtnClass="{`btn-active-light-primary btn-custom ${toolbarButtonHeightClass}`}"></app-theme-mode-switcher>
+  <app-theme-mode-switcher [toggleBtnClass]="btnClass"
+    toggleBtnClass="{`btn-active-light-primary btn-custom ${toolbarButtonHeightClass}`}"></app-theme-mode-switcher>
 </div>
 <!--end::Theme mode-->
 
 <!--begin::User menu-->
 <div class="app-navbar-item" [ngClass]="itemClass">
   <!--begin::Menu wrapper-->
-  <div class="cursor-pointer symbol" [ngClass]="userAvatarClass" data-kt-menu-trigger="{default: 'click'}" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
-    <img   *ngIf="imageUrlData; else iconTemplate"  src="{{imageUrlData}}" />
+  <div class="cursor-pointer symbol" [ngClass]="userAvatarClass" data-kt-menu-trigger="{default: 'click'}"
+    data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
+    <img *ngIf="imageUrlData; else iconTemplate" src="{{imageUrlData}}" />
     <ng-template #iconTemplate>
-      <img  src="/assets/media/user.png" />
+      <img src="/assets/media/user.png" />
     </ng-template>
-    
+
   </div>
-  <app-user-inner data-kt-menu='true' ></app-user-inner>
+  <app-user-inner data-kt-menu='true'></app-user-inner>
   <!--end::Menu wrapper-->
 </div>
 <!--end::User menu-->
