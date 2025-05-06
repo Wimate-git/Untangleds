@@ -315,6 +315,7 @@ type="square-jelly-box"
       <select 
         *ngIf="getDateTypeControl(fieldIndex, conditionIndex) as control"
         [formControl]="control" 
+  
         id="dateTypeSelect" 
         class="form-select form-select-solid form-select-lg"
         aria-label="Select Date Type">
@@ -363,7 +364,7 @@ type="square-jelly-box"
         Number of Days
       </label>
       <div class="col-3">
-        <input type="number" [formControlName]="'daysAgo'" class="form-control" placeholder="Enter number of days">
+        <input type="number" [formControlName]="'ConditiondaysAgo'" class="form-control" placeholder="Enter number of days">
       </div>
     </div>
   </div>
@@ -379,7 +380,7 @@ type="square-jelly-box"
       </label>
       <div class="col-3">
         <input [type]="getInputType(getDateType(fieldIndex, conditionIndex))" 
-               [formControlName]="'startDate'" 
+               [formControlName]="'ConditionstartDate'" 
                class="form-control">
       </div>
     </div>
@@ -390,7 +391,7 @@ type="square-jelly-box"
       </label>
       <div class="col-3">
         <input [type]="getInputType(getDateType(fieldIndex, conditionIndex))" 
-               [formControlName]="'endDate'" 
+               [formControlName]="'ConditionendDate'" 
                class="form-control">
       </div>
     </div>
@@ -407,7 +408,7 @@ type="square-jelly-box"
         Select Date
       </label>
       <div class="col-3">
-        <input type="date" [formControlName]="'singleDate'" class="form-control">
+        <input type="date" [formControlName]="'ConditionsingleDate'" class="form-control">
       </div>
     </div>
 

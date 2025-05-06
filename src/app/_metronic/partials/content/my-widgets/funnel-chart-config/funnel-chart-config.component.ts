@@ -2152,6 +2152,24 @@ toggleCheckbox(theme: any): void {
 
   defaultHighchartsOptionsJson: any = {
     chart: {
+      backgroundColor: {
+        "linearGradient": [
+            0,
+            0,
+            100,
+            1000
+        ],
+        stops: [
+            [
+             0,
+                "rgb(255, 255, 255)"
+            ],
+            [
+   1,
+                "rgb(200, 200, 255)"
+            ]
+        ]
+      },
       type: 'funnel',
     },
     title: {

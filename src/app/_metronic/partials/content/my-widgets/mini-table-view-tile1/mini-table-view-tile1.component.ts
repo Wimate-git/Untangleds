@@ -59,7 +59,7 @@ export class MiniTableViewTile1Component {
    // Accept row data
    
     @Output() modalClose = new EventEmitter<void>(); // Emit an event when the modal is closed
-    @Input() miniTableData: any[] = [];
+    @Input() minitableDataTile1: any[] = [];
     @Input() emitEvent: any[] = [];
    
     private gridApi!: GridApi;
@@ -106,25 +106,27 @@ export class MiniTableViewTile1Component {
   
     ngOnChanges(changes: SimpleChanges): void {
   
-  console.log('miniTableData checking',this.miniTableData)
+  console.log('miniTableData checking from tile1',this.minitableDataTile1)
   console.log('emitEvent checking',this.emitEvent)
   console.log('SK_clientID checking',this.SK_clientID)
   console.log('FormNameMini checking',this.FormNameMini)
   this.assignFormName = this.FormNameMini
   console.log('this.assignFormName',this.assignFormName)
+
+  this.processEvent(this.minitableDataTile1);
   
   
   
-  if (changes.emitEvent && changes.emitEvent.currentValue) {
-    // Check if it's an array and take appropriate action
-    if (Array.isArray(changes.emitEvent.currentValue)) {
-        // Handle it as an array if that's expected
-        console.log('Received an array of events', changes.emitEvent.currentValue);
-    } else {
-        // Handle it as a single event object
-        this.processEvent(changes.emitEvent.currentValue);
-    }
-  }
+  // if (changes.emitEvent && changes.emitEvent.currentValue) {
+  //   // Check if it's an array and take appropriate action
+  //   if (Array.isArray(changes.emitEvent.currentValue)) {
+  //       // Handle it as an array if that's expected
+  //       console.log('Received an array of events', changes.emitEvent.currentValue);
+  //   } else {
+  //       // Handle it as a single event object
+     
+  //   }
+  // }
   
   // this.processMultipleTables(this.emitEvent.data.dynamic_table_values);
       
@@ -133,7 +135,7 @@ export class MiniTableViewTile1Component {
   
   
   
-  async processEvent(event: EmitEvent) {
+  async processEvent(event:any) {
     console.log('event', event);
     this.dynamicTableValues = event.data.dynamic_table_values;
     console.log('this.dynamicTableValues checking', this.dynamicTableValues);

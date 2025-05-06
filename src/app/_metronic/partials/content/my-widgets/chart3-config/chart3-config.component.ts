@@ -2453,7 +2453,26 @@ toggleCheckbox(theme: any): void {
 
   defaultHighchartsOptionsJson = {
     chart: {
-      backgroundColor: 'var(--bs-body-bg)',
+      // backgroundColor: 'var(--bs-body-bg)',
+
+      backgroundColor: {
+        "linearGradient": [
+            0,
+            0,
+            100,
+            1000
+        ],
+        stops: [
+            [
+             0,
+                "rgb(255, 255, 255)"
+            ],
+            [
+   1,
+                "rgb(200, 200, 255)"
+            ]
+        ]
+      },
       renderTo: 'scatter',
       type: 'column',
     },
@@ -2544,8 +2563,15 @@ toggleCheckbox(theme: any): void {
       itemMarginTop: 10,
     },
     series: [
+      {
+        data: [],
+        marker: {
+            enabled: true
+        }
+      }
 
-    ],
+
+    ],  
     lineWidth: 2,
     credits: {
       enabled: false,

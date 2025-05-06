@@ -642,6 +642,12 @@ makeTrueCheck:any = false
               endDate:[''],
               singleDate:[''],
               dateType:[''],
+              ConditiondaysAgo:[''],
+              ConditionstartDate:[''],
+              ConditionendDate:[''],
+              ConditionsingleDate:['']
+
+
             }),
           ]),
         })
@@ -692,6 +698,10 @@ makeTrueCheck:any = false
       endDate:[''],
       singleDate:[''],
       dateType:[''],
+      ConditiondaysAgo:[''],
+      ConditionstartDate:[''],
+      ConditionendDate:[''],
+      ConditionsingleDate:['']
 
 
     });
@@ -984,11 +994,23 @@ makeTrueCheck:any = false
                 fieldLabel: condition.fieldLabel,
     
                 // Use values from `condition` when it's a date field
-                daysAgo: condition.daysAgo || '',
-                startDate: condition.startDate || '',
-                endDate: condition.endDate || '',
-                singleDate: condition.singleDate || '',
+                // daysAgo: condition.daysAgo || '',
+                // startDate: condition.startDate || '',
+                // endDate: condition.endDate || '',
+                // singleDate: condition.singleDate || '',
+
+
+
+
+                // daysAgo: this.createChart.value.daysAgo || '',
+                // startDate: this.createChart.value.startDate || '',
+                // endDate: this.createChart.value.endDate || '',
+                // singleDate: this.createChart.value.singleDate || '',
                 dateType: condition.dateType || '',
+                ConditiondaysAgo:condition.ConditiondaysAgo || '',
+                ConditionstartDate:condition.ConditionstartDate ||'',
+                ConditionendDate: condition.ConditionendDate ||'',
+                ConditionsingleDate:condition.ConditionsingleDate ||''
             };
         } else {
             return {
@@ -1000,17 +1022,29 @@ makeTrueCheck:any = false
                 fieldLabel: condition.fieldLabel,
     
                 // Use default values from `this.createChart.value`
-                daysAgo: this.createChart.value.daysAgo || '',
-                startDate: this.createChart.value.startDate || '',
-                endDate: this.createChart.value.endDate || '',
-                singleDate: this.createChart.value.singleDate || '',
-                dateType: this.createChart.value.dateType || '',
+                // daysAgo: this.createChart.value.daysAgo || '',
+                // startDate: this.createChart.value.startDate || '',
+                // endDate: this.createChart.value.endDate || '',
+                // singleDate: this.createChart.value.singleDate || '',
+                // dateType: this.createChart.value.dateType || '',
+                ConditiondaysAgo:condition.ConditiondaysAgo || '',
+                ConditionstartDate:condition.ConditionstartDate ||'',
+                ConditionendDate: condition.ConditionendDate ||'',
+                ConditionsingleDate:condition.ConditionsingleDate ||''
             };
         }
     });
     
     });
 
+    const mainConditions = {
+      daysAgo: this.createChart.value.daysAgo || '',
+      startDate: this.createChart.value.startDate || '',
+      endDate: this.createChart.value.endDate || '',
+      singleDate: this.createChart.value.singleDate || '',
+      dateType: this.createChart.value.dateType || '',
+    }
+    console.log('mainConditions checking',mainConditions)
     console.log('conditionsFilter check inside the requestbody',conditionsFilter)
 
     console.log('conditionsFilter checking', conditionsFilter);
@@ -1036,6 +1070,7 @@ makeTrueCheck:any = false
         userName: this.userdetails,
         conditions: this.ConditionsFormat,
         MsgType:'FilterRequest',
+        MainFilter:mainConditions
       
 
       }),

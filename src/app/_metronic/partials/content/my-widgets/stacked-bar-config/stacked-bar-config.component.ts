@@ -1216,8 +1216,15 @@ const updatedHighchartsOptionsJson = {
   title: {
     ...tempParsed.title,
     text: this.createChart.value.chart_title || ''  // Update the title dynamically
+  },
+  chart:{
+    ...tempParsed.chart,
+type: this.createChart.value.ChartTypeSelection || 'bar'
   }
 };
+
+
+// chart.type 
 console.log('updatedHighchartsOptionsJson check',updatedHighchartsOptionsJson)
 this.chartFinalOptions =JSON.stringify(updatedHighchartsOptionsJson,null,4)
 console.log('this.chartFinalOptions check',this.chartFinalOptions)
@@ -1257,7 +1264,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
     dataLabelFontColor:this.createChart.value.dataLabelFontColor ||'',
     chartBackgroundColor1:this.createChart.value.chartBackgroundColor1 ||'',
     chartBackgroundColor2:this.createChart.value.chartBackgroundColor2 ||'',
-    ChartTypeSelection:this.createChart.value.ChartTypeSelection ||'',
+    ChartTypeSelection:this.createChart.value.ChartTypeSelection || 'bar',
 
     // filterForm:this.createChart.value.filterForm,
     // filterParameter:this.createChart.value.filterParameter,
@@ -2433,8 +2440,26 @@ toggleCheckbox(theme: any): void {
 
   defaultHighchartsOptionsJson: any = {
     chart: {
+      backgroundColor: {
+        "linearGradient": [
+            0,
+            0,
+            100,
+            1000
+        ],
+        stops: [
+            [
+             0,
+                "rgb(255, 255, 255)"
+            ],
+            [
+   1,
+                "rgb(200, 200, 255)"
+            ]
+        ]
+      },
       type: 'bar', // Use 'bar' for horizontal stacked bar, 'column' for vertical
-      backgroundColor: 'var(--bs-body-bg)',
+      // backgroundColor: 'var(--bs-body-bg)',
     },
     title: {
       text: 'Stacked Bar Chart',
@@ -2509,8 +2534,15 @@ toggleCheckbox(theme: any): void {
       },
     },
     series: [
+      {
+        data: [],
+        marker: {
+            enabled: true
+        }
+      }
 
-    ],
+
+    ],  
   
   };
   

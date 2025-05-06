@@ -76,7 +76,7 @@ import { FullscreenService } from '../report-studio/services/fullscreen.service'
 import { SemiDonutConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/semi-donut-config/semi-donut-config.component';
 import { GaugeChartUiComponent } from 'src/app/_metronic/partials/content/my-widgets/gauge-chart-ui/gauge-chart-ui.component';
 import { GaugeChartConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/gauge-chart-config/gauge-chart-config.component';
-
+import { Location } from '@angular/common';
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
 
@@ -363,6 +363,15 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   sendFullScreenCheck: boolean;
   summaryDashboardData: any;
   summaryDashboardDataFetch: any;
+  page: number = 1; // current page
+  totalRecords: number = 0; // total number of records
+  displayedRecords: number = 0; // number of records on the current page
+  startRecord: number = 1; // start record on current page
+  endRecord: number = 10; 
+  totalPages: number = 3;  
+  pageNumbers: number[] = [];
+  minitableDataTile1: any;
+  responseRowData1: any;
 
   createPieChart() {
     const chartOptions: any = {
@@ -2711,9 +2720,9 @@ exitFullScreen(): void {
       // Handle both charts and maps
       if (item.grid_type === 'Linechart') {
         const baseHeight = 400; // Base height for the chart
-        const extraHeight = 40; // Additional height for labels, etc.
+        // const extraHeight = 40; // Additional height for labels, etc.
   
-        this.chartHeight[index] = Math.max(0, itemComponentHeight + extraHeight); // Adjust height
+        this.chartHeight[index] = Math.max(0, itemComponentHeight ); // Adjust height
         this.chartWidth[index] = Math.max(0, itemComponentWidth);
   
         console.log(
@@ -3129,7 +3138,7 @@ exitFullScreen(): void {
   constructor(private summaryConfiguration: SharedService, private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector, private auditTrail: AuditTrailService,
     private spinner: NgxSpinnerService, private zone: NgZone,private http: HttpClient,  private sanitizer: DomSanitizer, // Inject DomSanitizer
-    private titleService: Title, private summaryService: SummaryEngineService,private blobService: BlobService,private renderer: Renderer2,private authservice: AuthService, private fullscreenService: FullscreenService,private el: ElementRef
+    private titleService: Title, private summaryService: SummaryEngineService,private blobService: BlobService,private renderer: Renderer2,private authservice: AuthService, private fullscreenService: FullscreenService,private el: ElementRef,private location: Location
   ) {
     this.resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
@@ -3803,7 +3812,7 @@ this.http.post(apiUrl, requestBody).subscribe(
 
 
     // this.summaryService.updatelookUpData(processedDataFilter)
-    this.responseRowData = JSON.parse(this.responseBody.Processed_Data
+    this.responseRowData1 = JSON.parse(this.responseBody.Processed_Data
     )
     console.log('this.responseRowData checking',this.responseRowData)
 
@@ -6816,196 +6825,103 @@ console.log('selectedTab checking',this.selectedTab)
         });
     });
   }
-  // this.datatableConfig = {};
-  // this.lookup_data_summary = [];
-  // this.fetchCompanyLookupdata(page, pageSize)
-  // const page = Math.floor(dataTablesParameters.start / dataTablesParameters.length) + 1;
-  // const pageSize = dataTablesParameters.length;
+  goToPage(page: number) {
+    if (page < 1 || page > this.totalPages) return; // Prevent invalid page changes
+    this.page = page;
+    console.log('Current Page:', this.page);
+    this.showTable(); // Reload data when page changes
+}
 
-  // async showTable() {
-  //   console.log("Show DataTable is called BTW");
-  
-  //   this.datatableConfig = {};
-  //   this.lookup_data_summary = [];
-  
-  //   this.datatableConfig = {
-  //     serverSide: true,
-  //     processing: true,
-  //     order: [[3, 'desc']], // Set default sorting by 'Updated' column in descending order
-  //     ajax: (dataTablesParameters: any, callback) => {
-  //       const page = Math.floor(dataTablesParameters.start / dataTablesParameters.length) + 1;
-  //       const pageSize = dataTablesParameters.length;
-  
-  //       // Fetch paginated data with server-side sorting
-  //       this.fetchCompanyLookupdata(page, pageSize)
-  //         .then((resp: any) => {
-  //           console.log('resp check',resp)
-  //           // Ensure data is sorted by Updated (P4) in descending order
-  //           this.responseData = (resp.data || []).sort((a:any, b:any) => b.P4 - a.P4);
-  //           console.log('this.responseData check',this.responseData)
-  //           const totalRecords = resp.totalRecords || 0;
-            
-  //           console.log('totalRecords check',totalRecords)
-  
-  //           // Provide the response to DataTable
-  //           callback({
-  //             draw: dataTablesParameters.draw,
-  //             recordsTotal: totalRecords,
-  //             recordsFiltered: totalRecords,
-  //             data: this.responseData,
-  //           });
-  
-  //           console.log("Sorted Paginated Response Data:", this.responseData);
-  //         })
-  //         .catch((error: any) => {
-  //           console.error('Error fetching user lookup data:', error);
-  
-  //           // Provide an empty dataset in case of an error
-  //           callback({
-  //             draw: dataTablesParameters.draw,
-  //             recordsTotal: 0,
-  //             recordsFiltered: 0,
-  //             data: [],
-  //           });
-  //         });
-  //     },
-  //     columns: [
-  //       { title: '<span style="color: black;">ID</span>', data: 'P1', render: function (data, type, full) {
-  //         const colorClasses = ['success', 'info', 'warning', 'danger'];
-  //         const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
-          
-  //         const initials = data[0].toUpperCase();
-  //         const symbolLabel = `
-  //           <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
-  //             ${initials}
-  //           </div>
-  //         `;
-  //         return `<span style="color:Black; font-weight: bold;">${data}</span>`;
-  //     }}
-  //     ,
-  //       { title: '<span style="color: black;">Name</span>', data: 'P2' },
-  //       { title: '<span style="color: black;">Description</span>', data: 'P3' },
-  //       {
-  //         title: '<span style="color: black;">Updated</span>',
-  //         data: 'P4',
-  //         render: function (data) {
-  //           const updatedDate = new Date(data * 1000);
-  //           const formattedDate = new Intl.DateTimeFormat('en-US', {
-  //             weekday: 'short',
-  //             day: '2-digit',
-  //             month: 'short',
-  //           }).format(updatedDate);
-  //           const formattedTime = updatedDate.toLocaleTimeString('en-US', {
-  //             hour12: false,
-  //             hour: '2-digit',
-  //             minute: '2-digit',
-  //           });
-  //           return `${formattedDate} ${formattedTime}`;
-  //         },
-  //       },
-  //       {
-  //         title: '<span style="color: black;">Created</span>',
-  //         data: 'P5',
-  //         render: function (data) {
-  //           const createdDate = new Date(data * 1000);
-  //           const formattedDate = new Intl.DateTimeFormat('en-US', {
-  //             weekday: 'short',
-  //             day: '2-digit',
-  //             month: 'short',
-  //           }).format(createdDate);
-  //           const formattedTime = createdDate.toLocaleTimeString('en-US', {
-  //             hour12: false,
-  //             hour: '2-digit',
-  //             minute: '2-digit',
-  //           });
-  //           return `${formattedDate} ${formattedTime}`;
-  //         },
-  //       },
-  //       { title: '<span style="color: black;">Created UserName</span>', data: 'P6' },
-  //       { title: '<span style="color: black;">Updated UserName</span>', data: 'P7' },
-  //     ],
-  //     createdRow: (row, data, dataIndex) => {
-  //       $('td:eq(0)', row).addClass('');
-  //     },
-  //   };
-  // }
+
   async showTable() {
     console.log("Show DataTable is called BTW");
   
     this.datatableConfig = {};
-    this.lookup_data_summary = [];
-    this.datatableConfig = {
-      serverSide: true,
-      ajax: (dataTablesParameters: any, callback) => {
-        this.datatableConfig = {};
-        const start = dataTablesParameters.start;
-        const length = dataTablesParameters.length;
-  
-        this.fetchCompanyLookupdata(1)
-          .then((resp: any) => {
-            console.log("resp check", resp);
-            let responseData = resp || []; // Default to an empty array if resp is null
-            console.log("responseData", responseData);
-  
-            // Apply Permission-Based Filtering
-            if (this.userPermission === "All") {
-              console.log('permissionIdCheck',this.permissionIdCheck)
+  this.lookup_data_summary = [];
+  this.datatableConfig = {
+    serverSide: true,
+    ajax: (dataTablesParameters: any, callback) => {
+      this.datatableConfig = {};
+      const start = dataTablesParameters.start;
+      const length = dataTablesParameters.length;
+
+      this.fetchCompanyLookupdata(1)
+        .then((resp: any) => {
+          console.log("resp check", resp);
+          let responseData = resp || []; // Default to an empty array if resp is null
+          console.log("responseData", responseData);
+
+          // Apply Permission-Based Filtering
+          if (this.userPermission === "All") {
+            console.log('permissionIdCheck', this.permissionIdCheck)
+            console.log("Permission is 'All'. Displaying all data.");
+            // No filtering needed, show all data
+          } else {
+            console.log("Restricted permissions. Filtering data...");
+            if (this.summaryPermission.includes('None')) {
+              console.log("Permission includes 'None'. No data will be displayed.");
+              responseData = []; // Set responseData to an empty array
+            } else if (this.summaryPermission.includes('All')) {
               console.log("Permission is 'All'. Displaying all data.");
-              // No filtering needed, show all data
+              // No filtering needed
             } else {
               console.log("Restricted permissions. Filtering data...");
-              if (this.summaryPermission.includes('None')) {
-                console.log("Permission includes 'None'. No data will be displayed.");
-                responseData = []; // Set responseData to an empty array
-              } else if (this.summaryPermission.includes('All')) {
-                console.log("Permission is 'All'. Displaying all data.");
-                // No filtering needed
-              } else {
-                console.log("Restricted permissions. Filtering data...");
-                responseData = responseData.filter((item: any) =>
-                  this.summaryPermission.includes(item.P1)
-                );
-              }
+              responseData = responseData.filter((item: any) =>
+                this.summaryPermission.includes(item.P1)
+              );
             }
-  
-            // Example filtering for search
-            const searchValue = dataTablesParameters.search.value.toLowerCase();
-            const filteredData = Array.from(
-              new Set(
-                responseData
-                  .filter((item: { P1: string }) => item.P1.toLowerCase().includes(searchValue))
-                  .map((item: any) => JSON.stringify(item)) // Stringify the object to make it unique
-              )
-            ).map((item: any) => JSON.parse(item)); // Parse back to object
+          }
 
-            console.log('filteredData checkinbg',filteredData)
-  
-            console.log("Filtered Data after permissions and search:", filteredData);
-  
-            // Implement pagination by slicing the filtered data
-            const paginatedData = filteredData.slice(start, start + length);
-            console.log('paginatedData checking',paginatedData)
-  
-            callback({
-              draw: dataTablesParameters.draw,
-              recordsTotal: filteredData.length, // Total records after search
-              recordsFiltered: filteredData.length, // Total records after filtering
-              data: paginatedData, // Data for the current page
-            });
-  
-            console.log("Paginated Data for current page", paginatedData);
-          })
-          .catch((error: any) => {
-            console.error("Error fetching user lookup data:", error);
-            // Provide an empty dataset in case of an error
-            callback({
-              draw: dataTablesParameters.draw,
-              recordsTotal: 0,
-              recordsFiltered: 0,
-              data: [],
-            });
+          // Example filtering for search
+          const searchValue = dataTablesParameters.search.value.toLowerCase();
+          const filteredData = Array.from(
+            new Set(
+              responseData
+                .filter((item: { P1: string }) => item.P1.toLowerCase().includes(searchValue))
+                .map((item: any) => JSON.stringify(item)) // Stringify the object to make it unique
+            )
+          ).map((item: any) => JSON.parse(item)); // Parse back to object
+
+          console.log('filteredData checkinbg', filteredData)
+
+          console.log("Filtered Data after permissions and search:", filteredData);
+
+          // Implement pagination by slicing the filtered data
+
+          const paginatedData = filteredData.slice(start, start + length);
+
+          this.totalRecords = filteredData.length;
+          this.displayedRecords = paginatedData.length;
+          this.totalPages = Math.ceil(this.totalRecords / length);
+
+          // Update page numbers dynamically based on total pages
+          this.pageNumbers = Array.from({ length: this.totalPages }, (_, i) => i + 1);
+
+          // Update start and end records for current page
+          this.startRecord = start + 1; // Start record (1-indexed)
+          this.endRecord = start + this.displayedRecords;
+
+
+          callback({
+            draw: dataTablesParameters.draw,
+            recordsTotal: this.totalRecords,
+            recordsFiltered: this.totalRecords,
+            data: paginatedData, // Data for the current page
           });
-      },
+
+          console.log("Paginated Data for current page", paginatedData);
+        })
+        .catch((error: any) => {
+          console.error("Error fetching user lookup data:", error);
+          // Provide an empty dataset in case of an error
+          callback({
+            draw: dataTablesParameters.draw,
+            recordsTotal: 0,
+            recordsFiltered: 0,
+            data: [],
+          });
+        });
+    },
       columns: [
         {
           title: '<span style="color: black;">ID</span>',
@@ -7155,7 +7071,7 @@ console.log('selectedTab checking',this.selectedTab)
   //     })
   //   };
   
-  //   this.validateAndSubmit(tempObj, key);
+
   // }
 //   updateSummary(value: any,key: any,pinValue?:any) {
 //     if(key=='addPin'){
@@ -7233,7 +7149,7 @@ console.log('selectedTab checking',this.selectedTab)
 //     console.log('TempObj being validated and submitted:', tempObj);
   
 //     // Validate and submit the object
-//     this.validateAndSubmit(tempObj, key);
+
   
 //     // Prepare items for fetchTimeMachineById
 //     const items = {
@@ -7368,10 +7284,11 @@ console.log('Serialized Query Params:', serializedQueryParams);
   };
 
   console.log('TempObj being validated and submitted:', tempObj);
-
+const storeFullScreenValue = this.allCompanyDetails.fullScreenModeCheck
   // Validate and submit the object
-  this.validateAndSubmit(tempObj, key);
+  this.validateAndSubmit(tempObj, key,storeFullScreenValue);
 
+console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
   // Prepare items for fetchTimeMachineById
   const items = {
     P1: this.allCompanyDetails.summaryID || value.P1,
@@ -7453,7 +7370,7 @@ console.log('Serialized Query Params:', serializedQueryParams);
   
   
   
-  private validateAndSubmit(tempObj: any, actionKey: string) {
+  private validateAndSubmit(tempObj: any, actionKey: string,receiveFullScreenValue?:any) {
     this.isGirdMoved = false;
     console.log('actionKey checking', actionKey);
   
@@ -7521,7 +7438,36 @@ console.log('Serialized Query Params:', serializedQueryParams);
             }else if(actionKey === 'importUpdate'){
               window.location.reload();
             }else if (actionKey === 'editSummary'){
-              window.location.reload();
+              console.log('receiveFullScreenValue checking from summary',receiveFullScreenValue)
+
+              let queryParams: any = {
+                isFullScreen: receiveFullScreenValue
+              };
+            
+              // Conditionally add userId and userPass
+              if (this.userId) {
+                queryParams.uID = this.userId;
+              }
+              if (this.userPass) {
+                queryParams.pass = this.userPass;
+              }
+              console.log('checking router id from validation',this.routeId)
+
+          
+            
+              // Navigate
+              if (this.userId || this.userPass) {
+                this.location.replaceState(`/summary-engine/${this.routeId}`, this.createQueryString(queryParams));
+                this.openModalHelpher(this.routeId);
+                window.location.reload();
+
+
+              } else {
+                this.location.replaceState(`/summary-engine/${this.routeId}`, this.createQueryString(queryParams));
+                window.location.reload();
+              }
+
+       
 
             }
           }
@@ -7562,8 +7508,10 @@ console.log('Serialized Query Params:', serializedQueryParams);
   }
   
   
-  
-  
+  createQueryString(params: any): string {
+    const queryParams = new URLSearchParams(params).toString();
+    return queryParams ? '?' + queryParams : '';
+  }
   
   
 
@@ -8544,58 +8492,7 @@ refreshFunction(){
 
 
 
-  // openKPIModal6(content: any, tile?: any, index?: number) {
-  //   if (tile) {
-  //     this.selectedTile = tile;
-  //     this.editTileIndex6 = index !== undefined ? index : null; // Store the index, default to null if undefined
-  //     console.log('Tile Object:', tile); // Log the tile object
-
-  //     // Initialize form fields and pre-select values
-  //     this.initializeTileFields6();
-  //     this.createKPIWidget6.patchValue({
-  //       formlist: tile.formlist,
-  //       parameterName: tile.parameterName,
-  //       value: tile.value,
-  //       Target: tile.Target,
-  //       MaxRange: tile.MaxRange,
-  //       groupByFormat: tile.groupByFormat,
-  //       constantValuevalue: tile.constantValuevalue,
-  //       percentageValue: tile.percentageValue,
-  //       constantValueTarget: tile.constantValueTarget,
-  //       constantValueMaxRange: tile.constantValueMaxRange,
-  //       percentageValueTarget: tile.percentageValueTarget,
-  //       percentageValueMaxRange: tile.percentageValueMaxRange
-
-
-
-
-  //     });
-
-  //     this.isEditMode = true; // Set to edit mode
-  //   } else {
-  //     this.selectedTile = null; // No tile selected for adding
-  //     this.isEditMode = false; // Set to add mode
-  //     this.createKPIWidget6.reset(); // Reset the form for new entry
-  //   }
-  //   this.themes.forEach(theme => {
-  //     theme.selected = false; // Deselect all themes
-  //   });
-
-  //   // Find the theme that matches the tile's themeColor
-  //   const matchingTheme = this.themes.find(theme => theme.color === tile?.themeColor);
-
-  //   // If a matching theme is found, set it as selected
-  //   if (matchingTheme) {
-  //     matchingTheme.selected = true;
-  //     console.log('Matching theme found and selected:', matchingTheme);
-  //   }
-
-
-  //   this.modalService.open(content, { size: 'lg', ariaLabelledBy: 'modal-basic-title' });
-  //   this.showTable()
-  //   // 
-  //   this.reloadEvent.next(true);
-  // }
+ 
 
   selectValue6(value: string, modal: any) {
     console.log('Selected value:', value);
@@ -9175,8 +9072,20 @@ refreshFunction(){
     console.log('event checking mini table',helperminiTableData)
 
     this.miniTableData = helperminiTableData
+    
+
+
 
     
+
+
+  }
+
+
+  miniTableDataReceive(receiveData:any){
+
+      console.log('this.miniTableData checking mini table',this.minitableDataTile1)
+      
 
 
   }
@@ -9692,6 +9601,20 @@ helperChartClickFunnel(event: any, modalChart: any) {
 
 
 
+receiveminiTableIcon(checkevent:any,modalref: any){
+   
+  this.minitableDataTile1 = checkevent
+
+
+  setTimeout(() => {
+    this.modalService.open(modalref,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
+  }, 500);
+
+}
+
+
+
 
   
   fetchFormBuilderData(receiveValue:any){
@@ -9805,19 +9728,20 @@ helperChartClickFunnel(event: any, modalChart: any) {
   }
   
   
-  onFileSelectedfromSystem(event: any): void {
+  onFileSelectedfromSystem(event: any,receiveKey:any): void {
+    console.log('receiveKey checking',receiveKey)
     const file = event.target.files[0]; // Get the first selected file
 
     if (file) {
       console.log('File selected:', file);
       // You can process the file here
       // For example, reading the content of the file:
-      this.readFileContent(file);
+      this.readFileContent(file,receiveKey);
     } else {
       console.error('No file selected');
     }
   }
-  readFileContent(file: File) {
+  readFileContent(file: File,receivedKey:any) {
     const reader = new FileReader();
   
     reader.onload = () => {
@@ -9832,7 +9756,14 @@ helperChartClickFunnel(event: any, modalChart: any) {
         const { summaryID, summaryName, summaryDesc, ...filteredContent } = parsedContent;
   
         console.log('Filtered content (without summaryID, summaryName, summaryDesc):', filteredContent);
-        this.updateimporteddashboardData(filteredContent,'importUpdate')
+        if(receivedKey=='onUpdateImport'){
+          this.updateimporteddashboardData(filteredContent,'importUpdate')
+        }else if(receivedKey=='onSaveImport'){
+    this.createSummaryWithImportedData(filteredContent,'importUpdate')
+        }
+      
+    
+        
 
 
   
@@ -9995,6 +9926,169 @@ helperChartClickFunnel(event: any, modalChart: any) {
   
     // Trigger change detection
     this.cd.detectChanges();
+  }
+
+
+  createSummaryWithImportedData(importData:any,key:any){
+
+    this.defaultValue = 'Tiles'
+    if (this.isDuplicateID || this.isDuplicateName || this.createSummaryField.invalid) {
+      return; // Prevent saving if there are errors
+    }
+
+
+
+    let tempClient = this.SK_clientID + "#summary" + "#lookup";
+    console.log('tempClient checking', tempClient);
+
+
+    const createdDate = Math.ceil((new Date()).getTime() / 1000); // Created date
+    const updatedDate = Math.ceil((new Date()).getTime() / 1000); // Updated date
+
+    // Prepare summary details
+    this.allCompanyDetails = {
+      summaryID: this.createSummaryField.value.summaryID,
+      summaryName: this.createSummaryField.value.summaryName,
+      summaryDesc: this.createSummaryField.value.summarydesc,
+
+      // jsonData: parsedJsonData,
+      summaryIcon: this.createSummaryField.value.iconSelect,
+      iconObject: this.previewObjDisplay,
+      LiveDashboard:this.createSummaryField.value.LiveDashboard,
+      fullScreenModeCheck:this.createSummaryField.value.fullScreenModeCheck,
+
+      // Add the selected icon
+      crDate: createdDate, // Created date
+      upDate: updatedDate,  // Updated date
+      createdUser: this.getLoggedUser.username, // Set the creator's username
+      grid_details: importData.grid_details
+    };
+
+    console.log("summary data ", this.allCompanyDetails);
+
+    // Prepare ISO date strings
+    const createdDateISO = new Date(this.allCompanyDetails.crDate * 1000).toISOString();
+    const updatedDateISO = new Date(this.allCompanyDetails.upDate * 1000).toISOString();
+
+    // Prepare tempObj for API call
+    const tempObj = {
+      PK: this.SK_clientID + "#" + this.allCompanyDetails.summaryID + "#summary" + "#main",
+      SK: 1,
+      metadata: JSON.stringify({
+        summaryID: this.allCompanyDetails.summaryID,
+        summaryName: this.allCompanyDetails.summaryName,
+        summaryDesc: this.allCompanyDetails.summaryDesc,
+        // jsonData: this.allCompanyDetails.jsonData,
+        summaryIcon: this.createSummaryField.value.iconSelect,
+        LiveDashboard:this.createSummaryField.value.LiveDashboard,
+        fullScreenModeCheck:this.createSummaryField.value.fullScreenModeCheck,
+        // Include selected icon in the metadata
+        created: createdDateISO, // Created date in ISO format
+        updated: updatedDateISO,   // Updated date in ISO format
+        createdUser: this.allCompanyDetails.createdUser, // Use the persisted createdUser
+        iconObject: this.allCompanyDetails.iconObject,
+        tilesList:this.defaultValue ,
+        grid_details:importData.grid_details,
+        queryParams:[],
+
+
+      })
+    };
+    // Now, patch the 'tilesList' form control after creating the summary
+this.createSummaryField.patchValue({
+  tilesList: this.defaultValue // Set the value to 'Widget'
+});
+
+    console.log("TempObj is here ", tempObj);
+    const temobj1: any = JSON.stringify(this.createSummaryField.value.iconSelect)
+    // Prepare items for further processing
+    console.log("this.createSummaryField.value.iconSelec", this.createSummaryField.value.iconSelect)
+    console.log("temobj1", temobj1)
+    const items = {
+      P1: this.createSummaryField.value.summaryID,
+      P2: this.createSummaryField.value.summaryName,
+      P3: this.createSummaryField.value.summarydesc,
+      P4: updatedDate,  // Updated date
+      P5: createdDate,   // Created date
+      P6: this.allCompanyDetails.createdUser,  // Created by user
+      P7: this.getLoggedUser.username,          // Updated by user
+      P8: JSON.stringify(this.previewObjDisplay) ||'',
+      P9: this.createSummaryField.value.iconSelect, // Add selected icon
+      P10:this.createSummaryField.value.PinCheck ||'',
+      P11:this.createSummaryField.value.fullScreenModeCheck
+    };
+    console.log('items checking from create Summary',items)
+
+    // API call to create the summary
+    this.api.CreateMaster(tempObj).then(async (value: any) => {
+      await this.createLookUpSummary(items, 1, tempClient);
+
+      this.datatableConfig = {};
+      this.lookup_data_summary = [];
+
+      console.log('value check from create master', value);
+      if (items || value) {
+        console.log('items check from create master', items);
+
+        // Call the loadData function
+        this.loadData();
+
+        // Show a success alert and handle the "OK" button click
+        Swal.fire({
+          position: 'center', // Center the alert
+          icon: 'success', // Alert type
+          title: 'New summary successfully created', // Title text
+          showConfirmButton: true, // Display the OK button
+          confirmButtonText: 'OK', // Customize the OK button text
+          allowOutsideClick: false, // Prevent closing the alert by clicking outside
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // This block is executed when the "OK" button is clicked
+            if (items && items.P1) {
+              this.dashboardOpen(items.P1);
+       
+          // Pass item.P1 to viewItem
+            }
+            if (this.modalRef) {
+              this.modalRef.close(); // Close the modal
+            }
+          }
+        });
+      }
+
+      else {
+        Swal.fire({
+          position: 'top-end',
+          icon: 'error',
+          title: 'Failed to create summary',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }
+
+      const UserDetails = {
+        "User Name": this.userdetails,
+        "Action": "Created",
+        "Module Name": "Summary Dashboard",
+        "Form Name": "Summary Dashboard",
+        "Description": "Dashboard is Created",
+        "User Id": this.userdetails,
+        "Client Id": this.SK_clientID,
+        "created_time": Date.now(),
+        "updated_time": Date.now()
+      }
+
+      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+
+    }).catch(err => {
+      console.log('err for creation', err);
+      this.toast.open("Error in adding new Summary Configuration ", "Check again", {
+        duration: 5000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+      });
+    });
+
   }
 
 

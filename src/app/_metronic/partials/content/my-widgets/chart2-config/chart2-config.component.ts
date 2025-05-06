@@ -2054,7 +2054,25 @@ toggleCheckbox(theme: any): void {
 
   defaultHighchartsOptionsJson = {
     chart: {
-      backgroundColor: 'var(--bs-body-bg)',
+      // backgroundColor: 'var(--bs-body-bg)',
+      backgroundColor: {
+        "linearGradient": [
+            0,
+            0,
+            100,
+            1000
+        ],
+        stops: [
+            [
+             0,
+                "rgb(255, 255, 255)"
+            ],
+            [
+   1,
+                "rgb(200, 200, 255)"
+            ]
+        ]
+      },
       renderTo: 'lineChart',  // Specify your div's id dynamically
       type: 'line',
     },
@@ -2113,6 +2131,13 @@ toggleCheckbox(theme: any): void {
       }
     },
     series: [
+      {
+        data: [],
+        marker: {
+            enabled: true
+        }
+      }
+
 
     ],  // Start with no data
     lineWidth: 2,  // Line thickness

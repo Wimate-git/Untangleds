@@ -335,6 +335,7 @@ this.formTableConfig = {
     console.log('this.item in else chart2',this.item)
 
       const linachartDataFormat = JSON.parse(this.item.highchartsOptionsJson)
+      console.log('linachartDataFormat checking',linachartDataFormat)
       linachartDataFormat.series = linachartDataFormat.series.map((series: any) => {
         return {
           ...series,

@@ -349,6 +349,26 @@
                       </p-multiSelect>
           
                     </div>
+                    <div class="col-md-4 mb-3">
+                      <label for="custom_Label" class="col-createChart-label fw-bold fs-6  ">Custom Value Label</label>
+                      <input type="text" class="form-control form-control-solid"  name="custom_Label"
+                        formControlName="Value_Label">
+  
+  
+  
+                    </div>
+  
+  
+                    <div class="col-md-4 mb-3">
+                      <label for="primaryValue" class="col-createChart-label fw-bold fs-6 ">
+                        Category Value
+              
+                      </label>
+                      <ngx-select id="primaryValue" [allowClear]="true" formControlName="CategoryValue"
+                        [items]="CategoryValueItems" optionValueField="value" optionTextField="text" placeholder="Select Operation"
+                        class="w-100"></ngx-select>
+           
+                    </div>
                       <div class="col-md-4 mb-3" *ngIf = "shoRowData" >
                         <label for="constant" class="col-createChart-label fw-bold fs-6 required"></label>
                         <input id="constant" type="number" class="form-control form-control-solid"

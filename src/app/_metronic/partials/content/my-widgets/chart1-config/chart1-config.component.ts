@@ -711,7 +711,9 @@ export class Chart1ConfigComponent implements OnInit {
           custom_Label: ['', Validators.required],
           filterParameter: [[]],
           filterDescription: [''],
-          XaxisFormat: ['']
+          XaxisFormat: [''],
+          Value_Label:[''],
+          CategoryValue:['']
         })
       );
     } else if (this.createChart.value.all_fields.length > 0) {
@@ -1223,7 +1225,9 @@ repopulate_fields(getValues: any): FormArray {
           undefinedCheckLabel: [configItem.undefinedCheckLabel || ''],
           custom_Label: [configItem.custom_Label || '', Validators.required],
           filterDescription: [configItem.filterDescription || ''],
-          XaxisFormat: this.fb.control(dateParameter)
+          XaxisFormat: this.fb.control(dateParameter),
+          Value_Label:[configItem.Value_Label || ''],
+          CategoryValue:[configItem.CategoryValue || ''],
         })
       );
 
@@ -1805,6 +1809,17 @@ this.dynamicDateParamMap.set(index,dateFieldsList)
 
 
   ]
+
+
+  CategoryValueItems = [
+     { value: 'Count', text: 'Count' },
+         { value: 'sum', text: 'Sum' },
+    { value: 'min', text: 'Minimum' },
+    { value: 'max', text: 'Maximum' },
+        { value: 'average', text: 'Average' },
+    { value: 'latest', text: 'Latest' },
+
+  ]
   showStatusValues = [
     { value: 'Open', text: 'Open' },
     { value: 'In-Progress', text: 'In-Progress' },
@@ -2017,8 +2032,27 @@ toggleCheckbox(theme: any): void {
 
   defaultHighchartsOptionsJson: any = {
     chart: {
+
+      backgroundColor: {
+            "linearGradient": [
+                0,
+                0,
+                100,
+                1000
+            ],
+            stops: [
+                [
+                 0,
+                    "rgb(255, 255, 255)"
+                ],
+                [
+       1,
+                    "rgb(200, 200, 255)"
+                ]
+            ]
+          },
       type: 'pie',
-      backgroundColor: 'var(--bs-body-bg)',
+  
     },
     title: {
       style: {

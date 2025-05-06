@@ -77,14 +77,15 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.dtOptions = {
       dom:  // Length changing (l)
-           `<"row"<"col-sm-12"tr>>` +  // Table (t)
-           `<"row"<"col-sm-12"p>>` +   // Pagination (p)
-           `<"row"<"col-sm-12"i>>`,    // Information (i) — Add this row for info
-    
+            `<"row"<"col-sm-12"tr>>` +  // Table (t)
+      // Pagination (p)
+            `<"row"<"col-sm-12"i>>` + 
+            `<"row"<"col-sm-12"p>>`,   // Information (i) — Add this row for info
+        
       processing: true,
       language: {
         processing: `<span class="spinner-border spinner-border-sm align-middle"></span> Loading...`,
-        info: "Showing _START_ to _END_ of _TOTAL_ entries",  // Customize the info text
+        info: "",  // Hide the info text, keeping functionality intact
       },
     
       ...this.datatableConfig,
@@ -98,6 +99,7 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
       ordering: false,
       searching: true, // Keep the search functionality enabled
     };
+    
     
     
     

@@ -583,7 +583,7 @@ if(data){
     console.log(' Initializing Pie Chart for ', chartdata);
 if (chartdata) {
   const chartOptionsCopy = JSON.parse(chartdata.highchartsOptionsJson);
-  console.log('Data check from initialize', chartOptionsCopy);
+  console.log('Data check from initialize from stackedBarChart', chartOptionsCopy);
   
   // Apply the event to the series directly (outside of data.map)
   chartOptionsCopy.series = chartOptionsCopy.series.map((series: any) => {

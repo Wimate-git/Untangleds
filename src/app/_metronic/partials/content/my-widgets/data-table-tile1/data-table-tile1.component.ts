@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { GridApi ,Column} from 'ag-grid-community';
+import { event } from 'jquery';
 import pdfMake from 'pdfmake/build/pdfmake';
 import * as XLSX from 'xlsx';  
 
@@ -22,13 +23,15 @@ export class DataTableTile1Component {
   pageSizeOptions = [10, 25, 50, 100];
 
   @Output() dataTableCellInfo = new EventEmitter<any>();
+  @Output() miniTableIcon = new EventEmitter<any>() 
   @Output() sendFormNameForMini = new EventEmitter<any>();
+  @Output() emitfullRowDataToParent = new EventEmitter<any>();
+  
   rowClass: 'clickable-row'
   modalData: any[] = [];
   iconCellRenderer: (params: any) => string; 
   
 
-  //   [responseRowData]="responseRowData"
   // [all_Packet_store]="all_Packet_store"
   // @Input() columnDefs: any[] = []; 
 
@@ -51,23 +54,45 @@ export class DataTableTile1Component {
 
   constructor(private modalService: NgbModal) {
     this.iconCellRenderer = function (params) {
+      console.log('check what params params is getting', params);
+    
       // Check if 'dynamic_table_values' exists and is not empty
       if (params.data.dynamic_table_values && Object.keys(params.data.dynamic_table_values).some(key => params.data.dynamic_table_values[key].length > 0)) {
-        // If conditions are met, return the icon HTML
-        return `<i class="bi bi-table" style="color: #204887; font-size: 25px;"></i>`;
+        // If conditions are met, return the icon HTML with a click event
+        return `
+          <i 
+            class="bi bi-table" 
+            style="color: #204887; font-size: 25px;" 
+            (click)="onIconClick($event, ${params.node.rowIndex}, ${params})"></i>`;
       } else {
         // If conditions are not met, return an empty string
         return '';
       }
     };
+    
+    
+    
   }
 
+
+  onIconClick(event: MouseEvent, rowIndex?: number) {
+    console.log('i am clicked',event)
+    console.log('Icon clicked in row index:', rowIndex);
+    // const rowData = this.responseRowData[rowIndex];
+    // console.log('Row data:', rowData);
+  
+    // You can now perform any logic you need with the clicked row data
+    // For example, you might want to open a modal or navigate somewhere
+  }
+  
   ngOnChanges(changes: SimpleChanges): void {
 console.log('modalData check',this.storeDrillDown)
 console.log('columnDefs check',this.all_Packet_store)
 this.FormName = this.storeDrillDown.formlist
 console.log('this.storeDrillDown checking datatable tile1',this.storeDrillDown)
 console.log('this.FormName for drill name',this.FormName)
+console.log('responseRowData c hecking from datatable Tile1',this.responseRowData)
+this.emitfullRowDataToParent.emit(this.responseRowData)
 // this.extractRowData = JSON.parse(this.item.rowData)
 // console.log('this.extractRowData checking',this.extractRowData)
 // console.log('this.extractRowData checking from',this.extractRowData)
@@ -82,6 +107,9 @@ this.parseChartConfig(this.storeDrillDown)
     
   }
 
+
+
+  ngOnInit(){}
   parseChartConfig(data: any) {
     console.log('datachecking tile1 drill', data);
   
@@ -104,6 +132,20 @@ this.parseChartConfig(this.storeDrillDown)
 
   
 
+  // createColumnDefs(columnVisibility: any[]) {
+  //   return columnVisibility.map(column => ({
+  //     headerName: column.text,
+  //     field: column.value,
+  //     sortable: true,
+  //     filter: true,
+  //     resizable: true,
+  //     cellClass: 'pointer-cursor' , // Add this class to the cells
+  //     cellRenderer: (column.value === 'dynamic_table_values') ? this.iconCellRenderer : undefined,
+  //   }));
+  // }
+
+
+
   createColumnDefs(columnVisibility: any[]) {
     return columnVisibility.map(column => ({
       headerName: column.text,
@@ -111,15 +153,26 @@ this.parseChartConfig(this.storeDrillDown)
       sortable: true,
       filter: true,
       resizable: true,
-      cellClass: 'pointer-cursor' , // Add this class to the cells
-      cellRenderer: (column.value === 'dynamic_table_values') ? this.iconCellRenderer : undefined,
+      cellClass: 'pointer-cursor',
+      cellRenderer: (column.value === 'dynamic_table_values') ? this.iconCellRenderer : undefined, // Set the appropriate cellRenderer
+      // If you want to handle click events for dynamic_table_values separately, you can define params like this:
+      cellRendererParams: (column.value === 'dynamic_table_values') 
+        ? {
+            onClick: (event: MouseEvent) => this.onIconClick(event)  // If needed, handle icon clicks
+          }
+        : undefined
     }));
   }
   
+  
+  onBtnClick(receivedata:any){
+    console.log('i am clicked')
 
+  }
   // closeModal(): void {
   //   this.modalClose.emit();
   // }
+
 
   closeModal(): void {
     this.modalService.dismissAll()
@@ -341,24 +394,36 @@ this.parseChartConfig(this.storeDrillDown)
 
 
       clickLock = false; // Lock flag to prevent multiple clicks
-
-      onCellClick(eventData: any) {
+      onCellClick(eventData: any, isIconClick: boolean = false) {
+        console.log('eventdata checking from cell',eventData)
         if (this.clickLock) {
           console.log("Click ignored: Already processing a click.");
           return; // Ignore repeated clicks
         }
+        const storeminiTableData = eventData.value;
+
+        if (Object.keys(storeminiTableData).some(key => key.startsWith('table'))) {
+          this.miniTableIcon.emit(eventData)
+          // If keys start with 'table', do nothing
+          console.log("Data contains 'table' key, no action taken.",eventData);
+        } else {
+          // If no key starts with 'table', proceed with the else block
+          console.log("Row clicked, eventData: ", eventData);
+          this.dataTableCellInfo.emit(eventData); 
+        }
       
-        this.clickLock = true; // Lock the click
-        console.log("eventData check for", eventData);
+    // Lock the click
       
-        this.dataTableCellInfo.emit(eventData);
+   
+          // This is the row click handler
+ // Emit data to parent if needed
+        
       
         // Unlock click after a short delay (e.g., 500ms)
         setTimeout(() => {
           this.clickLock = false;
         }, 500);
       }
-      
 
       getRowClass(params:any) {
         if (params.node && params.node.data && params.node.data.clickable) {
