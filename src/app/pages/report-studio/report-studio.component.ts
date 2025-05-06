@@ -178,6 +178,8 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
   blobUrl: string = '';
   dateFilterOperator: any;
   uniqueIDArrays: any = [];
+  excelMiniTableEnable: boolean = false;
+  excelTrackEnable: boolean = false;
 
 
   constructor(private fb: FormBuilder, private api: APIService, private configService: SharedService, private scheduleAPI: scheduleApiService,
@@ -1571,7 +1573,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     this.showTable = true
     this.tableData = [];
 
-    let formMap
+    let formMap:any
     let formValues
 
     if (this.visibiltyflag) {
@@ -1580,9 +1582,6 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
       this.selectedValues = formValues
 
       console.log('Selected columns are here ', this.selectedValues);
-
-
-
       formMap = this.selectedValues.reduce((acc: { [x: string]: any[]; }, group: { formName: string | number; label: any; }[]) => {
 
         group && group.forEach((item: any) => {
@@ -1596,8 +1595,31 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
       // console.log("Form mapped data is here on Submit",formMap);
     }
 
+    //check if customColumns is being added and also check if RT or TAT is being added
+
+    if (this.excelMiniTableEnable || this.excelTrackEnable || this.customColumnsflag) {
+      Object.keys(formMap).forEach((key,index) => {
+        const fields = formMap[key];
+    
+        if (Array.isArray(fields)) {
+          // if ((this.excelTrackEnable && !fields.includes("trackLocation")) || (!fields.includes("trackLocation") && this.customColumnsflag)) {
+          if (!fields.includes("trackLocation") && (this.excelTrackEnable || this.customColumnsflag)) {
+            fields.push("trackLocation");
+            this.selectedValues[index].push({name: "trackLocation", label: "trackLocation", formName: key})
+          }
+    
+          if (this.excelMiniTableEnable && !fields.includes("dynamic_table_values")) {
+            fields.push("dynamic_table_values");
+            this.selectedValues[index].push({name: 'dynamic_table_values', label: "Mini Table", formName: key})
+          }
+        }
+      });
+    }
 
     console.log("Form Map are here ",formMap);
+
+    console.log("After adding values to column Visibilty ",this.selectedValues);
+    
 
     // this.spinner.show();
 
@@ -2983,6 +3005,8 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
       modalRef.componentInstance.configSaved.subscribe((data: any) => {
         console.log('All advanced excel configurations are:', data);
         this.allAdvancedExcelConfigurations = JSON.parse(JSON.stringify(data))
+        this.excelMiniTableEnable = this.allAdvancedExcelConfigurations.miniTableEnable.includes("MiniTable")
+        this.excelTrackEnable = this.allAdvancedExcelConfigurations.trackEnable.includes("trackLocation")
       });
 
       this.spinner.hide()
@@ -3025,10 +3049,8 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
   clearFeilds() {
 
-
-
-
-
+    this.excelMiniTableEnable = false;
+    this.excelTrackEnable = false;
     this.editedQueryName = ''
     this.allAdvancedExcelConfigurations = undefined
 
@@ -4780,12 +4802,12 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
   
                     if (excelSheets && Array.isArray(excelSheets) && excelSheets.length > 0) {
                       if (excelSheets.includes('miniTable')) {
-                        XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1);
+                        XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1.replace(/[^a-zA-Z0-9]/g, ' '));
                       }
   
                     }
                     else {
-                      XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1);
+                      XLSX.utils.book_append_sheet(wb, miniTableSheet, sheetName1.replace(/[^a-zA-Z0-9]/g, ' '));
                     }
                   }
                 }
