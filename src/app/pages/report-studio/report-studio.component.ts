@@ -1598,7 +1598,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     //check if customColumns is being added and also check if RT or TAT is being added
 
     if (this.excelMiniTableEnable || this.excelTrackEnable || this.customColumnsflag) {
-      Object.keys(formMap).forEach((key,index) => {
+      formMap && Object.keys(formMap).forEach((key,index) => {
         const fields = formMap[key];
     
         if (Array.isArray(fields)) {
