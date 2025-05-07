@@ -10161,7 +10161,30 @@ this.createSummaryField.patchValue({
 // fetchSummaryDashboardConfig(dashboardId: any) {
   
 // }
+checkLegendEnabled(item: any): string {
+  try {
+    // Check if the item is a chart type
+    if (['chart', 'Linechart', 'Columnchart', 'Funnelchart'].includes(item.grid_type)) {
+      // Parse the highchartsOptionsJson to get the options object
+      const options = JSON.parse(item.highchartsOptionsJson);
 
+      // Check if the legend is enabled
+      if (options.legend && options.legend.enabled === true) {
+        // If legends are enabled, apply the increase-height class
+        return 'increase-height';
+      } else {
+        // If legends are not enabled, apply the chart1-style class
+        return 'chart1-style';
+      }
+    } else {
+      // If the item is not a chart, return an empty string to avoid applying any chart classes
+      return '';
+    }
+  } catch (e) {
+    console.error('Error parsing highchartsOptionsJson:', e);
+    return '';
+  }
+}
 
   
 }

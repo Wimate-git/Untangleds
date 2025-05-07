@@ -82,7 +82,8 @@
                 [ngClass]="{
                 
                     
-                         'chart1-style' : item.grid_type === 'chart' || item.grid_type === 'Linechart' ||item.grid_type === 'Columnchart' ||item.grid_type === 'Funnelchart',
+                  'chart1-style': checkLegendEnabled(item) === 'chart1-style',
+                  'increase-height': checkLegendEnabled(item) === 'increase-height',
                       
               
                         
@@ -90,6 +91,7 @@
                          'mo-title-wid-style' : item.grid_type === 'title' || item.grid_type === 'filterTile' || item.grid_type === 'dynamicTile' ,
                 
                          'tile-style' : item.grid_type ==='tile',
+                         'table-width-style' :item.grid_type ==='TableWidget'
                      
                         
                          }"

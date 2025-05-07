@@ -45,6 +45,9 @@ export class TableWidgetUiComponent implements OnInit{
   @ViewChildren(AgGridAngular) agGrids!: QueryList<AgGridAngular>;
   pageSizeOptions = [10, 25, 50, 100];
   @Output() dataTableCellInfo = new EventEmitter<any>();
+  isMobile: boolean = false;
+  mobileChartWidth: number = window.innerWidth * 0.85;  // Custom mobile width
+  mobileChartHeight: number = window.innerWidth * 0.60; 
   
   
   @Output() customEvent = new EventEmitter<{ arg1: any; arg2: number }>();
@@ -897,5 +900,10 @@ get shouldShowButton(): boolean {
     }, 500);
   }
   
+    detectScreenSize() {
+    this.isMobile = window.innerWidth <= 760; // Adjust breakpoint as needed
+    // if (this.isMobile)
+      // alert(`${this.mobileChartWidth}, 'X',${this.mobileChartHeight}`)
+  }
 
 }

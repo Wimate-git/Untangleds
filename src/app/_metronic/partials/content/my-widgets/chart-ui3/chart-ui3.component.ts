@@ -84,7 +84,7 @@ export class ChartUi3Component implements OnInit{
 
   isMobile: boolean = false;
   mobileChartWidth: number = window.innerWidth * 0.85;  // Custom mobile width
-  mobileChartHeight: number = window.innerWidth * 0.87; 
+  mobileChartHeight: number = window.innerWidth * 0.70; 
   iframeUrl: any;
   selectedMarkerIndex: any;
   tile1Config: any;

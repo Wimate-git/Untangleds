@@ -713,7 +713,7 @@ gridster-item {
     flex-direction: column !important;
     align-content: center !important;
     justify-content: center !important;
-    //   align-items: center !important;
+      align-items: center !important;
 
   }
 
@@ -734,6 +734,8 @@ gridster-item {
     align-content: center !important;
     justify-content: center !important;
     align-items: center !important;
+    font-size: 16px !important;
+    height:300px !important
   }
 
   .chart2-style {
@@ -743,6 +745,10 @@ gridster-item {
     justify-content: center !important;
     align-items: center !important;
 
+  }
+  .increase-height {
+    /* Your styles for increased height */
+    height: 300px !important;  /* Adjust this height based on the need when legends are enabled */
   }
 
   .chart3-style {
@@ -804,13 +810,48 @@ gridster-item {
     align-items: center !important;
   }
 
+  // .mo-title-wid-style {
+  //   display: flex !important;
+  //   flex-direction: column !important;
+  //   align-content: center !important;
+  //   justify-content: center !important;
+  //   align-items: center !important;
+  // }
   .mo-title-wid-style {
     display: flex !important;
     flex-direction: column !important;
     align-content: center !important;
     justify-content: center !important;
     align-items: center !important;
+    text-align: center;  /* Ensures the title is centered */
+    padding: 10px;  /* Adjust padding to give more space */
+    word-wrap: break-word; /* Ensure long titles wrap to the next line */
+    overflow-wrap: break-word; /* Ensure long titles wrap to the next line */
+    white-space: normal; /* Allow text to wrap */
+    font-size: 16px;
   }
+  .table-width-style {
+    display: block !important;  /* Allow for horizontal scrolling */
+    height: 500px !important;
+    overflow-y: auto;  /* Enable vertical scrolling */
+    overflow-x: auto;  /* Enable horizontal scrolling */
+    white-space: nowrap; /* Prevent wrapping of content */
+  }
+  
+  table {
+    width: 100% !important;  /* Ensure the table takes full width */
+    table-layout: auto;  /* Auto-adjust column widths based on content */
+  }
+  
+  th, td {
+    min-width: 120px;  /* Set a minimum width for columns to prevent them from collapsing */
+    word-wrap: break-word;  /* Ensure long text breaks and doesn't overflow */
+    text-align: center;  /* Ensure text is centered in the cells */
+  }
+  
+  
+  
+  
   .mo-tile1-wid-style{
     display: flex !important;
     flex-direction: column !important;
@@ -832,6 +873,12 @@ gridster-item {
   align-content: center !important;
   justify-content: center !important;
   align-items: center !important;
+  text-align: center;  /* Ensures the title is centered */
+  padding: 10px;  /* Adjust padding to give more space */
+  word-wrap: break-word; /* Ensure long titles wrap to the next line */
+  overflow-wrap: break-word; /* Ensure long titles wrap to the next line */
+  white-space: normal; /* Allow text to wrap */
+  font-size: 16px;
 }
 .mo-tile1-wid-style{
   display: flex !important;
@@ -1180,7 +1227,8 @@ gridster-item {
   .datatable-container table {
     width: 100%; /* Ensure the table spans the container */
     min-width: 600px; /* Set a minimum width for the table if needed */
-    table-layout: fixed; /* Prevent the table from adjusting its columns */
+    table-layout: fixed;
+    height: 600px; /* Prevent the table from adjusting its columns */
   }
 
   .datatable-container th,

@@ -78,7 +78,7 @@ export class ChartUi1Component implements OnChanges,OnInit {
   @Input() summaryDashboardUpdate:any;
   isMobile: boolean = false;
   mobileChartWidth: number = window.innerWidth * 0.85;  // Custom mobile width
-  mobileChartHeight: number = window.innerWidth * 0.87; // Custom mobile height
+  mobileChartHeight: number = window.innerWidth * 0.70; // Custom mobile height
   
   allChartsData:any[] =[]
   

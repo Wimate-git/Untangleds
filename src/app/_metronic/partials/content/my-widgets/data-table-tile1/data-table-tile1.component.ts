@@ -409,7 +409,11 @@ this.parseChartConfig(this.storeDrillDown)
         } else {
           // If no key starts with 'table', proceed with the else block
           console.log("Row clicked, eventData: ", eventData);
-          this.dataTableCellInfo.emit(eventData); 
+          setTimeout(() => {
+            
+            this.dataTableCellInfo.emit(eventData); 
+          }, 500);
+ 
         }
       
     // Lock the click
