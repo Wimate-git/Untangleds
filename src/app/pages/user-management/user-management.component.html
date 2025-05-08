@@ -282,7 +282,7 @@
                                 <div class="row mb-7">
 
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-4" *ngIf="!editOperation">
                                         <label class="required fw-semibold fs-6 mb-2"> User ID</label>
                                         <input type="text" class="
                                         form-control form-control-lg form-control-solid
@@ -290,7 +290,7 @@
                                       " placeholder="Enter User ID" name="userID" formControlName="userID" required
                                             (keyup)="checkUniqueUserID($event)">
         
-                                        <span style="color: #fc1900;">{{errorForUniqueUserID}}</span>
+                                        <span style="color: #6e6261;">{{errorForUniqueUserID}}</span>
                                         <div *ngIf="
                                         createUserField.get('userID')?.hasError('required') &&
                                         createUserField.get('userID')?.touched
@@ -411,6 +411,8 @@
                                         placeholder="select Location"
                                         (onChange)="onModuleLocationSelect($event)"
                                         formControlName="location_permission"
+                                        display="chip"
+                                        [showToggleAll]="false"
                                         required>
                                         </p-multiSelect>
                                     </div>
@@ -451,6 +453,8 @@
                                             placeholder="select formID permission"
                                             (onChange)="onModuleSelect($event)"
                                             value ="value"
+                                            [showToggleAll]="false"
+                                            display="chip"
                                             formControlName="form_permission"
                                             required>
                                             </p-multiSelect>

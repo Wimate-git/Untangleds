@@ -1416,6 +1416,9 @@ rdtListWorkAround :any =[{
 
           // alert(JSON.stringify(this.allUserDetails));
 
+
+          await this.updateCognitoAttributes();
+
           try{
             await this.recordUserDetails(JSON.parse(JSON.stringify(this.allUserDetails)),'update',this.userCreatedTime)
           }
@@ -1514,8 +1517,7 @@ rdtListWorkAround :any =[{
 
 
 
-          await this.updateCognitoAttributes();
-          await this.addFromService();
+          this.addFromService();
 
           this.showAlert(successAlert)
 

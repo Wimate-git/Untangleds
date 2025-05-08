@@ -13,6 +13,7 @@ import { SweetAlert2Module } from "@sweetalert2/ngx-sweetalert2";
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { UserExportComponent } from "./user-export/user-export.component";
 import { UserVerifiedTableComponent } from "./user-verified-table/user-verified-table.component";
+import { PasswordModule } from 'primeng/password';
 
 
 
@@ -42,6 +43,7 @@ import { UserVerifiedTableComponent } from "./user-verified-table/user-verified-
     UserExportComponent,
     MultiSelectModule,
     SelectButtonModule,
+    PasswordModule
     
 ]
 })
