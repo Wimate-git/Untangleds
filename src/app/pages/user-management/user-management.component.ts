@@ -1514,7 +1514,8 @@ rdtListWorkAround :any =[{
 
 
 
-          this.updateCognitoAttributes();
+          await this.updateCognitoAttributes();
+          await this.addFromService();
 
           this.showAlert(successAlert)
 
@@ -1556,7 +1557,7 @@ rdtListWorkAround :any =[{
           // })
 
           //need to refresh table so updated value will be fetched
-          this.addFromService();
+       
           //modal closing based on viewchild
           // this.closeUser.nativeElement.click();
 
@@ -1594,7 +1595,7 @@ rdtListWorkAround :any =[{
 
 
 
-  updateCognitoAttributes() {
+  async updateCognitoAttributes() {
 
 
     let authenticationData = {
@@ -1648,7 +1649,7 @@ rdtListWorkAround :any =[{
 
     let authenticationDetails = new AuthenticationDetails(authenticationData);
 
-    cognitoUser.authenticateUser(authenticationDetails, {
+    await cognitoUser.authenticateUser(authenticationDetails, {
       onSuccess: function (result) {
         let accessToken = result.getAccessToken().getJwtToken();
 
@@ -3696,14 +3697,14 @@ rdtListWorkAround :any =[{
         catch(error){
           console.log("Error while creating audit trails ",error);
         }
-    
-        this.spinner.hide()
 
         this.datatableConfig = {}
 
         this.lookup_data_user = []
         
         this.reloadEvent.next(true)
+
+        this.spinner.hide()
   
         Swal.fire(
           'Removed!',
