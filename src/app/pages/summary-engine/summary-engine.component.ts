@@ -1564,14 +1564,12 @@ Highcharts.chart('MixedChart', barchartOptions);
   @ViewChild('TitleModal', { static: false }) TitleModal: TemplateRef<any>;
   handleClick(item: any, i: number, event: MouseEvent) {
 
-    console.log('item is checking from handleclick',item)
-    console.log('index is checking from i',i)
+    // console.log('item is checking from handleclick',item)
+    // console.log('index is checking from i',i)
     if (item.grid_type === 'filterTile') {
       if (this.summaryDashboardView && this.summaryDashboardUpdate || this.summaryDashboardUpdate){
         this.justReadStyles(item, i);
       }
-   
-  
 
    
     } else if (item.grid_type === 'tile') {
@@ -1989,7 +1987,7 @@ showDrillDownData(dynamicDrill:any,modalref:any){
   console.log('pointData for Tile',pointData)
   console.log('this.permissionIdRequest check drilldown',this.permissionIdRequest)
 
-
+console.log('this.eventFilterConditions checking',this.eventFilterConditions)
         // Define the API Gateway URL
         const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
     
@@ -7582,7 +7580,8 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
       filterParameterLine:this.formatField(tile.filterParameterLine),
       parameterNameHTML:this.formatField(tile.parameterNameHTML),
       table_rowConfig:this.formatField(tile.table_rowConfig),
-      DrillConfig:this.formatField(tile.DrillConfig)
+      DrillConfig:this.formatField(tile.DrillConfig),
+      filter_duplicate_data:this.formatField(tile.filter_duplicate_data),
   
       // parameterName:this.formatField(tile.parameterName)
 
@@ -9142,6 +9141,57 @@ refreshFunction(){
         console.error("❌ Error opening modal:", error);
     }
   }
+
+
+
+  helperStackedChartClick(event:any,modalChart:any){
+  
+ 
+    console.log('event checking:', event);
+    console.log('modalChart reference:', modalChart);
+    console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
+  
+  
+    // ✅ Step 1: Check if modal opening is manually stopped
+    if (this.preventModalOpening) {
+        console.log("🚫 Modal opening is manually disabled. Not opening modal.");
+        return;
+    }
+  
+    // ✅ Step 2: Ensure this.chartDataConfigExport exists and is an object
+    if (!this.chartDataConfigExport || typeof this.chartDataConfigExport !== 'object') {
+        console.log("❌ chartDataConfigExport is undefined or not an object, not opening the modal.");
+        return;
+    }
+  
+    // ✅ Step 3: Extract columnVisibility safely
+    const columnVisibility = this.chartDataConfigExport.columnVisibility;
+    console.log('columnVisibility checking',columnVisibility)
+    const columnVisibilityRead = columnVisibility
+    console.log('columnVisibilityRead checki',columnVisibilityRead)
+  
+    // ✅ Step 4: Ensure columnVisibility exists and has values
+    if (!Array.isArray(columnVisibilityRead) || columnVisibilityRead.length === 0) {
+        console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
+        return;
+    }else if(this.isEditModeView == true){
+      console.log('this.isEditModeView checking chart3', this.isEditModeView);
+      setTimeout(() => {
+        this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+          keyboard: false  });
+      }, 500);
+   
+    }
+  
+    console.log("✅ columnVisibility has data, opening modal...");
+  
+    // ✅ Step 5: Try to open the modal
+    try {
+  
+    } catch (error) {
+        console.error("❌ Error opening modal:", error);
+    }
+  }
 // Class-level variable to store chart data
 
 
@@ -9602,6 +9652,9 @@ helperChartClickFunnel(event: any, modalChart: any) {
 
 
 receiveminiTableIcon(checkevent:any,modalref: any){
+  this.isLoading = true;
+
+  this.spinner.show('FormView')
    
   this.minitableDataTile1 = checkevent
 
@@ -9610,6 +9663,9 @@ receiveminiTableIcon(checkevent:any,modalref: any){
     this.modalService.open(modalref,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
       keyboard: false  });
   }, 500);
+
+  this.isLoading = false;
+  this.spinner.hide('FormView')
 
 }
 

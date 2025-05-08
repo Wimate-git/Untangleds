@@ -424,7 +424,8 @@ export class PieChartConfigComponent {
             filterDescription:[''],
             XaxisFormat:[''],
             Value_Label:[''],
-            CategoryValue:['']
+            CategoryValue:[''],
+            CustomValueLabelfontSize:['']
 
             
 
@@ -491,6 +492,13 @@ const updatedHighchartsOptionsJson = {
 console.log('updatedHighchartsOptionsJson check',updatedHighchartsOptionsJson)
 this.chartFinalOptions =JSON.stringify(updatedHighchartsOptionsJson,null,4)
 console.log('this.chartFinalOptions check',this.chartFinalOptions)
+
+const updatedChartConfig = this.createChart.value.all_fields.map((field: any) => {
+  if (field.CustomValueLabelfontSize) {
+    field.CustomValueLabelfontSize = `${field.CustomValueLabelfontSize || 16}px`;  // Add 'px' if fontSize is present
+  }
+  return field;
+});
     
   
       // Create the new tile object with all the required properties
@@ -509,7 +517,7 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         chart_title: this.createChart.value.chart_title || '',  // Ensure this value exists
         fontSize: `${this.createChart.value.fontSize || 16}px`,  // Provide a fallback font size
         themeColor: 'var(--bs-body-bg)',  // Default theme color
-        chartConfig: this.createChart.value.all_fields || [],  // Default to empty array if missing
+        chartConfig: updatedChartConfig || [],  // Default to empty array if missing
         filterForm: this.createChart.value.filterForm || {},
         // filterParameter: this.createChart.value.filterParameter || {},
         // filterDescription: this.createChart.value.filterDescription || '',
@@ -628,7 +636,12 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
       // Add defensive checks for predefinedSelectRange
 
   
-      
+      const updatedChartConfig = this.createChart.value.all_fields.map((field: any) => {
+        if (field.CustomValueLabelfontSize) {
+          field.CustomValueLabelfontSize = `${field.CustomValueLabelfontSize || 16}px`;  // Add 'px' if fontSize is present
+        }
+        return field;
+      });
       console.log('this.dashboard',this.dashboard)
       // Now update the tile with the updated multi_value
       const updatedTile = {
@@ -950,6 +963,7 @@ repopulate_fields(getValues: any): FormArray {
           XaxisFormat: this.fb.control(dateParameter),
           Value_Label:[configItem.Value_Label || ''],
           CategoryValue:[configItem.CategoryValue || ''],
+          CustomValueLabelfontSize: [configItem.CustomValueLabelfontSize ? parseInt(configItem.CustomValueLabelfontSize.replace('px', ''), 10) : 14]
         })
       );
 

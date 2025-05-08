@@ -18,6 +18,40 @@ interface CustomPoint {
   y: number;
   colorIndex: number;
 }
+interface FormTableConfig {
+  columnVisibility: Array<{
+    formlist: string;
+    parameterName: string[];
+    primaryValue: string;
+    groupByFormat: string;
+    constantValue: string;
+    // Include other properties as needed
+  }>;
+  formName?: string;
+}
+interface ColumnVisibility {
+  formlist: string;
+  parameterName: string[];
+  primaryValue: string;
+  groupByFormat: string;
+  constantValue: string;
+  // Add other properties that are part of the object
+}
+interface storeColumnVisibility {
+  formlist: string;
+  parameterName: string[];
+  primaryValue: string;
+  groupByFormat: string;
+  constantValue: string;
+  columnVisibility: string[]; // This expects an array of strings
+}
+
+interface CustomPoint {
+  options: CustomPointOptions;
+  category: string;
+  y: number;
+  colorIndex: number;
+}
 @Component({
   selector: 'app-stacked-bar-ui',
 
@@ -58,7 +92,7 @@ export class StackedBarUiComponent {
   isChecked: boolean = false; // Initial state is false
   isHomeChecked:boolean = false;
   
-  formTableConfig: {};
+
   storeDrillFilter: any;
   DrillFilterLevel: undefined;
   parseChartData: any;
@@ -70,6 +104,7 @@ export class StackedBarUiComponent {
   storeDrillConfig: any;
   isLoading = false;
   enableDrillButton: boolean;
+  formTableConfig: FormTableConfig = { columnVisibility: [] };
   
   toggleCheck(isChecked: boolean,index:any) {
     this.counter =0; 
@@ -306,16 +341,16 @@ export class StackedBarUiComponent {
     
   }
 
-  onBarClick(event: Highcharts.PointClickEventObject, index: any): void {
+   onBarClick(event: Highcharts.PointClickEventObject, index: any): void {
     console.log('index checking from toggle', index);
-    console.log('event check for stacked chart', event);
 
     if(this.isEditModeView==true){
-      this.enableDrillButton = true
 
+      this.enableDrillButton = true
 
       this.spinner.show('dataProcess' + index);
 
+      console.log('event check for column chart', event);
 
       console.log('Bar clicked:', {
           category: event.point.category,
@@ -330,7 +365,7 @@ export class StackedBarUiComponent {
           colorIndex: event.point.colorIndex
       };
   
-      console.log('pointData checking stacked chart', pointData);
+      console.log('pointData checking column chart', pointData);
       const chartConfig = JSON.parse(this.item.chartConfig);
       console.log('chartConfig check from chart ui', chartConfig);
   
@@ -351,25 +386,74 @@ export class StackedBarUiComponent {
       console.log('storeconditionsLength checking', storeconditionsLength);
       console.log('this.counter checking', this.counter);
   
-      if (storeconditionsLength === this.counter || storeconditionsLength === undefined) {
-          console.log('Emitting action, either conditions are empty or second bar clicked');
-          
-          // Emit action
-          this.emitChartConfigTable.emit(this.formTableConfig);
-          this.sendCellInfo.emit(event);
-          this.counter--; // Reset counter after emitting
-      }
+      // if (storeconditionsLength === this.counter || storeconditionsLength === undefined) {
+      //     console.log('Emitting action, either conditions are empty or second bar clicked');
+      //     console.log('this.formTableConfig checking inside',this.formTableConfig)
+      //     // Emit action
+      //     this.emitChartConfigTable.emit(this.formTableConfig);
+      //     this.sendCellInfo.emit(event);
+      //     this.counter--; // Reset counter after emitting
+      // }
 
-      if(storeconditionsLength === undefined){
-        this.enableDrillButton = false
-  
-  }
-  
-      // Show the spinner while API is processing
-      const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+        if (storeconditionsLength === this.counter || storeconditionsLength === undefined) {
+          console.log('storeconditionsLength checking from donut',storeconditionsLength)
+          console.log('this.counter checking from donut',this.counter)
+          console.log('Emitting action, either conditions are empty or second bar clicked');
+          console.log('this.formTableConfig checking from donut',this.formTableConfig)
+          console.log('this.formTableConfig checking from donut', this.formTableConfig);
+          console.log('access columnVisibility',this.formTableConfig.columnVisibility);
+          const storeObject = this.formTableConfig.columnVisibility
+          const storeColumnVisibility:any =this.formTableConfig.columnVisibility[0]
+          console.log('storeColumnVisibility checking',storeColumnVisibility)
+         const columnVisibility = storeColumnVisibility?.columnVisibility || [];
+         console.log('columnVisibility check from donut',columnVisibility)
+         if (!columnVisibility.length) {
+          // Show SweetAlert with the updated message if columnVisibility is empty or undefined
+          Swal.fire({
+              icon: 'warning',
+              title: 'Final Stage',
+              text: 'columnVisibility is not configured.',
+              confirmButtonText: 'OK'
+          });
+          this.counter--; 
+      } 
+      else {
+          // Proceed with emitting events if columnVisibility is valid
+          const clickedPoint = event.point;
+          console.log('Clicked bar index:', clickedPoint.index);
+          console.log('Clicked bar',event.point.colorIndex)
+          const clickedColorIndex: any = event.point.colorIndex;
+
+          console.log('Clicked bar colorIndex:', clickedColorIndex);
+          
+          // Access the corresponding columnVisibility using the colorIndex
+          console.log('this.formTableConfig.columnVisibility check', this.formTableConfig.columnVisibility);
+          
+          // If columnVisibility has length greater than 0, use clickedColorIndex; otherwise, use 0
+          const indexToUse = this.formTableConfig.columnVisibility.length > 0 
+              ? (clickedColorIndex >= 0 && clickedColorIndex < this.formTableConfig.columnVisibility.length ? clickedColorIndex : 0)
+              : 0;
+          
+          const selectedColumn = this.formTableConfig.columnVisibility[indexToUse];
+          
+          console.log('Selected Column from formTableConfig:', selectedColumn);
+          
+
+          console.log('Selected Column from formTableConfig:', selectedColumn);
+
+          console.log('this.formTableConfig>>>>',this.formTableConfig)
+          this.emitChartConfigTable.emit(selectedColumn);
+          this.sendCellInfo.emit(event);
+          this.counter--; 
       
-      const requestBody = {
-          body: JSON.stringify({
+      
+      
+      
+      
+          const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+        
+          const requestBody = {
+            body: JSON.stringify({
               clientId: this.SK_clientID,
               routeId: this.routeId,
               widgetId: this.item.id,
@@ -381,72 +465,174 @@ export class StackedBarUiComponent {
               conditions: this.eventFilterConditions || [],
               DrillFilter: this.storeDrillFilter || '',
               DrillFilterLevel: this.DrillFilterLevel || ''
-          }),
-      };
+            }),
+          };
+        
+          console.log('requestBody checking chart1Drilldown', requestBody);
+        
+          // Send a POST request to the Lambda function
+          this.http.post(apiUrl, requestBody).subscribe(
+            (response: any) => {
+                if (response?.statusCode === 200) {
+                    console.log('Lambda function triggered successfully chart1 drilldown', response);
+                    this.checkResBody = response.body;
+                    this.parsedResBody.push(JSON.parse(this.checkResBody));
+                    console.log('this.parsedResBody checking', this.parsedResBody);
+        
+                    this.parsedResBody.forEach((item: { ChartData?: any; rowdata?: any; }, index: any) => {
+                        if (Object.keys(item).includes('ChartData')) {
+                            this.parseChartData = JSON.parse(item.ChartData);
+                            console.log(`this.parseChartDatav checking at index ${index}`, this.parseChartData);
+                            this.storeDrillFilter = this.parseChartData.DrillFilter;
+                            this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
+        
+                            this.summaryService.updatelookUpData(this.parseChartData);
+                        } else {
+                            this.processedData = JSON.parse(item.rowdata);
+                            console.log(`this.processedData check at index ${index}`, this.processedData);
+                            this.paresdDataEmit.emit(this.processedData);
+                        }
+                
+                    });
+                    // Hide the spinner after API processing
+                    this.spinner.hide('dataProcess' + index);
+                } else {
+                    // Hide the spinner in case of an error
+                    this.spinner.hide('dataProcess' + index);
+                    console.error('Unexpected statusCode:', response?.statusCode);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: `Unexpected response received (Status Code: ${response?.statusCode}).`,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            },
+            (error: any) => {
+                // Hide the spinner if there's an error
+                this.spinner.hide('dataProcess' + index);
+                console.error('Error triggering Lambda function:', error);
+        
+                if (error.status === 404) {
+                    console.log('Received 404 error - stopping loading and showing error message.');
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Data not found. Please check your inputs and try again.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to trigger the Lambda function. Please try again.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            }
+        );
+      }
+      
+      
+          // this.emitChartConfigTable.emit(this.formTableConfig);
+          // this.sendCellInfo.emit(event);
+          // this.counter--; 
+      }
+
+
+
+      if(storeconditionsLength === undefined){
+        this.enableDrillButton = false
   
-      console.log('requestBody checking chart1Drilldown', requestBody);
-  
-      this.http.post(apiUrl, requestBody).subscribe(
-          (response: any) => {
-              if (response?.statusCode === 200) {
-                  console.log('Lambda function triggered successfully:', response);
-                  this.checkResBody = response.body;
-                  this.parsedResBody.push(JSON.parse(this.checkResBody));
-                  console.log('this.parsedResBody checking', this.parsedResBody);
-  
-                  this.parsedResBody.forEach((item: { ChartData?: any; rowdata?: any; }, index: any) => {
-                      if (Object.keys(item).includes('ChartData')) {
-                          this.parseChartData = JSON.parse(item.ChartData);
-                          console.log(`this.parseChartDatav checking at index ${index}`, this.parseChartData);
-                          this.storeDrillFilter = this.parseChartData.DrillFilter;
-                          this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
-  
-                          this.summaryService.updatelookUpData(this.parseChartData);
-                      } else {
-                          this.processedData = JSON.parse(item.rowdata);
-                          console.log(`this.processedData check at index ${index}`, this.processedData);
-                          this.paresdDataEmit.emit(this.processedData);
-                      }
-              
-                  });
-                  // Hide the spinner after API processing
-                  this.spinner.hide('dataProcess' + index);
-              } else {
-                  // Hide the spinner in case of an error
-                  this.spinner.hide('dataProcess' + index);
-                  console.error('Unexpected statusCode:', response?.statusCode);
-                  Swal.fire({
-                      title: 'Error!',
-                      text: `Unexpected response received (Status Code: ${response?.statusCode}).`,
-                      icon: 'error',
-                      confirmButtonText: 'OK'
-                  });
-              }
-          },
-          (error: any) => {
-              // Hide the spinner if there's an error
-              this.spinner.hide('dataProcess' + index);
-              console.error('Error triggering Lambda function:', error);
-  
-              if (error.status === 404) {
-                  console.log('Received 404 error - stopping loading and showing error message.');
-                  Swal.fire({
-                      title: 'Error!',
-                      text: 'Data not found. Please check your inputs and try again.',
-                      icon: 'error',
-                      confirmButtonText: 'OK'
-                  });
-              } else {
-                  Swal.fire({
-                      title: 'Error!',
-                      text: 'Failed to trigger the Lambda function. Please try again.',
-                      icon: 'error',
-                      confirmButtonText: 'OK'
-                  });
-              }
-          }
-      );
-  
+  }
+      
+
+
+
+    const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+      
+    const requestBody = {
+        body: JSON.stringify({
+            clientId: this.SK_clientID,
+            routeId: this.routeId,
+            widgetId: this.item.id,
+            chartData: pointData,
+            MsgType: 'DrillDown',
+            permissionId: this.permissionIdRequest,
+            permissionList: this.readFilterEquation,
+            userName: this.userdetails,
+            conditions: this.eventFilterConditions || [],
+            DrillFilter: this.storeDrillFilter || '',
+            DrillFilterLevel: this.DrillFilterLevel || ''
+        }),
+    };
+
+    console.log('requestBody checking chart1Drilldown', requestBody);
+
+    this.http.post(apiUrl, requestBody).subscribe(
+        (response: any) => {
+            if (response?.statusCode === 200) {
+                console.log('Lambda function triggered successfully:', response);
+                this.checkResBody = response.body;
+                this.parsedResBody.push(JSON.parse(this.checkResBody));
+                console.log('this.parsedResBody checking', this.parsedResBody);
+
+                this.parsedResBody.forEach((item: { ChartData?: any; rowdata?: any; }, index: any) => {
+                    if (Object.keys(item).includes('ChartData')) {
+                        this.parseChartData = JSON.parse(item.ChartData);
+                        console.log(`this.parseChartDatav checking at index ${index}`, this.parseChartData);
+                        this.storeDrillFilter = this.parseChartData.DrillFilter;
+                        this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
+
+                        this.summaryService.updatelookUpData(this.parseChartData);
+                    } else {
+                        this.processedData = JSON.parse(item.rowdata);
+                        console.log(`this.processedData check at index ${index}`, this.processedData);
+                        this.paresdDataEmit.emit(this.processedData);
+                    }
+            
+                });
+                // Hide the spinner after API processing
+                this.spinner.hide('dataProcess' + index);
+            } else {
+                // Hide the spinner in case of an error
+                this.spinner.hide('dataProcess' + index);
+                console.error('Unexpected statusCode:', response?.statusCode);
+                Swal.fire({
+                    title: 'Error!',
+                    text: `Unexpected response received (Status Code: ${response?.statusCode}).`,
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        },
+        (error: any) => {
+            // Hide the spinner if there's an error
+            this.spinner.hide('dataProcess' + index);
+            console.error('Error triggering Lambda function:', error);
+
+            if (error.status === 404) {
+                console.log('Received 404 error - stopping loading and showing error message.');
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Data not found. Please check your inputs and try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Failed to trigger the Lambda function. Please try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+    );
+
+
+      // Show the spinner while API is processing
+
       // Once the request is finished, hide the spinner
   
       this.counter++;
@@ -611,52 +797,73 @@ if (chartdata) {
   Highcharts.chart(`pieChart${this.index + 1}`, chartOptionsCopy);
 }
 
-   else {
-      console.log('this.items checkinh',this.item)
-      const extractOptions = this.item.highchartsOptionsJson
-      console.log('extractOptions checking',extractOptions)
-      const parseExtractOptions = JSON.parse(extractOptions)
-      console.log('parseExtractOptions checking',parseExtractOptions)
-      const chartOptionsCopy = JSON.parse(this.item.highchartsOptionsJson);
-    
-      console.log('chartOptionsCopy else condition', chartOptionsCopy);
-    
-      parseExtractOptions.series = parseExtractOptions.series.map((series: any) => {
-        return {
-          ...series,
-          data: series.data.map((point: any, index: number) => {
-            // Handle both array-based and object-based data
-            let category, value;
-    
-            if (Array.isArray(point)) {
-              category = point[0]; // First element as category name
-              value = point[1]; // Second element as y-value
-            } else if (typeof point === 'object' && point !== null) {
-              category = point.category || 'Unknown'; // Default if missing
-              value = point.value || 0;
-            } else {
-              console.warn("Unexpected data format in series:", point);
-              return null;
-            }
-    
-            return {
-              ...series,
-              data: series.data.map((value: any, index: number) => ({
-                y: value, // Data value
-                name: series.name, // Series name (optional)
-                customIndex: index, // Custom property to track index
-                events: {
-                  click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event,this.index),
-                },
-              })),
-            };
-          }).filter((point: any) => point !== null), // Filter out null values if any
-        };
-      });
-    
-      // Initialize the Highcharts stacked bar chart
-      Highcharts.chart(`pieChart${this.index + 1}`, chartOptionsCopy);
-    }
+else {
+  console.log('this.items checking', this.item);
+  const extractOptions = this.item.highchartsOptionsJson;
+  console.log('extractOptions checking', extractOptions);
+
+  // Parse the JSON options object
+  const parseExtractOptions = JSON.parse(extractOptions);
+  console.log('parseExtractOptions checking', parseExtractOptions);
+
+  // Ensure series.data is present before processing
+  if (parseExtractOptions.series && parseExtractOptions.series.length > 0) {
+    parseExtractOptions.series = parseExtractOptions.series.map((series: any) => {
+      // Make sure the series.data exists and is valid
+      // if (Array.isArray(series.data) && series.data.length > 0) {
+      //   series.data = series.data.map((point: any, index: number) => {
+      //     let category, value;
+
+      //     // Handle both array-based and object-based data
+      //     if (point) {
+      //       category = point[0]; // First element as category name
+      //       value = point[1]; // Second element as y-value
+      //     } else if (typeof point === 'object' && point !== null) {
+      //       category = point.category || 'Unknown'; // Default if missing
+      //       value = point.value || 0;
+      //     } else {
+      //       console.warn("Unexpected data format in series:", point);
+      //       return null;
+      //     }
+
+      //     // Return the point with the click event attached
+      //     return {
+      //       ...point,
+      //       category, // Ensure the category is part of the point data
+      //       value, // Ensure the value is part of the point data
+      //       y: value, // Data value
+      //       name: series.name, // Series name (optional)
+      //       customIndex: index, // Custom property to track index
+      //       events: {
+      //         click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event, this.index),
+      //       }, // Attach the click event
+      //     };
+      //   }).filter((point: any) => point !== null); // Filter out null values if any
+      // }()
+      series.data = series.data.map((point: any)=>{
+        const data = {
+          events :{
+            click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event, this.index),
+          },
+          y:point
+        }
+
+   return data
+        
+      })
+  
+      return series; // Return the modified series
+    });
+  } else {
+    console.warn("No valid series data found.");
+  }
+
+  // Initialize the Highcharts stacked bar chart with the modified options
+  Highcharts.chart(`pieChart${this.index + 1}`, parseExtractOptions);
+}
+
+// Ensure that each chart gets a unique copy of the options
+
     
     // Ensure that each chart gets a unique copy of the options
 

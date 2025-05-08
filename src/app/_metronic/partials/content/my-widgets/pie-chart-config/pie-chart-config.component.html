@@ -369,6 +369,23 @@
                         class="w-100"></ngx-select>
            
                     </div>
+
+
+
+                  <div class="col-md-4 mb-3">
+                    <label for="fontSize" class="col-createChart-label fw-bold fs-6 ">Custom Value Label FontSize</label>
+                    <input
+                      id="fontSize"
+                      type="number"
+                      class="form-control form-control-solid"
+                      placeholder="Enter Font Size (e.g., 14)"
+                      formControlName="CustomValueLabelfontSize"
+                      min="8"
+                      max="72">
+                      <div *ngIf="createChart.get('fontSize')?.errors?.min || createChart.get('fontSize')?.errors?.max" class="text-danger mt-1">
+                        Font size must be between 8 and 72.
+                      </div>
+                  </div>
                       <div class="col-md-4 mb-3" *ngIf = "shoRowData" >
                         <label for="constant" class="col-createChart-label fw-bold fs-6 required"></label>
                         <input id="constant" type="number" class="form-control form-control-solid"

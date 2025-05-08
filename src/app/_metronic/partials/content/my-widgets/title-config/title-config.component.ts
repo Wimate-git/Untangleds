@@ -144,9 +144,9 @@ ngOnChanges(changes: SimpleChanges): void {
       fontFamily: [''], // Font family
       fontSize: [''], // Font size
       textAlign: ['left'], // Text alignment
-      themeColor: ['transparent'], // Background color
+      themeColor: ['#3498db'], // Background color
       fontWeight:[''],
-      textColor:['black'],
+      textColor:['#FFFFFF'],
       ModuleNames:[''],
       dashboardIds:[''],
       selectType:['']
@@ -246,7 +246,7 @@ ngOnChanges(changes: SimpleChanges): void {
     fontFamily: 'Lato',
     fontSize: '14px',
     textAlign: 'left',
-    themeColor: '#ffffff'
+    themeColor: '#3498db'
   };
 // Apply font style
 toggleBold(): void {
@@ -357,12 +357,12 @@ updateTextColor(event: Event): void {
       grid_type: 'title',
 
       customLabel: this.createTitle.value.customLabel, // User input for the title
-      themeColor:this.createTitle.value.themeColor, // Background color
+      themeColor:this.createTitle.value.themeColor || '#3498db', // Background color
       fontFamily: this.createTitle.value.fontFamily, // Font family
       fontSize: this.createTitle.value.fontSize, // Font size
       textAlign: this.createTitle.value.textAlign, // Text alignment
       fontWeight: this.createTitle.value.fontWeight, // Bold
-      textColor:this.createTitle.value.textColor,
+      textColor:this.createTitle.value.textColor || '#FFFFFF',
       ModuleNames:this.createTitle.value.ModuleNames,
       dashboardIds:this.createTitle.value.dashboardIds,
       selectType:this.createTitle.value.selectType

@@ -395,39 +395,38 @@ this.parseChartConfig(this.storeDrillDown)
 
       clickLock = false; // Lock flag to prevent multiple clicks
       onCellClick(eventData: any, isIconClick: boolean = false) {
-        console.log('eventdata checking from cell',eventData)
+        console.log('eventdata checking from cell', eventData);
+      
+        // If already locked, ignore further clicks
         if (this.clickLock) {
           console.log("Click ignored: Already processing a click.");
-          return; // Ignore repeated clicks
+          return;
         }
+      
+        // Lock the click immediately to prevent multiple triggers
+        this.clickLock = true;
+      
         const storeminiTableData = eventData.value;
-
+      
         if (Object.keys(storeminiTableData).some(key => key.startsWith('table'))) {
-          this.miniTableIcon.emit(eventData)
+          this.miniTableIcon.emit(eventData);
           // If keys start with 'table', do nothing
-          console.log("Data contains 'table' key, no action taken.",eventData);
+          console.log("Data contains 'table' key, no action taken.", eventData);
         } else {
           // If no key starts with 'table', proceed with the else block
           console.log("Row clicked, eventData: ", eventData);
           setTimeout(() => {
-            
-            this.dataTableCellInfo.emit(eventData); 
+            // Emit the event after a delay (500ms here)
+            this.dataTableCellInfo.emit(eventData);
           }, 500);
- 
         }
       
-    // Lock the click
-      
-   
-          // This is the row click handler
- // Emit data to parent if needed
-        
-      
-        // Unlock click after a short delay (e.g., 500ms)
+        // Unlock click after processing (to prevent multiple triggers)
         setTimeout(() => {
           this.clickLock = false;
-        }, 500);
+        }, 500); // The same delay as the timeout for emitting data
       }
+      
 
       getRowClass(params:any) {
         if (params.node && params.node.data && params.node.data.clickable) {

@@ -2518,19 +2518,7 @@ toggleCheckbox(theme: any): void {
             textOutline: 'none',
           },
         },
-        events: {
-          click: function (event: { point: { category: any; series: { name: any; }; y: any; }; }) {
-            const category = event.point.category;
-            const seriesName = event.point.series.name;
-            const value = event.point.y;
 
-            // Handle the click event here
-            console.log('check click event for stacked bar chart',event);
-
-            // Example: You can trigger any Angular method from here
-            // For instance: this.onBarClick(seriesName, category, value);
-          },
-        },
       },
     },
     series: [

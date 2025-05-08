@@ -420,7 +420,9 @@ createtableWidget(mapWidgetData?:any){
   } catch (error) {
   console.error('Error parsing table data:', error);
   }
-  }else{
+  }
+  
+  else{
     console.log("❌ LiveDashboard is FALSE - Keeping original item.");
       this.formName = this.item.formlist
       this.customLabel = this.item.custom_Label
@@ -494,6 +496,24 @@ createtableWidget(mapWidgetData?:any){
     // Parse row data
     this.rowData = JSON.parse(this.item.rowData);
     console.log('this.rowData from table Tile', this.rowData);
+    // this.rowData = this.removeMatchingPackets(this.rowData);
+    const getFilterFields = JSON.parse(this.item.filter_duplicate_data)
+
+
+// Log the filtered data
+console.log('getFilterFields rowData:', getFilterFields);
+
+// Check if getFilterFields has a length before calling removeDuplicatePacketsBasedOnFilterFields
+if (getFilterFields && getFilterFields.length > 0) {
+  // If getFilterFields has data, call the function with getFilterFields
+  this.rowData = this.removeDuplicatePacketsBasedOnFilterFields(this.rowData, getFilterFields);
+  console.log('Filtered rowData based on filterFields:', this.rowData);
+} else {
+  // If getFilterFields is empty, call the function without it
+  // this.rowData = this.removeDuplicatePacketsBasedOnFilterFields(this.rowData, []);
+  console.log('Filtered rowData without filterFields:', this.rowData);
+}
+
 
     const enableRowCal = this.item.enableRowCal
     console.log('enableRowCal checking',enableRowCal)
@@ -532,6 +552,53 @@ createtableWidget(mapWidgetData?:any){
 
 
 }
+
+removeMatchingPackets(data: any[]) {
+  const seenValues = new Set();
+  const uniqueData: any[] = [];
+
+  // Filter out duplicates based on the 'value' field
+  data.forEach(item => {
+    // Check if the value already exists
+    if (seenValues.has(item.value)) {
+      // If value is already seen, skip this packet
+      return;
+    }
+    
+    // If the value is unique, add to uniqueData and mark as seen
+    seenValues.add(item.value);
+    uniqueData.push(item);
+  });
+
+  return uniqueData;
+}
+removeDuplicatePacketsBasedOnFilterFields(rowData: any[], filterFields: any[]): any[] {
+  const uniqueRows: any[] = [];
+  const seenValues = new Set();
+
+  // Iterate through rowData to check and remove duplicates based on filterFields
+  rowData.forEach(row => {
+    // Create a composite key for each row based on the combination of values from the fields in filterFields
+    const key = filterFields
+      .map(field => row[field.value]) // Dynamically get the value from the row based on filterFields
+      .join('|'); // Combine the field values with a separator to create a unique key
+
+    // Check if this combination of field values has already been encountered
+    if (seenValues.has(key)) {
+      return; // Skip this row if the combination of values is a duplicate
+    }
+
+    // If the combination is unique, mark it as seen and add the row to the result
+    seenValues.add(key);
+    uniqueRows.push(row);
+  });
+
+  return uniqueRows;
+}
+
+
+
+
 
 getRowStyle = ({ node }: RowClassParams): { [key: string]: string } | undefined => 
   node.rowPinned ? { fontWeight: 'bold', backgroundColor: 'lightblue' } : undefined;

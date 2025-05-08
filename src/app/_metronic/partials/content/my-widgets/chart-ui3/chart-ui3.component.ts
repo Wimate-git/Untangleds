@@ -523,14 +523,22 @@ export class ChartUi3Component implements OnInit{
           const clickedPoint = event.point;
           console.log('Clicked bar index:', clickedPoint.index);
           console.log('Clicked bar',event.point.colorIndex)
-          const clickedColorIndex: any = event.point.colorIndex ;
+          const clickedColorIndex: any = event.point.colorIndex;
 
           console.log('Clicked bar colorIndex:', clickedColorIndex);
-    
+          
           // Access the corresponding columnVisibility using the colorIndex
-          const selectedColumn = this.formTableConfig.columnVisibility[clickedColorIndex];
-    
+          console.log('this.formTableConfig.columnVisibility check', this.formTableConfig.columnVisibility);
+          
+          // If columnVisibility has length greater than 0, use clickedColorIndex; otherwise, use 0
+          const indexToUse = this.formTableConfig.columnVisibility.length > 0 
+              ? (clickedColorIndex >= 0 && clickedColorIndex < this.formTableConfig.columnVisibility.length ? clickedColorIndex : 0)
+              : 0;
+          
+          const selectedColumn = this.formTableConfig.columnVisibility[indexToUse];
+          
           console.log('Selected Column from formTableConfig:', selectedColumn);
+          
 
           console.log('Selected Column from formTableConfig:', selectedColumn);
 

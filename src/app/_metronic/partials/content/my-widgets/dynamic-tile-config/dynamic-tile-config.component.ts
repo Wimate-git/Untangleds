@@ -430,6 +430,7 @@ export class DynamicTileConfigComponent implements OnInit{
         return { ...field, label }; // Add the label to the current field object
       });
   
+      
       console.log('this.fields check after label update', this.fields);
   
       const newTile = {

@@ -1048,10 +1048,13 @@ makeTrueCheck:any = false
     console.log('conditionsFilter check inside the requestbody',conditionsFilter)
 
     console.log('conditionsFilter checking', conditionsFilter);
+    const CombinedConditions = {...mainConditions, ...conditionsFilter};
+
+
   
     this.ConditionsFormat = conditionsFilter;
     console.log('this.ConditionsFormat checking',this.ConditionsFormat)
-    this.liveFilterConditions.emit(this.ConditionsFormat);
+    this.liveFilterConditions.emit(CombinedConditions);
 
     this.isLoading = true;
   
@@ -1389,7 +1392,7 @@ openFilterModal(tile: any, index: number) {
     this.selectedTile = tile;
     this.editTileIndex = index !== undefined ? index : null;
     this.paramCount = tile.noOfParams || 1;
-    this.parsedfilterTileConfig = JSON.parse(tile.filterTileConfig || '[]');
+    // this.parsedfilterTileConfig = JSON.parse(tile.filterTileConfig || '[]');
 
     console.log('this.parsedfilterTileConfig check', this.parsedfilterTileConfig);
 

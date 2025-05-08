@@ -713,7 +713,8 @@ export class Chart1ConfigComponent implements OnInit {
           filterDescription: [''],
           XaxisFormat: [''],
           Value_Label:[''],
-          CategoryValue:['']
+          CategoryValue:[''],
+          CustomValueLabelfontSize:['']
         })
       );
     } else if (this.createChart.value.all_fields.length > 0) {
@@ -778,7 +779,12 @@ console.log('updatedHighchartsOptionsJson check',updatedHighchartsOptionsJson)
 this.chartFinalOptions =JSON.stringify(updatedHighchartsOptionsJson,null,4)
 console.log('this.chartFinalOptions check',this.chartFinalOptions)
     
-  
+const updatedChartConfig = this.createChart.value.all_fields.map((field: any) => {
+  if (field.CustomValueLabelfontSize) {
+    field.CustomValueLabelfontSize = `${field.CustomValueLabelfontSize || 16}px`;  // Add 'px' if fontSize is present
+  }
+  return field;
+});
       // Create the new tile object with all the required properties
       const newTile = {
         id: uniqueId,
@@ -793,9 +799,9 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
         grid_type: 'chart',
   
         chart_title: this.createChart.value.chart_title || '',  // Ensure this value exists
-        fontSize: `${this.createChart.value.fontSize || 16}px`,  // Provide a fallback font size
+        // fontSize: `${this.createChart.value.fontSize || 16}px`,  // Provide a fallback font size
         themeColor: 'var(--bs-body-bg)',  // Default theme color
-        chartConfig: this.createChart.value.all_fields || [],  // Default to empty array if missing
+        chartConfig: updatedChartConfig || [],  // Default to empty array if missing
         filterForm: this.createChart.value.filterForm || {},
         // filterParameter: this.createChart.value.filterParameter || {},
         // filterDescription: this.createChart.value.filterDescription || '',
@@ -909,6 +915,12 @@ console.log('this.chartFinalOptions check',this.chartFinalOptions)
       // this.chartFinalOptions = updatedHighchartsOptionsJson;
   
       console.log('this.chartFinalOptions check', this.chartFinalOptions);
+      const updatedChartConfig = this.createChart.value.all_fields.map((field: any) => {
+        if (field.CustomValueLabelfontSize) {
+          field.CustomValueLabelfontSize = `${field.CustomValueLabelfontSize || 16}px`;  // Add 'px' if fontSize is present
+        }
+        return field;
+      });
   
       // ✅ Update the tile object
       const updatedTile = {
@@ -1095,7 +1107,7 @@ openChartModal1(tile: any, index: number): void {
       chart_title: tile.chart_title,
       highchartsOptionsJson: this.highchartsOptionsJson,  // Pass the deep clone of highchartsOptionsJson
       custom_Label: tile.custom_Label,
-      fontSize: fontSizeValue,
+      // fontSize: fontSizeValue,
       filterDescription: tile.filterDescription,
       filterForm: tile.filterForm,
       filterFormList: tile.filterFormList,
@@ -1150,6 +1162,113 @@ preDefinedRange(preDefined:any){
   console.log('preDefined check',preDefined)
 
 }
+
+// repopulate_fields(getValues: any): FormArray {
+//   if (!getValues || getValues === null) {
+//     console.warn('No data to repopulate');
+//     return this.all_fields;
+//   }
+
+//   // Clear existing fields in the FormArray
+//   this.all_fields.clear();
+
+//   // Parse `chartConfig` safely
+//   let parsedChartConfig: any[] = [];
+//   try {
+//     if (typeof getValues.chartConfig === 'string') {
+//       parsedChartConfig = JSON.parse(getValues.chartConfig || '[]');
+//     } else if (Array.isArray(getValues.chartConfig)) {
+//       parsedChartConfig = getValues.chartConfig;
+//     }
+//   } catch (error) {
+//     console.error('Error parsing chartConfig:', error);
+//     parsedChartConfig = [];
+//   }
+
+//   console.log('Parsed chartConfig:', parsedChartConfig);
+
+//   // Populate FormArray based on parsedChartConfig
+//   if (parsedChartConfig.length > 0) {
+//     parsedChartConfig.forEach((configItem, index) => {
+//       console.log(`Processing index ${index} - Full Object:`, configItem);
+
+//       // Handle columnVisibility as a simple array initialization
+//       const columnVisibility = Array.isArray(configItem.columnVisibility)
+//         ? configItem.columnVisibility.map((item: { text: any; value: any; }) => ({
+//             text: item.text || '',
+//             value: item.value || '',
+//           }))
+//         : [];
+
+//       // Handle filterParameter dynamically
+//       const filterParameterValue = Array.isArray(configItem.filterParameter)
+//         ? configItem.filterParameter
+//         : [];
+
+//       // Handle filterParameter1 dynamically
+//       const filterParameter1Value = Array.isArray(configItem.filterParameter1)
+//         ? configItem.filterParameter1
+//         : [];
+
+//       const arrayParameter = Array.isArray(configItem.parameterName)
+//         ? configItem.parameterName
+//         : [];
+
+//       const dateParameter = Array.isArray(configItem.XaxisFormat)
+//         ? configItem.XaxisFormat
+//         : [];
+
+//       // Create and push FormGroup into FormArray
+//       this.all_fields.push(
+//         this.fb.group({
+//           formlist: [configItem.formlist || '', Validators.required],
+//           parameterName: this.fb.control(arrayParameter, Validators.required),
+//           primaryValue: [configItem.primaryValue || '', Validators.required],
+//           groupByFormat: [configItem.groupByFormat || '', Validators.required],
+//           constantValue: [configItem.constantValue || ''],
+//           selectedRangeType: [configItem.selectedRangeType || '', Validators.required],
+//           // selectFromTime: [configItem.selectFromTime || ''],
+//           // selectToTime: [configItem.selectToTime || ''],
+//           parameterValue: [configItem.parameterValue || ''],
+//           columnVisibility: this.fb.control(columnVisibility),
+//           filterParameter: this.fb.control(filterParameterValue),
+//           filterParameter1: this.fb.control(filterParameter1Value),
+//           formatType: [configItem.formatType || '', Validators.required],
+//           undefinedCheckLabel: [configItem.undefinedCheckLabel || ''],
+//           custom_Label: [configItem.custom_Label || '', Validators.required],
+//           filterDescription: [configItem.filterDescription || ''],
+//           XaxisFormat: this.fb.control(dateParameter),
+//           Value_Label:[configItem.Value_Label || ''],
+//           CategoryValue:[configItem.CategoryValue || ''],
+//           fontSize:[configItem.fontSize || '30px']
+//         })
+//       );
+
+//       // Log the added FormGroup for debugging
+//       console.log(`FormGroup at index ${index}:`, this.all_fields.at(index).value);
+//     });
+//   } else {
+//     console.warn('No parsed data to populate fields');
+//   }
+
+//   console.log('Final FormArray Values:', this.all_fields.value);
+
+//   // **Validate if any required field is missing**
+//   const allFieldsValid = this.validateRequiredFields();
+//   if (!allFieldsValid) {
+//     console.error('Required fields missing in the form');
+//     // alert('Some required fields are missing. Please complete all required fields.');
+//     return this.all_fields; // Return without proceeding with the update
+//   }
+
+//   return this.all_fields;
+// }
+
+// **Validation function to check required fields**
+
+
+
+
 
 repopulate_fields(getValues: any): FormArray {
   if (!getValues || getValues === null) {
@@ -1206,6 +1325,21 @@ repopulate_fields(getValues: any): FormArray {
         ? configItem.XaxisFormat
         : [];
 
+      // Ensure fontSize is initialized with a value (adding 'px' if necessary)
+      // const CustomValueLabelfontSize = configItem.CustomValueLabelfontSize && typeof configItem.CustomValueLabelfontSize === 'string' ? 
+      //                  configItem.CustomValueLabelfontSize : '30px';  // Default to '30px' if no fontSize is provided
+      //                  console.log('CustomValueLabelfontSize checking',CustomValueLabelfontSize)
+
+
+        //                let CustomValueLabelfontSize = configItem.CustomValueLabelfontSize && typeof configItem.CustomValueLabelfontSize === 'string' 
+        //                ? configItem.CustomValueLabelfontSize 
+        //                : '30px';  // Default to '30px' if no fontSize is provided
+  
+        // // Extract the numeric part of fontSize (if it's a string like '45px')
+        // const numericFontSize = CustomValueLabelfontSize.replace('px', '').trim();  // Remove 'px' if present
+        // CustomValueLabelfontSize = `${parseInt(numericFontSize, 10) || 30}px`;
+        // console.log('CustomValueLabelfontSize checking',CustomValueLabelfontSize)
+
       // Create and push FormGroup into FormArray
       this.all_fields.push(
         this.fb.group({
@@ -1215,8 +1349,6 @@ repopulate_fields(getValues: any): FormArray {
           groupByFormat: [configItem.groupByFormat || '', Validators.required],
           constantValue: [configItem.constantValue || ''],
           selectedRangeType: [configItem.selectedRangeType || '', Validators.required],
-          // selectFromTime: [configItem.selectFromTime || ''],
-          // selectToTime: [configItem.selectToTime || ''],
           parameterValue: [configItem.parameterValue || ''],
           columnVisibility: this.fb.control(columnVisibility),
           filterParameter: this.fb.control(filterParameterValue),
@@ -1228,6 +1360,7 @@ repopulate_fields(getValues: any): FormArray {
           XaxisFormat: this.fb.control(dateParameter),
           Value_Label:[configItem.Value_Label || ''],
           CategoryValue:[configItem.CategoryValue || ''],
+          CustomValueLabelfontSize: [configItem.CustomValueLabelfontSize ? parseInt(configItem.CustomValueLabelfontSize.replace('px', ''), 10) : 14]  // Ensure fontSize is correctly initialized
         })
       );
 
@@ -1244,14 +1377,12 @@ repopulate_fields(getValues: any): FormArray {
   const allFieldsValid = this.validateRequiredFields();
   if (!allFieldsValid) {
     console.error('Required fields missing in the form');
-    // alert('Some required fields are missing. Please complete all required fields.');
     return this.all_fields; // Return without proceeding with the update
   }
 
   return this.all_fields;
 }
 
-// **Validation function to check required fields**
 validateRequiredFields(): boolean {
   let isValid = true;
 

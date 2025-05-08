@@ -91,6 +91,7 @@ this.initializeTileFields()
       conditions: this.fb.array([]), 
       formlist: ['', Validators.required],
       form_data_selected: ['', Validators.required],
+      filter_duplicate_data:[''],
     
       custom_Label:['',Validators.required],
       groupByFormat: ['', Validators.required],
@@ -330,7 +331,9 @@ this.initializeTileFields()
       table_rowConfig: this.createKPIWidget.value.all_fields || [],
       // custom_Label1:this.createKPIWidget.value.custom_Label1,
       filterDescription1:this.createKPIWidget.value.filterDescription1,
-      enableRowCal:this.createKPIWidget.value.enableRowCal
+      enableRowCal:this.createKPIWidget.value.enableRowCal,
+      filter_duplicate_data:this.createKPIWidget.value.filter_duplicate_data,
+
       // PredefinedScripts:this.createKPIWidget.value.PredefinedScripts
 
     };
@@ -587,6 +590,17 @@ this.initializeTileFields()
       } else {
         parsedFilterParameter1 = tile.filterParameter1;
       }
+      let parsedFilterFields = [];
+      if (typeof tile.filter_duplicate_data === 'string') {
+        try {
+          parsedFilterFields = JSON.parse(tile.filter_duplicate_data);
+          console.log('Parsed filterParameter1:', parsedFilterFields);
+        } catch (error) {
+          console.error('Error parsing filterParameter1:', error);
+        }
+      } else {
+        parsedFilterFields = tile.filter_duplicate_data;
+      }
   
       // Set parsedConditions into FormArray
       const formArray = this.conditions;
@@ -613,6 +627,7 @@ this.initializeTileFields()
         filterParameter1: parsedFilterParameter1, // Parsed array
         filterDescription1: tile.filterDescription1,
         enableRowCal:tile.enableRowCal,
+        filter_duplicate_data:parsedFilterFields,
         all_fields: this.repopulate_fields(tile),
         // custom_Label1: tile.custom_Label1,
       });
@@ -739,7 +754,8 @@ this.initializeTileFields()
         filterParameter1: this.createKPIWidget.value.filterParameter1 ||'', // Parsed array
         filterDescription1: this.createKPIWidget.value.filterDescription1 ||'',
         table_rowConfig: this.createKPIWidget.value.all_fields || '',
-        enableRowCal:this.createKPIWidget.value.enableRowCal || ''
+        enableRowCal:this.createKPIWidget.value.enableRowCal || '',
+        filter_duplicate_data:this.createKPIWidget.value.filter_duplicate_data || ''
         // custom_Label1: this.createKPIWidget.value.custom_Label1,
       };
   

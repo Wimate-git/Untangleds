@@ -257,7 +257,7 @@
                     <div *ngIf="item.grid_type === 'Stackedchart'"  >
                       <app-stacked-bar-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,stackedBarChartModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
                  
-                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-stacked-bar-ui>
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions" (sendCellInfo) = "helperStackedChartClick($event,dataTableStackedModal)" (emitChartConfigTable)="emitchartDatatable($event)"></app-stacked-bar-ui>
                     </div>
 
                     <div *ngIf="item.grid_type === 'Piechart'"  >
@@ -285,7 +285,7 @@
                     </div>
                     <div *ngIf="item.grid_type === 'Columnchart'"  >
                       <app-chart-ui3 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal3)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
-                      [hidingLink]="hidingLink"  [eventFilterConditions]="eventFilterConditions"  [isFullscreen]="isFullscreen"  (sendCellInfo) = "helperChartClick($event,dataTableModal)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)"  (emitChartConfigTable)="emitchartDatatable($event)" [liveDataColumnChart]="liveDataColumnChart" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [permissionIdRequest]="permissionIdRequest"></app-chart-ui3>
+                      [hidingLink]="hidingLink"  [eventFilterConditions]="eventFilterConditions"  [isFullscreen]="isFullscreen"   [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (sendCellInfo) = "helperChartClick($event,dataTableModal)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataColumnChart]="liveDataColumnChart" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [permissionIdRequest]="permissionIdRequest"></app-chart-ui3>
                     </div>
 
                     <div *ngIf="item.grid_type === 'mixedChart'"  >
@@ -2649,6 +2649,11 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
     <app-data-table-show
     [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"  (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
     ></app-data-table-show>
+  </ng-template>
+  <ng-template #dataTableStackedModal let-modal>
+    <app-data-table-stacked-bar
+    [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"  (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
+    ></app-data-table-stacked-bar>
   </ng-template>
   <ng-template #dataTableModalChart1 let-modal>
     <app-data-table-chart1
