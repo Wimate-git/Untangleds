@@ -99,6 +99,7 @@ makeTrueCheck:any = false
   enableParameterName :boolean = false
   @Output() liveFilterData = new EventEmitter<any>();
   @Output() liveFilterConditions = new EventEmitter<any>();
+  @Output() mainFilterConditions = new EventEmitter<any>();
 
   private optionsCache = new Map<string, Observable<any[]>>();
   private destroy$ = new Subject<void>();
@@ -1051,10 +1052,12 @@ makeTrueCheck:any = false
     const CombinedConditions = {...mainConditions, ...conditionsFilter};
 
 
+
   
     this.ConditionsFormat = conditionsFilter;
     console.log('this.ConditionsFormat checking',this.ConditionsFormat)
-    this.liveFilterConditions.emit(CombinedConditions);
+    this.liveFilterConditions.emit(this.ConditionsFormat);
+    this.mainFilterConditions.emit(mainConditions)
 
     this.isLoading = true;
   

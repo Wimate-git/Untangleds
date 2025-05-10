@@ -221,8 +221,10 @@ export class MiniTableViewTile1Component {
             
   
             const columnDefs = await this.fetchMiniTableHeaders(validateFormName);
+            console.log('columnDefs checking from Tile mini',columnDefs)
   
             this.columnDefsMap[tableId] = columnDefs;
+            console.log('this.columnDefsMap[tableId] chgeck from tile1',this.columnDefsMap[tableId])
             
             this.columnDefsSet = columnDefs;
             console.log('Received Column Definitions:', columnDefs);

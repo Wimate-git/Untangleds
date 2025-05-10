@@ -78,7 +78,7 @@ get shouldShowButton(): boolean {
 
 
   ngOnInit(){
-    console.log('item chacke',this.item.grid_details)
+    // console.log('item chacke',this.item.grid_details)
     console.log('disableMenuQP check from ngOnint',this.disableMenuQP)
     console.log('this.queryParamsSend check ngOnInit',)
 

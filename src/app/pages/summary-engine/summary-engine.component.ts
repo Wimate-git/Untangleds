@@ -372,6 +372,10 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   pageNumbers: number[] = [];
   minitableDataTile1: any;
   responseRowData1: any;
+  mainFilterCon: any;
+  mainFilterCondition: any;
+  filterMainConditions: any;
+  minitableDataChart1: any;
 
   createPieChart() {
     const chartOptions: any = {
@@ -2002,7 +2006,8 @@ console.log('this.eventFilterConditions checking',this.eventFilterConditions)
             permissionId:this.permissionIdRequest,
             permissionList:this.readFilterEquation || [],
             userName:this.userdetails,
-            conditions:this.eventFilterConditions
+            conditions:this.eventFilterConditions,
+            MainFilter:this.mainFilterCon ||''
 
           }),
         };
@@ -2066,12 +2071,14 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
   let filterTileQueryParam = '';
 
 
+
   const validatedFilterConfig = this.eventFilterConditions
+  const validateMainFilter = this.mainFilterCon
 
   
   filterTileQueryParam = `&filterTileConfig=${JSON.stringify(validatedFilterConfig)}`;
   console.log('filterTileQueryParam checking after stringify',filterTileQueryParam)
-
+const mainFilterQueryParam  = `&mainFilterCon=${JSON.stringify(validateMainFilter)}`
 
   const viewMode = true;
   const disableMenu = true;
@@ -2086,7 +2093,7 @@ setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): v
 
   // Append parsedFilterTileConfig to queryParams
   console.log('filterTileQueryParam',filterTileQueryParam)
-  const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}${filterTileQueryParam}&from_routerID=${this.routeId}`;
+  const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}${filterTileQueryParam}${mainFilterQueryParam}&from_routerID=${this.routeId}`;
   console.log('queryParams checking for modal',queryParams)
 
   this.currentItem = packet;
@@ -2178,6 +2185,10 @@ if (this.eventFilterConditions && this.eventFilterConditions.length > 0) {
 queryParams.append('filters', encodeURIComponent(JSON.stringify(this.eventFilterConditions)));
 }
 
+if (this.mainFilterCon ) {
+  queryParams.append('MainFilter', encodeURIComponent(JSON.stringify(this.mainFilterCon)));
+  }
+
 if (packet.dashboardIds) {
 queryParams.append('dashboardId', packet.dashboardIds);
 }
@@ -2248,6 +2259,7 @@ this.fetchCompanyLookupdataOnit(1)
           console.log('this.storeCheck check from setmoduleId',this.storeCheck)
     queryParams.append('isFullScreen', 'true');
       const finalUrl = `${window.location.origin}/summary-engine/${modulePath}?${queryParams.toString()}`;
+      console.log('finalUrl checking from Modal',finalUrl)
 
       this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
 
@@ -3445,6 +3457,14 @@ exitFullScreen(): void {
           this.toRouterID = params['dashboardId']
           console.log('this.toRouterID checking',this.toRouterID)
         }
+        if(params['MainFilter']){
+          console.log(params['MainFilter'])
+          const decodedMainFilters = JSON.parse(decodeURIComponent(params['MainFilter']));
+          this.filterMainConditions = decodedMainFilters;
+          // this.mainFilterCondition = params['MainFilter']
+          console.log('this.toRouterID checking',this.toRouterID)
+        }
+
         if (params['filters']) {
           try {
             // Decode and parse the filters parameter
@@ -3452,7 +3472,7 @@ exitFullScreen(): void {
             console.log('Decoded Filters:', decodedFilters);
         
             this.filterConditions = decodedFilters;
-            this.QueryParamsRead(this.fromRouterID, this.toRouterID, this.filterConditions,permissionId);
+            this.QueryParamsRead(this.fromRouterID, this.toRouterID, this.filterConditions,permissionId,this.filterMainConditions);
           } catch (error) {
             console.error('Error decoding filters:', error);
           }
@@ -3742,7 +3762,7 @@ console.log('this.sendFullScreenCheck  checking',this.sendFullScreenCheck )
     const style = getComputedStyle(this.myDiv.nativeElement);
     return style.getPropertyValue('--bs-heading-color').trim();
   }
-  async QueryParamsRead(routeId:any,toRouterId:any,eventFilterConditions:any,permissionId:any){
+  async QueryParamsRead(routeId:any,toRouterId:any,eventFilterConditions:any,permissionId:any,receiveMainFilterCondition:any){
 
 
   const resolvedPermission = await permissionId;
@@ -3775,7 +3795,8 @@ const requestBody = {
     queryParams:eventFilterConditions,
     permissionId:permissionIdRead,
     permissionList:permissionList,
-    userName:this.userdetails
+    userName:this.userdetails,
+     MainFilter:receiveMainFilterCondition ||''
   }),
 };
 
@@ -3793,8 +3814,10 @@ this.http.post(apiUrl, requestBody).subscribe(
 
     console.log('processedData checking from queryParams',processedDataFilter)
     this.eventFilterConditions= eventFilterConditions
+    const CombinedConditions = {...eventFilterConditions, ...receiveMainFilterCondition};
+    console.log('CombinedConditions checking',CombinedConditions)
     this.summaryService.updatelookUpData(processedDataFilter)
-    this.summaryService.queryPramsFunction(eventFilterConditions)
+    this.summaryService.queryPramsFunction(CombinedConditions)
     // const viewModeQP = true;
     // const disableMenuQP = true;
     console.log('disableMenuQP check from modal',this.disableMenuQP)
@@ -9088,6 +9111,14 @@ refreshFunction(){
 
 
   }
+
+  miniTableDataReceiveChart1(receiveData:any){
+
+    console.log('this.miniTableData checking mini table',this.minitableDataChart1)
+    
+
+
+}
   helperForName(receiveFormName:any){
     this.FormNameMini = receiveFormName
 
@@ -9593,6 +9624,12 @@ helperChartClickFunnel(event: any, modalChart: any) {
 
     
   }
+
+  mainFilterConditions(receiveMainFilter:any){
+    console.log('receiveMainFilter checking',receiveMainFilter)
+    this.mainFilterCon = receiveMainFilter
+
+  }
   private apiUrl = 'https://iy5kihshy9.execute-api.ap-south-1.amazonaws.com/s1/crud';
   private headers = new HttpHeaders({
     'Content-Type': 'application/json',
@@ -9652,11 +9689,31 @@ helperChartClickFunnel(event: any, modalChart: any) {
 
 
 receiveminiTableIcon(checkevent:any,modalref: any){
+  console.log('checkevent checking',checkevent)
   this.isLoading = true;
 
   this.spinner.show('FormView')
    
   this.minitableDataTile1 = checkevent
+
+
+  setTimeout(() => {
+    this.modalService.open(modalref,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
+  }, 500);
+
+  this.isLoading = false;
+  this.spinner.hide('FormView')
+
+}
+
+receiveminiTableChart1(checkevent:any,modalref: any){
+  console.log('checkevent checking',checkevent)
+  this.isLoading = true;
+
+  this.spinner.show('FormView')
+   
+  this.minitableDataChart1 = checkevent
 
 
   setTimeout(() => {

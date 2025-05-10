@@ -88,6 +88,7 @@ export class ChartUi1Component implements OnChanges,OnInit {
   @Output() paresdDataEmit = new EventEmitter<any>();
   @Output() emitChartConfigTable = new EventEmitter<any>();
   @Input() eventFilterConditions : any
+  @Input() mainFilterCon:any
   isChecked: boolean = false;
   counter: number=0;
   isHomeChecked:boolean = false;
@@ -104,6 +105,7 @@ export class ChartUi1Component implements OnChanges,OnInit {
   isDrillPacketAvailable: any;
   enableDrillButton: boolean =true;
   formTableConfig: FormTableConfig = { columnVisibility: [] };
+  storeMainFilterCon: any;
   // const storeColumnVisibility: FormTableConfig = this.formTableConfig.columnVisibility[0];
   
   
@@ -115,6 +117,7 @@ ngOnChanges(changes: SimpleChanges): void {
     console.log('SK_clientID checking', this.SK_clientID);
     console.log('eventFilterConditions chart ui1',this.eventFilterConditions)
     this.storeDrillPacket = JSON.parse(this.item.DrillConfig)
+
 
     console.log('this.storeDrillPacket checking',this.storeDrillPacket )
     this.isDrillPacketAvailable = this.storeDrillPacket && this.storeDrillPacket.length > 0;
@@ -292,7 +295,8 @@ toggleCheck(isChecked: boolean, index: any) {
           conditions: this.eventFilterConditions || [],
           ChartClick: this.isChecked,
           DrillFilter: this.storeDrillFilter || '',
-          DrillFilterLevel: this.DrillFilterLevel || ''
+          DrillFilterLevel: this.DrillFilterLevel || '',
+          MainFilter:this.mainFilterCon ||''
         }),
       };
 
@@ -446,7 +450,8 @@ else {
         userName: this.userdetails,
         conditions: this.eventFilterConditions || [],
         DrillFilter: this.storeDrillFilter || '',
-        DrillFilterLevel: this.DrillFilterLevel || ''
+        DrillFilterLevel: this.DrillFilterLevel || '',
+        MainFilter:this.mainFilterCon ||''
       }),
     };
   
@@ -537,7 +542,8 @@ const requestBody = {
     userName: this.userdetails,
     conditions: this.eventFilterConditions || [],
     DrillFilter: this.storeDrillFilter || '',
-    DrillFilterLevel: this.DrillFilterLevel || ''
+    DrillFilterLevel: this.DrillFilterLevel || '',
+    MainFilter:this.mainFilterCon ||''
   }),
 };
 
@@ -723,10 +729,31 @@ if(storeconditionsLength === undefined){
 
     this.summaryService.queryParamsData$.subscribe((data: any)=>{
       console.log('data check filterConditions',data)
-
-if(data){
-  this.eventFilterConditions = data
-}
+      if (data) {
+        console.log('data checking from chart1', data);
+      
+        // Extract indexed data (all indexes) and assign to eventFilterConditions
+        this.eventFilterConditions = [];
+        for (let key in data) {
+          if (Array.isArray(data[key])) {
+            this.eventFilterConditions.push(data[key]);
+          }
+        }
+      
+        // Extract non-indexed data and assign to mainFilterCon
+        const { dateType, daysAgo, startDate, endDate, singleDate } = data;
+        this.mainFilterCon = {
+          dateType,
+          daysAgo,
+          startDate,
+          endDate,
+          singleDate
+        };
+      
+        console.log('Indexed conditions assigned to eventFilterConditions', this.eventFilterConditions);
+        console.log('Non-indexed conditions assigned to mainFilterCon', this.mainFilterCon);
+      }
+      
       
       
     
@@ -903,7 +930,8 @@ this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(window.location.o
                   conditions:this.eventFilterConditions ||[],
                   chartHomeClick:this.isHomeChecked,
                          DrillFilter:this.storeDrillFilter ||'',
-              DrillFilterLevel:this.DrillFilterLevel ||''
+              DrillFilterLevel:this.DrillFilterLevel ||'',
+              MainFilter:this.mainFilterCon ||''
                 }),
               };
             

@@ -75,6 +75,7 @@ export class ChartUi3Component implements OnInit{
   @Input () summaryDashboardView :any
   @Input() summaryDashboardUpdate:any;
   @Input() eventFilterConditions : any
+  @Input() mainFilterCon:any
   
   checkResBody: any;
   parsedResBody: any[]=[];
@@ -141,7 +142,9 @@ export class ChartUi3Component implements OnInit{
                 conditions:this.eventFilterConditions ||[],
                 ChartClick:this.isChecked,
                        DrillFilter:this.storeDrillFilter ||'',
-            DrillFilterLevel:this.DrillFilterLevel ||''
+            DrillFilterLevel:this.DrillFilterLevel ||'',
+                   MainFilter:this.mainFilterCon ||''
+
               }),
             };
           
@@ -253,7 +256,8 @@ export class ChartUi3Component implements OnInit{
                   conditions:this.eventFilterConditions ||[],
                   chartHomeClick:this.isHomeChecked,
                          DrillFilter:this.storeDrillFilter ||'',
-              DrillFilterLevel:this.DrillFilterLevel ||''
+              DrillFilterLevel:this.DrillFilterLevel ||'',
+                     MainFilter:this.mainFilterCon ||''
                 }),
               };
             
@@ -565,7 +569,8 @@ export class ChartUi3Component implements OnInit{
               userName: this.userdetails,
               conditions: this.eventFilterConditions || [],
               DrillFilter: this.storeDrillFilter || '',
-              DrillFilterLevel: this.DrillFilterLevel || ''
+              DrillFilterLevel: this.DrillFilterLevel || '',
+                     MainFilter:this.mainFilterCon ||''
             }),
           };
         
@@ -664,7 +669,8 @@ export class ChartUi3Component implements OnInit{
             userName: this.userdetails,
             conditions: this.eventFilterConditions || [],
             DrillFilter: this.storeDrillFilter || '',
-            DrillFilterLevel: this.DrillFilterLevel || ''
+            DrillFilterLevel: this.DrillFilterLevel || '',
+                   MainFilter:this.mainFilterCon ||''
         }),
     };
 
@@ -865,9 +871,30 @@ export class ChartUi3Component implements OnInit{
     this.summaryService.queryParamsData$.subscribe((data: any)=>{
       console.log('data check filterConditions',data)
 
-if(data){
-  this.eventFilterConditions = data
-}
+      if (data) {
+        console.log('data checking from chart1', data);
+      
+        // Extract indexed data (all indexes) and assign to eventFilterConditions
+        this.eventFilterConditions = [];
+        for (let key in data) {
+          if (Array.isArray(data[key])) {
+            this.eventFilterConditions.push(data[key]);
+          }
+        }
+      
+        // Extract non-indexed data and assign to mainFilterCon
+        const { dateType, daysAgo, startDate, endDate, singleDate } = data;
+        this.mainFilterCon = {
+          dateType,
+          daysAgo,
+          startDate,
+          endDate,
+          singleDate
+        };
+      
+        console.log('Indexed conditions assigned to eventFilterConditions', this.eventFilterConditions);
+        console.log('Non-indexed conditions assigned to mainFilterCon', this.mainFilterCon);
+      }
       
       
     

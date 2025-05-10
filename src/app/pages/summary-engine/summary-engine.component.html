@@ -239,7 +239,7 @@
                               <div *ngIf="item.grid_type === 'chart'"  >
                       <app-chart-ui1 [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,ChartModal1)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
                  
-                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalChart1)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-chart-ui1>
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalChart1)" [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions" [mainFilterCon]="mainFilterCon"></app-chart-ui1>
                     </div>
 
 
@@ -257,13 +257,13 @@
                     <div *ngIf="item.grid_type === 'Stackedchart'"  >
                       <app-stacked-bar-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,stackedBarChartModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
                  
-                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions" (sendCellInfo) = "helperStackedChartClick($event,dataTableStackedModal)" (emitChartConfigTable)="emitchartDatatable($event)"></app-stacked-bar-ui>
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions" [mainFilterCon]="mainFilterCon" (sendCellInfo) = "helperStackedChartClick($event,dataTableStackedModal)" (emitChartConfigTable)="emitchartDatatable($event)"></app-stacked-bar-ui>
                     </div>
 
                     <div *ngIf="item.grid_type === 'Piechart'"  >
                       <app-pie-chart-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,pieChartModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
                  
-                      [hidingLink]="hidingLink" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalPieChart)"   [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions"></app-pie-chart-ui>
+                      [hidingLink]="hidingLink" (sendCellInfo) = "helperChartClickChart1($event,dataTableModalPieChart)"   [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions" [mainFilterCon]="mainFilterCon"></app-pie-chart-ui>
                     </div>
 
                     
@@ -276,7 +276,7 @@
                     <div *ngIf="item.grid_type === 'Funnelchart'"  >
                       <app-funnel-chart-ui [item]="item" [chartIndex]="i" [index]="i" (customEvent)="helperTile($event,FunnelChartModal)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [hideButton]="hideButton" [all_Packet_store]="all_Packet_store" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
                  
-                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions" (sendCellInfo) = "helperChartClickFunnel($event,dataTableModalFunnelChart)"></app-funnel-chart-ui>
+                      [hidingLink]="hidingLink"    [isFullscreen]="isFullscreen"  [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataChart]="liveDataChart" [permissionIdRequest]="permissionIdRequest" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [eventFilterConditions]="eventFilterConditions" [mainFilterCon]="mainFilterCon" (sendCellInfo) = "helperChartClickFunnel($event,dataTableModalFunnelChart)"></app-funnel-chart-ui>
                       
                     </div>
                     <div *ngIf="item.grid_type === 'Linechart'"  >
@@ -285,7 +285,8 @@
                     </div>
                     <div *ngIf="item.grid_type === 'Columnchart'"  >
                       <app-chart-ui3 [item]="item" [index]="i" (customEvent)="helperTile($event,ChartModal3)" (customEvent1)="emitDuplicate($event)" (customEvent2)="emitDelete6($event)" [isEditModeView]="isEditModeView" [chartWidth]="chartWidth[i]"  [chartHeight]="chartHeight[i]" [all_Packet_store]="all_Packet_store" [hideButton]="hideButton" [summaryDashboardUpdate]="summaryDashboardUpdate"   [summaryDashboardView]="summaryDashboardView"
-                      [hidingLink]="hidingLink"  [eventFilterConditions]="eventFilterConditions"  [isFullscreen]="isFullscreen"   [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (sendCellInfo) = "helperChartClick($event,dataTableModal)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataColumnChart]="liveDataColumnChart" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [permissionIdRequest]="permissionIdRequest"></app-chart-ui3>
+  @Input() mainFilterCon:any
+                      [hidingLink]="hidingLink"  [eventFilterConditions]="eventFilterConditions" [mainFilterCon]="mainFilterCon" [isFullscreen]="isFullscreen"   [routeId]="routeId" [SK_clientID]="SK_clientID" (paresdDataEmit)="helperRow($event)" (sendCellInfo) = "helperChartClick($event,dataTableModal)" (emitChartConfigTable)="emitchartDatatable($event)" [liveDataColumnChart]="liveDataColumnChart" [readFilterEquation]="readFilterEquation" [userdetails]="userdetails" [permissionIdRequest]="permissionIdRequest"></app-chart-ui3>
                     </div>
 
                     <div *ngIf="item.grid_type === 'mixedChart'"  >
@@ -2517,7 +2518,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   </ng-template>
   <!-- <ng-template #FilterModal let-modal > -->
   
-    <app-filter-tile-config (refreshData)="refreshHelper($event)" (dashboardChange)="getGridDetails2($event)" [dashboard]="dashboard"  [all_Packet_store]="all_Packet_store" (update_PowerBoard_config)="updateSummaryHelper2($event)" (send_all_Packet_store1)="allPacketStoreReceiver2($event)" [userdetails]="userdetails" [readFilterEquation]="readFilterEquation" [routeId]="routeId"  [permissionIdRequest]="permissionIdRequest" [isLoading]="isLoading" (liveFilterData)="liveFilterDataProcess($event)" (liveFilterConditions)="liveFilterConditions($event)"></app-filter-tile-config>
+    <app-filter-tile-config (refreshData)="refreshHelper($event)" (dashboardChange)="getGridDetails2($event)" [dashboard]="dashboard"  [all_Packet_store]="all_Packet_store" (update_PowerBoard_config)="updateSummaryHelper2($event)" (send_all_Packet_store1)="allPacketStoreReceiver2($event)" [userdetails]="userdetails" [readFilterEquation]="readFilterEquation" [routeId]="routeId"  [permissionIdRequest]="permissionIdRequest" [isLoading]="isLoading" (liveFilterData)="liveFilterDataProcess($event)" (liveFilterConditions)="liveFilterConditions($event)" (mainFilterConditions)="mainFilterConditions($event)"></app-filter-tile-config>
   
   <!-- </ng-template> -->
   <ng-template #tableModal let-modal >
@@ -2644,10 +2645,24 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
     [minitableDataTile1]="minitableDataTile1" [emitEvent]="emitEvent" [SK_clientID]="SK_clientID" [FormNameMini]="FormNameMini"
     ></app-mini-table-view-tile1>
   </ng-template>
+  <ng-template #miniTableViewChart1 let-modal>
+    <app-mini-table-view-chart1
+    [minitableDataChart1]="minitableDataChart1" [emitEvent]="emitEvent" [SK_clientID]="SK_clientID" [FormNameMini]="FormNameMini"
+    ></app-mini-table-view-chart1>
+  </ng-template>
+
+
+
+  <ng-template #miniTableViewChart3 let-modal>
+    <app-mini-table-view-chart3
+    [minitableDataChart1]="minitableDataChart1" [emitEvent]="emitEvent" [SK_clientID]="SK_clientID" [FormNameMini]="FormNameMini"
+    ></app-mini-table-view-chart3>
+  </ng-template>
 
   <ng-template #dataTableModal let-modal>
     <app-data-table-show
     [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"  (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
+ (miniTableIconChart1)="receiveminiTableChart1($event,miniTableViewChart3)"   (emitfullRowData)="miniTableDataReceiveChart1($event)" (sendFormNameForMini)="helperForName($event)"
     ></app-data-table-show>
   </ng-template>
   <ng-template #dataTableStackedModal let-modal>
@@ -2658,7 +2673,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   <ng-template #dataTableModalChart1 let-modal>
     <app-data-table-chart1
    
-       [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
+       [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)" (miniTableIconChart1)="receiveminiTableChart1($event,miniTableViewChart1)"   (emitfullRowData)="miniTableDataReceiveChart1($event)" (sendFormNameForMini)="helperForName($event)"
     ></app-data-table-chart1>
   </ng-template>
 
@@ -2676,6 +2691,9 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
       [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
     ></app-data-table-chart2>
   </ng-template>
+
+
+  
   <ng-template #dataTableModalTile1 let-modal>
     <app-data-table-tile1
   [responseRowData]="responseRowData"

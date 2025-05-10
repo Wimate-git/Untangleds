@@ -19,13 +19,16 @@ export class DataTableChart1Component {
   @Input() sendRowDynamic :any
   @Input() all_Packet_store :any
   @Input() chartDataConfigExport :any
+  @Output() sendFormNameForMini = new EventEmitter<any>();
   
   @Output() dataTableCellInfo = new EventEmitter<any>();
   columnDefs: any[]; 
   private gridApi!: GridApi;
   pageSizeOptions = [10, 25, 50, 100];
 
-  
+  iconCellRenderer: (params: any) => string; 
+  @Output() miniTableIconChart1 = new EventEmitter<any>() 
+  @Output() emitfullRowData = new EventEmitter<any>();
 
   // @Input() columnDefs: any[] = []; 
 
@@ -54,6 +57,23 @@ export class DataTableChart1Component {
 
 
   constructor(private modalService: NgbModal) {
+    this.iconCellRenderer = function (params) {
+      console.log('check what params params is getting', params);
+    
+      // Check if 'dynamic_table_values' exists and is not empty
+      if (params.data.dynamic_table_values && Object.keys(params.data.dynamic_table_values).some(key => params.data.dynamic_table_values[key].length > 0)) {
+        // If conditions are met, return the icon HTML with a click event
+        return `
+          <i 
+            class="bi bi-table" 
+            style="color: #204887; font-size: 25px;" 
+            (click)="onIconClick($event, ${params.node.rowIndex}, ${params})"></i>`;
+      } else {
+        // If conditions are not met, return an empty string
+        return '';
+      }
+    };
+    
 
   }
 
@@ -65,9 +85,11 @@ console.log('all_Packet_store from data table',this.all_Packet_store)
 console.log('chartDataConfigExport',this.chartDataConfigExport)
 this.FormName = this.chartDataConfigExport.columnVisibility[0].formlist
 console.log('this.FormName',this.FormName)
+this.emitfullRowData.emit(this.sendRowDynamic)
 
 // this.parseChartConfig(this.all_Packet_store);
 this.parseChartConfig(this.chartDataConfigExport)
+this.sendFormNameForMini.emit(this.FormName)
     
   }
 
@@ -97,13 +119,16 @@ this.parseChartConfig(this.chartDataConfigExport)
     }
   }
   createColumnDefs(columnVisibility: any[]) {
-    console.log('columnVisibility check',columnVisibility)
     return columnVisibility.map(column => ({
       headerName: column.text,
       field: column.value,
       sortable: true,
       filter: true,
-      resizable: true
+      resizable: true,
+      cellClass: 'pointer-cursor',
+      cellRenderer: (column.value === 'dynamic_table_values') ? this.iconCellRenderer : undefined, // Set the appropriate cellRenderer
+      // If you want to handle click events for dynamic_table_values separately, you can define params like this:
+
     }));
   }
   // deleteColumn(colId: string): void {
@@ -232,6 +257,7 @@ this.parseChartConfig(this.chartDataConfigExport)
     };
   
     // Dynamically extract column headers from rowData
+    console.log('this.columnDefschecking',this.columnDefs)
     const columnHeaders = this.columnDefs.map((column: any) => column.headerName);
     const columnFields = this.columnDefs.map((column: any) => column.field);
     console.log('columnFields checking',columnFields)
@@ -327,21 +353,37 @@ this.parseChartConfig(this.chartDataConfigExport)
 
   clickLock = false; // Lock flag to prevent multiple clicks
 
-  onCellClick(eventData: any) {
+  onCellClick(eventData: any, isIconClick: boolean = false) {
+    console.log('eventdata checking from cell', eventData);
+  
+    // If already locked, ignore further clicks
     if (this.clickLock) {
       console.log("Click ignored: Already processing a click.");
-      return; // Ignore repeated clicks
+      return;
     }
   
-    this.clickLock = true; // Lock the click
-    console.log("eventData check for", eventData);
+    // Lock the click immediately to prevent multiple triggers
+    this.clickLock = true;
   
-    this.dataTableCellInfo.emit(eventData);
+    const storeminiTableData = eventData.value;
   
-    // Unlock click after a short delay (e.g., 500ms)
+    if (Object.keys(storeminiTableData).some(key => key.startsWith('table'))) {
+      this.miniTableIconChart1.emit(eventData);
+      // If keys start with 'table', do nothing
+      console.log("Data contains 'table' key, no action taken.", eventData);
+    } else {
+      // If no key starts with 'table', proceed with the else block
+      console.log("Row clicked, eventData: ", eventData);
+      setTimeout(() => {
+        // Emit the event after a delay (500ms here)
+        this.dataTableCellInfo.emit(eventData);
+      }, 500);
+    }
+  
+    // Unlock click after processing (to prevent multiple triggers)
     setTimeout(() => {
       this.clickLock = false;
-    }, 500);
+    }, 500); // The same delay as the timeout for emitting data
   }
 
 

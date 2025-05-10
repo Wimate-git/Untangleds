@@ -89,6 +89,7 @@ export class StackedBarUiComponent {
   @Output() paresdDataEmit = new EventEmitter<any>();
   @Output() emitChartConfigTable = new EventEmitter<any>();
   @Input() eventFilterConditions : any
+  @Input() mainFilterCon:any
   isChecked: boolean = false; // Initial state is false
   isHomeChecked:boolean = false;
   
@@ -145,7 +146,8 @@ export class StackedBarUiComponent {
                 conditions:this.eventFilterConditions ||[],
                 ChartClick:this.isChecked,
                        DrillFilter:this.storeDrillFilter ||'',
-            DrillFilterLevel:this.DrillFilterLevel ||''
+            DrillFilterLevel:this.DrillFilterLevel ||'',
+            MainFilter:this.mainFilterCon ||''
               }),
             };
           
@@ -251,7 +253,8 @@ export class StackedBarUiComponent {
                   conditions:this.eventFilterConditions ||[],
                   chartHomeClick:this.isHomeChecked,
                          DrillFilter:this.storeDrillFilter ||'',
-              DrillFilterLevel:this.DrillFilterLevel ||''
+              DrillFilterLevel:this.DrillFilterLevel ||'',
+              MainFilter:this.mainFilterCon ||''
                 }),
               };
             
@@ -355,14 +358,16 @@ export class StackedBarUiComponent {
       console.log('Bar clicked:', {
           category: event.point.category,
           value: event.point.y,
-          colorIndex: event.point.colorIndex
+          colorIndex: event.point.colorIndex,
+          stackName: event.point.series.name
       });
   
       const pointData = {
           name: event.point.category,
           value: event.point.y,
-          customIndex: (event.point.options as CustomPointOptions).customIndex, 
-          colorIndex: event.point.colorIndex
+          customIndex: event.point.index, 
+          colorIndex: event.point.colorIndex,
+
       };
   
       console.log('pointData checking column chart', pointData);
@@ -464,7 +469,8 @@ export class StackedBarUiComponent {
               userName: this.userdetails,
               conditions: this.eventFilterConditions || [],
               DrillFilter: this.storeDrillFilter || '',
-              DrillFilterLevel: this.DrillFilterLevel || ''
+              DrillFilterLevel: this.DrillFilterLevel || '',
+              MainFilter:this.mainFilterCon ||''
             }),
           };
         
@@ -563,7 +569,8 @@ export class StackedBarUiComponent {
             userName: this.userdetails,
             conditions: this.eventFilterConditions || [],
             DrillFilter: this.storeDrillFilter || '',
-            DrillFilterLevel: this.DrillFilterLevel || ''
+            DrillFilterLevel: this.DrillFilterLevel || '',
+            MainFilter:this.mainFilterCon ||''
         }),
     };
 
@@ -737,9 +744,30 @@ export class StackedBarUiComponent {
     this.summaryService.queryParamsData$.subscribe((data: any)=>{
       console.log('data check filterConditions',data)
 
-if(data){
-  this.eventFilterConditions = data
-}
+      if (data) {
+        console.log('data checking from chart1', data);
+      
+        // Extract indexed data (all indexes) and assign to eventFilterConditions
+        this.eventFilterConditions = [];
+        for (let key in data) {
+          if (Array.isArray(data[key])) {
+            this.eventFilterConditions.push(data[key]);
+          }
+        }
+      
+        // Extract non-indexed data and assign to mainFilterCon
+        const { dateType, daysAgo, startDate, endDate, singleDate } = data;
+        this.mainFilterCon = {
+          dateType,
+          daysAgo,
+          startDate,
+          endDate,
+          singleDate
+        };
+      
+        console.log('Indexed conditions assigned to eventFilterConditions', this.eventFilterConditions);
+        console.log('Non-indexed conditions assigned to mainFilterCon', this.mainFilterCon);
+      }
       
       
     

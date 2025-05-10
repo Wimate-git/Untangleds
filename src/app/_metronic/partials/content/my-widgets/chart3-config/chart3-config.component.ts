@@ -1698,6 +1698,14 @@ repopulateDrill_fields(getValues: any): FormArray {
             });
           }
 
+          if (parsedMetadata.updated_time) {
+            dynamicParamList.push({
+              value: `dynamic_table_values`,
+              text: 'Dynamic Table Values' // You can customize the label here if needed
+            });
+            
+          }
+
           const formFieldsArray: FormField[] = Object.values(parsedMetadata.formFields) as FormField[];
 
           const dateFields = formFieldsArray.filter((field: FormField) => field.type === "date");

@@ -156,11 +156,7 @@ this.parseChartConfig(this.storeDrillDown)
       cellClass: 'pointer-cursor',
       cellRenderer: (column.value === 'dynamic_table_values') ? this.iconCellRenderer : undefined, // Set the appropriate cellRenderer
       // If you want to handle click events for dynamic_table_values separately, you can define params like this:
-      cellRendererParams: (column.value === 'dynamic_table_values') 
-        ? {
-            onClick: (event: MouseEvent) => this.onIconClick(event)  // If needed, handle icon clicks
-          }
-        : undefined
+
     }));
   }
   
@@ -241,17 +237,19 @@ this.parseChartConfig(this.storeDrillDown)
         link.click();
       }
     
+
+
+
+
+
       exportAllTablesAsPDF() {
         if (!this.responseRowData || this.responseRowData.length === 0) {
           console.error('No data available for export.');
-          return; // Exit if there's no data to export
+          return;
         }
       
         const docDefinition: any = {
           content: [],
-          defaultStyle: {
-            // font: 'Roboto',
-          },
           styles: {
             tableHeader: {
               bold: true,
@@ -293,28 +291,31 @@ this.parseChartConfig(this.storeDrillDown)
           },
         };
       
-        // Dynamically extract column headers from rowData
+        // Dynamically extract column headers and map them to row data
         const columnHeaders = this.columnDefs.map((column: any) => column.headerName);
         const columnFields = this.columnDefs.map((column: any) => column.field);
-        console.log('columnFields checking',columnFields)
-        // const columns = Object.keys(this.rowData[0] || {});
-        // console.log('columns checking',columns)
-    
+      
         if (columnHeaders.length === 0) {
           console.error('No columns available for export.');
           return;
         }
       
-        // Adjust page size dynamically
+        // Dynamically calculate page size
         const columnCount = columnFields.length;
-        docDefinition.pageSize =
-          columnCount <= 6
-            ? 'A4'
-            : columnCount <= 10
-            ? 'A3'
-            : columnCount <= 15
-            ? 'A2'
-            : 'A1';
+      
+        if (columnCount <= 6) {
+          docDefinition.pageSize = 'A4'; // Standard A4 size
+        } else if (columnCount <= 10) {
+          docDefinition.pageSize = 'A3'; // Standard A3 size
+        } else if (columnCount <= 15) {
+          docDefinition.pageSize = 'A2'; // Standard A2 size
+        } else {
+          // For more columns, use custom page size (optional)
+          docDefinition.pageSize = {
+            width: 800,  // Custom width
+            height: 1200, // Custom height
+          };
+        }
       
         // Add document title
         docDefinition.content.push({
@@ -329,7 +330,7 @@ this.parseChartConfig(this.storeDrillDown)
         // Add header row
         tableBody.push(
           columnHeaders.map((col: any) => ({
-            text: col, // Use column headers directly
+            text: col,
             style: 'tableHeader',
           }))
         );
@@ -338,7 +339,6 @@ this.parseChartConfig(this.storeDrillDown)
         this.responseRowData.forEach((row: Record<string, any>, index: number) => {
           const rowData = columnFields.map((col: string | number) => {
             const cellData = row[col];
-            console.log('cellData checking',cellData)
       
             if (cellData === null || cellData === undefined) {
               return ''; // Treat null/undefined as empty string
@@ -359,7 +359,6 @@ this.parseChartConfig(this.storeDrillDown)
             return cellData.toString(); // Convert all other data types to string
           });
       
-          // Push row as an array, not as an object
           tableBody.push(rowData);
         });
       
@@ -380,12 +379,14 @@ this.parseChartConfig(this.storeDrillDown)
       
         // Error handling during PDF generation
         try {
-          pdfMake.createPdf(docDefinition).download(`${this.FormName}`+'.pdf');
+          pdfMake.createPdf(docDefinition).download(`${this.FormName}` + '.pdf');
         } catch (error) {
           console.error('Error generating PDF:', error);
-          // alert('Failed to generate PDF. Please try again.');
         }
       }
+      
+      
+      
 
       onGridReady(params:any) {
         this.gridApi = params.api;

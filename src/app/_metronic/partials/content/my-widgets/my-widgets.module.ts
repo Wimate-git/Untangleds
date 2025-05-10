@@ -92,6 +92,8 @@ import { GaugeChartConfigComponent } from './gauge-chart-config/gauge-chart-conf
 import { GaugeChartUiComponent } from './gauge-chart-ui/gauge-chart-ui.component';
 import { MiniTableViewTile1Component } from './mini-table-view-tile1/mini-table-view-tile1.component';
 import { DataTableStackedBarComponent } from './data-table-stacked-bar/data-table-stacked-bar.component';
+import { MiniTableViewChart1Component } from './mini-table-view-chart1/mini-table-view-chart1.component';
+import { MiniTableViewChart3Component } from './mini-table-view-chart3/mini-table-view-chart3.component';
 
 
 
@@ -162,7 +164,9 @@ import { DataTableStackedBarComponent } from './data-table-stacked-bar/data-tabl
  GaugeChartConfigComponent,
  GaugeChartUiComponent,
  MiniTableViewTile1Component,
- DataTableStackedBarComponent
+ DataTableStackedBarComponent,
+ MiniTableViewChart1Component,
+ MiniTableViewChart3Component
     
 
 
@@ -273,7 +277,9 @@ import { DataTableStackedBarComponent } from './data-table-stacked-bar/data-tabl
     GaugeChartConfigComponent,
     GaugeChartUiComponent,
     MiniTableViewTile1Component,
-    DataTableStackedBarComponent
+    DataTableStackedBarComponent,
+    MiniTableViewChart1Component,
+    MiniTableViewChart3Component
     
   
 
