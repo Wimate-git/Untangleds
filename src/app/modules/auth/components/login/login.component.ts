@@ -171,7 +171,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
           console.log(`result is here ${clientID} != ${metaData.clientID}`);
 
-          if(this.baseUrl != 'https://untangled.cloudtesla.com' && this.baseUrl != 'http://localhost:4200' ){
+          if(this.baseUrl != 'https://untangled.cloudtesla.com' && this.baseUrl != 'http://localhost:4200' && this.baseUrl != 'http://10.0.1.53:4200'){
             if(clientID != metaData.clientID && metaData.clientID != 'WIMATE_ADMIN'){
               this.spinner.hide();
               return Swal.fire({
