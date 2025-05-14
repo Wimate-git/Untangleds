@@ -92,6 +92,9 @@ this.FormName = this.storeDrillDown.formlist
 console.log('this.storeDrillDown checking datatable tile1',this.storeDrillDown)
 console.log('this.FormName for drill name',this.FormName)
 console.log('responseRowData c hecking from datatable Tile1',this.responseRowData)
+
+this.responseRowData = this.formatDateFields(this.responseRowData);
+console.log('Formatted Data:', this.responseRowData);
 this.emitfullRowDataToParent.emit(this.responseRowData)
 // this.extractRowData = JSON.parse(this.item.rowData)
 // console.log('this.extractRowData checking',this.extractRowData)
@@ -107,7 +110,14 @@ this.parseChartConfig(this.storeDrillDown)
     
   }
 
-
+  private formatDate(dateStr: string): string {
+    console.log('dateStr checking tile1',dateStr)
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
 
   ngOnInit(){}
   parseChartConfig(data: any) {
@@ -123,9 +133,24 @@ this.parseChartConfig(this.storeDrillDown)
   
       // Generate AG Grid column definitions
       this.columnDefs = this.createColumnDefs(columnVisibility);
+      console.log('this.columnDefs checking from ui',this.columnDefs)
     } catch (e) {
       console.error('Error parsing columnVisibility:', e);
     }
+  }
+
+
+
+  private formatDateFields(data: any[]): any[] {
+    return data.map(row => {
+      Object.keys(row).forEach(key => {
+        if (key.startsWith('date-')) {
+          // Format the date if the key starts with 'date-'
+          row[key] = this.formatDate(row[key]);
+        }
+      });
+      return row;
+    });
   }
   
   // Function to create AG Grid column definitions

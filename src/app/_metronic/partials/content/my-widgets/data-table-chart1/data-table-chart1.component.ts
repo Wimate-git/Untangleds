@@ -81,6 +81,8 @@ export class DataTableChart1Component {
 
 console.log('columnDefs check',this.columnDefs)
 console.log('sendRowDynamic checking from data table',this.sendRowDynamic)
+this.sendRowDynamic = this.formatDateFields(this.sendRowDynamic);
+console.log('Formatted Data:', this.sendRowDynamic);
 console.log('all_Packet_store from data table',this.all_Packet_store)
 console.log('chartDataConfigExport',this.chartDataConfigExport)
 this.FormName = this.chartDataConfigExport.columnVisibility[0].formlist
@@ -98,6 +100,29 @@ this.sendFormNameForMini.emit(this.FormName)
   // closeModal(): void {
   //   this.modalClose.emit();
   // }
+
+
+  private formatDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+  
+
+
+  private formatDateFields(data: any[]): any[] {
+    return data.map(row => {
+      Object.keys(row).forEach(key => {
+        if (key.startsWith('date-')) {
+          // Format the date if the key starts with 'date-'
+          row[key] = this.formatDate(row[key]);
+        }
+      });
+      return row;
+    });
+  }
 
   closeModal(): void {
     this.modalService.dismissAll()

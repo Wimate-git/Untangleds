@@ -668,13 +668,24 @@ export class Tile1ConfigComponent implements OnInit {
       console.log('Form Value for processed_value:', processedValue);
       console.log('Form Value for constantValue:', updatedConstantValue);
   
-      if (multiValue.length > 1) {
-        multiValue[1].processed_value = processedValue;
+      if (multiValue.length === 1) {
+        multiValue[0].processed_value = processedValue;
         multiValue[0].constantValue = updatedConstantValue;
         multiValue[0].value = primaryValue;
       } else {
-        multiValue.push({ processed_value: processedValue, constantValue: updatedConstantValue, value: primaryValue });
+        // If the array is empty, add the new values
+        multiValue.push({
+          processed_value: processedValue,
+          constantValue: updatedConstantValue,
+          value: primaryValue
+        });
       }
+      // else {
+      //   multiValue.push({ processed_value: processedValue, constantValue: updatedConstantValue, value: primaryValue });
+      // }
+  
+      // Reassign the multi_value array to trigger Angular change detection
+      this.dashboard[this.editTileIndex].multi_value = [...multiValue]; 
   
       // Recalculate EquationDesc
       const updatedEquationDesc = this.generateEquationDesc(
@@ -694,41 +705,34 @@ export class Tile1ConfigComponent implements OnInit {
         constantValue: updatedConstantValue,
         processed_value: processedValue,
         multi_value: multiValue,
-
-        startDate: this.createKPIWidget.value.startDate ||'',
-        endDate: this.createKPIWidget.value.endDate ||'',
+        startDate: this.createKPIWidget.value.startDate || '',
+        endDate: this.createKPIWidget.value.endDate || '',
         themeColor: this.createKPIWidget.value.themeColor,
         fontSize: `${this.createKPIWidget.value.fontSize}px`,
-        fontColor: this.createKPIWidget.value.fontColor ||'#040101',
-        selectFromTime: this.createKPIWidget.value.selectFromTime ||'',
-        selectToTime: this.createKPIWidget.value.selectToTime ||'',
-        dashboardIds: this.createKPIWidget.value.dashboardIds ||'',
-        selectType: this.createKPIWidget.value.selectType ||'',
+        fontColor: this.createKPIWidget.value.fontColor || '#040101',
+        selectFromTime: this.createKPIWidget.value.selectFromTime || '',
+        selectToTime: this.createKPIWidget.value.selectToTime || '',
+        dashboardIds: this.createKPIWidget.value.dashboardIds || '',
+        selectType: this.createKPIWidget.value.selectType || '',
         filterParameter: this.createKPIWidget.value.filterParameter,
         filterDescription: this.createKPIWidget.value.filterDescription,
         parameterNameRead: this.parameterNameRead,
         formatType: this.createKPIWidget.value.formatType,
         custom_Label: this.createKPIWidget.value.custom_Label,
-        equation: this.createKPIWidget.value.all_fields || [], 
-        noOfParams:this.dashboard[this.editTileIndex].noOfParams,
-        // EquationFormList: this.createKPIWidget.value.EquationFormList,
-        // EquationParam: this.createKPIWidget.value.EquationParam,
-        // EquationOperation: this.createKPIWidget.value.EquationOperation,
+        equation: this.createKPIWidget.value.all_fields || [],
+        noOfParams: this.dashboard[this.editTileIndex].noOfParams,
         EquationDesc: this.createKPIWidget.value.EquationDesc, // Update with recalculated value
-    
-        miniForm:this.createKPIWidget.value.miniForm || '',
-        MiniTableNames:this.createKPIWidget.value.MiniTableNames ||'',
-        MiniTableFields:this.createKPIWidget.value.MiniTableFields ||'',
-        minitableEquation:this.createKPIWidget.value.minitableEquation||'',
-        EquationOperationMini:this.createKPIWidget.value.EquationOperationMini||'',
-        ModuleNames:this.createKPIWidget.value.ModuleNames||'',
-        columnVisibility:this.createKPIWidget.value.columnVisibility,
-        fontSizeValue:`${this.createKPIWidget.value.fontSizeValue}px`,
-        fontColorValue:this.createKPIWidget.value.fontColorValue || '#ebeaea',
-        FontTypeValue:this.createKPIWidget.value.FontTypeValue ||'',
-        FontTypeLabel:this.createKPIWidget.value.FontTypeLabel ||''
-
-
+        miniForm: this.createKPIWidget.value.miniForm || '',
+        MiniTableNames: this.createKPIWidget.value.MiniTableNames || '',
+        MiniTableFields: this.createKPIWidget.value.MiniTableFields || '',
+        minitableEquation: this.createKPIWidget.value.minitableEquation || '',
+        EquationOperationMini: this.createKPIWidget.value.EquationOperationMini || '',
+        ModuleNames: this.createKPIWidget.value.ModuleNames || '',
+        columnVisibility: this.createKPIWidget.value.columnVisibility,
+        fontSizeValue: `${this.createKPIWidget.value.fontSizeValue}px`,
+        fontColorValue: this.createKPIWidget.value.fontColorValue || '#ebeaea',
+        FontTypeValue: this.createKPIWidget.value.FontTypeValue || '',
+        FontTypeLabel: this.createKPIWidget.value.FontTypeLabel || ''
       };
   
       console.log('Updated tile:', updatedTile);
@@ -758,6 +762,9 @@ export class Tile1ConfigComponent implements OnInit {
       }
   
       this.editTileIndex = null;
+  
+      // Manually trigger change detection
+      this.cdr.detectChanges();  // Ensure the view updates after the data change
     } else {
       console.error('Edit index is null or invalid. Unable to update the tile.');
     }
@@ -1067,55 +1074,55 @@ console.log("allFieldsArray",allFieldsArray.value)
   }
 
 
-  duplicateTile(tile: any, index: number): void {
-    // Clone the tile with its properties
-    const clonedTile = {
-      ...tile, // Copy all existing properties from the original tile
-      id: new Date().getTime(), // Generate a unique ID
-      parameterName: `${tile.parameterName}`, // Copy the parameterName as is (no "Copy" appended)
-      multi_value: tile.multi_value.map((value: any) => ({ ...value })) // Deep copy of multi_value
-    };
-// alert('cloned tile')
-    // Ensure all fields are properly copied
-    clonedTile.x = tile.x;
-    clonedTile.y = tile.y;
-    clonedTile.rows = tile.rows;
-    clonedTile.cols = tile.cols;
-    clonedTile.rowHeight = tile.rowHeight;
-    clonedTile.colWidth = tile.colWidth;
-    clonedTile.fixedColWidth = tile.fixedColWidth;
-    clonedTile.fixedRowHeight = tile.fixedRowHeight;
-    clonedTile.grid_type = tile.grid_type;
-    clonedTile.formlist = tile.formlist;
-    // clonedTile.groupBy = tile.groupBy;
-    clonedTile.groupByFormat = tile.groupByFormat;
-    // clonedTile.predefinedSelectRange = tile.predefinedSelectRange;
+//   duplicateTile(tile: any, index: number): void {
+//     // Clone the tile with its properties
+//     const clonedTile = {
+//       ...tile, // Copy all existing properties from the original tile
+//       id: new Date().getTime(), // Generate a unique ID
+//       parameterName: `${tile.parameterName}`, // Copy the parameterName as is (no "Copy" appended)
+//       multi_value: tile.multi_value.map((value: any) => ({ ...value })) // Deep copy of multi_value
+//     };
+// // alert('cloned tile')
+//     // Ensure all fields are properly copied
+//     clonedTile.x = tile.x;
+//     clonedTile.y = tile.y;
+//     clonedTile.rows = tile.rows;
+//     clonedTile.cols = tile.cols;
+//     clonedTile.rowHeight = tile.rowHeight;
+//     clonedTile.colWidth = tile.colWidth;
+//     clonedTile.fixedColWidth = tile.fixedColWidth;
+//     clonedTile.fixedRowHeight = tile.fixedRowHeight;
+//     clonedTile.grid_type = tile.grid_type;
+//     clonedTile.formlist = tile.formlist;
+//     // clonedTile.groupBy = tile.groupBy;
+//     clonedTile.groupByFormat = tile.groupByFormat;
+//     // clonedTile.predefinedSelectRange = tile.predefinedSelectRange;
 
-    clonedTile.themeColor = tile.themeColor;
+//     clonedTile.themeColor = tile.themeColor;
 
-    // Add the cloned tile to the dashboard at the correct position
-    this.dashboard.splice(index + 1, 0, clonedTile);
+//     // Add the cloned tile to the dashboard at the correct position
+//     this.dashboard.splice(index + 1, 0, clonedTile);
 
-    // Log the updated dashboard for debugging
-    console.log('this.dashboard after duplicating a tile:', this.dashboard);
-    this.grid_details = this.dashboard;
+//     // Log the updated dashboard for debugging
+//     console.log('this.dashboard after duplicating a tile:', this.dashboard);
+//     this.grid_details = this.dashboard;
 
     
-    this.dashboardChange.emit(this.grid_details);
+//     this.dashboardChange.emit(this.grid_details);
 
-    if(this.grid_details)
+//     if(this.grid_details)
       
-      {
-        // alert('grid details is there')
-        this.updateSummary('','add_tile')
-      }
+//       {
+//         // alert('grid details is there')
+//         this.updateSummary('','add_tile')
+//       }
 
-    // Trigger change detection to ensure the UI updates
-    this.cdr.detectChanges();
+//     // Trigger change detection to ensure the UI updates
+//     this.cdr.detectChanges();
 
-    // Update summary to handle the addition of the duplicated tile
+//     // Update summary to handle the addition of the duplicated tile
 
-  }
+//   }
   updateSummary(data: any, arg2: any) {
     this.update_PowerBoard_config.emit({ data, arg2 });
   }

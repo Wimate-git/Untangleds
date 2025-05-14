@@ -317,6 +317,8 @@ data.forEach((packet: any,matchedIndex:number) => {
 
 if(packet.grid_type == 'TableWidget'&& this.index==matchedIndex && packet.id === this.item.id){
   tempCharts[matchedIndex] = packet
+  // this.sendRowDynamic = this.formatDateFields(this.sendRowDynamic);
+  // console.log('Formatted Data:', this.sendRowDynamic);
   console.log('packet checking from table widget',packet)
   setTimeout(() => {
     this.createtableWidget(packet)
@@ -416,6 +418,8 @@ createtableWidget(mapWidgetData?:any){
   
   // Parse row data
   this.rowData = JSON.parse(mapWidgetData.rowData);
+  this.rowData = this.formatDateFields(this.rowData);
+  console.log('Formatted Data:', this.rowData);
   console.log('this.rowData', this.rowData);
   } catch (error) {
   console.error('Error parsing table data:', error);
@@ -496,6 +500,9 @@ createtableWidget(mapWidgetData?:any){
     // Parse row data
     this.rowData = JSON.parse(this.item.rowData);
     console.log('this.rowData from table Tile', this.rowData);
+    this.rowData = this.formatDateFields(this.rowData);
+console.log('Formatted Data:', this.rowData);
+    
     // this.rowData = this.removeMatchingPackets(this.rowData);
     const getFilterFields = JSON.parse(this.item.filter_duplicate_data)
 
@@ -553,6 +560,30 @@ if (getFilterFields && getFilterFields.length > 0) {
 
 }
 
+
+
+private formatDate(dateStr: string): string {
+  console.log('dateStr checking from table widget',dateStr)
+  const date = new Date(dateStr);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+}
+
+
+
+private formatDateFields(data: any[]): any[] {
+  return data.map(row => {
+    Object.keys(row).forEach(key => {
+      if (key.startsWith('date-')) {
+        // Format the date if the key starts with 'date-'
+        row[key] = this.formatDate(row[key]);
+      }
+    });
+    return row;
+  });
+}
 removeMatchingPackets(data: any[]) {
   const seenValues = new Set();
   const uniqueData: any[] = [];

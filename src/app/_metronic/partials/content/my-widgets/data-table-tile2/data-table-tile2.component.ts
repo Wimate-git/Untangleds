@@ -50,6 +50,8 @@ console.log('modalData check',this.storeDrillDown)
 console.log('columnDefs check',this.all_Packet_store)
 this.FormName = this.storeDrillDown.formlist
 console.log('this.FormName for drill name',this.FormName)
+this.responseRowData = this.formatDateFields(this.responseRowData);
+console.log('Formatted Data:', this.responseRowData);
 
 this.parseChartConfig(this.storeDrillDown)
 
@@ -73,7 +75,29 @@ this.parseChartConfig(this.storeDrillDown)
       console.error('Error parsing columnVisibility:', e);
     }
   }
+
+
+  private formatDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
   
+
+
+  private formatDateFields(data: any[]): any[] {
+    return data.map(row => {
+      Object.keys(row).forEach(key => {
+        if (key.startsWith('date-')) {
+          // Format the date if the key starts with 'date-'
+          row[key] = this.formatDate(row[key]);
+        }
+      });
+      return row;
+    });
+  }
   // Function to create AG Grid column definitions
 
   

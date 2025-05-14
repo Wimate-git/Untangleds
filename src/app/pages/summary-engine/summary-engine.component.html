@@ -2655,14 +2655,14 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
 
   <ng-template #miniTableViewChart3 let-modal>
     <app-mini-table-view-chart3
-    [minitableDataChart1]="minitableDataChart1" [emitEvent]="emitEvent" [SK_clientID]="SK_clientID" [FormNameMini]="FormNameMini"
+    [minitableDataChart3]="minitableDataChart3" [emitEvent]="emitEvent" [SK_clientID]="SK_clientID" [FormNameMini]="FormNameMini"
     ></app-mini-table-view-chart3>
   </ng-template>
 
   <ng-template #dataTableModal let-modal>
     <app-data-table-show
     [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"  (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
- (miniTableIconChart1)="receiveminiTableChart1($event,miniTableViewChart3)"   (emitfullRowData)="miniTableDataReceiveChart1($event)" (sendFormNameForMini)="helperForName($event)"
+ (miniTableIconChart1)="receiveminiTableChart3($event,miniTableViewChart3)"   (emitfullRowData)="miniTableDataReceiveChart1($event)" (sendFormNameForMini)="helperForName($event)"
     ></app-data-table-show>
   </ng-template>
   <ng-template #dataTableStackedModal let-modal>

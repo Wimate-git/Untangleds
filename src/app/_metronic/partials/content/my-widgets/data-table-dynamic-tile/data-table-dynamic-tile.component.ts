@@ -64,6 +64,8 @@ export class DataTableDynamicTileComponent {
 
   ngOnChanges(changes: SimpleChanges): void {
 console.log('modalData check',this.responseRowData)
+this.responseRowData = this.formatDateFields(this.responseRowData);
+console.log('Formatted Data:', this.responseRowData);
 console.log('columnDefs check',this.all_Packet_store)
 this.FormName = this.storeDrillDown.formlist
 console.log('this.FormName for drill name',this.FormName)
@@ -71,7 +73,27 @@ this.parseChartConfig(this.all_Packet_store)
 
     
   }
+  private formatDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+  
 
+
+  private formatDateFields(data: any[]): any[] {
+    return data.map(row => {
+      Object.keys(row).forEach(key => {
+        if (key.startsWith('date-')) {
+          // Format the date if the key starts with 'date-'
+          row[key] = this.formatDate(row[key]);
+        }
+      });
+      return row;
+    });
+  }
   parseChartConfig(data: any) {
     console.log('datachecking', data);
     // Iterate through the grid_details array

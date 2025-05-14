@@ -376,6 +376,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   mainFilterCondition: any;
   filterMainConditions: any;
   minitableDataChart1: any;
+  minitableDataChart3: any;
 
   createPieChart() {
     const chartOptions: any = {
@@ -385,7 +386,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
         // Set the chart height
       },
       title: {
-        text: 'Pie Chart',
+        text: 'Donut Chart',
       },
       legend: {
         enabled: false,  // Hide the legend
@@ -2063,7 +2064,7 @@ helperTileClick(event:any,modalChart:any){
 }
 
 
-setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): void {
+  async setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): Promise<void> {
   console.log('modaref checking:', modaref);
   console.log('packet checking:', packet);
   console.log('dashboard filterCheck', this.dashboard);
@@ -2238,42 +2239,7 @@ queryParams.append('modalWidth', String(modalWidth));
 
 // Wait for permissions and then build final URL
 
-this.fetchCompanyLookupdataOnit(1)
-  .then((data: any) => {
-    const readLookupSummary = data; // Assign fetched data to the component property
-    console.log('readLookupSummary', readLookupSummary);
-    console.log('this.lookup_data_summaryCopy check', this.lookup_data_summaryCopy);
 
-    // Assuming `dashboardIds` is an array that contains the values to compare with `P1`
-    const dashboardIds = packet.dashboardIds;
-
-
-    // Loop through the data and find the matching packet
-    const matchingPacket = readLookupSummary.find((packet: any) => {
-      return dashboardIds.includes(packet.P1); // Check if P1 matches any value in dashboardIds
-    });
-
-    if (matchingPacket) {
-      console.log('Matching Packet:', matchingPacket);
-          this.storeCheck = matchingPacket.P11
-          console.log('this.storeCheck check from setmoduleId',this.storeCheck)
-    queryParams.append('isFullScreen', 'true');
-      const finalUrl = `${window.location.origin}/summary-engine/${modulePath}?${queryParams.toString()}`;
-      console.log('finalUrl checking from Modal',finalUrl)
-
-      this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
-
-      
-      
-      console.log('this.currentiframeUrl checking', this.currentiframeUrl);
-      // Do something with the matching packet here
-    } else {
-      console.log('No matching packet found');
-    }
-  })
-  .catch((error: any) => {
-    console.error('Error fetching data:', error);
-  });
 
 // Append isFullScreen based on storeCheck AFTER getting it
 
@@ -2297,6 +2263,7 @@ this.fetchCompanyLookupdataOnit(1)
 
 }
 if (packet.selectType === 'Same page Redirect') {
+  // alert('same page redirect')
   // Extract query parameters once (avoid repeated subscription)
   const queryParams = this.route.snapshot.queryParams;
 
@@ -2319,10 +2286,12 @@ if (packet.selectType === 'Same page Redirect') {
 
   console.log('User ID from redirectModal:', this.userId);
   console.log('User Password from redirectModal:', this.userPass);
+  console.log('modulePath checking from same page',modulePath)
 
   // Ensure modulePath is properly decoded to avoid double encoding
   const modulePathCheck = decodeURIComponent(modulePath);
 console.log('Decoded modulePath:', modulePathCheck);
+
 
 // Ensure query parameters exist before navigating
 const queryParamsToSend: any = {};
@@ -2334,32 +2303,77 @@ if (this.userPass) {
 }
 
 console.log('Final query params:', queryParamsToSend);
+// this.router.navigate(['/summary-engine', modulePathCheck], { queryParams: queryParamsToSend })
+//   .then(() => {
+//     console.log('Navigation successful:', `/summary-engine/${modulePathCheck}`, queryParamsToSend);
+//     window.location.reload(); // Reload after navigation
+//   })
+//   .catch(err => console.error('Navigation error:', err));
 
 // Close the modal before navigating
+this.fetchCompanyLookupdataOnit(1)
+  .then((data: any) => {
+    const readLookupSummary = data; // Assign fetched data to the component property
+    console.log('readLookupSummary:', readLookupSummary);
+
+    const dashboardIds = packet.dashboardIds; // Assuming this is defined
+
+    // Find matching packet
+    const matchingPacket = readLookupSummary.find((packet: any) => dashboardIds.includes(packet.P1));
+
+    if (matchingPacket) {
+      console.log('Matching Packet:', matchingPacket);
+      this.storeCheck = matchingPacket.P11;
+      console.log('storeCheck:', this.storeCheck);
+
+      const queryParams = new URLSearchParams();
+      queryParams.append('isFullScreen', 'true');
+      const finalUrl = `${window.location.origin}/summary-engine/${modulePath}?${queryParams.toString()}`;
+      console.log('finalUrl:', finalUrl);
+
+      this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
+      console.log('this.currentiframeUrl:', this.currentiframeUrl);
+
+      // Proceed with further actions using matchingPacket or storeCheck
+    } else {
+      console.log('No matching packet found');
+    }
+  })
+  .catch((error: any) => {
+    console.error('Error fetching data:', error);
+  });
 this.modalService.dismissAll();
+this.storeCheck = true;
+console.log('this.storeCheck checking', this.storeCheck);
+
+// Append isFullScreen based on storeCheck AFTER getting it
+queryParamsToSend.isFullScreen = String(this.storeCheck);
+this.router.navigate(['/summary-engine', modulePathCheck], { queryParams: queryParamsToSend }).then(() => {
+  console.log('Navigation successful:', `/summary-engine/${modulePathCheck}`, queryParamsToSend);
+
+  this.openModalHelpher(modulePath)
+  .then((data) => {
+    console.log('✅ this.all_Packet_store permissions:', data);
+    const readMainData = data;
+    console.log('readMainData checking', readMainData);
+
+    this.storeCheck = readMainData.fullScreenModeCheck;
+    console.log('this.storeCheck checking', this.storeCheck);
+
+    // Append isFullScreen based on storeCheck AFTER getting it
+    queryParamsToSend.isFullScreen = String(this.storeCheck);
+
+    // Optional: continue with any navigation or reload logic here
+  })
+  .catch(err => {
+    console.error('Error in openModalHelpher:', err);
+  });
+  // window.location.reload(); // Reload after navigation
+})
+.catch(err => console.error('Navigation error:', err));
 
 // Get the storeCheck value before navigating
-this.openModalHelpher(packet.dashboardIds).then((data) => {
-  console.log('✅ this.all_Packet_store permissions:', data);
-  const readMainData = data;
-  console.log('readMainData checking', readMainData);
-  this.storeCheck = readMainData.fullScreenModeCheck;
-  console.log('this.storeCheck checking', this.storeCheck);
 
-  // Append isFullScreen based on storeCheck AFTER getting it
-  queryParamsToSend.isFullScreen = String(this.storeCheck);
-
-  // Now navigate & reload after adding isFullScreen
-  this.router.navigate(['/summary-engine', modulePathCheck], { queryParams: queryParamsToSend })
-    .then(() => {
-      console.log('Navigation successful:', `/summary-engine/${modulePathCheck}`, queryParamsToSend);
-      window.location.reload(); // Reload after navigation
-    })
-    .catch(err => console.error('Navigation error:', err));
-})
-.catch(err => {
-  console.error('Error in openModalHelpher:', err);
-});
 
 }
 
@@ -3425,7 +3439,7 @@ exitFullScreen(): void {
     // if (isFullscreen) {
     //   this.enterFullscreenMode(); // Your logic to make it fullscreen (e.g., adding class, resizing layout etc.)
     // }
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.subscribe(async params => {
       this.routeId = params.get('id');
       if (this.routeId) {
         const permissionId =this.fetchUserPermissions(1)
@@ -3529,6 +3543,7 @@ exitFullScreen(): void {
           }
         });
         console.log('permissionId onInit',permissionId)
+        console.log('this.routeId checking from ngOnIOnit',this.routeId)
         this.openModalHelpher(this.routeId)
 
     .then((data) => {
@@ -3557,6 +3572,28 @@ exitFullScreen(): void {
     .catch((error) => {
     console.error('❌ Error fetching data:', error);
     });
+
+
+  //   this.openModalHelpher(this.routeId)
+  // .then((data) => {
+  //   console.log('✅ this.all_Packet_store permissions:', data);
+  //   const livedatacheck = data;
+  //   console.log('livedatacheck', livedatacheck);
+
+  //   if (livedatacheck) {
+  //     this.checkLiveDashboard = livedatacheck.LiveDashboard;
+  //     this.viewFullScreenCheck = livedatacheck.fullScreenModeCheck;
+  //     console.log('this.viewFullScreenCheck checking', this.viewFullScreenCheck);
+
+  //     if (this.viewFullScreenCheck === true) {
+  //       // Uncomment to invoke fullscreen logic
+  //       // this.checkAndSetFullscreen();
+  //     }
+  //   }
+  // })
+  // .catch(err => {
+  //   console.error('Error in openModalHelpher:', err);
+  // });
         this.editButtonCheck = true
     
       }
@@ -4648,135 +4685,195 @@ setTimeout(() => {
     { color: "linear-gradient(to right, #ff9a9e, #fad0c4)", selected: false }, // Pink Pastel
     { color: "linear-gradient(to right, #fc5c7d, #6a82fb)", selected: false }  // Pink to Blue
   ];
-
-  async openModalHelpher(getValue: any) : Promise<any> {
-    console.log("Data from lookup:", getValue);
-    return new Promise((resolve, reject) => {
-
-    this.api
-      .GetMaster(`${this.SK_clientID}#${getValue}#summary#main`, 1)
-      .then((result: any) => {
-        if (result && result.metadata) {
-          const parsedMetadata = JSON.parse(result.metadata);
-          this.parsedSummaryData = parsedMetadata
-          console.log('parsedMetadata check', this.parsedSummaryData);
-          this.all_Packet_store = parsedMetadata;
-          this.createdTime = this.all_Packet_store.created;
-          this.createdUserName = this.all_Packet_store.createdUser;
-
-          console.log('Before Parsing:', this.all_Packet_store);
-    
-   
-        // Assuming this.all_Packet_store.LastUpdate contains the epoch time
-        
-const formattedDate = new Date(this.all_Packet_store.LastUpdate);
-
-// For debugging, log the converted date and time
-console.log('this.lastUpdatedTime', formattedDate);
-
-// To format the date into a specific format (e.g., locale-specific date and time)
-this.lastUpdatedTime = formattedDate.toLocaleString();  // You can adjust the locale as needed
-console.log('Formatted Date:', this.lastUpdatedTime);
-
-          console.log('this.storeFilterDetail checking',this.storeFilterDetail)
-
-          // this.isFilterdetail=true
-    
-          // alert("hiii")
-          console.log('this.all_Packet_store.grid_details.length check',this.all_Packet_store.grid_details.length)
-          if (this.all_Packet_store.grid_details.length === 0 && !this.modalOpened) {
-            this.modalOpened = true; // Prevent multiple openings
-            this.openModal('edit_ts', this.all_Packet_store, this.summaryModal);
-          }
-            // setTimeout(() => {
-     
-            // }, 2000);
-          
-          
-          // Check if `grid_details` is not empty and `multi_value` is present
-          if (this.all_Packet_store.grid_details && this.all_Packet_store.grid_details.length > 0) {
-            this.all_Packet_store.grid_details.forEach((gridItem: { multi_value: any; }, index: any) => {
-              if (gridItem?.multi_value) {
-                try {
-                  const multiValueString = gridItem.multi_value;
-                  const parsedMultiValue = Array.isArray(multiValueString)
-                    ? multiValueString
-                    : JSON.parse(multiValueString);
-                  gridItem.multi_value = parsedMultiValue;
-                  console.log(`After Parsing and Reassigning for item ${index}:`, gridItem);
-                } catch (error) {
-                  console.error(`Error parsing multi_value for item ${index}:`, error);
-                }
-              } else {
-                console.log(`multi_value is undefined or not available for item ${index}.`);
-              }
-            });
-
-            // Reassign the updated grid_details to dashboard
-            this.dashboard = this.all_Packet_store.grid_details;
-       
-            console.log('this.dashboard after parsing', this.dashboard);
-          } else {
-            console.log('grid_details is undefined or empty.');
-          }
-
-          // Match themeColor and set selected to true
-
-
-          // Iterate through the dashboard and themes to find a matching 
-          console.log('checkdta for filter',this.all_Packet_store)
-
-            console.log('this.isFilterdetail',this.isFilterdetail)
-            console.log('this.storeFilterDetail',this.storeFilterDetail)
-            console.log('this.routeId',this.routeId)
-            console.log('this.toRouteId',this.toRouteId)
-            console.log('this.readFilterEquation checking from modal ',this.readFilterEquation)
-            
-       
-
-          this.dashboard.forEach((gridItem: any) => {
-            // Find the theme that matches the current grid item
-            const matchingTheme = this.themes.find(theme => theme.color === gridItem.themeColor);
-
-            // If a matching theme is found, clear the 'selected' state for the matching theme only
-            if (matchingTheme) {
-              // Clear the 'selected' state for all themes in the dashboard except the matched one
-              this.themes.forEach(theme => {
-                if (theme.color !== matchingTheme.color) {
-                  theme.selected = false; // Only unselect the themes that don't match
-                }
-              });
-
-              // Set the matching theme as selected
-              matchingTheme.selected = true;
-              console.log('Matching theme found and selected:', matchingTheme);
-            }
-          });
-
-
-
-          // Continue with other actions
-          this.cdr.detectChanges();
-          this.bindDataToGridster(this.all_Packet_store); // Pass the object to bindDataToGridster
-          this.openModal('Edit_ts', this.all_Packet_store); // Open modal with the data
-
-          resolve(this.all_Packet_store);
-        }else{
-          reject("No metadata found");
-        }
-      })
-      .catch((err) => {
-        console.log("Can't fetch", err);
-      });
-    });
-  }
+  // async openModalHelpher(getValue: any): Promise<any> {
+  //   console.log("Data from lookup:", getValue);
+  
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //       // Fetching data
+  //       const result: any = await this.api.GetMaster(`${this.SK_clientID}#${getValue}#summary#main`, 1);
+  
+  //       if (result && result.metadata) {
+  //         const parsedMetadata = JSON.parse(result.metadata);
+  //         this.parsedSummaryData = parsedMetadata;
+  //         console.log('Parsed Metadata:', this.parsedSummaryData);
+  
+  //         this.all_Packet_store = parsedMetadata;
+  //         this.createdTime = this.all_Packet_store.created;
+  //         this.createdUserName = this.all_Packet_store.createdUser;
+  
+  //         // Handling date formatting
+  //         const formattedDate = new Date(this.all_Packet_store.LastUpdate);
+  //         this.lastUpdatedTime = formattedDate.toLocaleString(); 
+  //         console.log('Formatted Date:', this.lastUpdatedTime);
+  
+  //         // Check grid details
+  //         if (this.all_Packet_store.grid_details?.length === 0 && !this.modalOpened) {
+  //           this.modalOpened = true; // Prevent multiple openings
+  //           this.openModal('edit_ts', this.all_Packet_store, this.summaryModal);
+  //         }
+  
+  //         // Handling multi_value parsing
+  //         if (this.all_Packet_store.grid_details && this.all_Packet_store.grid_details.length > 0) {
+  //           this.all_Packet_store.grid_details.forEach((gridItem: { multi_value: any }, index: any) => {
+  //             if (gridItem?.multi_value) {
+  //               try {
+  //                 const multiValueString = gridItem.multi_value;
+  //                 gridItem.multi_value = Array.isArray(multiValueString)
+  //                   ? multiValueString
+  //                   : JSON.parse(multiValueString);
+  //                 console.log(`After Parsing for item ${index}:`, gridItem);
+  //               } catch (error) {
+  //                 console.error(`Error parsing multi_value for item ${index}:`, error);
+  //               }
+  //             }
+  //           });
+  
+  //           // Reassign the updated grid_details to dashboard
+  //           this.dashboard = this.all_Packet_store.grid_details;
+  //           console.log('Dashboard after parsing:', this.dashboard);
+  //         }
+  
+  //         // Theme matching logic
+  //         this.dashboard.forEach((gridItem_1: any) => {
+  //           const matchingTheme = this.themes.find(theme => theme.color === gridItem_1.themeColor);
+  //           if (matchingTheme) {
+  //             this.themes.forEach(theme_1 => {
+  //               if (theme_1.color !== matchingTheme.color) {
+  //                 theme_1.selected = false; // Unselect themes that don't match
+  //               }
+  //             });
+  //             matchingTheme.selected = true;
+  //             console.log('Matching theme found and selected:', matchingTheme);
+  //           }
+  //         });
+  
+  //         // Continue with other actions
+  //         this.cdr.detectChanges();
+  //         this.bindDataToGridster(this.all_Packet_store); // Pass the object to bindDataToGridster
+  //         this.openModal('Edit_ts', this.all_Packet_store); // Open modal with the data
+  //         console.log('this.all_Packet_store check resolve', this.all_Packet_store);
+  
+  //         // Resolve only after all operations are done
+  //         resolve(this.all_Packet_store);
+  //       } else {
+  //         reject("No metadata found");
+  //       }
+  //     } catch (err) {
+  //       console.error("Error fetching data:", err);
+  //       reject(err);  // Reject with the error
+  //     }
+  //   });
+  // }
+  
+  
+  
   // fullscreen: true,
 
   // modalDialogClass:'p-9',
   // centered: true// Custom class for modal width
+
+
+
+  
 justReadStyles(data:any,index:any){
   this.FilterTileConfigComponent.openFilterModal(data, index);
 }
+async openModalHelpher(getValue: any): Promise<any> {
+  console.log("Data from lookup:", getValue);
+
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Fetching data from API
+      const result: any = await this.api.GetMaster(`${this.SK_clientID}#${getValue}#summary#main`, 1);
+      console.log('API Result:', result);
+
+      if (result && result.metadata) {
+        const parsedMetadata = JSON.parse(result.metadata);
+        this.parsedSummaryData = parsedMetadata;
+        console.log('Parsed Metadata:', this.parsedSummaryData);
+
+        this.all_Packet_store = parsedMetadata;
+        this.createdTime = this.all_Packet_store.created;
+        this.createdUserName = this.all_Packet_store.createdUser;
+
+        // Handling date formatting
+        const formattedDate = new Date(this.all_Packet_store.LastUpdate);
+        this.lastUpdatedTime = formattedDate.toLocaleString();
+        console.log('Formatted Date:', this.lastUpdatedTime);
+
+        // Check if modal needs to be opened due to empty grid details
+        if (this.all_Packet_store.grid_details?.length === 0 && !this.modalOpened) {
+          this.modalOpened = true; // Prevent multiple openings
+          this.openModal('edit_ts', this.all_Packet_store, this.summaryModal);
+        }
+        resolve(this.all_Packet_store);
+        // Parsing multi_value entries in grid details if present
+        if (this.all_Packet_store.grid_details && this.all_Packet_store.grid_details.length > 0) {
+          this.all_Packet_store.grid_details.forEach((gridItem: { multi_value: any }, index: number) => {
+            if (gridItem?.multi_value) {
+              try {
+                const multiValueString = gridItem.multi_value;
+                gridItem.multi_value = Array.isArray(multiValueString)
+                  ? multiValueString
+                  : JSON.parse(multiValueString);
+                console.log(`After Parsing for item ${index}:`, gridItem);
+              } catch (error) {
+                console.error(`Error parsing multi_value for item ${index}:`, error);
+              }
+            }
+          });
+
+          // Update dashboard property with parsed grid details
+          this.dashboard = this.all_Packet_store.grid_details;
+          console.log('Dashboard after parsing:', this.dashboard);
+        }
+
+        // Theme matching logic to select/deselect themes based on grid details
+        if (this.dashboard && this.themes) {
+          this.dashboard.forEach((gridItem_1: any) => {
+            const matchingTheme = this.themes.find(theme => theme.color === gridItem_1.themeColor);
+            if (matchingTheme) {
+              this.themes.forEach(theme_1 => {
+                if (theme_1.color !== matchingTheme.color) {
+                  theme_1.selected = false; // Unselect themes that don't match
+                }
+              });
+              matchingTheme.selected = true;
+              console.log('Matching theme found and selected:', matchingTheme);
+            }
+          });
+        }
+
+        // Continue with change detection and data binding
+        if (this.cdr) {
+          this.cdr.detectChanges();
+        }
+        this.bindDataToGridster(this.all_Packet_store);
+        this.openModal('Edit_ts', this.all_Packet_store);
+        console.log('this.all_Packet_store check resolve', this.all_Packet_store);
+
+        // Resolve the Promise with full data
+        // resolve(this.all_Packet_store);
+      } else {
+        console.error("No metadata found in result");
+        reject("No metadata found");
+      }
+    } catch (err) {
+      console.error("Error fetching or processing data:", err);
+      reject(err);
+    }
+  });
+}
+
+// Usage example:
+
+
+
+// Function call with proper Promise handling:
+
+
+
   helperFilter(data:any,index:any, KPIModal: TemplateRef<any>){
     if(data.grid_type=='filterTile'){
     this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
@@ -5315,6 +5412,7 @@ justReadStyles(data:any,index:any){
   // console.log('event check chart1', event);
     
   // Store all company details
+  console.log('event.all_Packet_store checking',event.all_Packet_store)
   this.allCompanyDetails = event.all_Packet_store;
 
   // Directly update the id and push the object into the dashboard in one line
@@ -5324,6 +5422,7 @@ justReadStyles(data:any,index:any){
   });
 
   console.log('event.data.arg1', event.data.arg1);
+  // window.location.reload();
  
 
     }
@@ -6788,45 +6887,47 @@ console.log('selectedTab checking',this.selectedTab)
   //   this.errorForUniqueName = null; // Clear error state
   //   this.isDuplicateName = false;  // Reset duplicate flag
   // }
-
-  fetchCompanyLookupdataOnit(sk: any): any {
-    console.log("I am called snn");
+  fetchCompanyLookupdataOnit(sk: any): Promise<any> {
+    console.log("Fetching company lookup data with SK:", sk);
     console.log('this.SK_clientID check lookup', this.SK_clientID);
-
+  
     return new Promise((resolve, reject) => {
-      this.api.GetMaster(this.SK_clientID + "#summary" + "#lookup", sk)
+      this.api.GetMaster(`${this.SK_clientID}#summary#lookup`, sk)
         .then(response => {
           if (response && response.options) {
             if (typeof response.options === 'string') {
-              let data = JSON.parse(response.options);
-              console.log("d1 =", data);
-
+              let data;
+  
+              try {
+                data = JSON.parse(response.options);
+              } catch (err) {
+                console.error('Error parsing response options:', err);
+                return reject(new Error('Failed to parse response.options'));
+              }
+  
+              console.log("Parsed data:", data);
+  
               if (Array.isArray(data)) {
-                const promises = [];
-
-                for (let index = 0; index < data.length; index++) {
-                  const element = data[index];
-                  console.log('element check', element);
-
-                  if (element !== null && element !== undefined) {
+                // Process and add data to lookup_data_summary1
+                data.forEach(element => {
+                  if (element) {
                     const key = Object.keys(element)[0];
-                    const { P1, P2, P3, P4, P5, P6, P7, P8, P9 ,P10,P11} = element[key];
-                    this.lookup_data_summary1.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9,P10,P11 });
-                    console.log("d2 =", this.lookup_data_summary1);
-                  } else {
-                    break; // This may need refinement based on your data structure
+                    const { P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11 } = element[key];
+                    this.lookup_data_summary1.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11 });
+                    console.log("Updated lookup_data_summary1:", this.lookup_data_summary1);
                   }
+                });
+  
+                // Recursively fetch more data if available (using sk + 1 for the next call)
+                if (data.length > 0) {
+                  this.fetchCompanyLookupdataOnit(sk + 1)
+                    .then(resolve)
+                    .catch(reject);  // Continue recursion and propagate errors if any
+                } else {
+                  // If no more data to fetch, resolve with the collected data
+                  resolve(this.lookup_data_summary1);
                 }
-
-                // Recursive call to fetch more data
-                if (data.length > 0) { // Ensure there is data to fetch recursively
-                  promises.push(this.fetchCompanyLookupdataOnit(sk + 1));
-                }
-
-                // Wait for all promises to resolve
-                Promise.all(promises)
-                  .then(() => resolve(this.lookup_data_summary1))
-                  .catch(reject);
+  
               } else {
                 console.error('Invalid data format - not an array.');
                 reject(new Error('Invalid data format - not an array.'));
@@ -6836,12 +6937,12 @@ console.log('selectedTab checking',this.selectedTab)
               reject(new Error('response.options is not a string.'));
             }
           } else {
-            console.log("this.lookup_data_summary1 checking", this.lookup_data_summary1);
-            resolve(this.lookup_data_summary1); // Resolve if no valid response
+            console.log("No response data, returning collected data:", this.lookup_data_summary1);
+            resolve(this.lookup_data_summary1); // Resolve with existing data if no valid response
           }
         })
         .catch(error => {
-          console.error('Error:', error);
+          console.error('Error fetching data:', error);
           reject(error);
         });
     });
@@ -7490,6 +7591,9 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
 
        
 
+            }
+            else if(actionKey === 'Save'){
+              window.location.reload();
             }
           }
         });
@@ -9726,6 +9830,27 @@ receiveminiTableChart1(checkevent:any,modalref: any){
 
 }
 
+
+
+
+receiveminiTableChart3(checkevent:any,modalref: any){
+  console.log('checkevent checking',checkevent)
+  this.isLoading = true;
+
+  this.spinner.show('FormView')
+   
+  this.minitableDataChart3 = checkevent
+
+
+  setTimeout(() => {
+    this.modalService.open(modalref,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
+  }, 500);
+
+  this.isLoading = false;
+  this.spinner.hide('FormView')
+
+}
 
 
 

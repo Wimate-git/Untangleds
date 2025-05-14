@@ -60,7 +60,7 @@ export class MiniTableViewChart3Component {
        // Accept row data
        
         @Output() modalClose = new EventEmitter<void>(); // Emit an event when the modal is closed
-        @Input() minitableDataChart1: any[] = [];
+        @Input() minitableDataChart3: any[] = [];
         @Input() emitEvent: any[] = [];
        
         private gridApi!: GridApi;
@@ -107,14 +107,14 @@ export class MiniTableViewChart3Component {
       
         ngOnChanges(changes: SimpleChanges): void {
       
-      console.log('miniTableData checking from chart1',this.minitableDataChart1)
+      console.log('miniTableData checking from chart3',this.minitableDataChart3)
       console.log('emitEvent checking',this.emitEvent)
       console.log('SK_clientID checking',this.SK_clientID)
       console.log('FormNameMini checking',this.FormNameMini)
       this.assignFormName = this.FormNameMini
       console.log('this.assignFormName',this.assignFormName)
     
-      this.processEvent(this.minitableDataChart1);
+      this.processEvent(this.minitableDataChart3);
       
       
       
