@@ -120,17 +120,6 @@ this.emitfullRowData.emit(this.sendRowDynamic)
 
 
 
-  private formatDate(dateStr: string): string {
-    console.log('dateStr checking',dateStr)
-    const date = new Date(dateStr);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-  }
-  
-
-
   private formatDateFields(data: any[]): any[] {
     return data.map(row => {
       Object.keys(row).forEach(key => {
@@ -141,6 +130,21 @@ this.emitfullRowData.emit(this.sendRowDynamic)
       });
       return row;
     });
+  }
+  
+  private formatDate(dateStr: string): string {
+    console.log('dateStr checking from table widget', dateStr);
+  
+    // Check if dateStr is empty or invalid
+    if (!dateStr || isNaN(new Date(dateStr).getTime())) {
+      return '';  // Return an empty string or any default message if the date is invalid or empty
+    }
+  
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
   }
 
 

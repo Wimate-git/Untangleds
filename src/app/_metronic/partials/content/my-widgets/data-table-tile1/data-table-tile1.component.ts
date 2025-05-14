@@ -110,14 +110,6 @@ this.parseChartConfig(this.storeDrillDown)
     
   }
 
-  private formatDate(dateStr: string): string {
-    console.log('dateStr checking tile1',dateStr)
-    const date = new Date(dateStr);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-  }
 
   ngOnInit(){}
   parseChartConfig(data: any) {
@@ -151,6 +143,21 @@ this.parseChartConfig(this.storeDrillDown)
       });
       return row;
     });
+  }
+  
+  private formatDate(dateStr: string): string {
+    console.log('dateStr checking from table widget', dateStr);
+  
+    // Check if dateStr is empty or invalid
+    if (!dateStr || isNaN(new Date(dateStr).getTime())) {
+      return '';  // Return an empty string or any default message if the date is invalid or empty
+    }
+  
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
   }
   
   // Function to create AG Grid column definitions
