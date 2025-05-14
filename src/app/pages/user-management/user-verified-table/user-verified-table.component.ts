@@ -27,6 +27,41 @@ export class UserVerifiedTableComponent{
  }  
 
 
+ async resendCredentials(userName:any){
+
+  const targetUser = this.unverifiedUsers.find((item:any)=>item.username == userName)
+
+  const body = { type: "userVerify", username:targetUser.username,name:targetUser.password,email:targetUser.email};
+
+
+  this.DynamicApi.sendData(body).subscribe(response => {
+    console.log('Response from Lambda:', response);
+
+    if(response){
+        Swal.fire({
+          position: "top-right",
+          icon: "success",
+          title: `Credentails mail sent successfully `,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+
+
+        this.unverifiedUsers = this.unverifiedUsers.map((item: any) => {
+          if (userName === item.username) {
+            return { ...item, sentCredentailMail: true };
+          }
+          return item;
+        });
+
+    }
+      
+  }, error => {
+    console.error('Error calling dynamic lambda:', error);
+  });
+ }
+
+
  async resendVerification(userName: any) {
 
 

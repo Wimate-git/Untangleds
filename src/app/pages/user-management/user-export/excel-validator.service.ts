@@ -279,6 +279,8 @@ export class ExcelValidatorService {
               });
             }
           });
+
+          const excelUsernameList = data.map((item:any)=>item[0])
   
           // Validate each data row
           for (let rowIndex = 1; rowIndex < data.length; rowIndex++) {
@@ -297,6 +299,7 @@ export class ExcelValidatorService {
               if (validation) {
                 const cellValue = row[colIndex];
                 const columnLetter = this.getColumnLetter(colIndex);
+            
   
                 // Check required fields
                 if (validation.required && (cellValue === undefined || cellValue === null || cellValue === '')) {
@@ -308,6 +311,8 @@ export class ExcelValidatorService {
                     error: `${header} is required`
                   });
                 }
+
+              
   
                 // Check for duplicate username
                 if (header === 'UserName' && validation.required && existingUsernames.includes(cellValue.toLowerCase())) {
@@ -327,6 +332,33 @@ export class ExcelValidatorService {
                     }
                   }
                 }
+
+                // try{
+                  if (
+                    header === 'UserName' &&
+                    validation.required &&
+                    typeof cellValue === 'string' &&
+                    excelUsernameList.filter(
+                      (item: any) =>
+                        typeof item === 'string' &&
+                        cellValue.toLowerCase() === item.toLowerCase()
+                    ).length > 1
+                  ) {
+
+                    console.log("Duplicate user found: ",cellValue);
+                    errors.push({
+                      row: rowIndex + 1,
+                      column: header,
+                      columnLetter,
+                      value: cellValue,
+                      error: `Duplicate username found`,
+                    });
+                  }
+                // }
+                // catch(error){
+                //   console.log("User duplication check error ",error);
+                // }
+                
 
 
                 if(header === 'Client ID' && validation.required && cellValue != SK_clientID){

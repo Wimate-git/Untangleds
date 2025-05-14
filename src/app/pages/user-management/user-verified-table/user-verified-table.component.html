@@ -18,6 +18,7 @@
           <th>Email</th>
           <th>Status</th>
           <th>Verification</th>
+          <th>Credentails</th>
         </tr>
       </thead>
       <tbody>
@@ -25,12 +26,17 @@
           <td>{{ user.username }}</td>
           <td>{{ user.email }}</td>
           <td class="status">
-            <span class="badge badge-danger">Unconfirmed</span>
+            <span class="btn btn-sm btn-danger fw-bolder ms-2 fs-7 py-2 px-5">Unconfirmed</span>
           </td>
           <td class="status">
-            <a *ngIf="user && user.sentMail == undefined" class="badge btn badge-warning" (click)="resendVerification(user.username)" type="submit">Resend</a>
-            <a *ngIf="user && user.sentMail" class="badge btn badge-success" type="submit">Sent</a>
+            <a *ngIf="user && user.sentMail == undefined" class="btn btn-sm custom-primary fw-bolder ms-2 fs-7 py-2 px-5" (click)="resendVerification(user.username)" type="submit">Resend</a>
+            <a *ngIf="user && user.sentMail" class="btn btn-sm btn-success fw-bolder ms-2 fs-7 py-2 px-5" type="submit">Sent</a>
           </td>
+
+            <td class="status">
+              <a *ngIf="user && user.sentCredentailMail == undefined" class="btn btn-sm btn-dark fw-bolder ms-2 fs-7 py-2 px-5" (click)="resendCredentials(user.username)" type="submit">Resend</a>
+              <a *ngIf="user && user.sentCredentailMail" class="btn btn-sm btn-success fw-bolder ms-2 fs-7 py-2 px-5" type="submit">Sent</a>
+            </td>
         </tr>
       </tbody>
     </table>

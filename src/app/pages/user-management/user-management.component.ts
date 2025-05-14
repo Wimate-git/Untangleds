@@ -181,6 +181,7 @@ rdtListWorkAround :any =[{
   userCreatedTime: any;
   lookup_data_Options: any = [];
   permissionIDRef: any = [];
+  privacyVisibility: boolean = false;
 
   constructor(private apiService: UserService,private configService:SharedService,private fb:FormBuilder
     ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal,private DynamicApi:DynamicApiService,
@@ -600,9 +601,12 @@ rdtListWorkAround :any =[{
 
   async addFromService() {
     await this.getClientID()
+    this.lookup_All_User = []
     await this.fetchAllUsersData(1)
     await this.getAllUsers()
+    this.permission_data = []
     await this.getPermissionIDs(1)
+    this.company_data = []
     await this.getCompanyIDs(1);
     await this.getTreeData();
 
@@ -1188,9 +1192,95 @@ rdtListWorkAround :any =[{
   }
 
 
+  async resendVerification(userName: any) {
+
+
+    const body = { "type": "cognitoServices",
+      "event":{
+        path: "/resendVerification",
+        queryStringParameters: {
+            email: "dummy@wimate.in"
+        },
+        username:userName
+      }
+    }
   
-  updateUser(value: any, key: any) {
+    try {
+  
+      const response = await this.DynamicApi.getData(body);
+     
+      if(response){
+        if(response.statusCode == 200){
+          Swal.fire({
+            position: "top-right",
+            icon: "success",
+            title: `Verification mail sent successfully `,
+            showConfirmButton: false,
+            timer: 1500,
+          });
+  
+  
+          try{
+            const UserDetails = {
+              "User Name": this.username,
+              "Action": "View",
+              "Module Name": "User Management",
+              "Form Name": 'User Management',
+             "Description": `Verification mail sent successfully to ${userName}`,
+              "User Id": this.username,
+              "Client Id": this.SK_clientID,
+              "created_time": Date.now(),
+              "updated_time": Date.now()
+            }
+        
+            this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+          }
+          catch(error){
+            console.log("Error while creating audit trails ",error);
+          }
+        }
+        else{
+          Swal.fire({
+            position: "top-right",
+            icon: "error",
+            title: `Error sending mail`,
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      }
+  
+    } catch (error) {
+      console.error('Error calling dynamic lambda:', error);
+    }
+  
+  }
+  
+
+  
+  async updateUser(value: any, key: any) {
     console.log("value",value)
+
+
+    if(await this.checkUserConfirmed() == false){
+      return Swal.fire({
+        title: 'User Not Confirmed',
+        text: 'Please confirm your email before updating.',
+        icon: 'warning',
+        position: 'center',
+        customClass: {
+          container: 'swal2-container'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Resend Confirmation',
+        cancelButtonText: 'Cancel',
+        allowOutsideClick: false,
+      }).then((result)=>{
+        if(result.isConfirmed){
+          this.resendVerification(this.createUserField.get('username')?.value)
+        }
+      });
+    }
 
 
     const successAlert: SweetAlertOptions = {
@@ -1593,6 +1683,46 @@ rdtListWorkAround :any =[{
 
 
 
+  }
+
+
+
+  async checkUserConfirmed(): Promise<boolean> {
+    const authenticationData = {
+      Username: this.createUserField.get('username')?.value,
+      Password: this.createUserField.get('name')?.value, // Double-check if this should be 'password'
+    };
+  
+    let poolData = {
+      UserPoolId: "ap-south-1_aaPSwPS14", // user pool id here
+      ClientId: "42pb85v3sv84jdrfi1rub7a4e5"// client id here
+    };
+
+    let userPool = new CognitoUserPool(poolData);
+
+
+    let poolDetails: any = {
+      Username: this.tempUpdateUser,
+      Pool: userPool
+    }
+
+    let cognitoUser = new CognitoUser(poolDetails);
+
+    let authenticationDetails = new AuthenticationDetails(authenticationData);
+  
+    return new Promise((resolve, reject) => {
+      cognitoUser.authenticateUser(authenticationDetails, {
+        onSuccess: (result) => {
+          const accessToken = result.getAccessToken().getJwtToken();
+          console.log("Authentication success, token:", accessToken);
+          resolve(true);
+        },
+        onFailure: (err) => {
+          console.log("Error updating cognito:", err);
+          resolve(false); // or reject(err) if you want to handle it as an error
+        }
+      });
+    });
   }
 
 
@@ -2448,6 +2578,8 @@ rdtListWorkAround :any =[{
 
   openModal(getValues: any, getKey: any) {
 
+    this.privacyVisibility = false
+
     this.permissionIDRef = ''
 
     this.redirectionURL = ''
@@ -2483,7 +2615,7 @@ rdtListWorkAround :any =[{
         this.errorForInvalidEmail = '';
         this.errorForUniqueUserID = '';
         this.errorForUniquemobileID = ''
-        this.showMobileNumber = getValues.mobile;
+        this.showMobileNumber = '';
         this.switchBetweenDropdown_textField = false;
         this.disabled_CLientID_textField = true;
         this.switchBetweenDropdown_company_id = false;
@@ -2540,6 +2672,9 @@ rdtListWorkAround :any =[{
           'device_timeout': getValues.device_timeout,
           'alert_timeout': getValues.alert_timeout,
         })
+
+
+        console.log("values are being added ",this.createUserField);
 
         this.showDisabledClientID = this.createUserField.get('disabled_CLientID')?.setValue(this.SK_clientID, { emitEvent: false });
         this.createUserField.get('disabled_CLientID')?.disable({ emitEvent: false })
@@ -2665,6 +2800,9 @@ rdtListWorkAround :any =[{
         })
 
 
+        this.privacyVisibility = getValues.mobile_privacy == 'Invisible' ? false : true;
+
+
         this.permissionIDRef = getValues.permission_ID
 
 
@@ -2687,6 +2825,9 @@ rdtListWorkAround :any =[{
         this.cd.detectChanges()
       }
     }
+
+
+    this.cd.detectChanges()
   }
 
 
@@ -2694,6 +2835,8 @@ rdtListWorkAround :any =[{
 
   async getClientID() {
     try{
+
+      this.lookup_data_client = []
 
       await this.fetchTMLookupData(1)
 
@@ -2959,6 +3102,11 @@ rdtListWorkAround :any =[{
         {
           title: "Phone",
           data: "P2",
+          render: function (data) {
+            return typeof data === "string"
+              ? data.replace(/\d(?=\d{2})/g, "x")
+              : data || "";
+          },
         },
         {
           title: "Permission",
@@ -3607,6 +3755,7 @@ rdtListWorkAround :any =[{
 
             console.log("Result is here ",result);
             await this.deleteCognitoUser(JSON.parse(result.metadata))
+            this.addFromService()
             }
         })
         .catch((err) => {
@@ -3979,7 +4128,7 @@ fetchDynamicLookupData(pk:any,sk:any):any {
       .map((item: any) => {
         if (item.attributes.email_verified !== 'true') {
           // Return the user data for unverified users
-          return { username: item.username, email: item.attributes.email };
+          return { username: item.username, email: item.attributes.email,password: item.attributes['custom:password']};
         }
         return null; 
       })

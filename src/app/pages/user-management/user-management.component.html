@@ -107,7 +107,7 @@
                                         form-control form-control-lg form-control-solid
                                         mb-3 mb-lg-0
                                       " placeholder="Enter User Name" name="username"  formControlName="username" required
-                                            (keyup)="checkUniqueIdentifier($event)">
+                                            (keyup)="checkUniqueIdentifier($event)"  autocomplete="off">
         
                                         <span style="color: #fc1900;">{{errorForUniqueID}}</span>
                                         <div *ngIf="
@@ -324,10 +324,15 @@
                                     <div class="col-md-4">
                                         <label class="fw-semibold fs-6 mb-2"> Mobile</label>
         
-                                        <input type="text" class="
+                                        <input type="text" *ngIf="privacyVisibility"  class="
                                             form-control form-control-lg form-control-solid
                                             mb-3 mb-lg-0
-                                          " placeholder="Enter mobile number" (keypress)="keyPress($event)" maxlength="10" min="0" max="9" pattern="^\d{10}$" name="mobile" formControlName="mobile" >
+                                          " placeholder="Enter mobile number" autocomplete="off"  (keypress)="keyPress($event)" maxlength="10" min="0" max="9" pattern="^\d{10}$" name="mobile" formControlName="mobile" >
+
+                                          <input type="password" *ngIf="!privacyVisibility"  class="
+                                            form-control form-control-lg form-control-solid
+                                            mb-3 mb-lg-0
+                                          "   autocomplete="new-password" placeholder="Enter mobile number" (keypress)="keyPress($event)" maxlength="10" min="0" max="9" pattern="^\d{10}$" name="mobile" formControlName="mobile" >
         
                                     </div>
         
