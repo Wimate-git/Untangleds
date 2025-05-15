@@ -1719,6 +1719,9 @@ rdtListWorkAround :any =[{
         },
         onFailure: (err) => {
           console.log("Error updating cognito:", err);
+          if(err && err.message != 'User is not confirmed.'){
+            resolve(true);
+          }
           resolve(false); // or reject(err) if you want to handle it as an error
         }
       });
@@ -2578,7 +2581,7 @@ rdtListWorkAround :any =[{
 
   openModal(getValues: any, getKey: any) {
 
-    this.privacyVisibility = false
+    this.privacyVisibility = true
 
     this.permissionIDRef = ''
 
