@@ -2,7 +2,7 @@ import { Component, HostBinding, OnInit } from '@angular/core';
 import { LayoutService } from '../../../../../layout';
 import { APIService } from 'src/app/API.service';
 // import { formatDistanceToNow } from 'date-fns';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { NotificationService } from 'src/app/pages/services/notification/notification.service';
 
 
@@ -36,7 +36,8 @@ export class NotificationsInnerComponent implements OnInit {
   constructor(
     private api: APIService,
     private router: Router,
-    private nObserve: NotificationService//2 may
+    private nObserve: NotificationService,//2 may
+    private route: ActivatedRoute
 
   ) { }
 
@@ -240,6 +241,7 @@ export class NotificationsInnerComponent implements OnInit {
       title: item.metadata.ID,
       description: item.metadata.message,
       SK: item.SK,
+      type: item.metadata.type,
       // time: formatDistanceToNow(new Date(item.metadata.createdTime), { addSuffix: true }),  // Converts timestamp to readable date
       time: this.formatDate(item.metadata.createdTime),
       // icon: 'icons/duotune/technology/teh008.svg', // Example icon, you might want to vary it
@@ -281,6 +283,10 @@ export class NotificationsInnerComponent implements OnInit {
   }
 
   toggleSelection(alert: any) {
+
+    console.log('clicked alert :>> ', alert);
+
+
     let temp = this.nObserve.getUnreadNotification();
     if (temp >= 1 && alert.isSelected === false) {
       temp -= 1;
@@ -312,10 +318,20 @@ export class NotificationsInnerComponent implements OnInit {
 
     console.log('recordId :>> ', recordId);
 
-    this.id = 'Forms'
-    this.router.navigate([`view-dreamboard/${this.id}/${alert.formID}&recordId=${JSON.stringify(JSON.stringify(recordId))}`]);
+    this.id = alert.type//'Forms' OR 'Pending Approval Task'
+    // let tempredirect = 'Pending Approval Task';
+    if (this.id === 'Pending Approval Task') {
 
-    console.log(`redirect link--> view-dreamboard/${this.id}/${alert.formID}&recordId=${JSON.stringify(JSON.stringify(recordId))}`);
+      const encodedRecordId = encodeURIComponent(alert.title);
+
+      this.router.navigate([`view-dreamboard/${this.id}/${alert.formID}&recordId=${JSON.stringify(JSON.stringify(encodedRecordId))}`],);//,{ queryParams: { recordId: alert.title } }
+      // this.router.navigate([`view-dreamboard/${tempredirect}&recordId=${JSON.stringify(alert.title)}`]);
+    } else {
+      this.router.navigate([`view-dreamboard/Forms/${alert.formID}&recordId=${JSON.stringify(JSON.stringify(recordId))}`]);
+
+    }
+
+    // console.log(`redirect link--> view-dreamboard/${this.id}/${alert.formID}&recordId=${JSON.stringify(JSON.stringify(recordId))}`);
 
     alert.isSelected = true;
 
