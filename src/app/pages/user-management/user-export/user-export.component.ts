@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, TemplateRef } from '@angular/core';
-import { NgbModal, NgbModule, NgbTooltipModule }  from "@ng-bootstrap/ng-bootstrap";
+import { NgbModal, NgbModule, NgbTooltipModule } from "@ng-bootstrap/ng-bootstrap";
 import * as XLSX from 'xlsx-js-style';
 import { ExcelValidatorService } from './excel-validator.service';
 import { AES } from 'crypto-js';
@@ -23,16 +23,16 @@ interface ListItem {
     P6: any;
     P7: any;
     P8: any;
-    P9:any;
-    P10:any;
-    P11:any;
+    P9: any;
+    P10: any;
+    P11: any;
   };
 }
 
 @Component({
   selector: 'app-user-export',
   standalone: true,
-  imports: [NgbTooltipModule,NgbModule,CommonModule,NgxSpinnerModule],
+  imports: [NgbTooltipModule, NgbModule, CommonModule, NgxSpinnerModule],
   templateUrl: './user-export.component.html',
   styleUrl: './user-export.component.scss'
 })
@@ -47,25 +47,25 @@ export class UserExportComponent {
   username: any;
   avgLabourHistory: any = [];
 
-  constructor(private modalService: NgbModal, private excelValidator: ExcelValidatorService,private api:APIService,private sharedAPi:SharedService,private spinner:NgxSpinnerService,
-    private DynamicApi:DynamicApiService,private loggedInUser:SharedService,private auditTrail:AuditTrailService,private userForm:UserFormsService
-  ){}
+  constructor(private modalService: NgbModal, private excelValidator: ExcelValidatorService, private api: APIService, private sharedAPi: SharedService, private spinner: NgxSpinnerService,
+    private DynamicApi: DynamicApiService, private loggedInUser: SharedService, private auditTrail: AuditTrailService, private userForm: UserFormsService
+  ) { }
 
-  @Input() listofSK:any;
-  @Input() uniqueList:any;
-  @Input() adminLogin:any;
-  @Input() SK_clientID:any;
-  @Input() lookup_data_user:any;
-  @Input() combinationOfUser:any;
+  @Input() listofSK: any;
+  @Input() uniqueList: any;
+  @Input() adminLogin: any;
+  @Input() SK_clientID: any;
+  @Input() lookup_data_user: any;
+  @Input() combinationOfUser: any;
 
   selectedFile: any;
   isDragging = false;
   error = '';
   validationErrors: string[] = [];
-  isUploading:boolean = false
+  isUploading: boolean = false
 
 
-  ngOnInit(){
+  ngOnInit() {
 
     this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
 
@@ -74,7 +74,7 @@ export class UserExportComponent {
   }
 
 
-  reloadTable(){
+  reloadTable() {
     console.log("I am triggered here reload the table ",);
     this.newItemEvent.emit()
   }
@@ -82,7 +82,7 @@ export class UserExportComponent {
 
   openFileUploadModal(content: TemplateRef<any>) {
     this.resetState();
-    this.modalService.open(content, { 
+    this.modalService.open(content, {
       backdrop: 'static',
       keyboard: false,
       size: 'lg'
@@ -145,19 +145,19 @@ export class UserExportComponent {
     this.selectedFile = file;
 
     try {
-      const validationResult = await this.excelValidator.validateExcelFile(file,this.listofSK,this.uniqueList,this.adminLogin,this.SK_clientID,this.combinationOfUser);
+      const validationResult = await this.excelValidator.validateExcelFile(file, this.listofSK, this.uniqueList, this.adminLogin, this.SK_clientID, this.combinationOfUser);
       if (!validationResult.isValid) {
         this.validationErrors = this.excelValidator.formatValidationErrors(validationResult.errors);
       }
-      else{
+      else {
         this.validExcelData = validationResult
 
-        console.log("Data to be processed is here ",this.validExcelData);
+        console.log("Data to be processed is here ", this.validExcelData);
       }
-    } catch (err:any) {
-      console.log("Error message is here ",err);
+    } catch (err: any) {
+      console.log("Error message is here ", err);
 
-      this.error = err.message || 'Error validating file',err;
+      this.error = err.message || 'Error validating file', err;
       this.selectedFile = null;
     }
   }
@@ -171,51 +171,51 @@ export class UserExportComponent {
 
 
 
- exportTemplate(getType: any) {
+  exportTemplate(getType: any) {
     let Heading: any;
     let filename: any;
-  
+
     // SELECTED is parameters xlsx
     if (getType == 'users_xlsx') {
       Heading = [
         ['UserName', 'Password', 'Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Mobile',
-          'Mobile Privacy', 'Telegram Channel ID', 'Permission ID', 'Location Permission', 'FormID Permission', 'Start Node',  'Default Module',
-          'Redirection ID','Average Labour Cost','SMS', 'Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram','Created Time'
+          'Mobile Privacy', 'Telegram Channel ID', 'Permission ID', 'Location Permission', 'FormID Permission', 'Start Node', 'Default Module',
+          'Redirection ID', 'Average Labour Cost','Enable Email', 'Enable SMS', 'Enable Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram', 'Created Time', "Enable User"
         ],
         ['', '', '', '', '', '', '',
           '', '', '', '', '', '', '',
           '', '', '', '', '', '',
           '']
       ];
-  
+
       filename = 'Users.xlsx';
     }
 
     //avg_labour_cost
-  
+
     // Create a new workbook
     const wb = XLSX.utils.book_new();
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet([]);
-  
+
     // Add headings with styles (from Heading array)
     let onlyHeading = XLSX.utils.sheet_add_aoa(ws, Heading, { origin: 'A1' });
-  
+
     // Define column width for all columns
     let modifiedColumnWidth: any = [];
     for (let allCells = 0; allCells < Heading[0].length; allCells++) {
       modifiedColumnWidth[allCells] = { wch: 50 }; // Set width to 50 for all columns
     }
     ws['!cols'] = modifiedColumnWidth;
-  
+
     // Apply styles to the first row (headers)
     for (let colIndex = 0; colIndex < Heading[0].length; colIndex++) {
       const cellAddress = XLSX.utils.encode_cell({ r: 0, c: colIndex });
       const cell = ws[cellAddress];
-  
+
       // Apply style (orange background, white font)
       if (cell) {
         // If it's a required field (like 'UserName' and 'Password'), make it red, otherwise orange
-        const isRequired = ['UserName', 'Password','Client ID', 'Company ID', 'Email', 'User ID', 'Description','Permission ID','Location Permission', 'FormID Permission'].includes(Heading[0][colIndex]);
+        const isRequired = ['UserName', 'Password', 'Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Permission ID', 'Location Permission', 'FormID Permission'].includes(Heading[0][colIndex]);
         cell.s = {
           fill: {
             fgColor: { rgb: isRequired ? "FF0000" : "FFA500" }, // Red for required, orange for optional
@@ -227,16 +227,16 @@ export class UserExportComponent {
         };
       }
     }
-  
+
     // Append the worksheet to the workbook
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-  
+
     // Export the file as Users.xlsx
     XLSX.writeFile(wb, filename);
 
 
 
-    try{
+    try {
       const UserDetails = {
         "User Name": this.username,
         "Action": "View",
@@ -248,72 +248,72 @@ export class UserExportComponent {
         "created_time": Date.now(),
         "updated_time": Date.now()
       }
-  
-      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+
+      this.auditTrail.mappingAuditTrailData(UserDetails, this.SK_clientID)
     }
-    catch(error){
-      console.log("Error while creating audit trails ",error);
+    catch (error) {
+      console.log("Error while creating audit trails ", error);
     }
 
 
   }
-  
 
-  async downLoadUser(){
+
+  async downLoadUser() {
 
     this.spinner.show()
 
-      console.log("Users to download are here  ",this.lookup_data_user);
+    console.log("Users to download are here  ", this.lookup_data_user);
 
     const pkValues = this.lookup_data_user.map((item: any) => ({
       PK: `${item.P1}#user#main`,
       SK: 1
     }));
-    
+
     // Use a Map to eliminate duplicates based on the combination of PK and SK
     const uniquePkValues = Array.from(
       new Map(pkValues.map((item: any) => [`${item.PK}#${item.SK}`, item])).values()
     );
-    
-      const chunkArray = (array: any[], size: number) => {
-        const result = [];
-        for (let i = 0; i < array.length; i += size) {
-          result.push(array.slice(i, i + size));
-        }
-        return result;
-      };
 
-      const pkBatches = chunkArray(uniquePkValues, 100);
-
-      let fetchedData = []
-
-      for (const batch of pkBatches) {
-        try {
-          const response:any = await this.sharedAPi.batchGetItems(batch) // Convert observable to promise
-          console.log("Batch response:", );
-
-          const result = JSON.parse(response.body)
-
-          fetchedData.push(result.items)
-        
-        } catch (error) {
-
-          this.spinner.hide()
-          console.error("Error retrieving batch:", error);
-        }
+    const chunkArray = (array: any[], size: number) => {
+      const result = [];
+      for (let i = 0; i < array.length; i += size) {
+        result.push(array.slice(i, i + size));
       }
+      return result;
+    };
 
-      fetchedData = fetchedData.flat()
+    const pkBatches = chunkArray(uniquePkValues, 100);
 
-      fetchedData = fetchedData.map((item:any)=>item && typeof item.metadata == 'string'? JSON.parse(item.metadata):item.metadata)
+    let fetchedData = []
 
-      console.log("Fetched data is here ",fetchedData);
-      this.downloadExcell(fetchedData,'users_xlsx')
+    for (const batch of pkBatches) {
+      try {
+        const response: any = await this.sharedAPi.batchGetItems(batch) // Convert observable to promise
+        console.log("Batch response:",);
+
+        const result = JSON.parse(response.body)
+
+        fetchedData.push(result.items)
+
+      } catch (error) {
+
+        this.spinner.hide()
+        console.error("Error retrieving batch:", error);
+      }
+    }
+
+    fetchedData = fetchedData.flat()
+
+    fetchedData = fetchedData.map((item: any) => item && typeof item.metadata == 'string' ? JSON.parse(item.metadata) : item.metadata)
+
+    console.log("Fetched data is here ", fetchedData);
+    this.downloadExcell(fetchedData, 'users_xlsx')
 
 
 
 
-    try{
+    try {
       const UserDetails = {
         "User Name": this.username,
         "Action": "View",
@@ -325,29 +325,29 @@ export class UserExportComponent {
         "created_time": Date.now(),
         "updated_time": Date.now()
       }
-  
-      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+
+      this.auditTrail.mappingAuditTrailData(UserDetails, this.SK_clientID)
     }
-    catch(error){
-      console.log("Error while creating audit trails ",error);
+    catch (error) {
+      console.log("Error while creating audit trails ", error);
     }
   }
 
   downloadExcell(fetchedData: any, getType: any) {
     let Heading: any;
     let filename: any;
-  
+
     // SELECTED is parameters xlsx
     if (getType == 'users_xlsx') {
       Heading = [
         ['UserName', 'Password', 'Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Mobile',
           'Mobile Privacy', 'Telegram Channel ID', 'Permission ID', 'Location Permission', 'FormID Permission', 'Start Node', 'Default Module',
-          'Redirection ID', 'Average Labour Cost', 'SMS', 'Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram', 'Created Time'
+          'Redirection ID', 'Average Labour Cost','Enable Email', 'Enable SMS', 'Enable Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram', 'Created Time', "Enable User"
         ]
       ];
       filename = 'Users.xlsx';
     }
-  
+
     // Prepare the data for insertion into the worksheet
     const formattedData = fetchedData.flat().map((user: any) => {
       return [
@@ -368,39 +368,41 @@ export class UserExportComponent {
         user.default_module || '',
         user.redirectionURL || '',
         user.avg_labour_cost || '',
+        user.alert_email || '',
         user.alert_sms || '',
         user.alert_telegram || '',
         user.escalation_email || '',
         user.escalation_sms || '',
         user.escalation_telegram || '',
-        user.created || ''
+        user.created || '',
+        user.enable_user || ''
       ];
     });
-  
+
     // Create a new workbook
     const wb = XLSX.utils.book_new();
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet([]);
-  
+
     // Add headings to the sheet
     let onlyHeading = XLSX.utils.sheet_add_aoa(ws, Heading, { origin: 'A1' });
-  
+
     // Add data to the sheet
     XLSX.utils.sheet_add_aoa(ws, formattedData, { origin: 'A2' });
-  
+
     // Define column width for all columns (Set width to 50 for all columns)
     let modifiedColumnWidth: any = [];
     for (let allCells = 0; allCells < Heading[0].length; allCells++) {
       modifiedColumnWidth[allCells] = { wch: 50 }; // Set width to 50 for all columns
     }
     ws['!cols'] = modifiedColumnWidth;
-  
+
     // Apply styles to the first row (headers)
     for (let colIndex = 0; colIndex < Heading[0].length; colIndex++) {
       const cellAddress = XLSX.utils.encode_cell({ r: 0, c: colIndex });
       const cell = ws[cellAddress];
-  
+
       if (cell) {
-        const isRequired = ['UserName', 'Password','Client ID', 'Company ID', 'Email', 'User ID', 'Description','Permission ID','Location Permission', 'FormID Permission'].includes(Heading[0][colIndex]);
+        const isRequired = ['UserName', 'Password', 'Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Permission ID', 'Location Permission', 'FormID Permission'].includes(Heading[0][colIndex]);
         cell.s = {
           fill: {
             fgColor: { rgb: isRequired ? "FF0000" : "FFA500" }, // Red for required, orange for optional
@@ -412,21 +414,21 @@ export class UserExportComponent {
         };
       }
     }
-  
+
     // Append the worksheet to the workbook
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-  
+
     // Export the file as Users.xlsx
     XLSX.writeFile(wb, filename);
 
     this.spinner.hide();
-}
+  }
 
 
   // downloadExcell(fetchedData: any,getType:any) {
   //   let Heading: any;
   //   let filename: any;
-  
+
   //   // SELECTED is parameters xlsx
   //   if (getType == 'users_xlsx') {
   //     Heading = [
@@ -437,7 +439,7 @@ export class UserExportComponent {
   //     ];
   //     filename = 'Users.xlsx';
   //   }
-  
+
   //   // Prepare the data for insertion into the worksheet
   //   const formattedData = fetchedData.flat().map((user: any) => {
   //     return [
@@ -465,29 +467,29 @@ export class UserExportComponent {
   //       user.escalation_telegram || ''
   //     ];
   //   });
-  
+
   //   // Create a new workbook
   //   const wb = XLSX.utils.book_new();
   //   const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet([]);
-  
+
   //   // Add headings to the sheet
   //   let onlyHeading = XLSX.utils.sheet_add_aoa(ws, Heading, { origin: 'A1' });
-  
+
   //   // Add data to the sheet
   //   XLSX.utils.sheet_add_aoa(ws, formattedData, { origin: 'A2' });
-  
+
   //   // Define column width for all columns (Set width to 50 for all columns)
   //   let modifiedColumnWidth: any = [];
   //   for (let allCells = 0; allCells < Heading[0].length; allCells++) {
   //     modifiedColumnWidth[allCells] = { wch: 50 }; // Set width to 50 for all columns
   //   }
   //   ws['!cols'] = modifiedColumnWidth;
-  
+
   //   // Apply styles to the first row (headers)
   //   for (let colIndex = 0; colIndex < Heading[0].length; colIndex++) {
   //     const cellAddress = XLSX.utils.encode_cell({ r: 0, c: colIndex });
   //     const cell = ws[cellAddress];
-  
+
   //     if (cell) {
   //       const isRequired = ['UserName', 'Password','Client ID', 'Company ID', 'Email', 'User ID', 'Description','Permission ID','Location Permission', 'FormID Permission'].includes(Heading[0][colIndex]);
   //       cell.s = {
@@ -501,10 +503,10 @@ export class UserExportComponent {
   //       };
   //     }
   //   }
-  
+
   //   // Append the worksheet to the workbook
   //   XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-  
+
   //   // Export the file as Users.xlsx
   //   XLSX.writeFile(wb, filename);
 
@@ -512,7 +514,7 @@ export class UserExportComponent {
   // }
 
 
-  
+
   async uploadFile(modal: any): Promise<void> {
     if (!this.selectedFile || this.validationErrors.length > 0) return;
 
@@ -525,55 +527,63 @@ export class UserExportComponent {
       this.spinner.show()
 
 
-      if(tempcreateHolder && Array.isArray(tempcreateHolder) && tempcreateHolder.length > 0){
-        for(let user of tempcreateHolder){
+      if (tempcreateHolder && Array.isArray(tempcreateHolder) && tempcreateHolder.length > 0) {
+        for (let user of tempcreateHolder) {
           await this.createNewUser(user)
         }
       }
 
 
-      if(tempupdateHolder && Array.isArray(tempupdateHolder) && tempupdateHolder.length > 0){
-        for(let user of tempupdateHolder){
+      if (tempupdateHolder && Array.isArray(tempupdateHolder) && tempupdateHolder.length > 0) {
+        for (let user of tempupdateHolder) {
           await this.updateUser(user)
         }
       }
 
-      Swal.fire({
-        icon: 'success', // or another icon like 'info', 'error', etc.
-        title: `File Uploaded Successfully: ${tempcreateHolder.length} users added,  ${tempupdateHolder.length} users updated.`,
-        showConfirmButton: true,
-      })
 
-      this.reloadTable()         
-      console.log('File uploaded successfully:', this.selectedFile);
-
+      if (tempupdateHolder && Array.isArray(tempupdateHolder) && tempupdateHolder.length > 0 || tempcreateHolder && Array.isArray(tempcreateHolder) && tempcreateHolder.length > 0) {
+        Swal.fire({
+          icon: 'success', // or another icon like 'info', 'error', etc.
+          title: `File Uploaded Successfully: ${tempcreateHolder.length} users added,  ${tempupdateHolder.length} users updated.`,
+          showConfirmButton: true,
+        })
 
 
-      try{
-        const UserDetails = {
-          "User Name": this.username,
-          "Action": "Created/Edited",
-          "Module Name": "User Management",
-          "Form Name": 'User Management',
-          "Description": `Users were Imported through excel`,
-          "User Id": this.username,
-          "Client Id": this.SK_clientID,
-          "created_time": Date.now(),
-          "updated_time": Date.now()
+        try {
+          const UserDetails = {
+            "User Name": this.username,
+            "Action": "Created/Edited",
+            "Module Name": "User Management",
+            "Form Name": 'User Management',
+            "Description": `Users were Imported through excel`,
+            "User Id": this.username,
+            "Client Id": this.SK_clientID,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+
+          this.auditTrail.mappingAuditTrailData(UserDetails, this.SK_clientID)
         }
-    
-        this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+        catch (error) {
+          console.log("Error while creating audit trails ", error);
+        }
+
       }
-      catch(error){
-        console.log("Error while creating audit trails ",error);
+      else if (tempupdateHolder && Array.isArray(tempupdateHolder) && tempupdateHolder.length == 0 && tempcreateHolder && Array.isArray(tempcreateHolder) && tempcreateHolder.length == 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'No Users Found in File',
+          text: 'The uploaded Excel file does not contain any user data. Please make sure the file includes at least one user entry.',
+          showConfirmButton: true,
+        });
       }
 
-
-
+      this.reloadTable()
+      console.log('File uploaded successfully:', this.selectedFile);
 
       modal.close();
     } catch (err) {
-      this.error = 'Error uploading file. Please try again.',err;
+      this.error = 'Error uploading file. Please try again.', err;
     } finally {
       this.isUploading = false;
       this.spinner.hide()
@@ -582,170 +592,313 @@ export class UserExportComponent {
 
   async updateUser(userFields: any) {
 
-    console.log("All the users data is here ",this.lookup_data_user);
+    console.log("All the users data is here ", this.lookup_data_user);
 
-    try{
-      console.log("User Details are here ",userFields);
-      let tempObj:any = {}
-  
-  
-        this.allUserDetails = {}
-  
-          this.allUserDetails = {
-            username: userFields[0].toLowerCase(),
-            password: userFields[1],
-            clientID: userFields[2],
-            companyID:userFields[3],
-            email: userFields[4],
-            userID: userFields[5].toLowerCase(),
-            description: userFields[6],
-            mobile: userFields[7],
-            mobile_privacy: userFields[8],
-            telegramID: userFields[9],
-            permission_ID: userFields[10],
-            location_permission:userFields[11].includes(',') == true ? userFields[11].split(','):[userFields[11]],
-            form_permission:userFields[12].includes(',') == true ? userFields[12].split(','):[userFields[12]],
-            start_node: userFields[13],
-            default_module:userFields[14],
-            redirectionURL:userFields[15],
-            avg_labour_cost:userFields[16],
-            alert_sms: userFields[17] ,
-            alert_telegram: userFields[18] ,
-            escalation_email: userFields[19] ,
-            escalation_sms: userFields[20],
-            escalation_telegram: userFields[21] ,
-            created:userFields[22] == '' || userFields[22] == undefined ? Date.now() : userFields[22],
-            // cognito_update:userFields[21] ,
-            // enable_user: userFields[22],
-            updated: new Date()
+    try {
+      console.log("User Details are here ", userFields);
+      let tempObj: any = {}
+
+
+      this.allUserDetails = {}
+
+      this.allUserDetails = {
+        username: userFields[0].toLowerCase(),
+        password: userFields[1],
+        clientID: userFields[2],
+        companyID: userFields[3],
+        email: userFields[4],
+        userID: userFields[5].toLowerCase(),
+        description: userFields[6],
+        mobile: userFields[7],
+        mobile_privacy: userFields[8],
+        telegramID: userFields[9],
+        permission_ID: userFields[10],
+        location_permission: userFields[11].includes(',') == true ? userFields[11].split(',') : [userFields[11]],
+        form_permission: userFields[12].includes(',') == true ? userFields[12].split(',') : [userFields[12]],
+        start_node: userFields[13],
+        default_module: userFields[14],
+        redirectionURL: userFields[15],
+        avg_labour_cost: userFields[16],
+        alert_email: userFields[17],
+        alert_sms: userFields[18],
+        alert_telegram: userFields[19],
+        escalation_email: userFields[20],
+        escalation_sms: userFields[21],
+        escalation_telegram: userFields[22],
+        created: userFields[23] == '' || userFields[23] == undefined ? Date.now() : userFields[23],
+        // cognito_update:userFields[21] ,
+        enable_user: userFields[24],
+        updated: new Date()
+      }
+
+
+      const userCreatedTime = userFields[22] == '' || userFields[22] == undefined || userFields[22] == null ? Date.now() : userFields[22]
+
+
+      tempObj = {
+        PK: (this.allUserDetails.username).toLowerCase() + "#user" + "#main",
+        SK: 1,
+        metadata: JSON.stringify(this.allUserDetails)
+      }
+
+      const tempClient = this.allUserDetails.clientID
+
+
+      let temp1 = this.allUserDetails.form_permission;
+      let temp2 = '';
+
+      if (temp1) {
+        // If temp1 is not null or undefined
+        if (temp1.length === 1) {
+          temp2 = temp1[0];
+        } else if (temp1.length > 1) {
+          temp2 = temp1[0] + '...(' + (temp1.length) + ')';
+        } else {
+          temp2 = '...(0)';
+        }
+      } else {
+        // If temp1 is null or undefined
+        temp2 = '...(0)';
+      }
+
+
+
+      let temp3 = this.allUserDetails.location_permission;
+      let temp4 = '';
+
+      if (temp3) {
+        // If temp1 is not null or undefined
+        if (temp3.length === 1) {
+          temp4 = temp3[0];
+        } else if (temp3.length > 1) {
+          temp4 = temp3[0] + '...(' + (temp3.length) + ')';
+        } else {
+          temp4 = '...(0)';
+        }
+      } else {
+        // If temp1 is null or undefined
+        temp4 = '...(0)';
+      }
+
+
+      const date = Math.ceil(((new Date()).getTime()) / 1000)
+      const items = {
+        P1: (this.allUserDetails.username).toLowerCase(),
+        P2: this.allUserDetails.mobile || 'N/A',
+        P3: this.allUserDetails.email,
+        P4: this.allUserDetails.permission_ID,
+        P5: temp4,
+        P6: temp2,
+        P7: date
+      }
+
+      const masterUser = {
+        P1: (this.allUserDetails.username).toLowerCase(),
+        P2: this.allUserDetails.clientID,
+        P3: this.allUserDetails.email,
+        P4: this.allUserDetails.mobile || 'N/A',
+        P5: (this.allUserDetails.userID).toLowerCase()
+      }
+
+      console.log("User master table data is here ", masterUser);
+
+      console.log('newly added user', this.allUserDetails);
+
+      console.log("Items are here ", items);
+
+
+      // Create the master user table entry
+      await this.api.UpdateMaster(tempObj);
+
+      await this.fetchTimeMachineById(1, masterUser.P1, 'update', items, masterUser.P2);
+      await this.fetchAllusersData(1, masterUser.P1, 'update', masterUser)
+
+      if (this.allUserDetails.enable_user != true) {
+        await this.updateCognitoAttributesV2(this.allUserDetails)
+      }
+
+      // await this.updateCognitoAttributes(this.allUserDetails);
+
+
+
+      this.lookup_data_user = []
+
+      let QueryParam = {}
+      if (this.allUserDetails.enable_user == true) {
+        QueryParam = {
+          "path": "/enableUser",
+          "queryStringParameters": {
+            "email": masterUser.P3,
+            "username": masterUser.P1,
+            "clientID": masterUser.P2
           }
-
-
-          const userCreatedTime = userFields[22] == '' || userFields[22] == undefined || userFields[22] == null? Date.now() : userFields[22]
-  
-  
-          tempObj = {
-            PK:(this.allUserDetails.username).toLowerCase()+"#user"+"#main",
-            SK:1,
-            metadata:JSON.stringify(this.allUserDetails)
+        }
+      }
+      else {
+        QueryParam = {
+          "path": "/disableUser",
+          "queryStringParameters": {
+            "email": masterUser.P3,
+            "username": masterUser.P1,
+            "clientID": masterUser.P2
           }
-
-          const tempClient = this.allUserDetails.clientID
-      
-
-          let temp1 = this.allUserDetails.form_permission;
-          let temp2 = '';
-    
-          if (temp1) {
-            // If temp1 is not null or undefined
-            if (temp1.length === 1) {
-              temp2 = temp1[0];
-            } else if (temp1.length > 1) {
-              temp2 = temp1[0] + '...(' + (temp1.length) + ')';
-            } else {
-              temp2 = '...(0)';
-            }
-          } else {
-            // If temp1 is null or undefined
-            temp2 = '...(0)';
-          }
-    
-    
-    
-          let temp3 = this.allUserDetails.location_permission;
-          let temp4 = '';
-    
-          if (temp3) {
-            // If temp1 is not null or undefined
-            if (temp3.length === 1) {
-              temp4 = temp3[0];
-            } else if (temp3.length > 1) {
-              temp4 = temp3[0] + '...(' + (temp3.length) + ')';
-            } else {
-              temp4 = '...(0)';
-            }
-          } else {
-            // If temp1 is null or undefined
-            temp4 = '...(0)';
-          }
-    
-    
-          const date = Math.ceil(((new Date()).getTime()) / 1000)
-          const items ={
-          P1: (this.allUserDetails.username).toLowerCase(),
-          P2: this.allUserDetails.mobile || 'N/A',
-          P3: this.allUserDetails.email,
-          P4: this.allUserDetails.permission_ID,
-          P5:temp4,
-          P6:temp2,
-          P7:date
-          }
-    
-          const masterUser = {
-            P1:(this.allUserDetails.username).toLowerCase(),
-            P2:this.allUserDetails.clientID,
-            P3:this.allUserDetails.email,
-            P4:this.allUserDetails.mobile || 'N/A',
-            P5:(this.allUserDetails.userID).toLowerCase()
-          }
-    
-          console.log("User master table data is here ",masterUser);
-    
-          console.log('newly added user', this.allUserDetails);
-    
-          console.log("Items are here ",items);
-
-
-          // Create the master user table entry
-          await this.api.UpdateMaster(tempObj);
-
-          await this.fetchTimeMachineById(1,masterUser.P1, 'update', items,masterUser.P2);
-          await this.fetchAllusersData(1,masterUser.P1,'update',masterUser)
-
-          await this.updateCognitoAttributes(this.allUserDetails);
-
-
-          try{
-            await this.recordUserDetails(this.allUserDetails,'update',userCreatedTime)
-          }
-          catch(error){
-            console.log("Error in configuration ",error);
-          }
-  
+        }
+      }
 
 
 
-          try{
-            const UserDetails = {
-              "User Name": this.username,
-              "Action": "Edited",
-              "Module Name": "User Management",
-              "Form Name": 'User Management',
-             "Description": `${masterUser.P1} User was Edited Through Excel`,
-              "User Id": this.username,
-              "Client Id": this.SK_clientID,
-              "created_time": Date.now(),
-              "updated_time": Date.now()
-            }
-        
-            this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
-          }
-          catch(error){
-            console.log("Error while creating audit trails ",error);
-          }
+
+      const body = {
+        "type": "cognitoServices",
+        "event": QueryParam
+      }
+
+
+      try {
+
+        const response = await this.DynamicApi.getData(body);
+        console.log("Response is here ", JSON.parse(response.body));
+
+      } catch (error) {
+        console.error('Error calling dynamic lambda:', error);
+        this.spinner.hide();
+      }
+
+
+      if (this.allUserDetails.enable_user == true) {
+        await this.updateCognitoAttributesV2(this.allUserDetails)
+      }
+
+
+
+      try {
+        await this.recordUserDetails(this.allUserDetails, 'update', userCreatedTime)
+      }
+      catch (error) {
+        console.log("Error in configuration ", error);
+      }
+
+
+
+
+      try {
+        const UserDetails = {
+          "User Name": this.username,
+          "Action": "Edited",
+          "Module Name": "User Management",
+          "Form Name": 'User Management',
+          "Description": `${masterUser.P1} User was Edited Through Excel`,
+          "User Id": this.username,
+          "Client Id": this.SK_clientID,
+          "created_time": Date.now(),
+          "updated_time": Date.now()
+        }
+
+        this.auditTrail.mappingAuditTrailData(UserDetails, this.SK_clientID)
+      }
+      catch (error) {
+        console.log("Error while creating audit trails ", error);
+      }
 
 
     }
-    catch(error){
-      console.log("Error in object Creation ",error);
+    catch (error) {
+      console.log("Error in object Creation ", error);
     }
   }
 
 
+  async updateCognitoAttributesV2(userFields: any) {
+    let authenticationData = {
+      Username: userFields.username,
+      Password: userFields.password,
+    };
+
+    const poolData = {
+      UserPoolId: "ap-south-1_aaPSwPS14",
+      ClientId: "42pb85v3sv84jdrfi1rub7a4e5"
+    };
+
+    const userPool = new CognitoUserPool(poolData);
+
+    const poolDetails = {
+      Username: userFields.username,
+      Pool: userPool
+    };
+
+    const userData: any = {
+      "email": userFields.email,
+      'custom:userID': userFields.userID,
+      'custom:password': userFields.password,
+      'custom:clientID': this.allUserDetails.clientID,
+      'custom:companyID': this.allUserDetails.companyID,
+      'custom:username': userFields.username,
+      'custom:description': userFields.description,
+      'custom:mobile': JSON.stringify(userFields.mobile),
+      'custom:mobile_privacy': userFields.mobile_privacy,
+      'custom:user_type': JSON.stringify(userFields.user_type),
+      'custom:enable_user': JSON.stringify(userFields.enable_user == null ? false : userFields.enable_user),
+      'custom:disable_user': JSON.stringify(userFields.disable_user == null ? false : userFields.disable_user),
+      'custom:alert_email': JSON.stringify(userFields.alert_email == null ? false : userFields.alert_email),
+      'custom:alert_sms': JSON.stringify(userFields.alert_sms == null ? false : userFields.alert_sms),
+      'custom:alert_telegram': JSON.stringify(userFields.alert_telegram == null ? false : userFields.alert_telegram),
+      'custom:escalation_email': JSON.stringify(userFields.escalation_email == null ? false : userFields.escalation_email),
+      'custom:escalation_sms': JSON.stringify(userFields.escalation_sms == null ? false : userFields.escalation_sms),
+      'custom:escalation_telegram': JSON.stringify(userFields.escalation_telegram == null ? false : userFields.escalation_telegram),
+      'custom:telegramID': JSON.stringify(userFields.telegramID),
+      'custom:permission_id': this.allUserDetails.permission_ID,
+      'custom:defaultdevloc': userFields.default_dev_loc ?? '',
+    };
+
+    const cognitoUser = new CognitoUser(poolDetails);
+    const authenticationDetails = new AuthenticationDetails(authenticationData);
+
+    try {
+      const session = await new Promise<any>((resolve, reject) => {
+        cognitoUser.authenticateUser(authenticationDetails, {
+          onSuccess: resolve,
+          onFailure: reject
+        });
+      });
+
+      const attributeList = Object.entries(userData).map(([key, value]: any) => {
+        return new CognitoUserAttribute({ Name: key, Value: value });
+      });
+
+      const updateResult = await new Promise((resolve, reject) => {
+        cognitoUser.updateAttributes(attributeList, (err, result) => {
+          if (err) reject(err);
+          else resolve(result);
+        });
+      });
+
+      console.log('Attributes updated successfully:', updateResult);
+
+    } catch (err: any) {
+      console.error("Cognito Error:", err);
+
+      if (err.message !== 'User is disabled.') {
+        if (err.message === 'User is not confirmed.') {
+          Swal.fire({
+            icon: 'error',
+            title: 'User is not confirmed!',
+            text: 'User details weren\'t updated in Cognito.'
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: err.message
+          });
+        }
+      }
+    }
+  }
+
 
   async updateCognitoAttributes(userFields: any) {
 
-    console.log("User fields are here ",userFields);
+    console.log("User fields are here ", userFields);
 
     try {
       // Prepare the authentication data
@@ -753,21 +906,21 @@ export class UserExportComponent {
         Username: userFields.username,
         Password: userFields.password,
       };
-  
+
       let poolData = {
         UserPoolId: "ap-south-1_aaPSwPS14", // Your Cognito UserPoolId
         ClientId: "42pb85v3sv84jdrfi1rub7a4e5" // Your Cognito ClientId
       };
-  
+
       // Create user pool and cognito user instance
       let userPool = new CognitoUserPool(poolData);
       let poolDetails: any = {
         Username: userFields.username,
         Pool: userPool
       };
-      
+
       let cognitoUser = new CognitoUser(poolDetails);
-      
+
       // Prepare the user data for updating attributes
       let userData: any = {
         "email": userFields.email,
@@ -792,12 +945,12 @@ export class UserExportComponent {
         'custom:permission_id': this.allUserDetails.permission_ID,
         'custom:defaultdevloc': userFields.default_dev_loc ?? '',
       };
-  
+
       // Wrap the authenticateUser in a Promise to use async/await
       const authenticateUser = () => {
         return new Promise((resolve, reject) => {
           let authenticationDetails = new AuthenticationDetails(authenticationData);
-  
+
           cognitoUser.authenticateUser(authenticationDetails, {
             onSuccess: function (result: any) {
               resolve(result);
@@ -808,13 +961,13 @@ export class UserExportComponent {
           });
         });
       };
-  
+
       // Wait for authentication to succeed
-      const authResult:any = await authenticateUser();
+      const authResult: any = await authenticateUser();
       const accessToken = authResult.getAccessToken().getJwtToken();
-  
+
       console.log("Authentication successful, access token: ", accessToken);
-  
+
       // Prepare the attribute list
       let attributeList = Object.keys(userData).map((key) => {
         return new CognitoUserAttribute({
@@ -822,7 +975,7 @@ export class UserExportComponent {
           Value: userData[key]
         });
       });
-  
+
       // Wrap the updateAttributes function in a Promise to use async/await
       const updateAttributes = () => {
         return new Promise((resolve, reject) => {
@@ -835,204 +988,205 @@ export class UserExportComponent {
           });
         });
       };
-  
+
       // Wait for the attributes to be updated
       const updateResult = await updateAttributes();
       console.log("User attributes updated successfully: ", updateResult);
-  
+
     } catch (error) {
       console.error("Error updating Cognito attributes: ", error);
     }
   }
-  
+
 
 
 
   async createNewUser(userFields: any) {
 
-    try{
-      console.log("User Details are here ",userFields);
+    try {
+      console.log("User Details are here ", userFields);
 
       let token = this.generateToken((userFields[0]).toLowerCase(), userFields[2]);
-      let tempObj:any = {}
-  
-  
-        this.allUserDetails = {}
-
-          //Create avg_labour_history packet
-          this.avgLabourHistory = []
-          if(userFields && userFields[16] && userFields[16] != ''){
-            const avgCost = userFields[16]
-            this.avgLabourHistory.push([
-              avgCost,new Date().getTime()
-            ])
-          }
-  
-        
-          this.allUserDetails = {
-            key: token,
-            username: userFields[0].toLowerCase(),
-            password: userFields[1],
-            clientID: userFields[2],
-            companyID:userFields[3],
-            email: userFields[4],
-            userID: userFields[5].toLowerCase(),
-            description: userFields[6],
-            mobile: userFields[7],
-            mobile_privacy: userFields[8],
-            telegramID: userFields[9],
-            permission_ID: userFields[10],
-            location_permission:userFields[11].includes(',') == true ? userFields[11].split(','):[userFields[11]],
-            form_permission:userFields[12].includes(',') == true ? userFields[12].split(','):[userFields[12]],
-            start_node: userFields[13],
-            default_module:userFields[14],
-            redirectionURL:userFields[15],
-            avg_labour_cost:userFields[16],
-            alert_sms: userFields[17] ,
-            alert_telegram: userFields[18] ,
-            escalation_email: userFields[19] ,
-            escalation_sms: userFields[20] ,
-            escalation_telegram: userFields[21] ,
-            avg_labour_history: this.avgLabourHistory,
-            // cognito_update:userFields[21] ,
-            // enable_user: userFields[22] ,
-            enable_user:true,
-            updated: new Date(),
-            created:new Date().getTime()
-          }
-  
-  
-          tempObj = {
-            PK:(this.allUserDetails.username).toLowerCase()+"#user"+"#main",
-            SK:1,
-            metadata:JSON.stringify(this.allUserDetails)
-          }
-
-          const tempClient = this.allUserDetails.clientID
-      
-
-          let temp1 = this.allUserDetails.form_permission;
-          let temp2 = '';
-    
-          if (temp1) {
-            // If temp1 is not null or undefined
-            if (temp1.length === 1) {
-              temp2 = temp1[0];
-            } else if (temp1.length > 1) {
-              temp2 = temp1[0] + '...(' + (temp1.length) + ')';
-            } else {
-              temp2 = '...(0)';
-            }
-          } else {
-            // If temp1 is null or undefined
-            temp2 = '...(0)';
-          }
-    
-    
-    
-          let temp3 = this.allUserDetails.location_permission;
-          let temp4 = '';
-    
-          if (temp3) {
-            // If temp1 is not null or undefined
-            if (temp3.length === 1) {
-              temp4 = temp3[0];
-            } else if (temp3.length > 1) {
-              temp4 = temp3[0] + '...(' + (temp3.length) + ')';
-            } else {
-              temp4 = '...(0)';
-            }
-          } else {
-            // If temp1 is null or undefined
-            temp4 = '...(0)';
-          }
-    
-    
-          const date = Math.ceil(((new Date()).getTime()) / 1000)
-          const items ={
-          P1: (this.allUserDetails.username).toLowerCase(),
-          P2: this.allUserDetails.mobile || 'N/A',
-          P3: this.allUserDetails.email,
-          P4: this.allUserDetails.permission_ID,
-          P5:temp4,
-          P6:temp2,
-          P7:date
-          }
-    
-          const masterUser = {
-            P1:(this.allUserDetails.username).toLowerCase(),
-            P2:this.allUserDetails.clientID,
-            P3:this.allUserDetails.email,
-            P4:this.allUserDetails.mobile || 'N/A',
-            P5:(this.allUserDetails.userID).toLowerCase()
-          }
-    
-          console.log("User master table data is here ",masterUser);
-    
-          console.log('newly added user', this.allUserDetails);
-    
-          console.log("Items are here ",items);
+      let tempObj: any = {}
 
 
-          // Create the master user table entry
-          await this.api.CreateMaster(tempObj);
+      this.allUserDetails = {}
 
-      
-
-
-          await this.createLookUpRdt(items,1,tempClient+"#user"+"#lookup")
-          await this.createLookUpRdt(masterUser,1,"#user#All");
-
-          await this.addtoCognitoTable(this.allUserDetails);
-
-            try{
-              //Creating User Management Forms Data here similar to the Audit trails
-              await this.recordUserDetails(this.allUserDetails,'add',this.allUserDetails.created)
-            }
-            catch(error){
-              console.log("Error in configuration ",error);
-            }
-          
+      //Create avg_labour_history packet
+      this.avgLabourHistory = []
+      if (userFields && userFields[16] && userFields[16] != '') {
+        const avgCost = userFields[16]
+        this.avgLabourHistory.push([
+          avgCost, new Date().getTime()
+        ])
+      }
 
 
-          // Send dynamic lambda request
-          const body = { type: "userVerify", username: masterUser.P1, name: this.allUserDetails.password, email: masterUser.P3 };
-          await this.DynamicApi.sendData(body).toPromise();  // Use toPromise for async/await
+      this.allUserDetails = {
+        key: token,
+        username: userFields[0].toLowerCase(),
+        password: userFields[1],
+        clientID: userFields[2],
+        companyID: userFields[3],
+        email: userFields[4],
+        userID: userFields[5].toLowerCase(),
+        description: userFields[6],
+        mobile: userFields[7],
+        mobile_privacy: userFields[8],
+        telegramID: userFields[9],
+        permission_ID: userFields[10],
+        location_permission: userFields[11].includes(',') == true ? userFields[11].split(',') : [userFields[11]],
+        form_permission: userFields[12].includes(',') == true ? userFields[12].split(',') : [userFields[12]],
+        start_node: userFields[13],
+        default_module: userFields[14],
+        redirectionURL: userFields[15],
+        avg_labour_cost: userFields[16],
+        alert_email: userFields[17],
+        alert_sms: userFields[18],
+        alert_telegram: userFields[19],
+        escalation_email: userFields[20],
+        escalation_sms: userFields[21],
+        escalation_telegram: userFields[22],
+        avg_labour_history: this.avgLabourHistory,
+        // cognito_update:userFields[21] ,
+        // enable_user: userFields[22] ,
+        enable_user: true,
+        updated: new Date(),
+        created: new Date().getTime()
+      }
 
 
-          try{
-            const UserDetails = {
-              "User Name": this.username,
-              "Action": "Created",
-              "Module Name": "User Management",
-              "Form Name": 'User Management',
-             "Description": `${masterUser.P1} User was Created Through Excel`,
-              "User Id": this.username,
-              "Client Id": this.SK_clientID,
-              "created_time": Date.now(),
-              "updated_time": Date.now()
-            }
-        
-            this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
-          }
-          catch(error){
-            console.log("Error while creating audit trails ",error);
-          }
+      tempObj = {
+        PK: (this.allUserDetails.username).toLowerCase() + "#user" + "#main",
+        SK: 1,
+        metadata: JSON.stringify(this.allUserDetails)
+      }
 
-        
-      
+      const tempClient = this.allUserDetails.clientID
+
+
+      let temp1 = this.allUserDetails.form_permission;
+      let temp2 = '';
+
+      if (temp1) {
+        // If temp1 is not null or undefined
+        if (temp1.length === 1) {
+          temp2 = temp1[0];
+        } else if (temp1.length > 1) {
+          temp2 = temp1[0] + '...(' + (temp1.length) + ')';
+        } else {
+          temp2 = '...(0)';
+        }
+      } else {
+        // If temp1 is null or undefined
+        temp2 = '...(0)';
+      }
+
+
+
+      let temp3 = this.allUserDetails.location_permission;
+      let temp4 = '';
+
+      if (temp3) {
+        // If temp1 is not null or undefined
+        if (temp3.length === 1) {
+          temp4 = temp3[0];
+        } else if (temp3.length > 1) {
+          temp4 = temp3[0] + '...(' + (temp3.length) + ')';
+        } else {
+          temp4 = '...(0)';
+        }
+      } else {
+        // If temp1 is null or undefined
+        temp4 = '...(0)';
+      }
+
+
+      const date = Math.ceil(((new Date()).getTime()) / 1000)
+      const items = {
+        P1: (this.allUserDetails.username).toLowerCase(),
+        P2: this.allUserDetails.mobile || 'N/A',
+        P3: this.allUserDetails.email,
+        P4: this.allUserDetails.permission_ID,
+        P5: temp4,
+        P6: temp2,
+        P7: date
+      }
+
+      const masterUser = {
+        P1: (this.allUserDetails.username).toLowerCase(),
+        P2: this.allUserDetails.clientID,
+        P3: this.allUserDetails.email,
+        P4: this.allUserDetails.mobile || 'N/A',
+        P5: (this.allUserDetails.userID).toLowerCase()
+      }
+
+      console.log("User master table data is here ", masterUser);
+
+      console.log('newly added user', this.allUserDetails);
+
+      console.log("Items are here ", items);
+
+
+      // Create the master user table entry
+      await this.api.CreateMaster(tempObj);
+
+
+
+
+      await this.createLookUpRdt(items, 1, tempClient + "#user" + "#lookup")
+      await this.createLookUpRdt(masterUser, 1, "#user#All");
+
+      await this.addtoCognitoTable(this.allUserDetails);
+
+      try {
+        //Creating User Management Forms Data here similar to the Audit trails
+        await this.recordUserDetails(this.allUserDetails, 'add', this.allUserDetails.created)
+      }
+      catch (error) {
+        console.log("Error in configuration ", error);
+      }
+
+
+
+      // Send dynamic lambda request
+      const body = { type: "userVerify", username: masterUser.P1, name: this.allUserDetails.password, email: masterUser.P3 };
+      await this.DynamicApi.sendData(body).toPromise();  // Use toPromise for async/await
+
+
+      try {
+        const UserDetails = {
+          "User Name": this.username,
+          "Action": "Created",
+          "Module Name": "User Management",
+          "Form Name": 'User Management',
+          "Description": `${masterUser.P1} User was Created Through Excel`,
+          "User Id": this.username,
+          "Client Id": this.SK_clientID,
+          "created_time": Date.now(),
+          "updated_time": Date.now()
+        }
+
+        this.auditTrail.mappingAuditTrailData(UserDetails, this.SK_clientID)
+      }
+      catch (error) {
+        console.log("Error while creating audit trails ", error);
+      }
+
+
+
     }
-    catch(error){
-      console.log("Error in object Creation ",error);
+    catch (error) {
+      console.log("Error in object Creation ", error);
     }
 
   }
 
 
-  async recordUserDetails(getValues:any,key:any,createdTime:any){
-    if(key == 'add' || key == 'update'){
+  async recordUserDetails(getValues: any, key: any, createdTime: any) {
+    if (key == 'add' || key == 'update') {
 
-      try{
+      try {
         const UserDetails = {
           "User Name": getValues.username,
           "Password": getValues.password,
@@ -1045,43 +1199,43 @@ export class UserExportComponent {
           "Mobile Privacy": getValues.mobile_privacy,
           "Telegram Channel ID": getValues.telegramID,
           "Permission ID": getValues.permission_ID,
-          "Location Permission":getValues.location_permission,
-          "FormID Permission":getValues.form_permission,
-          "Start Node":getValues.start_node,
+          "Location Permission": getValues.location_permission,
+          "FormID Permission": getValues.form_permission,
+          "Start Node": getValues.start_node,
           "Default Module": getValues.default_module,
           "Redirection ID": getValues.location_object,
           "Average Labour Cost": getValues.avg_labour_cost,
           "SMS": getValues.alert_sms,
-          "Telegram":getValues.alert_telegram,
+          "Telegram": getValues.alert_telegram,
           "Escalation Email": getValues.escalation_email,
           "Escalation SMS": getValues.escalation_sms,
           "Escalation Telegram": getValues.escalation_telegram,
           "Enable User": getValues.enable_user,
-          "Average Labour Cost History":getValues.avg_labour_history && typeof getValues.avg_labour_history == 'string' ? JSON.parse(getValues.avg_labour_history) :getValues.avg_labour_history,
+          "Average Labour Cost History": getValues.avg_labour_history && typeof getValues.avg_labour_history == 'string' ? JSON.parse(getValues.avg_labour_history) : getValues.avg_labour_history,
 
-          "Notification":[
+          "Notification": [
             (getValues.alert_sms && typeof getValues.alert_sms == 'boolean') ? getValues.alert_sms : false,
             (getValues.alert_telegram && typeof getValues.alert_telegram == 'boolean') ? getValues.alert_telegram : false
           ],
-          "Escalation Enable:":[
+          "Escalation Enable:": [
             (getValues.escalation_email && typeof getValues.escalation_email == 'boolean') ? getValues.escalation_email : false,
             (getValues.escalation_sms && typeof getValues.escalation_sms == 'boolean') ? getValues.escalation_sms : false,
             (getValues.escalation_telegram && typeof getValues.escalation_telegram == 'boolean') ? getValues.escalation_telegram : false
           ],
-          "created":createdTime
+          "created": createdTime
         }
 
-        console.log('Data to be added in User forms are here ',UserDetails);
-    
-        this.userForm.mappingAuditTrailData(UserDetails,this.SK_clientID,this.username)
+        console.log('Data to be added in User forms are here ', UserDetails);
+
+        this.userForm.mappingAuditTrailData(UserDetails, this.SK_clientID, this.username)
       }
-      catch(error){
-        console.log("Error while creating audit trails ",error);
+      catch (error) {
+        console.log("Error while creating audit trails ", error);
       }
 
     }
-    else{
-      await this.userForm.delete_request_look_up_main_audit_trail(createdTime,this.SK_clientID,'SYSTEM_USER_CONFIGURATION')
+    else {
+      await this.userForm.delete_request_look_up_main_audit_trail(createdTime, this.SK_clientID, 'SYSTEM_USER_CONFIGURATION')
     }
   }
 
@@ -1090,16 +1244,16 @@ export class UserExportComponent {
     // Adding to cognito table
     console.log('cogntio table', getValues);
     if (getValues) {
-  
+
       let poolData = {
-        UserPoolId: "ap-south-1_aaPSwPS14", 
+        UserPoolId: "ap-south-1_aaPSwPS14",
         ClientId: "42pb85v3sv84jdrfi1rub7a4e5"
       };
-  
+
       console.log('poolData after user added to cognito', poolData);
-  
+
       this.userPool = new CognitoUserPool(poolData);
-  
+
       let attributeList = [];
       let formData: any = {
         "email": String(getValues.email),
@@ -1124,7 +1278,7 @@ export class UserExportComponent {
         'custom:permission_id': String(getValues.permission_ID),
         'custom:defaultdevloc': String(getValues.default_dev_loc ?? ''),
       }
-  
+
       // Loop through and add attributes to cognito
       for (let key in formData) {
         let attrData = {
@@ -1134,7 +1288,7 @@ export class UserExportComponent {
         let attribute = new CognitoUserAttribute(attrData);
         attributeList.push(attribute);
       }
-  
+
       // Sign up user in Cognito sequentially
       return new Promise((resolve, reject) => {
         this.userPool.signUp(getValues.username, getValues.password, attributeList, [], (err: { message: any; }, result: any) => {
@@ -1149,24 +1303,24 @@ export class UserExportComponent {
       throw new Error('Invalid user data for Cognito');
     }
   }
-  
 
 
-  async createLookUpRdt(item: any, pageNumber: number,tempclient:any){
+
+  async createLookUpRdt(item: any, pageNumber: number, tempclient: any) {
     try {
       console.log("iam a calleddd dude", item, pageNumber);
       const response = await this.api.GetMaster(tempclient, pageNumber);
-  
+
       let checklength: any[] = [];
       if (response != null && response.options && typeof response.options === 'string') {
         checklength = JSON.parse(response.options);
       }
-  
+
       if (response != null && checklength.length < this.maxlength) {
         let newdata: any[] = [];
         if (response.options && typeof response.options === 'string') {
           const parsedData = JSON.parse(response.options);
-  
+
           parsedData.forEach((item: any) => {
             for (const key in item) {
               if (Object.prototype.hasOwnProperty.call(item, key)) {
@@ -1175,20 +1329,20 @@ export class UserExportComponent {
             }
           });
         }
-  
+
         newdata.unshift(item);
         newdata = newdata.map((data, index) => {
           return { [`L${index + 1}`]: data };
         });
-  
+
         console.log('newdata 11111111 :>> ', newdata);
-  
+
         let Look_data: any = {
           PK: tempclient,
           SK: response.SK,
           options: JSON.stringify(newdata),
         };
-  
+
         const createResponse = await this.api.UpdateMaster(Look_data);
         console.log('createResponse :>> ', createResponse);
       } else if (response == null) {
@@ -1197,19 +1351,19 @@ export class UserExportComponent {
         newdata = newdata.map((data, index) => {
           return { [`L${index + 1}`]: data };
         });
-  
+
         let Look_data = {
           SK: pageNumber,
           PK: tempclient,
           options: JSON.stringify(newdata),
         };
-  
+
         console.log(Look_data);
-  
+
         const createResponse = await this.api.CreateMaster(Look_data);
         console.log(createResponse);
       } else {
-        await this.createLookUpRdt(item, pageNumber + 1,tempclient);
+        await this.createLookUpRdt(item, pageNumber + 1, tempclient);
       }
     } catch (err) {
       console.log('err :>> ', err);
@@ -1217,39 +1371,39 @@ export class UserExportComponent {
     }
   }
 
-  async   fetchTimeMachineById(sk: any, id: any, type: any, item: any,client:any) {
-    const tempClient = client+'#user'+"#lookup";
-    console.log("Temp client is ",tempClient);
-    console.log("Type of client",typeof tempClient);
+  async fetchTimeMachineById(sk: any, id: any, type: any, item: any, client: any) {
+    const tempClient = client + '#user' + "#lookup";
+    console.log("Temp client is ", tempClient);
+    console.log("Type of client", typeof tempClient);
     try {
       const response = await this.api.GetMaster(tempClient, sk);
-      
+
       if (response && response.options) {
         let data: ListItem[] = await JSON.parse(response.options);
-  
+
         // Find the index of the item with the matching id
         let findIndex = data.findIndex((obj) => obj[Object.keys(obj)[0]].P1 === id);
-  
+
         if (findIndex !== -1) { // If item found
           if (type === 'update') {
             data[findIndex][`L${findIndex + 1}`] = item;
-  
+
             // Create a new array to store the re-arranged data without duplicates
             const newData = [];
-          
+
             // Loop through each object in the data array
             for (let i = 0; i < data.length; i++) {
               const originalKey = Object.keys(data[i])[0]; // Get the original key (e.g., L1, L2, ...)
               const newKey = `L${i + 1}`; // Generate the new key based on the current index
-          
+
               // Check if the original key exists before renaming
               if (originalKey) {
                 // Create a new object with the new key and the data from the original object
                 const newObj = { [newKey]: data[i][originalKey] };
-          
+
                 // Check if the new key already exists in the newData array
                 const existingIndex = newData.findIndex(obj => Object.keys(obj)[0] === newKey);
-          
+
                 if (existingIndex !== -1) {
                   // Merge the properties of the existing object with the new object
                   Object.assign(newData[existingIndex][newKey], data[i][originalKey]);
@@ -1262,29 +1416,29 @@ export class UserExportComponent {
                 // Handle the error or log a message accordingly
               }
             }
-          
+
             // Replace the original data array with the newData array
             data = newData;
-                  
+
           } else if (type === 'delete') {
             // Remove the item at the found index
             data.splice(findIndex, 1);
           }
-  
+
           // Prepare the updated data for API update
           let updateData = {
             PK: tempClient,
             SK: response.SK,
             options: JSON.stringify(data)
           };
-  
+
           // Update the data in the API
           await this.api.UpdateMaster(updateData);
-  
+
         } else { // If item not found
           await new Promise(resolve => setTimeout(resolve, 500)); // Wait before retrying
-          await this.fetchTimeMachineById(sk + 1, id, type, item,client); // Retry with next SK
-  
+          await this.fetchTimeMachineById(sk + 1, id, type, item, client); // Retry with next SK
+
         }
       } else { // If response or listOfItems is null
         Swal.fire({
@@ -1302,39 +1456,39 @@ export class UserExportComponent {
 
 
 
-  async   fetchAllusersData(sk: any, id: any, type: any, item: any) {
-    const tempClient = '#user'+"#All";
-    console.log("Temp client is ",tempClient);
-    console.log("Type of client",typeof tempClient);
+  async fetchAllusersData(sk: any, id: any, type: any, item: any) {
+    const tempClient = '#user' + "#All";
+    console.log("Temp client is ", tempClient);
+    console.log("Type of client", typeof tempClient);
     try {
       const response = await this.api.GetMaster(tempClient, sk);
-      
+
       if (response && response.options) {
         let data: ListItem[] = await JSON.parse(response.options);
-  
+
         // Find the index of the item with the matching id
         let findIndex = data.findIndex((obj) => obj[Object.keys(obj)[0]].P1 === id);
-  
+
         if (findIndex !== -1) { // If item found
           if (type === 'update') {
             data[findIndex][`L${findIndex + 1}`] = item;
-  
+
             // Create a new array to store the re-arranged data without duplicates
             const newData = [];
-          
+
             // Loop through each object in the data array
             for (let i = 0; i < data.length; i++) {
               const originalKey = Object.keys(data[i])[0]; // Get the original key (e.g., L1, L2, ...)
               const newKey = `L${i + 1}`; // Generate the new key based on the current index
-          
+
               // Check if the original key exists before renaming
               if (originalKey) {
                 // Create a new object with the new key and the data from the original object
                 const newObj = { [newKey]: data[i][originalKey] };
-          
+
                 // Check if the new key already exists in the newData array
                 const existingIndex = newData.findIndex(obj => Object.keys(obj)[0] === newKey);
-          
+
                 if (existingIndex !== -1) {
                   // Merge the properties of the existing object with the new object
                   Object.assign(newData[existingIndex][newKey], data[i][originalKey]);
@@ -1347,29 +1501,29 @@ export class UserExportComponent {
                 // Handle the error or log a message accordingly
               }
             }
-          
+
             // Replace the original data array with the newData array
             data = newData;
-                  
+
           } else if (type === 'delete') {
             // Remove the item at the found index
             data.splice(findIndex, 1);
           }
-  
+
           // Prepare the updated data for API update
           let updateData = {
             PK: tempClient,
             SK: response.SK,
             options: JSON.stringify(data)
           };
-  
+
           // Update the data in the API
           await this.api.UpdateMaster(updateData);
-  
+
         } else { // If item not found
           await new Promise(resolve => setTimeout(resolve, 500)); // Wait before retrying
           await this.fetchAllusersData(sk + 1, id, type, item); // Retry with next SK
-  
+
         }
       } else { // If response or listOfItems is null
         Swal.fire({

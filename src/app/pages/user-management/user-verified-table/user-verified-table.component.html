@@ -10,6 +10,16 @@
       <p>No unconfirmed users found.</p>
     </div>
 
+    <div class="search-bar">
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        (ngModelChange)="filterUsers()"
+        placeholder="Search"
+        class="search-input"
+      />
+    </div>
+
     <!-- Table of users -->
     <table *ngIf="unverifiedUsers.length > 0" class="approval-table">
       <thead>
@@ -18,7 +28,7 @@
           <th>Email</th>
           <th>Status</th>
           <th>Verification</th>
-          <th>Credentails</th>
+          <th>Credentials</th>
         </tr>
       </thead>
       <tbody>
@@ -26,20 +36,23 @@
           <td>{{ user.username }}</td>
           <td>{{ user.email }}</td>
           <td class="status">
-            <span class="btn btn-sm btn-danger fw-bolder ms-2 fs-7 py-2 px-5">Unconfirmed</span>
+            <span class="badge badge-danger" style="cursor: not-allowed;">Unconfirmed</span>
           </td>
           <td class="status">
             <a *ngIf="user && user.sentMail == undefined" class="btn btn-sm custom-primary fw-bolder ms-2 fs-7 py-2 px-5" (click)="resendVerification(user.username)" type="submit">Resend</a>
             <a *ngIf="user && user.sentMail" class="btn btn-sm btn-success fw-bolder ms-2 fs-7 py-2 px-5" type="submit">Sent</a>
           </td>
 
-            <td class="status">
-              <a *ngIf="user && user.sentCredentailMail == undefined" class="btn btn-sm btn-dark fw-bolder ms-2 fs-7 py-2 px-5" (click)="resendCredentials(user.username)" type="submit">Resend</a>
-              <a *ngIf="user && user.sentCredentailMail" class="btn btn-sm btn-success fw-bolder ms-2 fs-7 py-2 px-5" type="submit">Sent</a>
-            </td>
+          <td class="status">
+            <a *ngIf="user && user.sentCredentialMail == undefined" class="btn btn-sm btn-dark fw-bolder ms-2 fs-7 py-2 px-5" (click)="resendCredentials(user.username)" type="submit">Resend</a>
+            <a *ngIf="user && user.sentCredentialMail" class="btn btn-sm btn-success fw-bolder ms-2 fs-7 py-2 px-5" type="submit">Sent</a>
+          </td>
         </tr>
       </tbody>
     </table>
+    <div *ngIf="unverifiedUsers.length > 0" class="user-count">
+      <p>Total Unconfirmed Users: {{ unverifiedUsers.length }}</p>
+    </div>
 
     <!-- Pagination Controls -->
     <div class="pagination-controls" *ngIf="totalPages > 1">

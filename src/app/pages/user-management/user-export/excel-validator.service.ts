@@ -175,7 +175,7 @@ export class ExcelValidatorService {
         return { isValid: true };
       }
     },
-    'SMS': {
+    'Enable Email': {
       required: false,
       validate: (value: any) => {
         if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
@@ -184,7 +184,16 @@ export class ExcelValidatorService {
         return { isValid: true };
       }
     },
-    'Telegram': {
+    'Enable SMS': {
+      required: false,
+      validate: (value: any) => {
+        if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
+        if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
+        // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+        return { isValid: true };
+      }
+    },
+    'Enable Telegram': {
       required: false,
       validate: (value: any) => {
         if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
@@ -223,7 +232,17 @@ export class ExcelValidatorService {
         // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
         return { isValid: true };
       }
-    }
+    },
+    'Enable User': {
+      required: false,
+      validate: (value: any) => {
+        if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
+        // if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
+        if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
+        // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+        return { isValid: true };
+      }
+    },
     // 'Account': {
     //   required: false,
     //   validate: (value: any) => {

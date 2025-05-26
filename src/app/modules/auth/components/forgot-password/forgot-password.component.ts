@@ -169,6 +169,17 @@ async forgotCognitoPass() {
 
   var authuser = this.forgotPasswordForm.get('email')?.value;
 
+  if(authuser == undefined || authuser == '' || authuser == undefined){
+    return Swal.fire({
+      title: 'Error',
+      text: 'Please enter Username/Email to continue.',
+      icon: 'error',
+      confirmButtonText: 'Okay'
+    });
+  }
+
+
+
   const result = await this.fetchAllUsersData(1) 
 
   this.filterUser = result.filter((item:any)=>item.P3 == authuser || item.P1 == authuser)
@@ -189,6 +200,17 @@ async forgotCognitoPass() {
   }
   else{
     this.selectedUser = authuser.toLowerCase()
+  }
+
+  console.log("Selected user is here ",this.selectedUser);
+  
+  if(this.selectedUser == undefined || this.selectedUser == null || this.selectedUser == ''){
+    return  Swal.fire({
+      title: 'Error',
+      text: "User not found. Please check your username or email and try again.",  
+      icon: 'error',
+      confirmButtonText: 'Okay'
+    });
   }
 
 
@@ -244,13 +266,23 @@ async forgotCognitoPass() {
         // Extract the error message from the error object if available
         const errorMessage = err.message || 'An error occurred while sending the verification code. Please check your input and try again.';
 
-        // Display the error message in the Swal alert
+
+        if(errorMessage == 'Username/client id combination not found.'){
+          Swal.fire({
+            title: 'Error',
+            text: "User not found. Please check your username or email and try again.",  
+            icon: 'error',
+            confirmButtonText: 'Okay'
+          });
+        }
+        else{
         Swal.fire({
           title: 'Error',
-          text: errorMessage,  // Display the extracted error message
+          text: errorMessage,  
           icon: 'error',
           confirmButtonText: 'Okay'
         });
+        }
       }
     });
 }

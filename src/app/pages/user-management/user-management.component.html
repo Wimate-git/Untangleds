@@ -434,7 +434,6 @@
                                         placeholder="select Location"
                                         (onChange)="onModuleLocationSelect($event)"
                                         formControlName="location_permission"
-                                        display="chip"
                                         [showToggleAll]="false"
                                         required>
                                         </p-multiSelect>
@@ -477,7 +476,6 @@
                                             (onChange)="onModuleSelect($event)"
                                             value ="value"
                                             [showToggleAll]="false"
-                                            display="chip"
                                             formControlName="form_permission"
                                             required>
                                             </p-multiSelect>
@@ -591,7 +589,12 @@
                                    
         
         
-                                    <div class="col-md-4 mt-10">
+                                    <div class="col-md-4 mt-12">
+
+                                        <label class="fw-semibold fs-6 mb-2" style="margin-right: 10px;"><input
+                                            class="form-check-input" name="sms" type="checkbox"
+                                            formControlName="alert_email" /><span class="fw-bold ps-2 fs-6">Email
+                                        </span></label>
                                        
                                         <label class="fw-semibold fs-6 mb-2" style="margin-right: 10px;"><input
                                                 class="form-check-input" name="sms" type="checkbox"
@@ -608,29 +611,31 @@
 
 
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-4" >
                                         <label class="fw-semibold fs-6 mb-2">Escalation Enable:</label>
+                                        <div class="d-flex flex-row gap-3 mt-4">
+                                            <div class="mb-2">
+                                                <label class="fw-semibold fs-6">
+                                                    <input class="form-check-input" name="email" type="checkbox" formControlName="escalation_email" />
+                                                    <span class="fw-bold ps-2 fs-6">Email</span>
+                                                </label>
+                                            </div>
                                         
-                                        <div class="mb-2">
-                                            <label class="fw-semibold fs-6">
-                                                <input class="form-check-input" name="email" type="checkbox" formControlName="escalation_email" />
-                                                <span class="fw-bold ps-2 fs-6">Email</span>
-                                            </label>
+                                            <div class="mb-2">
+                                                <label class="fw-semibold fs-6">
+                                                    <input class="form-check-input" name="sms" type="checkbox" formControlName="escalation_sms" />
+                                                    <span class="fw-bold ps-2 fs-6">SMS</span>
+                                                </label>
+                                            </div>
+                                        
+                                            <div class="mb-2">
+                                                <label class="fw-semibold fs-6">
+                                                    <input class="form-check-input" name="telegram" type="checkbox" formControlName="escalation_telegram" />
+                                                    <span class="fw-bold ps-2 fs-6">Telegram</span>
+                                                </label>
+                                            </div>
                                         </div>
-                                    
-                                        <div class="mb-2">
-                                            <label class="fw-semibold fs-6">
-                                                <input class="form-check-input" name="sms" type="checkbox" formControlName="escalation_sms" />
-                                                <span class="fw-bold ps-2 fs-6">SMS</span>
-                                            </label>
-                                        </div>
-                                    
-                                        <div class="mb-2">
-                                            <label class="fw-semibold fs-6">
-                                                <input class="form-check-input" name="telegram" type="checkbox" formControlName="escalation_telegram" />
-                                                <span class="fw-bold ps-2 fs-6">Telegram</span>
-                                            </label>
-                                        </div>
+                                       
                                     </div>
 
 
@@ -664,7 +669,7 @@
 
 
 
-                              <div class="col-md-4 form-check form-switch ms-4">
+                              <div class="col-md-4 form-check form-switch ms-3 mt-10">
         
                                 <div class="col-lg-12" *ngIf="editOperation">
                                     <input class="col-lg-6 form-check-input" formControlName="enable_user"
@@ -674,6 +679,19 @@
                                     </label>
                                 
                                 </div>
+
+
+
+                                <div class="col-lg-12 d-none" *ngIf="this.adminLogin">
+                                    <input class="col-lg-6 form-check-input" formControlName="cognito_update"
+                                        type="checkbox">
+                                    <label class=" fw-semibold fs-6 mb-2" style="padding-top: 0px;">
+                                        <b>Cognito Update</b>
+                                    </label>
+                                
+                                </div>
+
+
                             </div>
 
 
@@ -724,14 +742,6 @@
                                  
         
                                         
-                                            <div class="col-lg-12" *ngIf="this.adminLogin">
-                                                <input class="col-lg-6 form-check-input" formControlName="cognito_update"
-                                                    type="checkbox">
-                                                <label class=" fw-semibold fs-6 mb-2" style="padding-top: 0px;">
-                                                    <b>Cognito Update</b>
-                                                </label>
-                                            
-                                            </div>
                                     </div>
         
         

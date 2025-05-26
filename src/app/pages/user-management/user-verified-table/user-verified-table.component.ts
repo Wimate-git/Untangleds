@@ -1,6 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { DynamicApiService } from '../../dynamic-api.service';
 import Swal from 'sweetalert2';
 import { AuditTrailService } from '../../services/auditTrail.service';
@@ -8,171 +7,146 @@ import { AuditTrailService } from '../../services/auditTrail.service';
 @Component({
   selector: 'app-user-verified-table',
   templateUrl: './user-verified-table.component.html',
-  styleUrl: './user-verified-table.component.scss'
+  styleUrls: ['./user-verified-table.component.scss']
 })
-export class UserVerifiedTableComponent{
+export class UserVerifiedTableComponent implements OnInit {
   unverifiedUsers: any[] = [];
-  isModalOpen: boolean = true;
-  @Input() username:any;
-  @Input() SK_clientID:any;
+  filteredUsers: any[] = [];
+  page: number = 1;
+  pageSize: number = 10;
+  searchText: string = '';
 
+  @Input() username: any;
+  @Input() SK_clientID: any;
 
+  constructor(
+    private DynamicApi: DynamicApiService,
+    private auditTrail: AuditTrailService,
+    public modal: NgbActiveModal,
+    private cd: ChangeDetectorRef
+  ) {}
 
+  ngOnInit() {
+    console.log("Unverified users are here", this.unverifiedUsers);
+    this.filteredUsers = [...this.unverifiedUsers]; // initialize filtered list
+  }
 
-  constructor(private DynamicApi:DynamicApiService,private auditTrail:AuditTrailService,public modal: NgbActiveModal,){}
+  get paginatedUsers() {
+    const start = (this.page - 1) * this.pageSize;
+    return this.filteredUsers.slice(start, start + this.pageSize);
+  }
 
+  get totalPages() {
+    return Math.ceil(this.filteredUsers.length / this.pageSize);
+  }
 
- ngOnInit(){
-  console.log("Unverified users are here ",this.unverifiedUsers);
- }  
+  nextPage() {
+    if (this.page < this.totalPages) {
+      this.page++;
+    }
+  }
 
+  previousPage() {
+    if (this.page > 1) {
+      this.page--;
+    }
+  }
 
- async resendCredentials(userName:any){
+  filterUsers() {
+    const search = this.searchText.toLowerCase();
+    this.filteredUsers = this.unverifiedUsers.filter(user =>
+      user.username.toLowerCase().includes(search) ||
+      user.email.toLowerCase().includes(search)
+    );
+    this.page = 1;
+  }
 
-  const targetUser = this.unverifiedUsers.find((item:any)=>item.username == userName)
+  async resendCredentials(userName: any) {
+    const targetUser = this.unverifiedUsers.find(item => item.username === userName);
+    const body = {
+      type: "userVerify",
+      username: targetUser.username,
+      name: targetUser.password,
+      email: targetUser.email
+    };
 
-  const body = { type: "userVerify", username:targetUser.username,name:targetUser.password,email:targetUser.email};
-
-
-  this.DynamicApi.sendData(body).subscribe(response => {
-    console.log('Response from Lambda:', response);
-
-    if(response){
+    this.DynamicApi.sendData(body).subscribe(response => {
+      if (response) {
         Swal.fire({
           position: "top-right",
           icon: "success",
-          title: `Credentails mail sent successfully `,
+          title: `Credentials mail sent successfully`,
           showConfirmButton: false,
-          timer: 1500,
+          timer: 1500
         });
 
-
-        this.unverifiedUsers = this.unverifiedUsers.map((item: any) => {
-          if (userName === item.username) {
-            return { ...item, sentCredentailMail: true };
+        this.unverifiedUsers = this.unverifiedUsers.map(item => {
+          if (item.username === userName) {
+            return { ...item, sentCredentialMail: true }; // fixed typo
           }
           return item;
         });
-
-    }
-      
-  }, error => {
-    console.error('Error calling dynamic lambda:', error);
-  });
- }
-
-
- async resendVerification(userName: any) {
-
-
-  const body = { "type": "cognitoServices",
-    "event":{
-      path: "/resendVerification",
-      queryStringParameters: {
-          email: "dummy@wimate.in"
-      },
-      username:userName
-    }
+        this.filterUsers(); // reapply search and pagination
+      }
+    }, error => {
+      console.error('Error sending credentials:', error);
+    });
   }
 
+  async resendVerification(userName: any) {
+    const body = {
+      type: "cognitoServices",
+      event: {
+        path: "/resendVerification",
+        queryStringParameters: { email: "dummy@wimate.in" },
+        username: userName
+      }
+    };
 
-
-  try {
-
-    const response = await this.DynamicApi.getData(body);
-   
-    if(response){
-      if(response.statusCode == 200){
+    try {
+      const response = await this.DynamicApi.getData(body);
+      if (response?.statusCode === 200) {
         Swal.fire({
           position: "top-right",
           icon: "success",
-          title: `Verification mail sent successfully `,
+          title: `Verification mail sent successfully`,
           showConfirmButton: false,
-          timer: 1500,
+          timer: 1500
         });
 
-
-        try{
-          const UserDetails = {
-            "User Name": this.username,
-            "Action": "View",
-            "Module Name": "User Management",
-            "Form Name": 'User Management',
-           "Description": `Verification mail sent successfully to ${userName}`,
-            "User Id": this.username,
-            "Client Id": this.SK_clientID,
-            "created_time": Date.now(),
-            "updated_time": Date.now()
-          }
-      
-          this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
-        }
-        catch(error){
-          console.log("Error while creating audit trails ",error);
-        }
-    
-    
-
-
-
-
-
-
-
-
-
-      }
-      else{
+        const auditData = {
+          "User Name": this.username,
+          "Action": "View",
+          "Module Name": "User Management",
+          "Form Name": 'User Management',
+          "Description": `Verification mail sent successfully to ${userName}`,
+          "User Id": this.username,
+          "Client Id": this.SK_clientID,
+          "created_time": Date.now(),
+          "updated_time": Date.now()
+        };
+        this.auditTrail.mappingAuditTrailData(auditData, this.SK_clientID);
+      } else {
         Swal.fire({
           position: "top-right",
           icon: "error",
-          title: `Error sending mail`,
+          title: `Error sending verification mail`,
           showConfirmButton: false,
-          timer: 1500,
+          timer: 1500
         });
       }
+
+      this.unverifiedUsers = this.unverifiedUsers.map(item => {
+        if (item.username === userName) {
+          return { ...item, sentMail: true };
+        }
+        return item;
+      });
+      this.filterUsers(); // reapply search and pagination
+      this.cd.detectChanges();
+
+    } catch (error) {
+      console.error('Error calling dynamic lambda:', error);
     }
-
-  } catch (error) {
-    console.error('Error calling dynamic lambda:', error);
   }
-
-
-
-  this.unverifiedUsers = this.unverifiedUsers.map((item: any) => {
-    if (userName === item.username) {
-      return { ...item, sentMail: true };
-    }
-    return item;
-  });
-
-}
-
-
-
-page: number = 1;
-pageSize: number = 10; // You can change this to show more rows per page
-
-get paginatedUsers() {
-  const start = (this.page - 1) * this.pageSize;
-  return this.unverifiedUsers.slice(start, start + this.pageSize);
-}
-
-get totalPages() {
-  return Math.ceil(this.unverifiedUsers.length / this.pageSize);
-}
-
-nextPage() {
-  if (this.page < this.totalPages) {
-    this.page++;
-  }
-}
-
-previousPage() {
-  if (this.page > 1) {
-    this.page--;
-  }
-}
-
-
 }

@@ -11,7 +11,7 @@ import { AES } from 'crypto-js';
 import { AuthenticationDetails, CognitoUser, CognitoUserAttribute, CognitoUserPool, CognitoUserSession } from 'amazon-cognito-identity-js';
 import { NgxSpinner, NgxSpinnerService } from 'ngx-spinner';
 import { Observable } from 'rxjs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 
 
@@ -1506,8 +1506,12 @@ rdtListWorkAround :any =[{
 
           // alert(JSON.stringify(this.allUserDetails));
 
+          if (this.allUserDetails.enable_user != true) {
+            await this.updateCognitoAttributesV2()
+          }
 
-          await this.updateCognitoAttributes();
+
+          // await this.updateCognitoAttributes();
 
           try{
             await this.recordUserDetails(JSON.parse(JSON.stringify(this.allUserDetails)),'update',this.userCreatedTime)
@@ -1577,13 +1581,10 @@ rdtListWorkAround :any =[{
           }
 
 
-       
 
-     
-
-
-
-
+          if (this.allUserDetails.enable_user == true) {
+            await this.updateCognitoAttributesV2()
+          }
 
           try{
             const UserDetails = {
@@ -1843,9 +1844,98 @@ rdtListWorkAround :any =[{
 
     });
 
-
-
   }
+
+
+
+
+  async updateCognitoAttributesV2() {
+    const authenticationData = {
+      Username: this.tempUpdateUser,
+      Password: this.createUserField.get('name')?.value,
+    };
+  
+    const poolData = {
+      UserPoolId: "ap-south-1_aaPSwPS14",
+      ClientId: "42pb85v3sv84jdrfi1rub7a4e5"
+    };
+  
+    const userPool = new CognitoUserPool(poolData);
+  
+    const poolDetails = {
+      Username: this.tempUpdateUser,
+      Pool: userPool
+    };
+  
+    const userData: any = {
+      email: this.createUserField.get('email')?.value,
+      'custom:userID': this.createUserField.value.userID,
+      'custom:password': this.createUserField.get('name')?.value,
+      'custom:clientID': this.allUserDetails.clientID,
+      'custom:companyID': this.allUserDetails.companyID,
+      'custom:username': this.tempUpdateUser,
+      'custom:description': this.createUserField.value.description,
+      'custom:mobile': JSON.stringify(this.createUserField.value.mobile),
+      'custom:mobile_privacy': this.createUserField.value.mobile_privacy,
+      'custom:user_type': JSON.stringify(this.createUserField.value.user_type),
+      'custom:enable_user': JSON.stringify(this.createUserField.value.enable_user ?? false),
+      'custom:disable_user': JSON.stringify(this.createUserField.value.disable_user ?? false),
+      'custom:alert_email': JSON.stringify(this.createUserField.value.alert_email ?? false),
+      'custom:alert_sms': JSON.stringify(this.createUserField.value.alert_sms ?? false),
+      'custom:alert_telegram': JSON.stringify(this.createUserField.value.alert_telegram ?? false),
+      'custom:escalation_email': JSON.stringify(this.createUserField.value.escalation_email ?? false),
+      'custom:escalation_sms': JSON.stringify(this.createUserField.value.escalation_sms ?? false),
+      'custom:escalation_telegram': JSON.stringify(this.createUserField.value.escalation_telegram ?? false),
+      'custom:telegramID': JSON.stringify(this.createUserField.value.telegramID),
+      'custom:permission_id': this.allUserDetails.permission_ID,
+      'custom:defaultdevloc': this.createUserField.value.default_dev_loc
+    };
+  
+    const cognitoUser = new CognitoUser(poolDetails);
+    const authenticationDetails = new AuthenticationDetails(authenticationData);
+  
+    try {
+      const session = await new Promise<any>((resolve, reject) => {
+        cognitoUser.authenticateUser(authenticationDetails, {
+          onSuccess: resolve,
+          onFailure: reject
+        });
+      });
+  
+      const attributeList = Object.entries(userData).map(([key, value]:any) => {
+        return new CognitoUserAttribute({ Name: key, Value: value });
+      });
+  
+      const updateResult = await new Promise((resolve, reject) => {
+        cognitoUser.updateAttributes(attributeList, (err, result) => {
+          if (err) reject(err);
+          else resolve(result);
+        });
+      });
+  
+      console.log('Attributes updated successfully:', updateResult);
+  
+    } catch (err: any) {
+      console.error("Cognito Error:", err);
+  
+      if (err.message !== 'User is disabled.') {
+        if (err.message === 'User is not confirmed.') {
+          Swal.fire({
+            icon: 'error',
+            title: 'User is not confirmed!',
+            text: 'User details weren\'t updated in Cognito.'
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: err.message
+          });
+        }
+      }
+    }
+  }
+  
 
 
 
@@ -2149,7 +2239,7 @@ rdtListWorkAround :any =[{
           alert_levels: this.createUserField.value.alert_levels,
           permission_ID: this.createUserField.value.permission_ID,
           report_to: this.createUserField.value.report_to,
-          enable_user: this.createUserField.value.enable_user == null ? false : this.createUserField.value.enable_user,
+          enable_user: true,
           disable_user: this.createUserField.value.disable_user == null ? false : this.createUserField.value.disable_user,
           health_check: this.createUserField.value.health_check == null ? false : this.createUserField.value.health_check,
           device_timeout: this.createUserField.value.device_timeout == null ? false : this.createUserField.value.device_timeout,
@@ -3102,15 +3192,15 @@ rdtListWorkAround :any =[{
             `;
           },
         },
-        {
-          title: "Phone",
-          data: "P2",
-          render: function (data) {
-            return typeof data === "string"
-              ? data.replace(/\d(?=\d{2})/g, "x")
-              : data || "";
-          },
-        },
+        // {
+        //   title: "Phone",
+        //   data: "P2",
+        //   render: function (data) {
+        //     return typeof data === "string"
+        //       ? data.replace(/\d(?=\d{2})/g, "x")
+        //       : data || "";
+        //   },
+        // },
         {
           title: "Permission",
           data: "P4",
@@ -3758,7 +3848,9 @@ rdtListWorkAround :any =[{
 
             console.log("Result is here ",result);
             await this.deleteCognitoUser(JSON.parse(result.metadata))
-            this.addFromService()
+            await this.addFromService()
+
+            this.spinner.hide()
             }
         })
         .catch((err) => {
@@ -3857,8 +3949,6 @@ rdtListWorkAround :any =[{
         this.lookup_data_user = []
         
         this.reloadEvent.next(true)
-
-        this.spinner.hide()
   
         Swal.fire(
           'Removed!',
@@ -3889,6 +3979,10 @@ rdtListWorkAround :any =[{
       this.createUserField.get('email')?.reset()
       this.createUserField.get('email')?.enable()
       this.createUserField.get('mobile')?.reset()
+      this.createUserField.get('avg_labour_cost')?.reset()
+
+      this.avgLabourHistory = []
+      this.getRefAvgLabour = []
 
       this.editOperation = false
 
@@ -4169,10 +4263,14 @@ fetchDynamicLookupData(pk:any,sk:any):any {
 
 
 
+    let ngbModalOptions: NgbModalOptions = {
+      backdrop : 'static',
+      keyboard : false,
+      size: 'lg'
+    };
 
 
-
-    const modalRef = this.modalService.open(UserVerifiedTableComponent,{ size: 'lg' })
+    const modalRef = this.modalService.open(UserVerifiedTableComponent,ngbModalOptions)
     modalRef.componentInstance.unverifiedUsers = storedResponse
     modalRef.componentInstance.username = this.username
     modalRef.componentInstance.SK_clientID = this.SK_clientID

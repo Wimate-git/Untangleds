@@ -1,172 +1,192 @@
 /* General Styles for the Approval History Container */
 .approval-history-container {
-    max-width: 100%;
-    margin: 20px;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .approval-history-header h3 {
-    font-size: 1.5rem;
-    color: #333;
-    text-align: center;
-    margin-bottom: 20px;
-    font-weight: 600;
-  }
-  
-  /* Table Styles */
-  .approval-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 0 auto;
-  }
-  
-  .approval-table th, .approval-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .approval-table th {
-    background-color: #1b84ff;
-    color: white;
-    font-weight: bold;
-    font-size: 1.1rem;
-  }
-  
-  .approval-table td {
-    background-color: #ffffff;
-    color: #555;
-    font-size: 1rem;
-  }
-  
-  /* Hover Effect for Table Rows */
-  .approval-table tr:hover {
-    background-color: #f1f1f1;
-  }
-  
-  /* Badge Styles for Status */
-  .status .badge {
-    padding: 8px 12px;
-    font-size: 0.875rem;
-    font-weight: bold;
-    color: #fff;
-    border-radius: 4px;
-  }
-  
-  .status .badge-danger {
-    background-color: #f8285a;
-  }
+  max-width: 100%;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
-  .status .badge-success{
-    background-color: #15d61f;
-  }
-
-
-  .status .badge-warning{
-    background-color: #ee903e;
-  }
-  
-  /* Responsive Styles */
-  @media (max-width: 768px) {
-    .approval-table th, .approval-table td {
-      padding: 8px;
-    }
-  
-    .approval-history-header h3 {
-      font-size: 1.2rem;
-    }
-  }
-  
-
-
-
-  .close-btn {
-    background: none;
-    border: none;
-    font-size: 2.5em;
-    color: #000;
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    cursor: pointer;
-  }
-  
-  .close-btn:hover {
-    color: #f00;
-  }
-  
-  .error-message {
-    color: green;
-    font-weight: bold;
-    text-align: center;
-    padding: 10px;
-    border: 1px solid green;
-    margin-top: 20px;
-  }
-
-
-  .pagination-controls {
-  margin-top: 15px;
+.approval-history-header h3 {
+  font-size: 1.5rem;
+  color: #333;
   text-align: center;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+/* Table Styles */
+.approval-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 auto;
+}
+
+.approval-table th, .approval-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.approval-table th {
+  background-color: #1b84ff;
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.approval-table td {
+  background-color: #ffffff;
+  color: #555;
+  font-size: 1rem;
+}
+
+/* Hover Effect for Table Rows */
+.approval-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Badge Styles for Status */
+.status .badge {
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #f8285a;
+  border-radius: 4px;
+}
+
+.status .badge-danger {
+  background-color: #f8285a;
+}
+
+.status .badge-success{
+  background-color: #15d61f;
+}
+
+
+.status .custom-primary{
+  background-color: #ff6f1e;
+  color: #fff;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .approval-table th, .approval-table td {
+    padding: 8px;
+  }
+
+  .approval-history-header h3 {
+    font-size: 1.2rem;
+  }
+}
+
+
+
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 2.5em;
+  color: #000;
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: #f00;
+}
+
+.error-message {
+  color: green;
+  font-weight: bold;
+  text-align: center;
+  padding: 10px;
+  border: 1px solid green;
+  margin-top: 20px;
+}
+
+
+.pagination-controls {
+margin-top: 15px;
+text-align: center;
 }
 
 .pagination-controls button {
-  margin: 0 5px;
+margin: 0 5px;
 }
 
 .pagination-controls {
-  margin-top: 15px;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
+margin-top: 15px;
+text-align: center;
+display: flex;
+justify-content: center;
+align-items: center;
+gap: 15px;
 }
 
 .arrow-btn {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 50%;
-  font-size: 15px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+background-color: #007bff;
+color: white;
+border: none;
+padding: 10px 14px;
+border-radius: 50%;
+font-size: 15px;
+cursor: pointer;
+transition: background-color 0.2s ease;
 }
 
 .arrow-btn:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+background-color: #ccc;
+cursor: not-allowed;
 }
 
 .arrow-btn:hover:not(:disabled) {
-  background-color: #0056b3;
+background-color: #0056b3;
 }
 
 .page-label {
-  font-weight: bold;
-  font-size: 16px;
+font-weight: bold;
+font-size: 16px;
+}
+
+
+
+/* Search Bar Styles */
+.search-bar {
+margin: 20px 0;
+display: flex;
+justify-content: end;
+}
+
+.search-input {
+width: 25%;
+max-width: 500px;
+padding: 10px 15px;
+font-size: 1rem;
+border: 1px solid #ccc;
+border-radius: 6px;
+transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+border-color: #1b84ff;
+outline: none;
+box-shadow: 0 0 5px rgba(27, 132, 255, 0.3);
+}
+
+
+.user-count {
+text-align: right;
+font-weight: bold;
+color: #333;
+margin-bottom: 10px;
 }
 
 
 .btn:hover{
-  transform: translateY(-2px);
-  transition: 0.5ms;
-}
-
-
-.custom-primary{
-  background-color:  #ff6f1e; 
-  color: #fff; 
-}
-
-.custom-primary:hover {
-  background-color: #ff6f1e; 
-  color: #fff; 
-  opacity: 1.0;
-  transform: translateY(-2px);
-  transition: 0.5s;
+ transform: translateY(-2px);
+ transition: 0.8 ms;
 }
