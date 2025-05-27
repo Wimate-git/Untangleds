@@ -155,7 +155,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     private api: APIService,
     private spinner: NgxSpinnerService,
     private auditTrail: AuditTrailService,
-    private DynamicApi:DynamicApiService
+    private DynamicApi: DynamicApiService
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -285,11 +285,11 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
           }
         }
       ],
-      createdRow: (row, data:any, dataIndex) => {
+      createdRow: (row, data: any, dataIndex) => {
         $('td:eq(0)', row).addClass('d-flex align-items-center');
         $(row).find('.view-item').on('click', () => {
-            console.log("Event triggered ");
-            this.edit(data.P1)
+          console.log("Event triggered ");
+          this.edit(data.P1)
         });
       },
     };
@@ -329,32 +329,32 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
   onModuleSelect(option: any) {
     const selectedValues = this.permissionForm.get('summaryList')?.value;
-    
-    if(selectedValues.includes('All')){
+
+    if (selectedValues.includes('All')) {
       this.permissionForm.get('summaryList')?.setValue(['All'])
     }
 
-    if(selectedValues.includes('None')){
+    if (selectedValues.includes('None')) {
       this.permissionForm.get('summaryList')?.setValue(['None'])
     }
   }
 
   onDreamboardSelect(option: any) {
     const selectedValues = this.permissionForm.get('dreamBoardIDs')?.value;
-    
-    if(selectedValues.includes('All')){
+
+    if (selectedValues.includes('All')) {
       this.permissionForm.get('dreamBoardIDs')?.setValue(['All'])
     }
   }
 
   onUserSelect(option: any) {
     const selectedValues = this.permissionForm.get('userList')?.value;
-    
-    if(selectedValues.includes('All')){
+
+    if (selectedValues.includes('All')) {
       this.permissionForm.get('userList')?.setValue(['All'])
     }
 
-    if(selectedValues.includes('None')){
+    if (selectedValues.includes('None')) {
       this.permissionForm.get('userList')?.setValue(['None'])
     }
   }
@@ -426,7 +426,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
   }
 
-   populateFilterEquation(): void {
+  populateFilterEquation(): void {
 
     const errorAlertform: SweetAlertOptions = {
       icon: 'error',
@@ -624,7 +624,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       label: ["", Validators.required],
       description: ["", Validators.required],
       time: ["",],
-      filterOption: ['', Validators.required],
+      filterOption: ['advance', Validators.required],
       no_of_request: ["",],
       no_of_records: ["",],
       size: ["",],
@@ -654,6 +654,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
     this.addPermissions();
     this.addCondition();
+    this.selectedFilterOption = 'advance'
   }
 
   get conditions(): FormArray {
@@ -1035,18 +1036,49 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
       }));
     });
   }
+
   updatePermissions() {
-    // readback permissions to the FormArray dynamically
     const permissionsFormArray = this.permissionForm.get('permissionsList') as FormArray;
 
-    this.data_temp[0].permissionsList.forEach((permission: { name: any; view: any; update: any; }) => {
+    // First populate the FormArray
+    this.permissionsList.forEach((permission: { name: any; view: any; update: any; }) => {
       permissionsFormArray.push(this.fb.group({
         name: [permission.name, Validators.required],
-        view: [permission.view],
-        update: [permission.update],
+        view: [false], // Initialize as false or null
+        update: [false],
       }));
     });
+
+    console.log('permissionsFormArray :>> ', permissionsFormArray);
+
+    // Now update the controls directly from data_temp
+    permissionsFormArray.controls.forEach((control: any) => {
+      const name = control.get('name')?.value;
+      const obj = this.data_temp[0].permissionsList.find((element: any) => element.name === name);
+
+      if (obj) {
+        control.get('view')?.setValue(obj.view);
+        control.get('update')?.setValue(obj.update);
+      } else {
+        control.get('view')?.setValue(false);
+        control.get('update')?.setValue(false);
+      }
+    });
   }
+
+
+  //   updatePermissions() {//legacy old code 
+  //   // readback permissions to the FormArray dynamically
+  //   const permissionsFormArray = this.permissionForm.get('permissionsList') as FormArray;
+
+  //   this.data_temp[0].permissionsList.forEach((permission: { name: any; view: any; update: any; }) => {
+  //     permissionsFormArray.push(this.fb.group({
+  //       name: [permission.name, Validators.required],
+  //       view: [permission.view],
+  //       update: [permission.update],
+  //     }));
+  //   });
+  // }
 
   populateDynamicEntries(dynamicEntriesData: any[]) {
     const dynamicEntriesArray = this.permissionForm.get('dynamicEntries') as FormArray;
@@ -1098,7 +1130,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
         "updated_time": Date.now()
       }
 
-      this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+      this.auditTrail.mappingAuditTrailData(UserDetails, this.client)
 
     }).catch((error) => {
       console.log("DREAMBOARD DELLETE ID ERROR:", error)
@@ -1110,7 +1142,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     this.initForm()
     this.formName = ''
     this.update = true
-    this.selectedFilterOption = ''
+    // this.selectedFilterOption = ''
     console.log("EDIT ID:", P1)
     this.data_temp = []
     this.fieldList = []
@@ -1128,8 +1160,9 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
         this.onSelectAll(this.data_temp[0].formgroup)
 
+        this.selectedFilterOption = this.data_temp[0]?.filterOption ?? 'advance'
         if (this.data_temp) {
-
+          console.log('this.data_temp :>> ', this.data_temp);
           this.permissionForm = this.fb.group({
             permissionID: [this.data_temp[0].permissionID],
             label: [this.data_temp[0].label],
@@ -1139,7 +1172,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
             no_of_records: [this.data_temp[0].no_of_request],
             size: [this.data_temp[0].size],
             setting: [this.data_temp[0].setting],
-            filterOption: [],
+            filterOption: [this.data_temp[0]?.filterOption ?? 'advance'],
             user_grade: [this.data_temp[0].user_grade],
             api_enable: [this.data_temp[0].api_enable],
             formgroup: [this.data_temp[0].formgroup],
@@ -1176,9 +1209,11 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
             "created_time": Date.now(),
             "updated_time": Date.now()
           }
-    
-          this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+
+          this.auditTrail.mappingAuditTrailData(UserDetails, this.client)
         }
+
+        // this.selectedFilterOption = this.data_temp[0]?.filterOption ?? 'advance'
 
       }
 
@@ -1200,6 +1235,20 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onSubmit(event: Event) {
+
+    if (this.permissionForm.invalid) {
+      this.permissionForm.markAllAsTouched(); // trigger validation messages
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'Permission Configuration is incomplete',
+        text: 'Please fill all required fields before submitting.',
+        confirmButtonColor: '#fc1900'
+      });
+
+      return;
+    }
+
 
     console.log("On CLICK OF Form Submit Event:", event)
 
@@ -1371,22 +1420,23 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
           "updated_time": Date.now()
         }
 
-        this.auditTrail.mappingAuditTrailData(UserDetails,this.client)
+        this.auditTrail.mappingAuditTrailData(UserDetails, this.client)
 
-        const Cognitobody = { "type": "cognitoServices",
+        const Cognitobody = {
+          "type": "cognitoServices",
           "event": {
             "path": "/timeoutPermissionSession",
             "queryStringParameters": {
-            "permissionID":this.updateResponse.permissionID,
-            "clientID":this.client
+              "permissionID": this.updateResponse.permissionID,
+              "clientID": this.client
             }
           }
-          }
+        }
 
 
         try {
           const response = await this.DynamicApi.getData(Cognitobody);
-          console.log("Cognito Revoke successfull  ",JSON.parse(response.body));
+          console.log("Cognito Revoke successfull  ", JSON.parse(response.body));
 
         } catch (error) {
           console.error('Error calling dynamic lambda:', error);

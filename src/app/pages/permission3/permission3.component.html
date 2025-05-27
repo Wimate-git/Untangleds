@@ -1,4 +1,7 @@
-<ngx-spinner *ngIf="loading" bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true"><p style="color: white" > Loading data, please wait... </p></ngx-spinner>
+<ngx-spinner *ngIf="loading" bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#fff" type="square-jelly-box"
+    [fullScreen]="true">
+    <p style="color: white"> Loading data, please wait... </p>
+</ngx-spinner>
 <div class="card">
     <div class="card-header border-0 pt-6">
         <h2>Permission Configuration</h2>
@@ -57,9 +60,9 @@
             <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
         </div>
         <div class="modal-body">
-            <div class="d-flex flex-column scroll-y p-9" id="kt_modal_update_customer_scroll"
-                data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}"
-                data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_update_customer_header"
+            <div class="d-flex flex-column scroll-y p-9" id="kt_modal_update_customer_scroll" data-kt-scroll="true"
+                data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto"
+                data-kt-scroll-dependencies="#kt_modal_update_customer_header"
                 data-kt-scroll-wrappers="#kt_modal_update_customer_scroll" data-kt-scroll-offset="300px">
                 <div class="collapse show" #collapse1="ngbCollapse" [(ngbCollapse)]="isCollapsed1">
                     <!--begin::Input group-->
@@ -74,8 +77,10 @@
                                 name="permissionID" placeholder="Enter permission Id" formControlName="permissionID"
                                 readonly required />
                             <span style="color: #fc1900;">{{error}}</span>
-                            <div *ngIf="permissionForm.controls['permissionID'].invalid && permissionForm.controls['permissionID'].touched"
-                                class="invalid-feedback">
+                            <div *ngIf="
+                                        permissionForm.get('permissionID')?.hasError('required') &&
+                                        permissionForm.get('permissionID')?.touched
+                                      " class="fv-plugins-message-container invalid-feedback">
                                 Permission Id is required.
                             </div>
                         </div>
@@ -85,8 +90,10 @@
                             <label class="required fw-semibold fs-6 mb-2">Label</label>
                             <input type="text" class="form-control form-control-solid" name="label"
                                 formControlName="label" placeholder="Enter label" />
-                            <div *ngIf="permissionForm.controls['label'].invalid && permissionForm.controls['label'].touched"
-                                class="invalid-feedback">
+                            <div *ngIf="
+                                        permissionForm.get('label')?.hasError('required') &&
+                                        permissionForm.get('label')?.touched
+                                      " class="fv-plugins-message-container invalid-feedback">
                                 Label is required.
                             </div>
                         </div>
@@ -96,11 +103,38 @@
                             <label class="required fw-semibold fs-6 mb-2">Description</label>
                             <input type="text" class="form-control form-control-solid" name="description"
                                 placeholder="Enter description" formControlName="description" />
-                            <div *ngIf="permissionForm.controls['description'].invalid && permissionForm.controls['description'].touched"
+                            <!-- <div *ngIf="permissionForm.controls['description'].invalid && permissionForm.controls['description'].touched"
                                 class="invalid-feedback">
                                 Description is required.
+                            </div> -->
+                            <span style="color: #fc1900;">{{error}}</span>
+                            <div *ngIf="
+                                        permissionForm.get('description')?.hasError('required') &&
+                                        permissionForm.get('description')?.touched
+                                      " class="fv-plugins-message-container invalid-feedback">
+                                Description is required
                             </div>
                         </div>
+
+                        <!-- refference <div class="col-md-4">
+                            <label class="required fw-semibold fs-6 mb-2"> User Name
+                            </label>
+
+                            <input type="text" class="
+                                        form-control form-control-lg form-control-solid
+                                        mb-3 mb-lg-0
+                                      " placeholder="Enter User Name" name="username" formControlName="username"
+                                required (keyup)="checkUniqueIdentifier($event)" autocomplete="off">
+
+                            <span style="color: #fc1900;">{{errorForUniqueID}}</span>
+                            <div *ngIf="
+                                        createUserField.get('username')?.hasError('required') &&
+                                        createUserField.get('username')?.touched
+                                      " class="fv-plugins-message-container invalid-feedback">
+                                Username is required
+                            </div>
+                        </div> -->
+
                         <!-- <div class="col-md-4 mb-4">
                             <label class="required fw-semibold fs-6 mb-2">Time</label>
                             <input type="number" class="form-control form-control-solid" name="time"
@@ -162,15 +196,18 @@
                         <div class="col-md-4 mb-6">
                             <label class="required fw-semibold fs-6 mb-2">Dreamboard ID</label>
                             <div class="custom-multiselect">
-            
-                                <p-multiSelect
-                                [options]="dreamBoardIDs" 
-                                value ="value"
-                                placeholder="Select dreamboard"
-                                (onChange)="onDreamboardSelect($event)"
-                                formControlName="dreamBoardIDs"
-                                required>
+
+                                <p-multiSelect [options]="dreamBoardIDs" value="value" placeholder="Select dreamboard"
+                                    (onChange)="onDreamboardSelect($event)" formControlName="dreamBoardIDs" required>
                                 </p-multiSelect>
+                            </div>
+
+                            <span style="color: #fc1900;">{{error}}</span>
+                            <div *ngIf="
+                                        permissionForm.get('dreamBoardIDs')?.hasError('required') &&
+                                        permissionForm.get('dreamBoardIDs')?.touched
+                                      " class="fv-plugins-message-container invalid-feedback">
+                                Please select Dreamboard ID
                             </div>
                             <!-- <div class="custom-multiselect">
                                 <ng-multiselect-dropdown style="
@@ -194,17 +231,21 @@
                             </div> -->
                         </div>
                         <div class="col-md-4 mb-6">
-                            <label class="fw-semibold fs-6 mb-2">Summary Dashboard</label>
+                            <label class="fw-semibold fs-6 mb-2 required">Summary Dashboard</label>
                             <div class="custom-multiselect">
-            
-                                <p-multiSelect
-                                [options]="summaryList" 
-                                value ="value"
-                                placeholder="Select summary permission"
-                                (onChange)="onModuleSelect($event)"
-                                formControlName="summaryList"
-                                required>
+
+                                <p-multiSelect [options]="summaryList" value="value"
+                                    placeholder="Select summary permission" (onChange)="onModuleSelect($event)"
+                                    formControlName="summaryList" required>
                                 </p-multiSelect>
+                            </div>
+
+                            <span style="color: #fc1900;">{{error}}</span>
+                            <div *ngIf="
+                                        permissionForm.get('summaryList')?.hasError('required') &&
+                                        permissionForm.get('summaryList')?.touched
+                                      " class="fv-plugins-message-container invalid-feedback">
+                                Please select Summary Dashboard
                             </div>
                             <!-- <div class="custom-multiselect">
                                 <ng-multiselect-dropdown style="
@@ -227,7 +268,7 @@
                                     [formControl]="$any(permissionForm.controls['summaryList'])">
                                 </ng-multiselect-dropdown>
                             </div> -->
-                        </div> 
+                        </div>
                         <div class="col-md-4 mb-6">
                             <label class="fw-semibold fs-6 mb-2">Advance Report Permission</label>
                             <div class="custom-multiselect">
@@ -275,17 +316,21 @@
                             </div>
                         </div> -->
                         <div class="col-md-4 mb-6">
-                            <label class="fw-semibold fs-6 mb-2">User Restriction</label>
+                            <label class="fw-semibold fs-6 mb-2 required">User Restriction</label>
                             <div class="custom-multiselect">
-            
-                                <p-multiSelect
-                                [options]="userList" 
-                                value ="value"
-                                placeholder="Select summary permission"
-                                (onChange)="onUserSelect($event)"
-                                formControlName="userList"
-                                required>
+
+                                <p-multiSelect [options]="userList" value="value"
+                                    placeholder="Select summary permission" (onChange)="onUserSelect($event)"
+                                    formControlName="userList" required>
                                 </p-multiSelect>
+                            </div>
+
+                            <!-- <span style="color: #fc1900;">{{error}}</span> -->
+                            <div *ngIf="
+                                        permissionForm.get('userList')?.hasError('required') &&
+                                        permissionForm.get('userList')?.touched
+                                      " class="fv-plugins-message-container invalid-feedback">
+                                Please select User Restriction
                             </div>
                             <!-- <div class="custom-multiselect">
                                 <ng-multiselect-dropdown style="
@@ -360,15 +405,17 @@
                           flex-nowrap w-100
                         " role="tablist">
 
-                            <li class="nav-item">
-                                <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Sidebar' }"
-                                    (click)="setActiveTab('Sidebar')" role="tab">
+                            <li class="nav-item ">
+                                <a class="nav-link cursor-pointer required"
+                                    [ngClass]="{ active: activeTab === 'Sidebar' }" (click)="setActiveTab('Sidebar')"
+                                    role="tab">
                                     Modules
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Toolbar' }"
-                                    (click)="setActiveTab('Toolbar')" role="tab">
+                            <li class="nav-item ">
+                                <a class="nav-link cursor-pointer required"
+                                    [ngClass]="{ active: activeTab === 'Toolbar' }" (click)="setActiveTab('Toolbar')"
+                                    role="tab">
                                     Form Group
                                 </a>
                             </li>
@@ -443,8 +490,9 @@
                                                       background-image: none;
                                                       border-radius: 4px;
                                                       " class="form-select form-select-solid form-select"
-                                            (onSelect)="dynamicFormSelect($event)" [placeholder]="'dynamic form'"[disabled]="disabled"
-                                            [settings]="dropdownSettings_" [data]="formList" name="dynamicForm"
+                                            (onSelect)="dynamicFormSelect($event)" [placeholder]="'dynamic form'"
+                                            [disabled]="disabled" [settings]="dropdownSettings_" [data]="formList"
+                                            name="dynamicForm"
                                             [formControl]="$any(permissionForm.controls['dynamicForm'])">
                                         </ng-multiselect-dropdown>
                                     </div>
@@ -497,7 +545,7 @@
                                     </div>
                                 </div>
                                 <div *ngIf="selectedFilterOption === 'advance'" class="row">
-                                    
+
                                     <div class="col-md-3 mb-4">
                                         <label class="fw-semibold fs-6 mb-2">Field Label</label>
                                         <select class="form-select form-select-solid form-select" name="field"
@@ -610,23 +658,27 @@
                                                         </select>
                                                     </div>
 
-                                                    <div style="width: 100%; display: flex; justify-content: flex-start;">
-                                                        <button *ngIf="condIndex != 0" type="button" class="btn btn-danger btn-sm mt-2 mb-2" (click)="removeCondition(condIndex)">
+                                                    <div
+                                                        style="width: 100%; display: flex; justify-content: flex-start;">
+                                                        <button *ngIf="condIndex != 0" type="button"
+                                                            class="btn btn-danger btn-sm mt-2 mb-2"
+                                                            (click)="removeCondition(condIndex)">
                                                             Remove Condition
                                                         </button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <button type="button" class="btn btn-primary btn-sm mt-2" [disabled]="!isConditionsValid"
-                                            (click)="addCondition()">Add Condition</button>
+                                        <button type="button" class="btn btn-primary btn-sm mt-2"
+                                            [disabled]="!isConditionsValid" (click)="addCondition()">Add
+                                            Condition</button>
                                     </div>
                                     <div class="col-md-2 mb-16 d-flex align-items-end">
                                         <button type="button" class="btn btn-primary w-60"
                                             (click)="addDynamicData()">Add</button>
                                     </div>
                                 </div>
-                                
+
 
 
                             </div>
@@ -713,7 +765,6 @@
                 Discard
             </button>
             <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary"
-                [disabled]="permissionForm.invalid || permissionForm.pristine"
                 [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
                 <span *ngIf="!update" class="indicator-label">Submit</span>
                 <span *ngIf="update" class="indicator-label">Update</span>
