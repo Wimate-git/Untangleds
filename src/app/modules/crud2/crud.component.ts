@@ -73,6 +73,9 @@ export class Crud2Component implements OnInit, AfterViewInit, OnDestroy{
     else if(this.componentSource == 'client-configuration'){
       this.filterSearch = 'client_filter'
     }
+    else{
+      this.filterSearch = 'company_filter'
+    }
 
 
 

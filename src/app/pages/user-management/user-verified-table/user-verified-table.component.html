@@ -50,8 +50,12 @@
         </tr>
       </tbody>
     </table>
+    <div *ngIf="searchText != '' && filteredUsers.length == 0" class="error-message">
+      <p>No user found with the entered value.</p>
+    </div>
+
     <div *ngIf="unverifiedUsers.length > 0" class="user-count">
-      <p>Total Unconfirmed Users: {{ unverifiedUsers.length }}</p>
+      <p>Total Unconfirmed Users: {{ searchText != '' ?  filteredUsers.length + " of " + unverifiedUsers.length : unverifiedUsers.length }}</p>
     </div>
 
     <!-- Pagination Controls -->

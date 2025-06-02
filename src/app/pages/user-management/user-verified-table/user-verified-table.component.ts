@@ -53,7 +53,7 @@ export class UserVerifiedTableComponent implements OnInit {
   }
 
   filterUsers() {
-    const search = this.searchText.toLowerCase();
+    const search = this.searchText.toLowerCase().trim();
     this.filteredUsers = this.unverifiedUsers.filter(user =>
       user.username.toLowerCase().includes(search) ||
       user.email.toLowerCase().includes(search)

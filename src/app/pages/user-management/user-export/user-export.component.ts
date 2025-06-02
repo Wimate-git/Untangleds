@@ -307,6 +307,8 @@ export class UserExportComponent {
 
     fetchedData = fetchedData.map((item: any) => item && typeof item.metadata == 'string' ? JSON.parse(item.metadata) : item.metadata)
 
+    fetchedData = fetchedData.sort((a:{updated:any},b:{updated:any})=> new Date(b.updated).getTime() - new Date(a.updated).getTime())
+
     console.log("Fetched data is here ", fetchedData);
     this.downloadExcell(fetchedData, 'users_xlsx')
 

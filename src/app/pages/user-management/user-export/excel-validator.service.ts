@@ -300,6 +300,8 @@ export class ExcelValidatorService {
           });
 
           const excelUsernameList = data.map((item:any)=>item[0])
+          const excelEmailList = data.map((item:any)=>item[4])
+          const excelUserIDList = data.map((item:any)=>item[5])
   
           // Validate each data row
           for (let rowIndex = 1; rowIndex < data.length; rowIndex++) {
@@ -426,6 +428,33 @@ export class ExcelValidatorService {
                     });
                   }
 
+
+
+                  if(header === 'Email' && validation.required){
+                    excelEmailList
+                    if (
+                      header === 'Email' &&
+                      validation.required &&
+                      typeof cellValue === 'string' &&
+                      excelEmailList.filter(
+                        (item: any) =>
+                          typeof item === 'string' &&
+                          cellValue.toLowerCase() === item.toLowerCase()
+                      ).length > 1
+                    ) {
+  
+                      errors.push({
+                        row: rowIndex + 1,
+                        column: header,
+                        columnLetter,
+                        value: cellValue,
+                        error: `Duplicate Email found`,
+                      });
+                    }
+                  }
+
+
+
                     //Check for companyID
                     if (header === 'User ID' && validation.required && uniqueList[3].includes(cellValue) == true && !editOperation) {
                       errors.push({
@@ -435,6 +464,30 @@ export class ExcelValidatorService {
                         value: cellValue,
                         error: `${cellValue} ${header} already exist`
                       });
+                    }
+
+
+                    if(header === 'User ID' && validation.required){
+                      excelUserIDList
+                      if (
+                        header === 'User ID' &&
+                        validation.required &&
+                        typeof cellValue === 'string' &&
+                        excelUserIDList.filter(
+                          (item: any) =>
+                            typeof item === 'string' &&
+                            cellValue.toLowerCase() === item.toLowerCase()
+                        ).length > 1
+                      ) {
+    
+                        errors.push({
+                          row: rowIndex + 1,
+                          column: header,
+                          columnLetter,
+                          value: cellValue,
+                          error: `Duplicate UserID's found`,
+                        });
+                      }
                     }
 
 
