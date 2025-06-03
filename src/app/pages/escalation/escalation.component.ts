@@ -56,7 +56,7 @@ export class EscalationComponent implements OnInit {
   dropdownSettings: IDropdownSettings = {};
   multiselectModule: any = [];
   stopTimer: any = '';
-  maxlength=5;
+  maxlength: number = 500;
   getDialogData: any = {
     id: '',
     client_id: '',
