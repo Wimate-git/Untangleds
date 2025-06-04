@@ -31,10 +31,6 @@
     <!-- Last Updated Time: {{lastUpdatedTime}} -->
   </button>
 
-
-  
-  
-
 </div>
 
 
@@ -101,7 +97,8 @@
                 
                 [style.height.px]="item.grid_type === 'chart' ? 300 : null" 
                 [style.width.px]="item.grid_type === 'chart' ? 400 : null" 
-                (click)="handleClick(item, i, $event)"
+                (click)="onItemClick(item, i, $event)"
+
                 (dblclick)="
                 (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView)) &&
                 (item.grid_type === 'tile' 
@@ -346,6 +343,7 @@
                       [summaryDashboardUpdate]="summaryDashboardUpdate" 
                       [summaryDashboardView]="summaryDashboardView"
                       [hidingLink]="hidingLink"
+                      (customEvent)="onFilterClick(item, i, $event)"
                      
                       (customEvent1)="emitDuplicate($event)" 
                       (customEvent2)="emitDelete6($event)"
@@ -793,7 +791,7 @@
 
   <ngx-spinner 
   *ngIf="isLoading" 
-  bdColor="rgba(0, 0, 0, 0.8)" 
+  bdColor="#000000" 
   size="medium" 
   color="#fff" 
 
@@ -841,7 +839,7 @@
    [style.visibility]="hideNavMenu ||  !(!disableMenuQP&&(!(summaryPermission?.includes('None')) || userPermission === 'All'))&&!isNone?'hidden':'visible' "> -->
 
    <div style="top: 1%; z-index: 100; right:44px; flex-direction: column;" 
-     class="d-flex position-fixed fw-bolder zindex-2 mt-20 gap-2" 
+     class="d-flex position-fixed fw-bolder zindex-2  gap-2"  [ngClass]="isSummaryEngine() ? 'mt-20' : 'mt-1'"
      [style.visibility]="hideNavMenu ||  !(!disableMenuQP && (!(summaryPermission?.includes('None')) || userPermission === 'All')) && !isNone ? 'hidden' : 'visible'">
 
   
@@ -986,10 +984,14 @@
             [summaryDashboardUpdate]="summaryDashboardUpdate"
             [summaryDashboardView]="summaryDashboardView"
             [userPermission]="userPermission"
+            (datatableReady)="onDatatableReady()"
             class="table-responsive">
           </app-crud-summary>
           <table #dataTable class="table table-striped table-bordered"></table>
+
         </div>
+
+
       </div>
 <!--       
       <div class="modal-footer">
@@ -997,16 +999,34 @@
 
         <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
       </div> -->
-      <div class="modal-footer d-flex justify-content-between">
-        <!-- Pagination Info at the start of the page -->
-        <div class="pagination-info">
-          <!-- Displaying the current record range and total records -->
-          Showing {{startRecord}} to {{endRecord}} of {{totalRecords}} entries
+      <!-- <div class="modal-footer d-flex flex-wrap justify-content-between align-items-center">
+
+        <div class="pagination-info mb-2 mb-md-0">
+          Showing {{ startRecord }} to {{ endRecord }} of {{ totalRecords }} entries
         </div>
+      
+    
+         <div class="dt-paging">
+          <ul class="pagination mb-2 mb-md-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" href="javascript:void(0)" (click)="changePage(currentPage - 1)">Previous</a>
+            </li>
         
-        <!-- "Close" button at the end of the page -->
-        <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
-      </div>
+            <li class="page-item" *ngFor="let page of pageNumbers" [class.active]="page === currentPage">
+              <a class="page-link" href="javascript:void(0)" (click)="changePage(page)">{{ page }}</a>
+            </li>
+        
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <a class="page-link" href="javascript:void(0)" (click)="changePage(currentPage + 1)">Next</a>
+            </li>
+          </ul>
+         </div>
+
+      
+
+
+      </div> -->
+      
       
       
       
@@ -1288,6 +1308,27 @@
                             </div>
                           </div>
                         </div>
+
+
+                        <!-- <div class="col-lg-4 col-md-4 col-sm-6 mb-4 mt-4">
+                          <div class="d-flex align-items-center">
+                            <label for="toggleCheck" class="col-createChart-label fw-bold fs-6  me-2">
+                         Enable Dashboard Restriction
+                            </label>
+                            <div class="form-check form-switch">
+                              <input
+                              class="form-check-input"
+                              type="checkbox"
+                              name="add_fields"
+                          
+                              formControlName="DashboardRestriction"
+                        
+                              id="toggleCheck"
+                            >
+                            
+                            </div>
+                          </div>
+                        </div> -->
             
             </div>
   
@@ -1679,7 +1720,7 @@
 
             <div class="col-md-12">
               <!-- Bar Chart Button -->
-              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7 disabled-button"  style="border: 0px; display: block; width: 100%;">
+              <button class="container col bg-light-primary px-6 py-8 rounded-2 mb-7 disabled-button" [disabled]="true"  style="border: 0px; display: block; width: 100%;">
                 <div class="container">
                   <!-- Column Chart Container -->
                   <div class="chart-container ">
@@ -2641,11 +2682,31 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
 
 
   <ng-template #miniTableView let-modal>
+    <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+        style="position: relative; top: 4px; right: 4px;">
+      </button>
+    </div>
+  
+  
     <app-mini-table-view-tile1
     [minitableDataTile1]="minitableDataTile1" [emitEvent]="emitEvent" [SK_clientID]="SK_clientID" [FormNameMini]="FormNameMini"
     ></app-mini-table-view-tile1>
   </ng-template>
   <ng-template #miniTableViewChart1 let-modal>
+    <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+        style="position: relative; top: 4px; right: 4px;">
+      </button>
+    </div>
     <app-mini-table-view-chart1
     [minitableDataChart1]="minitableDataChart1" [emitEvent]="emitEvent" [SK_clientID]="SK_clientID" [FormNameMini]="FormNameMini"
     ></app-mini-table-view-chart1>
@@ -2654,6 +2715,15 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
 
 
   <ng-template #miniTableViewChart3 let-modal>
+    <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+        style="position: relative; top: 4px; right: 4px;">
+      </button>
+    </div>
     <app-mini-table-view-chart3
     [minitableDataChart3]="minitableDataChart3" [emitEvent]="emitEvent" [SK_clientID]="SK_clientID" [FormNameMini]="FormNameMini"
     ></app-mini-table-view-chart3>
@@ -2662,18 +2732,18 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   <ng-template #dataTableModal let-modal>
     <app-data-table-show
     [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"  (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
- (miniTableIconChart1)="receiveminiTableChart3($event,miniTableViewChart3)"   (emitfullRowData)="miniTableDataReceiveChart1($event)" (sendFormNameForMini)="helperForName($event)"
+ (miniTableIconChart1)="receiveminiTableChart3($event,miniTableViewChart3)"   (emitfullRowData)="miniTableDataReceiveChart1($event)" (sendFormNameForMini)="helperForName($event)" [SK_clientID]="SK_clientID"
     ></app-data-table-show>
   </ng-template>
   <ng-template #dataTableStackedModal let-modal>
     <app-data-table-stacked-bar
-    [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"  (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
+    [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"  (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)" [SK_clientID]="SK_clientID"
     ></app-data-table-stacked-bar>
   </ng-template>
   <ng-template #dataTableModalChart1 let-modal>
     <app-data-table-chart1
    
-       [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)" (miniTableIconChart1)="receiveminiTableChart1($event,miniTableViewChart1)"   (emitfullRowData)="miniTableDataReceiveChart1($event)" (sendFormNameForMini)="helperForName($event)"
+       [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)" (miniTableIconChart1)="receiveminiTableChart1($event,miniTableViewChart1)"   (emitfullRowData)="miniTableDataReceiveChart1($event)" (sendFormNameForMini)="helperForName($event)" [SK_clientID]="SK_clientID"
     ></app-data-table-chart1>
   </ng-template>
 
@@ -2681,7 +2751,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   <ng-template #dataTableModalPieChart let-modal>
     <app-data-table-pie-chart
    
-       [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
+       [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)" [SK_clientID]="SK_clientID"
     ></app-data-table-pie-chart>
   </ng-template>
   <ng-template #dataTableModalChart2 let-modal>
@@ -2703,6 +2773,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   (sendFormNameForMini)="helperForName($event)"
   (emitfullRowDataToParent)="miniTableDataReceive($event)"
   (miniTableIcon)="receiveminiTableIcon($event,miniTableView)"
+  [SK_clientID]="SK_clientID"
 
     ></app-data-table-tile1>
   </ng-template>
@@ -2756,9 +2827,10 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   <ng-template #dataTableModalFunnelChart let-modal>
     <app-data-table-funnel-chart
    
-       [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)"
+       [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)" [SK_clientID]="SK_clientID"
     ></app-data-table-funnel-chart>
   </ng-template>
+  
 
 
 
@@ -2775,6 +2847,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
     <app-gauge-chart-config  [dashboard]="dashboard" (dashboardChange)="getGridDetails2($event)"[modal]="modal" (update_PowerBoard_config)="updateSummaryHelper2($event)" [all_Packet_store]="all_Packet_store" (send_all_Packet_store1)="allPacketStoreReceiver2($event)" ></app-gauge-chart-config>
   
   </ng-template>
+
   </div>
 <!--   
   <ng-template #modalContent>

@@ -41,10 +41,16 @@ export class ChartUi2Component implements OnInit{
   mobileChartWidth: number = window.innerWidth * 0.85;  // Custom mobile width
   mobileChartHeight: number = window.innerWidth * 0.87; // Custom mobile height
   @Input() eventFilterConditions : any
-  
+  iframeUrl: any;
+  selectedMarkerIndex: any;
+  storeRedirectionCheck: any;
+  tile1Config: any;
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
     console.log('eventFilterConditions chart ui1',this.eventFilterConditions)
+    this.storeRedirectionCheck = this.item.toggleCheck
+
+    this.tile1Config = this.item;
  
       // console.log("DynamicLine chart",this.item)
 
@@ -358,6 +364,107 @@ this.formTableConfig = {
 
 
   }
+
+  helperDashboard(item: any, index: any, modalContent: any, selectType: any, ModuleNames: any) {
+    console.log('selectType checking dashboard', selectType);
+    console.log('item checking from', item);
+    console.log('ModuleNames:', ModuleNames);
   
+    // ✅ Only handle custom logic for Summary Dashboard
+    if (selectType && ModuleNames === 'Summary Dashboard') {
+      const viewMode = true;
+      const disableMenu = true;
+      localStorage.setItem('isFullScreen', JSON.stringify(true));
+  
+      const modulePath = item.dashboardIds;
+      const isFullScreen = localStorage.getItem('isFullScreen') === 'true';
+      const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}&isFullScreen=${isFullScreen}`;
+  
+      const fullUrl = `/summary-engine/${modulePath}${queryParams}`;
+  
+      this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+        window.location.origin + fullUrl
+      );
+  
+      this.selectedMarkerIndex = index;
+  
+      if (selectType === 'NewTab') {
+        window.open(this.iframeUrl.changingThisBreaksApplicationSecurity, '_blank');
+      } else if (selectType === 'Modal') {
+        this.modalService.open(modalContent, { size: 'xl' });
+      } else if (selectType === 'Same page Redirect') {
+        this.router.navigateByUrl(fullUrl).catch(err => console.error('Navigation error:', err));
+      }
+    } 
+    // ✅ If module is NOT Summary Dashboard, delegate to general redirect
+    else if (selectType && ModuleNames !== 'Summary Dashboard') {
+      this.redirectModule(item);
+    }
+  }
+  
+  
+  redirectModule(recieveItem: any) {
+    console.log('recieveItem check', recieveItem);
+  
+    const moduleName = recieveItem.dashboardIds;
+    const selectedModule = recieveItem.ModuleNames;
+    const redirectType = recieveItem.selectType; // 'NewTab' or 'Same page Redirect'
+  
+    console.log('moduleName:', moduleName);
+    console.log('selectedModule:', selectedModule);
+    console.log('selectType (redirectType):', redirectType);
+  
+    let targetUrl: string = '';
+    const isNewTab = redirectType === 'NewTab';
+  
+    switch (selectedModule) {
+      case 'Forms':
+        targetUrl = `/view-dreamboard/Forms/${moduleName}`;
+        break;
+  
+      case 'Summary Dashboard':
+        targetUrl = `/summary-engine/${moduleName}`;
+        break;
+  
+      case 'Dashboard':
+        targetUrl = `/dashboard/dashboardFrom/Forms/${moduleName}`;
+        break;
+  
+      case 'Projects':
+        targetUrl = `/project-dashboard/project-template-dashboard/${moduleName}`;
+        break;
+  
+      case 'Calender':
+        targetUrl = `/view-dreamboard/Calendar/${moduleName}`;
+        break;
+  
+      case 'Report Studio':
+        const tree = this.router.createUrlTree(['/reportStudio'], {
+          queryParams: { savedQuery: moduleName }
+        });
+        targetUrl = this.router.serializeUrl(tree); // already serialized
+        break;
+  
+      default:
+        console.error('Unknown module:', selectedModule);
+        return;
+    }
+  
+    // 🔁 Navigation logic
+    if (isNewTab) {
+      // Open serialized or regular route as full URL
+      window.open(targetUrl, '_blank');
+    } else {
+      // Same Page Navigation
+      if (selectedModule === 'Report Studio') {
+        this.router.navigateByUrl(targetUrl).catch(err => console.error('Navigation error:', err));
+      } else {
+        this.router.navigate([targetUrl]).catch(err => console.error('Navigation error:', err));
+      }
+    }
+  }
+  closeModal() {
+    this.modalService.dismissAll(); // Close the modal programmatically
+  }
 
 }

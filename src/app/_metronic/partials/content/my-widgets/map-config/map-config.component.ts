@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -139,6 +139,30 @@ export class MapConfigComponent {
 
   }
 
+
+  dateTypeOptions = [
+    { value: 'is', label: 'is' },
+    { value: '>=', label: '>=' },
+    { value: '<=', label: '<=' },
+    { value: 'between', label: 'between' },
+    { value: 'between time', label: 'between time' },
+    { value: 'less than days ago', label: 'less than days ago' },
+    { value: 'more than days ago', label: 'more than days ago' },
+    { value: 'in the past', label: 'in the past' },
+    { value: 'days ago', label: 'days ago' },
+    { value: 'today', label: 'today' },
+    { value: 'yesterday', label: 'yesterday' },
+    { value: 'this week', label: 'this week' },
+    { value: 'last week', label: 'last week' },
+    { value: 'last 2 weeks', label: 'last 2 weeks' },
+    { value: 'this month', label: 'this month' },
+    { value: 'last month', label: 'last month' },
+    { value: 'this year', label: 'this year' },
+    { value: 'any', label: 'any' },
+    { value: 'latest 10', label: 'latest 10' }
+  ];
+  
+
   onDateTypeChange(value: string) {
 
     this.createChart.get('singleDate')?.clearValidators();
@@ -171,6 +195,33 @@ export class MapConfigComponent {
     this.createChart.get('endDate')?.updateValueAndValidity();
     this.createChart.get('daysAgo')?.updateValueAndValidity();
   }
+
+  tooltipContent: string = 'Group data by time periods like Today, Last 7 Days, This Month, etc. to view filtered insights based on the selected range.';
+  formTooltip: string = 'Select a form to view and analyze data specific to that form only.';
+  parameterTooltip: string = 'Select the type of location to display. Choosing "Graphic" will show graphic locations, while selecting "Tracking" will display tracking locations.';
+
+
+  formatTypeTooltip: string = 'Select a format to represent the output value appropriately, such as Rupee for money, Distance for measurements, or Percentage for ratios.';
+  customLabelTooltip: string = 'Specify a custom label to be used as the title displayed on the widget.';
+  moduleNamesTooltip: string = 'Select the module that the user will be redirected to when the widget is clicked.';
+  selectTypeTooltip: string = 'Choose how the dashboard should open when the widget is clicked—open in a new tab, within a modal, on the same page.';
+
+  redirectToTooltip: string = 'Select the specific dashboard or module to which the user should be redirected when the widget is clicked.';
+
+  columnVisibilityTooltip: string = 'Select the fields you want to display in the drill-down table. Only the selected columns will be visible in the detailed view.';
+
+  UndefinedtooltipContent: string = 'Enter the text to display when the output label is undefined. This will replace the default "undefined" label in the final result.';
+  DateRangetooltipContent: string = 'Select how the date range should be labeled. "Any" supports flexible time grouping.';
+
+  CustomLabeltooltipContent: string = 'This text will appear as a tooltip on the widget to describe the displayed value.';
+  ParametertooltipContent: string = 'Specifies the number of parameters to configure.';
+  ChartTitletooltipContent: string = 'This title will appear as the heading of the map.';
+customLabelValue: string = 'Enter a custom label to display inside the donut chart along with the value. This label helps identify what the value represents.';
+CustomValueLabelFontSize: string = 'Defines the font size of the custom label shown inside the donut chart.';
+
+markerTooltip: string = 'Select a marker type to display on the map. The chosen marker will visually represent data or location points.';
+infoWindowTooltip: string = 'Select the fields to display in the marker’s info window. The selected fields will be replaced with actual values on the map.';
+
   dateTypeConfig :any= {
     'is': { showDate: true },
     '>=': { showDate: true },
@@ -247,6 +298,12 @@ console.log('Cleaned-up formlist values:', this.formlistValues);
 
 
   }
+
+  openDateTypeHelper(stepperModal: TemplateRef<any>){
+      this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false    });
+  
+    }
   fetchDynamicFormDataForAll(values: string[]) {
     values.forEach((value, index) => {
       this.fetchDynamicFormData(value, index);

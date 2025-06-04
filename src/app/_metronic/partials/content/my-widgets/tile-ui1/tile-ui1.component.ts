@@ -59,6 +59,9 @@ export class TileUi1Component implements OnInit{
     console.log('dashboardChange tile1 ui',this.all_Packet_store)
     console.log('this.liveDataTile check',this.liveDataTile)
     console.log('this.queryParamsSend checking',this.queryParamsSend)
+    console.log('this.item i am checking from ng onchanges',this.item)
+    this.item.multi_value = JSON.parse(this.item.multi_value)
+    console.log('this.item in else condition',this.item)
 
 }
 
@@ -85,55 +88,35 @@ get shouldShowButton(): boolean {
     this.check = this.isButtonVisible;
     console.log('this.check checking',this.check)
 
-  //     this.summaryService.lookUpData$.subscribe((data: any)=>{
-  //       console.log('data check>>> tileui1',data)
-  //  let tempCharts:any=[]
-  // data.forEach((packet: any,matchedIndex:number) => {
-    
-  //   if(packet.grid_type == 'tile'&& this.index==matchedIndex && packet.id === this.item.id){
-  //     tempCharts[matchedIndex] = packet
-  //     console.log('packet checking response data',packet)
-      
-  //     this.formatTile(packet)
-  
-  //   }
-  // });
-  
-  
-  
-        
-  //       // console.log("✅ Matched Charts:", matchedCharts);
-        
-      
-        
-        
-  //     })
-    
 
+this.summaryService.lookUpData$.subscribe((data: any) => {
+  console.log('data check>>> tileui1', data);
 
-  this.summaryService.lookUpData$.subscribe((data: any) => {
-    console.log('data check>>> tileui1', data);
-    let tempCharts: any[] = [];
-    let duplicateIds: Set<any> = new Set(); // Set to keep track of duplicate ids
+  if (data && Array.isArray(data)) { // Check if data is not null or undefined and is an array
+      let tempCharts: any[] = [];
+      let duplicateIds: Set<any> = new Set(); // Set to keep track of duplicate ids
 
-    data.forEach((packet: any, matchedIndex: number) => {
-        if (packet.grid_type == 'tile' && this.index == matchedIndex && packet.id === this.item.id) {
-            if (duplicateIds.has(packet.id)) {
-                // If a duplicate is found, show SweetAlert but continue processing
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Duplicate ID Found',
-                    text: `The ID '${packet.id}' is duplicated in the data. Processing continues.`,
-                });
-            } else {
-                duplicateIds.add(packet.id); // Add the id to the set to track duplicates
-            }
-            
-            tempCharts[matchedIndex] = packet;
-            console.log('packet checking response data', packet);
-            this.formatTile(packet);
-        }
-    });
+      data.forEach((packet: any, matchedIndex: number) => {
+          if (packet.grid_type == 'tile' && this.index == matchedIndex && packet.id === this.item.id) {
+              if (duplicateIds.has(packet.id)) {
+                  // If a duplicate is found, show SweetAlert but continue processing
+                  Swal.fire({
+                      icon: 'warning',
+                      title: 'Duplicate ID Found',
+                      text: `The ID '${packet.id}' is duplicated in the data. Processing continues.`,
+                  });
+              } else {
+                  duplicateIds.add(packet.id); // Add the id to the set to track duplicates
+              }
+              
+              tempCharts[matchedIndex] = packet;
+              console.log('packet checking response data', packet);
+              this.formatTile(packet);
+          }
+      });
+  } else {
+      console.warn('Received data is null or not an array');
+  }
 });
 
 
@@ -152,7 +135,8 @@ get shouldShowButton(): boolean {
 
     }
     else{
-      console.log('this.item in else',this.item)
+      this.item.multi_value = JSON.parse(this.item.multi_value)
+      console.log('this.item in else condition',this.item)
     }
 
   

@@ -48,3 +48,20 @@
 .dataTables_filter {
   display: none;
 }
+// table.dataTable {
+//   table-layout: fixed !important;
+// }
+
+table.dataTable td {
+  white-space: normal !important;
+  word-break: break-word;
+  vertical-align: top;
+}
+
+.wrap-text {
+  white-space: normal !important;
+  word-break: break-word;
+  display: block;
+  max-width: 300px;
+}
+

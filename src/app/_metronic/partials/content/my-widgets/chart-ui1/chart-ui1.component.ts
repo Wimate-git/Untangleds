@@ -106,6 +106,8 @@ export class ChartUi1Component implements OnChanges,OnInit {
   enableDrillButton: boolean =true;
   formTableConfig: FormTableConfig = { columnVisibility: [] };
   storeMainFilterCon: any;
+  isBarClickableMap: { [key: number]: boolean } = {};
+
   // const storeColumnVisibility: FormTableConfig = this.formTableConfig.columnVisibility[0];
   
   
@@ -455,7 +457,7 @@ else {
       }),
     };
   
-    console.log('requestBody checking chart1Drilldown', requestBody);
+    console.log('requestBody checking chart1Drilldown data Table', requestBody);
   
     // Send a POST request to the Lambda function
     this.http.post(apiUrl, requestBody).subscribe(
@@ -473,7 +475,7 @@ else {
                       this.storeDrillFilter = this.parseChartData.DrillFilter;
                       this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
   
-                      this.summaryService.updatelookUpData(this.parseChartData);
+                      // this.summaryService.updatelookUpData(this.parseChartData);
                   } else {
                       this.processedData = JSON.parse(item.rowdata);
                       console.log(`this.processedData check at index ${index}`, this.processedData);
@@ -565,16 +567,23 @@ this.http.post(apiUrl, requestBody).subscribe(
                   this.storeDrillFilter = this.parseChartData.DrillFilter;
                   this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
 
+                  
+
                   this.summaryService.updatelookUpData(this.parseChartData);
-              } else {
-                  this.processedData = JSON.parse(item.rowdata);
-                  console.log(`this.processedData check at index ${index}`, this.processedData);
-                  this.paresdDataEmit.emit(this.processedData);
-              }
+              } 
+              // else {
+              //     this.processedData = JSON.parse(item.rowdata);
+              //     console.log(`this.processedData check at index ${index}`, this.processedData);
+              //     this.paresdDataEmit.emit(this.processedData);
+              // }
       
           });
           // Hide the spinner after API processing
-          this.spinner.hide('dataProcess' + index);
+          setTimeout(() => {
+            this.spinner.hide('dataProcess' + index);
+            
+          }, 2000);
+   
       } else {
           // Hide the spinner in case of an error
           this.spinner.hide('dataProcess' + index);
@@ -794,36 +803,48 @@ if(storeconditionsLength === undefined){
 
     }
     else {
-      // Create a deep copy of the original chart options by stringifying and parsing it
+      // Declare or ensure a per-chart control map
+      if (!this.isBarClickableMap) this.isBarClickableMap = {};
+      this.isBarClickableMap[this.index] = true; // Initialize clickable flag
+    
+      // Create a deep copy of the original chart options
       const chartOptionsCopy = JSON.parse(this.item.highchartsOptionsJson);
       console.log('chartOptionsCopy with preserved properties:', chartOptionsCopy);
     
-      // Since chartOptionsCopy is already an object, no need to parse it again
-      const readOptions = chartOptionsCopy; // Use chartOptionsCopy directly
+      const readOptions = chartOptionsCopy;
       console.log('readOptions checking from chart1', readOptions);
     
-      // Modify the series data with necessary transformations
+      // Modify the series data
       readOptions.series = readOptions.series.map((series: any) => {
-        console.log('readOptions.series checking',readOptions.series)
+        console.log('readOptions.series checking', readOptions.series);
         return {
           ...series,
           data: series.data.map((point: any, index: number) => ({
-            name: point.name,         // Directly access the name property
-            y: point.y,               // Directly access the y property (value)
-            customIndex: index,       // Custom index for the point
-            selected: point.selected, // Directly access the selected property
-            sliced: point.sliced,     // Directly access the sliced property
-    
+            name: point.name,
+            y: point.y,
+            customIndex: index,
+            selected: point.selected,
+            sliced: point.sliced,
             events: {
-              click: (event: Highcharts.PointClickEventObject) => this.onBarClick(event, this.index),
+              click: (event: Highcharts.PointClickEventObject) => {
+                if (!this.isBarClickableMap[this.index]) return;
+    
+                this.isBarClickableMap[this.index] = false; // Disable further clicks temporarily
+                this.onBarClick(event, this.index);
+    
+                setTimeout(() => {
+                  this.isBarClickableMap[this.index] = true; // Re-enable after 1 second
+                }, 1000); // Adjust delay if needed
+              },
             },
           })),
         };
       });
     
-      // Initialize the Highcharts pie chart once
+      // Initialize the chart
       Highcharts.chart(`pieChart${this.index + 1}`, chartOptionsCopy);
     }
+    
     
 
     // Ensure that each chart gets a unique copy of the options
@@ -841,45 +862,104 @@ if(storeconditionsLength === undefined){
      
     ){}
 
-  helperDashboard(item:any,index:any,modalContent:any,selectType:any){
-    console.log('selectType checking dashboard',selectType)
-    console.log('item checking from ',item)
-    // if (typeof this.item.chartConfig === 'string') {
-    //   this.gridOptions = JSON.parse(this.item.chartConfig);
-    // } else {
-    //   this.gridOptions = this.item.chartConfig; // Already an object
-    // }
-    const viewMode = true;
-    const disableMenu = true
-
-
-console.log('this.gridOptions checking from chart',this.gridOptions)
-    localStorage.setItem('isFullScreen', JSON.stringify(true));
-    const modulePath = this.item.dashboardIds; // Adjust with your module route
-    console.log('modulePath checking from chart',modulePath)
-    // queryParams.append('isFullScreen', 'true');
-// Set isFullScreen to true in local storage
-localStorage.setItem('isFullScreen', 'true');
-
-// Retrieve and use it later
-const isFullScreen = localStorage.getItem('isFullScreen') === 'true';
-
-// Now you can use `isFullScreen` in your logic
-const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}&isFullScreen=${isFullScreen}`; 
-this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(window.location.origin + "/summary-engine/" + modulePath + queryParams);
-
- this.selectedMarkerIndex = index
- if (selectType === 'NewTab') {
-  // Open in a new tab
-  window.open(this.iframeUrl.changingThisBreaksApplicationSecurity, '_blank');
-} else if(selectType === 'Modal'){
-  // Open in the modal
-  this.modalService.open(modalContent, { size: 'xl' });
-}
-
-
-  }
-
+    helperDashboard(item: any, index: any, modalContent: any, selectType: any, ModuleNames: any) {
+      console.log('selectType checking dashboard', selectType);
+      console.log('item checking from', item);
+      console.log('ModuleNames:', ModuleNames);
+    
+      // ✅ Only handle custom logic for Summary Dashboard
+      if (selectType && ModuleNames === 'Summary Dashboard') {
+        const viewMode = true;
+        const disableMenu = true;
+        localStorage.setItem('isFullScreen', JSON.stringify(true));
+    
+        const modulePath = item.dashboardIds;
+        const isFullScreen = localStorage.getItem('isFullScreen') === 'true';
+        const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}&isFullScreen=${isFullScreen}`;
+    
+        const fullUrl = `/summary-engine/${modulePath}${queryParams}`;
+    
+        this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+          window.location.origin + fullUrl
+        );
+    
+        this.selectedMarkerIndex = index;
+    
+        if (selectType === 'NewTab') {
+          window.open(this.iframeUrl.changingThisBreaksApplicationSecurity, '_blank');
+        } else if (selectType === 'Modal') {
+          this.modalService.open(modalContent, { size: 'xl' });
+        } else if (selectType === 'Same page Redirect') {
+          this.router.navigateByUrl(fullUrl).catch(err => console.error('Navigation error:', err));
+        }
+      } 
+      // ✅ If module is NOT Summary Dashboard, delegate to general redirect
+      else if (selectType && ModuleNames !== 'Summary Dashboard') {
+        this.redirectModule(item);
+      }
+    }
+    
+    
+    redirectModule(recieveItem: any) {
+      console.log('recieveItem check', recieveItem);
+    
+      const moduleName = recieveItem.dashboardIds;
+      const selectedModule = recieveItem.ModuleNames;
+      const redirectType = recieveItem.selectType; // 'NewTab' or 'Same page Redirect'
+    
+      console.log('moduleName:', moduleName);
+      console.log('selectedModule:', selectedModule);
+      console.log('selectType (redirectType):', redirectType);
+    
+      let targetUrl: string = '';
+      const isNewTab = redirectType === 'NewTab';
+    
+      switch (selectedModule) {
+        case 'Forms':
+          targetUrl = `/view-dreamboard/Forms/${moduleName}`;
+          break;
+    
+        case 'Summary Dashboard':
+          targetUrl = `/summary-engine/${moduleName}`;
+          break;
+    
+        case 'Dashboard':
+          targetUrl = `/dashboard/dashboardFrom/Forms/${moduleName}`;
+          break;
+    
+        case 'Projects':
+          targetUrl = `/project-dashboard/project-template-dashboard/${moduleName}`;
+          break;
+    
+        case 'Calender':
+          targetUrl = `/view-dreamboard/Calendar/${moduleName}`;
+          break;
+    
+        case 'Report Studio':
+          const tree = this.router.createUrlTree(['/reportStudio'], {
+            queryParams: { savedQuery: moduleName }
+          });
+          targetUrl = this.router.serializeUrl(tree); // already serialized
+          break;
+    
+        default:
+          console.error('Unknown module:', selectedModule);
+          return;
+      }
+    
+      // 🔁 Navigation logic
+      if (isNewTab) {
+        // Open serialized or regular route as full URL
+        window.open(targetUrl, '_blank');
+      } else {
+        // Same Page Navigation
+        if (selectedModule === 'Report Studio') {
+          this.router.navigateByUrl(targetUrl).catch(err => console.error('Navigation error:', err));
+        } else {
+          this.router.navigate([targetUrl]).catch(err => console.error('Navigation error:', err));
+        }
+      }
+    }
   closeModal() {
     this.modalService.dismissAll(); // Close the modal programmatically
   }

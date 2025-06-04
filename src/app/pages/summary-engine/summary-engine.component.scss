@@ -848,8 +848,29 @@ gridster-item {
     word-wrap: break-word;  /* Ensure long text breaks and doesn't overflow */
     text-align: center;  /* Ensure text is centered in the cells */
   }
-  
-  
+  .ag-paging-panel {
+    height: auto !important;
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 4px !important;
+    gap: 4px;
+  }
+
+  .ag-paging-panel > span,
+  .ag-paging-button,
+  .ag-paging-page-summary-panel {
+    font-size: 10px !important;
+    padding: 2px 4px !important;
+    line-height: 1.2 !important;
+  }
+
+  .ag-paging-button i {
+    font-size: 10px !important;
+  }
   
   
   .mo-tile1-wid-style{
@@ -984,7 +1005,7 @@ gridster-item {
 
 
 
-@media (max-width: 767px) {
+@media (max-width: 1000px) {
 
   /* Position the menu at the bottom-right with margin from the bottom */
   .myMenu {
@@ -1351,6 +1372,14 @@ input.form-control {
   max-width: 150px; /* Optional: Set a max-width if you want to restrict the width */
 }
 
+.wrap-text1 {
+  white-space: normal !important;
+  word-break: break-word;
+  max-width: 350px;
+}
+
+
+
 // .text-gray-600 {
 //   word-wrap: break-word; /* Break long words onto the next line */
 //   white-space: normal;   /* Ensure the text can break at normal spaces */
@@ -1370,12 +1399,12 @@ input.form-control {
 //   margin-left: 0; /* Ensures no extra margin on the left of item.P2 */
 // }
 
-.wrap-text1 {
-  white-space: normal; /* Ensure text doesn't stay in a single line */
-  word-break: break-word; /* Break words when necessary */
-  overflow-wrap: break-word; /* Handles long words */
-  max-width: 240px; /* Optional: Set a max-width if you want to restrict the width */
-}
+// .wrap-text1 {
+//   white-space: normal; /* Ensure text doesn't stay in a single line */
+//   word-break: break-word; /* Break words when necessary */
+//   overflow-wrap: break-word; /* Handles long words */
+//   max-width: 240px; /* Optional: Set a max-width if you want to restrict the width */
+// }
 
 .table td {
   word-wrap: break-word !important;
@@ -1412,8 +1441,20 @@ input.form-control {
   height: 1rem;
 }
 
+/* Example overlay style */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Change 0.5 to 0.7 or higher for a darker effect */
+  z-index: 999; /* Ensure it's above the main content */
+}
 
-
+.ag-paging-panel {
+  font-size: 12px !important;  /* Smaller font size */
+}
 
 
 

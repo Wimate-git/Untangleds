@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -119,6 +119,29 @@ export class ProgressTileComponent implements OnInit{
   listofFormParam: any;
   icons: any;
   isSummaryDashboardSelected = false;
+  formValidationFailed:boolean =true;
+  userdetails: any;
+  userClient: string;
+  permissionsMetaData: any;
+  permissionIdRequest: any;
+  storeFormIdPerm: any;
+  allDeviceIds: any;
+  parsedPermission: any;
+  readFilterEquation: any;
+  summaryPermission: any;
+
+
+
+  helpherObjCalender: any;
+  formListTitles: any;
+  SelectTypeSummary = [
+    { value: 'NewTab', text: 'New Tab' },
+    { value: 'Modal', text: 'Modal(Pop Up)' },
+    { value: 'Same page Redirect', text: 'Same Page Redirect' },
+    // { value: 'drill down', text: 'Drill Down' },
+  ];
+
+  filteredSelectTypeSummary = [...this.SelectTypeSummary]; 
 
 
  
@@ -134,7 +157,7 @@ export class ProgressTileComponent implements OnInit{
     console.log('this.SK_clientID check', this.SK_clientID)
     this.initializeTileFields()
     this.setupRanges();
-    this.dynamicData()
+    this.fetchUserPermissions(1)
     this.dashboardIds(1)
     this.dynamicDataEquation()
     this.dynamicDataDrill()
@@ -297,17 +320,30 @@ export class ProgressTileComponent implements OnInit{
     this.constants.removeAt(index);
   }
   
-  async dynamicData(){
+  async dynamicData(receiveFormIds?: any) {
+    console.log('receiveFormIds checlking from',receiveFormIds)
     try {
       const result: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#lookup", 1);
       if (result) {
-        console.log('forms chaecking',result)
+        console.log('forms checking', result);
         const helpherObj = JSON.parse(result.options);
-        console.log('helpherObj checking',helpherObj)
-        this.formList = helpherObj.map((item: [string]) => item[0]); // Explicitly define the type
-        this.listofDeviceIds = this.formList.map((form: string) => ({ text: form, value: form })); // Explicitly define the type here too
-        console.log('listofDeviceIds',this.listofDeviceIds)
-        console.log('this.formList check from location', this.formList);
+        console.log('helpherObj checking', helpherObj);
+  
+        this.formList = helpherObj.map((item: [string]) => item[0]);
+         this.allDeviceIds = this.formList.map((form: string) => ({ text: form, value: form }));
+        console.log('allDeviceIds checking from',this.allDeviceIds)
+  
+        // ✅ Conditionally filter only if receiveFormIds has items
+        if (Array.isArray(receiveFormIds) && receiveFormIds.length > 0) {
+          const receivedSet = new Set(receiveFormIds);
+          this.listofDeviceIds = this.allDeviceIds.filter((item: { value: any; }) => receivedSet.has(item.value));
+        } else {
+          console.log('i am checking forms from else cond',this.allDeviceIds)
+          this.listofDeviceIds = this.allDeviceIds; // No filtering — use all
+
+        }
+  
+        console.log('Final listofDeviceIds:', this.listofDeviceIds);
       }
     } catch (err) {
       console.log("Error fetching the dynamic form data", err);
@@ -397,7 +433,7 @@ export class ProgressTileComponent implements OnInit{
             constantValue: [''],
             processed_value: [''],
             selectedColor: [this.selectedColor || '#FFFFFF'], // Default to white if no color is set
-            selectedRangeType: ['', Validators.required],
+            // selectedRangeType: ['', Validators.required],
             // selectFromTime: [''],
             // selectToTime: [''],
             fontSize: [20, [Validators.required, Validators.min(8), Validators.max(72)]], // Default to 20px
@@ -405,7 +441,8 @@ export class ProgressTileComponent implements OnInit{
             filterParameter: [''],
             filterDescription: [''],
             custom_Label: ['', Validators.required],
-            EquationDesc: ['']
+            EquationDesc: [''],
+            formatType:['']
           })
         );
       }
@@ -648,58 +685,7 @@ export class ProgressTileComponent implements OnInit{
 
 
 
-  validateAndUpdate() {
-    let isFormValid = true; // Initialize form validity as true
-  
-    // Mark all controls as touched for validation, including controls inside FormArray
-    Object.values(this.createChart.controls).forEach(control => {
-      if (control instanceof FormControl) {
-        // Mark the control as touched and update its validity
-        control.markAsTouched();
-        control.updateValueAndValidity();
-  
-        // If it's a required field and it's empty, mark the form as invalid
-        if (control.hasError('required') && !control.value) {
-          console.error('Required field is empty, update stopped');
-          isFormValid = false;
-        }
-      } else if (control instanceof FormArray) {
-        // Iterate over the controls in the FormArray
-        control.controls.forEach((controlItem, index) => {
-          if (controlItem instanceof FormGroup) {
-            // Iterate over inner controls in the FormGroup
-            Object.values(controlItem.controls).forEach(innerControl => {
-              innerControl.markAsTouched();
-              innerControl.updateValueAndValidity();
-  
-              // Check if the inner control is required and empty
-              if (innerControl.hasError('required') && !innerControl.value) {
-                console.error('Required field is empty in FormGroup, update stopped');
-                isFormValid = false;
-              }
-            });
-          }
-        });
-      }
-    });
-  
-    // Check overall form validity
-    const allFieldsValid = this.createChart.get('all_fields')?.valid;
-    console.log('check form array', allFieldsValid);
-  
-    // Check if the form is valid, including nested FormArray controls
-    console.log('isFormValid checking', isFormValid);
-  
-    // Only proceed with update if the form is valid
-    if (isFormValid && this.createChart.valid && allFieldsValid) {
-      this.updateTile('dynamicTile');
-      this.modal.dismiss();
-    } else {
-      console.error('Form is invalid. Cannot update.');
-      // Show error message
-      // alert('Please fill all required fields before updating.');
-    }
-  }
+
 
   selectedSettingsTab(tab: string) {
     this.selectedTabset = tab;
@@ -731,7 +717,7 @@ export class ProgressTileComponent implements OnInit{
     // clonedTile.groupBy = tile.groupBy;
     clonedTile.groupByFormat = tile.groupByFormat;
     clonedTile.predefinedSelectRange = tile.predefinedSelectRange;
-    clonedTile.selectedRangeType = tile.selectedRangeType;
+    // clonedTile.selectedRangeType = tile.selectedRangeType;
     // clonedTile.themeColor = tile.themeColor;
 
     // Add the cloned tile to the dashboard at the correct position
@@ -1078,7 +1064,7 @@ repopulate_fields(getValues: any) {
           primaryValue: [parsedtileConfig[i].primaryValue || '', Validators.required],
           groupByFormat: [parsedtileConfig[i].groupByFormat || '', Validators.required],
           constantValue: [parsedtileConfig[i].constantValue || ''],
-          selectedRangeType: [parsedtileConfig[i].selectedRangeType || '', Validators.required],
+          // selectedRangeType: [parsedtileConfig[i].selectedRangeType || '', Validators.required],
           // selectFromTime: [parsedtileConfig[i].selectFromTime || ''],
           // selectToTime: [parsedtileConfig[i].selectToTime || ''],
           filterDescription: [parsedtileConfig[i].filterDescription || ''],
@@ -1086,7 +1072,8 @@ repopulate_fields(getValues: any) {
           fontSize: [parsedtileConfig[i].fontSize || 14, [Validators.required, Validators.min(8), Validators.max(72)]],
           filterForm: [parsedtileConfig[i].filterForm || ''],
           filterParameter: this.fb.control(filterParameterValue),
-          EquationDesc: [parsedtileConfig[i].EquationDesc || '']
+          EquationDesc: [parsedtileConfig[i].EquationDesc || ''],
+          formatType:[parsedtileConfig[i].formatType || '']
         }));
 
         // Log to confirm the field was added correctly
@@ -1453,13 +1440,13 @@ addEquationControls(event: any, _type: string) {
       });
   }
 
-  SelectTypeSummary =[
-    { value: 'NewTab', text: 'New Tab' },
-    { value: 'Modal', text: 'Modal(Pop Up)' },
-    { value: 'Same page Redirect', text: 'Same Page Redirect' },
+  // SelectTypeSummary =[
+  //   { value: 'NewTab', text: 'New Tab' },
+  //   { value: 'Modal', text: 'Modal(Pop Up)' },
+  //   { value: 'Same page Redirect', text: 'Same Page Redirect' },
 
-    { value: 'drill down', text: 'Drill Down' },
-  ]
+  //   { value: 'drill down', text: 'Drill Down' },
+  // ]
   dynamicparameterValue(event: any, index: any): void {
     console.log('Event check for dynamic param:', event);
     console.log('Index check:', index);
@@ -1729,6 +1716,21 @@ addEquationControls(event: any, _type: string) {
   }
   
   
+tooltipContent: string = 'Group data by time periods such as Today, Last 7 Days, This Month, or This Year to view filtered insights based on the selected range. For example, "This Year" refers to data from January to December of the current year.';
+
+formTooltip: string = 'Select a form to view and analyze data specific to that form.';
+parameterTooltip: string = 'Specify which form fields to analyze. The results will be based solely on your selection.';
+
+formatTypeTooltip: string = 'Select a format to represent the output value appropriately—for example, Rupee for currency, Distance for measurements, or Percentage for ratios.';
+customLabelTooltip: string = 'Provide a custom label to be displayed as the widget title.';
+moduleNamesTooltip: string = 'Select the module that the user will be redirected to when the widget is clicked.';
+selectTypeTooltip: string = 'Choose how the dashboard should open when the widget is clicked—whether in a new tab, a modal, or on the same page.';
+
+redirectToTooltip: string = 'Select the specific dashboard or module the user should be redirected to when the widget is clicked.';
+columnVisibilityTooltip: string = 'Select the fields to display in the drill-down table. Only the selected columns will be visible in the detailed view.';
+redirectionType: string = 'Choose how the widget should open the target dashboard or module: "New Tab" opens it in a separate browser tab, "Modal (Pop Up)" displays it in a modal window, "Same Page Redirect" replaces the current view, and "Drill Down" shows detailed insights in Table.';
+ParametertooltipContent: string = 'Specifies the number of parameters to configure.';
+ChartTitletooltipContent: string = 'This title will appear as the heading of the dyanmic tile.';
   
 
   onValueSelect(onSelectValue:any){
@@ -1742,6 +1744,11 @@ addEquationControls(event: any, _type: string) {
 
   }
   
+  openPrimaryValueInfoModal(stepperModal: TemplateRef<any>) {
+      this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false    });
+  
+    }
   
   get primaryValue() {
     return this.createChart.get('primaryValue');
@@ -2306,103 +2313,89 @@ async dynamicDataEquation() {
 }
 
 showModuleNames = [
-  { value: 'None', text: 'None' },
+  // { value: 'None', text: 'None' },
   { value: 'Forms', text: 'Forms' },
   { value: 'Dashboard', text: 'Dashboard' },
-  { value: 'Dashboard - Group', text: 'Dashboard - Group' },
+  // { value: 'Dashboard - Group', text: 'Dashboard - Group' },
   { value: 'Summary Dashboard', text: 'Summary Dashboard' },
   { value: 'Projects', text: 'Projects' },
-  { value: 'Project - Detail', text: 'Project - Detail' },
-  { value: 'Project - Group', text: 'Project - Group' },
-  {value: 'Report Studio', text: 'Report Studio'}
+  // { value: 'Project - Detail', text: 'Project - Detail' },
+  // { value: 'Project - Group', text: 'Project - Group' },
+  {value: 'Report Studio', text: 'Report Studio'},
+  {value:'Calender', text:'Calender'}
 
 ]
+
 async moduleSelection(event: any): Promise<void> {
-  const selectedValue = event[0].value; // Get selected value
+  const selectedValue = event[0].value;
+
+  // 🔁 Update flag for conditional UI logic (if still needed)
+  this.isSummaryDashboardSelected = selectedValue === 'Summary Dashboard';
+
+  // 🔁 Filter dropdown options based on selection
   if (selectedValue === 'Summary Dashboard') {
-    this.isSummaryDashboardSelected = true;
+    // Show all options
+    this.filteredSelectTypeSummary = [...this.SelectTypeSummary];
   } else {
-    this.isSummaryDashboardSelected = false;
+    // Hide only the "Modal" option
+    this.filteredSelectTypeSummary = this.SelectTypeSummary.filter(
+      item => item.value !== 'Modal' && item.value !== 'drill down'
+    );
+  
+    // Clear "Modal" if it was previously selected
+    const currentType = this.createChart.get('selectType')?.value;
+    if (currentType === 'Modal') {
+      // this.createTitle.get('selectType')?.setValue('');
+    }
   }
-  console.log('selectedValue checking',selectedValue)
+  
+  
+
+  console.log('selectedValue checking', selectedValue);
+
   switch (selectedValue) {
     case 'None':
       console.log('No module selected');
-      // Add specific logic here
       break;
 
     case 'Forms':
       console.log('Forms module selected');
-      this.FormNames=this.listofDeviceIds
-      console.log('this.FormNames checking',this.FormNames)
-      this.dynamicIDArray = []
-      this.dynamicIDArray = this.FormNames
-      // Add specific logic for Forms
+      this.FormNames = this.listofDeviceIds;
+      this.dynamicIDArray = [...this.FormNames];
       break;
 
     case 'Dashboard':
       console.log('Dashboard module selected');
-      this.IdsFetch = await this.dashboardIdsFetching(1)
-  
-      console.log('IdsFetch checking',this.IdsFetch)
-      this.dynamicIDArray = []
-      this.dynamicIDArray = this.IdsFetch
-    
-      break;
-      // Add specific logic for Dashboard
-
-
-    case 'Dashboard - Group':
-      console.log('Dashboard - Group module selected');
-      this.dynamicIDArray = []
-      // Add specific logic for Dashboard - Group
+      this.IdsFetch = await this.dashboardIdsFetching(1);
+      this.dynamicIDArray = [...this.IdsFetch];
       break;
 
     case 'Summary Dashboard':
-      this.summaryIds = await this.dashboardIds(1); // Await and get P1 values
-      console.log('Fetched P1 values:', this.summaryIds);
-      this.dynamicIDArray = [];
-      this.dynamicIDArray = this.summaryIds
-      
       console.log('Summary Dashboard module selected');
-      // Add specific logic for Summary Dashboard
+      this.summaryIds = await this.dashboardIds(1);
+      console.log('Fetched P1 values:', this.summaryIds);
+      this.dynamicIDArray = [...this.summaryIds];
       break;
 
     case 'Projects':
       console.log('Projects module selected');
-      const projectList = await this.fetchDynamicLookupData(1)
-      console.log('projectList checking',projectList)
-      
-      this.dynamicIDArray = []
-      this.dynamicIDArray = projectList
-      break;
-      // Add specific logic for Projects
+      const projectList = await this.fetchDynamicLookupData(1);
+      console.log('projectList checking', projectList);
+      this.dynamicIDArray = [...projectList];
       break;
 
-    case 'Project - Detail':
-      console.log('Project - Detail module selected');
-      const projectDetailList = await this.ProjectDetailLookupData(1)
-
-      this.dynamicIDArray = []
-      this.dynamicIDArray = projectDetailList
-
-      // Add specific logic for Project - Detail
+    case 'Report Studio':
+      console.log('Report Studio module selected');
+      const ReportStudioLookup = await this.reportStudioLookupData(1);
+      this.dynamicIDArray = [...ReportStudioLookup];
       break;
 
-    case 'Project - Group':
-      console.log('Project - Group module selected');
-      this.dynamicIDArray = []
-      // Add specific logic for Project - Group
+    case 'Calender':
+      console.log('Calender module selected');
+      const CalenderLookup = await this.fetchCalender();
+      console.log('CalenderLookup check', CalenderLookup);
+      this.dynamicIDArray = [...CalenderLookup];
       break;
-      case 'Report Studio':
-        console.log('Project - Group module selected');
-        this.dynamicIDArray = []
-        const ReportStudioLookup = await this.reportStudioLookupData(1)
-
-        this.dynamicIDArray = []
-        this.dynamicIDArray = ReportStudioLookup
-        // Add specific logic for Project - Group
-        break;
 
     default:
       console.log('Invalid selection');
@@ -2410,6 +2403,30 @@ async moduleSelection(event: any): Promise<void> {
   }
 }
 
+async fetchCalender(): Promise<string[]> {
+  try {
+    const result: any = await this.api.GetMaster(this.SK_clientID + "#systemCalendarQuery#lookup", 1);
+
+    if (result) {
+      this.helpherObjCalender = JSON.parse(result.options);
+      console.log('this.helpherObjCalender check', this.helpherObjCalender);
+
+      this.formList = this.helpherObjCalender.map((item: any) => item);
+      console.log("DYNAMIC FORMLIST:", this.formList);
+
+      // Extract the first element (0th index) from each record in formList
+      this.formListTitles = this.formList.map((item: any[]) => item[0]);
+      console.log("Extracted Titles:", this.formListTitles);
+
+      return this.formListTitles; // ✅ Return extracted titles
+    }
+
+    return []; // Return empty array if no result
+  } catch (error) {
+    console.error("Error:", error);
+    return []; // Return empty array in case of error
+  }
+}
 
 async dashboardIdsFetching(sk: any): Promise<string[]> {
   console.log("I am called Bro");
@@ -2798,7 +2815,7 @@ fetchDynamicFormDataDrill(value: any) {
         this.columnVisisbilityFields = formFields
         .filter((field: any) => {
           // Filter out fields with type "heading" or with an empty placeholder
-          return field.type !== "heading" && field.type !== 'Empty Placeholder';
+          return field.type !== "heading" && field.type !== 'Empty Placeholder' && field.type !=='button' && field.type !=='table' && field.type !=='radio' && field.type !== 'checkbox' && field.type !== 'html code' && field.type !=='file' && field.type !=='range' && field.type !=='color' && field.type !=='password' && field.type !=='sub heading';
         })
         .map((field: any) => {
           console.log('field check', field);
@@ -2851,5 +2868,254 @@ async dynamicDataDrill(){
   }
 }
 
+
+
+validateAndUpdate() {
+  let isFormValid = true;
+  // this.formValidationFailed = true; // Assume valid initially
+
+  Object.values(this.createChart.controls).forEach(control => {
+    if (control instanceof FormControl) {
+      control.markAsTouched();
+      control.updateValueAndValidity();
+
+      if (control.hasError('required') && !control.value) {
+        console.error('Required field is empty, update stopped');
+        isFormValid = false;
+        this.formValidationFailed = false;
+      }
+    } else if (control instanceof FormArray) {
+      control.controls.forEach((controlItem) => {
+        if (controlItem instanceof FormGroup) {
+          Object.values(controlItem.controls).forEach(innerControl => {
+            innerControl.markAsTouched();
+            innerControl.updateValueAndValidity();
+
+            if (innerControl.hasError('required') && !innerControl.value) {
+              console.error('Required field is empty in FormGroup, update stopped');
+              isFormValid = false;
+              this.formValidationFailed = false;
+            }
+          });
+        }
+      });
+    }
+  });
+
+  const allFieldsValid = this.createChart.get('all_fields')?.valid;
+  console.log('check form array', allFieldsValid);
+  console.log('this.formValidationFailed checking from ui', this.formValidationFailed);
+  console.log('isFormValid checking', isFormValid);
+
+  if (isFormValid && this.createChart.valid && allFieldsValid) {
+    this.updateTile('dynamicTile');
+    this.modal.dismiss();
+  } else {
+    console.error('Form is invalid. Cannot update.');
+    // Optional: Keep the message visible for a few seconds then hide
+    setTimeout(() => {
+      this.formValidationFailed = true;
+    }, 5000);
+  }
+}
+
+async fetchUserPermissions(sk: any) {
+  try {
+      this.userdetails = this.getLoggedUser.username;
+      this.userClient = `${this.userdetails}#user#main`;
+      console.log("this.tempClient from form service check", this.userClient);
+
+      // Fetch user permissions
+      const permission = await this.api.GetMaster(this.userClient, sk);
+      
+      if (!permission) {
+          console.warn("No permission data received.");
+          return null; // Fix: Returning null instead of undefined
+      }
+
+      console.log("Data checking from add form", permission);
+
+      // Parse metadata
+      const metadataString: string | null | undefined = permission.metadata;
+      if (typeof metadataString !== "string") {
+          console.error("Invalid metadata format:", metadataString);
+          return null; // Fix: Ensuring the function returns a value
+      }
+      console.log('metadataString checking for',metadataString)
+
+      try {
+          this.permissionsMetaData = JSON.parse(metadataString);
+          console.log("Parsed Metadata Object from location", this.permissionsMetaData);
+
+          const permissionId = this.permissionsMetaData.permission_ID;
+          console.log("permission Id check from Tile1", permissionId);
+          this.permissionIdRequest = permissionId;
+          console.log('this.permissionIdRequest checking',this.permissionIdRequest)
+          this.storeFormIdPerm = this.permissionsMetaData.form_permission
+          console.log('this.storeFormIdPerm check',this.storeFormIdPerm)
+  
+
+          if(this.permissionIdRequest=='All' && this.storeFormIdPerm=='All'){
+            this.dynamicData()
+
+          }else if(this.permissionIdRequest=='All' && this.storeFormIdPerm !=='All'){
+            const StorePermissionIds = this.storeFormIdPerm
+            this.dynamicData(StorePermissionIds)
+          }
+          else if (this.permissionIdRequest != 'All' && this.storeFormIdPerm[0] != 'All') {
+            const readFilterEquationawait: any = await this.fetchPermissionIdMain(1, permissionId);
+            console.log('main permission check from Tile1', readFilterEquationawait);
+          
+            if (Array.isArray(readFilterEquationawait)) {
+              const hasAllPermission = readFilterEquationawait.some(
+                (packet: any) => Array.isArray(packet.dynamicForm) && packet.dynamicForm.includes('All')
+              );
+          
+              if (hasAllPermission) {
+                const StorePermissionIds = this.storeFormIdPerm;
+                this.dynamicData(StorePermissionIds);
+              } else {
+                // Match dynamicForm values with storeFormIdPerm
+                const dynamicFormValues = readFilterEquationawait
+                  .map((packet: any) => packet.dynamicForm?.[0]) // Get each dynamicForm value
+                  .filter((v: string | undefined) => !!v);        // Remove undefined
+          
+                const matchedStoreFormIds = this.storeFormIdPerm.filter((id: string) =>
+                  dynamicFormValues.includes(id)
+                );
+          
+                console.log('matchedStoreFormIds:', matchedStoreFormIds);
+          
+                this.dynamicData(matchedStoreFormIds); // ⬅️ Use the filtered list
+              }
+            } else {
+              console.warn('fetchPermissionIdMain did not return an array.');
+            }
+          }
+          else if (this.permissionIdRequest !== 'All' && this.storeFormIdPerm[0] === 'All') {
+            const readFilterEquationawait: any = await this.fetchPermissionIdMain(1, permissionId);
+            console.log('main permission check from Tile1', readFilterEquationawait);
+          
+            if (Array.isArray(readFilterEquationawait)) {
+              const hasAllPermission = readFilterEquationawait.some(
+                (packet: any) => Array.isArray(packet.dynamicForm) && packet.dynamicForm.includes('All')
+              );
+          
+              if (hasAllPermission) {
+                // No filtering needed, show all
+                this.dynamicData();
+              } else {
+                // Extract dynamicForm[0] from each packet
+                const filteredFormIds = readFilterEquationawait
+                  .map((packet: any) => packet.dynamicForm?.[0])  // Get first value from each dynamicForm
+                  .filter((formId: string | undefined) => !!formId); // Remove undefined/null
+          
+                console.log('filteredFormIds (no "All" present):', filteredFormIds);
+          
+                this.dynamicData(filteredFormIds);
+              }
+            } else {
+              console.warn('fetchPermissionIdMain did not return an array.');
+            }
+          }
+          
+          
+          
+          // **Fix: Ensure fetchPermissionIdMain is awaited**
+
+
+       
+
+      } catch (error) {
+          console.error("Error parsing JSON:", error);
+          return null; // Fix: Ensuring return on JSON parsing failure
+      }
+  } catch (error) {
+      console.error("Error fetching user permissions:", error);
+      return null; // Fix: Ensuring return on outer try-catch failure
+  }
+}
+
+
+async fetchPermissionIdMain(clientID: number, p1Value: string): Promise<void> {
+
+try {
+  console.log("p1Value checking", p1Value);
+  console.log("clientID checking", clientID);
+  console.log("this.SK_clientID checking from permission", this.SK_clientID);
+
+  const pk = `${this.SK_clientID}#permission#${p1Value}#main`;
+  console.log(`Fetching main table data for PK: ${pk}`);
+
+  const result: any = await this.api.GetMaster(pk, clientID);
+
+  if (!result || !result.metadata) {
+    console.warn("Result metadata is null or undefined.");
+// Resolve even if no data is found
+    return;
+  }
+
+  // Parse metadata
+  this.parsedPermission = JSON.parse(result.metadata);
+  console.log("Parsed permission metadata:", this.parsedPermission);
+
+  this.readFilterEquation = JSON.parse(this.parsedPermission.dynamicEntries);
+  console.log("this.readFilterEquation check", this.readFilterEquation);
+
+  // Handling Dashboard Permissions
+  this.summaryPermission = this.parsedPermission.summaryList || [];
+  console.log("this.summaryPermission check", this.summaryPermission);
+
+  // if (this.summaryPermission.includes("All")) {
+  //   console.log("Permission is 'All'. Fetching all dashboards...");
+
+return this.readFilterEquation
+  // } else {
+  //   console.log("Fetching specific dashboards...");
+  //   const allData = await this.fetchCompanyLookupdata(1);
+  //   this.dashboardData = allData.filter((dashboard: any) =>
+  //     this.summaryPermission.includes(dashboard.P1)
+  //   );
+  //   console.log("Filtered Dashboards Data:", this.dashboardData);
+  // }
+
+  // Extract Permission List
+
+  
+// Resolve the Promise after all operations are complete
+} catch (error) {
+  console.error(`Error fetching data for PK (${p1Value}):`, error);
+// Reject in case of API failure
+}
+
+}
+
+FormatTypeValues = [
+  { value: 'Default', text: 'Default' },
+  { value: 'Rupee', text: 'Rupee' },
+  { value: 'Distance', text: 'Distance' },
+  { value: 'Minutes', text: 'Minutes' },
+  { value: 'Hours', text: 'Hours' },
+  { value: 'Days', text: 'Days' },
+  { value: 'Days & Hours', text: 'Days & Hours' },
+
+
+  { value: 'Months', text: 'Months' },
+  { value: 'Years', text: 'Years' },
+  {value:'Label With Value',text:'Label With Value'},
+  { value: 'Percentage', text: 'Percentage' },
+
+]
+
+  openFormatTypeModal(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+
+  }
+  openRedirectionTypeInfoModal(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+
+  }
 
 }

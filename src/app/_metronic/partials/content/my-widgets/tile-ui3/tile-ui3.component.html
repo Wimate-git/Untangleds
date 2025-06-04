@@ -7,7 +7,7 @@
    <div class="row text_3d" style="display: flex; flex-direction: column; align-items: center;">
     <div [style.font-size]="item.fontSize" 
     [style.color]="item.fontColor"  
-    style=" text-align: center; margin-top: 6px; margin-bottom: 6px;">
+    style=" font-weight: bold;text-align: center; margin-top: 6px; margin-bottom: 6px;">
  {{ item.custom_Label }}
 </div>
     <!-- Display the parameterName -->
@@ -23,7 +23,7 @@
     class="value" 
     tabindex="0" 
     style="color: #333333; text-align: center; margin-top: 6px; margin-bottom: 6px;">
- {{ item.multi_value[1]?.value }}:{{ item.multi_value[1]?.processed_value }}
+ {{ item.multi_value[1]?.value }}{{ item.multi_value[1]?.processed_value }}
 </div>
 
     
@@ -33,7 +33,7 @@
          class="value" 
          tabindex="0" 
          style="font-weight: bold; color: #333333; text-align: center; margin-top: 6px; margin-bottom: 6px;">
-         {{ descriptionData || primaryValue}}:{{ item.multi_value[0]?.processed_value }}
+         {{ descriptionData || primaryValue}}{{ item.multi_value[0]?.processed_value }}
     </div>
     
     <!-- Display processed_value from multi_value[2] -->
@@ -42,7 +42,7 @@
          class="value" 
          tabindex="0" 
          style=" color: #333333; text-align: center; margin-top: 6px; margin-bottom: 6px;">
-      {{ item.multi_value[2]?.value }}:{{ item.multi_value[2]?.processed_value }}
+      {{ item.multi_value[2]?.value }}{{ item.multi_value[2]?.processed_value }}
     </div>
   
   </div>

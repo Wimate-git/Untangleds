@@ -1,7 +1,7 @@
 
 <ngx-spinner 
 *ngIf="isLoading" 
-bdColor="rgba(0, 0, 0, 0.8)" 
+bdColor="#000000" 
 size="medium" 
 color="#fff" 
 
@@ -107,6 +107,8 @@ type="square-jelly-box"
                 <option value="this year">this year</option>
        
                 <option value="latest 10">latest 10</option>
+                <option value="This financial year">This financial year</option>
+                <option value="Last financial year">Last financial year</option>
               </select>
             </div>
           </div>
@@ -340,6 +342,8 @@ type="square-jelly-box"
         <option value="last month">last month</option>
         <option value="this year">this year</option>
         <option value="latest 10">latest 10</option>
+        <option value="This financial year">This financial year</option>
+        <option value="Last financial year">Last financial year</option>
       </select>
     </div>
   </div>
@@ -505,7 +509,7 @@ type="square-jelly-box"
                 <div class="row g-3" [formGroup]="createChart">
                   <!-- Existing Themes Section -->
                   <div class="col-md-12 mb-3">
-                    <label class="col-createChart-label fw-bold fs-6 required">Themes:</label>
+                    <label class="col-createChart-label fw-bold fs-6 required">Background Theme:</label>
                     <div class="color-boxes">
                       <div
                         *ngFor="let theme of themes"

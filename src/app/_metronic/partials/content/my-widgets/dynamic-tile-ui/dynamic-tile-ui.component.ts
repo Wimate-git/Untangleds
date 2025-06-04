@@ -41,6 +41,7 @@ export class DynamicTileUiComponent implements OnInit{
   tileTiltle: any;
   showTotalSumValue: any;
   equationProcessValue: any;
+  storeDynamicTileConfig: any;
   ngOnInit(){
     // console.log('item chacke',this.item.grid_details)
     this.summaryService.lookUpData$.subscribe((data: any)=>{
@@ -51,7 +52,11 @@ data.forEach((packet: any,matchedIndex:number) => {
   if(packet.grid_type == 'dynamicTile'&& this.index==matchedIndex && packet.id === this.item.id){
     tempCharts[matchedIndex] = packet
     console.log('packet checking from dynamic Tile',packet)
-    this.dynamicTileFormat(packet,'live')
+    setTimeout(() => {
+      this.dynamicTileFormat(packet)
+      
+    }, 1000);
+
 
   }
 });
@@ -67,63 +72,43 @@ data.forEach((packet: any,matchedIndex:number) => {
 
   }
 
-  // dynamicTileFormat(dinamicTileresponse?:any){
-
-  //   console.log('dinamicTileresponse check',dinamicTileresponse)
-  //   if(dinamicTileresponse){
-  //     this.parsedTileConfig = JSON.parse(dinamicTileresponse.tileConfig)
-  //     console.log('this.parsedTileConfig check',this.parsedTileConfig)
-  //     this.equationProcessValue = JSON.parse(dinamicTileresponse.equationProcess)
-  //     console.log('this.equationProcessValue checking',this.equationProcessValue)
-  //   }else
-  //   console.log('this.item checking dynamic',this.item )
-  //   this.parsedTileConfig = JSON.parse(this.item.tileConfig)
-  //   console.log('this.parsedTileConfig check',this.parsedTileConfig)
-  //   this.equationProcessValue = this.item.equationProcess
-  //   console.log('this.equationProcessValue checking',this.equationProcessValue)
-  // }
 
 
 
-  dynamicTileFormat(dinamicTileresponse?: any,receiveflag?:string) {
-    if(receiveflag=='live'){
+  dynamicTileFormat(dinamicTileresponse?: any) {
+   
       if (dinamicTileresponse) {
-        // Check if tileConfig and equationProcess are valid JSON strings before parsing
-        if (dinamicTileresponse.tileConfig) {
-          try {
+        console.log('dinamicTileresponse checking from dynamicTile',dinamicTileresponse)
+
+        try {
+          setTimeout(() => {
             this.parsedTileConfig = JSON.parse(dinamicTileresponse.tileConfig);
-            console.log('this.parsedTileConfig check', this.parsedTileConfig);
-          } catch (error) {
-            console.error('Error parsing tileConfig:', error);
-            this.parsedTileConfig = {}; // Provide a fallback value if parsing fails
-          }
-        } else {
-          console.warn('tileConfig is empty or missing');
-          this.parsedTileConfig = {}; // Provide a fallback value
+            this.cdr.detectChanges();
+            console.log('this.parsedTileConfig check from liveData', this.parsedTileConfig);
+            
+          }, 500);
+
+    
+        } catch (error) {
+          console.error('Error parsing tileConfig from this.item:', error);
+          // this.parsedTileConfig = {}; // Provide a fallback value if parsing fails
         }
     
-        if (dinamicTileresponse.equationProcess) {
-          try {
-            this.equationProcessValue = JSON.parse(dinamicTileresponse.equationProcess);
-            console.log('this.equationProcessValue checking', this.equationProcessValue);
-          } catch (error) {
-            console.error('Error parsing equationProcess:', error);
-            this.equationProcessValue = {}; // Provide a fallback value if parsing fails
-          }
-        } else {
-          console.warn('equationProcess is empty or missing');
-          this.equationProcessValue = {}; // Provide a fallback value
-        }
+        // this.equationProcessValue = dinamicTileresponse.equationProcess;
+        // console.log('this.equationProcessValue checking', this.equationProcessValue);
+        // Check if tileConfig and equationProcess are valid JSON strings before parsing
+
       }
 
-    }else if(receiveflag=='dbData'){
+    else {
       console.log('this.item checking dynamic', this.item);
       try {
         this.parsedTileConfig = JSON.parse(this.item.tileConfig);
-        console.log('this.parsedTileConfig check', this.parsedTileConfig);
+        this.cdr.detectChanges();
+        console.log('this.parsedTileConfig check from dynamicFormat', this.parsedTileConfig);
       } catch (error) {
         console.error('Error parsing tileConfig from this.item:', error);
-        this.parsedTileConfig = {}; // Provide a fallback value if parsing fails
+        // this.parsedTileConfig = {}; // Provide a fallback value if parsing fails
       }
   
       this.equationProcessValue = this.item.equationProcess;
@@ -137,8 +122,8 @@ data.forEach((packet: any,matchedIndex:number) => {
 
   ngAfterViewInit(){
     setTimeout(() => {
-      // this.dynamicTileFormat('','dbData')
-    }, 500);
+      this.dynamicTileFormat('')
+    }, 1500);
   
 
   }
@@ -147,7 +132,10 @@ data.forEach((packet: any,matchedIndex:number) => {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
     console.log("tile data check from dynamic Title",this.liveDataDynamicTile)
-    console.log('this ngonchanges',this.item )
+    console.log('this ngonchanges dynamicTile',this.item )
+    this.storeDynamicTileConfig = JSON.parse(this.item.tileConfig)
+    console.log('this.storeDynamicTileConfig checking',this.storeDynamicTileConfig)
+    
 
     // this.tileTiltle = this.item.chart_title
     // if (this.item && this.liveDataDynamicTile !==undefined) {
@@ -218,7 +206,7 @@ get shouldShowButton(): boolean {
 }
 
   constructor(
-   private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private summaryService:SummaryEngineService
+   private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private summaryService:SummaryEngineService,private cdr: ChangeDetectorRef
    
   ){}
 

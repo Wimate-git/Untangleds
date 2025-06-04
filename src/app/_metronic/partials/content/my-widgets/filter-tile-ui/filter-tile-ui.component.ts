@@ -157,9 +157,14 @@ get shouldShowButton(): boolean {
   ){}
 
   edit_each_tileUI(value1: any,value2: number) {
+    console.log('edit button clicked')
     const data = { arg1: value1, arg2: value2 }; // Two arguments
     console.log('data checking from tile1',data)
-  this.customEvent.emit(data); // Emitting an event with two arguments
+
+
+      this.customEvent.emit(data);
+    
+ // Emitting an event with two arguments
 
   }
   edit_each_duplicate(value1: any, value2: number) {

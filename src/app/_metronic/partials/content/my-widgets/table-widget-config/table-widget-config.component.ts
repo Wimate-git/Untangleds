@@ -55,6 +55,16 @@ export class TableWidgetConfigComponent implements OnInit,AfterViewInit{
   dynamicFields: any;
   selectedParameterValueDupli: { value: any; text: any; };
   selectedParameterValueDupl: string;
+  formValidationFailed:boolean =true;
+  userdetails: any;
+  userClient: string;
+  permissionsMetaData: any;
+  permissionIdRequest: any;
+  storeFormIdPerm: any;
+  allDeviceIds: any;
+  parsedPermission: any;
+  readFilterEquation: any;
+  summaryPermission: any;
 
 
   ngOnInit(): void {
@@ -67,8 +77,14 @@ export class TableWidgetConfigComponent implements OnInit,AfterViewInit{
     this.SK_clientID = this.getLoggedUser.clientID;
     console.log('this.SK_clientID check', this.SK_clientID)
 this.initializeTileFields()
-    this.dynamicData()
+this.fetchUserPermissions(1)
+  
 
+    this.createKPIWidget.valueChanges.subscribe(() => {
+      if (this.createKPIWidget.valid) {
+        this.formValidationFailed = true;
+      }
+    });
     // this.dashboardIds(1)
   }
   constructor(private summaryConfiguration: SharedService, private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
@@ -363,22 +379,207 @@ this.initializeTileFields()
     this.widgetIdCounter++;
     return Date.now() + this.widgetIdCounter; // Use timestamp and counter for uniqueness
   }
-  async dynamicData(){
+  async dynamicData(receiveFormIds?: any) {
+    console.log('receiveFormIds checlking from',receiveFormIds)
     try {
       const result: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#lookup", 1);
       if (result) {
-        console.log('forms chaecking',result)
+        console.log('forms checking', result);
         const helpherObj = JSON.parse(result.options);
-        console.log('helpherObj checking',helpherObj)
-        this.formList = helpherObj.map((item: [string]) => item[0]); // Explicitly define the type
-        this.listofDeviceIds = this.formList.map((form: string) => ({ text: form, value: form })); // Explicitly define the type here too
-        console.log('listofDeviceIds',this.listofDeviceIds)
-        console.log('this.formList check from location', this.formList);
+        console.log('helpherObj checking', helpherObj);
+  
+        this.formList = helpherObj.map((item: [string]) => item[0]);
+         this.allDeviceIds = this.formList.map((form: string) => ({ text: form, value: form }));
+        console.log('allDeviceIds checking from',this.allDeviceIds)
+  
+        // ✅ Conditionally filter only if receiveFormIds has items
+        if (Array.isArray(receiveFormIds) && receiveFormIds.length > 0) {
+          const receivedSet = new Set(receiveFormIds);
+          this.listofDeviceIds = this.allDeviceIds.filter((item: { value: any; }) => receivedSet.has(item.value));
+        } else {
+          console.log('i am checking forms from else cond',this.allDeviceIds)
+          this.listofDeviceIds = this.allDeviceIds; // No filtering — use all
+
+        }
+  
+        console.log('Final listofDeviceIds:', this.listofDeviceIds);
       }
     } catch (err) {
       console.log("Error fetching the dynamic form data", err);
     }
   }
+
+
+  async fetchUserPermissions(sk: any) {
+    try {
+        this.userdetails = this.getLoggedUser.username;
+        this.userClient = `${this.userdetails}#user#main`;
+        console.log("this.tempClient from form service check", this.userClient);
+
+        // Fetch user permissions
+        const permission = await this.api.GetMaster(this.userClient, sk);
+        
+        if (!permission) {
+            console.warn("No permission data received.");
+            return null; // Fix: Returning null instead of undefined
+        }
+
+        console.log("Data checking from add form", permission);
+
+        // Parse metadata
+        const metadataString: string | null | undefined = permission.metadata;
+        if (typeof metadataString !== "string") {
+            console.error("Invalid metadata format:", metadataString);
+            return null; // Fix: Ensuring the function returns a value
+        }
+        console.log('metadataString checking for',metadataString)
+
+        try {
+            this.permissionsMetaData = JSON.parse(metadataString);
+            console.log("Parsed Metadata Object from location", this.permissionsMetaData);
+
+            const permissionId = this.permissionsMetaData.permission_ID;
+            console.log("permission Id check from Tile1", permissionId);
+            this.permissionIdRequest = permissionId;
+            console.log('this.permissionIdRequest checking',this.permissionIdRequest)
+            this.storeFormIdPerm = this.permissionsMetaData.form_permission
+            console.log('this.storeFormIdPerm check',this.storeFormIdPerm)
+    
+
+            if(this.permissionIdRequest=='All' && this.storeFormIdPerm=='All'){
+              this.dynamicData()
+
+            }else if(this.permissionIdRequest=='All' && this.storeFormIdPerm !=='All'){
+              const StorePermissionIds = this.storeFormIdPerm
+              this.dynamicData(StorePermissionIds)
+            }
+            else if (this.permissionIdRequest != 'All' && this.storeFormIdPerm[0] != 'All') {
+              const readFilterEquationawait: any = await this.fetchPermissionIdMain(1, permissionId);
+              console.log('main permission check from Tile1', readFilterEquationawait);
+            
+              if (Array.isArray(readFilterEquationawait)) {
+                const hasAllPermission = readFilterEquationawait.some(
+                  (packet: any) => Array.isArray(packet.dynamicForm) && packet.dynamicForm.includes('All')
+                );
+            
+                if (hasAllPermission) {
+                  const StorePermissionIds = this.storeFormIdPerm;
+                  this.dynamicData(StorePermissionIds);
+                } else {
+                  // Match dynamicForm values with storeFormIdPerm
+                  const dynamicFormValues = readFilterEquationawait
+                    .map((packet: any) => packet.dynamicForm?.[0]) // Get each dynamicForm value
+                    .filter((v: string | undefined) => !!v);        // Remove undefined
+            
+                  const matchedStoreFormIds = this.storeFormIdPerm.filter((id: string) =>
+                    dynamicFormValues.includes(id)
+                  );
+            
+                  console.log('matchedStoreFormIds:', matchedStoreFormIds);
+            
+                  this.dynamicData(matchedStoreFormIds); // ⬅️ Use the filtered list
+                }
+              } else {
+                console.warn('fetchPermissionIdMain did not return an array.');
+              }
+            }
+            else if (this.permissionIdRequest !== 'All' && this.storeFormIdPerm[0] === 'All') {
+              const readFilterEquationawait: any = await this.fetchPermissionIdMain(1, permissionId);
+              console.log('main permission check from Tile1', readFilterEquationawait);
+            
+              if (Array.isArray(readFilterEquationawait)) {
+                const hasAllPermission = readFilterEquationawait.some(
+                  (packet: any) => Array.isArray(packet.dynamicForm) && packet.dynamicForm.includes('All')
+                );
+            
+                if (hasAllPermission) {
+                  // No filtering needed, show all
+                  this.dynamicData();
+                } else {
+                  // Extract dynamicForm[0] from each packet
+                  const filteredFormIds = readFilterEquationawait
+                    .map((packet: any) => packet.dynamicForm?.[0])  // Get first value from each dynamicForm
+                    .filter((formId: string | undefined) => !!formId); // Remove undefined/null
+            
+                  console.log('filteredFormIds (no "All" present):', filteredFormIds);
+            
+                  this.dynamicData(filteredFormIds);
+                }
+              } else {
+                console.warn('fetchPermissionIdMain did not return an array.');
+              }
+            }
+            
+            
+            
+            // **Fix: Ensure fetchPermissionIdMain is awaited**
+
+
+         
+
+        } catch (error) {
+            console.error("Error parsing JSON:", error);
+            return null; // Fix: Ensuring return on JSON parsing failure
+        }
+    } catch (error) {
+        console.error("Error fetching user permissions:", error);
+        return null; // Fix: Ensuring return on outer try-catch failure
+    }
+}
+
+
+async fetchPermissionIdMain(clientID: number, p1Value: string): Promise<void> {
+
+  try {
+    console.log("p1Value checking", p1Value);
+    console.log("clientID checking", clientID);
+    console.log("this.SK_clientID checking from permission", this.SK_clientID);
+
+    const pk = `${this.SK_clientID}#permission#${p1Value}#main`;
+    console.log(`Fetching main table data for PK: ${pk}`);
+
+    const result: any = await this.api.GetMaster(pk, clientID);
+
+    if (!result || !result.metadata) {
+      console.warn("Result metadata is null or undefined.");
+// Resolve even if no data is found
+      return;
+    }
+
+    // Parse metadata
+    this.parsedPermission = JSON.parse(result.metadata);
+    console.log("Parsed permission metadata:", this.parsedPermission);
+
+    this.readFilterEquation = JSON.parse(this.parsedPermission.dynamicEntries);
+    console.log("this.readFilterEquation check", this.readFilterEquation);
+
+    // Handling Dashboard Permissions
+    this.summaryPermission = this.parsedPermission.summaryList || [];
+    console.log("this.summaryPermission check", this.summaryPermission);
+
+    // if (this.summaryPermission.includes("All")) {
+    //   console.log("Permission is 'All'. Fetching all dashboards...");
+
+return this.readFilterEquation
+    // } else {
+    //   console.log("Fetching specific dashboards...");
+    //   const allData = await this.fetchCompanyLookupdata(1);
+    //   this.dashboardData = allData.filter((dashboard: any) =>
+    //     this.summaryPermission.includes(dashboard.P1)
+    //   );
+    //   console.log("Filtered Dashboards Data:", this.dashboardData);
+    // }
+
+    // Extract Permission List
+ 
+    
+// Resolve the Promise after all operations are complete
+  } catch (error) {
+    console.error(`Error fetching data for PK (${p1Value}):`, error);
+// Reject in case of API failure
+  }
+
+}
   selectFormParams(event: any) {
     if (event && event[0] && event[0].data) {
       const selectedText = event[0].data.text; 
@@ -408,13 +609,13 @@ this.initializeTileFields()
         if (result && result.metadata) {
           const parsedMetadata = JSON.parse(result.metadata);
           const formFields = parsedMetadata.formFields;
-          console.log('formFields check',formFields)
+          console.log('formFields check from table',formFields)
 
           // Initialize the list with formFields labels
           this.listofDynamicParam   = formFields
           .filter((field: any) => {
             // Filter out fields with type "heading" or with an empty placeholder
-            return field.type !== "heading" && field.type !== 'Empty Placeholder';
+            return field.type !== "heading" && field.type !== 'Empty Placeholder' && field.type !=='button' && field.type !=='table' && field.type !=='radio' && field.type !== 'checkbox' && field.type !== 'html code' && field.type !=='file' && field.type !=='range' && field.type !=='color' && field.type !=='password' && field.type !=='sub heading';
           })
           .map((field: any) => {
             console.log('field check', field);
@@ -470,6 +671,23 @@ this.initializeTileFields()
     this.CustomRowCal();
   }
 
+
+  tooltipContent: string = 'Group data by time periods such as Today, Last 7 Days, This Month, or This Year to view filtered insights based on the selected range. For example, "This Year" refers to data from January to December of the current year.';
+
+  formTooltip: string = 'Select a form to view and analyze data specific to that form.';
+  parameterTooltip: string = 'Select the fields you want to see in the table. Only the fields you choose will be shown.';
+
+  
+  formatTypeTooltip: string = 'Select a format to represent the output value appropriately—for example, Rupee for currency, Distance for measurements, or Percentage for ratios.';
+  customLabelTooltip: string = 'Provide a custom label to be displayed as the widget title.';
+  moduleNamesTooltip: string = 'Select the module that the user will be redirected to when the widget is clicked.';
+  selectTypeTooltip: string = 'Choose how the dashboard should open when the widget is clicked—whether in a new tab, a modal, or on the same page.';
+  
+  redirectToTooltip: string = 'Select the specific dashboard or module the user should be redirected to when the widget is clicked.';
+  columnVisibilityTooltip: string = 'Select the fields to display in the drill-down table. Only the selected columns will be visible in the detailed view.';
+  redirectionType: string = 'Choose how the widget should open the target dashboard or module: "New Tab" opens it in a separate browser tab, "Modal (Pop Up)" displays it in a modal window, "Same Page Redirect" replaces the current view, and "Drill Down" shows detailed insights in Table.';
+  filterTooltip: string = 'Only unique rows will be shown in table based on the fields you select here.';
+
   CustomRowCal() {
     const readrowCalCheck = this.createKPIWidget.get('enableRowCal')?.value;
     const formArray = this.createKPIWidget.get('all_fields') as FormArray;
@@ -489,10 +707,15 @@ this.initializeTileFields()
   }
   
   
-  
+
+
+
+
+
   validateAndUpdate() {
     if (this.createKPIWidget.invalid) {
-      // ✅ Mark all fields as touched to trigger validation messages
+      this.formValidationFailed = false; // 🔴 Show the error
+  
       Object.values(this.createKPIWidget.controls).forEach(control => {
         if (control instanceof FormControl) {
           control.markAsTouched();
@@ -504,10 +727,11 @@ this.initializeTileFields()
         }
       });
   
-      return; // 🚨 Stop execution if the form is invalid
+      return; // 🚫 Stop if invalid
     }
   
-    // ✅ Proceed with saving only if form is valid
+    // ✅ If the form is valid
+    this.formValidationFailed = true; // ✅ Hide the warning now
     this.updateTile('TableWidget');
     this.modal.dismiss();
   }

@@ -15,7 +15,7 @@ export class HtmlModalComponent {
   constructor(private sanitizer: DomSanitizer) {} // Inject DomSanitizer
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('blobUrl checking', this.blobUrl);
+    console.log('blobUrl checking from child', this.blobUrl);
 
     // Sanitize blob URL before using it in iframe
     if (this.blobUrl) {

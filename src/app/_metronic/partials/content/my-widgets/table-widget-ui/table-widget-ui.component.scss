@@ -82,3 +82,11 @@
   .ag-root-wrapper {
     cursor: default;
   }
+  // .ag-paging-panel {
+  //   font-size: 12px !important;  /* Smaller font size */
+  // }
+
+  .ag-theme-alpine .ag-paging-panel {
+    font-size: 11px !important;  /* Adjust size as needed */
+  }
+  

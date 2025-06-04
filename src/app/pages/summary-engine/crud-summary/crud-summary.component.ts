@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
   Input,
   OnDestroy,
@@ -55,6 +56,9 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('deleteSwal') public deleteSwal!: SwalComponent;
   @ViewChild('successSwal') public successSwal!: SwalComponent;
+  @ViewChild('dtTable', { static: false }) table!: ElementRef;
+  dtInstance!: any;
+
 
   swalOptions: SweetAlertOptions = { buttonsStyling: false };
 
@@ -76,16 +80,15 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.dtOptions = {
-      dom:  // Length changing (l)
-            `<"row"<"col-sm-12"tr>>` +  // Table (t)
-      // Pagination (p)
-            `<"row"<"col-sm-12"i>>` + 
-            `<"row"<"col-sm-12"p>>`,   // Information (i) — Add this row for info
-        
+      dom: `<"row"<"col-sm-12"tr>>` +
+           `<"row align-items-center mt-2"<"col-sm-6"i><"col-sm-6 text-end"p>>`,
+    
       processing: true,
+      scrollX: true, // ✅ Enable horizontal scroll
+    
       language: {
         processing: `<span class="spinner-border spinner-border-sm align-middle"></span> Loading...`,
-        info: "",  // Hide the info text, keeping functionality intact
+        info: "Showing _START_ to _END_ of _TOTAL_ entries"
       },
     
       ...this.datatableConfig,
@@ -97,8 +100,19 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
     
       order: false,
       ordering: false,
-      searching: true, // Keep the search functionality enabled
+      searching: true,
+    
+      columnDefs: [
+        {
+          targets: [1, 2, 3, 4, 5, 6],
+          className: 'wrap-text',
+          width: '250px'
+        }
+      ]
     };
+    
+    
+    
     
     
     
@@ -116,9 +130,12 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
 
+  
+
   ngOnChanges(changes: SimpleChanges): void {
     console.log('summaryDashboardUpdate check from crudSummary',this.summaryDashboardUpdate)
     console.log('summaryDashboardView check from crudSummary',this.summaryDashboardView)
+    console.log('this.datatableConfig check from crud summary',this.datatableConfig)
   }
 
   // renderActionColumn(): void {
@@ -267,7 +284,16 @@ export class CrudSummaryComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
 
+
+    setTimeout(() => {
+      if (this.table?.nativeElement) {
+        this.dtInstance = $(this.table.nativeElement).DataTable();
+      }
+    }, 0);
+    
+
     this.triggerFilter();
+
   }
 
   ngOnDestroy(): void {

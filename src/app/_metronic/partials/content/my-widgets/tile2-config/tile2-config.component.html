@@ -123,7 +123,7 @@
                       </div>
                   </div>
     
-                  <div class="col-md-4" *ngIf="primaryValue1?.value === 'Constant'">
+                  <!-- <div class="col-md-4" *ngIf="primaryValue1?.value === 'Constant'">
                     <label for="constant1" class="col-createChart-label fw-bold fs-6 required">Constant</label>
                     <input
                       id="constant1"
@@ -133,7 +133,7 @@
                       formControlName="constantValue"
                       (change)="onValueChange1($event)" 
                     />
-                  </div>
+                  </div> -->
                   <div class="col-md-4"> <!-- Column for the second dropdown -->
                       <label class="col-createChart-label fw-bold fs-6 required">Secondary Value
                         <span class="ms-2 text-primary" 
@@ -234,73 +234,95 @@
   
             <div class="fv-row">
               <div class="row">
-  
-                      <div class="col-md-4 mb-3">
-                        <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Module Names</label>
-                        <ngx-select
-                      
-                          [allowClear]="true"
-                          formControlName="ModuleNames"
-                          [items]="showModuleNames"
-                          optionValueField="value"
-                          optionTextField="text"
-                          placeholder="Select Parameter"
-                          (selectionChanges)="moduleSelection($event)"
-                      
-                          style="width: 100%;">
-                        </ngx-select>
-                      </div>
-  
-  
-  
-                      <div class="col-md-4 mb-3">
-                        <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Redirect To</label>
-                        <ngx-select
-                       
-                          [allowClear]="true"
-                          formControlName="dashboardIds"
-                          [items]="dynamicIDArray"
-                          optionValueField="value"
-                          optionTextField="text"
-                          placeholder="Select Parameter"
-                          (selectionChanges)="dynamicRedirectChanged($event)"
-                      
-                          style="width: 100%;">
-                        </ngx-select>
-                      </div>
-                   
-                        <!-- Select Type -->
-                        <div *ngIf="isSummaryDashboardSelected" class="col-md-4">
-                          <div class="d-flex flex-column">
-                            <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Select Redirection Type</label>
-                            <ngx-select
-                              id="selectType"
-                              [allowClear]="true"
-                              formControlName="selectType"
-                              [items]="SelectTypeSummary"
-                              optionValueField="value"
-                              optionTextField="text"
-                              placeholder="Select Parameter"
-                              (change)="onSelectTypeChange()"
-                            >
-                            </ngx-select>
-                          </div>
-                        </div>
-                        
-                        <!-- Column Visibility (Shown only if 'drill down' is selected) -->
-                        <div class="col-md-4" style="margin-top:30px;" *ngIf="showColumnVisibility">
-                          <div class="d-flex flex-column">
-                            <label for="columnVisibility" class="fw-bold fs-6">Column Visibility</label>
-                            <p-multiSelect
-                              id="columnVisibility"
-                              formControlName="columnVisibility"
-                              [options]="columnVisisbilityFields"
-                              optionLabel="text"
-                              placeholder="Select Parameter"
-                            >
-                            </p-multiSelect>
-                          </div>
-                        </div>
+                <div class="col-md-4 mb-3">
+                  <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Module Names
+                    <span class="ms-2 text-primary"
+                  
+                    placement="top"
+                    container="body">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+
+                    
+                  </label>
+                  <ngx-select
+                    [allowClear]="true"
+                    formControlName="ModuleNames"
+                    [items]="showModuleNames"
+                    optionValueField="value"
+                    optionTextField="text"
+                    placeholder="Select Parameter"
+                    (selectionChanges)="moduleSelection($event)"
+                    style="width: 100%;"
+                  >
+                  </ngx-select>
+                </div>
+                <div class="col-md-4">
+                  <div class="d-flex flex-column">
+                    <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Select Redirection Type
+                      <span class="ms-2 text-primary" placement="top" container="body">
+                        <i class="bi bi-info-circle fs-5"></i>
+                      </span>
+                    </label>
+                
+                    <ngx-select
+                      id="selectType"
+                      [allowClear]="true"
+                      formControlName="selectType"
+                      [items]="filteredSelectTypeSummary"
+                      optionValueField="value"
+                      optionTextField="text"
+                      placeholder="Select Parameter"
+                      (change)="onSelectTypeChange()"
+                    >
+                    </ngx-select>
+                  </div>
+                </div>
+
+
+
+                <div *ngIf="createKPIWidget1.controls.selectType.value !== 'drill down'" class="col-md-4 mb-3">
+                  <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Redirect To
+
+                    <span class="ms-2 text-primary"
+               
+                    placement="top"
+                    container="body">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+                  </label>
+                  <ngx-select
+                    [allowClear]="true"
+                    formControlName="dashboardIds"
+                    [items]="dynamicIDArray"
+                    optionValueField="value"
+                    optionTextField="text"
+                    placeholder="Select Parameter"
+                    (selectionChanges)="dynamicRedirectChanged($event)"
+                    style="width: 100%;"
+                  >
+                  </ngx-select>
+                </div>
+                <div class="col-md-4"  *ngIf="showColumnVisibility">
+                  <div class="d-flex flex-column">
+                    <label for="columnVisibility" class="fw-bold fs-6">Column Visibility
+                      <span class="ms-2 text-primary"
+               
+                      placement="top"
+                      container="body">
+                  <i class="bi bi-info-circle fs-5"></i>
+                </span>
+                    </label>
+                    <p-multiSelect
+                      id="columnVisibility"
+                      formControlName="columnVisibility"
+                      [options]="columnVisisbilityFields"
+                      optionLabel="text"
+                      placeholder="Select Parameter"
+                    >
+                    </p-multiSelect>
+                  </div>
+                </div>
                       
                         <!-- Custom Label -->
                         <div class="col-md-5">
@@ -387,7 +409,7 @@
             <!-- Themes Section -->
   <div class="row g-3">
     <div class="col-md-12 mb-3">
-      <label class="col-createChart-label fw-bold fs-6 required">Themes:</label>
+      <label class="col-createChart-label fw-bold fs-6 required">Background Theme:</label>
       <div class="color-boxes">
         <div
           *ngFor="let theme of themes"
@@ -696,7 +718,7 @@
       </div>
       
     
-    <div class="modal-footer">
+    <div class="modal-footer" style="margin-top:200px">
       <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Discard</button>
       <button type="button" class="btn btn-primary"     (click)="validateAndSubmit()" *ngIf="!isEditMode">Save</button> 
       <button type="button" class="btn btn-primary" (click)="validateAndUpdate()"  *ngIf="isEditMode">Update</button> <!-- Update button shown only in edit mode -->
@@ -758,6 +780,11 @@
                 <div class="title">Any</div>
                 <div class="example">E.g., Any</div>
               </div>
+              <div class="list-item" (click)="selectValue('Last financial year', modal)" (mouseenter)="showTooltip('Last financial year')"
+              (mouseleave)="hideTooltip()">
+              <div class="title">Last financial year</div>
+              <div class="example">E.g., Data from the last financial year</div>
+            </div>
               </div>
             
               <div class="list-column">
@@ -801,6 +828,11 @@
                   <div class="title">Last 5 Weeks</div>
                   <div class="example">E.g., Data for the last 5 weeks</div>
                 </div>
+                <div class="list-item" (click)="selectValue('This financial year', modal)" (mouseenter)="showTooltip('This financial year')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">This financial year</div>
+                <div class="example">E.g., Data for the this financial year</div>
+              </div>
               </div>
             </div>
             

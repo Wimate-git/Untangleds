@@ -3,27 +3,27 @@
     <div class="table-heading" style="display: flex; justify-content: center; align-items: center; width: 100%;">
       <h3>{{ assignFormName }}</h3> <!-- Binding FormName here -->
     </div>
-      <button type="button" class="btn-close" aria-label="Close"   (click)="closeModal()"></button>
+
     </div>
     <div class="modal-body right-side-modal">
       <div class="card-body pt-0">
         <div class="container1">
   
     
+          <div *ngFor="let tableId of tableIds" style="margin-bottom: 40px;">
+            <h3 class="text-center pt-5 mb-3">{{ tableNamesMap[tableId] }}</h3>
           
-          <div *ngFor="let tableId of tableIds" class="ag-theme-alpine" style="width: 100%; height: 350px; margin-bottom: 20px;">
-            <h3>{{ tableNamesMap[tableId] }}</h3>
-            
-            <ag-grid-angular
-              [rowData]="dynamicTableValues[tableId]"
-              [columnDefs]="columnDefsMap[tableId]" 
-              [defaultColDef]="defaultColDef"
-              [paginationPageSizeSelector]="pageSizeOptions"
-              [pagination]="true"
-              [paginationPageSize]="5"
-              (gridReady)="onGridReady($event, tableId)"
-              style="width: 100%; height: 100%;">
-            </ag-grid-angular>
+            <div class="ag-theme-alpine" style="width: 100%;">
+              <ag-grid-angular
+                [rowData]="dynamicTableValues[tableId]"
+                [columnDefs]="columnDefsMap[tableId]"
+                [defaultColDef]="defaultColDef"
+                [pagination]="true"
+                [paginationPageSize]="5"
+                style="width: 100%; height: 300px;" 
+                (gridReady)="onGridReady($event, tableId)">
+              </ag-grid-angular>
+            </div>
           </div>
       
         </div>

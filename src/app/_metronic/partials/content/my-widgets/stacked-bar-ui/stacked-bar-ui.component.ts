@@ -367,6 +367,7 @@ export class StackedBarUiComponent {
           value: event.point.y,
           customIndex: event.point.index, 
           colorIndex: event.point.colorIndex,
+          stackName:event.point.series.name
 
       };
   
@@ -600,7 +601,10 @@ export class StackedBarUiComponent {
             
                 });
                 // Hide the spinner after API processing
-                this.spinner.hide('dataProcess' + index);
+                setTimeout(() => {
+                  this.spinner.hide('dataProcess' + index);
+                  
+                }, 2000);
             } else {
                 // Hide the spinner in case of an error
                 this.spinner.hide('dataProcess' + index);
@@ -908,42 +912,104 @@ else {
      
     ){}
 
-  helperDashboard(item:any,index:any,modalContent:any,selectType:any){
-    console.log('selectType checking dashboard',selectType)
-    console.log('item checking from ',item)
-    // if (typeof this.item.chartConfig === 'string') {
-    //   this.gridOptions = JSON.parse(this.item.chartConfig);
-    // } else {
-    //   this.gridOptions = this.item.chartConfig; // Already an object
-    // }
-    const viewMode = true;
-    const disableMenu = true
-
-
-console.log('this.gridOptions checking from chart',this.gridOptions)
-    localStorage.setItem('isFullScreen', JSON.stringify(true));
-    const modulePath = this.item.dashboardIds; // Adjust with your module route
-    console.log('modulePath checking from chart',modulePath)
-    localStorage.setItem('isFullScreen', 'true');
-
-    // Retrieve and use it later
-    const isFullScreen = localStorage.getItem('isFullScreen') === 'true';
+    helperDashboard(item: any, index: any, modalContent: any, selectType: any, ModuleNames: any) {
+      console.log('selectType checking dashboard', selectType);
+      console.log('item checking from', item);
+      console.log('ModuleNames:', ModuleNames);
     
-    // Now you can use `isFullScreen` in your logic
-    const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}&isFullScreen=${isFullScreen}`; 
-    this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(window.location.origin +"/summary-engine/"+ modulePath+queryParams);
- this.selectedMarkerIndex = index
- if (selectType === 'NewTab') {
-  // Open in a new tab
-  window.open(this.iframeUrl.changingThisBreaksApplicationSecurity, '_blank');
-} else if(selectType === 'Modal'){
-  // Open in the modal
-  this.modalService.open(modalContent, { size: 'xl' });
-}
-
-
-  }
-
+      // ✅ Only handle custom logic for Summary Dashboard
+      if (selectType && ModuleNames === 'Summary Dashboard') {
+        const viewMode = true;
+        const disableMenu = true;
+        localStorage.setItem('isFullScreen', JSON.stringify(true));
+    
+        const modulePath = item.dashboardIds;
+        const isFullScreen = localStorage.getItem('isFullScreen') === 'true';
+        const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}&isFullScreen=${isFullScreen}`;
+    
+        const fullUrl = `/summary-engine/${modulePath}${queryParams}`;
+    
+        this.iframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+          window.location.origin + fullUrl
+        );
+    
+        this.selectedMarkerIndex = index;
+    
+        if (selectType === 'NewTab') {
+          window.open(this.iframeUrl.changingThisBreaksApplicationSecurity, '_blank');
+        } else if (selectType === 'Modal') {
+          this.modalService.open(modalContent, { size: 'xl' });
+        } else if (selectType === 'Same page Redirect') {
+          this.router.navigateByUrl(fullUrl).catch(err => console.error('Navigation error:', err));
+        }
+      } 
+      // ✅ If module is NOT Summary Dashboard, delegate to general redirect
+      else if (selectType && ModuleNames !== 'Summary Dashboard') {
+        this.redirectModule(item);
+      }
+    }
+    
+    
+    redirectModule(recieveItem: any) {
+      console.log('recieveItem check', recieveItem);
+    
+      const moduleName = recieveItem.dashboardIds;
+      const selectedModule = recieveItem.ModuleNames;
+      const redirectType = recieveItem.selectType; // 'NewTab' or 'Same page Redirect'
+    
+      console.log('moduleName:', moduleName);
+      console.log('selectedModule:', selectedModule);
+      console.log('selectType (redirectType):', redirectType);
+    
+      let targetUrl: string = '';
+      const isNewTab = redirectType === 'NewTab';
+    
+      switch (selectedModule) {
+        case 'Forms':
+          targetUrl = `/view-dreamboard/Forms/${moduleName}`;
+          break;
+    
+        case 'Summary Dashboard':
+          targetUrl = `/summary-engine/${moduleName}`;
+          break;
+    
+        case 'Dashboard':
+          targetUrl = `/dashboard/dashboardFrom/Forms/${moduleName}`;
+          break;
+    
+        case 'Projects':
+          targetUrl = `/project-dashboard/project-template-dashboard/${moduleName}`;
+          break;
+    
+        case 'Calender':
+          targetUrl = `/view-dreamboard/Calendar/${moduleName}`;
+          break;
+    
+        case 'Report Studio':
+          const tree = this.router.createUrlTree(['/reportStudio'], {
+            queryParams: { savedQuery: moduleName }
+          });
+          targetUrl = this.router.serializeUrl(tree); // already serialized
+          break;
+    
+        default:
+          console.error('Unknown module:', selectedModule);
+          return;
+      }
+    
+      // 🔁 Navigation logic
+      if (isNewTab) {
+        // Open serialized or regular route as full URL
+        window.open(targetUrl, '_blank');
+      } else {
+        // Same Page Navigation
+        if (selectedModule === 'Report Studio') {
+          this.router.navigateByUrl(targetUrl).catch(err => console.error('Navigation error:', err));
+        } else {
+          this.router.navigate([targetUrl]).catch(err => console.error('Navigation error:', err));
+        }
+      }
+    }
   closeModal() {
     this.modalService.dismissAll(); // Close the modal programmatically
   }

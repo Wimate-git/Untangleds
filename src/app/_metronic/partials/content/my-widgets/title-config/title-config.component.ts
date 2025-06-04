@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, SimpleChanges, TemplateRef } from '@angular/core';
 import { FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -48,6 +48,28 @@ export class TitleConfigComponent  implements OnInit{
   formListTitles: any;
   projectListRead: any[];
   projectList: any[];
+  isSummaryDashboardSelected = false;
+  columnVisisbilityFields: any;
+  showColumnVisibility = false;
+
+
+  SelectTypeSummary = [
+    { value: 'NewTab', text: 'New Tab' },
+    { value: 'Modal', text: 'Modal(Pop Up)' },
+    { value: 'Same page Redirect', text: 'Same Page Redirect' },
+  ];
+
+  filteredSelectTypeSummary = [...this.SelectTypeSummary]; 
+  allDeviceIds: any;
+  userdetails: any;
+  userClient: string;
+  permissionsMetaData: any;
+  permissionIdRequest: any;
+  storeFormIdPerm: any;
+  parsedPermission: any;
+  readFilterEquation: any;
+  summaryPermission: any;
+  
 
 ngOnInit(){
   this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
@@ -61,6 +83,11 @@ ngOnInit(){
   this.initializeTitleFields()
   this.dynamicData()
   this.dashboardIds(1)
+  this.fetchUserPermissions(1)
+
+  this.createTitle.get('selectType')?.valueChanges.subscribe(value => {
+    this.showColumnVisibility = value === 'drill down';
+  });
 }
 
 constructor(private summaryConfiguration: SharedService,private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
@@ -365,7 +392,7 @@ updateTextColor(event: Event): void {
       textColor:this.createTitle.value.textColor || '#FFFFFF',
       ModuleNames:this.createTitle.value.ModuleNames,
       dashboardIds:this.createTitle.value.dashboardIds,
-      selectType:this.createTitle.value.selectType
+      selectType:this.createTitle.value.selectType ||''
    
 
     };
@@ -439,110 +466,88 @@ updateTitle() {
   }
 }
 showModuleNames = [
-  { value: 'None', text: 'None' },
+  // { value: 'None', text: 'None' },
   { value: 'Forms', text: 'Forms' },
   { value: 'Dashboard', text: 'Dashboard' },
-  { value: 'Dashboard - Group', text: 'Dashboard - Group' },
+  // { value: 'Dashboard - Group', text: 'Dashboard - Group' },
   { value: 'Summary Dashboard', text: 'Summary Dashboard' },
   { value: 'Projects', text: 'Projects' },
-  { value: 'Project - Detail', text: 'Project - Detail' },
-  { value: 'Project - Group', text: 'Project - Group' },
+  // { value: 'Project - Detail', text: 'Project - Detail' },
+  // { value: 'Project - Group', text: 'Project - Group' },
   {value: 'Report Studio', text: 'Report Studio'},
   {value:'Calender', text:'Calender'}
 
 ]
 async moduleSelection(event: any): Promise<void> {
-  const selectedValue = event[0].value; // Get selected value
-  console.log('selectedValue checking',selectedValue)
+  const selectedValue = event[0].value;
+
+  // 🔁 Update flag for conditional UI logic (if still needed)
+  this.isSummaryDashboardSelected = selectedValue === 'Summary Dashboard';
+
+  // 🔁 Filter dropdown options based on selection
+  if (selectedValue === 'Summary Dashboard') {
+    // Show all options
+    this.filteredSelectTypeSummary = [...this.SelectTypeSummary];
+  } else {
+    // Hide only the "Modal" option
+    this.filteredSelectTypeSummary = this.SelectTypeSummary.filter(
+      item => item.value !== 'Modal'
+    );
+  
+    // Clear "Modal" if it was previously selected
+    const currentType = this.createTitle.get('selectType')?.value;
+    if (currentType === 'Modal') {
+      // this.createTitle.get('selectType')?.setValue('');
+    }
+  }
+  
+  
+
+  console.log('selectedValue checking', selectedValue);
+
   switch (selectedValue) {
     case 'None':
       console.log('No module selected');
-      // Add specific logic here
       break;
 
     case 'Forms':
       console.log('Forms module selected');
-      this.FormNames=this.listofDeviceIds
-      console.log('this.FormNames checking',this.FormNames)
-      this.dynamicIDArray = []
-      this.dynamicIDArray = this.FormNames
-      // Add specific logic for Forms
+      this.FormNames = this.listofDeviceIds;
+      this.dynamicIDArray = [...this.FormNames];
       break;
 
     case 'Dashboard':
       console.log('Dashboard module selected');
-      this.IdsFetch = await this.dashboardIdsFetching(1)
-  
-      console.log('IdsFetch checking',this.IdsFetch)
-      this.dynamicIDArray = []
-      this.dynamicIDArray = this.IdsFetch
-    
-      break;
-      // Add specific logic for Dashboard
-
-
-    case 'Dashboard - Group':
-      console.log('Dashboard - Group module selected');
-      this.dynamicIDArray = []
-      // Add specific logic for Dashboard - Group
+      this.IdsFetch = await this.dashboardIdsFetching(1);
+      this.dynamicIDArray = [...this.IdsFetch];
       break;
 
     case 'Summary Dashboard':
-      this.summaryIds = await this.dashboardIds(1); // Await and get P1 values
-      console.log('Fetched P1 values:', this.summaryIds);
-      this.dynamicIDArray = [];
-      this.dynamicIDArray = this.summaryIds
-      
       console.log('Summary Dashboard module selected');
-      // Add specific logic for Summary Dashboard
+      this.summaryIds = await this.dashboardIds(1);
+      console.log('Fetched P1 values:', this.summaryIds);
+      this.dynamicIDArray = [...this.summaryIds];
       break;
 
     case 'Projects':
       console.log('Projects module selected');
-      const projectList = await this.fetchDynamicLookupData(1)
-      console.log('projectList checking',projectList)
-      
-      this.dynamicIDArray = []
-      this.dynamicIDArray = projectList
-      break;
-      // Add specific logic for Projects
+      const projectList = await this.fetchDynamicLookupData(1);
+      console.log('projectList checking', projectList);
+      this.dynamicIDArray = [...projectList];
       break;
 
-    case 'Project - Detail':
-      console.log('Project - Detail module selected');
-      const projectDetailList = await this.ProjectDetailLookupData(1)
-
-      this.dynamicIDArray = []
-      this.dynamicIDArray = projectDetailList
-
-      // Add specific logic for Project - Detail
+    case 'Report Studio':
+      console.log('Report Studio module selected');
+      const ReportStudioLookup = await this.reportStudioLookupData(1);
+      this.dynamicIDArray = [...ReportStudioLookup];
       break;
 
-    case 'Project - Group':
-      console.log('Project - Group module selected');
-      this.dynamicIDArray = []
-      // Add specific logic for Project - Group
+    case 'Calender':
+      console.log('Calender module selected');
+      const CalenderLookup = await this.fetchCalender();
+      console.log('CalenderLookup check', CalenderLookup);
+      this.dynamicIDArray = [...CalenderLookup];
       break;
-      case 'Report Studio':
-        console.log('Project - Group module selected');
-        this.dynamicIDArray = []
-        const ReportStudioLookup = await this.reportStudioLookupData(1)
-
-    
-        this.dynamicIDArray = ReportStudioLookup
-        // Add specific logic for Project - Group
-        break;
-        case 'Calender':
-          console.log('Project - Group module selected');
-     
-          this.dynamicIDArray = []
-          const CalenderLookup = await this.fetchCalender()
-          console.log('CalenderLookup check',CalenderLookup)
-  
-      
-          this.dynamicIDArray = CalenderLookup
-          // Add specific logic for Project - Group
-          break;
 
     default:
       console.log('Invalid selection');
@@ -550,29 +555,307 @@ async moduleSelection(event: any): Promise<void> {
   }
 }
 
-SelectTypeSummary =[
-  { value: 'NewTab', text: 'New Tab' },
-  { value: 'Modal', text: 'Modal(Pop Up)' },
-  { value: 'Same page Redirect', text: 'Same Page Redirect' },
 
-  { value: 'drill down', text: 'Drill Down' },
-]
-async dynamicData(){
+fetchDynamicFormDataConfig(value: any) {
+  console.log("Data from lookup:", value);
+
+  this.api
+    .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
+    .then((result: any) => {
+      if (result && result.metadata) {
+        const parsedMetadata = JSON.parse(result.metadata);
+        console.log('parsedMetadata check dynamic', parsedMetadata);
+        const formFields = parsedMetadata.formFields;
+        console.log('formFields check from tile1', formFields);
+
+        // Initialize the list with formFields labels, filtering out "heading" type and "Empty Placeholder"
+        this.columnVisisbilityFields = formFields
+          .filter((field: any) => {
+            // Filter out fields with type "heading" or with an empty placeholder
+            return field.type !== "heading" && field.type !== 'Empty Placeholder' && field.type !=='button' && field.type !=='table' && field.type !=='radio' && field.type !== 'checkbox' && field.type !== 'html code' && field.type !=='file' && field.type !=='range' && field.type !=='color' && field.type !=='password';
+          })
+          .map((field: any) => {
+            console.log('field check', field);
+            return {
+              value: field.name,
+              text: field.label
+            };
+          });
+
+        // Include created_time and updated_time if available
+        if (parsedMetadata.created_time) {
+          this.columnVisisbilityFields.push({
+            value: parsedMetadata.created_time.toString(),
+            text: 'Created Time' // You can customize the label here if needed
+          });
+        }
+
+        if (parsedMetadata.updated_time) {
+          this.columnVisisbilityFields.push({
+            value: parsedMetadata.updated_time.toString(),
+            text: 'Updated Time' // You can customize the label here if needed
+          });
+        }
+        if (parsedMetadata.updated_time) {
+          this.columnVisisbilityFields.push({
+            value: `dynamic_table_values`,
+            text: 'Dynamic Table Values' // You can customize the label here if needed
+          });
+          
+        }
+        console.log('Transformed dynamic parameters config', this.columnVisisbilityFields);
+
+        // Trigger change detection to update the view
+        this.cdr.detectChanges();
+      }
+    })
+    .catch((err) => {
+      console.log("Can't fetch", err);
+    });
+}
+onSelectTypeChange() {
+  const selectedType = this.createTitle.get('selectType')?.value;
+  // this.showColumnVisibility = selectedType === 'drill down';
+}
+
+// SelectTypeSummary =[
+//   { value: 'NewTab', text: 'New Tab' },
+//   { value: 'Modal', text: 'Modal(Pop Up)' },
+//   { value: 'Same page Redirect', text: 'Same Page Redirect' },
+
+//   // { value: 'drill down', text: 'Drill Down' },
+// ]
+async dynamicData(receiveFormIds?: any) {
+  console.log('receiveFormIds checlking from',receiveFormIds)
   try {
     const result: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#lookup", 1);
     if (result) {
-      console.log('forms chaecking',result)
+      console.log('forms checking', result);
       const helpherObj = JSON.parse(result.options);
-      console.log('helpherObj checking',helpherObj)
-      this.formList = helpherObj.map((item: [string]) => item[0]); // Explicitly define the type
-      this.listofDeviceIds = this.formList.map((form: string) => ({ text: form, value: form })); // Explicitly define the type here too
-      console.log('listofDeviceIds',this.listofDeviceIds)
-      console.log('this.formList check from location', this.formList);
+      console.log('helpherObj checking', helpherObj);
+
+      this.formList = helpherObj.map((item: [string]) => item[0]);
+       this.allDeviceIds = this.formList.map((form: string) => ({ text: form, value: form }));
+      console.log('allDeviceIds checking from',this.allDeviceIds)
+
+      // ✅ Conditionally filter only if receiveFormIds has items
+      if (Array.isArray(receiveFormIds) && receiveFormIds.length > 0) {
+        const receivedSet = new Set(receiveFormIds);
+        this.listofDeviceIds = this.allDeviceIds.filter((item: { value: any; }) => receivedSet.has(item.value));
+      } else {
+        console.log('i am checking forms from else cond',this.allDeviceIds)
+        this.listofDeviceIds = this.allDeviceIds; // No filtering — use all
+
+      }
+
+      console.log('Final listofDeviceIds:', this.listofDeviceIds);
     }
   } catch (err) {
     console.log("Error fetching the dynamic form data", err);
   }
 }
+
+async fetchUserPermissions(sk: any) {
+  try {
+      this.userdetails = this.getLoggedUser.username;
+      this.userClient = `${this.userdetails}#user#main`;
+      console.log("this.tempClient from form service check", this.userClient);
+
+      // Fetch user permissions
+      const permission = await this.api.GetMaster(this.userClient, sk);
+      
+      if (!permission) {
+          console.warn("No permission data received.");
+          return null; // Fix: Returning null instead of undefined
+      }
+
+      console.log("Data checking from add form", permission);
+
+      // Parse metadata
+      const metadataString: string | null | undefined = permission.metadata;
+      if (typeof metadataString !== "string") {
+          console.error("Invalid metadata format:", metadataString);
+          return null; // Fix: Ensuring the function returns a value
+      }
+      console.log('metadataString checking for',metadataString)
+
+      try {
+          this.permissionsMetaData = JSON.parse(metadataString);
+          console.log("Parsed Metadata Object from location", this.permissionsMetaData);
+
+          const permissionId = this.permissionsMetaData.permission_ID;
+          console.log("permission Id check from Tile1", permissionId);
+          this.permissionIdRequest = permissionId;
+          console.log('this.permissionIdRequest checking',this.permissionIdRequest)
+          this.storeFormIdPerm = this.permissionsMetaData.form_permission
+          console.log('this.storeFormIdPerm check',this.storeFormIdPerm)
+  
+
+          if(this.permissionIdRequest=='All' && this.storeFormIdPerm=='All'){
+            this.dynamicData()
+
+          }else if(this.permissionIdRequest=='All' && this.storeFormIdPerm !=='All'){
+            const StorePermissionIds = this.storeFormIdPerm
+            this.dynamicData(StorePermissionIds)
+          }
+          else if (this.permissionIdRequest != 'All' && this.storeFormIdPerm[0] != 'All') {
+            const readFilterEquationawait: any = await this.fetchPermissionIdMain(1, permissionId);
+            console.log('main permission check from Tile1', readFilterEquationawait);
+          
+            if (Array.isArray(readFilterEquationawait)) {
+              const hasAllPermission = readFilterEquationawait.some(
+                (packet: any) => Array.isArray(packet.dynamicForm) && packet.dynamicForm.includes('All')
+              );
+          
+              if (hasAllPermission) {
+                const StorePermissionIds = this.storeFormIdPerm;
+                this.dynamicData(StorePermissionIds);
+              } else {
+                // Match dynamicForm values with storeFormIdPerm
+                const dynamicFormValues = readFilterEquationawait
+                  .map((packet: any) => packet.dynamicForm?.[0]) // Get each dynamicForm value
+                  .filter((v: string | undefined) => !!v);        // Remove undefined
+          
+                const matchedStoreFormIds = this.storeFormIdPerm.filter((id: string) =>
+                  dynamicFormValues.includes(id)
+                );
+          
+                console.log('matchedStoreFormIds:', matchedStoreFormIds);
+          
+                this.dynamicData(matchedStoreFormIds); // ⬅️ Use the filtered list
+              }
+            } else {
+              console.warn('fetchPermissionIdMain did not return an array.');
+            }
+          }
+          else if (this.permissionIdRequest !== 'All' && this.storeFormIdPerm[0] === 'All') {
+            const readFilterEquationawait: any = await this.fetchPermissionIdMain(1, permissionId);
+            console.log('main permission check from Tile1', readFilterEquationawait);
+          
+            if (Array.isArray(readFilterEquationawait)) {
+              const hasAllPermission = readFilterEquationawait.some(
+                (packet: any) => Array.isArray(packet.dynamicForm) && packet.dynamicForm.includes('All')
+              );
+          
+              if (hasAllPermission) {
+                // No filtering needed, show all
+                this.dynamicData();
+              } else {
+                // Extract dynamicForm[0] from each packet
+                const filteredFormIds = readFilterEquationawait
+                  .map((packet: any) => packet.dynamicForm?.[0])  // Get first value from each dynamicForm
+                  .filter((formId: string | undefined) => !!formId); // Remove undefined/null
+          
+                console.log('filteredFormIds (no "All" present):', filteredFormIds);
+          
+                this.dynamicData(filteredFormIds);
+              }
+            } else {
+              console.warn('fetchPermissionIdMain did not return an array.');
+            }
+          }
+          
+          
+          
+          // **Fix: Ensure fetchPermissionIdMain is awaited**
+
+
+       
+
+      } catch (error) {
+          console.error("Error parsing JSON:", error);
+          return null; // Fix: Ensuring return on JSON parsing failure
+      }
+  } catch (error) {
+      console.error("Error fetching user permissions:", error);
+      return null; // Fix: Ensuring return on outer try-catch failure
+  }
+}
+
+tooltipContent: string = 'Group data by time periods such as Today, Last 7 Days, This Month, or This Year to view filtered insights based on the selected range. For example, "This Year" refers to data from January to December of the current year.';
+
+formTooltip: string = 'Select a form to view and analyze data specific to that form.';
+parameterTooltip: string = 'Specify which form fields to analyze. The results will be based solely on your selection.';
+
+formatTypeTooltip: string = 'Select a format to represent the output value appropriately—for example, Rupee for currency, Distance for measurements, or Percentage for ratios.';
+customLabelTooltip: string = 'Provide a custom label to be displayed as the widget title.';
+moduleNamesTooltip: string = 'Select the module that the user will be redirected to when the widget is clicked.';
+selectTypeTooltip: string = 'Choose how the dashboard should open when the widget is clicked—whether in a new tab, a modal, or on the same page.';
+
+redirectToTooltip: string = 'Select the specific dashboard or module the user should be redirected to when the widget is clicked.';
+columnVisibilityTooltip: string = 'Select the fields to display in the drill-down table. Only the selected columns will be visible in the detailed view.';
+redirectionType: string = 'Choose how the widget should open the target dashboard or module: "New Tab" opens it in a separate browser tab, "Modal (Pop Up)" displays it in a modal window, "Same Page Redirect" replaces the current view, and "Drill Down" shows detailed insights in Table.';
+iconTooltip: string = 'The icon you select will be shown on the tile.';
+
+iconFontSizeTooltip: string = 'Set the font size for the icon. The icon will scale up or down based on the value entered.';
+fontTypeTooltip: string = 'Choose a font style (italic, bold, or underline) to apply to the title. The selected style will be reflected in the displayed title.';
+fontAlignTooltip: string = 'Set the alignment of the title text. You can align it to the left, center, or right within the tile.';
+fontStyleTooltip: string = 'Select a font style for the title text. The chosen font will be applied to how the title appears on the tile.';
+fontSizeTooltip: string = 'Set the text size for the title shown on the tile.';
+bgColorTooltip: string = 'Choose a background color for the widget title.';
+textColorTooltip: string = 'Choose the color for the title text.';
+
+titleInputTooltip: string = 'Enter a title to display on the widget. This text will appear as the main heading.';
+
+
+async fetchPermissionIdMain(clientID: number, p1Value: string): Promise<void> {
+
+  try {
+    console.log("p1Value checking", p1Value);
+    console.log("clientID checking", clientID);
+    console.log("this.SK_clientID checking from permission", this.SK_clientID);
+
+    const pk = `${this.SK_clientID}#permission#${p1Value}#main`;
+    console.log(`Fetching main table data for PK: ${pk}`);
+
+    const result: any = await this.api.GetMaster(pk, clientID);
+
+    if (!result || !result.metadata) {
+      console.warn("Result metadata is null or undefined.");
+// Resolve even if no data is found
+      return;
+    }
+
+    // Parse metadata
+    this.parsedPermission = JSON.parse(result.metadata);
+    console.log("Parsed permission metadata:", this.parsedPermission);
+
+    this.readFilterEquation = JSON.parse(this.parsedPermission.dynamicEntries);
+    console.log("this.readFilterEquation check", this.readFilterEquation);
+
+    // Handling Dashboard Permissions
+    this.summaryPermission = this.parsedPermission.summaryList || [];
+    console.log("this.summaryPermission check", this.summaryPermission);
+
+    // if (this.summaryPermission.includes("All")) {
+    //   console.log("Permission is 'All'. Fetching all dashboards...");
+
+return this.readFilterEquation
+    // } else {
+    //   console.log("Fetching specific dashboards...");
+    //   const allData = await this.fetchCompanyLookupdata(1);
+    //   this.dashboardData = allData.filter((dashboard: any) =>
+    //     this.summaryPermission.includes(dashboard.P1)
+    //   );
+    //   console.log("Filtered Dashboards Data:", this.dashboardData);
+    // }
+
+    // Extract Permission List
+ 
+    
+// Resolve the Promise after all operations are complete
+  } catch (error) {
+    console.error(`Error fetching data for PK (${p1Value}):`, error);
+// Reject in case of API failure
+  }
+
+}
+
+  openRedirectionTypeInfoModal(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+
+  }
 async dashboardIds(sk: any): Promise<string[]> {
   console.log("I am called Bro");
   

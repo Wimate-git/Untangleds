@@ -136,57 +136,58 @@ this.parseChartConfig(this.storeDrillDown)
         }
       }
       exportAllTablesAsExcel() {
-        if (!this.responseRowData || this.responseRowData.length === 0) {
-          console.error('No data available for export.');
-          // alert('No data available for export.');
-          return; // Exit if there's no data to export
+        let dataToExport: any[] = [];
+      
+        // Check if filters are applied and rows are reduced
+        const isFilterApplied = this.gridApi && Object.keys(this.gridApi.getFilterModel()).length > 0;
+        const displayedRowCount = this.gridApi.getDisplayedRowCount();
+      
+        if (isFilterApplied && displayedRowCount > 0) {
+          // ✅ Export only filtered data
+          this.gridApi.forEachNodeAfterFilter((node: any) => {
+            if (node.data) dataToExport.push(node.data);
+          });
+        } else {
+          // ✅ No filters — export all raw data
+          dataToExport = this.responseRowData || [];
         }
-        console.log('this.rowData checking',this.responseRowData)
       
-        const wb = XLSX.utils.book_new(); // Create a new workbook
-        
-    
-      
-        // Extract column headers and fields dynamically from finalColumns
-        const columnHeaders = this.columnDefs.map((column: any) => column.headerName);
-        const columnFields = this.columnDefs.map((column: any) => column.field);
-        console.log('Extracted Column Headers:', columnHeaders);
-        console.log('Extracted Column Fields:', columnFields);
-      
-        if (columnHeaders.length === 0) {
-          console.error('No columns available for export.');
-          // alert('No columns available for export.');
+        if (!dataToExport.length) {
+          console.error('No data available for export.');
           return;
         }
       
-        // Build the Excel data: column headers + row data
+        const wb = XLSX.utils.book_new();
+      
+        // Extract headers and fields dynamically
+        const columnHeaders = this.columnDefs.map((col: any) => col.headerName);
+        const columnFields = this.columnDefs.map((col: any) => col.field);
+      
+        if (!columnHeaders.length) {
+          console.error('No columns available for export.');
+          return;
+        }
+      
         const excelData = [
-          columnHeaders, // Add headers as the first row
-          ...this.responseRowData.map((row: Record<string, any>) =>
-            columnFields.map((field: string | number) =>
-              row[field] !== null && row[field] !== undefined ? row[field].toString() : '' // Handle null/undefined
+          columnHeaders,
+          ...dataToExport.map(row =>
+            columnFields.map(field =>
+              row[field] !== null && row[field] !== undefined ? row[field].toString() : ''
             )
-          ),
+          )
         ];
-        console.log('Excel Data Check:', excelData);
       
-        // Convert data to a worksheet
         const ws = XLSX.utils.aoa_to_sheet(excelData);
+        XLSX.utils.book_append_sheet(wb, ws, 'Work Orders');
       
-        // Add the worksheet to the workbook
-        XLSX.utils.book_append_sheet(wb, ws, 'TableData');
-      
-        // Generate the Excel file
         const excelFile = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-      
-        // Create a Blob and trigger the download
         const blob = new Blob([excelFile], { type: 'application/octet-stream' });
+      
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = `${this.FormName}`+'.xlsx';
+        link.download = `${this.FormName || 'ExportedData'}.xlsx`;
         link.click();
       }
-    
       exportAllTablesAsPDF() {
         if (!this.responseRowData || this.responseRowData.length === 0) {
           console.error('No data available for export.');

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, QueryList, SimpleChanges, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, QueryList, SimpleChanges, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -6,6 +6,9 @@ import { AgGridAngular } from 'ag-grid-angular';
 import pdfMake from 'pdfmake/build/pdfmake';
 import * as XLSX from 'xlsx';  
 import { GridApi ,Column} from 'ag-grid-community';
+import { SharedService } from 'src/app/pages/shared.service';
+import { APIService } from 'src/app/API.service';
+import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engine.service';
 
 @Component({
   selector: 'app-multi-table-ui',
@@ -30,6 +33,7 @@ export class MultiTableUiComponent implements OnInit{
   @Output() sendCellInfo = new EventEmitter<any>();
   @Output() sendminiTableData = new EventEmitter<any>();
   @Output() sendFormNameForMini = new EventEmitter<any>();
+  pinnedBottomRowData: any[];
   
   pageSizeOptions = [10, 25, 50, 100];
 
@@ -59,11 +63,469 @@ export class MultiTableUiComponent implements OnInit{
   mutitableColumns: any;
   extractRowData: any;
   extractFormName: any;
-  ngOnInit(): void {
+  getLoggedUser: any;
+  SK_clientID: any;
+  formName: any;
+  customLabel: any;
+  finalColumns: any;
 
+  
+  ngOnInit(){
+    console.log('item chacke',this.item.grid_details)
+    this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
+    console.log('this.getLoggedUser read for redirect',this.getLoggedUser)
+  
+  
+    this.SK_clientID = this.getLoggedUser.clientID;
+    this.summaryService.lookUpData$.subscribe((data: any)=>{
+      console.log('data check>>> from multiTable',data)
+  let tempCharts:any=[]
+  data.forEach((packet: any,matchedIndex:number) => {
+  
+  if(packet.grid_type == 'MultiTableWidget'&& this.index==matchedIndex && packet.id === this.item.id){
+    tempCharts[matchedIndex] = packet
+    // this.sendRowDynamic = this.formatDateFields(this.sendRowDynamic);
+    // console.log('Formatted Data:', this.sendRowDynamic);
+    console.log('packet checking from multitable widget',packet)
+    setTimeout(() => {
+      this.createtableWidget(packet)
+      
+    }, 500);
+  
+   
+  }
+  });
+  
+  
+  
+  
+  
+      
+      // console.log("✅ Matched Charts:", matchedCharts);
+      
     
+      
+      
+    })
+  
+  
   }
 
+  async createtableWidget(mapWidgetData?:any){
+    
+    if(mapWidgetData){
+      console.log("tile data check from multi table Widget",this.item)
+      this.extractFormName = mapWidgetData.formlist
+      console.log('this.extractFormName',this.extractFormName)
+      this.sendFormNameForMini.emit(this.extractFormName)
+  
+  
+      this.mutitableColumns = JSON.parse(mapWidgetData.multiTableWidget_Config)
+      console.log('this.mutitableColumns checking',this.mutitableColumns)
+      
+  // Parse the conditions
+  this.parsedColumns = JSON.parse(mapWidgetData.conditions);
+  console.log('this.parsedColumns checking', this.parsedColumns);
+  
+  // Extract columnLabel values
+  const columnLabels = this.parsedColumns.map((column: { columnLabel: string }) => column.columnLabel);
+  
+  // Log or store the extracted column labels
+  console.log('Extracted column labels:', columnLabels);
+  
+  // Store in a variable
+  this.columnLabelsArray = columnLabels; // Example variable to hold the column labels
+  console.log('this.columnLabelsArray checking',this.columnLabelsArray)
+  
+  
+  
+    
+  
+     
+  
+     
+  this.tabledata = mapWidgetData.multiTableWidget_Config; // This will contain your data
+  console.log('description check', this.tabledata);
+  
+  
+  
+  try {
+    this.tabledata = mapWidgetData.multiTableWidget_Config; // Source data for columns
+    console.log('description check', this.tabledata);
+  
+    // Parse tableWidget_Config
+    this.parsedTableData = JSON.parse(this.tabledata);
+    console.log('this.parsedTableData checking', this.parsedTableData);
+  
+    const tableWidgetColumns = this.parsedTableData.map((column: { text: any; value: string; }) => ({
+      headerName: column.text || 'Default Header',
+      field: column.value,
+      sortable: true,
+      filter: true,
+      resizable: true,
+      cellRenderer: (column.value === 'dynamic_table_values') ? this.iconCellRenderer : undefined,
+    }));
+    
+    
+    console.log('tableWidget column definitions:', tableWidgetColumns);
+    
+    // Define the cell renderer function
+  
+  
+    // Include additional columns from columnLabelsArray
+    const additionalColumns = this.columnLabelsArray
+    .filter((label: any) => label && label.trim() !== '')
+    .map((label: any) => ({
+      headerName: label,
+      field: label,
+      sortable: true,
+      filter: true,
+      resizable: true,
+    }));
+  
+  this.columnDefs = [...tableWidgetColumns, ...additionalColumns];
+  
+    console.log('Final column definitions:', this.columnDefs);
+        this.extractRowData = JSON.parse(mapWidgetData.rowData)
+      console.log('this.extractRowData checking',this.extractRowData)
+    console.log('this.extractRowData checking from',this.extractRowData)
+    this.sendminiTableData.emit(this.extractRowData)
+  // this.rowData = this.extractRowData
+
+  const parseRowData = this.extractRowData
+
+
+  console.log('this.rowData from table Tile', parseRowData);
+
+  const dateKeys: string[] = [];
+
+
+
+
+  parseRowData.forEach((row: any) => {
+    Object.keys(row).forEach((key) => {
+      if (
+        (key.startsWith('date') ||
+         key.startsWith('datetime') ||
+         key.startsWith('epoch-date') ||
+         key.startsWith('epoch-datetime-local')) &&
+        !dateKeys.includes(key)
+      ) {
+        dateKeys.push(key);
+      }
+    });
+  });
+  
+  console.log('Extracted date/datetime keys:', dateKeys);
+  
+  // Pass both date and datetime keys to fetchDynamicFormData
+  const matchedDateFields = await this.fetchDynamicFormData(this.extractFormName, dateKeys);
+  console.log('Received date fields in caller:', matchedDateFields);
+  
+  
+  
+
+  this.rowData = this.formatDateFields(parseRowData,matchedDateFields);
+console.log('Formatted Data: multitableWidget', this.rowData);
+    // Generate dummy row data based on column definitions
+  
+  
+    console.log('Generated dummy row data:', this.rowData);
+  } catch (error) {
+    console.error('Error parsing table data:', error);
+  }
+}
+    
+    
+    else{
+      console.log("tile data check from multi table Widget",this.item)
+      this.extractFormName = this.item.formlist
+      this.formName = this.item.formlist
+      console.log('this.extractFormName',this.extractFormName)
+      this.sendFormNameForMini.emit(this.extractFormName)
+  
+  
+      this.mutitableColumns = JSON.parse(this.item.multiTableWidget_Config)
+      console.log('this.mutitableColumns checking',this.mutitableColumns)
+      
+  // Parse the conditions
+  this.parsedColumns = JSON.parse(this.item.conditions);
+  console.log('this.parsedColumns checking', this.parsedColumns);
+  
+  // Extract columnLabel values
+  const columnLabels = this.parsedColumns.map((column: { columnLabel: string }) => column.columnLabel);
+  
+  // Log or store the extracted column labels
+  console.log('Extracted column labels:', columnLabels);
+  
+  // Store in a variable
+  this.columnLabelsArray = columnLabels; // Example variable to hold the column labels
+  console.log('this.columnLabelsArray checking',this.columnLabelsArray)
+  
+  
+  
+    
+  
+     
+  
+     
+  this.tabledata = this.item.multiTableWidget_Config; // This will contain your data
+  console.log('description check', this.tabledata);
+  
+  
+  
+  try {
+    this.tabledata = this.item.multiTableWidget_Config; // Source data for columns
+    console.log('description check', this.tabledata);
+  
+    // Parse tableWidget_Config
+    this.parsedTableData = JSON.parse(this.tabledata);
+    console.log('this.parsedTableData checking', this.parsedTableData);
+  
+    const tableWidgetColumns = this.parsedTableData.map((column: { text: any; value: string; }) => ({
+      headerName: column.text || 'Default Header',
+      field: column.value,
+      sortable: true,
+      filter: true,
+      resizable: true,
+      cellRenderer: (column.value === 'dynamic_table_values') ? this.iconCellRenderer : undefined,
+    }));
+    
+    
+    console.log('tableWidget column definitions:', tableWidgetColumns);
+    
+    // Define the cell renderer function
+  
+  
+    // Include additional columns from columnLabelsArray
+    const additionalColumns = this.columnLabelsArray
+    .filter((label: any) => label && label.trim() !== '')
+    .map((label: any) => ({
+      headerName: label,
+      field: label,
+      sortable: true,
+      filter: true,
+      resizable: true,
+    }));
+  
+  this.columnDefs = [...tableWidgetColumns, ...additionalColumns];
+  
+    console.log('Final column definitions:', this.columnDefs);
+        this.extractRowData = JSON.parse(this.item.rowData)
+      console.log('this.extractRowData checking',this.extractRowData)
+    console.log('this.extractRowData checking from',this.extractRowData)
+    this.sendminiTableData.emit(this.extractRowData)
+    const parseRowData = this.extractRowData
+
+
+  console.log('this.rowData from table Tile', parseRowData);
+
+  const dateKeys: string[] = [];
+
+
+
+
+  parseRowData.forEach((row: any) => {
+    Object.keys(row).forEach((key) => {
+      if (
+        (key.startsWith('date') ||
+         key.startsWith('datetime') ||
+         key.startsWith('epoch-date') ||
+         key.startsWith('epoch-datetime-local')) &&
+        !dateKeys.includes(key)
+      ) {
+        dateKeys.push(key);
+      }
+    });
+  });
+  
+  console.log('Extracted date/datetime keys:', dateKeys);
+  
+  // Pass both date and datetime keys to fetchDynamicFormData
+  const matchedDateFields = await this.fetchDynamicFormData(this.formName, dateKeys);
+  console.log('Received date fields in caller:', matchedDateFields);
+  
+  
+  
+
+  this.rowData = this.formatDateFields(parseRowData,matchedDateFields);
+console.log('Formatted Data: multitableWidget from multitable', this.rowData);
+    // Generate dummy row data based on column definitions
+  
+  
+    console.log('Generated dummy row data:', this.rowData);
+  } catch (error) {
+    console.error('Error parsing table data:', error);
+  }
+}
+  
+  }
+
+  ngAfterViewInit(){
+
+    this.createtableWidget()
+
+
+
+}
+
+private formatDateFields(data: any[], receiveformatPckets: any[]): any[] {
+  console.log('receiveformatPckets checking', receiveformatPckets);
+
+  return data.map(row => {
+    Object.keys(row).forEach(key => {
+      const isDateKey = key.startsWith('date-');
+      const isDateTimeKey = key.startsWith('datetime-');
+      const isEpochDate = key.startsWith('epoch-date-');
+      const isEpochDateTime = key.startsWith('epoch-datetime-local-');
+
+      if (isDateKey || isDateTimeKey || isEpochDate || isEpochDateTime) {
+        const matchingField = receiveformatPckets.find(
+          (packet: any) => packet.name === key
+        );
+
+        if (matchingField) {
+          const validation = matchingField.validation || {};
+          const dateFormat = validation.dateFormatType || 'DD/MM/YYYY';
+          const timeFormat = validation.timeFormatType || '12-hour (hh:mm AM/PM)';
+
+          console.log('Date Format Applied:', dateFormat);
+          console.log('Time Format Applied:', timeFormat);
+
+          let rawValue = row[key];
+
+          // ✅ Convert epoch to ISO string (only if it's a number)
+          if ((isEpochDate || isEpochDateTime) && rawValue) {
+            const epoch = parseInt(rawValue, 10);
+            if (!isNaN(epoch)) {
+              const epochMs = epoch < 1e12 ? epoch * 1000 : epoch; // Detect seconds vs milliseconds
+              rawValue = new Date(epochMs).toISOString();
+            }
+          }
+
+          // ✅ Apply formatting
+          const requiresTime = isDateTimeKey || isEpochDateTime;
+          row[key] = this.formatDate(rawValue, dateFormat, requiresTime ? timeFormat : null);
+        }
+      }
+    });
+    return row;
+  });
+}
+
+
+
+
+private formatDate(dateStr: string, dateFormat: string = 'DD/MM/YYYY', timeFormat?: string): string {
+  if (!dateStr || typeof dateStr !== 'string') return '';
+
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '';
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = String(date.getFullYear());
+
+  let formattedDate = '';
+  switch (dateFormat.toUpperCase()) {
+    case 'MM/DD/YYYY':
+      formattedDate = `${month}/${day}/${year}`;
+      break;
+    case 'YYYY/MM/DD':
+      formattedDate = `${year}/${month}/${day}`;
+      break;
+    case 'DD/MM/YYYY':
+    default:
+      formattedDate = `${day}/${month}/${year}`;
+      break;
+  }
+
+  const resolvedTimeFormat = (timeFormat || '12-hour (hh:mm AM/PM)').trim().toLowerCase();
+  let formattedTime = '';
+  const hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+
+  if (resolvedTimeFormat.includes('am/pm')) {
+    const hour12 = (hours % 12) || 12;
+    const meridian = hours >= 12 ? 'PM' : 'AM';
+    formattedTime = `${String(hour12).padStart(2, '0')}:${minutes} ${meridian}`;
+  } else {
+    formattedTime = `${String(hours).padStart(2, '0')}:${minutes}`;
+  }
+
+  return timeFormat ? `${formattedDate} ${formattedTime}` : formattedDate;
+}
+
+
+removeMatchingPackets(data: any[]) {
+  const seenValues = new Set();
+  const uniqueData: any[] = [];
+
+  // Filter out duplicates based on the 'value' field
+  data.forEach(item => {
+    // Check if the value already exists
+    if (seenValues.has(item.value)) {
+      // If value is already seen, skip this packet
+      return;
+    }
+    
+    // If the value is unique, add to uniqueData and mark as seen
+    seenValues.add(item.value);
+    uniqueData.push(item);
+  });
+
+  return uniqueData;
+}
+removeDuplicatePacketsBasedOnFilterFields(rowData: any[], filterFields: any[]): any[] {
+  const uniqueRows: any[] = [];
+  const seenValues = new Set();
+
+  // Iterate through rowData to check and remove duplicates based on filterFields
+  rowData.forEach(row => {
+    // Create a composite key for each row based on the combination of values from the fields in filterFields
+    const key = filterFields
+      .map(field => row[field.value]) // Dynamically get the value from the row based on filterFields
+      .join('|'); // Combine the field values with a separator to create a unique key
+
+    // Check if this combination of field values has already been encountered
+    if (seenValues.has(key)) {
+      return; // Skip this row if the combination of values is a duplicate
+    }
+
+    // If the combination is unique, mark it as seen and add the row to the result
+    seenValues.add(key);
+    uniqueRows.push(row);
+  });
+
+  return uniqueRows;
+}
+  async fetchDynamicFormData(value: any, receiveDateKeys: any): Promise<any[]> {
+    console.log("Data from lookup:", value);
+    console.log('receiveDateKeys checking table ui', receiveDateKeys);
+  
+    try {
+      const result: any = await this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1);
+  
+      if (result && result.metadata) {
+        const parsedMetadata = JSON.parse(result.metadata);
+        const formFields = parsedMetadata.formFields;
+        console.log('fields checking table ui', formFields);
+  
+        const receiveSet = new Set(receiveDateKeys);
+  
+        const filteredFields = formFields.filter(
+          (field: any) => receiveSet.has(field.name)
+        );
+  
+        console.log('Matched date fields:', filteredFields);
+        return filteredFields;
+      }
+    } catch (err) {
+      console.log("Can't fetch", err);
+    }
+  
+    return []; // fallback if error or no metadata
+  }
   defaultColDef = {
     resizable: true, // Allow columns to be resized
     sortable: true, // Enable sorting
@@ -101,137 +563,54 @@ export class MultiTableUiComponent implements OnInit{
   }
 
 
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log('dashboardChange dynamic ui',this.all_Packet_store)
+//   ngOnChanges(changes: SimpleChanges): void {
+//     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
-    console.log("tile data check from multi table Widget",this.item)
-    this.extractFormName = this.item.formlist
-    console.log('this.extractFormName',this.extractFormName)
-    this.sendFormNameForMini.emit(this.extractFormName)
-
-
-    this.mutitableColumns = JSON.parse(this.item.multiTableWidget_Config)
-    console.log('this.mutitableColumns checking',this.mutitableColumns)
-    
-// Parse the conditions
-this.parsedColumns = JSON.parse(this.item.conditions);
-console.log('this.parsedColumns checking', this.parsedColumns);
-
-// Extract columnLabel values
-const columnLabels = this.parsedColumns.map((column: { columnLabel: string }) => column.columnLabel);
-
-// Log or store the extracted column labels
-console.log('Extracted column labels:', columnLabels);
-
-// Store in a variable
-this.columnLabelsArray = columnLabels; // Example variable to hold the column labels
-console.log('this.columnLabelsArray checking',this.columnLabelsArray)
-
-
-
-  
-
-   
-
-   
-this.tabledata = this.item.multiTableWidget_Config; // This will contain your data
-console.log('description check', this.tabledata);
-
-
-
-try {
-  this.tabledata = this.item.multiTableWidget_Config; // Source data for columns
-  console.log('description check', this.tabledata);
-
-  // Parse tableWidget_Config
-  this.parsedTableData = JSON.parse(this.tabledata);
-  console.log('this.parsedTableData checking', this.parsedTableData);
-
-  const tableWidgetColumns = this.parsedTableData.map((column: { text: any; value: string; }) => ({
-    headerName: column.text || 'Default Header',
-    field: column.value,
-    sortable: true,
-    filter: true,
-    resizable: true,
-    cellRenderer: (column.value === 'dynamic_table_values') ? this.iconCellRenderer : undefined,
-  }));
-  
-  
-  console.log('tableWidget column definitions:', tableWidgetColumns);
-  
-  // Define the cell renderer function
-
-
-  // Include additional columns from columnLabelsArray
-  const additionalColumns = this.columnLabelsArray
-  .filter((label: any) => label && label.trim() !== '')
-  .map((label: any) => ({
-    headerName: label,
-    field: label,
-    sortable: true,
-    filter: true,
-    resizable: true,
-  }));
-
-this.columnDefs = [...tableWidgetColumns, ...additionalColumns];
-
-  console.log('Final column definitions:', this.columnDefs);
-      this.extractRowData = JSON.parse(this.item.rowData)
-    console.log('this.extractRowData checking',this.extractRowData)
-  console.log('this.extractRowData checking from',this.extractRowData)
-  this.sendminiTableData.emit(this.extractRowData)
-this.rowData = this.extractRowData
-  // Generate dummy row data based on column definitions
-
-
-  console.log('Generated dummy row data:', this.rowData);
-} catch (error) {
-  console.error('Error parsing table data:', error);
-}
+ 
 
 
 
 
   
     
-    // Split the description by '&&'
-    // let conditions = description.split('&&').map((cond: string) => cond.trim());
+//     // Split the description by '&&'
+//     // let conditions = description.split('&&').map((cond: string) => cond.trim());
     
-    // Iterate over each condition to extract values
-    // let extractedValues: any[] = [];
+//     // Iterate over each condition to extract values
+//     // let extractedValues: any[] = [];
     
-    // conditions.forEach((condition: string) => {
-    //   // Use regex to capture the value after "=="
-    //   let regex = /\$\{[^\}]+\}==(['"]?)(.+?)\1/;
-    //   let match = condition.match(regex);
+//     // conditions.forEach((condition: string) => {
+//     //   // Use regex to capture the value after "=="
+//     //   let regex = /\$\{[^\}]+\}==(['"]?)(.+?)\1/;
+//     //   let match = condition.match(regex);
       
-    //   if (match) {
-    //     let value = match[2].trim(); // Extract the value after ==
-    //     extractedValues.push(value); // Store the extracted value
-    //   }
-    // });
+//     //   if (match) {
+//     //     let value = match[2].trim(); // Extract the value after ==
+//     //     extractedValues.push(value); // Store the extracted value
+//     //   }
+//     // });
     
-    // // Assign the first extracted value to descriptionData
-    // if (extractedValues.length > 0) {
-    //   this.descriptionData = extractedValues[0];
-    //   console.log('this.descriptionData check', this.descriptionData);
-    // } else {
-    //   this.primaryValue = this.item.multi_value[0].value;
-    // }
+//     // // Assign the first extracted value to descriptionData
+//     // if (extractedValues.length > 0) {
+//     //   this.descriptionData = extractedValues[0];
+//     //   console.log('this.descriptionData check', this.descriptionData);
+//     // } else {
+//     //   this.primaryValue = this.item.multi_value[0].value;
+//     // }
     
-    // // Log all extracted values
-    // console.log('Extracted Values:', extractedValues);
+//     // // Log all extracted values
+//     // console.log('Extracted Values:', extractedValues);
     
 
 
 
-    // this.tile1Config = this.item
+//     // this.tile1Config = this.item
 
   
  
 
   
-}
+// }
 
 
 // exportToCSV(): void {
@@ -266,7 +645,7 @@ get shouldShowButton(): boolean {
 }
 
   constructor(
-   private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer
+   private router: Router,   private modalService: NgbModal,private sanitizer: DomSanitizer,private summaryService:SummaryEngineService,private api: APIService,private cdr: ChangeDetectorRef,private summaryConfiguration: SharedService
    
   ){
     this.iconCellRenderer = function (params) {

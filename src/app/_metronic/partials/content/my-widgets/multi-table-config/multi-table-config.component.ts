@@ -262,7 +262,22 @@ async fetchMiniTableHeaders(item: any) {
 
 
 
-  
+tooltipContent: string = 'Group data by time periods such as Today, Last 7 Days, This Month, or This Year to view filtered insights based on the selected range. For example, "This Year" refers to data from January to December of the current year.';
+
+formTooltip: string = 'Select a form to view and analyze data specific to that form.';
+parameterTooltip: string = 'Select the fields you want to see in the table. Only the fields you choose will be shown.';
+
+
+formatTypeTooltip: string = 'Select a format to represent the output value appropriately—for example, Rupee for currency, Distance for measurements, or Percentage for ratios.';
+customLabelTooltip: string = 'Provide a custom label to be displayed as the widget title.';
+moduleNamesTooltip: string = 'Select the module that the user will be redirected to when the widget is clicked.';
+selectTypeTooltip: string = 'Choose how the dashboard should open when the widget is clicked—whether in a new tab, a modal, or on the same page.';
+
+redirectToTooltip: string = 'Select the specific dashboard or module the user should be redirected to when the widget is clicked.';
+columnVisibilityTooltip: string = 'Select the fields to display in the drill-down table. Only the selected columns will be visible in the detailed view.';
+redirectionType: string = 'Choose how the widget should open the target dashboard or module: "New Tab" opens it in a separate browser tab, "Modal (Pop Up)" displays it in a modal window, "Same Page Redirect" replaces the current view, and "Drill Down" shows detailed insights in Table.';
+filterTooltip: string = 'Only unique rows will be shown in table based on the fields you select here.';
+
 
 
 

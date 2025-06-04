@@ -1,0 +1,16 @@
+
+<div class="modal-header d-flex justify-content-between align-items-center">
+    <div class="action-menu-container d-flex align-items-center" style="gap: 50px;">
+        <h3>Format Type Guide</h3>
+
+    </div>
+
+    </div>
+    <div class="modal-body right-side-modal">
+        <div class="card-body pt-0">
+          <div *ngFor="let item of formatTypeList" class="mb-3 d-flex flex-wrap align-items-start">
+            <div class="fw-bold text-primary fs-5 me-2">{{ item[0] }}:</div>
+            <div class="fw-bold text-muted">{{ item[1] }}</div>
+          </div>
+        </div>
+      </div>

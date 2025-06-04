@@ -99,6 +99,7 @@ export class MiniTableViewTile1Component {
     generateColumnDefs: any;
     columnDefsSet: any;
     TableName: any;
+  storeFormLabel: any;
   
   
   
@@ -220,14 +221,18 @@ export class MiniTableViewTile1Component {
             console.log('tableId checking for columns', tableId);  // Log the updated tableId
             
   
-            const columnDefs = await this.fetchMiniTableHeaders(validateFormName);
-            console.log('columnDefs checking from Tile mini',columnDefs)
-  
-            this.columnDefsMap[tableId] = columnDefs;
-            console.log('this.columnDefsMap[tableId] chgeck from tile1',this.columnDefsMap[tableId])
+            const receiveData:any = await this.fetchMiniTableHeaders(validateFormName);
+            console.log('receiveData checking',receiveData)
             
-            this.columnDefsSet = columnDefs;
-            console.log('Received Column Definitions:', columnDefs);
+            // console.log('columnDefs checking from Tile mini',columnDefs)
+
+  
+            this.columnDefsMap[tableId] = receiveData.columnDefs;
+            console.log('this.columnDefsMap[tableId] chgeck from tile1',this.columnDefsMap[tableId])
+            this.tableNamesMap[tableId] = receiveData.formLabel
+            
+            this.columnDefsSet = receiveData.columnDefs;
+            // console.log('Received Column Definitions:', columnDefs);
         }
     } else {
         console.log('No matching tables found for any tableId.');
@@ -282,6 +287,7 @@ export class MiniTableViewTile1Component {
       const formNames = Array.isArray(items) ? items : [items];
   
       const allColumnDefs = [];
+      const results = [];
   
       // Iterate over each formName (whether single or multiple)
       for (let formName of formNames) {
@@ -302,10 +308,13 @@ export class MiniTableViewTile1Component {
   
             // Store extracted form fields by formLabel
             const formLabel = helpherObjmainHeaders.formLabel;
+     
   
             if (!this.extractedTableHeaders[formLabel]) {
               this.extractedTableHeaders[formLabel] = {
                 formFields: helpherObjmainHeaders.formFields,
+                formName:helpherObjmainHeaders.formLabel,
+
                 columnDefs: helpherObjmainHeaders.formFields.map((field: { label: string; name: string }) => ({
                   headerName: field.label,
                   field: field.name,
@@ -317,16 +326,24 @@ export class MiniTableViewTile1Component {
             }
   
             console.log(`Extracted Form Fields for: ${formLabel}`);
+            
+            this.storeFormLabel = formLabel
             console.log('Column Definitions:', this.extractedTableHeaders[formLabel].columnDefs);
+            console.log('this.storeFormLabel chcking',this.storeFormLabel)
   
             // Add columnDefs of this form to the allColumnDefs array
-            allColumnDefs.push(this.extractedTableHeaders[formLabel].columnDefs);
+            results.push({
+              formLabel,
+              columnDefs: this.extractedTableHeaders[formLabel].columnDefs
+            });
           }
         }
       }
   
       // Return all columnDefs for the forms (single or multiple)
-      return allColumnDefs.length > 1 ? allColumnDefs : allColumnDefs[0];
+      return results.length > 1 ? results : results[0];
+      
+
     } catch (err) {
       console.log("Error fetching the dynamic form data", err);
     }
@@ -351,9 +368,9 @@ export class MiniTableViewTile1Component {
     //   this.modalClose.emit();
     // }
   
-    closeModal(): void {
-      this.modalService.dismissAll()
-        }
+    // closeModal(): void {
+    //   this.modalService.dismissAll()
+    //     }
       
   
   

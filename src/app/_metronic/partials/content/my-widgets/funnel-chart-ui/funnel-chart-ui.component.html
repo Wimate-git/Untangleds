@@ -38,7 +38,7 @@ style="position: absolute; top: 10px; right: 10px; gap: 10px;z-index: 50;">
 *ngIf="isEditModeView && shouldShowButton && !hideButton &&  storeRedirectionCheck &&(summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))"
 class="mat-icon-button btn btn-warning btn-icon btn-custom btn-active-light btn-active-color-primary w-50px h-30px w-md-40px h-md-30px mb-4"
 
-(click)="helperDashboard(item, index,modalContent,item.selectType)"
+(click)="helperDashboard(item, index,modalContent,item.selectType,item.ModuleNames)"
 
 aria-haspopup="menu" 
 aria-expanded="false" 

@@ -138,3 +138,13 @@
   border-radius: 5px;
   border: 1px solid #ced4da;
 }
+
+.custom-tooltip {
+  white-space: pre-line;
+  max-width: 250px;
+}
+
+::ng-deep .tooltip-inner {
+  white-space: pre-line;
+  max-width: 250px;
+}

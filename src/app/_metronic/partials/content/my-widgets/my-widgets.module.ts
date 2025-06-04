@@ -94,6 +94,20 @@ import { MiniTableViewTile1Component } from './mini-table-view-tile1/mini-table-
 import { DataTableStackedBarComponent } from './data-table-stacked-bar/data-table-stacked-bar.component';
 import { MiniTableViewChart1Component } from './mini-table-view-chart1/mini-table-view-chart1.component';
 import { MiniTableViewChart3Component } from './mini-table-view-chart3/mini-table-view-chart3.component';
+import { Tile1HelpPrimaryValueComponent } from './tile1-help-primary-value/tile1-help-primary-value.component';
+import { Tile1HelpRedirectionTypeComponent } from './tile1-help-redirection-type/tile1-help-redirection-type.component';
+import { Tile1HelpFormatTypeComponent } from './tile1-help-format-type/tile1-help-format-type.component';
+import { Chart1HelpPrimaryValueComponent } from './chart1-help-primary-value/chart1-help-primary-value.component';
+import { Chart1HelpFormatTypeComponent } from './chart1-help-format-type/chart1-help-format-type.component';
+import { Chart1HelpCustomValueComponent } from './chart1-help-custom-value/chart1-help-custom-value.component';
+import { Chart1HelpredirectionTypeComponent } from './chart1-helpredirection-type/chart1-helpredirection-type.component';
+import { TileWithIconHelpFormatTypeComponent } from './tile-with-icon-help-format-type/tile-with-icon-help-format-type.component';
+import { TileWithIconRedirectionTypeComponent } from './tile-with-icon-redirection-type/tile-with-icon-redirection-type.component';
+import { TileWithIconPrimaryValueComponent } from './tile-with-icon-primary-value/tile-with-icon-primary-value.component';
+import { HelpSectionDateTypeComponent } from './help-section-date-type/help-section-date-type.component';
+
+
+
 
 
 
@@ -166,7 +180,18 @@ import { MiniTableViewChart3Component } from './mini-table-view-chart3/mini-tabl
  MiniTableViewTile1Component,
  DataTableStackedBarComponent,
  MiniTableViewChart1Component,
- MiniTableViewChart3Component
+ MiniTableViewChart3Component,
+ Tile1HelpPrimaryValueComponent,
+ Tile1HelpRedirectionTypeComponent,
+ Tile1HelpFormatTypeComponent,
+ Chart1HelpPrimaryValueComponent,
+ Chart1HelpFormatTypeComponent,
+ Chart1HelpCustomValueComponent,
+ Chart1HelpredirectionTypeComponent,
+ TileWithIconHelpFormatTypeComponent,
+ TileWithIconRedirectionTypeComponent,
+ TileWithIconPrimaryValueComponent,
+ HelpSectionDateTypeComponent
     
 
 
@@ -279,7 +304,19 @@ import { MiniTableViewChart3Component } from './mini-table-view-chart3/mini-tabl
     MiniTableViewTile1Component,
     DataTableStackedBarComponent,
     MiniTableViewChart1Component,
-    MiniTableViewChart3Component
+    MiniTableViewChart3Component,
+    Tile1HelpPrimaryValueComponent,
+    Tile1HelpRedirectionTypeComponent,
+    Tile1HelpFormatTypeComponent,
+    Chart1HelpPrimaryValueComponent,
+    Chart1HelpFormatTypeComponent,
+    Chart1HelpCustomValueComponent,
+    Chart1HelpredirectionTypeComponent,
+    TileWithIconHelpFormatTypeComponent,
+    TileWithIconRedirectionTypeComponent,
+    TileWithIconPrimaryValueComponent,
+    HelpSectionDateTypeComponent
+
     
   
 

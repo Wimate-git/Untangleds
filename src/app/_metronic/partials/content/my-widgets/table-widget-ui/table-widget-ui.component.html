@@ -10,6 +10,12 @@ matTooltipPosition="above">
       {{item.custom_Label}}
       <!-- {{ item.chart_title }} -->
     </div>
+
+
+    <!-- <div class="toolbar">
+      <button (click)="getFilteredData()" class="btn btn-primary">Get Filtered Data</button>
+    </div> -->
+    
     
     <div class="ag-theme-alpine gridster-item-content" style="width: 100%; height: 400px; overflow: hidden;">
       <ag-grid-angular
@@ -27,6 +33,12 @@ matTooltipPosition="above">
         (cellClicked)="onCellClick($event)"
       ></ag-grid-angular>
     </div>
+    
+    <!-- Button to trigger fetching filtered data -->
+    <!-- <div class="button-container" style="margin-top: 10px;">
+      <button (click)="getFilteredData()" class="btn btn-primary">Get Filtered Data</button>
+    </div> -->
+    
     
     
     
@@ -67,18 +79,18 @@ matTooltipPosition="above">
          <i class="bi bi-trash fs-4"></i>
          <span>Delete</span>
        </button>
-       <button mat-menu-item (click)="exportToCSV()">
+       <!-- <button mat-menu-item (click)="exportToCSV()">
          <i class="bi bi-file-earmark-arrow-down fs-4"></i>
          <span>Export to CSV</span>
-       </button>
+       </button> -->
        <button mat-menu-item (click)="exportAllTablesAsExcel()">
          <i class="bi bi-file-earmark-spreadsheet fs-4"></i>
          <span>Export to Excel</span>
        </button>
-       <button mat-menu-item (click)="exportAllTablesAsPDF()">
+       <!-- <button mat-menu-item (click)="exportAllTablesAsPDF()">
          <i class="bi bi-file-earmark-pdf fs-4"></i>
          <span>Export to PDF</span>
-       </button>
+       </button> -->
      </mat-menu>
    </div>
  </div>

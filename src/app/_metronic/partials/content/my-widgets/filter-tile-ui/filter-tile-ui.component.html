@@ -1,6 +1,15 @@
 <div class="action-menu-container d-flex align-items-center"
 style="position: absolute; top: 10px; right: 10px; gap: 10px;"
 (click)="$event.stopPropagation()">
+
+<button *ngIf="!isEditModeView && !hideButton && (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))"
+class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px"
+(click)="edit_each_tileUI(item, index)"
+aria-haspopup="menu"
+aria-expanded="false"
+style="background: none; border: none; cursor: pointer;">
+<i class="bi bi-pencil" style="color: var(--bs-body-color);"></i>
+</button>
   <!-- Dropdown Menu -->
   <div class="dropdown">
     <button *ngIf="!isEditModeView && !hideButton && (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))"

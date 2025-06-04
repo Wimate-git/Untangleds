@@ -8,6 +8,13 @@
       <div class="row">
         <div class="col-md-6" >
           <label class="col-lg-12 col-createChart-label fw-bold fs-6 ">Parameters
+            <span class="ms-2 text-primary"
+            [ngbTooltip]="ParametertooltipContent"
+            placement="top"
+            container="body"
+            style="cursor: pointer;">
+            <i class="bi bi-info-circle fs-5"></i>
+          </span>
           </label>
           <input type="number" class="
                             form-control form-control-lg form-control-solid
@@ -18,7 +25,15 @@
             </div>
         </div>
         <div class="col-md-6" [formGroup]="createChart">
-          <label class="col-lg-12 col-createChart-label fw-bold fs-6 required"> Title </label>
+          <label class="col-lg-12 col-createChart-label fw-bold fs-6 required"> Title 
+            <span class="ms-2 text-primary"
+            [ngbTooltip]="ChartTitletooltipContent"
+            placement="top"
+            container="body"
+            style="cursor: pointer;">
+        <i class="bi bi-info-circle fs-5"></i>
+      </span>
+          </label>
     
           <input type="text" class="
                       form-control form-control-lg form-control-solid
@@ -137,7 +152,14 @@
                     <div class="row g-3">
                       <!-- Forms Field -->
                       <div class="col-md-4">
-                        <label for="formlist" class="col-createChart-label fw-bold fs-6 required">Forms</label>
+                        <label for="formlist" class="col-createChart-label fw-bold fs-6 required">Forms
+                          <span class="ms-2 text-primary"
+                          [ngbTooltip]="formTooltip"
+                          placement="top"
+                          container="body">
+                      <i class="bi bi-info-circle fs-5"></i>
+                    </span>
+                        </label>
                         <ngx-select
                           id="formlist"
                           [allowClear]="true"
@@ -155,7 +177,14 @@
                     
                       <!-- Form Fields Dropdown -->
                       <div class="col-md-4">
-                        <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields</label>
+                        <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields
+                          <span class="ms-2 text-primary"
+                          [ngbTooltip]="parameterTooltip"
+                          placement="top"
+                          container="body">
+                      <i class="bi bi-info-circle fs-5"></i>
+                    </span>
+                        </label>
                         <ngx-select
                           [allowClear]="true"
                           formControlName="parameterName"
@@ -173,7 +202,14 @@
                     
                       <!-- Marker Type Dropdown -->
                       <div class="col-md-4">
-                        <label for="map_type" class="fw-bold fs-6 required">Marker Type</label>
+                        <label for="map_type" class="fw-bold fs-6 required">Marker Type
+                          <span class="ms-2 text-primary"
+                          [ngbTooltip]="markerTooltip"
+                          placement="top"
+                          container="body">
+                          <i class="bi bi-info-circle fs-5"></i>
+                        </span>
+                        </label>
                         <select
                           id="map_type"
                           class="form-select form-select-solid form-select-lg fw-bold"
@@ -196,45 +232,36 @@
           
 
 
-  
-                      <div class="col-lg-6 col-md-6 col-sm-6 mb-4 mt-4">
+  <div class="row g-3">
+                      <div class="col-md-4  mb-4 mt-4">
                         <div class="form-group row align-items-center" >
                           <label 
                             for="dateTypeSelect" 
-                            class="col-lg-4 col-md-4 col-sm-4 col-form-label text-lg-end text-md-start text-sm-start fw-bold required">
+                            class="fw-bold fs-6 required">
                             Date Type 
+
+          <span class="ms-2 text-primary"
+          (mouseenter)="openDateTypeHelper(dateTypeHelpModal)"
+          style="cursor: pointer;">
+      <i class="bi bi-info-circle fs-5"></i>
+    </span>
                           </label>
-                          <div class="col-lg-8 col-md-12 col-sm-8">
-                            <select 
-                              formControlName="dateType" 
-                              id="dateTypeSelect" 
-                              class="form-select form-select-solid form-select-lg"
-                              aria-label="Select Date Type">
-                              <!-- <option [value]="null" [selected]="true" disabled>Select Date Type</option> -->
-                              <option value="is">is</option>
-                              <option value=">=">&gt;=</option>
-                              <option value="<=">&lt;=</option>
-                              <option value="between">between</option>
-                              <option value="between time">between time</option>
-                              <option value="less than days ago">less than days ago</option>
-                              <option value="more than days ago">more than days ago</option>
-                              <option value="in the past">in the past</option> 
-                              <option value="days ago">days ago</option>
-                              <option value="today">today</option>
-                              <option value="yesterday">yesterday</option>
-                              <option value="this week">this week</option>
-                              <option value="last week">last week</option>
-                              <option value="last 2 weeks">last 2 weeks</option>
-                              <option value="this month">this month</option>
-                              <option value="last month">last month</option>
-                              <option value="this year">this year</option>
-                              <option value="any">any</option>
-                              <option value="latest 10">latest 10</option>
-                            </select>
+                  
+                          <ngx-select
+                          id="dateTypeSelect"
+                          [allowClear]="true"
+                          formControlName="dateType"
+                          [items]="dateTypeOptions"
+                          optionValueField="value"
+                          optionTextField="label"
+              
+                          placeholder="Select Date Type"
+                        ></ngx-select>
+                    
                             <div *ngIf="field.get('dateType')?.touched && field.get('dateType')?.invalid" class="text-danger">
                               <div *ngIf="field.get('dateType')?.errors?.required">DateType is required.</div>
                             </div>
-                          </div>
+                   
                         </div>
                       </div>
                       
@@ -242,10 +269,10 @@
                       getDateType(fieldIndex)?.value === 'less than days ago' || 
                       getDateType(fieldIndex)?.value === 'more than days ago' || 
                       getDateType(fieldIndex)?.value === 'in the past'" 
-               class="mb-7">
+               class="mb-7 col-md-4">
             <div class="form-group row ps-4 mb-2">
-              <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Number of Days</label>
-              <div class="col-3">
+              <label class="fw-bold fs-6 required">Number of Days</label>
+              <div >
                 <input type="number" formControlName="daysAgo" class="form-control" placeholder="Enter number of days">
               </div>
             </div>
@@ -254,36 +281,35 @@
           
 <!-- For "between time" and "between" -->
 <!-- For "between time" and "between" -->
-<div *ngIf="getDateType(fieldIndex)?.value === 'between time' || 
-            getDateType(fieldIndex)?.value === 'between'" class="mb-7">
-  <div class="form-group row ps-4 mb-2">
-    <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Start Date</label>
-    <div class="col-3">
+
+  <div class="form-group row ps-4 mt-3 mb-7 col-md-4" *ngIf="getDateType(fieldIndex)?.value === 'between time' || getDateType(fieldIndex)?.value === 'between'">
+    <label class="fw-bold fs-6 required">Start Date</label>
+    <div >
       <input 
         [type]="dateTypeConfig[getDateType(fieldIndex)?.value]?.isBetweenTime ? 'datetime-local' : 'date'" 
         formControlName="startDate" 
         class="form-control">
     </div>
   </div>
-  <br>
-  <div class="form-group row ps-4">
-    <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">End Date</label>
-    <div class="col-3">
+
+  <div class="form-group row ps-4 mt-3 mb-7 col-md-4" *ngIf="getDateType(fieldIndex)?.value === 'between time' || getDateType(fieldIndex)?.value === 'between'">
+    <label class="fw-bold fs-6 required">End Date</label>
+    <div >
       <input 
         [type]="dateTypeConfig[getDateType(fieldIndex)?.value]?.isBetweenTime ? 'datetime-local' : 'date'" 
         formControlName="endDate" 
         class="form-control">
     </div>
   </div>
-</div>
+
 
 <!-- For "is", ">=", "<=" -->
 <div *ngIf="getDateType(fieldIndex)?.value === '<=' || 
             getDateType(fieldIndex)?.value === '>=' || 
-            getDateType(fieldIndex)?.value === 'is'" class="mb-7">
+            getDateType(fieldIndex)?.value === 'is'" class="mb-7 col-md-4">
   <div class="form-group row ps-4 mb-2">
-    <label class="col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm required fw-bold">Select Date</label>
-    <div class="col-3">
+    <label class="fw-bold fs-6 required">Select Date</label>
+    <div >
       <input 
         type="date" 
         formControlName="singleDate" 
@@ -298,9 +324,15 @@
                     mb-3 mb-lg-0" name="add_Markers" formControlName="add_Markers"
     required>
 </div>
-
-<div *ngIf="dynamicparameterLabMap?.[fieldIndex] === 'Graphic Location'" class="col-md-5 mb-3">
-  <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields</label>
+<div *ngIf="dynamicparameterLabMap?.[fieldIndex] === 'Graphic Location'" class="col-md-4 mb-3">
+  <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Info Window Fields
+    <span class="ms-2 text-primary"
+    [ngbTooltip]="infoWindowTooltip"
+    placement="top"
+    container="body">
+    <i class="bi bi-info-circle fs-5"></i>
+  </span>
+  </label>
   <p-multiSelect
     id="parameterName"
     formControlName="filterParameter1"
@@ -311,9 +343,14 @@
   </p-multiSelect>
 </div>
 
-<div *ngIf="dynamicparameterLabMap?.[fieldIndex] === 'Graphic Location'" class="col-md-2 mb-3 d-flex align-items-end">
+<div *ngIf="dynamicparameterLabMap?.[fieldIndex] === 'Graphic Location'" class="col-md-2  d-flex align-items-end" style="margin-bottom: 20px;">
   <button type="button" class="btn btn-primary w-100" (click)="onAdd1(fieldIndex)">Add</button>
 </div>
+</div>
+
+
+
+
 
 <div *ngIf="dynamicparameterLabMap?.[fieldIndex] === 'Graphic Location'" class="col-md-12 mb-3">
   <label for="description" class="col-createChart-label fw-bold fs-6">Description</label>
@@ -322,7 +359,7 @@
     formControlName="filterDescription1"
     class="form-control"
     rows="3"
-    placeholder="Enter description">
+    placeholder="Enter description"     [readonly]="true">
     {{ selectedParameterValue }}
   </textarea>
 </div>
@@ -549,4 +586,19 @@
         </div>
       </div>
     </div>
+  </ng-template>
+
+  <ng-template #dateTypeHelpModal let-modal>
+    <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+        style="position: relative; top: 4px; right: 4px;">
+      </button>
+    </div>
+    <app-help-section-date-type
+
+    ></app-help-section-date-type>
   </ng-template>

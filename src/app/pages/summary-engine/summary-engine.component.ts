@@ -77,6 +77,7 @@ import { SemiDonutConfigComponent } from 'src/app/_metronic/partials/content/my-
 import { GaugeChartUiComponent } from 'src/app/_metronic/partials/content/my-widgets/gauge-chart-ui/gauge-chart-ui.component';
 import { GaugeChartConfigComponent } from 'src/app/_metronic/partials/content/my-widgets/gauge-chart-config/gauge-chart-config.component';
 import { Location } from '@angular/common';
+import { CrudSummaryComponent } from './crud-summary/crud-summary.component';
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
 
 
@@ -95,6 +96,7 @@ interface ListItem {
     P9: any;
     P10:any;
     P11:any;
+    // P12:any;
   };
 }
 interface RowData {
@@ -211,6 +213,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   
   
   @ViewChild('container', { read: ElementRef }) container: ElementRef;
+  @ViewChild(CrudSummaryComponent) crudSummaryComp!: CrudSummaryComponent;
+
 
   
 
@@ -259,8 +263,10 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   extractUserName: any;
   mapHeight: any[] = [];
   mapWidth: any[] = [];
+  datatableInstance: any;
 
   liveDataFilterCheck:boolean=false
+  datatableReady = false;
 
   center: google.maps.LatLngLiteral = { lat: 20.5937, lng: 78.9629 };
   zoom = 5; // Adjust the zoom level
@@ -377,6 +383,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   filterMainConditions: any;
   minitableDataChart1: any;
   minitableDataChart3: any;
+  paginationDataStore: any[];
 
   createPieChart() {
     const chartOptions: any = {
@@ -1264,7 +1271,7 @@ Highcharts.chart('MixedChart', barchartOptions);
   getWorkFlowDetails: any;
   listofDynamicParam: any;
   isHovered: boolean = false;
-  isEditMode: boolean = false; // Initially set to false for add mode
+  isEditMode: boolean = true; // Initially set to false for add mode
   currentItem: any;
   private editTileIndex: number | null = null;
   private widgetIdCounter = 0;
@@ -1390,13 +1397,16 @@ Highcharts.chart('MixedChart', barchartOptions);
                 });
               }
           
-              this.spinner.hide('dataProcess');
-              this.isLoading = false; // Reset loading state
+              setTimeout(() => {
+                this.spinner.hide('dataProcess');
+                this.isLoading = false; 
+                
+              }, 500); // Reset loading state
           if(key="from_ts"){
             this.route.paramMap.subscribe(params => {
               this.routeId = params.get('id');
               if (this.routeId) {
-                this.openModalHelpher(this.routeId);
+                // this.openModalHelpher(this.routeId);
                 this.editButtonCheck = true;
               }
             });
@@ -1549,9 +1559,12 @@ Highcharts.chart('MixedChart', barchartOptions);
               confirmButtonText: 'OK'
             });
           }
-      
-          this.spinner.hide('dataProcess');
-          this.isLoading = false; // Ensure loading is stopped in all error cases
+      setTimeout(() => {
+        this.spinner.hide('dataProcess');
+        this.isLoading = false; 
+        
+      }, 500);
+     // Ensure loading is stopped in all error cases
         }
       );
 
@@ -1567,7 +1580,27 @@ Highcharts.chart('MixedChart', barchartOptions);
   @ViewChild('dataTableModalTile2', { static: false }) dataTableModalTile2: TemplateRef<any>;
   @ViewChild('dataTableModalDynamicTile', { static: false }) dataTableModalDynamicTile: TemplateRef<any>;
   @ViewChild('TitleModal', { static: false }) TitleModal: TemplateRef<any>;
+
+
+
+  onItemClick(item: any, index: number, event: any): void {
+    // this.isEditModeView = false
+    this.FilterTileConfigComponent.isEditMode =true;
+    this.FilterTileConfigComponent.openFilterModal(item, index);
+    console.log('this.isEditModeView checling filter',this.isEditModeView)
+    if (this.isEditModeView) {
+      this.handleClick(item, index, event);
+    }
+  }
+
+  onFilterClick(item: any, index: number, event: any){
+    this.FilterTileConfigComponent.isEditMode =true;
+    this.FilterTileConfigComponent.openFilterModal(item, index);
+
+  }
+  
   handleClick(item: any, i: number, event: MouseEvent) {
+    this.FilterTileConfigComponent.isEditMode =true;
 
     // console.log('item is checking from handleclick',item)
     // console.log('index is checking from i',i)
@@ -1590,17 +1623,22 @@ Highcharts.chart('MixedChart', barchartOptions);
       //   // this.helperTile($event, this.KPIModal);
       //   this.helperEditModalOpen(item,i,this.KPIModal)
       // }
-    } else if (item.grid_type === 'tile2') {
+    } 
+    else if (item.grid_type === 'tile2') {
       if (this.isEditModeView && !this.hideButton) {
         this.invokeHelperDashboard(item, i, this.modalContent, this.dataTableModalTile2);
       } 
-      
-      // else if (!this.isEditModeView) {
-      //   console.log('i am triggering helperTile')
-      //   // this.helperTile($event, this.KPIModal);
-      //   this.helperEditModalOpen(item,i,this.KPIModal1)
-      // }
-    } else if (item.grid_type === 'dynamicTile') {
+
+    } 
+
+
+    else if (item.grid_type === 'tile3') {
+      if (this.isEditModeView && !this.hideButton) {
+        this.invokeHelperDashboard(item, i, this.modalContent, this.dataTableModalTile2);
+      } 
+
+    } 
+    else if (item.grid_type === 'dynamicTile') {
       if (this.isEditModeView && !this.hideButton) {
         this.invokeHelperDashboard(item, i, this.modalContent, this.dataTableModalDynamicTile);
       }
@@ -1782,133 +1820,196 @@ checkAndSetFullscreen(receiveFullScreenCheck:any): void {
     //     this.toggleFullScreenFullView(false); // Exit fullscreen
     // }
 }
-invokeHelperDashboard(item: any, index: number, template: any,modaref:any): void {
-  console.log('item check for switch case',item)
-  const selectedType = item.selectType
-  console.log('selectedType checking',selectedType)
-  console.log('modaref check',modaref)
-  console.log('this.userId checking from redirectModal',this.userId)
-  console.log('this.userPass checking from redirectModal',this.userPass)
+invokeHelperDashboard(item: any, index: number, template: any, modaref: any): void {
+  console.log('item check for switch case', item);
 
+  const selectedType = item.selectType;
+  const redirectionId = item.ModuleNames;
 
+  console.log('selectedType checking', selectedType);
+  console.log('modaref check', modaref);
+  console.log('this.userId checking from redirectModal', this.userId);
+  console.log('this.userPass checking from redirectModal', this.userPass);
 
+  this.currentModalIndex = index;
+  this.currentItem = item;
 
-  // this.showDrillDownData(item)
-  // this.redirectModule(item)
-  
-    this.currentModalIndex = index;
-  
-      this.currentItem = item
-  
-      console.log('item checking',item)
-      switch (selectedType) {
-        case 'drill down': // Assuming 'Drill Down' is the expected value for drill-down cases
-        this.showDrillDownData(item,modaref);
+  // 🧠 If redirectionId is not 'Summary Dashboard', skip switch and default to redirect
+  if (redirectionId !== 'Summary Dashboard') {
+    this.redirectModule(item);
+  } else {
+    switch (selectedType) {
+      case 'drill down':
+        this.showDrillDownData(item, modaref);
         break;
-        case 'NewTab':
-          this.setModuleID(item, index, modaref);
-          break;
-        case 'Same page Redirect':
-          this.setModuleID(item, index, modaref);
-          break;
-        case 'Modal':
-          this.setModuleID(item, index, modaref);
-          break;
-    
-  
-          case '': // Assuming 'Drill Down' is the expected value for drill-down cases
-          this.redirectModule(item);
-          break;
-    
-        default:
-          this.redirectModule(item); // Handle empty or undefined types
-          break;
-      }
-  
-      // this.setModuleID(item, index,modaref)
-  
-      const viewModeQP = true;
-      const disableMenuQP = true;
-  
-  
-      localStorage.setItem('viewMode', viewModeQP.toString());
-      localStorage.setItem('disableMenu', disableMenuQP.toString());
-      this.cdr.detectChanges()
-      // this.modalService.open(template, {
-      //   size: 'xl',
-      //   backdrop: 'static',
-      //   keyboard: false
-      // });
-  
+
+      case 'NewTab':
+      case 'Same page Redirect':
+      case 'Modal':
+        this.setModuleID(item, index, modaref);
+        break;
+
+      // case '':
+      // case undefined:
+      // case null:
+      //   this.redirectModule(item);
+      //   break;
+
+      // default:
+      //   this.redirectModule(item);
+      //   break;
+    }
   }
+
+  // Set query params in localStorage
+  const viewModeQP = true;
+  const disableMenuQP = true;
+  localStorage.setItem('viewMode', viewModeQP.toString());
+  localStorage.setItem('disableMenu', disableMenuQP.toString());
+
+  this.cdr.detectChanges();
+}
+
+
+
+// redirectModule(recieveItem: any) {
+//   console.log('recieveItem check', recieveItem);
+//   const moduleName = recieveItem.dashboardIds;
+//   console.log('moduleName checking',moduleName)
+//   let dashUrl = '/dashboard';
+//   let projecturl = '/project-dashboard';
+//   const selectedModule = recieveItem.ModuleNames;
+
+//   console.log("I am triggered here", selectedModule);
+
+
+//   switch (selectedModule) {
+//     // case 'Dashboard - Group':
+//     //   this.redirectionURL = dashUrl;
+//     //   this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+//     //   this.dynamicIDArray = [];
+//     //   break;
+//     // case 'Project - Group':
+//     //   this.redirectionURL = projecturl;
+//     //   this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+//     //   this.dynamicIDArray = [];
+//     //   break;
+//     case 'Forms':
+//       this.redirectionURL = `/view-dreamboard/Forms/${moduleName}`;
+//       this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+//       break;
+//     case 'Summary Dashboard':
+//       this.redirectionURL = `/summary-engine/${moduleName}`;
+//       this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+//       break;
+//       case 'Dashboard':
+//         const newTabURL = this.router.serializeUrl(
+//           this.router.createUrlTree([`/dashboard/dashboardFrom/Forms/${moduleName}`])
+//         );
+//         window.open(newTabURL, '_blank');
+//         break;
+      
+//     case 'Projects':
+//       this.redirectionURL = `/project-dashboard/project-template-dashboard/${moduleName}`;
+//       this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+//       break;
+//     // case 'Project - Detail':
+//     //   this.redirectionURL = `/view-dreamboard/Project%20Detail/${moduleName}`;
+//     //     this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+
+//     //   break;
+//     case 'Report Studio':
+//       const reportStudioURL = this.router.serializeUrl(
+//         this.router.createUrlTree(['/reportStudio'], {
+//           queryParams: { savedQuery: moduleName }
+//         })
+//       );
+//       window.open(reportStudioURL, '_blank');
+//       break;
+    
+//         case 'Calender':
+//           this.redirectionURL = `/view-dreamboard/Calendar/${moduleName}`;
+//           console.log('this.redirectionURL checking',this.redirectionURL)
+   
+//           this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+//           // this.router.navigate(['/reportStudio'], { queryParams: { savedQuery: moduleName } });
+     
+  
+//           // this.redirectionURL = `/reportStudio?savedQuery=${moduleName}`;
+//           break;
+//     default:
+//       console.error("Unknown module: ", selectedModule);
+//       return;
+//   }
+
+//   // // Ensure the redirection is triggered
+//   // console.log("Redirecting to:", this.redirectionURL);
+//   // this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+// }
 
 
 redirectModule(recieveItem: any) {
   console.log('recieveItem check', recieveItem);
+
   const moduleName = recieveItem.dashboardIds;
-  console.log('moduleName checking',moduleName)
-  let dashUrl = '/dashboard';
-  let projecturl = '/project-dashboard';
   const selectedModule = recieveItem.ModuleNames;
+  const redirectType = recieveItem.selectType; // 'NewTab' or 'Same page Redirect'
 
-  console.log("I am triggered here", selectedModule);
+  console.log('moduleName:', moduleName);
+  console.log('selectedModule:', selectedModule);
+  console.log('selectType (redirectType):', redirectType);
 
+  let targetUrl: string = '';
+  const isNewTab = redirectType === 'NewTab';
 
   switch (selectedModule) {
-    case 'Dashboard - Group':
-      this.redirectionURL = dashUrl;
-      this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
-      this.dynamicIDArray = [];
-      break;
-    case 'Project - Group':
-      this.redirectionURL = projecturl;
-      this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
-      this.dynamicIDArray = [];
-      break;
     case 'Forms':
-      this.redirectionURL = `/view-dreamboard/Forms/${moduleName}`;
-      this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+      targetUrl = `/view-dreamboard/Forms/${moduleName}`;
       break;
+
     case 'Summary Dashboard':
-      this.redirectionURL = `/summary-engine/${moduleName}`;
-      this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+      targetUrl = `/summary-engine/${moduleName}`;
       break;
+
     case 'Dashboard':
-      this.redirectionURL = `/dashboard/dashboardFrom/Forms/${moduleName}`;
-      this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+      targetUrl = `/dashboard/dashboardFrom/Forms/${moduleName}`;
       break;
+
     case 'Projects':
-      this.redirectionURL = `/project-dashboard/project-template-dashboard/${moduleName}`;
-      this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+      targetUrl = `/project-dashboard/project-template-dashboard/${moduleName}`;
       break;
-    case 'Project - Detail':
-      this.redirectionURL = `/view-dreamboard/Project%20Detail/${moduleName}`;
-        this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
 
+    case 'Calender':
+      targetUrl = `/view-dreamboard/Calendar/${moduleName}`;
       break;
-      case 'Report Studio':
-        this.router.navigate(['/reportStudio'], { queryParams: { savedQuery: moduleName } });
 
-        // this.redirectionURL = `/reportStudio?savedQuery=${moduleName}`;
-        break;
-        case 'Calender':
-          this.redirectionURL = `/dashboard/dashboardFrom/Calendar/${moduleName}`;
-   
-          this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
-          // this.router.navigate(['/reportStudio'], { queryParams: { savedQuery: moduleName } });
-     
-  
-          // this.redirectionURL = `/reportStudio?savedQuery=${moduleName}`;
-          break;
+    case 'Report Studio':
+      const tree = this.router.createUrlTree(['/reportStudio'], {
+        queryParams: { savedQuery: moduleName }
+      });
+      targetUrl = this.router.serializeUrl(tree); // already serialized
+      break;
+
     default:
-      console.error("Unknown module: ", selectedModule);
+      console.error('Unknown module:', selectedModule);
       return;
   }
 
-  // // Ensure the redirection is triggered
-  // console.log("Redirecting to:", this.redirectionURL);
-  // this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
+  // 🔁 Navigation logic
+  if (isNewTab) {
+    // Open serialized or regular route as full URL
+    window.open(targetUrl, '_blank');
+  } else {
+    // Same Page Navigation
+    if (selectedModule === 'Report Studio') {
+      this.router.navigateByUrl(targetUrl).catch(err => console.error('Navigation error:', err));
+    } else {
+      this.router.navigate([targetUrl]).catch(err => console.error('Navigation error:', err));
+    }
+  }
 }
+
+
 
 handleDelete(event: any) {
   this.delete(event); 
@@ -2236,6 +2337,10 @@ queryParams.append('pass', this.userPass);
 
 const modalWidth = 900; // Example width, replace with your actual dynamic width value
 queryParams.append('modalWidth', String(modalWidth));
+queryParams.append('isFullScreen', 'true');
+const finalUrl = `${window.location.origin}/summary-engine/${modulePath}?${queryParams.toString()}`;
+
+this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
 
 // Wait for permissions and then build final URL
 
@@ -2528,7 +2633,7 @@ exitFullScreen(): void {
   invalidDates: Dayjs[] = [];
   selectedRangeLabel: string;
   selectedRangeLabelWithDates: string = '';
-  isEditModeView: boolean = false;  // Default to Edit Mode
+  isEditModeView: boolean = true;  // Default to Edit Mode
   lookupId: any;
   contractLookupId: any;
   loading: boolean = false;
@@ -3175,7 +3280,7 @@ exitFullScreen(): void {
     this.resetInactivityTimer()
 
     this.loadPinnedItems();
-    this.setCheck();
+    this.setCheck(!this.isEditModeView);
     this.updateOptions();
 
   }
@@ -3304,6 +3409,17 @@ exitFullScreen(): void {
   // Append the search box to a custom div outside the table
   const dtSearch = $(dataTable.table().container()).find('.dataTables_filter');
   $('#datatable-search').append(dtSearch);
+
+
+  setTimeout(() => {
+    const pagination = document.querySelector('.dataTables_paginate');
+    const modalFooter = document.querySelector('.modal-footer');
+    const closeButton = modalFooter?.querySelector('button');
+
+    if (pagination && modalFooter && closeButton) {
+      modalFooter.insertBefore(pagination, closeButton);
+    }
+  }, 500); // 
   
   }
 
@@ -3449,7 +3565,7 @@ exitFullScreen(): void {
         
           console.log('this.queryParams checking', this.queryParams);
           // this.openQueryParams(this.queryParams)
-          this.isEditModeView = false;
+          // this.isEditModeView = false;
         
           if (params['viewMode']) {
             this.viewModeQP = params['viewMode'] === 'true';
@@ -4435,6 +4551,24 @@ setTimeout(() => {
     console.log('this.userPass checking from redirect', this.userPass);
     console.log('this.all_Packet_store check viewItem', this.lookup_data_summaryCopy);
     console.log('receivePacket checvking', receivePacket);
+    // console.log('this.lookup_data_summaryCopy checking from viewItem',this.lookup_data_summaryCopy)
+    // const checkP12 = receivePacket?.P12;
+    // console.log('check p12 key from lookup', checkP12);
+    
+    // if (checkP12) {
+    //     Swal.fire({
+    //         icon: 'warning',
+    //         title: 'Access Restricted',
+    //         text: 'Only administrators have permission to view all the data. You do not have the necessary permissions to access all the data.',
+    //         confirmButtonText: 'OK',
+    //         confirmButtonColor: '#3085d6',
+    //         iconColor: '#f39c12',
+    //         background: '#ffffff',
+    //          backdrop: 'rgba(0, 0, 0, 0.8)'
+    //     });
+    // }
+    
+
   
     const checkP11 = receivePacket?.P11 ?? false;
     console.log('checkP11 checking', checkP11);
@@ -4777,6 +4911,7 @@ setTimeout(() => {
 
   
 justReadStyles(data:any,index:any){
+  this.FilterTileConfigComponent.isEditMode =true;
   this.FilterTileConfigComponent.openFilterModal(data, index);
 }
 async openModalHelpher(getValue: any): Promise<any> {
@@ -4811,17 +4946,17 @@ async openModalHelpher(getValue: any): Promise<any> {
         // Parsing multi_value entries in grid details if present
         if (this.all_Packet_store.grid_details && this.all_Packet_store.grid_details.length > 0) {
           this.all_Packet_store.grid_details.forEach((gridItem: { multi_value: any }, index: number) => {
-            if (gridItem?.multi_value) {
-              try {
-                const multiValueString = gridItem.multi_value;
-                gridItem.multi_value = Array.isArray(multiValueString)
-                  ? multiValueString
-                  : JSON.parse(multiValueString);
-                console.log(`After Parsing for item ${index}:`, gridItem);
-              } catch (error) {
-                console.error(`Error parsing multi_value for item ${index}:`, error);
-              }
-            }
+            // if (gridItem?.multi_value) {
+            //   // try {
+            //   //   const multiValueString = gridItem.multi_value;
+            //   //   gridItem.multi_value = Array.isArray(multiValueString)
+            //   //     ? multiValueString
+            //   //     : JSON.parse(multiValueString);
+            //   //   console.log(`After Parsing for item ${index}:`, gridItem);
+            //   // } catch (error) {
+            //   //   console.error(`Error parsing multi_value for item ${index}:`, error);
+            //   // }
+            // }
           });
 
           // Update dashboard property with parsed grid details
@@ -5414,6 +5549,7 @@ async openModalHelpher(getValue: any): Promise<any> {
   // Store all company details
   console.log('event.all_Packet_store checking',event.all_Packet_store)
   this.allCompanyDetails = event.all_Packet_store;
+  this.updateSummary('','duplicateWidget')
 
   // Directly update the id and push the object into the dashboard in one line
   this.dashboard.push({
@@ -5423,6 +5559,7 @@ async openModalHelpher(getValue: any): Promise<any> {
 
   console.log('event.data.arg1', event.data.arg1);
   // window.location.reload();
+
  
 
     }
@@ -5916,7 +6053,8 @@ console.log('selectedTab checking',this.selectedTab)
       summarydesc: '',
       iconSelect: '',
       LiveDashboard:'',
-      fullScreenModeCheck:''
+      fullScreenModeCheck:'',
+      // DashboardRestriction:''
       
       
     });
@@ -5952,7 +6090,8 @@ console.log('selectedTab checking',this.selectedTab)
         iconSelect: getValues.summaryIcon || '',
         tilesList:getValues.tilesList,  // Default to empty string if summaryIcon is undefined
         LiveDashboard: getValues.LiveDashboard,
-        fullScreenModeCheck:getValues.fullScreenModeCheck
+        fullScreenModeCheck:getValues.fullScreenModeCheck,
+        // DashboardRestriction:getValues.DashboardRestriction
       });
       this.cd.detectChanges(); 
     }
@@ -5994,7 +6133,8 @@ console.log('selectedTab checking',this.selectedTab)
         iconSelect: getValues.summaryIcon,
         tilesList:this.tilesListDefault,
         LiveDashboard:getValues.LiveDashboard,
-        fullScreenModeCheck:getValues.fullScreenModeCheck
+        fullScreenModeCheck:getValues.fullScreenModeCheck,
+        // DashboardRestriction:getValues.DashboardRestriction
 
           // Assign the entire icon object here
       });
@@ -6092,7 +6232,8 @@ console.log('selectedTab checking',this.selectedTab)
       'tilesList':['Tiles'],
       LiveDashboard: [false], // Default toggle state
       PinCheck:[],
-      fullScreenModeCheck:['']
+      fullScreenModeCheck:[''],
+      // DashboardRestriction:['']
 
     })
   }
@@ -6299,6 +6440,7 @@ console.log('selectedTab checking',this.selectedTab)
       iconObject: duplicateData.iconObject,
       LiveDashboard:duplicateData.LiveDashboard,
       fullScreenModeCheck:duplicateData.fullScreenModeCheck,
+      // DashboardRestriction:duplicateData.DashboardRestriction,
       crDate: createdDate,
       upDate: updatedDate,
       createdUser: this.getLoggedUser.username, // Set the creator's username
@@ -6320,6 +6462,7 @@ console.log('selectedTab checking',this.selectedTab)
         summaryIcon: this.allCompanyDetails.summaryIcon,
         LiveDashboard:this.allCompanyDetails.LiveDashboard,
         fullScreenModeCheck:this.allCompanyDetails.fullScreenModeCheck,
+        // DashboardRestriction:this.allCompanyDetails.DashboardRestriction,
         grid_details:duplicateData.grid_details,
         created: createdDateISO,
         updated: updatedDateISO,
@@ -6342,7 +6485,8 @@ console.log('selectedTab checking',this.selectedTab)
       P8: JSON.stringify(this.allCompanyDetails.iconObject),
       P9: this.allCompanyDetails.summaryIcon,
       P10:'',
-      P11:this.allCompanyDetails.fullScreenModeCheck
+      P11:this.allCompanyDetails.fullScreenModeCheck,
+      // P12:this.allCompanyDetails.DashboardRestriction
     };
   
     // API call to create the summary
@@ -7011,6 +7155,8 @@ console.log('selectedTab checking',this.selectedTab)
           // Implement pagination by slicing the filtered data
 
           const paginatedData = filteredData.slice(start, start + length);
+          this.paginationDataStore = paginatedData
+          console.log('this.paginationDataStore checking',this.paginationDataStore)
 
           this.totalRecords = filteredData.length;
           this.displayedRecords = paginatedData.length;
@@ -7067,7 +7213,7 @@ console.log('selectedTab checking',this.selectedTab)
                   </a>
                 </div>
                 <div class="d-flex flex-column">
-                  <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1 view-item" data-id="${full.P1}">
+                  <a href="javascript:;" class="text-gray-800 text-hover-primary mb-1 view-item" style="width:150px;word-break:break-word;overflow-wrap:break-word" data-id="${full.P1}">
                     ${data}
                   </a>
                 </div>
@@ -7079,15 +7225,17 @@ console.log('selectedTab checking',this.selectedTab)
         {
           title: '<span style="color: black;">Name</span>',
           data: 'P2',
+          width: '300px', // force fixed width
+          className: 'wrap-text',
           render: function (data) {
-            return `<div class="wrap-text">${data}</div>`; // Wrap text here
+            return `<div class="wrap-text" style="width:150px;word-break:break-word;overflow-wrap:break-word">${data}</div>`; // Wrap text here
           }
         },
         {
           title: '<span style="color: black;">Description</span>',
           data: 'P3',
           render: function (data) {
-            return `<div class="wrap-text">${data}</div>`; // Wrap text here
+            return `<div class="wrap-text1" style="width:150px;word-break:break-word;overflow-wrap:break-word">${data}</div>`; // Wrap text here
           }
         },
         {
@@ -7105,7 +7253,7 @@ console.log('selectedTab checking',this.selectedTab)
               hour: '2-digit',
               minute: '2-digit',
             });
-            return `<div class="wrap-text">${formattedDate} ${formattedTime}</div>`; // Apply wrap-text here
+            return `<div class="wrap-text" style="width:150px;word-break:break-word;overflow-wrap:break-word">${formattedDate} ${formattedTime}</div>`; // Apply wrap-text here
           },
         },
         {
@@ -7123,21 +7271,21 @@ console.log('selectedTab checking',this.selectedTab)
               hour: '2-digit',
               minute: '2-digit',
             });
-            return `<div class="wrap-text">${formattedDate} ${formattedTime}</div>`; // Wrap text here
+            return `<div class="wrap-text" style="width:150px;word-break:break-word;overflow-wrap:break-word">${formattedDate} ${formattedTime}</div>`; // Wrap text here
           },
         },
         {
           title: '<span style="color: black;">Created UserName</span>',
           data: 'P6',
           render: function (data) {
-            return `<div class="wrap-text">${data}</div>`; // Wrap text here
+            return `<div class="wrap-text" style="width:150px;word-break:break-word;overflow-wrap:break-word">${data}</div>`; // Wrap text here
           },
         },
         {
           title: '<span style="color: black;">Updated UserName</span>',
           data: 'P7',
           render: function (data) {
-            return `<div class="wrap-text">${data}</div>`; // Wrap text here
+            return `<div class="wrap-text" style="width:150px;word-break:break-word;overflow-wrap:break-word">${data}</div>`; // Wrap text here
           },
         },
         // Other columns...
@@ -7349,7 +7497,8 @@ console.log('value checking summary',value)
       summaryDesc: this.allCompanyDetails.summaryDesc || this.all_Packet_store.summaryDesc,
       iconObject: this.allCompanyDetails.iconObject || this.all_Packet_store.iconObject,
       LiveDashboard:this.allCompanyDetails.LiveDashboard ||'',
-      fullScreenModeCheck:this.allCompanyDetails.fullScreenModeCheck ||''
+      fullScreenModeCheck:this.allCompanyDetails.fullScreenModeCheck ||'',
+      // DashboardRestriction:this.allCompanyDetails.DashboardRestriction ||''
     };
     console.log('Updated allCompanyDetails with Packet Store:', this.allCompanyDetails);
   }
@@ -7423,7 +7572,8 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
     P8: this.previewObjDisplay ? JSON.stringify(this.previewObjDisplay) : value.P8,
     P9: this.allCompanyDetails.iconSelect || value.P9,
     P10: this.allCompanyDetails.PinCheck || this.PinCheck,
-    P11:this.allCompanyDetails.fullScreenModeCheck ||value.P11
+    P11:this.allCompanyDetails.fullScreenModeCheck ||value.P11,
+    // P12:this.allCompanyDetails.DashboardRestriction ||value.P12
   };
   
 
@@ -7492,7 +7642,7 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
   
   
   
-  private validateAndSubmit(tempObj: any, actionKey: string,receiveFullScreenValue?:any) {
+  private validateAndSubmit(tempObj: any, actionKey: string, receiveFullScreenValue?: any) {
     this.isGirdMoved = false;
     console.log('actionKey checking', actionKey);
   
@@ -7515,14 +7665,13 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
           saveDashboard: 'Dashboard saved',
           add_tile: 'Widget Added',
           update_tile: 'Widget Updated',
-          delete_tile: 'Tile deleted',
+          delete_tile: 'Widget deleted',
           add_map: 'Map Added',
           update_map: 'Map Updated',
-          deleteTile: 'Tile deleted',
+          deleteTile: 'Widget deleted',
           update: 'Summary updated',
           update_Dashboard: 'Dashboard Filteration is updated',
           filter_add: 'Dashboard Filteration is added',
-  
           add_table: 'Table Widget Added',
           update_table: 'Table Widget Updated',
           add_multiTable: 'Table Widget Added',
@@ -7530,73 +7679,78 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
           query_applied: 'Query Applied',
           addPin: 'Pin Updated',
           Save: 'Dashboard changes saved',
-          importUpdate:'Summary Dashboard Imported',
-          editSummary:'Dashboard Configuration Updated'
+          importUpdate: 'Summary Dashboard Imported',
+          editSummary: 'Dashboard Configuration Updated',
+          stacked_save: 'Stacked Bar Chart Created',
+          duplicateWidget: '', // No title needed for duplicateWidget,
+          Add_Tile2:'Widget Added'
+
         }[actionKey] || 'Summary Updated';
   
         console.log('Action key condition check:', actionKey);
-  
-        // Show alert
-        Swal.fire({
-          position: 'center',
-          icon: 'success',
-          title: `${successTitle} successfully`,
-          showConfirmButton: true
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // Reload the page for specific action keys
-            if (actionKey === 'add_map' || actionKey === 'update_map') {
-              window.location.reload(); // Reloads the current window
-            } else if (actionKey === 'update_Dashboard' || actionKey === 'filter_add') {
-  
-            }
-            else if (actionKey === 'add_table' || actionKey === 'update_table') {
-              window.location.reload();
-            }
-            else if (actionKey === 'add_multiTable' || actionKey === 'update_multiTable') {
-  
-            } else if (actionKey === 'addPin') {
-              window.location.reload();
-            }else if(actionKey === 'importUpdate'){
-              window.location.reload();
-            }else if (actionKey === 'editSummary'){
-              console.log('receiveFullScreenValue checking from summary',receiveFullScreenValue)
 
-              let queryParams: any = {
-                isFullScreen: receiveFullScreenValue
-              };
-            
-              // Conditionally add userId and userPass
-              if (this.userId) {
-                queryParams.uID = this.userId;
+  
+        // Check if actionKey is 'duplicateWidget', if so, skip SweetAlert
+        if (actionKey !== 'duplicateWidget') {
+          // Show alert
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: `${successTitle} successfully`,
+            showConfirmButton: true
+          }).then((result) => {
+            if (result.isConfirmed) {
+              if(actionKey === 'filter_add'){
+                // window.location.reload();
+      
               }
-              if (this.userPass) {
-                queryParams.pass = this.userPass;
-              }
-              console.log('checking router id from validation',this.routeId)
-
-          
-            
-              // Navigate
-              if (this.userId || this.userPass) {
-                this.location.replaceState(`/summary-engine/${this.routeId}`, this.createQueryString(queryParams));
-                this.openModalHelpher(this.routeId);
+              // Reload the page for specific action keys
+              else if (actionKey === 'add_map' || actionKey === 'update_map') {
+                window.location.reload(); // Reloads the current window
+              } else if (actionKey === 'update_Dashboard' || actionKey === 'filter_add') {
+                // No action needed here for these cases
+              } else if (actionKey === 'add_table' || actionKey === 'update_table') {
                 window.location.reload();
-
-
-              } else {
-                this.location.replaceState(`/summary-engine/${this.routeId}`, this.createQueryString(queryParams));
+              } else if (actionKey === 'add_multiTable' || actionKey === 'update_multiTable') {
+                // No action needed here for these cases
+              } else if (actionKey === 'addPin') {
+                window.location.reload();
+              } else if (actionKey === 'importUpdate') {
+                window.location.reload();
+              } else if (actionKey === 'editSummary') {
+                console.log('receiveFullScreenValue checking from summary', receiveFullScreenValue);
+  
+                let queryParams: any = {
+                  isFullScreen: receiveFullScreenValue
+                };
+  
+                // Conditionally add userId and userPass
+                if (this.userId) {
+                  queryParams.uID = this.userId;
+                }
+                if (this.userPass) {
+                  queryParams.pass = this.userPass;
+                }
+                console.log('checking router id from validation', this.routeId);
+  
+                // Navigate
+                if (this.userId || this.userPass) {
+                  this.location.replaceState(`/summary-engine/${this.routeId}`, this.createQueryString(queryParams));
+                  this.openModalHelpher(this.routeId);
+                  window.location.reload();
+                } else {
+                  this.location.replaceState(`/summary-engine/${this.routeId}`, this.createQueryString(queryParams));
+                  window.location.reload();
+                }
+              } else if (actionKey === 'Save') {
+                window.location.reload();
+              } else if (actionKey === 'stacked_save') {
                 window.location.reload();
               }
-
-       
-
             }
-            else if(actionKey === 'Save'){
-              window.location.reload();
-            }
-          }
-        });
+          });
+        }
+  
         this.cdr.detectChanges();
   
         // Additional logic for 'update'
@@ -7631,6 +7785,7 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
       }
     });
   }
+  
   
   
   createQueryString(params: any): string {
@@ -7731,6 +7886,7 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
       iconObject: this.previewObjDisplay,
       LiveDashboard:this.createSummaryField.value.LiveDashboard,
       fullScreenModeCheck:this.createSummaryField.value.fullScreenModeCheck,
+      // DashboardRestriction:this.createSummaryField.value.DashboardRestriction,
       updated: new Date().toISOString(),
       createdUser: this.getLoggedUser?.username || this.createdUserName
     };
@@ -7763,6 +7919,7 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
       iconObject: this.previewObjDisplay,
       LiveDashboard:this.createSummaryField.value.LiveDashboard,
       fullScreenModeCheck:this.createSummaryField.value.fullScreenModeCheck,
+      // DashboardRestriction:this.createSummaryField.value.DashboardRestriction,
 
       // Add the selected icon
       crDate: createdDate, // Created date
@@ -7789,6 +7946,7 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
         summaryIcon: this.createSummaryField.value.iconSelect,
         LiveDashboard:this.createSummaryField.value.LiveDashboard,
         fullScreenModeCheck:this.createSummaryField.value.fullScreenModeCheck,
+        // DashboardRestriction:this.createSummaryField.value.DashboardRestriction,
         // Include selected icon in the metadata
         created: createdDateISO, // Created date in ISO format
         updated: updatedDateISO,   // Updated date in ISO format
@@ -7822,7 +7980,8 @@ this.createSummaryField.patchValue({
       P8: JSON.stringify(this.previewObjDisplay) ||'',
       P9: this.createSummaryField.value.iconSelect, // Add selected icon
       P10:this.createSummaryField.value.PinCheck ||'',
-      P11:this.createSummaryField.value.fullScreenModeCheck
+      P11:this.createSummaryField.value.fullScreenModeCheck,
+      // P12:this.createSummaryField.value.DashboardRestriction,
     };
     console.log('items checking from create Summary',items)
 
@@ -8124,7 +8283,7 @@ refreshFunction(){
               if (element !== null && element !== undefined) {
                 const key = Object.keys(element)[0];
                 const { P1, P2, P3, P4, P5, P6, P7, P8, P9,P10,P11 } = element[key];
-                this.lookup_data_client.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9,P10,P11 });
+                this.lookup_data_client.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9,P10,P11});
                 console.log("d2 =", this.lookup_data_client);
               } else {
                 break;
@@ -8421,7 +8580,7 @@ refreshFunction(){
     if (navId !== '') {
 
       // localStorage.setItem('fullscreen', 'true');
-      this.viewItem(navId)
+      // this.viewItem(navId)
 
     }
 
@@ -8936,6 +9095,7 @@ refreshFunction(){
   }
 
   get gridsterStyles() {
+    // console.log('this.check i am checking',this.check)
     // Check the value of `check` and update the background color accordingly
     const backgroundColor = this.check ? '#333333' : '#FFFFFF';  // Gray if check is true, White if false
     
@@ -9233,7 +9393,7 @@ refreshFunction(){
  
     console.log('event checking:', event);
     console.log('modalChart reference:', modalChart);
-    console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
+    console.log('this.chartDataConfigExport check from chart3', this.chartDataConfigExport);
   
   
     // ✅ Step 1: Check if modal opening is manually stopped
@@ -9739,56 +9899,105 @@ helperChartClickFunnel(event: any, modalChart: any) {
     'Content-Type': 'application/json',
     'x-api-key': 'p2FIIEi4cA2unoJhRIA137vRdGEuJCCi5hV6Vc11'
   });
+
+
   async readdataTableCellInfo(readData: any, modalref: any) {
     this.isLoading = true;
-
-    this.spinner.show('FormView')
-
+    this.spinner.show('FormView');
+    
     console.log('readData from parent:', readData);
-
+  
     if (!readData?.data) {
       console.error('Invalid readData object:', readData);
+      this.isLoading = false;
+      this.spinner.hide('FormView');
       return;
     }
-    // this.readFormName = readData.data.PK ? readData.data.PK.split("#")[1] || "" : "";
-    // console.log()
+  
     let formId = readData.data.PK ? readData.data.PK.split("#")[1] || "" : "";
-    console.log('formId checking from dataTableCell',formId)
-    this.blobUrl = await this.blobService.createBlobUrl(formId);
-    
-    // ✅ Store PK & SK in `window` (for main app)
-
+    console.log('formId checking from dataTableCell', formId);
+  
+    // Wait for the blobUrl to be generated and accessible
+    try {
+      this.blobUrl = await this.blobService.createBlobUrl(formId);
+    } catch (error) {
+      console.error("Error generating blob URL:", error);
+      this.isLoading = false;
+      this.spinner.hide('FormView');
+      return;
+    }
+    console.log('this.blobUrl checking from summary', this.blobUrl);
+  
     let SK = readData.data.SK;
-    
+  
     window.pk = `${this.SK_clientID}#${formId}#main`;
     window.sk = typeof SK === 'number' ? SK : Number(SK);
-
+  
     console.log('✅ Stored PK in window:', window.pk);
     console.log('✅ Stored SK in window:', window.sk);
-
-    // ✅ Pass PK & SK to the Blob iframe
-    setTimeout(() => {
-      let iframe = document.querySelector("iframe");
-      if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({
-          pk: window.pk,
-          sk: window.sk,
-          clientId:this.SK_clientID,
-          loginDetail :this.getLoggedUser
-        }, "*");
-        console.log("✅ Sent PK & SK to iframe via postMessage");
+  
+    // Update iframe src to blobUrl after generating it
+    const iframe: any = document.querySelector("iframe");
+    console.log('iframe checking from summaryEngine',iframe)
+  
+    if (iframe) {
+      iframe.src = this.blobUrl;  // Ensure iframe source is updated with blobUrl
+      console.log("✅ Iframe src updated:", iframe.src);
+    } else {
+      console.warn("⚠️ Iframe not found for updating src.");
+    }
+  
+    // Check if iframe is available and post the message to iframe
+    const iframeCheckInterval = setInterval(() => {
+      let iframe: any = document.querySelector("iframe");
+  
+      // Check if iframe is ready and blobUrl is available
+      if (iframe && iframe.contentWindow && this.blobUrl) {
+        clearInterval(iframeCheckInterval); // Stop checking once iframe is found and contentWindow is accessible
+        console.log('✅ iframe.contentWindow is available');
+  
+        // Post the message to iframe if contentWindow is available
+        iframe.contentWindow?.postMessage({
+          pk: `${this.SK_clientID}#${formId}#main`,
+          sk: typeof SK === 'number' ? SK : Number(SK),
+          clientId: this.SK_clientID,
+          loginDetail: this.getLoggedUser,
+          blobUrl: this.blobUrl  // Include the blobUrl in the message
+        }, "*");  // '*' means the message can be received from any origin. You can replace '*' with the specific iframe origin if needed.
+        
+        console.log("✅ Sent PK, SK & blobUrl to iframe via postMessage");
+  
       } else {
-        console.warn("⚠️ No iframe found to send PK & SK");
+        console.warn("⚠️ iframe.contentWindow or blobUrl not available, retrying...");
       }
-    }, 1000);
-
+    }, 500);  // Check every 500ms (adjust as needed)
+  
+    // Increase timeout for retrying iframe availability (increase from 10 to 20 seconds)
     setTimeout(() => {
-      this.modalService.open(modalref,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
-        keyboard: false  });
-    }, 500);
+      clearInterval(iframeCheckInterval); // Stop checking after timeout
+      console.error("⚠️ Timeout: iframe or blobUrl not available after retries.");
+      this.isLoading = false;
+      this.spinner.hide('FormView');
+    }, 20000);  // Timeout after 20 seconds (increased)
+  
+    // Open modal after a short delay
+    setTimeout(() => {
+      this.modalService.open(modalref, {
+        modalDialogClass: 'p-9',
+        centered: true,
+        fullscreen: true,
+        backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false
+      });
+    }, 1000);
+  
     this.isLoading = false;
-    this.spinner.hide('FormView')
-}
+    this.spinner.hide('FormView');
+  }
+  
+  
+  
+
 
 
 
@@ -9802,7 +10011,7 @@ receiveminiTableIcon(checkevent:any,modalref: any){
 
 
   setTimeout(() => {
-    this.modalService.open(modalref,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+    this.modalService.open(modalref,{  modalDialogClass:'px-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
       keyboard: false  });
   }, 500);
 
@@ -9930,7 +10139,7 @@ receiveminiTableChart3(checkevent:any,modalref: any){
   
   
           // Export the data as a .json file
-          this.exportToJson(this.summaryDashboardData);
+          this.exportToJson(this.summaryDashboardData,dashboardId);
         } else {
           console.log('No data found');
         }
@@ -9940,7 +10149,8 @@ receiveminiTableChart3(checkevent:any,modalref: any){
       });
   }
   
-  exportToJson(data: any) {
+  exportToJson(data: any,receiveId:any) {
+    console.log('exporting data checking',data)
     const jsonData = JSON.stringify(data, null, 4);  // Convert data to JSON with pretty formatting
   
     const blob = new Blob([jsonData], { type: 'application/json;charset=utf-8;' });  // Ensure UTF-8 encoding for the file
@@ -9951,7 +10161,7 @@ receiveminiTableChart3(checkevent:any,modalref: any){
       // Create a URL for the Blob
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
-      link.setAttribute('download', 'summary_dashboard_data.json');  // Set the file name
+      link.setAttribute('download', `${receiveId}.json`);  // Set the file name
       link.style.visibility = 'hidden';  // Make sure the link is not visible
       document.body.appendChild(link);  // Append the link to the body
   
@@ -10062,7 +10272,8 @@ receiveminiTableChart3(checkevent:any,modalref: any){
         summaryDesc: this.allCompanyDetails.summaryDesc || this.all_Packet_store.summaryDesc,
         iconObject: importData.iconObject ||'',
         LiveDashboard:importData.LiveDashboard ||'',
-        fullScreenModeCheck:importData.fullScreenModeCheck ||''
+        fullScreenModeCheck:importData.fullScreenModeCheck ||'',
+        // DashboardRestriction:importData.DashboardRestriction ||'',
       };
       console.log('Updated allCompanyDetails with Packet Store:', this.allCompanyDetails);
     }
@@ -10135,7 +10346,8 @@ receiveminiTableChart3(checkevent:any,modalref: any){
       P8: this.previewObjDisplay ? JSON.stringify(this.previewObjDisplay) : '',
       P9: importData.iconSelect ,
       P10: importData.PinCheck ,
-      P11:importData.fullScreenModeCheck 
+      P11:importData.fullScreenModeCheck ,
+      // P12:importData.DashboardRestriction 
     };
     
   
@@ -10194,6 +10406,7 @@ receiveminiTableChart3(checkevent:any,modalref: any){
       iconObject: this.previewObjDisplay,
       LiveDashboard:this.createSummaryField.value.LiveDashboard,
       fullScreenModeCheck:this.createSummaryField.value.fullScreenModeCheck,
+      // DashboardRestriction:this.createSummaryField.value.DashboardRestriction,
 
       // Add the selected icon
       crDate: createdDate, // Created date
@@ -10220,6 +10433,7 @@ receiveminiTableChart3(checkevent:any,modalref: any){
         summaryIcon: this.createSummaryField.value.iconSelect,
         LiveDashboard:this.createSummaryField.value.LiveDashboard,
         fullScreenModeCheck:this.createSummaryField.value.fullScreenModeCheck,
+        // DashboardRestriction:this.createSummaryField.value.DashboardRestriction,
         // Include selected icon in the metadata
         created: createdDateISO, // Created date in ISO format
         updated: updatedDateISO,   // Updated date in ISO format
@@ -10253,7 +10467,8 @@ this.createSummaryField.patchValue({
       P8: JSON.stringify(this.previewObjDisplay) ||'',
       P9: this.createSummaryField.value.iconSelect, // Add selected icon
       P10:this.createSummaryField.value.PinCheck ||'',
-      P11:this.createSummaryField.value.fullScreenModeCheck
+      P11:this.createSummaryField.value.fullScreenModeCheck,
+      // P12:this.createSummaryField.value.DashboardRestriction
     };
     console.log('items checking from create Summary',items)
 
@@ -10422,6 +10637,29 @@ checkLegendEnabled(item: any): string {
     console.error('Error parsing highchartsOptionsJson:', e);
     return '';
   }
+}
+
+currentPage = 1;
+pageLength = 10;
+
+changePage(page: number) {
+  // console.log('changePage checking', page);
+  // this.currentPage = page;
+
+  // const dtInstance = this.crudSummaryComp?.getDataTableInstance();
+  // console.log('dtInstance checking',dtInstance)
+
+  // if (dtInstance) {
+  //   dtInstance.page(page - 1).draw('page');
+  // } else {
+  //   console.warn('❌ DataTable instance is not initialized yet!');
+  // }
+}
+
+
+onDatatableReady() {
+  this.datatableReady = true;
+  console.log('✅ DataTable is initialized in child');
 }
 
   

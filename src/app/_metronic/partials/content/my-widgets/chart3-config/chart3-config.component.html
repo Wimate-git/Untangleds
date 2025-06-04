@@ -81,7 +81,42 @@
       </div>
 
     
-    
+      <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-3 mb-3">
+        <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Module Names
+          <span class="ms-2 text-primary"
+          [ngbTooltip]="moduleNamesTooltip"
+          placement="top"
+          container="body">
+      <i class="bi bi-info-circle fs-5"></i>
+    </span>
+
+          
+        </label>
+        <ngx-select
+          [allowClear]="true"
+          formControlName="ModuleNames"
+          [items]="showModuleNames"
+          optionValueField="value"
+          optionTextField="text"
+          placeholder="Select Parameter"
+          (selectionChanges)="moduleSelection($event)"
+          style="width: 100%;"
+        >
+        </ngx-select>
+      </div>
+      <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-3 mb-3">
+        <label for="selectType" class="col-createChart-label fw-bold fs-6">Select Redirection Type</label>
+        <ngx-select
+          id="selectType"
+          [allowClear]="true"
+          formControlName="selectType"
+          [items]="filteredSelectTypeSummary"
+          optionValueField="value"
+          optionTextField="text"
+          placeholder="Select Parameter"
+          style="width: 100%;">
+        </ngx-select>
+      </div>
     
         <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-3 mb-3">
           <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Redirect To</label>
@@ -89,7 +124,7 @@
             id="dashboardIds"
             [allowClear]="true"
             formControlName="dashboardIds"
-            [items]="p1ValuesSummary"
+            [items]="dynamicIDArray"
             optionValueField="value"
             optionTextField="text"
             placeholder="Select Parameter"
@@ -98,19 +133,7 @@
         </div>
       
         <!-- Conditionally Render Select Type Field -->
-        <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-3 mb-3">
-          <label for="selectType" class="col-createChart-label fw-bold fs-6">Select Redirection Type</label>
-          <ngx-select
-            id="selectType"
-            [allowClear]="true"
-            formControlName="selectType"
-            [items]="SelectTypeSummary"
-            optionValueField="value"
-            optionTextField="text"
-            placeholder="Select Parameter"
-            style="width: 100%;">
-          </ngx-select>
-        </div>
+
 
 
         <div class="col-lg-3 col-md-3 col-sm-6 mb-4 mt-4">
@@ -834,6 +857,9 @@
             >
             Update
           </button>
+          <div *ngIf="!formValidationFailed" class="alert alert-danger fw-bold mb-3">
+            ⚠️ Please fill all required fields before updating.
+          </div>
         </div>
       </div>
   

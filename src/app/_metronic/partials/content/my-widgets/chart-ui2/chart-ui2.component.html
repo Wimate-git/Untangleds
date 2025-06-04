@@ -1,5 +1,8 @@
 <div class="action-menu-container d-flex align-items-center"
 style="position: absolute; top: 10px; right: 10px; gap: 10px;z-index: 50;">
+
+
+
 <!-- Edit Button -->
 <button *ngIf="!isEditModeView && !hideButton && (summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))" style="z-index: 50;"
      class="mat-icon-button btn btn-icon btn-custom btn-active-light btn-active-color-primary w-25px h-25px w-md-20px h-md-20px"
@@ -8,6 +11,18 @@ style="position: absolute; top: 10px; right: 10px; gap: 10px;z-index: 50;">
      aria-expanded="false"
      style="background: none; border: none; cursor: pointer;">
 <i class="bi bi-pencil" style="color: var(--bs-body-color);"></i>
+</button>
+
+<button 
+*ngIf="isEditModeView && !hideButton &&  storeRedirectionCheck &&(summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))"
+class="mat-icon-button btn btn-warning btn-icon btn-custom btn-active-light btn-active-color-primary w-50px h-30px w-md-40px h-md-30px mb-4"
+
+(click)="helperDashboard(item, index,modalContent,item.selectType,item.ModuleNames)"
+
+aria-haspopup="menu" 
+aria-expanded="false" 
+>
+<i class="bi bi-graph-up" style="color: var(--bs-body-color);"></i> 
 </button>
 
 <!-- Dropdown Menu -->
@@ -41,3 +56,12 @@ matTooltipPosition="above">
 
 
 </div>
+<ng-template #modalContent>
+  <app-custom-info-ui
+
+    [iframeUrl]="iframeUrl"
+    [selectedMarkerIndex]="selectedMarkerIndex"
+    (closeModalEvent)="closeModal()" 
+    [tile1Config]="tile1Config">
+  </app-custom-info-ui>
+</ng-template>

@@ -29,7 +29,7 @@ matTooltipPosition="above"
              class="value" 
              tabindex="0" 
              style="font-weight: bold; color: #333333; text-align: center;">
-             {{ descriptionData || primaryValue}}:{{ item.multi_value[0]?.processed_value }}
+             {{ storeConfiguration[0].value}}{{ storeConfiguration[0]?.processed_value }}
         </div>
       
         <!-- Processed Value 2 -->
@@ -38,7 +38,7 @@ matTooltipPosition="above"
              class="value" 
              tabindex="0" 
              style="font-weight: bold; color: #333333; text-align: center;">
-          {{ item.multi_value[1]?.value }}:{{ item.multi_value[1]?.processed_value }}
+          {{ storeConfiguration[1]?.value }}{{ storeConfiguration[1]?.processed_value }}
         </div>
       </div>
 

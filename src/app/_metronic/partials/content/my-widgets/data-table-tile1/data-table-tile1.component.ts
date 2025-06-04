@@ -1,8 +1,11 @@
-import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { GridApi ,Column} from 'ag-grid-community';
 import { event } from 'jquery';
 import pdfMake from 'pdfmake/build/pdfmake';
+import { APIService } from 'src/app/API.service';
+import { SharedService } from 'src/app/pages/shared.service';
+import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engine.service';
 import * as XLSX from 'xlsx';  
 
 @Component({
@@ -19,8 +22,8 @@ export class DataTableTile1Component {
   @Output() modalClose = new EventEmitter<void>(); // Emit an event when the modal is closed
   @Input() storeDrillDown :any
 
-  private gridApi!: GridApi;
-  pageSizeOptions = [10, 25, 50, 100];
+  private gridApi!: any;
+  pageSizeOptions = [10, 25, 50, 100,150,200,250,300];
 
   @Output() dataTableCellInfo = new EventEmitter<any>();
   @Output() miniTableIcon = new EventEmitter<any>() 
@@ -50,9 +53,12 @@ export class DataTableTile1Component {
   columnDefs: { headerName: any; field: any; sortable: boolean; filter: boolean; resizable: boolean; }[];
   FormName: any;
   gridColumnApi: any;
+  getLoggedUser: any;
+  @Input() SK_clientID:any
+  formattedRowData: any[];
 
 
-  constructor(private modalService: NgbModal) {
+ constructor(private modalService: NgbModal,private summaryService:SummaryEngineService,private api: APIService,private cdr: ChangeDetectorRef,private summaryConfiguration: SharedService) {
     this.iconCellRenderer = function (params) {
       console.log('check what params params is getting', params);
     
@@ -85,16 +91,47 @@ export class DataTableTile1Component {
     // For example, you might want to open a modal or navigate somewhere
   }
   
-  ngOnChanges(changes: SimpleChanges): void {
+  async ngOnChanges(changes: SimpleChanges): Promise<void> {
 console.log('modalData check',this.storeDrillDown)
 console.log('columnDefs check',this.all_Packet_store)
+
 this.FormName = this.storeDrillDown.formlist
 console.log('this.storeDrillDown checking datatable tile1',this.storeDrillDown)
 console.log('this.FormName for drill name',this.FormName)
 console.log('responseRowData c hecking from datatable Tile1',this.responseRowData)
 
-this.responseRowData = this.formatDateFields(this.responseRowData);
+
+const dateKeys: string[] = [];
+
+this.responseRowData.forEach((row: any) => {
+  Object.keys(row).forEach((key) => {
+    if (
+      (key.startsWith('date') ||
+       key.startsWith('datetime') ||
+       key.startsWith('epoch-date') ||
+       key.startsWith('epoch-datetime-local')) &&
+      !dateKeys.includes(key)
+    ) {
+      dateKeys.push(key);
+    }
+  });
+});
+
+
+console.log('Extracted date/datetime keys:', dateKeys);
+
+// Pass both date and datetime keys to fetchDynamicFormData
+const matchedDateFields = await this.fetchDynamicFormData(this.FormName, dateKeys);
+console.log('Received date fields in caller:', matchedDateFields);
+
+
+
+
+this.formattedRowData = this.formatDateFields(this.responseRowData,matchedDateFields);
 console.log('Formatted Data:', this.responseRowData);
+
+
+
 this.emitfullRowDataToParent.emit(this.responseRowData)
 // this.extractRowData = JSON.parse(this.item.rowData)
 // console.log('this.extractRowData checking',this.extractRowData)
@@ -111,7 +148,7 @@ this.parseChartConfig(this.storeDrillDown)
   }
 
 
-  ngOnInit(){}
+
   parseChartConfig(data: any) {
     console.log('datachecking tile1 drill', data);
   
@@ -133,32 +170,94 @@ this.parseChartConfig(this.storeDrillDown)
 
 
 
-  private formatDateFields(data: any[]): any[] {
+  private formatDateFields(data: any[], receiveformatPckets: any[]): any[] {
+    console.log('receiveformatPckets checking', receiveformatPckets);
+  
     return data.map(row => {
       Object.keys(row).forEach(key => {
-        if (key.startsWith('date-')) {
-          // Format the date if the key starts with 'date-'
-          row[key] = this.formatDate(row[key]);
+        const isDateKey = key.startsWith('date-');
+        const isDateTimeKey = key.startsWith('datetime-');
+        const isEpochDate = key.startsWith('epoch-date-');
+        const isEpochDateTime = key.startsWith('epoch-datetime-local-');
+  
+        if (isDateKey || isDateTimeKey || isEpochDate || isEpochDateTime) {
+          const matchingField = receiveformatPckets.find(
+            (packet: any) => packet.name === key
+          );
+  
+          if (matchingField) {
+            const validation = matchingField.validation || {};
+            const dateFormat = validation.dateFormatType || 'DD/MM/YYYY';
+            const timeFormat = validation.timeFormatType || '12-hour (hh:mm AM/PM)';
+  
+            console.log('Date Format Applied:', dateFormat);
+            console.log('Time Format Applied:', timeFormat);
+  
+            let rawValue = row[key];
+  
+            // ✅ Convert epoch to ISO string (only if it's a number)
+            if ((isEpochDate || isEpochDateTime) && rawValue) {
+              const epoch = parseInt(rawValue, 10);
+              if (!isNaN(epoch)) {
+                const epochMs = epoch < 1e12 ? epoch * 1000 : epoch; // Detect seconds vs milliseconds
+                rawValue = new Date(epochMs).toISOString();
+              }
+            }
+  
+            // ✅ Apply formatting
+            const requiresTime = isDateTimeKey || isEpochDateTime;
+            row[key] = this.formatDate(rawValue, dateFormat, requiresTime ? timeFormat : null);
+          }
         }
       });
       return row;
     });
   }
   
-  private formatDate(dateStr: string): string {
-    console.log('dateStr checking from table widget', dateStr);
   
-    // Check if dateStr is empty or invalid
-    if (!dateStr || isNaN(new Date(dateStr).getTime())) {
-      return '';  // Return an empty string or any default message if the date is invalid or empty
-    }
+  
+  
+  private formatDate(dateStr: string, dateFormat: string = 'DD/MM/YYYY', timeFormat?: string): string {
+    if (!dateStr || typeof dateStr !== 'string') return '';
   
     const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return '';
+  
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
+    const year = String(date.getFullYear());
+  
+    let formattedDate = '';
+    switch (dateFormat.toUpperCase()) {
+      case 'MM/DD/YYYY':
+        formattedDate = `${month}/${day}/${year}`;
+        break;
+      case 'YYYY/MM/DD':
+        formattedDate = `${year}/${month}/${day}`;
+        break;
+      case 'DD/MM/YYYY':
+      default:
+        formattedDate = `${day}/${month}/${year}`;
+        break;
+    }
+  
+    const resolvedTimeFormat = (timeFormat || '12-hour (hh:mm AM/PM)').trim().toLowerCase();
+    let formattedTime = '';
+    const hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+  
+    if (resolvedTimeFormat.includes('am/pm')) {
+      const hour12 = (hours % 12) || 12;
+      const meridian = hours >= 12 ? 'PM' : 'AM';
+      formattedTime = `${String(hour12).padStart(2, '0')}:${minutes} ${meridian}`;
+    } else {
+      formattedTime = `${String(hours).padStart(2, '0')}:${minutes}`;
+    }
+  
+    return timeFormat ? `${formattedDate} ${formattedTime}` : formattedDate;
   }
+  
+  
   
   // Function to create AG Grid column definitions
 
@@ -203,8 +302,18 @@ this.parseChartConfig(this.storeDrillDown)
 
 
   closeModal(): void {
-    this.modalService.dismissAll()
-      }
+    if (this.gridApi) {
+      this.gridApi.destroy(); // Destroys the grid instance
+      this.gridApi  = null ;    // Clean reference
+    }
+    this.cdr.detectChanges()
+    this.modalService.dismissAll();
+  
+
+  }
+  
+  
+  
 
       exportToCSV(): void {
         if (this.gridApi) {
@@ -218,70 +327,80 @@ this.parseChartConfig(this.storeDrillDown)
         }
       }
       exportAllTablesAsExcel() {
-        if (!this.responseRowData || this.responseRowData.length === 0) {
-          console.error('No data available for export.');
-          // alert('No data available for export.');
-          return; // Exit if there's no data to export
+        let dataToExport: any[] = [];
+      
+        // Check if filters are applied and rows are reduced
+        const isFilterApplied = this.gridApi && Object.keys(this.gridApi.getFilterModel()).length > 0;
+        const displayedRowCount = this.gridApi.getDisplayedRowCount();
+      
+        if (isFilterApplied && displayedRowCount > 0) {
+          // ✅ Export only filtered data
+          this.gridApi.forEachNodeAfterFilter((node: any) => {
+            if (node.data) dataToExport.push(node.data);
+          });
+        } else {
+          // ✅ No filters — export all raw data
+          dataToExport = this.responseRowData || [];
         }
-        console.log('this.rowData checking',this.responseRowData)
       
-        const wb = XLSX.utils.book_new(); // Create a new workbook
-        
-    
-      
-        // Extract column headers and fields dynamically from finalColumns
-        const columnHeaders = this.columnDefs.map((column: any) => column.headerName);
-        const columnFields = this.columnDefs.map((column: any) => column.field);
-        console.log('Extracted Column Headers:', columnHeaders);
-        console.log('Extracted Column Fields:', columnFields);
-      
-        if (columnHeaders.length === 0) {
-          console.error('No columns available for export.');
-          // alert('No columns available for export.');
+        if (!dataToExport.length) {
+          console.error('No data available for export.');
           return;
         }
       
-        // Build the Excel data: column headers + row data
+        const wb = XLSX.utils.book_new();
+      
+        // Extract headers and fields dynamically
+        const columnHeaders = this.columnDefs.map((col: any) => col.headerName);
+        const columnFields = this.columnDefs.map((col: any) => col.field);
+      
+        if (!columnHeaders.length) {
+          console.error('No columns available for export.');
+          return;
+        }
+      
         const excelData = [
-          columnHeaders, // Add headers as the first row
-          ...this.responseRowData.map((row: Record<string, any>) =>
-            columnFields.map((field: string | number) =>
-              row[field] !== null && row[field] !== undefined ? row[field].toString() : '' // Handle null/undefined
+          columnHeaders,
+          ...dataToExport.map(row =>
+            columnFields.map(field =>
+              row[field] !== null && row[field] !== undefined ? row[field].toString() : ''
             )
-          ),
+          )
         ];
-        console.log('Excel Data Check:', excelData);
       
-        // Convert data to a worksheet
         const ws = XLSX.utils.aoa_to_sheet(excelData);
+        XLSX.utils.book_append_sheet(wb, ws, 'Work Orders');
       
-        // Add the worksheet to the workbook
-        XLSX.utils.book_append_sheet(wb, ws, 'TableData');
-      
-        // Generate the Excel file
         const excelFile = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-      
-        // Create a Blob and trigger the download
         const blob = new Blob([excelFile], { type: 'application/octet-stream' });
+      
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = `${this.FormName}`+'.xlsx';
+        link.download = `${this.FormName || 'ExportedData'}.xlsx`;
         link.click();
       }
-    
+      
+      
 
 
 
 
 
       exportAllTablesAsPDF() {
-        if (!this.responseRowData || this.responseRowData.length === 0) {
+        // Use getRenderedNodes() to check for filtered data
+        const dataToExport = this.gridApi.getRenderedNodes().length > 0
+          ? this.gridApi.getRenderedNodes().map((node: any) => node.data)  // Use filtered rows if available
+          : this.responseRowData;  // Fallback to full data if no filtered rows
+      
+        if (!dataToExport || dataToExport.length === 0) {
           console.error('No data available for export.');
-          return;
+          return; // Exit if there's no data to export
         }
       
         const docDefinition: any = {
           content: [],
+          pageSize: { width: 500, height: 1000 },
+          defaultStyle: {},
           styles: {
             tableHeader: {
               bold: true,
@@ -332,22 +451,16 @@ this.parseChartConfig(this.storeDrillDown)
           return;
         }
       
-        // Dynamically calculate page size
+        // Adjust page size dynamically based on the number of columns
         const columnCount = columnFields.length;
-      
-        if (columnCount <= 6) {
-          docDefinition.pageSize = 'A4'; // Standard A4 size
-        } else if (columnCount <= 10) {
-          docDefinition.pageSize = 'A3'; // Standard A3 size
-        } else if (columnCount <= 15) {
-          docDefinition.pageSize = 'A2'; // Standard A2 size
-        } else {
-          // For more columns, use custom page size (optional)
-          docDefinition.pageSize = {
-            width: 800,  // Custom width
-            height: 1200, // Custom height
-          };
-        }
+        docDefinition.pageSize =
+          columnCount <= 6
+            ? 'A4'
+            : columnCount <= 10
+            ? 'A3'
+            : columnCount <= 15
+            ? 'A2'
+            : 'A1';
       
         // Add document title
         docDefinition.content.push({
@@ -362,15 +475,16 @@ this.parseChartConfig(this.storeDrillDown)
         // Add header row
         tableBody.push(
           columnHeaders.map((col: any) => ({
-            text: col,
+            text: col, // Use column headers directly
             style: 'tableHeader',
           }))
         );
       
         // Add data rows
-        this.responseRowData.forEach((row: Record<string, any>, index: number) => {
+        dataToExport.forEach((row: Record<string, any>, index: number) => {
           const rowData = columnFields.map((col: string | number) => {
             const cellData = row[col];
+            console.log('cellData checking', cellData);
       
             if (cellData === null || cellData === undefined) {
               return ''; // Treat null/undefined as empty string
@@ -391,6 +505,7 @@ this.parseChartConfig(this.storeDrillDown)
             return cellData.toString(); // Convert all other data types to string
           });
       
+          // Push row as an array, not as an object
           tableBody.push(rowData);
         });
       
@@ -408,15 +523,69 @@ this.parseChartConfig(this.storeDrillDown)
           },
           margin: [0, 10],
         });
+
+
+
+        const maxRows = this.responseRowData.length;
+        const maxColumns = this.responseRowData.length > 0
+          ? Object.keys(this.responseRowData[0]).length
+          : 0;
+        
+        console.log('Row Count:', maxRows);
+        console.log('Column Count:', maxColumns);
+        
+        
+        console.log('Maximum Rows:', maxRows);
+        console.log('Maximum Columns:', maxColumns);
+        
+    
+        let dynamicWidth = this.calculatePageWidth(maxColumns)
+        let dynamicHight = 0;
+    
+        if (maxColumns >= 100) {
+          dynamicHight = 2500 + (70 * maxColumns); // higher offset for large tables
+        } else if (maxColumns >= 50) {
+          dynamicHight = 2200 + (50 * maxColumns);
+        } else if (maxColumns >= 10) {
+          dynamicHight = 1800 + (35 * maxColumns);
+        } else {
+          dynamicHight = 1200;
+        }
+        
+    
+        const minWidth = 595.28; // A4 width in points
+        const minHeight = 841.89; // A4 height in points
+    
+        // Check and enforce minimum dimensions
+        if (dynamicWidth < minWidth) {
+          dynamicWidth = minWidth;
+        }
+        if (dynamicHight < minHeight) {
+          dynamicHight = minHeight;
+        }
+    
+        docDefinition.pageSize = { width: dynamicWidth, height: dynamicHight }
+      
       
         // Error handling during PDF generation
         try {
           pdfMake.createPdf(docDefinition).download(`${this.FormName}` + '.pdf');
         } catch (error) {
           console.error('Error generating PDF:', error);
+          alert('Failed to generate PDF. Please try again.');
         }
       }
       
+      calculatePageWidth(columns: number): number {
+        const [minColumns, maxColumns, minWidth, maxWidth] = [10, 300, 2000, 9000]; // adjusted limits
+        return Math.max(
+          minWidth,
+          Math.min(
+            minWidth + ((columns - minColumns) * (maxWidth - minWidth)) / (maxColumns - minColumns),
+            maxWidth
+          )
+        );
+      }
       
       
 
@@ -448,10 +617,14 @@ this.parseChartConfig(this.storeDrillDown)
         } else {
           // If no key starts with 'table', proceed with the else block
           console.log("Row clicked, eventData: ", eventData);
-          setTimeout(() => {
+        
             // Emit the event after a delay (500ms here)
-            this.dataTableCellInfo.emit(eventData);
-          }, 500);
+            setTimeout(() => {
+              this.dataTableCellInfo.emit(eventData);
+              
+            }, 500);
+      
+        
         }
       
         // Unlock click after processing (to prevent multiple triggers)
@@ -475,4 +648,59 @@ this.parseChartConfig(this.storeDrillDown)
         this.modalData = [event.data]; // Pass the clicked row data to the modal
         this.isModalOpen = true;
       }
+
+      getFilteredData() {
+        // Get the filtered nodes (those that are rendered based on the applied filters)
+        const filteredNodes = this.gridApi.getRenderedNodes();  // Use getRenderedNodes instead of getFilteredNodes
+        console.log('filteredNodes checking from table',filteredNodes)
+      
+        // Map them to their data
+        const filteredData = filteredNodes.map((node: any) => node.data); 
+        console.log('filteredData checking',filteredData)
+      
+        console.log(filteredData);  // Log or use the filtered data
+        return filteredData;  // Return the filtered data
+      }
+
+
+  async fetchDynamicFormData(value: any, receiveDateKeys: any): Promise<any[]> {
+    console.log("Data from lookup:", value);
+    console.log('receiveDateKeys checking table ui', receiveDateKeys);
+  
+    try {
+      const result: any = await this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1);
+  
+      if (result && result.metadata) {
+        const parsedMetadata = JSON.parse(result.metadata);
+        const formFields = parsedMetadata.formFields;
+        console.log('fields checking table ui', formFields);
+  
+        const receiveSet = new Set(receiveDateKeys);
+  
+        const filteredFields = formFields.filter(
+          (field: any) => receiveSet.has(field.name)
+        );
+  
+        console.log('Matched date fields:', filteredFields);
+        return filteredFields;
+      }
+    } catch (err) {
+      console.log("Can't fetch", err);
+    }
+  
+    return []; // fallback if error or no metadata
+  }
+
+  async ngOnInit(){
+
+    this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
+    console.log('this.getLoggedUser read for redirect',this.getLoggedUser)
+  
+  
+    // this.SK_clientID = this.getLoggedUser.clientID;
+
+
+
+  }
+      
 }

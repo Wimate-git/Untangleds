@@ -5,7 +5,7 @@
   <div class="container" *ngIf="createChart">
     <div [formGroup]="createChart">
     <div class="row">
-      <div class="col-md-6" [formGroup]="createChart">
+      <div class="col-md-4" [formGroup]="createChart">
         <label class="col-lg-12 col-createChart-label fw-bold fs-6 required">Parameters
         </label>
         <input type="number" class="
@@ -17,7 +17,7 @@
             <div *ngIf="createChart.get('add_fields')?.errors?.required">Parameters is required.</div>
           </div>
       </div>
-      <div class="col-md-6" [formGroup]="createChart">
+      <div class="col-md-4" [formGroup]="createChart">
         <label class="col-lg-12 col-createChart-label fw-bold fs-6 required"> Title </label>
   
         <input type="text" class="
@@ -36,18 +36,8 @@
   
   
       </div>
-    </div>
-  
-    <div class="row mb-3">
-      <div class="col-md-3 mb-3">
-        <div class="col-lg-12 form-check form-switch">
-        <label for="toggleCheck" class="col-lg-12 col-createChart-label fw-bold fs-6  mt-7">Enable Redirection</label>
-        <input class="form-check-input mt-10 mb-3 mb-lg-0" type="checkbox" formControlName="toggleCheck" id="toggleCheck" />
-        <span>{{ createChart.get('toggleCheck')?.value ? 'Enabled' : 'Disabled' }}</span>
-      </div>
-      </div>
 
-      <div  class="col-md-3 mb-3">
+      <div  class="col-md-4 mb-3">
         <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Chart Type</label>
         <ngx-select
           id="dashboardIds"
@@ -60,12 +50,53 @@
           style="width: 100%;">
         </ngx-select>
       </div>
+    </div>
+  
+    <div class="row mb-3">
+      <div class="col-md-3 mb-3">
+        <div class="col-lg-12 form-check form-switch">
+        <label for="toggleCheck" class="col-lg-12 col-createChart-label fw-bold fs-6  mt-7">Enable Redirection</label>
+        <input class="form-check-input mt-10 mb-3 mb-lg-0" type="checkbox" formControlName="toggleCheck" id="toggleCheck" />
+        <span>{{ createChart.get('toggleCheck')?.value ? 'Enabled' : 'Disabled' }}</span>
+      </div>
+      </div>
 
-
-      
-      <!-- Conditionally Render Dashboard Ids Field -->
+      <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-3 mb-3">
+        <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Module Names
+          <span class="ms-2 text-primary"
     
-    
+          placement="top"
+          container="body">
+      <i class="bi bi-info-circle fs-5"></i>
+    </span>
+  
+          
+        </label>
+        <ngx-select
+          [allowClear]="true"
+          formControlName="ModuleNames"
+          [items]="showModuleNames"
+          optionValueField="value"
+          optionTextField="text"
+          placeholder="Select Parameter"
+          (selectionChanges)="moduleSelection($event)"
+          style="width: 100%;"
+        >
+        </ngx-select>
+      </div>
+      <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-3 mb-3">
+        <label for="selectType" class="col-createChart-label fw-bold fs-6">Select Redirection Type</label>
+        <ngx-select
+          id="selectType"
+          [allowClear]="true"
+          formControlName="selectType"
+          [items]="filteredSelectTypeSummary"
+          optionValueField="value"
+          optionTextField="text"
+          placeholder="Select Parameter"
+          style="width: 100%;">
+        </ngx-select>
+      </div>
     
         <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-3 mb-3">
           <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Redirect To</label>
@@ -73,22 +104,7 @@
             id="dashboardIds"
             [allowClear]="true"
             formControlName="dashboardIds"
-            [items]="p1ValuesSummary"
-            optionValueField="value"
-            optionTextField="text"
-            placeholder="Select Parameter"
-            style="width: 100%;">
-          </ngx-select>
-        </div>
-      
-        <!-- Conditionally Render Select Type Field -->
-        <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-3 mb-3">
-          <label for="selectType" class="col-createChart-label fw-bold fs-6">Select Type</label>
-          <ngx-select
-            id="selectType"
-            [allowClear]="true"
-            formControlName="selectType"
-            [items]="SelectTypeSummary"
+            [items]="dynamicIDArray"
             optionValueField="value"
             optionTextField="text"
             placeholder="Select Parameter"
@@ -728,6 +744,9 @@
            >
             Update
           </button>
+          <div *ngIf="!formValidationFailed" class="alert alert-danger fw-bold mb-3">
+            ⚠️ Please fill all required fields before updating.
+          </div>
         </div>
       </div>
   

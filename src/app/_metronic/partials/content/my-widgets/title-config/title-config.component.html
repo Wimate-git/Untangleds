@@ -8,14 +8,54 @@
       <div class="fv-row" [formGroup]="createTitle">
         <div class="modal-body">
           <div class="card-body pt-0">
+            <div class="row">            
+              <div
+              class="col-md-12 mb-3"
+              style="padding: 10px; border-radius: 8px;"
+            >
+              <label class="col-form-label fw-bold fs-6 required">Title
+                <span class="ms-2 text-primary"
+                [ngbTooltip]="titleInputTooltip"
+                placement="top"
+                container="body">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+              </label>
+              <input
+                formControlName="customLabel"
+          type="text" name="customLabel"
+                class="form-control form-control-solid"
+     
+            
+        
+              >
+  
+            
+              <!-- Validation Feedback -->
+              <div
+                class="invalid-feedback"
+                *ngIf="createTitle.get('customLabel')?.invalid && createTitle.get('customLabel')?.touched"
+                style="padding: 5px; border-radius: 5px;"
+              >
+                Title Name is required
+              </div>
+            </div>
+          </div>
             <!-- <div class="d-flex flex-wrap align-items-center gap-3"> -->
   
             <!-- Rich Text Editor Toolbar -->
-             <div class="row">
+             <div class="row mb-5 mt-3">
             <div class="col-md-3">
 
             <div class="mb-3">
-              <label for="fontSelector" class="col-createChart-label fw-bold fs-6 me-2 ">Font Type:</label>
+              <label for="fontSelector" class="col-createChart-label fw-bold fs-6 me-2 ">Font Type:
+                <span class="ms-2 text-primary"
+                [ngbTooltip]="fontTypeTooltip"
+                placement="top"
+                container="body">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+              </label>
               <div class="d-flex align-items-center gap-2">
               <button
               type="button"
@@ -54,7 +94,14 @@
             <div class="col-md-3">
               <!-- Alignment Buttons -->
               <div class="mb-3">
-                <label for="fontSelector" class="col-createChart-label fw-bold fs-6 me-2">Font Align:</label>
+                <label for="fontSelector" class="col-createChart-label fw-bold fs-6 me-2">Font Align:
+                  <span class="ms-2 text-primary"
+                  [ngbTooltip]="fontAlignTooltip"
+                  placement="top"
+                  container="body">
+                  <i class="bi bi-info-circle fs-5"></i>
+                </span>
+                </label>
                 <div class="d-flex align-items-center gap-2">
                 <button
                   type="button"
@@ -87,7 +134,14 @@
             <div class="col-md-3">
               <!-- Font Family Selector -->
               <div class="mb-3">
-                <label for="fontSelector" class="col-createChart-label fw-bold fs-6">Choose Font Style:</label>
+                <label for="fontSelector" class="col-createChart-label fw-bold fs-6">Choose Font Style:
+                  <span class="ms-2 text-primary"
+                  [ngbTooltip]="fontStyleTooltip"
+                  placement="top"
+                  container="body">
+                  <i class="bi bi-info-circle fs-5"></i>
+                </span>
+                </label>
                 <select
                   id="fontSelector"
                   class="form-select"
@@ -129,7 +183,14 @@
               <div class="mb-3">
                 <!-- <label  class="col-createChart-label fw-bold fs-6 required">Date Range Label</label> -->
         
-              <label for="fontSelector" class="col-createChart-label fw-bold fs-6">Choose Font Size:</label>
+              <label for="fontSelector" class="col-createChart-label fw-bold fs-6">Choose Font Size:
+                <span class="ms-2 text-primary"
+                [ngbTooltip]="fontSizeTooltip"
+                placement="top"
+                container="body">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+              </label>
               <select
               class="form-select "
               (change)="onFontSizeChange($event)"
@@ -166,93 +227,150 @@
               <!-- Background Color Picker -->
   
               
-        
-            <div class="color-picker-row" style="display: flex; gap: 1rem; align-items: center;">
-              <div class="col-md-6">
-              <!-- Background Color Picker -->
-              <div class="color-picker-container ">
-                <label for="bgColorPicker" class="col-createChart-label fw-bold fs-6">Choose Background Color:</label>
-                <input
-                  id="bgColorPicker"
-                  type="color"
-                  class="form-control-color"
-                  [value]="createTitle.value.themeColor || '#ffffff'"
-                  (input)="updateNameContainerColor($event)"
-                  [style.background]="createTitle.value.themeColor || '#ffffff'"
-                  title="Choose Name container background color"
-                />
-              </div>
+        <div class="row mb-5 mt-3" >
+          <div class="color-picker-row" style="display: flex; gap: 1rem; align-items: center;">
+            <div class="col-md-6">
+            <!-- Background Color Picker -->
+            <div class="color-picker-container ">
+              <label for="bgColorPicker" class="col-createChart-label fw-bold fs-6">Choose Background Color:
+                <span class="ms-2 text-primary"
+                [ngbTooltip]="bgColorTooltip"
+                placement="top"
+                container="body">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+              </label>
+              <input
+                id="bgColorPicker"
+                type="color"
+                class="form-control-color"
+                [value]="createTitle.value.themeColor || '#ffffff'"
+                (input)="updateNameContainerColor($event)"
+                [style.background]="createTitle.value.themeColor || '#ffffff'"
+                title="Choose Name container background color"
+              />
             </div>
-              
-              <!-- Text Color Picker -->
-              <div class="col-md-6">
-              <div class="color-picker-container ">
-                <label for="textColorPicker" class="col-createChart-label fw-bold fs-6">Choose Text Color:</label>
-                <input
-                  id="textColorPicker"
-                  type="color"
-                  class="form-control-color"
-                  [value]="createTitle.value.textColor || '#000000'"
-                  (input)="updateTextColor($event)"
-                  [style.background]="createTitle.value.textColor || '#000000'"
-                  title="Choose text color"
-                />
-              </div>
+          </div>
+            
+            <!-- Text Color Picker -->
+            <div class="col-md-6">
+            <div class="color-picker-container ">
+              <label for="textColorPicker" class="col-createChart-label fw-bold fs-6">Choose Text Color:
+                <span class="ms-2 text-primary"
+                [ngbTooltip]="textColorTooltip"
+                placement="top"
+                container="body">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+              </label>
+              <input
+                id="textColorPicker"
+                type="color"
+                class="form-control-color"
+                [value]="createTitle.value.textColor || '#000000'"
+                (input)="updateTextColor($event)"
+                [style.background]="createTitle.value.textColor || '#000000'"
+                title="Choose text color"
+              />
             </div>
-            </div>
-            <div class="row">
+          </div>
+          </div>
+        </div>
+
+            <div class="row mb-10 mt-3">
 
               <div class="col-md-4 mb-3">
-                <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Module Names</label>
+                <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Module Names
+                  <span class="ms-2 text-primary"
+                  [ngbTooltip]="moduleNamesTooltip"
+                  placement="top"
+                  container="body">
+              <i class="bi bi-info-circle fs-5"></i>
+            </span>
+
+                  
+                </label>
                 <ngx-select
-                  id="parameterName"
                   [allowClear]="true"
                   formControlName="ModuleNames"
                   [items]="showModuleNames"
                   optionValueField="value"
                   optionTextField="text"
-                  placeholder="Select Module Name"
+                  placeholder="Select Parameter"
                   (selectionChanges)="moduleSelection($event)"
-              
-                  style="width: 100%;">
+                  style="width: 100%;"
+                >
                 </ngx-select>
               </div>
-  
-  
-  
-              <div class="col-md-4 mb-3">
-                <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Redirect To</label>
+              <div class="col-md-4">
+                <div class="d-flex flex-column">
+                  <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Select Redirection Type
+                    <span class="ms-2 text-primary"
+                    (mouseenter)="openRedirectionTypeInfoModal(TileWithIconHelpRedirectionType)"
+                    style="cursor: pointer;">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+                  </label>
+              
+                  <ngx-select
+                    id="selectType"
+                    [allowClear]="true"
+                    formControlName="selectType"
+                    [items]="filteredSelectTypeSummary"
+                    optionValueField="value"
+                    optionTextField="text"
+                    placeholder="Select Parameter"
+                    (change)="onSelectTypeChange()"
+                  >
+                  </ngx-select>
+                </div>
+              </div>
+              
+
+
+
+              <div *ngIf="createTitle.controls.selectType.value !== 'drill down'" class="col-md-4 mb-3">
+                <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Redirect To
+
+                  <span class="ms-2 text-primary"
+                  [ngbTooltip]="redirectToTooltip"
+                  placement="top"
+                  container="body">
+              <i class="bi bi-info-circle fs-5"></i>
+            </span>
+                </label>
                 <ngx-select
-                  id="parameterName"
                   [allowClear]="true"
                   formControlName="dashboardIds"
                   [items]="dynamicIDArray"
                   optionValueField="value"
                   optionTextField="text"
-                  placeholder="Redirect To"
+                  placeholder="Select Parameter"
                   (selectionChanges)="dynamicRedirectChanged($event)"
-              
-                  style="width: 100%;">
+                  style="width: 100%;"
+                >
                 </ngx-select>
               </div>
-      
-                <!-- Select Type -->
-                <div class="col-md-4">
-                  <div class="d-flex flex-column">
-                    <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Select Type</label>
-                    <ngx-select
-                      id="selectType"
-                      [allowClear]="true"
-                      formControlName="selectType"
-                      [items]="SelectTypeSummary"
-                      optionValueField="value"
-                      optionTextField="text"
-                      placeholder="Select Type"
-                    >
-                    </ngx-select>
-                  </div>
+              <div class="col-md-4"  *ngIf="showColumnVisibility">
+                <div class="d-flex flex-column">
+                  <label for="columnVisibility" class="fw-bold fs-6">Column Visibility
+                    <span class="ms-2 text-primary"
+             
+                    placement="top"
+                    container="body">
+                <i class="bi bi-info-circle fs-5"></i>
+              </span>
+                  </label>
+                  <p-multiSelect
+                    id="columnVisibility"
+                    formControlName="columnVisibility"
+                    [options]="columnVisisbilityFields"
+                    optionLabel="text"
+                    placeholder="Select Parameter"
+                  >
+                  </p-multiSelect>
                 </div>
-              
+              </div>
                 <!-- Column Visibility -->
   
        
@@ -263,30 +381,7 @@
             
             
             <!-- Name Container -->
-            <div
-            class="col-md-6 mb-3"
-            style="padding: 10px; border-radius: 8px;"
-          >
-            <label class="col-form-label fw-bold fs-6 required">Title</label>
-            <input
-              formControlName="customLabel"
-        type="text" name="customLabel"
-              class="form-control form-control-solid"
-   
-          
-      
-            >
 
-          
-            <!-- Validation Feedback -->
-            <div
-              class="invalid-feedback"
-              *ngIf="createTitle.get('customLabel')?.invalid && createTitle.get('customLabel')?.touched"
-              style="padding: 5px; border-radius: 5px;"
-            >
-              Title Name is required
-            </div>
-          </div>
 
           <div class="row rounded col-createChart-label fw-bold fs-6 form-control form-control-solid" [style.backgroundColor]="createTitle.value.themeColor">
             <!-- Display the parameterName -->
@@ -323,5 +418,20 @@
           <button type="button" class="btn btn-primary" (click)="validateAndUpdate()" *ngIf="isEditMode">Update</button>
         </div>
       </div>
+
+      <ng-template #TileWithIconHelpRedirectionType let-modal>
+        <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Close"
+            (click)="modal.dismiss()"
+            style="position: relative; top: 4px; right: 4px;">
+          </button>
+        </div>
+        <app-tile-with-icon-redirection-type
+    
+        ></app-tile-with-icon-redirection-type>
+      </ng-template>
   
  

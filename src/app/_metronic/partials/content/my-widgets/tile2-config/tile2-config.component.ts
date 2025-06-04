@@ -93,6 +93,14 @@ export class Tile2ConfigComponent implements OnInit{
   paramCount: any;
   showColumnVisibility = false;
   isSummaryDashboardSelected = false;
+  SelectTypeSummary = [
+    { value: 'NewTab', text: 'New Tab' },
+    { value: 'Modal', text: 'Modal(Pop Up)' },
+    { value: 'Same page Redirect', text: 'Same Page Redirect' },
+    { value: 'drill down', text: 'Drill Down' },
+  ];
+
+  filteredSelectTypeSummary = [...this.SelectTypeSummary]; 
 
 ngOnInit(): void {
   this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
@@ -242,7 +250,7 @@ generateUniqueId(): number {
   
       primaryValue: ['', Validators.required],
       groupByFormat: ['', Validators.required],
-      constantValue: [''],
+      // constantValue: [''],
       secondaryValue: ['', Validators.required],
       widgetid: [this.generateUniqueId()],
       processed_value: [''],
@@ -265,6 +273,7 @@ generateUniqueId(): number {
       MiniTableFields:[''],
       minitableEquation:[''],
       EquationOperationMini:[''],
+      EquationDesc:[''],
  
 
     })
@@ -327,15 +336,14 @@ generateUniqueId(): number {
          minitableEquation:this.createKPIWidget1.value.minitableEquation,
          EquationOperationMini:this.createKPIWidget1.value.EquationOperationMini,
          noOfParams: this.noOfParams || 0,
+         EquationDesc: this.createKPIWidget1.value.EquationDesc,
      
 
 
          multi_value: [
            {
              value: this.createKPIWidget1.value.primaryValue,
-             constantValue: this.createKPIWidget1.value.constantValue !== undefined && this.createKPIWidget1.value.constantValue !== null
-               ? this.createKPIWidget1.value.constantValue
-               : 0,
+    
                processed_value: this.createKPIWidget1.value.processed_value || '',
            },
            {
@@ -364,7 +372,7 @@ generateUniqueId(): number {
        if(this.grid_details)
          {
 
-          this.updateSummary('','update_tile');
+          this.updateSummary('','Add_Tile2');
          }
    
        this.createKPIWidget1.patchValue({
@@ -399,8 +407,24 @@ generateUniqueId(): number {
       this.update_PowerBoard_config.emit({ data, arg2 });
     }
 
-     themes = [
+    themes = [
+      { color: "linear-gradient(to right, #ff7e5f, #feb47b)", selected: false }, // Warm Sunset
+      { color: "linear-gradient(to right, #6a11cb, #2575fc)", selected: false }, // Cool Blue-Purple
+      { color: "linear-gradient(to right, #ff6a00, #ee0979)", selected: false }, // Fiery Red-Orange
+      { color: "linear-gradient(to right, #36d1dc, #5b86e5)", selected: false }, // Aqua Blue
+      { color: "linear-gradient(to right, #56ab2f, #a8e063)", selected: false }, // Fresh Green
+      { color: "linear-gradient(to right, #ff9966, #ff5e62)", selected: false }, // Orange-Red Glow
+    
+      { color: "linear-gradient(to right, #8e44ad, #3498db)", selected: false }, // Vibrant Purple-Blue
+      { color: "linear-gradient(to right, #fdc830, #f37335)", selected: false }, // Golden Sunburst
+      { color: "linear-gradient(to right, #16a085, #f4d03f)", selected: false }, // Teal to Yellow
+      { color: "linear-gradient(to right, #9cecfb, #65c7f7, #0052d4)", selected: false }, // Light to Deep Blue
+      { color: "linear-gradient(to right, #00c6ff, #0072ff)", selected: false }, // Bright Blue
+      { color: "linear-gradient(to right, #11998e, #38ef7d)", selected: false }, // Mint Green
+      { color: "linear-gradient(to right, #ff9a9e, #fad0c4)", selected: false }, // Pink Pastel
+      { color: "linear-gradient(to right, #fc5c7d, #6a82fb)", selected: false } , // Pink to Blue
       { color: "linear-gradient(to right, #1D2671, #C33764)", selected: false }, // Deep Purple to Reddish Pink
+    
       { color: "linear-gradient(to right, #5433FF, #20BDFF, #A5FECB)", selected: false }, // Multicolor Cool Spectrum
       { color: "linear-gradient(to right, #FF5F6D, #FFC371)", selected: false }, // Soft Pink to Orange
       { color: "linear-gradient(to right, #C6FFDD, #FBD786, #f7797d)", selected: false }, // Pastel Multicolor
@@ -412,13 +436,7 @@ generateUniqueId(): number {
       { color: "linear-gradient(to right, #373B44, #4286F4)", selected: false }, // Dark Blue to Grey
       { color: "linear-gradient(to right, #614385, #516395)", selected: false }, // Moody Purple to Blue
       { color: "linear-gradient(to right, #000428, #004e92)", selected: false }, // Midnight Blue
-      { color: "linear-gradient(to right, #FF8008, #FFC837)", selected: false }, // Bright Orange to Yellow
-      { color: "linear-gradient(to right, #3A1C71, #D76D77, #FFAF7B)", selected: false }, // Purple to Peach
-      { color: "linear-gradient(to right, #4568DC, #B06AB3)", selected: false } , // Soft Blue to Purple
-
-
-
-
+    
       { color: "linear-gradient(to right, #3A1C71, #D76D77, #FFAF7B)", selected: false }, // Purple to Peach
       { color: "linear-gradient(to right, #4568DC, #B06AB3)", selected: false },
       { color: "linear-gradient(to right, #32cd32, #adff2f)", selected: false }, // Soft Blue to Purple
@@ -454,22 +472,107 @@ generateUniqueId(): number {
       { color: "linear-gradient(to right, #A1045A, #A1045A)", selected: true },
       { color: "linear-gradient(to right, #563C5C, #563C5C)", selected: false },
       { color: "linear-gradient(to right, #655967, #655967)", selected: false },
-      { color: "linear-gradient(to right, #ff7e5f, #feb47b)", selected: false }, // Warm Sunset
-      { color: "linear-gradient(to right, #6a11cb, #2575fc)", selected: false }, // Cool Blue-Purple
-      { color: "linear-gradient(to right, #ff6a00, #ee0979)", selected: false }, // Fiery Red-Orange
-      { color: "linear-gradient(to right, #36d1dc, #5b86e5)", selected: false }, // Aqua Blue
-      { color: "linear-gradient(to right, #56ab2f, #a8e063)", selected: false }, // Fresh Green
-      { color: "linear-gradient(to right, #ff9966, #ff5e62)", selected: false }, // Orange-Red Glow
+      {color:"linear-gradient(45deg, #FC466B 0%, #3F5EFB 100%)",selected:false},
+      {color:"linear-gradient(45deg, #833ab4 0%, #fd1d1d 100%)",selected:false},
+      {color:"linear-gradient(45deg, #16BFFD 0%, #CB3066 100%)",selected:false},
+      {color:"linear-gradient(45deg, #48c6ef 0%, #6f86d6 100%)",selected:false},
+      {color:"linear-gradient(45deg, #ff758c 0%, #ff7eb3 100%)",selected:false},
+      {color:"linear-gradient(45deg, #a80077 0%, #66ff00 100%)",selected:false},
+      {color:"linear-gradient(45deg, #6441a5 0%, #2a0845 100%)",selected:false},
+      {color:"linear-gradient(45deg, #fc5c7d 0%, #6a82fb 100%)",selected:false},
+      {color:"linear-gradient(45deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)",selected:false},
+      {color:"linear-gradient(45deg, #2C3E50 0%, #FD746C 100%)",selected:false},
+      {color:"linear-gradient(45deg, #abbaab 0%, #ffffff 100%)",selected:false},
+      { color: "linear-gradient(45deg, #283c86 0%, #45a247 100%)", selected: false }, // Deep Sea
+      { color: "linear-gradient(45deg, #16222a 0%, #3a6073 100%)", selected: false }, // Dark Ocean
+      { color: "linear-gradient(45deg, #3D3393 0%, #2D2560 100%)", selected: false }, // Royal Blue
+      { color: "linear-gradient(45deg, #000000 0%, #0d324d 100%)", selected: false }, // Midnight Black
+      { color: "linear-gradient(45deg, #0575E6 0%, #021B79 100%)", selected: false }, // Deep Blue
+      { color: "linear-gradient(45deg, #2C5364 0%, #203A43 100%)", selected: false }, // Emerald Green
+      { color: "linear-gradient(45deg, #833ab4 0%, #fd1d1d 100%)", selected: false }, // Purple Red
+      { color: "linear-gradient(45deg, #000000 0%, #434343 100%)", selected: false }, // Dark Grey
+      { color: "linear-gradient(45deg, #004e92 0%, #000000 100%)", selected: false },
+      { color: "linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%)", selected: false }, // Blue Purple Yellow
+      { color: "linear-gradient(132deg, #F4D03F 0%, #16A085 100%)", selected: false }, // Golden Green
+      { color: "linear-gradient(0deg, #08AEEA 0%, #2AF598 100%)", selected: false }, // Ocean Green
+      { color: "linear-gradient(147deg, #FFE53B 0%, #FF2525 74%)", selected: false }, // Sunset Red
+      { color: "linear-gradient(180deg, #52ACFF 25%, #FFE32C 100%)", selected: false }, // Sky Blue Yellow
+      { color: "linear-gradient(45deg, #EE7752 0%, #E73C7E 100%)", selected: false }, // Sunset Orange
+      { color: "linear-gradient(45deg, #FFA7A7 0%, #FFD4A2 100%)", selected: false }, // Peachy Pink
+      { color: "linear-gradient(45deg, #fc00ff 0%, #00dbde 100%)", selected: false }, // Electric Purple
+      { color: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", selected: false }, // Twilight Purple
+      { color: "linear-gradient(45deg, #d4145a 0%, #fbb03b 100%)", selected: false }, // Cherry Peach
+      { color: "linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%)", selected: false }, // Cotton Candy
+      { color: "linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)", selected: false }, // Blue Sky
+      { color: "linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%)", selected: false }, // Ice White
+      { color: "linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)", selected: false }, // Lavender Blue
+      { color: "linear-gradient(120deg, #f6d365 0%, #fda085 100%)", selected: false }, // Peachy Yellow
+      { color: "linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%)", selected: false }, // Azure Blue
+      { color: "linear-gradient(120deg, #abecd6 0%, #fbed96 100%)", selected: false }, // Pastel Green Yellow
+      { color: "linear-gradient(120deg, #f6d365 0%, #fda085 100%)", selected: false }, // Sunrise Yellow
+      { color: "linear-gradient(120deg, #fccb90 0%, #d57eeb 100%)", selected: false }, // Apricot Purple
+      { color: "linear-gradient(120deg, #f093fb 0%, #f5576c 100%)", selected: false }, 
+      { color: "transparent", selected: false }, // Transparent
+      { color: "linear-gradient(315deg, #990000 0%, #ff0000 74%)", selected: false }, // Red
+      { color: "linear-gradient(315deg, #378b29 0%, #74d680 74%)", selected: false }, // Green
+      { color: "linear-gradient(316deg, #3e187a 0%, #994ecc 74%)", selected: false }, // Purple
+      { color: "linear-gradient(315deg, #f9ff60 0%, #e0c300 74%)", selected: false }, // Yellow
+      { color: "linear-gradient(315deg, #182b3a 0%, #20a4f3 74%)", selected: false },
+      { color: "linear-gradient(315deg, #ff8000 0%, #ffcc00 74%)", selected: false }, // Orange
+      { color: "linear-gradient(315deg, #550022 0%, #aa0044 74%)", selected: false }, // Magenta
+      { color: "linear-gradient(315deg, #0073e6 0%, #00d8e6 74%)", selected: false }, // Cyan
+      { color: "linear-gradient(315deg, #660066 0%, #cc00cc 74%)", selected: false }, // Violet
+      { color: "linear-gradient(315deg, #cc0033 0%, #ff0066 74%)", selected: false }, // Pink
+      { color: "linear-gradient(315deg, #663300 0%, #996633 74%)", selected: false }, // Brown
+      { color: "linear-gradient(315deg, #006600 0%, #00cc00 74%)", selected: false }, // Lime
+      { color: "linear-gradient(315deg, #003366 0%, #0066cc 74%)", selected: false }, // Indigo
+      { color: "linear-gradient(315deg, #666600 0%, #cccc00 74%)", selected: false }, // Olive
+      { color: "linear-gradient(315deg, #660000 0%, #cc0000 74%)", selected: false }, // Maroon
+      { color: "linear-gradient(315deg, #ff0080 0%, #ff80bf 74%)", selected: false }, // Fuchsia
+      { color: "linear-gradient(315deg, #004080 0%, #007acc 74%)", selected: false }, // Sapphire
+      { color: "linear-gradient(315deg, #800040 0%, #cc0073 74%)", selected: false }, // Ruby
+      { color: "linear-gradient(315deg, #ffcc99 0%, #ff9966 74%)", selected: false }, // Apricot
+      { color: "linear-gradient(315deg, #00cc99 0%, #33ffcc 74%)", selected: false }, // Turquoise
+      { color: "linear-gradient(315deg, #ff6600 0%, #ff9933 74%)", selected: false }, // Tangerine
+      { color: "linear-gradient(315deg, #333300 0%, #666600 74%)", selected: false }, // Olive Green
+      { color: "linear-gradient(315deg, #800000 0%, #cc3333 74%)", selected: false }, // Brick Red
+      { color: "linear-gradient(315deg, #330033 0%, #660066 74%)", selected: false }, // Plum
+      { color: "linear-gradient(315deg, #006666 0%, #00cccc 74%)", selected: false }, // Teal
+                    
+                         
+                        
+                      
+                    
+                        
+                     
+                       
+             
+                     
     
-      { color: "linear-gradient(to right, #8e44ad, #3498db)", selected: false }, // Vibrant Purple-Blue
-      { color: "linear-gradient(to right, #fdc830, #f37335)", selected: false }, // Golden Sunburst
-      { color: "linear-gradient(to right, #16a085, #f4d03f)", selected: false }, // Teal to Yellow
-      { color: "linear-gradient(to right, #9cecfb, #65c7f7, #0052d4)", selected: false }, // Light to Deep Blue
-      { color: "linear-gradient(to right, #00c6ff, #0072ff)", selected: false }, // Bright Blue
-      { color: "linear-gradient(to right, #11998e, #38ef7d)", selected: false }, // Mint Green
-      { color: "linear-gradient(to right, #ff9a9e, #fad0c4)", selected: false }, // Pink Pastel
-      { color: "linear-gradient(to right, #fc5c7d, #6a82fb)", selected: false } , // Pink to Blue
-      { color: "linear-gradient(to right, #1D2671, #C33764)", selected: false }, 
+    
+      // { color: "linear-gradient(to right, #707070, #707070)", selected: false },
+    
+    
+    
+      
+    
+    
+      
+    
+    
+    
+    
+      
+    
+    
+      
+      
+    
+    
+      
+      
+    
+      
     ];
     
   
@@ -566,8 +669,10 @@ generateUniqueId(): number {
           formlist: tile.formlist,
           parameterName: tile.parameterName,
           primaryValue: parsedMultiValue.length > 0 ? parsedMultiValue[0]?.value || '' : '',
+          secondaryValue:parsedMultiValue.length > 0 ? parsedMultiValue[1]?.value || '' : '',
+
           groupByFormat: tile.groupByFormat,
-          constantValue: parsedMultiValue[0]?.constantValue !== undefined ? parsedMultiValue[0].constantValue : 0,
+          // constantValue: parsedMultiValue[0]?.constantValue !== undefined ? parsedMultiValue[0].constantValue : 0,
           processed_value: parsedMultiValue[0]?.processed_value !== undefined ? parsedMultiValue[0].processed_value : 0,
           selectedRangeCalendarTimeRight: tile.selectedRangeCalendarTimeRight,
     
@@ -858,122 +963,104 @@ generateUniqueId(): number {
   get primaryValue1() {
     return this.createKPIWidget1.get('primaryValue');
   }
-  updateTile1(key:any) {
-    console.log('key checking',key)
+  updateTile1(key: any) {
+    console.log('key checking', key);
+  
     if (this.editTileIndex1 !== null) {
       console.log('this.editTileIndex check', this.editTileIndex1);
       console.log('Tile checking for update:', this.dashboard[this.editTileIndex1]);
-
-      // Log the current details of the tile before update
-      console.log('Current Tile Details Before Update:', this.dashboard[this.editTileIndex1]);
-      console.log('this.dashboard check from tile1', this.dashboard);
-
-      // Extract the multi_value array
-      let multiValue = this.dashboard[this.editTileIndex1].multi_value || [];
-
-      // Update values in multi_value array
-      // const processedValue = this.createKPIWidget1.value.processed_value || ''; // Get updated processed_value from the form
-      const constantValue = this.createKPIWidget1.value.constantValue || 0; // Get updated constantValue from the form
+  
+      const currentTile = this.dashboard[this.editTileIndex1];
+      console.log('Current Tile Details Before Update:', currentTile);
+  
+      // ✅ Handle multi_value if it's a stringified JSON
+      let multiValueRaw = currentTile.multi_value || [];
+      let multiValue = typeof multiValueRaw === 'string' ? JSON.parse(multiValueRaw) : multiValueRaw;
+      console.log('Parsed multiValue from tile2:', multiValue);
+  
       const secondaryValue = this.createKPIWidget1.value.secondaryValue || '';
-      const primaryValue = this.createKPIWidget1.value.primaryValue || multiValue[0]?.value || '';  // Get updated secondaryValue from the form
-
-      // console.log('Form Value for processed_value:', processedValue);
-      console.log('Form Value for constantValue:', constantValue);
+      const primaryValue = this.createKPIWidget1.value.primaryValue || multiValue[0]?.value || '';
       console.log('Form Value for secondaryValue:', secondaryValue);
-
-      // Ensure the multiValue array is long enough, and update the values
+  
+      // Ensure multiValue array is structured correctly
       if (multiValue.length > 1) {
-        // multiValue[2].processed_value = processedValue; // Update processed_value at index 1
-        multiValue[0].constantValue = constantValue;
-        multiValue[0].value = primaryValue; // Update constantValue at index 0
-        multiValue[1].value = secondaryValue; // Update secondaryValue at index 1
+        multiValue[0].value = primaryValue;
+        multiValue[1].value = secondaryValue;
       } else {
-        // If multi_value array doesn't have enough elements, ensure it's structured correctly
-        // Ensure at least two objects are created with the correct structure
         if (multiValue.length === 0) {
-          // multiValue.push({ processed_value: processedValue });
-          multiValue.push({ constantValue: constantValue });
-          multiValue.push({ secondaryValue: secondaryValue });
+          multiValue.push({ value: primaryValue });
+          multiValue.push({ value: secondaryValue });
         } else if (multiValue.length === 1) {
-          multiValue.push({  secondaryValue: secondaryValue });
+          multiValue[0].value = primaryValue;
+          multiValue.push({ value: secondaryValue });
         }
       }
-      const fontSizeValue = `${this.createKPIWidget1.value.fontSize}px`;
-      // Now update the tile with the updated multi_value
-      const updateTile = {
-        ...this.dashboard[this.editTileIndex1], // Keep existing properties
-        formlist: this.createKPIWidget1.value.formlist,
-        parameterName: this.createKPIWidget1.value.parameterName,
   
-        primaryValue: primaryValue,
-        groupByFormat: this.createKPIWidget1.value.groupByFormat,
-        themeColor: this.createKPIWidget1.value.themeColor,
-        parameterNameRead: this.parameterNameRead,
-        multi_value: multiValue, // Update multi_value with the modified array
-        constantValue: constantValue, // Use the updated constantValue
-        // processed_value: processedValue,
-        secondaryValue: secondaryValue,
+      const fontSizeValue = `${this.createKPIWidget1.value.fontSize}px`;
+  
+      const updateTile = {
+        ...currentTile,
+        formlist: this.createKPIWidget1.value.formlist ||'',
+        parameterName: this.createKPIWidget1.value.parameterName ||'',
+        primaryValue: primaryValue || '',
+        groupByFormat: this.createKPIWidget1.value.groupByFormat ||'',
+        themeColor: this.createKPIWidget1.value.themeColor ||'',
+        parameterNameRead: this.parameterNameRead ||'',
+        multi_value: multiValue ||[],
+        secondaryValue: secondaryValue || '',
         fontSize: fontSizeValue,
-        fontColor: this.createKPIWidget1.value.fontColor ||'',
-        dashboardIds:this.createKPIWidget1.value.dashboardIds ||'',
-        selectType:this.createKPIWidget1.value.selectType ||'',
-        filterParameter:this.createKPIWidget1.value.filterParameter ||'',
-        filterDescription:this.createKPIWidget1.value.filterDescription ||'',
-        selectedRangeType:this.createKPIWidget1.value.selectedRangeType ||'',
-        custom_Label:this.createKPIWidget1.value.custom_Label ||'',
-        selectFromTime: this.createKPIWidget1.value.selectFromTime ||'',
-        selectToTime: this.createKPIWidget1.value.selectToTime ||'',
-
-        ModuleNames:this.createKPIWidget1.value.ModuleNames ||'',
-        columnVisibility:this.createKPIWidget1.value.columnVisibility ||'',
-        formatType: this.createKPIWidget1.value.formatType ||'',
-        equation: this.createKPIWidget1.value.all_fields || [], 
-        noOfParams:this.dashboard[this.editTileIndex1].noOfParams,
-        // EquationFormList: this.createKPIWidget.value.EquationFormList,
-        // EquationParam: this.createKPIWidget.value.EquationParam,
-        // EquationOperation: this.createKPIWidget.value.EquationOperation,
-        EquationDesc: this.createKPIWidget1.value.EquationDesc, // Update with recalculated value
-    
-        miniForm:this.createKPIWidget1.value.miniForm || '',
-        MiniTableNames:this.createKPIWidget1.value.MiniTableNames ||'',
-        MiniTableFields:this.createKPIWidget1.value.MiniTableFields ||'',
-        minitableEquation:this.createKPIWidget1.value.minitableEquation||'',
-        EquationOperationMini:this.createKPIWidget1.value.EquationOperationMini||'',
+        fontColor: this.createKPIWidget1.value.fontColor || '',
+        dashboardIds: this.createKPIWidget1.value.dashboardIds || '',
+        selectType: this.createKPIWidget1.value.selectType || '',
+        filterParameter: this.createKPIWidget1.value.filterParameter || '',
+        filterDescription: this.createKPIWidget1.value.filterDescription || '',
+        selectedRangeType: this.createKPIWidget1.value.selectedRangeType || '',
+        custom_Label: this.createKPIWidget1.value.custom_Label || '',
+        selectFromTime: this.createKPIWidget1.value.selectFromTime || '',
+        selectToTime: this.createKPIWidget1.value.selectToTime || '',
+        ModuleNames: this.createKPIWidget1.value.ModuleNames || '',
+        columnVisibility: this.createKPIWidget1.value.columnVisibility || '',
+        formatType: this.createKPIWidget1.value.formatType || '',
+        equation: this.createKPIWidget1.value.all_fields || [],
+        noOfParams: currentTile.noOfParams ||'',
+        EquationDesc: this.createKPIWidget1.value.EquationDesc ||'',
+        miniForm: this.createKPIWidget1.value.miniForm || '',
+        MiniTableNames: this.createKPIWidget1.value.MiniTableNames || '',
+        MiniTableFields: this.createKPIWidget1.value.MiniTableFields || '',
+        minitableEquation: this.createKPIWidget1.value.minitableEquation || '',
+        EquationOperationMini: this.createKPIWidget1.value.EquationOperationMini || '',
       };
-
-      // Log the updated details of the tile
-      console.log('Updated Tile Details:', this.dashboard[this.editTileIndex1]);
-
-      // Also update the grid_details array to reflect changes
+  
+      console.log('Updated Tile Details:', updateTile);
+  
+      // Update dashboard and grid_details
       this.dashboard = [
         ...this.dashboard.slice(0, this.editTileIndex1),
         updateTile,
         ...this.dashboard.slice(this.editTileIndex1 + 1),
       ];
   
-      console.log('Updated dashboard:', this.dashboard);
+      this.all_Packet_store.grid_details[this.editTileIndex1] = {
+        ...this.all_Packet_store.grid_details[this.editTileIndex1],
+        ...updateTile
+      };
   
-      // Update grid_details and emit the event
-      this.all_Packet_store.grid_details[this.editTileIndex1] = { ...this.all_Packet_store.grid_details[this.editTileIndex1], ...updateTile };
-
-      // Open the modal and perform additional actions
       this.grid_details = this.dashboard;
-      console.log('this.grid_details check',this.grid_details)
       this.dashboardChange.emit(this.grid_details);
   
-      if(this.grid_details)
-        {
-          this.updateSummary(this.all_Packet_store,'update_tile');
-        }
-      console.log('this.dashboard check from updateTile', this.dashboard);
+      if (this.grid_details) {
+        this.updateSummary(this.all_Packet_store, 'update_tile');
+      }
+  
       console.log("Updated all_Packet_store.grid_details:", this.all_Packet_store.grid_details);
-
-      // Reset the editTileIndex after the update
+  
+      // Reset the edit index
       this.editTileIndex1 = null;
     } else {
       console.error("Edit index is null. Unable to update the tile.");
     }
   }
+  
   showValues = [
     { value: 'sum', text: 'Sum' },
     { value: 'min', text: 'Minimum' },
@@ -982,7 +1069,7 @@ generateUniqueId(): number {
     { value: 'latest', text: 'Latest' },
     { value: 'previous', text: 'Previous' },
 
-    { value: 'Constant', text: 'Constant' },
+    // { value: 'Constant', text: 'Constant' },
    
     { value: 'Count', text: 'Count' },
     // { value: 'Count Dynamic', text: 'Count Dynamic' },
@@ -1057,13 +1144,13 @@ generateUniqueId(): number {
  
  
   ]
-  SelectTypeSummary =[
-    { value: 'NewTab', text: 'New Tab' },
-    { value: 'Modal', text: 'Modal(Pop Up)' },
-    { value: 'Same page Redirect', text: 'Same Page Redirect' },
+  // SelectTypeSummary =[
+  //   { value: 'NewTab', text: 'New Tab' },
+  //   { value: 'Modal', text: 'Modal(Pop Up)' },
+  //   { value: 'Same page Redirect', text: 'Same Page Redirect' },
 
-    { value: 'drill down', text: 'Drill Down' },
-  ]
+  //   { value: 'drill down', text: 'Drill Down' },
+  // ]
   fetchDynamicFormData(value: any) {
     console.log("Data from lookup:", value);
 
@@ -1079,7 +1166,7 @@ generateUniqueId(): number {
           this.listofDynamicParam = formFields
           .filter((field: any) => {
             // Filter out fields with type "heading" or with an empty placeholder
-            return field.type !== "heading" && field.type !== 'Empty Placeholder';
+            return field.type !== "heading" && field.type !== 'Empty Placeholder' && field.type !=='button' && field.type !=='table' && field.type !=='radio' && field.type !== 'checkbox' && field.type !== 'html code' && field.type !=='file' && field.type !=='range' && field.type !=='color' && field.type !=='password' && field.type !=='sub heading';
           })
           .map((field: any) => {
             console.log('field check', field);
@@ -1163,10 +1250,10 @@ generateUniqueId(): number {
         : [
           {
             value: tile.primaryValue || '',
-            constantValue:
-              tile.constantValue !== undefined && tile.constantValue !== null
-                ? tile.constantValue
-                : 0,
+            // constantValue:
+            //   tile.constantValue !== undefined && tile.constantValue !== null
+            //     ? tile.constantValue
+            //     : 0,
           },
           {
             value: tile.secondaryValue || '',
@@ -1197,14 +1284,14 @@ generateUniqueId(): number {
 
 
   showModuleNames = [
-    { value: 'None', text: 'None' },
+    // { value: 'None', text: 'None' },
     { value: 'Forms', text: 'Forms' },
     { value: 'Dashboard', text: 'Dashboard' },
-    { value: 'Dashboard - Group', text: 'Dashboard - Group' },
+    // { value: 'Dashboard - Group', text: 'Dashboard - Group' },
     { value: 'Summary Dashboard', text: 'Summary Dashboard' },
     { value: 'Projects', text: 'Projects' },
-    { value: 'Project - Detail', text: 'Project - Detail' },
-    { value: 'Project - Group', text: 'Project - Group' },
+    // { value: 'Project - Detail', text: 'Project - Detail' },
+    // { value: 'Project - Group', text: 'Project - Group' },
     {value: 'Report Studio', text: 'Report Studio'},
     {value:'Calender', text:'Calender'}
   
@@ -1212,104 +1299,75 @@ generateUniqueId(): number {
 
 
   async moduleSelection(event: any): Promise<void> {
-    const selectedValue = event[0].value; // Get selected value
-
-
+    const selectedValue = event[0].value;
+  
+    // 🔁 Update flag for conditional UI logic (if still needed)
+    this.isSummaryDashboardSelected = selectedValue === 'Summary Dashboard';
+  
+    // 🔁 Filter dropdown options based on selection
     if (selectedValue === 'Summary Dashboard') {
-      this.isSummaryDashboardSelected = true;
+      // Show all options
+      this.filteredSelectTypeSummary = [...this.SelectTypeSummary];
     } else {
-      this.isSummaryDashboardSelected = false;
+      // Hide only the "Modal" option
+      this.filteredSelectTypeSummary = this.SelectTypeSummary.filter(
+        item => item.value !== 'Modal' && item.value !== 'drill down'
+      );
+    
+      // Clear "Modal" if it was previously selected
+      const currentType = this.createKPIWidget1.get('selectType')?.value;
+      if (currentType === 'Modal') {
+        // this.createTitle.get('selectType')?.setValue('');
+      }
     }
-    console.log('selectedValue checking',selectedValue)
+    
+    
+  
+    console.log('selectedValue checking', selectedValue);
+  
     switch (selectedValue) {
       case 'None':
         console.log('No module selected');
-        // Add specific logic here
         break;
   
       case 'Forms':
         console.log('Forms module selected');
-        this.FormNames=this.listofDeviceIds
-        console.log('this.FormNames checking',this.FormNames)
-        this.dynamicIDArray = []
-        this.dynamicIDArray = this.FormNames
-        // Add specific logic for Forms
+        this.FormNames = this.listofDeviceIds;
+        this.dynamicIDArray = [...this.FormNames];
         break;
   
       case 'Dashboard':
         console.log('Dashboard module selected');
-        this.IdsFetch = await this.dashboardIdsFetching(1)
-    
-        console.log('IdsFetch checking',this.IdsFetch)
-        this.dynamicIDArray = []
-        this.dynamicIDArray = this.IdsFetch
-      
-        break;
-        // Add specific logic for Dashboard
-  
-  
-      case 'Dashboard - Group':
-        console.log('Dashboard - Group module selected');
-        this.dynamicIDArray = []
-        // Add specific logic for Dashboard - Group
+        this.IdsFetch = await this.dashboardIdsFetching(1);
+        this.dynamicIDArray = [...this.IdsFetch];
         break;
   
       case 'Summary Dashboard':
-        this.summaryIds = await this.dashboardIds(1); // Await and get P1 values
-        console.log('Fetched P1 values:', this.summaryIds);
-        this.dynamicIDArray = [];
-        this.dynamicIDArray = this.summaryIds
-        
         console.log('Summary Dashboard module selected');
-        // Add specific logic for Summary Dashboard
+        this.summaryIds = await this.dashboardIds(1);
+        console.log('Fetched P1 values:', this.summaryIds);
+        this.dynamicIDArray = [...this.summaryIds];
         break;
   
       case 'Projects':
         console.log('Projects module selected');
-        const projectList = await this.fetchDynamicLookupData(1)
-        console.log('projectList checking',projectList)
-        
-        this.dynamicIDArray = []
-        this.dynamicIDArray = projectList
-        break;
-        // Add specific logic for Projects
+        const projectList = await this.fetchDynamicLookupData(1);
+        console.log('projectList checking', projectList);
+        this.dynamicIDArray = [...projectList];
         break;
   
-      case 'Project - Detail':
-        console.log('Project - Detail module selected');
-        const projectDetailList = await this.ProjectDetailLookupData(1)
-  
-        this.dynamicIDArray = []
-        this.dynamicIDArray = projectDetailList
-  
-        // Add specific logic for Project - Detail
+      case 'Report Studio':
+        console.log('Report Studio module selected');
+        const ReportStudioLookup = await this.reportStudioLookupData(1);
+        this.dynamicIDArray = [...ReportStudioLookup];
         break;
   
-      case 'Project - Group':
-        console.log('Project - Group module selected');
-        this.dynamicIDArray = []
-        // Add specific logic for Project - Group
+      case 'Calender':
+        console.log('Calender module selected');
+        const CalenderLookup = await this.fetchCalender();
+        console.log('CalenderLookup check', CalenderLookup);
+        this.dynamicIDArray = [...CalenderLookup];
         break;
-        case 'Report Studio':
-          console.log('Project - Group module selected');
-          this.dynamicIDArray = []
-          const ReportStudioLookup = await this.reportStudioLookupData(1)
-  
-      
-          this.dynamicIDArray = ReportStudioLookup
-          // Add specific logic for Project - Group
-          break;
-          case 'Calender':
-            console.log('Project - Group module selected');
-       
-            this.dynamicIDArray = []
-            const CalenderLookup = await this.fetchCalender()
-            console.log('CalenderLookup check',CalenderLookup)
-    
-        
-            this.dynamicIDArray = CalenderLookup
-            // Add specific logic for Project - Group
-            break;
   
       default:
         console.log('Invalid selection');
@@ -1667,7 +1725,7 @@ generateUniqueId(): number {
           this.columnVisisbilityFields = formFields
           .filter((field: any) => {
             // Filter out fields with type "heading" or with an empty placeholder
-            return field.type !== "heading" && field.type !== 'Empty Placeholder';
+            return field.type !== "heading" && field.type !== 'Empty Placeholder' && field.type !=='button' && field.type !=='table' && field.type !=='radio' && field.type !== 'checkbox' && field.type !== 'html code' && field.type !=='file' && field.type !=='range' && field.type !=='color' && field.type !=='password' && field.type !=='sub heading';
           })
           .map((field: any) => {
             console.log('field check', field);
@@ -2021,55 +2079,7 @@ console.log("allFieldsArray",allFieldsArray.value)
 
   .join(', ');
   console.log('equationTextArea checking tile2',equationTextArea)
-  // Loop through each group in the form array
-  // allFieldsArray.controls.forEach((control, index) => {
-  //   // Safely cast the AbstractControl to FormGroup
-  //   const group = control as FormGroup;
 
-  //   // Push operation value for the current group
-  //   this.operationValue.push(group.get('EquationOperation')?.value || '');
-  //   console.log(`Operation Value for index ${index}:`, this.operationValue);
-  // });
-
-// console.log('this.operationValue', this.operationValue)
-//   let selectedParameters = this.selectedEquationParameterValue || [];
-//   selectedParameters = selectedParameters.length > 0 ? selectedParameters.filter((param: any) => param != null) : [];
-//   console.log('Selected Parameters:', selectedParameters);
-
-//   if (selectedParameters.length > 0) {
-//     const formattedParameters = selectedParameters
-//         .map((params: any[], index: number) => {
-//           if(!Array.isArray(params)){
-//             params = [params]
-//           }
-//             // Initialize a string to collect all parameter texts
-//             let tempText = params.map(param => `${this.formName[index]}.${param.text}.${param.value}`).join(',');
-
-//             // Return the formatted string for this group of parameters
-//             return `${this.operationValue[index]}(\${${tempText}})`;
-//         })
-//         .join(', ');
-
-//         console.log('formattedParameters',formattedParameters)
-
-//     // const formattedEquation = `${this.operationValue}(${formattedParameters})`;
-//     // console.log('Formatted Equation:', formattedEquation);
-
-//     this.createKPIWidget.patchValue({
-//         EquationDesc: formattedParameters,
-//     });
-// }
-//  else {
-//       console.warn('No parameters selected or invalid format:', selectedParameters);
-//       // this.createKPIWidget.patchValue({
-//       //     EquationDesc: '',
-//       // });
-//   }
-//   // Check if formName is set
-//   if (!this.formName) {
-//       console.error('Form name is not set. Cannot create equation.');
-//       return;
-//   }
   this.createKPIWidget1.patchValue({
     EquationDesc: "("+equationTextArea+")",
 });

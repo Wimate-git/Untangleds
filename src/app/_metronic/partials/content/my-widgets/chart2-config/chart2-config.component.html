@@ -6,6 +6,13 @@
     <div class="row mb-3">
       <div class="col-md-4 mb-3" [formGroup]="createChart">
         <label class="col-lg-12 col-createChart-label fw-bold fs-6 required">Parameters
+          <span class="ms-2 text-primary"
+          [ngbTooltip]="ParametertooltipContent"
+          placement="top"
+          container="body"
+          style="cursor: pointer;">
+          <i class="bi bi-info-circle fs-5"></i>
+        </span>
         </label>
         <input type="number" class="
                           form-control form-control-lg form-control-solid
@@ -17,7 +24,14 @@
           </div>
       </div>
       <div class="col-md-4 mb-3" [formGroup]="createChart">
-        <label class="col-lg-12 col-createChart-label fw-bold fs-6 required"> Title </label>
+        <label class="col-lg-12 col-createChart-label fw-bold fs-6 required"> Title
+          <span class="ms-2 text-primary"
+          [ngbTooltip]="ChartTitletooltipContent"
+          placement="top"
+          container="body"
+          style="cursor: pointer;">
+      <i class="bi bi-info-circle fs-5"></i>
+    </span> </label>
   
         <input type="text" class="
                     form-control form-control-lg form-control-solid
@@ -50,8 +64,113 @@
           </div>
         </div>
       </div>
+
+
   
     </div>
+
+
+    <div class="row mb-3" [formGroup]="createChart">
+      <div class="col-md-3 mb-3" [formGroup]="createChart">
+        <div class="col-lg-12 form-check form-switch">
+        <label for="toggleCheck" class="col-lg-12 col-createChart-label fw-bold fs-6  mt-7">Enable Redirection</label>
+        <input class="form-check-input mt-10 mb-3 mb-lg-0" type="checkbox" formControlName="toggleCheck" id="toggleCheck" />
+        <span>{{ createChart.get('toggleCheck')?.value ? 'Enabled' : 'Disabled' }}</span>
+      </div>
+      </div>
+  
+      <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-3 mb-3">
+        <label for="dashboardIds" class="col-createChart-label fw-bold fs-6 ">Module Names
+          <span class="ms-2 text-primary"
+          [ngbTooltip]="moduleNamesTooltip"
+          placement="top"
+          container="body">
+      <i class="bi bi-info-circle fs-5"></i>
+    </span>
+
+  
+          
+        </label>
+        <ngx-select
+          [allowClear]="true"
+          formControlName="ModuleNames"
+          [items]="showModuleNames"
+          optionValueField="value"
+          optionTextField="text"
+          placeholder="Select Parameter"
+          (selectionChanges)="moduleSelection($event)"
+          style="width: 100%;"
+        >
+        </ngx-select>
+      </div>
+      <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-3 mb-3">
+        <label for="selectType" class="col-createChart-label fw-bold fs-6">Select Redirection Type
+          <span class="ms-2 text-primary"
+          (mouseenter)="openRedirectionTypeInfoModal(Chart1RedirectionType)"
+          style="cursor: pointer;">
+      <i class="bi bi-info-circle fs-5"></i>
+    </span>
+        </label>
+        <ngx-select
+          id="selectType"
+          [allowClear]="true"
+          formControlName="selectType"
+          [items]="filteredSelectTypeSummary"
+          optionValueField="value"
+          optionTextField="text"
+          placeholder="Select Parameter"
+          style="width: 100%;">
+        </ngx-select>
+      </div>
+    
+        <div *ngIf="createChart.get('toggleCheck')?.value" class="col-md-3 mb-3">
+          <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Redirect To
+            <span class="ms-2 text-primary"
+            [ngbTooltip]="redirectToTooltip"
+            placement="top"
+            container="body">
+        <i class="bi bi-info-circle fs-5"></i>
+      </span>
+          </label>
+          <ngx-select
+            id="dashboardIds"
+            [allowClear]="true"
+            formControlName="dashboardIds"
+            [items]="dynamicIDArray"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Parameter"
+            style="width: 100%;">
+          </ngx-select>
+        </div>
+      <div class="col-lg-3 col-md-3 col-sm-6 mb-4 mt-4">
+        <div class="d-flex align-items-center">
+          <label for="toggleCheckLegend" class="col-createChart-label fw-bold fs-6  me-2">
+       Enable Legends
+          </label>
+          <div class="form-check form-switch">
+            <input
+            class="form-check-input"
+            type="checkbox"
+           
+        
+            formControlName="enableLegends"
+      
+            id="toggleCheckLegend"
+          >
+          
+          </div>
+        </div>
+      </div>
+      
+      
+      <!-- Conditionally Render Dashboard Ids Field -->
+    
+    
+    
+  
+  
+       </div>
 
     <!-- <div class="row mb-3">
 
@@ -127,7 +246,14 @@
   
                       <!-- createChart Fields -->
                       <div class="col-md-4 mb-3">
-                        <label for="formlist" class="col-createChart-label fw-bold fs-6 required">Forms</label>
+                        <label for="formlist" class="col-createChart-label fw-bold fs-6 required">Forms
+                          <span class="ms-2 text-primary"
+                          [ngbTooltip]="formTooltip"
+                          placement="top"
+                          container="body">
+                      <i class="bi bi-info-circle fs-5"></i>
+                    </span>
+                        </label>
                         <ngx-select id="formlist" [allowClear]="true" name="icon" formControlName="formlist"
                           [items]="listofDeviceIds" optionValueField="value" optionTextField="text"
                           (selectionChanges)="selectFormParams($event, fieldIndex)" placeholder="Select createChart">
@@ -138,7 +264,14 @@
                       </div>
   
                     <div class="col-md-4 mb-3">
-                      <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields</label>
+                      <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields
+                        <span class="ms-2 text-primary"
+                        [ngbTooltip]="parameterTooltip"
+                        placement="top"
+                        container="body">
+                    <i class="bi bi-info-circle fs-5"></i>
+                  </span>
+                      </label>
                       <p-multiSelect id="parameterName" formControlName="parameterName"
                       [options]="getDynamicParams(fieldIndex)"      optionLabel="text"
                         placeholder="Select Parameter" (onChange)="parameterValueCheck($event,fieldIndex)" >
@@ -158,10 +291,11 @@
                       <div class="col-md-4 mb-3">
                         <label for="primaryValue" class="col-createChart-label fw-bold fs-6 required">
                           Primary Value
-                          <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top"
-                            title="Show Value As">
-                            <i class="bi bi-info-circle fs-5"></i>
-                          </span>
+                          <span class="ms-2 text-primary"
+                          (mouseenter)="openPrimaryValueInfoModal(Tile1HelpModal)"
+                          style="cursor: pointer;">
+                      <i class="bi bi-info-circle fs-5"></i>
+                    </span>
                         </label>
                         <ngx-select id="primaryValue" [allowClear]="true" formControlName="primaryValue"
                           [items]="showValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
@@ -186,14 +320,31 @@
                           [disabled]="createChart.get('primaryValue')?.value !== 'Constant'" />
                       </div>
                       <div class="col-md-4 mb-3" >
-                        <label  class="col-createChart-label fw-bold fs-6 ">Undefined Format</label>
+                        <label  class="col-createChart-label fw-bold fs-6 ">Undefined Format
+                          <span class="ms-2 text-primary"
+                          [ngbTooltip]="UndefinedtooltipContent"
+                          placement="top"
+                          container="body"
+                          tooltipClass="custom-tooltip"
+                          style="cursor: pointer;">
+                      <i class="bi bi-info-circle fs-5"></i>
+                    </span>
+                        </label>
                         <input id="undefinedCheckLabel" type="text" class="form-control form-control-solid" placeholder="Enter Value"
                           formControlName="undefinedCheckLabel">
                       </div>
   
   
                       <div class="col-md-4 mb-3">
-                        <label for="groupByFormat" class="col-createChart-label fw-bold fs-6 required">Group By Format</label>
+                        <label for="groupByFormat" class="col-createChart-label fw-bold fs-6 required">Group By Format
+                          <span class="ms-2 text-primary"
+                          [ngbTooltip]="tooltipContent"
+                          placement="top"
+                          container="body"
+                          tooltipClass="custom-tooltip">
+                      <i class="bi bi-info-circle fs-5"></i>
+                    </span>
+                        </label>
                         <input id="groupByFormat" type="text" class="form-control form-control-solid"
                         placeholder="Select GroupByFormat" [formControlName]="'groupByFormat'"
                         (click)="openModalCalender(fieldIndex)" readonly>
@@ -226,7 +377,15 @@
                       </div> -->
   
                       <div class="col-md-4 mb-3">
-                        <label class="col-createChart-label fw-bold fs-6 required">Date Range Label</label>
+                        <label class="col-createChart-label fw-bold fs-6 required">Date Range Label
+                          <span class="ms-2 text-primary"
+                          [ngbTooltip]="DateRangetooltipContent"
+                          placement="top"
+                          container="body"
+                          style="cursor: pointer;">
+                      <i class="bi bi-info-circle fs-5"></i>
+                    </span>
+                        </label>
                         <ngx-select id="primaryValue" [allowClear]="true" formControlName="selectedRangeType"
                         [items]="showCustomValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
                         (selectionChanges)="onValueSelect($event)" class="w-100"   ></ngx-select>
@@ -246,7 +405,14 @@
                           formControlName="selectToTime">
                       </div> -->
                       <div class="col-md-4">
-                        <label for="columnVisibility" class="col-createChart-label fw-bold fs-6">column Visibility</label>
+                        <label for="columnVisibility" class="col-createChart-label fw-bold fs-6">column Visibility
+                          <span class="ms-2 text-primary"
+                          [ngbTooltip]="columnVisibilityTooltip"
+                          placement="top"
+                          container="body">
+                      <i class="bi bi-info-circle fs-5"></i>
+                    </span>
+                        </label>
                         <p-multiSelect
                           id="columnVisibility"
                           formControlName="columnVisibility"
@@ -258,7 +424,15 @@
                         ></p-multiSelect>
                       </div>
                       <div class="col-md-4 mb-3">
-                        <label for="custom_Label" class="col-createChart-label fw-bold fs-6  required">Custom Label</label>
+                        <label for="custom_Label" class="col-createChart-label fw-bold fs-6  required">Custom Label
+                          <span class="ms-2 text-primary"
+                          [ngbTooltip]="CustomLabeltooltipContent"
+                          placement="top"
+                          container="body"
+                          style="cursor: pointer;">
+                      <i class="bi bi-info-circle fs-5"></i>
+                    </span>
+                        </label>
                         <input type="text" class="form-control form-control-solid"  name="custom_Label"
                           formControlName="custom_Label">
                           <div *ngIf="field.get('custom_Label')?.touched && field.get('custom_Label')?.invalid" class="text-danger">
@@ -266,7 +440,15 @@
                           </div>
                       </div>
                       <div class="col-md-4 mb-3">
-                        <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Format Type</label>
+                        <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Format Type
+                          <span class="ms-2 text-primary"
+                          (mouseenter)="openFormatTypeModal(Chart1FormatTypeModal)"
+                          
+                          placement="top"
+                          container="body">
+                      <i class="bi bi-info-circle fs-5"></i>
+                    </span>
+                        </label>
                         <ngx-select
                           id="parameterName"
                           [allowClear]="true"
@@ -293,7 +475,17 @@
 
                       <div class="row d-flex align-items-center">
                         <div class="col-md-6 mb-3">
-                          <label for="parameterName" class="col-createChart-label fw-bold fs-6">Date Reference X axis</label>
+                          <label for="parameterName" class="col-createChart-label fw-bold fs-6">Date Reference X axis
+                            <span
+                            class="ms-2 text-primary"
+                            [ngbTooltip]="'Reserved for future use'"
+                            placement="top"
+                            container="body"
+                            style="cursor: pointer;"
+                          >
+                            <i class="bi bi-info-circle fs-5"></i>
+                          </span>
+                          </label>
                           <p-multiSelect
                             id="parameterName"
                             formControlName="XaxisFormat"
@@ -305,7 +497,18 @@
                       
                         <div class="col-md-6 mb-3">
                           <div class="color-picker-container d-flex align-items-center">
-                            <label for="textColorPicker" class="col-createChart-label fw-bold fs-6 ms-3">Select Line Color</label>
+                            <label for="textColorPicker" class="col-createChart-label fw-bold fs-6 ms-3">Select Line Color
+                              <span
+                              class="ms-2 text-primary"
+                              [ngbTooltip]="CustomLineColorTooltip"
+                              placement="top"
+                              container="body"
+                              style="cursor: pointer;"
+                            >
+                              <i class="bi bi-info-circle fs-5"></i>
+                            </span>
+                      
+                            </label>
                             <input
                               id="textColorPicker"
                               type="color"
@@ -596,6 +799,9 @@
            >
             Update
           </button>
+          <div *ngIf="!formValidationFailed" class="alert alert-danger fw-bold mb-3">
+            ⚠️ Please fill all required fields before updating.
+          </div>
         </div>
       </div>
   
@@ -719,4 +925,70 @@
         </div>
       </div>
     </div>
+  </ng-template>
+
+
+
+  
+
+  <ng-template #Tile1HelpModal let-modal>
+    <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+        style="position: relative; top: 4px; right: 4px;">
+      </button>
+    </div>
+    <app-tile1-help-primary-value
+
+    ></app-tile1-help-primary-value>
+  </ng-template>
+  
+  <ng-template #Chart1FormatTypeModal let-modal>
+    <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+        style="position: relative; top: 4px; right: 4px;">
+      </button>
+    </div>
+    <app-chart1-help-format-type
+  
+    ></app-chart1-help-format-type>
+  </ng-template>
+  
+  <ng-template #Chart1CustomValueModal let-modal>
+    <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+        style="position: relative; top: 4px; right: 4px;">
+      </button>
+    </div>
+    <app-chart1-help-custom-value
+  
+    ></app-chart1-help-custom-value>
+  </ng-template>
+  
+  
+  
+  <ng-template #Chart1RedirectionType let-modal>
+    <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+        style="position: relative; top: 4px; right: 4px;">
+      </button>
+    </div>
+    <app-chart1-helpredirection-type
+  
+    ></app-chart1-helpredirection-type>
   </ng-template>

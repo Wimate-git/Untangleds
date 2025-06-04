@@ -49,9 +49,12 @@
               <div class="col-md-4 mb-3">
                 <label for="formlist" class="col-createChart-label fw-bold fs-6 required">
                   Forms
-                  <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
-                    <i class="bi bi-info-circle fs-5"></i>
-                  </span>
+                  <span class="ms-2 text-primary"
+                  [ngbTooltip]="formTooltip"
+                  placement="top"
+                  container="body">
+              <i class="bi bi-info-circle fs-5"></i>
+            </span>
                 </label>
                 <ngx-select
             
@@ -71,7 +74,14 @@
         
             
               <div class="col-md-4 mb-3">
-                <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields</label>
+                <label for="parameterName" class="col-createChart-label fw-bold fs-6 required">Form Fields
+                  <span class="ms-2 text-primary"
+                  [ngbTooltip]="parameterTooltip"
+                  placement="top"
+                  container="body">
+              <i class="bi bi-info-circle fs-5"></i>
+            </span>
+                </label>
                 <div class="custom-multiselect">
                   <p-multiSelect
                     [options]="listofDynamicParam"
@@ -85,7 +95,14 @@
               </div>
 
               <div class="col-md-4 mb-3">
-                <label for="custom_Label" class="col-createChart-label fw-bold fs-6  required">Custom Label</label>
+                <label for="custom_Label" class="col-createChart-label fw-bold fs-6  required">Custom Label
+                  <span class="ms-2 text-primary"
+                  [ngbTooltip]="customLabelTooltip"
+                  placement="top"
+                  container="body">
+              <i class="bi bi-info-circle fs-5"></i>
+            </span>
+                </label>
                 <input type="text" class="form-control form-control-solid"  name="custom_Label"
                   formControlName="custom_Label">
               </div>
@@ -95,7 +112,15 @@
                   formControlName="rowData">
               </div>
               <div class="col-md-4 mb-3">
-                <label for="groupByFormat" class="col-createChart-label fw-bold fs-6 required">Group By Format</label>
+                <label for="groupByFormat" class="col-createChart-label fw-bold fs-6 required">Group By Format
+                  <span class="ms-2 text-primary"
+                  [ngbTooltip]="tooltipContent"
+                  placement="top"
+                  container="body"
+                  tooltipClass="custom-tooltip">
+              <i class="bi bi-info-circle fs-5"></i>
+            </span>
+                </label>
                 <input
                   id="groupByFormat"
                   type="text"
@@ -437,6 +462,11 @@
               <div class="title">Any</div>
               <div class="example">E.g., Any</div>
             </div>
+            <div class="list-item" (click)="selectValue('Last financial year', modal)" (mouseenter)="showTooltip('Last financial year')"
+            (mouseleave)="hideTooltip()">
+            <div class="title">Last financial year</div>
+            <div class="example">E.g., Data from the last financial year</div>
+          </div>
             </div>
           
             <div class="list-column">
@@ -480,6 +510,12 @@
                 <div class="title">Last 5 Years</div>
                 <div class="example">E.g., Data for the past 5 years</div>
               </div>
+              <div class="list-item" (click)="selectValue('This financial year', modal)" (mouseenter)="showTooltip('This financial year')"
+              (mouseleave)="hideTooltip()">
+              <div class="title">This financial year</div>
+              <div class="example">E.g., Data for the this financial year</div>
+            </div>
+              
             </div>
           </div>
           

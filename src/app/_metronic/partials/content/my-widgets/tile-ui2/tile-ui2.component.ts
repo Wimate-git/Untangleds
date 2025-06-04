@@ -32,6 +32,8 @@ export class TileUi2Component {
   tile1Config: any;
   descriptionData: any;
   primaryValue: any;
+  storeConfiguration: any;
+  storeParsedData: any;
 
   constructor(
     private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer
@@ -42,6 +44,7 @@ export class TileUi2Component {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
     console.log("tile data check ",this.item)
+
 
     let description = this.item.filterDescription; // This will contain your string
 
@@ -72,6 +75,19 @@ export class TileUi2Component {
  
 
   
+}
+
+
+
+ngOnInit() {
+
+  this.storeConfiguration = JSON.parse(JSON.stringify(this.item.multi_value));
+  console.log('this.storeConfiguration checking from tile ui2',this.storeConfiguration)
+  this.storeParsedData = JSON.parse(this.storeConfiguration)
+  console.log('this.storeParsedData checking',this.storeParsedData)
+
+
+  // this.permissionIds(1)
 }
   edit_each_tileUI(value1: any,value2: number) {
     const data = { arg1: value1, arg2: value2 }; // Two arguments

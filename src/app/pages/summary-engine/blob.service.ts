@@ -84,7 +84,7 @@ export class BlobService {
       setTimeout(() => {
         formContainer = document.getElementById('dynamic-form');
         console.log('🔄 Retried: formContainer:', formContainer);
-      }, 1000);
+      }, 1500);
     }
               if (formContainer) {
                 console.log('✅ Found #dynamic-form:', formContainer);
@@ -125,7 +125,7 @@ export class BlobService {
             } catch (e) {
               console.error('❌ Error initializing scripts:', e);
             }
-          }, 500); // Delay execution to allow full rendering
+          }, 1000); // Delay execution to allow full rendering
         });
       </script>
     `;
