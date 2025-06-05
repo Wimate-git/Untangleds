@@ -253,13 +253,13 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
             const nameAndEmail = `
               <div class="d-flex flex-column" >
-                <a href="javascript:;" data-action="view" class="text-gray-800 text-hover-primary mb-1 view-item" data-id="${full.id}">${data}</a>
+                <a href="javascript:;" data-action="edit" class="btn text-gray-800 text-hover-primary mb-1 view-item" data-id="${full.id}">${data}</a>
               </div>
             `;
 
             return `
               <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
-                <a href="javascript:; class="view-item">
+                <a href="javascript:; class="view-item" data-action="edit">
                   ${symbolLabel}
                 </a>
               </div>

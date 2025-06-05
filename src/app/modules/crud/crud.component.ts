@@ -22,7 +22,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Reload emitter inside datatable
   @Input() reload: EventEmitter<boolean>;
-  
+
 
   @Input() modal: TemplateRef<any>;
 
@@ -47,7 +47,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private idInAction: number;
 
-  
+
 
   swalOptions: SweetAlertOptions = { buttonsStyling: false };
 
@@ -60,19 +60,19 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     console.log('CrudComponent accessed by:', this.componentSource);
 
-    if(this.componentSource == 'dreamboard'){
-      this.modalConfig ={
-          modalDialogClass: 'modal-dialog modal-dialog-centered mw-650px ',
-          
-        };
-    }
-    if(this.componentSource == 'permission3'){
-      this.modalConfig ={
-          // modalDialogClass: 'modal-dialog modal-dialog-centered mw-1000px ',
+    if (this.componentSource == 'dreamboard') {
+      this.modalConfig = {
+        modalDialogClass: 'modal-dialog modal-dialog-centered mw-650px ',
 
-          modalDialogClass: 'modal-dialog modal-fullscreen p-9'
-          
-        };
+      };
+    }
+    if (this.componentSource == 'permission3') {
+      this.modalConfig = {
+        // modalDialogClass: 'modal-dialog modal-dialog-centered mw-1000px ',
+
+        modalDialogClass: 'modal-dialog modal-fullscreen p-9'
+
+      };
     }
 
 
@@ -138,7 +138,12 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.clickListener = this.renderer.listen(document, 'click', (event) => {
       const closestBtn = event.target.closest('.btn');
+
+      console.log('event :>> ', event);
+
       if (closestBtn) {
+
+        console.log('clodclosestBtneBtn :>> ', closestBtn);
         const { action, id } = closestBtn.dataset;
         this.idInAction = id;
 
@@ -153,7 +158,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
             this.modalRef = this.modalService.open(this.modal, {
               ...this.modalConfig, // Keep existing modal configuration if any
               backdrop: 'static'
-          });
+            });
             break;
 
           case 'edit':
@@ -161,7 +166,7 @@ export class CrudComponent implements OnInit, AfterViewInit, OnDestroy {
             this.modalRef = this.modalService.open(this.modal, {
               ...this.modalConfig, // Keep existing modal configuration if any
               backdrop: 'static'
-          });
+            });
             // this.modalRef = this.modalService.open(this.modal, this.modalConfig);
             break;
 
