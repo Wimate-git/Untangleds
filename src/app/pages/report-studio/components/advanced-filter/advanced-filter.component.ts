@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { APIService } from 'src/app/API.service';
 import { SharedService } from 'src/app/pages/shared.service';
 import Swal from 'sweetalert2';
+import { DynamicCustomMiniTableComponent } from '../../dynamic-custom-mini-table/dynamic-custom-mini-table.component';
 
 @Component({
   selector: 'app-advanced-filter',
@@ -34,6 +35,7 @@ export class AdvancedFilterComponent {
   customLocationGroup:FormGroup;
   reportsFeildsAdvanced:FormGroup;
   customMiniColumns:FormGroup;
+  customMiniColumnsAdder:FormGroup;
 
   isFormAdvancedVisible = false;
   addMiniTableFilters:boolean = false
@@ -47,8 +49,10 @@ export class AdvancedFilterComponent {
 
   selectedMiniTableFilter:any = []
   selectedEnabledMiniTableFilters: any = [];
+  addMiniTableCustomColumnsAdder: boolean = false;
+  getMiniTableLabels: any;
 
-  constructor(public modal: NgbActiveModal,private fb: FormBuilder,private cd:ChangeDetectorRef,private api:APIService,private configService:SharedService){}
+  constructor(public modal: NgbActiveModal,private modalService: NgbModal,private fb: FormBuilder,private cd:ChangeDetectorRef,private api:APIService,private configService:SharedService){}
 
   @Output() configSaved = new EventEmitter<any>();
 
@@ -73,6 +77,7 @@ export class AdvancedFilterComponent {
         addExcellOption:['all'],
         advanceOption: ['all'],
         miniTableColumn:['all'],
+        miniTableCustomAdder:['no'],
         miniTableOptions: ['all'],
         equationConditionText:[''],
         filter_type:this.fb.array([]),
@@ -89,6 +94,7 @@ export class AdvancedFilterComponent {
     }
     else{
       console.log("Parent data to be populated ")
+      this.addMiniTableCustomColumnsAdder = true
       this.repopulateAllForm()
     }
 
@@ -114,6 +120,7 @@ export class AdvancedFilterComponent {
     this.customLocationGroup.reset()
     this.queryBuilderForm.reset()
     this.customMiniColumns.reset()
+    this.customMiniColumnsAdder.reset()
 
 
     this.mainFormGroup = this.fb.group({
@@ -154,15 +161,18 @@ export class AdvancedFilterComponent {
     if(this.reportsFeildsAdvanced.get('miniTableEnable')?.value == ''){
       this.reportsFeildsAdvanced.get('miniTableColumn')?.setValue('all')
       this.reportsFeildsAdvanced.get('miniTableOptions')?.setValue('all')
+      this.reportsFeildsAdvanced.get('miniTableCustomAdder')?.setValue('no')
 
       console.log("Selected Forms are here ",this.selectedForms);
 
       this.queryBuilderForm.reset()
       this.customMiniColumns.reset()
+      this.customMiniColumnsAdder.reset()
 
       this.showTypes = []
       this.selectedEnabledMiniTableFilters = []
       this.addMiniTableCustomColumns = false
+      this.addMiniTableCustomColumnsAdder = false
       this.addMiniTableFilters = false
       
       this.initializeForm();
@@ -240,18 +250,21 @@ export class AdvancedFilterComponent {
     const advancedEquationFilter = this.AdvancedExcelData.advancedEquationFilter
     const advancedMiniTableFilter = this.AdvancedExcelData.advancedMiniTableFilter
     const advancedcustomMiniColumns = this.AdvancedExcelData.advancedcustomMiniColumns
+    const customMiniColumnsAdder = this.AdvancedExcelData.customMiniColumnsAdder
 
     this.reportsFeildsAdvanced = this.fb.group({
       addExcellOption:[advancedreportsFeildsAdvanced.addExcellOption],
       advanceOption: [advancedreportsFeildsAdvanced.advanceOption],
       miniTableColumn:[advancedreportsFeildsAdvanced.miniTableColumn],
       miniTableOptions: [advancedreportsFeildsAdvanced.miniTableOptions],
+      miniTableCustomAdder: [advancedreportsFeildsAdvanced.miniTableCustomAdder],
       equationConditionText:[advancedreportsFeildsAdvanced.equationConditionText],
       filter_type:[advancedreportsFeildsAdvanced.filter_type],
       trackEnable:[advancedreportsFeildsAdvanced.trackEnable],
       miniTableEnable:[advancedreportsFeildsAdvanced.miniTableEnable],
       mergeEnable:[advancedreportsFeildsAdvanced.mergeEnable]
     });
+
 
     this.initializeForm();
 
@@ -293,6 +306,15 @@ export class AdvancedFilterComponent {
       await this.onMiniCustomColumns('onCondition','edit','')
       this.repopulateCustomMiniFilter1(advancedcustomMiniColumns.miniCustomColumns)
       this.addMiniTableCustomColumns = true
+    }
+
+    if(advancedreportsFeildsAdvanced.miniTableCustomAdder  != 'no'){
+      await this.onMiniCustomColumnsAdder('onCondition','edit','')
+      this.repopulateCustomMiniFilter1Adder(customMiniColumnsAdder.miniCustomColumnsAdder)
+      this.addMiniTableCustomColumnsAdder = true
+    }
+    else{
+      this.addMiniTableCustomColumnsAdder = false
     }
 
   }
@@ -634,6 +656,60 @@ async onMiniTableColumns(event:any,getValue:any,temp:any){
 
 
 
+async onMiniCustomColumnsAdder(event:any,getValue:any,temp:any){
+  let selectedValue
+  if(getValue == 'html'){
+    selectedValue = (event.target as HTMLInputElement).value;
+  }
+  else{
+    selectedValue = event;
+  }
+
+  console.log("Selected value is ",selectedValue);
+
+  if(selectedValue == "no"){
+    this.reportsFeildsAdvanced.get('miniTableColumnAdder')?.patchValue('no')
+    this.addMiniTableCustomColumnsAdder = false
+    return
+  }
+  
+  this.reportsFeildsAdvanced.get('miniTableColumnAdder')?.patchValue('yes')
+
+  this.addMiniTableCustomColumnsAdder = true
+
+  if(!this.addMiniTableFilters){
+    for (let form of this.selectedForms) {
+  
+      const tableNames = form.dynamicForm
+        .filter((item: any) => item.name.startsWith('table-'))
+        .map((item: any) => item.validation.formName_table);
+    
+  
+      for (let table of tableNames) {
+        const result = await this.api.GetMaster(
+          `${this.SK_clientID}#dynamic_form#${table}#main`, 1
+        );
+    
+        if (result && result.metadata) {
+          const tempHolder = JSON.parse(result.metadata).formFields;
+          
+         
+          this.miniTableFormBuilderData[`${table}`] = tempHolder ;
+        }
+      }
+    }
+  }
+ 
+  
+
+  console.log("All mini table form data irrespective of forms",this.miniTableFormBuilderData);
+
+
+ this.cd.detectChanges()
+}
+
+
+
 async onMiniCustomColumns(event:any,getValue:any,temp:any){
   let selectedValue
   if(getValue == 'html'){
@@ -673,6 +749,7 @@ async onMiniCustomColumns(event:any,getValue:any,temp:any){
         if (result && result.metadata) {
           const tempHolder = JSON.parse(result.metadata).formFields;
           
+          // this.getMiniTableLabels[`${table}`] = 
          
           this.miniTableFormBuilderData[`${table}`] = tempHolder ;
         }
@@ -981,6 +1058,118 @@ onSubmit() {
 }
 
 
+//Custom Columns Formulae for MIni table adder
+get miniCustomColumnsAdder(): FormArray {
+  return this.customMiniColumnsAdder.get('miniCustomColumnsAdder') as FormArray;
+}
+
+getCustomTablesAdder(formGroupIndex: number): FormArray {
+  return this.miniCustomColumnsAdder.at(formGroupIndex).get('tables') as FormArray;
+}
+
+getCustomConditionsAdder(formGroupIndex: number, tableIndex: number): FormArray {
+  return this.getCustomTablesAdder(formGroupIndex).at(tableIndex).get('conditions') as FormArray;
+}
+
+
+addFormGroupCustomAdder(formData:any){
+  const formGroup = this.fb.group({
+    name:[formData.formName],
+    tables:this.fb.array([])
+  })
+
+  this.miniCustomColumnsAdder.push(formGroup)
+  let tableName = formData.dynamicForm.filter((item:any)=>{
+      if(item.name.startsWith('table-')){
+        console.log("Item to be selected is ",item.validation.formName_table);
+        return {tableLabel:item.label,tableName:item.validation.formName_table}
+      }
+    })
+
+    console.log("Before tableName are ",tableName);
+    const tableLabels = tableName.map((ele:any)=>ele.label)
+    const customTableName = tableName.map((ele:any)=>{return {"tableFormName":ele.validation.formName_table,"tableLabel":ele.label,"name":ele.name}})
+    tableName = tableName.map((ele:any)=>ele.validation.formName_table)
+
+    console.log("tableName are ",tableName);
+
+    console.log("Form name is here ",formData.formName);
+
+    try{
+      const formControls = this.showTypes.map(() => this.fb.control([]));
+      this.reportsFeildsAdvanced.setControl('filter_type', this.fb.array(formControls));
+    }
+    catch(error){
+      console.log("Error in reports Feilds Advanced ",error);
+    }
+  
+    for(let table of customTableName){
+      console.log("this.formGroups.length ",table);
+      this.addCustomTableAdder(this.miniCustomColumnsAdder.length - 1, table);
+    }
+  }
+
+  addCustomTableAdder(formGroupIndex: number, tableName: any) {
+    const table = this.fb.group({
+      tableLabel:[tableName.tableLabel],
+      tableName: [tableName.tableFormName],
+      name:[tableName.name],
+      conditions: this.fb.array([])
+    });
+  
+    this.getCustomTablesAdder(formGroupIndex).push(table);
+    this.addCustomConditionAdder(formGroupIndex, this.getCustomTablesAdder(formGroupIndex).length - 1);
+  }
+
+
+  addCustomConditionAdder(formGroupIndex: number, tableIndex: number) {
+    const condition = this.fb.group({
+      // columnName: ['', Validators.required],
+      field: ['', Validators.required],
+      equationText: ['', Validators.required],
+      predefined:['none'],
+      aggregate:['']
+    });
+  
+    this.getCustomConditionsAdder(formGroupIndex, tableIndex).push(condition);
+  }
+
+
+
+  dynamicScriptAdder(index:any,tableIndex:any,condIndex:any,tableName:any,formName:any){
+    const condition:any = this.getCustomConditionsAdder(index,tableIndex);
+    const predefinedValue = condition.at(0).get('predefined')?.value;
+
+    const modalref = this.modalService.open(DynamicCustomMiniTableComponent,{ size: 'xl' })
+    modalref.componentInstance.predefinedValue = predefinedValue
+    modalref.componentInstance.targetTableName = tableName
+    modalref.componentInstance.miniTableFormBuilderData = this.miniTableFormBuilderData
+    modalref.componentInstance.selectedForms = this.selectedForms
+    modalref.componentInstance.formName = formName
+
+
+    modalref.componentInstance.dynamicScriptSaved.subscribe((data: any) => {
+      console.log('Dynamic Script is here ', data);
+
+      if (condition) {
+        condition.at(0).get('equationText')?.setValue(data);
+      }
+      
+    });
+  }
+
+
+    // Insert selected field into the equation
+insertFieldIntoEquationMiniTableAdder(index:any,tableIndex:any,condIndex:any) {
+  const condition = this.getCustomConditionsAdder(index,tableIndex).at(condIndex);
+  const fieldSelector = condition.get('field')?.value;
+  const equationText = condition.get('equationText')?.value;
+
+  if (fieldSelector) {
+    const updatedEquation = `${equationText} \${${fieldSelector}}`; // Enclose the fieldSelector in ${}
+    condition.get('equationText')?.setValue(updatedEquation);
+  }
+}
 
 
 
@@ -998,6 +1187,15 @@ initializeMiniTable(){
 
   this.selectedForms.forEach((form:any) => {
     this.addFormGroupCustom(form);
+  });
+
+
+  this.customMiniColumnsAdder = this.fb.group({
+    miniCustomColumnsAdder:this.fb.array([])
+  })
+
+  this.selectedForms.forEach((form:any) => {
+    this.addFormGroupCustomAdder(form);
   });
 }
 
@@ -1129,6 +1327,60 @@ repopulateCustomMiniFilter1(data: any) {
 }
 
 
+
+repopulateCustomMiniFilter1Adder(data: any) {
+
+
+  data.forEach((form: any, formIndex: number) => {
+    // Ensure you're adding tables to the correct form group, using formIndex
+    form.tables.forEach((table: any) => {
+      this.addTableForExistingData1Adder(formIndex, table);
+    });
+  });
+}
+
+addTableForExistingData1Adder(formGroupIndex: number, table: any) {
+
+  let existingTableGroup: any = null;
+
+  // Loop through all existing tables in the formGroup
+  this.getCustomTablesAdder(formGroupIndex).controls.forEach((existingTable: any) => {
+    if (existingTable.get('tableName').value === table.tableName) {
+      existingTableGroup = existingTable;  // Table already exists
+    }
+  });
+
+  if (!existingTableGroup) {
+    // If the table doesn't exist, add it
+    const tableFormGroup = this.fb.group({
+      tableName: [table.tableName],
+      conditions: this.fb.array([])  // Initialize conditions array
+    });
+
+    this.getCustomTablesAdder(formGroupIndex).push(tableFormGroup);
+
+    // Add conditions for the table
+    table.conditions.forEach((condition: any) => {
+      this.addConditionForExistingData1Adder(formGroupIndex, this.getTables(formGroupIndex).length - 1, condition);
+    });
+  } else {
+    // If the table already exists, clear the existing conditions and add the new ones
+    console.log(`Table ${table.tableName} already exists, replacing conditions.`);
+
+    // Get the existing conditions array
+    const tableConditionsArray = existingTableGroup.get('conditions') as FormArray;
+
+    // Clear existing conditions (this replaces all of them)
+    tableConditionsArray.clear();  // This clears the previous conditions
+
+    // Add new conditions to the table
+    table.conditions.forEach((condition: any) => {
+      this.addConditionForExistingData1Adder(formGroupIndex, this.getCustomTablesAdder(formGroupIndex).controls.indexOf(existingTableGroup), condition);
+    });
+  }
+}
+
+
 addTableForExistingData1(formGroupIndex: number, table: any) {
 
   let existingTableGroup: any = null;
@@ -1188,6 +1440,21 @@ addConditionForExistingData1(formGroupIndex: number, tableIndex: number, conditi
 
 
 
+addConditionForExistingData1Adder(formGroupIndex: number, tableIndex: number, condition: any) {
+  const conditionFormGroup = this.fb.group({
+      // columnName: [condition.columnName, Validators.required],
+      field: [condition.field, Validators.required],
+      equationText: [condition.equationText, Validators.required],
+      predefined:[condition.predefined],
+      aggregate:[condition.aggregate]
+  });
+
+  this.getCustomConditionsAdder(formGroupIndex, tableIndex).push(conditionFormGroup);
+}
+
+
+
+
 
 
 
@@ -1210,11 +1477,13 @@ addConditionForExistingData1(formGroupIndex: number, tableIndex: number, conditi
       filter_type:this.reportsFeildsAdvanced.get('filter_type')?.value,
       trackEnable:this.reportsFeildsAdvanced.get('trackEnable')?.value,
       miniTableEnable:this.reportsFeildsAdvanced.get('miniTableEnable')?.value,
-      mergeEnable:this.reportsFeildsAdvanced.get('mergeEnable')?.value
+      mergeEnable:this.reportsFeildsAdvanced.get('mergeEnable')?.value,
+      miniTableCustomAdder:this.reportsFeildsAdvanced.get('miniTableCustomAdder')?.value,
+      customMiniColumnsAdder:this.customMiniColumnsAdder.value
     }
 
 
-    console.log("queryBuilderForm ",this.queryBuilderForm.value);
+    console.log("customMiniColumnsAdder ",this.customMiniColumnsAdder.value);
 
 
     this.configSaved.emit(advacnedExcelConfiguration); 
@@ -1236,5 +1505,276 @@ addConditionForExistingData1(formGroupIndex: number, tableIndex: number, conditi
 
   toggleEquationField2() {
     this.isEquationVisible2 = !this.isEquationVisible2;
+  }
+
+
+  isEquationVisible3: boolean = false;
+
+  toggleEquationField3() {
+    this.isEquationVisible3 = !this.isEquationVisible3;
+  }
+
+
+
+
+
+
+
+  onPredefinedChange(formIndex: number, condIndex: number): void {
+    const condition:any = this.getCustomConditionsAdder(formIndex,condIndex);
+    console.log("condition ",condition.value);
+    const predefinedValue = condition.at(0).get('predefined')?.value;
+    console.log("prpredefinedValue e",predefinedValue);
+
+
+    let updatedEquation = condition.at(0).get('equationText')?.value || '';
+
+    if (predefinedValue === 'otHoursForPresent') {
+      const script = this.presentWOrkingHours();
+      condition.at(0).get('equationText')?.setValue(script);
+    }
+    else if (predefinedValue === 'otHoursForAdditional') {  
+      const script = this.additionalWorkingHours();
+      condition.at(0).get('equationText')?.setValue(script);
+    }
+  }
+
+
+  additionalWorkingHours(){
+    return `
+
+function toDateSafe(str) {
+  const d = new Date(str);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function splitByDay(startStr, endStr, isPlanned = false) {
+  const start = toDateSafe(startStr);
+  const end = toDateSafe(endStr);
+  if (!start || !end || end <= start) return { base: 0, ot: 0, sunday: 0 };
+
+  let base = 0, ot = 0, sunday = 0;
+  let current = new Date(start);
+
+  while (current < end) {
+    const dayEnd = new Date(current);
+    dayEnd.setHours(23, 59, 59, 999);
+    const segmentEnd = new Date(Math.min(dayEnd.getTime(), end.getTime()));
+    const hours = (segmentEnd - current) / (1000 * 60 * 60);
+    const day = current.getDay();
+
+    if (isPlanned) {
+      base += hours; // ✅ Always count full time for planned
+    } else {
+      if (day === 0) {
+        sunday += hours; // ✅ Actual time on Sunday → sunday hours
+      } else {
+        base += Math.min(8, hours);
+        ot += Math.max(0, hours - 8);
+      }
+    }
+
+    current = new Date(dayEnd.getTime() + 1000);
+  }
+
+  return { base, ot, sunday };
+}
+
+function formatHoursMins(decimal) {
+  let hours = Math.floor(decimal);
+  let minutes = Math.round((decimal - hours) * 60);
+
+  if (minutes >= 60) {
+    hours += Math.floor(minutes / 60);
+    minutes = minutes % 60;
+  }
+
+  return hours + 'h ' + minutes + 'm';
+}
+
+function main(){
+
+const sourceTableKey = "table-1732775749102-table";
+const targetTableKey = "table-1749104720692-table";
+
+const FIELD = {
+  plannedFrom: "datetime-local-1732775620351",
+  plannedTo: "datetime-local-1732775621119",
+  actualFrom: "datetime-local-1732775641189",
+  actualTo: "datetime-local-1732775641875",
+  engineerId: "single-select-1732775673521",
+
+  targetEngineer: "single-select-1749103795275",
+  plannedHours: "text-1749103810138",
+  actualHours: "text-1749103813192",
+  otHours: "text-1749103817106",
+  sundayHours: "text-1749103818944"
+};
+    
+    const sourceRows = \${SourceTable.table-1732775749102-table};
+const engineerMap = {};
+
+let id = ''
+
+sourceRows.forEach(row => {
+  const engineer = (row[FIELD.engineerId] || "N/A").toString();
+
+  if (!engineerMap[engineer]) {
+    engineerMap[engineer] = { planned: 0, actual: 0, ot: 0, sunday: 0 };
+  }
+  
+   if(sourceRows && row["id"]){
+     id = row["id"]
+  }
+
+  const planned = splitByDay(row[FIELD.plannedFrom], row[FIELD.plannedTo], true);
+  const actual = splitByDay(row[FIELD.actualFrom], row[FIELD.actualTo], false);
+
+  engineerMap[engineer].planned += planned.base;
+  engineerMap[engineer].actual += actual.base;
+  engineerMap[engineer].ot += actual.ot;
+  engineerMap[engineer].sunday += actual.sunday;
+});
+
+const targetRows = Object.entries(engineerMap).map(([engineer, totals]) => ({
+       id:id,
+  [FIELD.targetEngineer]: engineer,
+  [FIELD.plannedHours]: formatHoursMins(totals.planned),
+  [FIELD.actualHours]: formatHoursMins(totals.actual),
+  [FIELD.otHours]: formatHoursMins(totals.ot),
+  [FIELD.sundayHours]: formatHoursMins(totals.sunday),
+  uniqueId: Date.now() + Math.floor(Math.random() * 10000)
+}));
+
+console.log("Final Additional Engineer Working Hours (Formatted):", targetRows);
+return targetRows;
+
+}
+
+main()
+
+`
+  }
+
+  presentWOrkingHours(){
+    return  `
+    function toDateSafe(str) {
+      const d = new Date(str);
+      return isNaN(d.getTime()) ? null : d;
+    }
+    
+    // Handles weekday hours (Mon–Sat) and Sunday hours (if actual)
+    function splitByDay(startStr, endStr, isPlanned = false) {
+      const start = toDateSafe(startStr);
+      const end = toDateSafe(endStr);
+      if (!start || !end || end <= start) return { base: 0, ot: 0, sunday: 0 };
+    
+      let base = 0, ot = 0, sunday = 0;
+      let current = new Date(start);
+    
+      while (current < end) {
+        const dayEnd = new Date(current);
+        dayEnd.setHours(23, 59, 59, 999);
+        const segmentEnd = new Date(Math.min(dayEnd.getTime(), end.getTime()));
+        const hours = (segmentEnd - current) / (1000 * 60 * 60);
+        const day = current.getDay();
+    
+        if (day === 0) {
+          // Sunday
+          if (isPlanned) {
+            base += hours;
+          } else {
+            sunday += hours;
+          }
+        } else {
+          if (isPlanned) {
+            base += hours;
+          } else {
+            base += Math.min(8, hours);
+            ot += Math.max(0, hours - 8);
+          }
+        }
+    
+        current = new Date(dayEnd.getTime() + 1000);
+      }
+    
+      return { base, ot, sunday };
+    }
+    
+    function convertDecimalToDisplayTime(decimal) {
+      let hours = Math.floor(decimal);
+      let minutes = Math.round((decimal - hours) * 60);
+    
+      if (minutes >= 60) {
+        hours += Math.floor(minutes / 60);
+        minutes = minutes % 60;
+      }
+    
+      return hours + 'h ' + minutes + 'm';
+    }
+    
+    function main(){
+        const sourceTableKey = "table-1735890726906-table";
+        const targetTableKey = "table-1749104827644-table";
+        
+        const FIELD = {
+          plannedFrom: "datetime-local-1732775620376",
+          plannedTo: "datetime-local-1732775621137",
+          actualFrom: "datetime-local-1732775641112",
+          actualTo: "datetime-local-1732775641882",
+          engineerId: "single-select-1732775673565",
+        
+          targetEngineer: "single-select-1749102905271",
+          plannedHours: "text-1749102910799",
+          actualHours: "text-1749102912933",
+          otHours: "text-1749102914969",
+          sundayHours: "text-1749102918084"
+        };
+        
+        
+        
+    const sourceTableData = \${SourceTable.table-1735890726906-table};
+    const engineerMap = {};
+    
+    let id = ''
+    
+    sourceTableData.forEach(row => {
+      const engineer = (row[FIELD.engineerId] || "N/A").toString();
+    
+      if (!engineerMap[engineer]) {
+        engineerMap[engineer] = { planned: 0, actual: 0, ot: 0, sunday: 0 };
+      }
+      
+      if(sourceTableData && row["id"]){
+         id = row["id"]
+      }
+    
+      const planned = splitByDay(row[FIELD.plannedFrom], row[FIELD.plannedTo], true);
+      const actual = splitByDay(row[FIELD.actualFrom], row[FIELD.actualTo], false);
+    
+      engineerMap[engineer].planned += planned.base;
+      engineerMap[engineer].actual += actual.base;
+      engineerMap[engineer].ot += actual.ot;
+      engineerMap[engineer].sunday += actual.sunday;
+    });
+    
+    const transformedRows = Object.entries(engineerMap).map(([engineer, totals]) => ({
+          id:id,
+      [FIELD.targetEngineer]: engineer,
+      [FIELD.plannedHours]: convertDecimalToDisplayTime(totals.planned),
+      [FIELD.actualHours]: convertDecimalToDisplayTime(totals.actual),
+      [FIELD.otHours]: convertDecimalToDisplayTime(totals.ot),
+      [FIELD.sundayHours]: convertDecimalToDisplayTime(totals.sunday),
+      uniqueId: Date.now() + Math.floor(Math.random() * 10000)
+    }));
+    
+    // funData["dynamic_table_values"][targetTableKey] = transformedRows;
+    
+    console.log("Present Assigned Engineer Working Hours (Formatted):", transformedRows);
+    return transformedRows;
+    }
+    
+     main()`
+    
   }
 }

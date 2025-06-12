@@ -556,9 +556,10 @@
                 <button type="submit" *ngIf="trackLocationMapFlag" class="btn fw-bold btn-dark translatey ms-5" (click)="openTrackLocationModal(trackLocationArray)">Map</button>
 
                        <!-- Main Button to trigger the dropdown -->
-                       <button mat-raised-button color="primary" [matMenuTriggerFor]="menu" class="export-button" *ngIf="showTable">
+                       <button mat-raised-button color="primary"  (click)="exportAllTablesAsExcel()" class="export-button" *ngIf="showTable">
                         Export
                       </button>
+                      <!-- [matMenuTriggerFor]="menu" -->
               </div>
 
 
@@ -576,17 +577,17 @@
        
               
                 <!-- Menu containing the export options -->
-                <mat-menu #menu="matMenu">
-                  <!-- <button mat-menu-item (click)="exportAllTablesAsCSV()">
+                <!-- <mat-menu #menu="matMenu">
+                  <button mat-menu-item (click)="exportAllTablesAsCSV()">
                     Export as CSV
-                  </button> -->
+                  </button>
                   <button mat-menu-item (click)="exportAllTablesAsExcel()">
                     Export as Excel
                   </button>
-                  <!-- <button mat-menu-item (click)="exportAllTablesAsPDF()">
+                  <button mat-menu-item (click)="exportAllTablesAsPDF()">
                     Export as PDF
-                  </button> -->
-                </mat-menu>
+                  </button>
+                </mat-menu> -->
             </div>
         </div>
     </div>

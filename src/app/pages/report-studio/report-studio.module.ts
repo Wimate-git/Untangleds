@@ -21,6 +21,7 @@ import { DropdownModule } from "primeng/dropdown";
 import { AdvancedFilterComponent } from "./components/advanced-filter/advanced-filter.component";
 import { OverViewModalComponent } from "./over-view-modal/over-view-modal.component";
 import { CheckboxModule } from 'primeng/checkbox';
+import { DynamicCustomMiniTableComponent } from "./dynamic-custom-mini-table/dynamic-custom-mini-table.component";
 
 
 
@@ -33,7 +34,7 @@ const routes: Routes = [
 
 
 @NgModule({
-  declarations: [ReportStudioComponent,SavedQueryComponent,AdvancedFilterComponent,OverViewModalComponent],
+  declarations: [ReportStudioComponent,SavedQueryComponent,AdvancedFilterComponent,OverViewModalComponent,DynamicCustomMiniTableComponent],
   imports: [
     AgGridAngular,
     RouterModule.forChild(routes),
@@ -58,7 +59,6 @@ const routes: Routes = [
     MatTooltipModule,
     GoogleMapsModule,
     CheckboxModule
-    
 ]
 })
 export class ReportStudioModule { }

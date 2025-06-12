@@ -24,7 +24,17 @@ export class MiniTableComponent {
   SK_clientID: any;
   getLoggedUser: any;
 
-  constructor(private spinner:NgxSpinnerService,public modal: NgbActiveModal, private cdr: ChangeDetectorRef,private api:APIService,private configService:SharedService){}
+  gridOptions = {
+    defaultColDef: {
+      resizable: true
+    }
+  };
+  gridApi: GridApi<any>;
+  gridColumnApi: any;
+
+  constructor(private spinner:NgxSpinnerService,public modal: NgbActiveModal, private cdr: ChangeDetectorRef,private api:APIService,private configService:SharedService){
+   
+  }
 
   ngOnInit() {
     this.getLoggedUser = this.configService.getLoggedUserDetails()
@@ -141,61 +151,103 @@ export class MiniTableComponent {
 
 
 
-  createColumnDefs(rowData: any[], formName: string): ColDef[] {
-    const columns: ColDef[] = [];
+  // createColumnDefs(rowData: any[], formName: string): ColDef[] {
+  //   const columns: ColDef[] = [];
   
-    if (rowData.length > 0) {
+  //   if (rowData.length > 0) {
 
-      columns.push({
-        headerName: 'Form Filter',
-        field: 'formFilter',
-        flex: 1,
-        filter: true,
-        minWidth: 150,
-        hide: true,
+  //     columns.push({
+  //       headerName: 'Form Filter',
+  //       field: 'formFilter',
+  //       flex: 1,
+  //       filter: true,
+  //       minWidth: 150,
+  //       hide: true,
     
-        valueGetter: (params: any) => params.data.formFilter
-      });
+  //       valueGetter: (params: any) => params.data.formFilter
+  //     });
   
-      const sampleRow = rowData[0]; 
+  //     const sampleRow = rowData[0]; 
   
  
-      Object.keys(sampleRow).forEach((key) => {
-        if (key !== 'formFilter' && key !== 'PK' && key !== 'SK' && key !== 'Updated Date' && key !== 'id') {
-          columns.push({
-            headerName: this.formatHeaderName(key), 
-            field: key,
-            flex: 1,
-            minWidth: 150,
-            filter: true,
-            sortable: true,
-            cellRenderer: null, 
-            cellRendererParams: {
-              context: this 
-            }
-          });
-        }
-      });
+  //     Object.keys(sampleRow).forEach((key) => {
+  //       if (key !== 'formFilter' && key !== 'PK' && key !== 'SK' && key !== 'Updated Date' && key !== 'id') {
+  //         columns.push({
+  //           headerName: this.formatHeaderName(key), 
+  //           field: key,
+  //           flex: 1,
+  //           minWidth: 150,
+  //           filter: true,
+  //           sortable: true,
+  //           cellRenderer: null, 
+  //           cellRendererParams: {
+  //             context: this 
+  //           }
+  //         });
+  //       }
+  //     });
   
   
-      if (sampleRow.hasOwnProperty('Updated Date')) {
-        columns.push({
-          headerName: 'Updated Date',
-          field: 'Updated Date',
-          flex: 1,
-          filter: 'agDateColumnFilter',
-          sortable: true,
-          minWidth: 200,
-          sort: 'desc',
-        });
-      }
-    }
+  //     if (sampleRow.hasOwnProperty('Updated Date')) {
+  //       columns.push({
+  //         headerName: 'Updated Date',
+  //         field: 'Updated Date',
+  //         flex: 1,
+  //         filter: 'agDateColumnFilter',
+  //         sortable: true,
+  //         minWidth: 200,
+  //         sort: 'desc',
+  //       });
+  //     }
+  //   }
   
-    return columns;
-  }
+  //   return columns;
+  // }
   
 
-  
+
+createColumnDefs(rowData: any[], formName: string): ColDef[] {
+  const columns: ColDef[] = [];
+
+  if (rowData && rowData.length > 0) {
+    const sampleRow = rowData[0];
+
+    // Optional hidden column for tracking form filter
+    columns.push({
+      headerName: 'Form Filter',
+      field: 'formFilter',
+      hide: true,
+      valueGetter: (params) => params.data?.formFilter
+    });
+
+    // Loop through all keys and skip unwanted fields
+    Object.keys(sampleRow).forEach((key) => {
+      if (!['formFilter', 'PK', 'SK', 'id', 'Updated Date'].includes(key)) {
+        columns.push({
+          headerName: this.formatHeaderName(key),
+          field: key,
+          flex: 1, // Allows it to auto-expand to fill space
+          minWidth: 300, // Prevents too small columns
+          filter: true,
+        });
+      }
+    });
+
+    // Add Updated Date at the end if present
+    if ('Updated Date' in sampleRow) {
+      columns.push({
+        headerName: 'Updated Date',
+        field: 'Updated Date',
+        flex: 1,
+        minWidth: 300,
+        filter: 'agDateColumnFilter',
+      });
+    }
+  }
+
+  return columns;
+}
+
   
 
 
@@ -203,5 +255,9 @@ export class MiniTableComponent {
   formatHeaderName(key: string): string {
     return key.replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
   }
+
+
+
+
 }
 

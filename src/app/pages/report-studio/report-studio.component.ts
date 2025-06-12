@@ -180,6 +180,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
   uniqueIDArrays: any = [];
   excelMiniTableEnable: boolean = false;
   excelTrackEnable: boolean = false;
+  isCustomMiniTableAdder: boolean;
 
 
   constructor(private fb: FormBuilder, private api: APIService, private configService: SharedService, private scheduleAPI: scheduleApiService,
@@ -996,8 +997,6 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
                 return field; // Return the modified field object
               });
 
-
-
             tempMetadata[item].push({ name: "approval_history", label: "approval_history", formName: formName })
             tempMetadata[item].push({ name: "approval_status", label: "approval_status", formName: formName })
             tempMetadata[item].push({ name: "current_Status", label: "current_Status", formName: formName })
@@ -1785,6 +1784,88 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
 
     console.log("Table rows are here ", this.tableDataWithFormFilters);
+
+
+
+    console.log("this.allAdvancedExcelConfigurations ",this.allAdvancedExcelConfigurations);
+
+    if (this.allAdvancedExcelConfigurations && this.allAdvancedExcelConfigurations.advancedreportsFeildsAdvanced && this.allAdvancedExcelConfigurations.advancedreportsFeildsAdvanced.miniTableCustomAdder == "yes") {
+      this.isCustomMiniTableAdder = true
+    }
+
+
+    if(
+        this.isCustomMiniTableAdder){
+          for (let index in tempArray) {
+            const tableData: any = {};
+            let tempHolder = this.tableDataWithFormFilters[index]["rows"].map((item: any) => {
+              if (item['Mini Table']) {
+                Object.keys(item['Mini Table']).forEach((dynamicRow: any) => {
+                  // Loop through each dynamic table row
+                  Array.isArray(item['Mini Table'][dynamicRow]) && item['Mini Table'][dynamicRow].forEach((ele: any, i: number) => {
+                    // Add 'id' to each dynamic row element
+                    item['Mini Table'][dynamicRow][i] = Object.assign({ id: item.id }, ele);
+                  });
+                });
+              }
+              return item['Mini Table'];
+            });
+      
+      
+            tempHolder = tempHolder.filter((item: any) => item != undefined);
+      
+      
+      
+      
+            if (
+              Array.isArray(tempHolder) &&
+              tempHolder.length > 0 &&
+              this.isCustomMiniTableAdder
+            ) {
+              console.log("I'm inside the if loop");
+            
+              const miniCustomColumnsAdder =
+                this.allAdvancedExcelConfigurations?.customMiniColumnsAdder?.miniCustomColumnsAdder;
+            
+              const configEntry = miniCustomColumnsAdder?.[index];
+              if (!configEntry || !Array.isArray(configEntry.tables)) return;
+            
+              const tablesData = configEntry.tables.filter(
+                (table: any) => table?.conditions?.[0]?.equationText?.trim() !== ''
+              );
+            
+              console.log("Filtered tablesData:", tablesData);
+            
+              for (const table of tablesData) {
+                const tableName = table.name;
+                const equation = table.conditions[0].equationText;
+            
+                for (const tempTableData of tempHolder) {
+                  // Skip if a table with the same name already exists
+                  const hasExistingTable = Object.keys(tempTableData).some(key =>
+                    key.startsWith(tableName)
+                  );
+                  if (hasExistingTable) continue;
+            
+                  // Evaluate expression synchronously
+                  const evaluatedResult = await this.evaluateTemplate(equation, tempTableData, 'split');
+            
+                  console.log("Evaluated Result:", evaluatedResult);
+            
+                  if (evaluatedResult) {
+                    tempTableData[`${tableName}-table`] = evaluatedResult;
+                  }
+                }
+              }
+            }
+          
+            console.log("After adding custom mini table tempHolder is :", tempHolder);
+          }
+    }
+
+
+
+
 
 
 
@@ -3059,6 +3140,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     this.editOperation = false;
     this.tableState = {};
     this.showTable = false
+    this.isCustomMiniTableAdder = false
 
     this.forms().clear()
     this.customForms().clear()
@@ -3131,7 +3213,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
   async evaluateTemplateReserved(template: string, metadata: any, getkey: any, predefinedCol: any) {
 
-    console.log("Response Time metadata is here ", metadata);
+    // console.log("Response Time metadata is here ", metadata);
 
     if (template.includes('${}') || template == '') {
       return true
@@ -3225,6 +3307,8 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     // Use regex to match variable-value pairs
     const matches = template.match(/\${(.*?)}/g);
 
+    console.log("matches are here ",matches);
+
     // If no variables are found, return the template directly
     if (!matches) {
       return template;
@@ -3234,14 +3318,20 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     matches.forEach((match: string) => {
       const variableName = match.replace(/\${|}/g, '');
 
+      console.log("variableName ",variableName);
+
       // Handle cases where the key format might be split
       const metadataKey = Object.keys(metadata).find(key => getkey === 'split' ? key === variableName.split('.')[1] : key === variableName);
+
+      console.log('metadataKey ',metadataKey);
 
       // Substitute the value or keep the original match if no value is found
       const substitutedValue = metadataKey ? metadata[metadataKey] : match == '${System.Username.}' ? this.username : match;
 
+      console.log('substitutedValue ',substitutedValue);
+
       // Wrap string values in quotes to ensure they are correctly evaluated
-      const formattedValue = typeof substitutedValue === 'string' ? `'${substitutedValue}'` : substitutedValue;
+      const formattedValue = typeof substitutedValue === 'string' ? `'${substitutedValue}'` : JSON.stringify(substitutedValue);
 
       // Replace the matched variable in the template
       template = template.replace(match, formattedValue);
@@ -3252,20 +3342,20 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
     // Evaluate the expression safely
     try {
       // Make sure to evaluate only the final expression and handle potential errors in evaluation
-      const result = eval(template);  // Using `Function` instead of `eval`
       console.log("Template is here ", template);
+      const result = eval(template);  // Using `Function` instead of `eval`
       console.log("Result is here ", result);
       return result;
     } catch (error) {
       console.error("Error evaluating template:", error);
 
       // Show an error message to the user
-      Swal.fire({
-        title: "Error while evaluating",
-        text: "Please check you conditions or script.",
-        icon: "error",
-        confirmButtonText: "Okay"
-      });
+      // Swal.fire({
+      //   title: "Error while evaluating",
+      //   text: "Please check you conditions or script.",
+      //   icon: "error",
+      //   confirmButtonText: "Okay"
+      // });
       return null;
     }
   }
@@ -4261,6 +4351,10 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
       if (this.allAdvancedExcelConfigurations && this.allAdvancedExcelConfigurations.advancedreportsFeildsAdvanced && this.allAdvancedExcelConfigurations.advancedreportsFeildsAdvanced.miniTableColumn == "onCondition") {
         this.isCustomMiniTable = true
+      }
+
+      if (this.allAdvancedExcelConfigurations && this.allAdvancedExcelConfigurations.advancedreportsFeildsAdvanced && this.allAdvancedExcelConfigurations.advancedreportsFeildsAdvanced.miniTableCustomAdder == "yes") {
+        this.isCustomMiniTableAdder = true
       }
 
     }
@@ -5439,6 +5533,93 @@ getLastWeekTimestamps() {
 
     console.log("tempHolder after filtering:", tempHolder);
 
+
+    //Adding Custom Tables Data function is here 
+    // if(tempHolder && Array.isArray(tempHolder) && tempHolder.length > 0 && this.isCustomMiniTableAdder){
+    //   console.log("Iam inside here in if loop");
+    //   const customMiniTableDataHolder = this.allAdvancedExcelConfigurations && this.allAdvancedExcelConfigurations.customMiniColumnsAdder.miniCustomColumnsAdder;
+    //   const tablesData = customMiniTableDataHolder[index].tables.filter((ele:any)=>ele.conditions[0].equationText != '')
+    //   console.log("Iam inside here in if loop tablesData",tablesData);
+    //   if(tablesData){
+    //     tablesData.forEach(async(element:any) => {
+    //       let modifyFlag = false
+    //       tempHolder.forEach(async tempTableData => {
+    //         Object.keys(tempTableData).some((table)=>{
+    //           if(table.startsWith(element.name)){
+    //             modifyFlag = true
+    //           }
+    //         })
+
+    //         if(!modifyFlag){
+    //           const evaluatedResult = await this.evaluateTemplate(element.conditions[0].equationText, tempTableData, 'split')
+    //           console.log("Evaluated Result is here ",evaluatedResult);
+    //           if(evaluatedResult){
+    //             tempTableData[element.name+"-table"] = evaluatedResult
+    //           }
+    //         }
+
+    //       });
+  
+    //     });
+    //   }
+      
+    // }
+    if (
+      Array.isArray(tempHolder) &&
+      tempHolder.length > 0 &&
+      this.isCustomMiniTableAdder
+    ) {
+      console.log("I'm inside the if loop");
+    
+      const miniCustomColumnsAdder =
+        this.allAdvancedExcelConfigurations?.customMiniColumnsAdder?.miniCustomColumnsAdder;
+    
+      const configEntry = miniCustomColumnsAdder?.[index];
+      if (!configEntry || !Array.isArray(configEntry.tables)) return;
+    
+      const tablesData = configEntry.tables.filter(
+        (table: any) => table?.conditions?.[0]?.equationText?.trim() !== ''
+      );
+    
+      console.log("Filtered tablesData:", tablesData);
+    
+      for (const table of tablesData) {
+        const tableName = table.name;
+        const equation = table.conditions[0].equationText;
+    
+        for (const tempTableData of tempHolder) {
+          // Skip if a table with the same name already exists
+          const hasExistingTable = Object.keys(tempTableData).some(key =>
+            key.startsWith(tableName)
+          );
+          if (hasExistingTable) continue;
+    
+          // Evaluate expression synchronously
+          const evaluatedResult = await this.evaluateTemplate(equation, tempTableData, 'split');
+    
+          console.log("Evaluated Result:", evaluatedResult);
+    
+          if (evaluatedResult) {
+            tempTableData[`${tableName}-table`] = evaluatedResult;
+          }
+        }
+      }
+    }
+    
+    
+
+    console.log("After adding custom mini table tempHolder is :", tempHolder);
+
+
+
+
+
+
+
+
+
+
+
     let tempConditionHolder: any;
     let currentForm: any;
     let allFilterConditions: any = {};
@@ -5465,6 +5646,7 @@ getLastWeekTimestamps() {
       if (dynamicTables) {
         // Iterate through each dynamic table in the current record
         for (const tableKey of Object.keys(dynamicTables)) {
+          console.log("tableKey ",tableKey);
           let tableRows = dynamicTables[tableKey];
 
           console.log("Table rows are here before evaluation ", tableRows);
@@ -5572,7 +5754,7 @@ getLastWeekTimestamps() {
 
                 if (tempCustomHolder) {
                   for (let col of tempCustomHolder) {
-                    tab[`${col.columnName}`] = await this.evaluateTemplate(col.equationText, tab, '')
+                    tab[`${col.columnName}`] = await this.evaluateTemplate(col.equationText, tab, 'split')
                   }
                 }
               }
@@ -5825,7 +6007,7 @@ getLastWeekTimestamps() {
       let trackLocationObjects = row.trackLocation || [];
 
       for (const obj of trackLocationObjects) {
-        console.log("Obj is here ", obj);
+        // console.log("Obj is here ", obj);
 
         const rowValues = [
           row.id || '',

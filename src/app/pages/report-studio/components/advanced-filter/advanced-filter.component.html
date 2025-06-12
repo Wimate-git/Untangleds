@@ -373,7 +373,7 @@
       </div> -->
 
 
-      <div class="form-group row ps-2 mt-5 mb-5 me-2" style="text-align: start;">
+      <div class="form-group row ps-2 mt-5 mb-8 me-2" style="text-align: start;">
         <div class="d-flex align-items-center gap-4 flex-wrap">
       
           <!-- Label -->
@@ -825,8 +825,144 @@
 
 
 
+      <!-- Add custom Mini tables -->
+      <div class="form-group row ps-1" style="text-align: start;">
+        <div class="form-group row ps-4 mb-7">
+          <label class="required col-lg-3 col-form-label col-sm-12 text-right col-form-label-sm fw-bold">Add Custom Mini
+            Table Data</label>
+          <div class="col-3 d-flex gap-7 align-items-center">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="miniTableCustomAdderNo" formControlName="miniTableCustomAdder"
+                value="no" (change)="onMiniCustomColumnsAdder($event,'html','create')">
+              <label class="form-check-label" for="filterAll">No</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="miniTableCustomAdderYes"
+                formControlName="miniTableCustomAdder" value="yes"
+                (change)="onMiniCustomColumnsAdder($event,'html','create')">
+              <label class="form-check-label" for="filterOnCondition">Yes</label>
+            </div>
+          </div>
+        </div>
+      </div>
 
 
+
+      <!-- <div class="card card-custom p-2" style="background-color: #F5F7F8;"
+          *ngIf="addMiniTableCustomColumnsAdder">
+          <app-dynamic-custom-mini-table></app-dynamic-custom-mini-table>
+      </div> -->
+
+
+      <form [formGroup]="customMiniColumnsAdder" class="card card-custom p-2" style="background-color: #F5F7F8;"
+      *ngIf="addMiniTableCustomColumnsAdder">
+      <div formArrayName="miniCustomColumnsAdder" style="display: flex; flex-direction: row;flex-wrap:warp; gap: 10px;">
+
+        <div *ngFor="let customColumn of miniCustomColumnsAdder.controls; let formIndex=index" [formGroupName]="formIndex"
+          class="form-group" style="border: 1px solid blue; padding: 10px; width: 50%;">
+          <h5>{{ customColumn.get('name')?.value }}</h5>
+
+          <div formArrayName="tables" style="display: flex; flex-wrap: wrap; gap: 10px;">
+
+            <div *ngFor="let table of getCustomTablesAdder(formIndex).controls; let tableIndex=index"
+              [formGroupName]="tableIndex" style="width: 100%; display: flex; flex-wrap: wrap; gap: 10px;">
+              <div  [ngStyle]="{
+                display:selectedEnabledMiniTableFilters && selectedEnabledMiniTableFilters[formIndex] &&
+                         selectedEnabledMiniTableFilters[formIndex].includes(table.get('tableLabel')?.value)
+                         ? 'flex' : 'none'
+              }"
+                style="flex: 1; border: 1px solid gray; padding: 10px; display: flex;flex-wrap: wrap; flex-direction: column; gap: 10px;">
+                <h5>{{ table.get('tableLabel')?.value }}</h5>
+
+
+                <div formArrayName="conditions" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                  <div
+                    *ngFor="let condition of getCustomConditionsAdder(formIndex, tableIndex).controls; let condIndex=index"
+                    [formGroupName]="condIndex">
+
+
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%;">
+                      <!-- <div class="mb-3" style="flex: 1; min-width: 200px;">
+                        <label class="required">Column Name</label>
+                        <input type="text" formControlName="columnName" placeholder="Enter Column Name"
+                          class="form-control" />
+                      </div> -->
+
+
+                      <div class="mb-3" style="flex: 1; min-width: 200px;">
+                        <label class="required">Field Selected</label>
+              
+
+
+                        <select formControlName="field" class="form-control">
+                          <option value="" disabled selected>Choose Field</option>
+                          <option *ngFor="let field of miniTableFormBuilderData[table.get('tableName')?.value]"
+                            [value]="field.name">{{ field.label }}</option>
+                        </select>
+                      </div>
+
+
+                      <div class="mb-3" style="flex: 1; min-width: 200px;">
+                        <label class="required">Predefined Scripts</label>
+                        <select formControlName="predefined" class="form-control" (change)="onPredefinedChange(formIndex, tableIndex)"
+                          [ngbTooltip]="'Select a predefined script to populate the equation field'">
+                          <option value="none">None</option>
+                          <option value="otHoursForPresent">Present Assigned Engineer Working Hours</option>
+                          <option value="otHoursForAdditional">Additional Engineer Working Hours</option>
+                        </select>
+                      </div>
+
+
+                      <div style="margin-top: 10px; width: 100%;"
+                      [ngStyle]="{ 'display': isEquationVisible3 ? 'block' : 'none' }">
+                      <button type="button" class="btn btn-secondary btn-sm"
+                        (click)="insertFieldIntoEquationMiniTableAdder(formIndex,tableIndex,condIndex)">Insert Field into
+                        Equation</button>
+
+
+                        <button type="button" class="btn btn-secondary btn-sm"
+                        (click)="dynamicScriptAdder(formIndex,tableIndex,condIndex,table.get('tableName')?.value,customColumn.get('name')?.value)">Dynamic Script</button>
+                      </div>
+
+                   
+
+
+
+                    <div class="mb-3" style="flex: 1; min-width: 200px; width: 100%;"
+                      [ngStyle]="{ 'display': isEquationVisible3 ? 'block' : 'none' }">
+                      <label class="required">Equation</label>
+                      <textarea formControlName="equationText" class="form-control" rows="1"></textarea>
+
+
+                    </div>
+
+
+                    <div class="mb-3" style="min-width: 200px; width: 100%;">
+                      <button class="btn btn-sm btn-dark btn-advanced" type="button"
+                        (click)="toggleEquationField3()">
+                        {{ isEquationVisible2 ? 'Hide Equation ' : 'Show Equation' }}
+                        <i class="fas" [ngClass]="isEquationVisible3 ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                      </button>
+                    </div>
+
+
+
+
+
+                    </div>
+
+                  
+
+                  </div>
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
 
 
     </div>

@@ -1,0 +1,74 @@
+<!-- dynamic-minitable.component.html -->
+<div class="modal-header">
+  <h4 class="modal-title">Dynamic Mini Table Script for Working Hours</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.close()"></button>
+</div>
+
+<div class="modal-body">
+  <div class="container">
+    <div class="tabs">
+      <button 
+        *ngFor="let tab of tabs"
+        (click)="setActiveTab(tab.id)"
+        [class.active]="activeTab === tab.id">
+        {{ tab.label }}
+      </button>
+    </div>
+
+    <!-- CONFIG TAB -->
+    <div *ngIf="activeTab === 'config'" class="tab-section config-tab">
+      <h3>Configuration</h3>
+
+      <div class="form-group">
+        <label>Source Mini Table:</label>
+        <select [(ngModel)]="formData.sourceTableKey">
+          <option *ngFor="let table of miniTableLabels" [value]="table">{{ table }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Target Mini Table:</label>
+        <input type="text" [value]="targetTableName" readonly>
+      </div>
+
+      <div class="form-group">
+        <label>Script Type:</label>
+        <select [(ngModel)]="scriptType">
+          <option *ngFor="let table of ['Additional Engineer Working Hours script','Present Assigned Engineer Working Hours script']" [value]="table">{{ table }}</option>
+        </select>
+      </div>
+
+      <div class="field-columns">
+        <div class="field-column">
+          <h4>Source Fields</h4>
+          <div *ngFor="let field of sourceFields" class="form-group">
+            <label>{{ field.label }}:</label>
+            <select [(ngModel)]="formData.sourceFields[field.key]">
+              <option *ngFor="let option of miniTableFormBuilderData[formData.sourceTableKey]" [value]="option.name">{{ option.label }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-column">
+          <h4>Target Fields</h4>
+          <div *ngFor="let field of targetFields" class="form-group">
+            <label>{{ field.label }}:</label>
+            <select [(ngModel)]="formData.targetFields[field.key]">
+              <option *ngFor="let option of miniTableFormBuilderData[targetTableName]" [value]="option.name">{{ option.label }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <button class="generate-button" (click)="this.scriptType == 'Additional Engineer Working Hours script'?generateScript():generateScriptAdditional()">Generate Script</button>
+    </div>
+
+    <!-- SCRIPT TAB -->
+    <div *ngIf="activeTab === 'script'" class="tab-section script-tab">
+      <h3>Generated Script</h3>
+      <textarea [value]="generatedScript" rows="20"></textarea>
+      <button type="btn" *ngIf="generatedScript != ''" class="btn btn-success me-2" (click)="saveToScriptFilter()">Save</button>
+      <button type="btn" *ngIf="generatedScript != ''" class="btn btn-secondary" (click)="modal.close()">Cancel</button>
+    </div>
+  </div>
+</div>
