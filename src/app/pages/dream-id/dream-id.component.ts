@@ -4,11 +4,11 @@ import { DomSanitizer, SafeResourceUrl, Title } from '@angular/platform-browser'
 import { ActivatedRoute, Route } from "@angular/router";
 import { param } from 'jquery';
 import { AuditTrailService } from '../services/auditTrail.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-dream-id',
-  standalone: true,
-  imports: [],
+
   templateUrl: './dream-id.component.html',
   styleUrl: './dream-id.component.scss'
 })
@@ -29,6 +29,7 @@ export class DreamIdComponent implements OnInit {
   form_id: any;
   formId: string | null;
   recordId: string | null;
+  isFullScreen: boolean = false;
   project: any;
   iframeSrc: string;
   // cacheBustingToken = new Date().getTime();
@@ -40,7 +41,8 @@ export class DreamIdComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
     private auditTrail: AuditTrailService,
-    private titleService: Title
+    private titleService: Title,
+    private location: Location
   ) {
 
 
@@ -48,6 +50,34 @@ export class DreamIdComponent implements OnInit {
   }
 
   async ngOnInit() {
+
+    try {
+
+      const rawUrl = this.location.path();
+      const fullUrl = decodeURIComponent(rawUrl);
+      console.log("Decoded URL:", fullUrl);
+
+      // Step 2: Extract params after the first & (since you’re not using ?)
+      const params: any = {};
+      const segments = fullUrl.split('&');
+
+      segments.forEach(segment => {
+        const [key, value] = segment.split('=');
+        if (key && value) {
+          const paramKey = key.split('/').pop(); // e.g., "recordId" or "isFullScreen"
+          if (paramKey) {
+            params[paramKey] = value;
+          }
+        }
+      });
+
+      // Step 3: Use parsed values
+      // this.recordId = params['recordId'];
+      this.isFullScreen = params['isFullScreen'] === 'true';
+
+    } catch (error) {
+      console.log('error dreamboard 79:>> ', error);
+    }
 
 
     const cacheBustingToken = new Date().getTime();
@@ -123,9 +153,14 @@ export class DreamIdComponent implements OnInit {
 
 
         this.route.queryParamMap.subscribe(queryParams => {
+          console.log('queryParams :>> ', queryParams);
           // Handle query parameters such as formId and recordId
           this.formId = queryParams.get('formId');
           this.recordId = queryParams.get('recordId');
+          // this.isFullScreen = queryParams.get('isFullScreen');
+
+          console.log('this.isFullScreen :>> 132', this.isFullScreen);
+
           console.log('recordId from dreamboard:>> ', this.recordId);
           let params_url = '';
 
@@ -156,6 +191,10 @@ export class DreamIdComponent implements OnInit {
               params_url = `&formId=${this.form_id}`;
             }
           }
+
+          // if (this.isFullScreen) {
+          //   params_url += `&isFullScreen=${this.isFullScreen}`
+          // }
 
           console.log("AFTER RECORD ID:", params_url)
 
@@ -237,9 +276,13 @@ export class DreamIdComponent implements OnInit {
 
 
         this.route.queryParamMap.subscribe(queryParams => {
+          console.log('queryParams :>> ', queryParams);
           // Handle query parameters such as formId and recordId
           this.formId = queryParams.get('formId');
           this.recordId = queryParams.get('recordId');
+          // this.isFullScreen = queryParams.get('isFullScreen');
+
+          console.log('this.isFullScreen 250:>> ', this.isFullScreen);
 
           let params_url = '';
 
@@ -270,6 +313,10 @@ export class DreamIdComponent implements OnInit {
               params_url = `&formId=${this.form_id}`;
             }
           }
+
+          // if (this.isFullScreen) {
+          //   params_url += `&isFullScreen=${this.isFullScreen}`
+          // }
 
           console.log("AFTER RECORD ID:", params_url)
 
@@ -304,6 +351,10 @@ export class DreamIdComponent implements OnInit {
 
       });
     }
+
+
+
+
 
   }
 }

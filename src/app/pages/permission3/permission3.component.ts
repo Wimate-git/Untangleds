@@ -60,6 +60,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   dropdownSettings_: IDropdownSettings = {
     singleSelection: true,
     allowSearchFilter: true,
+    disabledField: 'isDisabled',
   };
   swalOptions: SweetAlertOptions = {};
 
@@ -551,6 +552,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
           const helpherObj = JSON.parse(result.options)
 
           this.formList = helpherObj.map((item: any) => item[0])
+          console.log('this.formList :>> ', this.formList);
 
           console.log("FORMGORUP COMPONENT FETCH FORM LIST:", this.formList)
 
@@ -577,21 +579,58 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
 
     console.log("DYMAINC FORM :", this.dynamicform.formList)
 
+    console.log('this.dynamicform :>> ', this.dynamicform);
+    let temp = this.dynamicEntries
+
+    console.log('temp1234 :>> ', temp.value);
+
+    let configured: any[] = [];
+    if (temp?.value && temp?.value?.length > 0) {
+
+      console.log('temp.value :>> ', temp.value);
+
+
+      temp.value.forEach((item: any) => {
+        configured.push(item.dynamicForm[0])
+      })
+
+    }
+
+
     for (const form of this.dynamicform.formList) {
       // Assuming form has a property 'value' that you want to push
-      if (form && !this.formList.includes(form)) {
+      if (form && !this.formList.includes(form) && !configured.includes(form)) {
         this.formList.push(form);
+        console.log('form 604:>> ', form);
+        console.log('configured 605:>> ', configured);
       }
     }
 
-    this.formList.unshift("All");
+
+    if (!configured.includes("All")) {
+      this.formList.unshift("All");
+    }
+
 
     this.formList = Array.from(new Set(this.formList));
+    console.log('this.formList :>> ', this.formList);
 
     console.log("Unique Form List:", this.formList);
 
 
     console.log("Updated Form List:", this.formList);
+
+
+
+
+    // this.formList = this.formList.map((item, index) => {
+    //   item_id: index,
+    //     item_text: item,
+    //       isDisabled: true
+    // })
+
+
+
   }
 
   async handleFormOnSelectAll(value: any): Promise<void> {
@@ -894,6 +933,14 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
           fieldValue: [fieldValue],
         }));
 
+        this.formList = this.formList.filter(item => {
+          console.log('item  933:>> ', item);
+          console.log('dynamicForm[0] 934:>> ', dynamicForm[0]);
+          return item !== dynamicForm[0]
+        })
+
+        console.log(this.formList, 'hello formlist')
+
         console.log("ADD DYNAMIC DATA:", this.dynamicEntries);
 
         // Clear the input fields
@@ -921,6 +968,21 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
   }
 
   removeDynamicData(index: number) {
+    let temp = this.dynamicEntries.at(index)?.value;
+    console.log('dynamicForm :>> ', temp.dynamicForm[0]);
+
+    if (temp?.dynamicForm[0]) {
+      // this.formList.push(temp?.dynamicForm[0]);
+      this.formList = [...this.formList, temp.dynamicForm[0]]; // triggers change detection
+      this.formList.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+
+
+
+      console.log('this.formList after delete:>> ', this.formList);
+      this.cdr.detectChanges()
+
+    }
+
     this.dynamicEntries.removeAt(index);
     this.permissionForm.markAsDirty();
   }
@@ -1234,7 +1296,46 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
     this.initForm()
   }
 
+  get checkModules(): boolean {
+
+    console.log('this.permissionForm 1301:>> ', this.permissionForm);
+
+    let temp = this.permissionForm.get('permissionsList')?.value
+    console.log('temp :>> ', temp);
+    let flag = true;
+    for (let index = 0; index < temp.length; index++) {
+
+      let item = temp[index];
+      if (item && item.view === true) {
+        flag = false
+        break
+      }
+
+    }
+
+    return flag
+
+  }
+
+  get checkFormgroup(): boolean {
+    console.log('this.permissionForm 1321:>> ', this.permissionForm);
+
+    let temp = this.permissionForm.get('formgroup')?.value
+
+    return temp.length < 1
+  }
+  get checkDynamicFormCondition(): boolean {
+
+    console.log('this.permissionForm 1321:>> ', this.permissionForm);
+
+    let temp = this.permissionForm.get('dynamicEntries')?.value
+
+    return temp.length < 1
+  }
+
   onSubmit(event: Event) {
+
+    // console.log('this.permissionForm :>> ', this.checkModules());
 
     if (this.permissionForm.invalid) {
       this.permissionForm.markAllAsTouched(); // trigger validation messages
@@ -2024,6 +2125,7 @@ export class Permission3Component implements OnInit, AfterViewInit, OnDestroy {
           const helpherObj = JSON.parse(result.options)
 
           this.formList = helpherObj.map((item: any) => item[0])
+          console.log('this.formList :>> ', this.formList);
 
           this.formList.unshift("All");
         }

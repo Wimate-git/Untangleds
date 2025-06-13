@@ -406,21 +406,23 @@
                         " role="tablist">
 
                             <li class="nav-item ">
-                                <a class="nav-link cursor-pointer required"
-                                    [ngClass]="{ active: activeTab === 'Sidebar' }" (click)="setActiveTab('Sidebar')"
-                                    role="tab">
+                                <a class="nav-link cursor-pointer required invalid-shake" [ngClass]="{ active: activeTab === 'Sidebar' ,
+                                        'invalid-tab':  checkModules && permissionForm.get('permissionsList')?.touched
+                                    }" (click)="setActiveTab('Sidebar')" role="tab">
                                     Modules
                                 </a>
                             </li>
                             <li class="nav-item ">
-                                <a class="nav-link cursor-pointer required"
-                                    [ngClass]="{ active: activeTab === 'Toolbar' }" (click)="setActiveTab('Toolbar')"
-                                    role="tab">
+                                <a class="nav-link cursor-pointer required" [ngClass]="{ active: activeTab === 'Toolbar' ,
+                                        'invalid-tab':  checkFormgroup && permissionForm.get('formgroup')?.touched}"
+                                    (click)="setActiveTab('Toolbar')" role="tab">
                                     Form Group
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link cursor-pointer" [ngClass]="{ active: activeTab === 'Header' }"
+                                <a class="nav-link cursor-pointer required"
+                                    [ngClass]="{ active: activeTab === 'Header' ,
+                                        'invalid-tab':  checkDynamicFormCondition && permissionForm.get('dynamicForm')?.touched }"
                                     (click)="setActiveTab('Header')" role="tab">
                                     Dynamic Form
                                 </a>
