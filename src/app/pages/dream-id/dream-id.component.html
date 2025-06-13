@@ -2,7 +2,12 @@
   <div class="content-block">
     <div class="block-header">
     </div>
-    <div class="page-content" >
+    <div class="page-content" [ngClass]="{'full-screen-page': isFullScreen}">
       <!-- style="position: absolute; height: 100%; width:93%; border: none" -->
-      <iframe [src]="iframeSrc" style="position: absolute; height: 100%; width:93%; border: none" allow="geolocation *; camera *"></iframe>
+      <iframe [src]="iframeSrc" [ngStyle]="{
+    position: 'absolute',
+    height: '100%',
+    width: isFullScreen ? '100%' : '93%',
+    border: 'none'
+  }" allow="geolocation *; camera *"></iframe>
     </div>
