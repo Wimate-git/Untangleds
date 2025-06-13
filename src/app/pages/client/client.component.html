@@ -34,7 +34,7 @@
     </div>
     <!-- <div class="card-body pt-0"> -->
     <div class="card-body pt-0">
-        <app-crud-user [componentSource]="'app-client'" [datatableConfig]="datatableConfig" route="/client" (deleteEvent)="delete($event)" (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent" [modal]="clientModal"></app-crud-user>
+        <app-crud-user [componentSource]="'app-client'" [permissionAll]="permissionAll" [datatableConfig]="datatableConfig" route="/client" (deleteEvent)="delete($event)" (editEvent)="edit($event)" (createEvent)="create()" [reload]="reloadEvent" [modal]="clientModal"></app-crud-user>
     </div>
 </div>
 
@@ -509,7 +509,7 @@
                             <!--end::Button-->
                 
                             <!--begin::Button-->
-                            <button type="submit" id="kt_modal_update_customer_submit" class="btn btn-primary"
+                            <button type="submit" *ngIf="(this.permissionAll && this.permissionAll.update || adminLogin)" id="kt_modal_update_customer_submit" class="btn btn-primary"
                              [attr.data-kt-indicator]="isLoading ? 'on' : 'off'">
                                 <span *ngIf="!editOperation" class="indicator-label">
                                     Submit

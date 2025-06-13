@@ -53,6 +53,7 @@ export class ClientComponent implements OnInit {
 
   allClientDetails: any = {};
   getLoggedUser: any;
+  getLoggedUserPermissions:any
   SK_clientID: any;
   loggedUser_Company: any;
   errorForInvalidEmail: any;
@@ -120,15 +121,21 @@ export class ClientComponent implements OnInit {
 
     iconList: any[] = []; 
   username: any;
+  paginationDataStore: any;
+  getPermissionList: any = [];
+
+  permissionAll: any = {};
   
 
     async ngOnInit(){
 
       this.getLoggedUser = this.companyconfig.getLoggedUserDetails()
+      this.getLoggedUserPermissions =  this.companyconfig.getPermissionDetails()
+      this.getPermissionList = this.getLoggedUserPermissions.permissionsList
 
       this.SK_clientID = this.getLoggedUser.clientID;
       this.username = this.getLoggedUser.username
-      // this.SK_clientID = 'WIMATE_ADMIN';
+      // this.SK_clientID = 'WIMATE_ADMIN'; 
 
       this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
     
@@ -138,8 +145,32 @@ export class ClientComponent implements OnInit {
 
       this.showTable()
 
+      this.checkPermission("Client")
+
       this.loadIcons()
      
+    }
+
+
+
+    checkPermission(ModuleName:any){
+      if(this.SK_clientID == 'WIMATE_ADMIN'){
+        this.adminLogin = true
+      }
+      else{
+        this.adminLogin = false
+      }
+
+      const tempPermission = this.getPermissionList.find((item:any)=>item.name == ModuleName)
+      if(tempPermission && tempPermission.view && tempPermission.update){
+        this.permissionAll = tempPermission
+        this.permissionAll.update = this.adminLogin
+      }
+      else{
+        this.permissionAll.update = this.adminLogin
+      }
+
+      console.log("Permission All ",this.permissionAll)
     }
 
 
@@ -193,12 +224,15 @@ export class ClientComponent implements OnInit {
       this.datatableConfig = {
         serverSide: true,
         ajax: (dataTablesParameters:any, callback) => {
+          const start = dataTablesParameters.start;
+          const length = dataTablesParameters.length;
           this.datatableConfig = {}
           this.lookup_data_user = []
-          this.fetchTMLookupData(1)
+          this.fetchTMLookupData(1) 
             .then((resp:any) => {
               var responseData = resp || []; // Default to an empty array if resp is null
               
+         
 
               responseData = Array.from(new Set(responseData))
               // Example filtering for search
@@ -208,13 +242,30 @@ export class ClientComponent implements OnInit {
                   .filter((item: { P1: string }) => item.P1.toLowerCase().includes(searchValue.toLowerCase()))
                   .map((item: any) => JSON.stringify(item)) // Stringify the object to make it unique
               )).map((item: any) => JSON.parse(item)); // Parse back to object
+
+
+              const paginatedData = filteredData.slice(start, start + length);
+              this.paginationDataStore = paginatedData
+              console.log('this.paginationDataStore checking',this.paginationDataStore)
+    
+              const totalRecords = filteredData.length;
+              const displayedRecords = paginatedData.length;
+              const totalPages = Math.ceil(totalRecords / length);
+    
+              // Update page numbers dynamically based on total pages
+              const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+    
+              // Update start and end records for current page
+              const startRecord = start + 1; // Start record (1-indexed)
+              const endRecord = start + displayedRecords;
   
+            
               callback({
                 draw: dataTablesParameters.draw,
-                recordsTotal: responseData.length,
-                recordsFiltered: filteredData.length,
-                data: filteredData // Return filtered data
-            });
+                recordsTotal: totalRecords,
+                recordsFiltered: totalRecords,
+                data: paginatedData, // Data for the current page
+              });
    
     
               console.log("Response is in this form ", responseData);
@@ -295,7 +346,7 @@ export class ClientComponent implements OnInit {
 
 
 
-
+      
         try{
           const UserDetails = {
             "User Name": this.username,

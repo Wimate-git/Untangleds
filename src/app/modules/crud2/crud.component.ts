@@ -17,7 +17,7 @@ export class Crud2Component implements OnInit, AfterViewInit, OnDestroy{
 
   @Input() datatableConfig: any = {};
   @Input() componentSource: string = '';
-
+  @Input() permissionAll:any;
   @Input() route: string = '/';
 
   // Reload emitter inside datatable
@@ -134,7 +134,13 @@ export class Crud2Component implements OnInit, AfterViewInit, OnDestroy{
           buttons.push(editButton);
         }
 
-        if (this.deleteEvent.observed) {
+       
+        if(this.componentSource == 'app-client'){
+          if(this.deleteEvent.observed && this.permissionAll && this.permissionAll.update){
+            buttons.push(deleteButton);
+          }
+        }
+        else if (this.deleteEvent.observed) {
           buttons.push(deleteButton);
         }
 
