@@ -24,6 +24,7 @@ export class SharedService {
   private myBehaviorSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
   apiUrl = 'https://vux77bi1vi.execute-api.ap-south-1.amazonaws.com/default/api_for_Batch';
+  permissionDetails: any;
 
   constructor(private http: HttpClient,private encryption: EncriptionServiceService,private authService:AuthService,private api:APIService) { }
 
@@ -117,15 +118,15 @@ export class SharedService {
   public getLoggedUserDetails() {
 
     this.userDetails = JSON.parse(JSON.parse(JSON.stringify(localStorage.getItem("userAttributes"))));
-
-
-
-
-  
     // this.getPermission_basedonUser();
-
     return  JSON.parse(JSON.parse(JSON.stringify(localStorage.getItem("userAttributes"))));
+  }
 
+
+
+
+  public getPermissionDetails(){
+    return JSON.parse(JSON.parse(JSON.parse(JSON.stringify(localStorage.getItem('permissionDetails')))))
   }
 
 

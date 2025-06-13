@@ -185,6 +185,11 @@ export class LoginComponent implements OnInit, OnDestroy {
 
             this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', metaData.clientID)
 
+            const resultPermission:any = await this.api.GetMaster(`${metaData.clientID}#permission#${metaData.permission_ID}#main`, 1);
+            if(resultPermission && resultPermission.metadata){
+              console.log("Permission fetched successfully ");
+              localStorage.setItem('permissionDetails', JSON.stringify(resultPermission.metadata));
+            }
 
             //Redirection logic is here 
             if(metaData && metaData.redirectionURL && metaData.redirectionURL != 'None'){
