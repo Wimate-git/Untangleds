@@ -1513,6 +1513,11 @@ addEquationControls(event: any, _type: string) {
         console.log("Can't fetch", err);
       });
   }
+  openWidgetFilterHelp(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+  
+  }
 
   // SelectTypeSummary =[
   //   { value: 'NewTab', text: 'New Tab' },
@@ -2939,7 +2944,19 @@ columnVisibilityTooltip: string = 'Select the fields to display in the drill-dow
 redirectionType: string = 'Choose how the widget should open the target dashboard or module: "New Tab" opens it in a separate browser tab, "Modal (Pop Up)" displays it in a modal window, "Same Page Redirect" replaces the current view, and "Drill Down" shows detailed insights in Table.';
 ParametertooltipContent: string = 'Specifies the number of parameters to configure.';
 ChartTitletooltipContent: string = 'This title will appear as the heading of the dyanmic tile.';
-
+fontColorTooltip: string = 'This sets the font color for the label on the tile. Select a color to apply.';
+  valueFontSizeTooltip: string = 'This sets the font size for the value displayed on the tile. Enter a size between 8 and 72.';
+  valueFontColorTooltip: string = 'This sets the font color for the value shown on the tile. Choose a color to apply.';
+  tileBackgroundTooltip: string = 'Select a background theme. The chosen color or gradient will be applied as the tile\'s background.';
+  equationCountTooltip: string = 'Enter the number of equations you want to configure. Based on this count, dynamic form sections will be generated below.';
+  equationFormTooltip: string = 'Choose the form you want to use for building this equation. The fields and operations shown next will be based on the selected form.';
+  formFieldsTooltip: string = 'Select one or more fields from the chosen form. These fields will be used to build the equation below.';
+  
+  filterParameterTooltip: string = 'Select form fields to apply filter conditions. The chosen fields will be used to filter data based on matching or non-matching values.';
+filterEquationTooltip: string = 'Displays the generated filter equation based on selected fields. Field values are inserted dynamically in the format: Field Name - ${fieldId}. Example: Customer Name-${text-1732773051881} && Status-${single-select-1732769559973}';
+fontSizeTooltip: string = 'This sets the font size for the label on the tile. Enter a value between 8 and 72.';
+MiniformTooltip:string ='Select a minitable name to view and analyze data specific to that minitable only.'
+miniTableFieldsTooltip:string = 'Specify which minitable fields to analyze. Results will be based solely on your selection.'
 async dynamicDataDrill(){
   try {
     const result: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#lookup", 1);
@@ -2962,6 +2979,17 @@ openPrimaryValueInfoModal(stepperModal: TemplateRef<any>) {
       keyboard: false    });
 
   }
+  openEquationHelpTile(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+  
+  }
+  openWidgetAdvanceEquationHelp(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+  
+  }
+  
 
 async fetchUserPermissions(sk: any) {
   try {

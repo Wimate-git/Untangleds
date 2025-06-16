@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -123,6 +123,40 @@ this.fetchUserPermissions(1)
   }
 
 
+    openWidgetFilterHelp(stepperModal: TemplateRef<any>){
+      this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false    });
+    
+    }
+
+
+    openRowCalHelp(stepperModal: TemplateRef<any>){
+      this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false    });
+    
+    }
+
+
+
+    openPreDefinedScriptsHelp(stepperModal: TemplateRef<any>){
+      this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false    });
+    
+    }
+
+
+    openUnitHelp(stepperModal: TemplateRef<any>){
+      this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false    });
+    
+    }
+
+
+
+
+
+  filterParameterTooltip: string = 'Select form fields to apply filter conditions. The chosen fields will be used to filter data based on matching or non-matching values.';
+
   addControls(selectedFields: any[], _type: string) {
     console.log('Selected Fields:', selectedFields);
     
@@ -160,7 +194,7 @@ this.fetchUserPermissions(1)
     { value: 'average', text: 'Average' },
     { value: 'latest', text: 'Latest' },
     { value: 'previous', text: 'Previous' },
-    { value: 'default', text: 'Default' }
+    // { value: 'default', text: 'Default' }
   ];
   
 

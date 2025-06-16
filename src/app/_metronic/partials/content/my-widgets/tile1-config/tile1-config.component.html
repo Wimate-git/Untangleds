@@ -57,7 +57,7 @@
                       [ngbTooltip]="formTooltip"
                       placement="top"
                       container="body">
-                  <i class="bi bi-info-circle fs-5"></i>
+                  <i class="bi bi-info-circle fs-5 text-primary"></i>
                 </span>
                     </label>
                     <ngx-select
@@ -84,7 +84,7 @@
                       [ngbTooltip]="parameterTooltip"
                       placement="top"
                       container="body">
-                  <i class="bi bi-info-circle fs-5"></i>
+                  <i class="bi bi-info-circle fs-5 text-primary"></i>
                 </span>
             
                     </label>
@@ -112,7 +112,7 @@
                       
                       placement="top"
                       container="body">
-                  <i class="bi bi-info-circle fs-5"></i>
+                  <i class="bi bi-info-circle fs-5 text-primary"></i>
                 </span>
                     </label>
                     <ngx-select
@@ -153,7 +153,7 @@
                       <span class="ms-2 text-primary"
                       (mouseenter)="openPrimaryValueInfoModal(Tile1HelpModal)"
                       style="cursor: pointer;">
-                  <i class="bi bi-info-circle fs-5"></i>
+                  <i class="bi bi-info-circle fs-5 text-primary"></i>
                 </span>
                 
               
@@ -193,7 +193,7 @@
                       placement="top"
                       container="body"
                       tooltipClass="custom-tooltip">
-                  <i class="bi bi-info-circle fs-5"></i>
+                  <i class="bi bi-info-circle fs-5 text-primary"></i>
                 </span>
                 
                     </label>
@@ -280,7 +280,7 @@
                         [ngbTooltip]="moduleNamesTooltip"
                         placement="top"
                         container="body">
-                    <i class="bi bi-info-circle fs-5"></i>
+                    <i class="bi bi-info-circle fs-5 text-primary"></i>
                   </span>
 
                         
@@ -303,7 +303,7 @@
                           <span class="ms-2 text-primary"
                           (mouseenter)="openRedirectionTypeInfoModal(Tile1RedirectionModal)"
                           style="cursor: pointer;">
-                      <i class="bi bi-info-circle fs-5"></i>
+                      <i class="bi bi-info-circle fs-5 text-primary"></i>
                     </span>
                         </label>
                     
@@ -330,7 +330,7 @@
                         [ngbTooltip]="redirectToTooltip"
                         placement="top"
                         container="body">
-                    <i class="bi bi-info-circle fs-5"></i>
+                    <i class="bi bi-info-circle fs-5 text-primary"></i>
                   </span>
                       </label>
                       <ngx-select
@@ -352,7 +352,7 @@
                           [ngbTooltip]="columnVisibilityTooltip"
                           placement="top"
                           container="body">
-                      <i class="bi bi-info-circle fs-5"></i>
+                      <i class="bi bi-info-circle fs-5 text-primary"></i>
                     </span>
                         </label>
                         <p-multiSelect
@@ -372,7 +372,7 @@
                           [ngbTooltip]="customLabelTooltip"
                           placement="top"
                           container="body">
-                      <i class="bi bi-info-circle fs-5"></i>
+                      <i class="bi bi-info-circle fs-5 text-primary"></i>
                     </span>
                         </label>
                         <input
@@ -423,7 +423,11 @@
               <div class="row g-3 align-items-end mb-4">
                 <!-- Form Fields -->
                 <div class="col-md-4">
-                  <label  class="fw-bold fs-6">Form Fields</label>
+                  <label  class="fw-bold fs-6">Form Fields
+                    <span class="ms-2 text-primary" [ngbTooltip]="filterParameterTooltip" container="body" placement="top">
+                      <i class="bi bi-info-circle fs-5 text-primary"></i>
+                    </span>
+                  </label>
                   <p-multiSelect
             
                     formControlName="filterParameter"
@@ -445,7 +449,13 @@
               </div>
             
               <div class="col-md-12 mb-3">
-                <label for="description" class="col-createChart-label fw-bold fs-6">Equation</label>
+                <label for="description" class="col-createChart-label fw-bold fs-6">Equation
+                  <span class="ms-2 text-primary"
+                  (mouseenter)="openWidgetFilterHelp(WidgetFilterHelp)"
+                  style="cursor: pointer;">
+              <i class="bi bi-info-circle fs-5 text-primary"></i>
+            </span>
+                </label>
                 <textarea
                   id="description"
                   formControlName="filterDescription"
@@ -465,7 +475,14 @@
                 <div class="row g-3">
                   <!-- Existing Themes Section -->
                   <div class="col-md-12 mb-3">
-                    <label class="col-createChart-label fw-bold fs-6 required">Background Theme:</label>
+                    <label class="col-createChart-label fw-bold fs-6 required">Background Theme:
+                      <span class="ms-2 text-primary"
+                      [ngbTooltip]="tileBackgroundTooltip"
+                      placement="top"
+                      container="body">
+                  <i class="bi bi-info-circle fs-5 text-primary"></i>
+                </span>
+                    </label>
                     <div class="color-boxes">
                       <div
                         *ngFor="let theme of themes"
@@ -484,7 +501,15 @@
               
                   <!-- Font Size Input -->
                   <div class="col-md-4 mb-3">
-                    <label for="fontSize" class="col-createChart-label fw-bold fs-6 ">Label Font Size</label>
+                    <label for="fontSize" class="col-createChart-label fw-bold fs-6 ">Label Font Size
+                      <span class="ms-2 text-primary"
+                      [ngbTooltip]="fontSizeTooltip"
+                      placement="top"
+                      container="body">
+                  <i class="bi bi-info-circle fs-5 text-primary"></i>
+                </span>
+            
+                    </label>
                     <input
                       id="fontSize"
                       type="number"
@@ -500,7 +525,14 @@
               
                   <!-- Font Color Input -->
                   <div class="col-md-4 mb-3">
-                    <label for="fontColor" class="col-createChart-label fw-bold fs-6 ">Label Font Color</label>
+                    <label for="fontColor" class="col-createChart-label fw-bold fs-6 ">Label Font Color
+                      <span class="ms-2 text-primary"
+                      [ngbTooltip]="fontColorTooltip"
+                      placement="top"
+                      container="body">
+                  <i class="bi bi-info-circle fs-5 text-primary"></i>
+                </span>
+                    </label>
                     <div class="d-flex align-items-center">
                       <!-- Color Picker Input -->
                       <input
@@ -523,7 +555,16 @@
 
                   <div class="col-md-4">
                     <div class="d-flex flex-column">
-                      <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Label Font Style</label>
+                      <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Label Font Style
+                        <span class="ms-2 text-primary"
+                        (mouseenter)="openFontStyleModal(fontStyleHelpSection)"
+                        style="cursor: pointer;">
+                    <i class="bi bi-info-circle fs-5 text-primary"></i>
+                  </span>
+                      </label>
+
+
+                      
                       <ngx-select
                         id="selectType"
                         [allowClear]="true"
@@ -541,7 +582,14 @@
 
 
                   <div class="col-md-4 mb-3">
-                    <label for="fontSizeValue" class="col-createChart-label fw-bold fs-6 ">Value Font Size</label>
+                    <label for="fontSizeValue" class="col-createChart-label fw-bold fs-6 ">Value Font Size
+                      <span class="ms-2 text-primary"
+                      [ngbTooltip]="valueFontSizeTooltip"
+                      placement="top"
+                      container="body">
+                  <i class="bi bi-info-circle fs-5 text-primary"></i>
+                </span>
+                    </label>
                     <input
                       id="fontSizeValue"
                       type="number"
@@ -557,7 +605,14 @@
               
                   <!-- Font Color Input -->
                   <div class="col-md-4 mb-3">
-                    <label for="fontColorValue" class="col-createChart-label fw-bold fs-6 ">Value Font Color</label>
+                    <label for="fontColorValue" class="col-createChart-label fw-bold fs-6 ">Value Font Color
+                      <span class="ms-2 text-primary"
+                      [ngbTooltip]="valueFontColorTooltip"
+                      placement="top"
+                      container="body">
+                  <i class="bi bi-info-circle fs-5 text-primary"></i>
+                </span>
+                    </label>
                     <div class="d-flex align-items-center">
                       <!-- Color Picker Input -->
                       <input
@@ -580,7 +635,13 @@
 
                   <div class="col-md-4">
                     <div class="d-flex flex-column">
-                      <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Value Font Style</label>
+                      <label for="dashboardIds" class="col-createChart-label fw-bold fs-6">Value Font Style
+                        <span class="ms-2 text-primary"
+                        (mouseenter)="openFontStyleModal(fontStyleHelpSection)"
+                        style="cursor: pointer;">
+                    <i class="bi bi-info-circle fs-5 text-primary"></i>
+                  </span>
+                      </label>
                       <ngx-select
                         id="selectType"
                         [allowClear]="true"
@@ -609,6 +670,13 @@
                   <div class="row">
                     <div class="col-md-6" [formGroup]="createKPIWidget">
                       <label class="col-lg-12 col-createChart-label fw-bold fs-6 ">Equation Count
+                        <span class="ms-2 text-primary"
+                        [ngbTooltip]="equationCountTooltip"
+                        placement="top"
+                        container="body">
+                    <i class="bi bi-info-circle fs-5 text-primary"></i>
+                  </span>
+              
                       </label>
                       <input type="number" class="
                                         form-control form-control-lg form-control-solid
@@ -634,9 +702,12 @@
                 <div class="col-md-4 d-flex flex-column">
                   <label for="formlist" class="col-createChart-label fw-bold fs-6 mb-2">
                     Forms
-                    <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
-                      <i class="bi bi-info-circle fs-5"></i>
-                    </span>
+                    <span class="ms-2 text-primary"
+                    [ngbTooltip]="equationFormTooltip"
+                    container="body"
+                    placement="top">
+                <i class="bi bi-info-circle fs-5 text-primary"></i>
+              </span>
                   </label>
                   <ngx-select
                     id="formlist"
@@ -653,7 +724,15 @@
               
                 <!-- Form Fields -->
                 <div class="col-md-4 d-flex flex-column" *ngIf ="listofEquationParam&&listofEquationParam[fieldIndex]">
-                  <label for="EquationParam" class="fw-bold fs-6 mb-2">Form Fields</label>
+                  <label for="EquationParam" class="fw-bold fs-6 mb-2">Form Fields
+                    <span class="ms-2 text-primary"
+                    [ngbTooltip]="formFieldsTooltip"
+                    placement="top"
+                    container="body">
+                <i class="bi bi-info-circle fs-5 text-primary"></i>
+              </span>
+            
+                  </label>
                   <p-multiSelect
                 
                     formControlName="EquationParam"
@@ -668,9 +747,11 @@
                 <div class="col-md-4 d-flex flex-column">
                   <label for="primaryValue" class="col-createChart-label fw-bold fs-6 mb-2">
                     Operation
-                    <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Show Value As">
-                      <i class="bi bi-info-circle fs-5"></i>
-                    </span>
+                    <span class="ms-2 text-primary"
+                    (mouseenter)="openPrimaryValueInfoModal(Tile1HelpModal)"
+                    style="cursor: pointer;">
+                <i class="bi bi-info-circle fs-5 text-primary"></i>
+              </span>
                   </label>
                   <ngx-select
                     id="primaryValue"
@@ -702,7 +783,14 @@
               </div>
             
               <div class="col-md-12 mb-3">
-                <label for="description" class="col-createChart-label fw-bold fs-6">Equation</label>
+                <label for="description" class="col-createChart-label fw-bold fs-6">Equation
+                  <span class="ms-2 text-primary"
+                  (mouseenter)="openEquationHelpTile(helpSectionEquation)"
+                  style="cursor: pointer;">
+              <i class="bi bi-info-circle fs-5 text-primary"></i>
+            </span>
+                </label>
+                
                 <textarea
                   id="description"
                   formControlName="EquationDesc"
@@ -722,9 +810,12 @@
               <div class="col-md-4 mb-3">
                 <label for="formlist" class="col-createChart-label fw-bold fs-6 ">
                   Forms
-                  <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
-                    <i class="bi bi-info-circle fs-5"></i>
-                  </span>
+                  <span class="ms-2 text-primary"
+                  [ngbTooltip]="formTooltip"
+                  placement="top"
+                  container="body">
+              <i class="bi bi-info-circle fs-5 text-primary"></i>
+            </span>
                 </label>
                 <ngx-select
             
@@ -744,9 +835,12 @@
               <div class="col-md-4 mb-3">
                 <label for="formlist" class="col-createChart-label fw-bold fs-6 ">
                   Mini Table Name
-                  <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select form from the list">
-                    <i class="bi bi-info-circle fs-5"></i>
-                  </span>
+                  <span class="ms-2 text-primary"
+                  [ngbTooltip]="MiniformTooltip"
+                  placement="top"
+                  container="body">
+              <i class="bi bi-info-circle fs-5 text-primary"></i>
+            </span>
                 </label>
                 <ngx-select
             
@@ -765,7 +859,14 @@
   
        
             <div class="col-md-4 mb-3">
-              <label class="fw-bold fs-6">Mini Table Fields</label>
+              <label class="fw-bold fs-6">Mini Table Fields
+                <span class="ms-2 text-primary"
+                [ngbTooltip]="miniTableFieldsTooltip"
+                placement="top"
+                container="body">
+            <i class="bi bi-info-circle fs-5 text-primary"></i>
+          </span>
+              </label>
               <p-multiSelect
                   formControlName="MiniTableFields"
                   [options]="filteredHeaders"
@@ -778,9 +879,11 @@
         <div class="col-md-4 d-flex flex-column">
           <label for="primaryValue" class="col-createChart-label fw-bold fs-6 mb-2">
             Operation
-            <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Show Value As">
-              <i class="bi bi-info-circle fs-5"></i>
-            </span>
+            <span class="ms-2 text-primary"
+            (mouseenter)="openPrimaryValueInfoModal(Tile1HelpModal)"
+            style="cursor: pointer;">
+        <i class="bi bi-info-circle fs-5 text-primary"></i>
+      </span>
           </label>
           <ngx-select
             id="primaryValue"
@@ -805,7 +908,13 @@
    
         
           <div class="col-md-12 mb-3">
-            <label for="description" class="col-createChart-label fw-bold fs-6">Equation</label>
+            <label for="description" class="col-createChart-label fw-bold fs-6">Equation
+              <span class="ms-2 text-primary"
+              (mouseenter)="openWidgetAdvanceEquationHelp(WidgetAdvanceEquationHelp)"
+              style="cursor: pointer;">
+          <i class="bi bi-info-circle fs-5 text-primary"></i>
+        </span>
+            </label>
             <textarea
               id="description"
               formControlName="minitableEquation"
@@ -1017,4 +1126,62 @@
         <app-tile1-help-format-type
     
         ></app-tile1-help-format-type>
+      </ng-template>
+      <ng-template #WidgetFilterHelp let-modal>
+        <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Close"
+            (click)="modal.dismiss()"
+            style="position: relative; top: 4px; right: 4px;">
+          </button>
+        </div>
+        <app-help-section-filter
+      
+        ></app-help-section-filter>
+      </ng-template>
+
+
+      <ng-template #fontStyleHelpSection let-modal>
+        <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Close"
+            (click)="modal.dismiss()"
+            style="position: relative; top: 4px; right: 4px;">
+          </button>
+        </div>
+        <app-help-section-font-style
+      
+        ></app-help-section-font-style>
+      </ng-template>
+      <ng-template #WidgetAdvanceEquationHelp let-modal>
+        <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Close"
+            (click)="modal.dismiss()"
+            style="position: relative; top: 4px; right: 4px;">
+          </button>
+        </div>
+        <app-help-section-advance-equation
+      
+        ></app-help-section-advance-equation>
+      </ng-template>
+      <ng-template #helpSectionEquation let-modal>
+        <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Close"
+            (click)="modal.dismiss()"
+            style="position: relative; top: 4px; right: 4px;">
+          </button>
+        </div>
+        <app-help-section-equation-tiles
+      
+        ></app-help-section-equation-tiles>
       </ng-template>

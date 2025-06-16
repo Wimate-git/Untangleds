@@ -5,14 +5,14 @@
   </div>
     <!-- <button type="button" class="btn-close" aria-label="Close"   (click)="modal.dismiss()"></button> -->
   </div>
-  <div class="modal-body right-side-modal" style="max-height: 100%; overflow-y: auto;">
+  <div class="modal-body right-side-modal" >
     <div class="card-body pt-0">
       <div class="container1">
 
   
         
         <div *ngFor="let tableId of tableIds" style="margin-bottom: 40px;">
-          <h3 class="text-center pt-5 mb-3">{{ tableNamesMap[tableId] }}</h3>
+          <h3 class="text-center pt-5 mb-3 text-primary">{{ tableNamesMap[tableId] }}</h3>
         
           <div class="ag-theme-alpine" style="width: 100%;">
             <ag-grid-angular

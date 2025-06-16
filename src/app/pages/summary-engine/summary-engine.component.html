@@ -1092,7 +1092,7 @@
   
   
   <ng-template #summaryModal let-modal>
-    <div class="modal-header" style="max-width: 1500px; display: flex; justify-content: space-between; align-items: flex-start;">
+    <div class="modal-header" style=" display: flex; justify-content: space-between; align-items: flex-start;">
       <h2 class="modal-title">{{ showHeading ? 'Add Summary' : 'Edit Summary' }}</h2>
       <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
     </div>
@@ -2675,9 +2675,20 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   </ng-template>
 
   <ng-template #nestedTable let-modal>
+    <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+        style="position: relative; top: 4px; right: 4px;">
+      </button>
+    </div>
+    <div class="modal-body" style="height: 100%; overflow-y: auto;">
     <app-nested-table
     [miniTableData]="miniTableData" [emitEvent]="emitEvent" [SK_clientID]="SK_clientID" [FormNameMini]="FormNameMini"
     ></app-nested-table>
+    </div>
   </ng-template>
 
 
@@ -2692,10 +2703,11 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
       </button>
     </div>
   
-  
+    <div class="modal-body" style="height: 100%; overflow-y: auto;">
     <app-mini-table-view-tile1
     [minitableDataTile1]="minitableDataTile1" [emitEvent]="emitEvent" [SK_clientID]="SK_clientID" [FormNameMini]="FormNameMini"
     ></app-mini-table-view-tile1>
+    </div>
   </ng-template>
   <ng-template #miniTableViewChart1 let-modal>
     <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
@@ -2707,9 +2719,12 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
         style="position: relative; top: 4px; right: 4px;">
       </button>
     </div>
+    <div class="modal-body" style="height: 100%; overflow-y: auto;">
     <app-mini-table-view-chart1
     [minitableDataChart1]="minitableDataChart1" [emitEvent]="emitEvent" [SK_clientID]="SK_clientID" [FormNameMini]="FormNameMini"
     ></app-mini-table-view-chart1>
+
+    </div>
   </ng-template>
 
 
@@ -2724,9 +2739,48 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
         style="position: relative; top: 4px; right: 4px;">
       </button>
     </div>
+    <div class="modal-body" style="height: 100%; overflow-y: auto;">
     <app-mini-table-view-chart3
     [minitableDataChart3]="minitableDataChart3" [emitEvent]="emitEvent" [SK_clientID]="SK_clientID" [FormNameMini]="FormNameMini"
     ></app-mini-table-view-chart3>
+    </div>
+  </ng-template>
+
+
+
+
+  <ng-template #miniTableViewStackedBar let-modal>
+    <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+        style="position: relative; top: 4px; right: 4px;">
+      </button>
+    </div>
+    <div class="modal-body" style="height: 100%; overflow-y: auto;">
+    <app-mini-table-view-stackedbar
+    [minitableDataStacked]="minitableDataStacked" [emitEvent]="emitEvent" [SK_clientID]="SK_clientID" [FormNameMini]="FormNameMini"
+    ></app-mini-table-view-stackedbar>
+    </div>
+  </ng-template>
+
+  <ng-template #miniTableViewFunnelChart let-modal>
+    <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+        style="position: relative; top: 4px; right: 4px;">
+      </button>
+    </div>
+    <div class="modal-body" style="height: 100%; overflow-y: auto;">
+    <app-mini-table-view-funnel-chart
+    [minitableDataFunnelChart]="minitableDataFunnelChart" [emitEvent]="emitEvent" [SK_clientID]="SK_clientID" [FormNameMini]="FormNameMini"
+    ></app-mini-table-view-funnel-chart>
+    </div>
   </ng-template>
 
   <ng-template #dataTableModal let-modal>
@@ -2737,13 +2791,14 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   </ng-template>
   <ng-template #dataTableStackedModal let-modal>
     <app-data-table-stacked-bar
-    [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"  (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)" [SK_clientID]="SK_clientID"
+    [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"  (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)" 
+    (miniTableIconChart1)="receiveminiTableStackedChart($event,miniTableViewStackedBar)" [SK_clientID]="SK_clientID" (emitfullRowData)="miniTableDataReceiveChart1($event)" (sendFormNameForMini)="helperForName($event)"
     ></app-data-table-stacked-bar>
   </ng-template>
   <ng-template #dataTableModalChart1 let-modal>
     <app-data-table-chart1
    
-       [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)" (miniTableIconChart1)="receiveminiTableChart1($event,miniTableViewChart1)"   (emitfullRowData)="miniTableDataReceiveChart1($event)" (sendFormNameForMini)="helperForName($event)" [SK_clientID]="SK_clientID"
+       [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)" (miniTableIconChart1)="receiveminiTableChart1($event,miniTableViewChart1)"   (emitfullRowData)="miniTableDataReceiveChart1($event)" (sendFormNameForMini)="helperForName($event)" [SK_clientID]="SK_clientID" [userId]="userId" [userPass]="userPass"
     ></app-data-table-chart1>
   </ng-template>
 
@@ -2810,7 +2865,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
 
   <ng-template #htmlModal let-modal>
     <app-html-modal
-    [modal]="modal" [blobUrl]="blobUrl"
+    [modal]="modal" [iframeSafeUrl]="iframeSafeUrl"
     ></app-html-modal>
   </ng-template>
 
@@ -2828,6 +2883,7 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
     <app-data-table-funnel-chart
    
        [sendRowDynamic]="sendRowDynamic" [all_Packet_store]="all_Packet_store" [chartDataConfigExport]="chartDataConfigExport"   (dataTableCellInfo)="readdataTableCellInfo($event,htmlModal)" [SK_clientID]="SK_clientID"
+       (miniTableIconChart1)="receiveminiTableFunnelChart($event,miniTableViewFunnelChart)" (emitfullRowData)="miniTableDataReceiveChart1($event)" (sendFormNameForMini)="helperForName($event)"
     ></app-data-table-funnel-chart>
   </ng-template>
   

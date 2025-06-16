@@ -270,7 +270,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
 
   center: google.maps.LatLngLiteral = { lat: 20.5937, lng: 78.9629 };
   zoom = 5; // Adjust the zoom level
-
+  iframeSafeUrl: SafeResourceUrl = ''; 
   // Marker positions
   markers = [
     { lat: 28.6139, lng: 77.209, label: 'Delhi' }, // Delhi
@@ -384,6 +384,8 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
   minitableDataChart1: any;
   minitableDataChart3: any;
   paginationDataStore: any[];
+  minitableDataFunnelChart: any;
+  minitableDataStacked: any;
 
   createPieChart() {
     const chartOptions: any = {
@@ -1325,127 +1327,266 @@ Highcharts.chart('MixedChart', barchartOptions);
   iframeUrl!: SafeResourceUrl;
 
   async reloadPage(key:any,permissionfromOnInit?:any) {
-    if (key === "from_ts") {
-      this.isLoading = true; 
+  //   if (key === "from_ts") {
+  //     this.isLoading = true; 
 
-      try {
-        this.spinner.show('dataProcess')
-          // ✅ Ensure we await the resolved value of permissionfromOnInit
-          const resolvedPermission = await permissionfromOnInit;
+  //     try {
+  //       this.spinner.show('dataProcess')
+  //         // ✅ Ensure we await the resolved value of permissionfromOnInit
+  //         const resolvedPermission = await permissionfromOnInit;
           
-          console.log("✅ Resolved permissionfromOnInit check:", resolvedPermission);
+  //         console.log("✅ Resolved permissionfromOnInit check:", resolvedPermission);
 
-          // ✅ Extract values safely after resolving the Promise
-          const permissionId = resolvedPermission?.permissionId || "";
-          const permissionList = resolvedPermission?.readFilterEquationawait || [];
-          console.log('permissionList check',permissionList)
-          const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+  //         // ✅ Extract values safely after resolving the Promise
+  //         const permissionId = resolvedPermission?.permissionId || "";
+  //         const permissionList = resolvedPermission?.readFilterEquationawait || [];
+  //         console.log('permissionList check',permissionList)
+  //         const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
 
-          // ✅ Construct the request body
-          const requestBody = {
-              body: JSON.stringify({
-                  clientId: this.SK_clientID,
-                  routeId: this.routeId,
-                  permissionId: permissionId,  // Extracted from resolved data
-                  permissionList: permissionList, // Extracted from advance_report
-                  userName: this.userdetails
-              }),
-          };
+  //         // ✅ Construct the request body
+  //         const requestBody = {
+  //             body: JSON.stringify({
+  //                 clientId: this.SK_clientID,
+  //                 routeId: this.routeId,
+  //                 permissionId: permissionId,  // Extracted from resolved data
+  //                 permissionList: permissionList, // Extracted from advance_report
+  //                 userName: this.userdetails
+  //             }),
+  //         };
 
-          console.log("🚀 Final requestBody: liveTrigger", requestBody);
-          this.http.post(apiUrl, requestBody).subscribe(
-            (response: any) => {
-              console.log('Lambda function triggered successfully:', response);
+  //         console.log("🚀 Final requestBody: liveTrigger", requestBody);
+  //         this.http.post(apiUrl, requestBody).subscribe(
+  //           (response: any) => {
+  //             console.log('Lambda function triggered successfully:', response);
           
-              // Ensure response status is 200 before processing
-              if (response?.statusCode === 200) {
-                try {
-                  const constLiveData = JSON.parse(response.body); // Parse the JSON body
-                  console.log('constLiveData check', constLiveData);
+  //             // Ensure response status is 200 before processing
+  //             if (response?.statusCode === 200) {
+  //               try {
+  //                 const constLiveData = JSON.parse(response.body); // Parse the JSON body
+  //                 console.log('constLiveData check', constLiveData);
           
-                  // Ensure Processed_Data exists in response
-                  if (constLiveData?.Processed_Data?.metadata?.grid_details) {
-                    const processedData = constLiveData.Processed_Data.metadata.grid_details;
-                    console.log('processedData check liveData', processedData);
-                    this.summaryService.updatelookUpData(processedData)
+  //                 // Ensure Processed_Data exists in response
+  //                 if (constLiveData?.Processed_Data?.metadata?.grid_details) {
+  //                   const processedData = constLiveData.Processed_Data.metadata.grid_details;
+  //                   console.log('processedData check liveData', processedData);
+  //                   this.summaryService.updatelookUpData(processedData)
 
-                  } else {
-                    console.error('Processed_Data.metadata.grid_details not found in response');
-                    Swal.fire({
-                      title: 'Error!',
-                      text: 'No data found in response. Please check the input.',
-                      icon: 'error',
-                      confirmButtonText: 'OK'
-                    });
-                  }
-                } catch (error) {
-                  console.error('Error parsing response body:', error);
-                  Swal.fire({
-                    title: 'Error!',
-                    text: 'Invalid response format received.',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                  });
-                }
+  //                 } else {
+  //                   console.error('Processed_Data.metadata.grid_details not found in response');
+  //                   Swal.fire({
+  //                     title: 'Error!',
+  //                     text: 'No data found in response. Please check the input.',
+  //                     icon: 'error',
+  //                     confirmButtonText: 'OK'
+  //                   });
+  //                 }
+  //               } catch (error) {
+  //                 console.error('Error parsing response body:', error);
+  //                 Swal.fire({
+  //                   title: 'Error!',
+  //                   text: 'Invalid response format received.',
+  //                   icon: 'error',
+  //                   confirmButtonText: 'OK'
+  //                 });
+  //               }
+  //             } else {
+  //               console.error('Unexpected statusCode:', response?.statusCode);
+  //               Swal.fire({
+  //                 title: 'Error!',
+  //                 text: `Unexpected response received (Status Code: ${response?.statusCode}).`,
+  //                 icon: 'error',
+  //                 confirmButtonText: 'OK'
+  //               });
+  //             }
+          
+  //             setTimeout(() => {
+  //               this.spinner.hide('dataProcess');
+  //               this.isLoading = false; 
+                
+  //             }, 500); // Reset loading state
+  //         if(key="from_ts"){
+  //           this.route.paramMap.subscribe(params => {
+  //             this.routeId = params.get('id');
+  //             if (this.routeId) {
+  //               // this.openModalHelpher(this.routeId);
+  //               this.editButtonCheck = true;
+  //             }
+  //           });
+  //         }
+  //             // Proceed with route parameter handling
+         
+  //           },
+  //           (error) => {
+  //             console.error('Error triggering Lambda function:', error);
+          
+  //             // Handle different error codes
+  //             if (error.status === 404) {
+  //               console.log('Received 404 error - stopping loading and showing error message.');
+  //               Swal.fire({
+  //                 title: 'Error!',
+  //                 text: 'Data not found. Please check your inputs and try again.',
+  //                 icon: 'error',
+  //                 confirmButtonText: 'OK'
+  //               });
+  //             } else {
+  //               Swal.fire({
+  //                 title: 'Error!',
+  //                 text: 'Failed to trigger the Lambda function. Please try again.',
+  //                 icon: 'error',
+  //                 confirmButtonText: 'OK'
+  //               });
+  //             }
+          
+  //             this.spinner.hide('dataProcess');
+  //             this.isLoading = false; // Ensure loading is stopped in all error cases
+  //           }
+  //         );
+        
+
+  //     } catch (error) {
+  //         console.error("❌ Error resolving permissionfromOnInit:", error);
+  //         return null; // Return null in case of failure
+  //     }
+  // }
+
+
+
+  if (key === "from_ts") {
+    this.isLoading = true;
+  
+    try {
+      this.spinner.show('dataProcess');
+  
+      // ✅ Timeout logic – triggers after 2 minutes if no response
+      const lambdaTimeout = setTimeout(() => {
+        console.error('⚠️ Lambda function timed out after 2 minutes.');
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to trigger the Lambda function. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+        this.spinner.hide('dataProcess');
+        this.isLoading = false;
+      }, 120000); // 2 minutes
+  
+      // ✅ Await permission
+      const resolvedPermission = await permissionfromOnInit;
+      console.log("✅ Resolved permissionfromOnInit check:", resolvedPermission);
+  
+      const permissionId = resolvedPermission?.permissionId || "";
+      const permissionList = resolvedPermission?.readFilterEquationawait || [];
+      console.log('permissionList check', permissionList);
+  
+      const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+  
+      const requestBody = {
+        body: JSON.stringify({
+          clientId: this.SK_clientID,
+          routeId: this.routeId,
+          permissionId: permissionId,
+          permissionList: permissionList,
+          userName: this.userdetails
+        }),
+      };
+  
+      console.log("🚀 Final requestBody: liveTrigger", requestBody);
+  
+      this.http.post(apiUrl, requestBody).subscribe(
+        (response: any) => {
+          clearTimeout(lambdaTimeout); // ✅ Clear timeout on success
+          console.log('Lambda function triggered successfully:', response);
+  
+          if (response?.statusCode === 200) {
+            try {
+              const constLiveData = JSON.parse(response.body);
+              console.log('constLiveData check', constLiveData);
+  
+              if (constLiveData?.Processed_Data?.metadata?.grid_details) {
+                const processedData = constLiveData.Processed_Data.metadata.grid_details;
+                console.log('processedData check liveData', processedData);
+                setTimeout(() => {
+                  this.summaryService.updatelookUpData(processedData);
+                  
+                }, 1000);
+       
               } else {
-                console.error('Unexpected statusCode:', response?.statusCode);
+                console.error('Processed_Data.metadata.grid_details not found in response');
                 Swal.fire({
                   title: 'Error!',
-                  text: `Unexpected response received (Status Code: ${response?.statusCode}).`,
+                  text: 'No data found in response. Please check the input.',
                   icon: 'error',
                   confirmButtonText: 'OK'
                 });
               }
-          
-              setTimeout(() => {
-                this.spinner.hide('dataProcess');
-                this.isLoading = false; 
-                
-              }, 500); // Reset loading state
-          if(key="from_ts"){
+            } catch (error) {
+              console.error('Error parsing response body:', error);
+              Swal.fire({
+                title: 'Error!',
+                text: 'Invalid response format received.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+              });
+            }
+          } else {
+            console.error('Unexpected statusCode:', response?.statusCode);
+            Swal.fire({
+              title: 'Error!',
+              text: `Unexpected response received (Status Code: ${response?.statusCode}).`,
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
+          }
+  
+          setTimeout(() => {
+            this.spinner.hide('dataProcess');
+            this.isLoading = false;
+          }, 2000);
+  
+          // Optional route param logic
+          if (key === "from_ts") {
             this.route.paramMap.subscribe(params => {
               this.routeId = params.get('id');
               if (this.routeId) {
-                // this.openModalHelpher(this.routeId);
                 this.editButtonCheck = true;
               }
             });
           }
-              // Proceed with route parameter handling
-         
-            },
-            (error) => {
-              console.error('Error triggering Lambda function:', error);
-          
-              // Handle different error codes
-              if (error.status === 404) {
-                console.log('Received 404 error - stopping loading and showing error message.');
-                Swal.fire({
-                  title: 'Error!',
-                  text: 'Data not found. Please check your inputs and try again.',
-                  icon: 'error',
-                  confirmButtonText: 'OK'
-                });
-              } else {
-                Swal.fire({
-                  title: 'Error!',
-                  text: 'Failed to trigger the Lambda function. Please try again.',
-                  icon: 'error',
-                  confirmButtonText: 'OK'
-                });
-              }
-          
-              this.spinner.hide('dataProcess');
-              this.isLoading = false; // Ensure loading is stopped in all error cases
-            }
-          );
-        
-
-      } catch (error) {
-          console.error("❌ Error resolving permissionfromOnInit:", error);
-          return null; // Return null in case of failure
-      }
-  }else if(key=='html'){
+        },
+        (error) => {
+          clearTimeout(lambdaTimeout); // ✅ Clear timeout on error
+          console.error('Error triggering Lambda function:', error);
+  
+          if (error.status === 404) {
+            Swal.fire({
+              title: 'Error!',
+              text: 'Data not found. Please check your inputs and try again.',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
+          } else {
+            Swal.fire({
+              title: 'Error!',
+              text: 'Failed to trigger the Lambda function. Please try again.',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
+          }
+  
+          this.spinner.hide('dataProcess');
+          this.isLoading = false;
+        }
+      );
+  
+    } catch (error) {
+      console.error("❌ Error resolving permissionfromOnInit:", error);
+      this.spinner.hide('dataProcess');
+      this.isLoading = false;
+      return null;
+    }
+  }
+  
+  else if(key=='html'){
       this.isLoading = true; // Set loading state to true
       console.log('this.routeId check', this.routeId);
       console.log('client id check', this.SK_clientID);
@@ -4298,20 +4439,28 @@ processFetchedData(result: any): void {
   // }
 
   convertToIST(epochTime: number): string {
-    const date = new Date(epochTime * 1000); // Convert to milliseconds
+    const date = new Date(epochTime * 1000); // No offset needed if system is in IST
 
-    // Manually format the date to dd/MM/yyyy
-    const day = this.padZero(date.getUTCDate()); // Get day and pad with zero if needed
-    const month = this.padZero(date.getUTCMonth() + 1); // Month is 0-indexed
-    const year = date.getUTCFullYear(); // Get full year
-
-    return `${day}/${month}/${year}`; // Return formatted date string
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+    const year = date.getFullYear();
+  
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+  
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  
   }
+  
+  padZero(value: number): string {
+    return value < 10 ? `0${value}` : `${value}`;
+  }
+  
 
   // Helper function to pad single digit numbers with a leading zero
-  private padZero(value: number): string {
-    return value < 10 ? '0' + value : value.toString();
-  }
+  // private padZero(value: number): string {
+  //   return value < 10 ? '0' + value : value.toString();
+  // }
 
 
   openSummaryTable(content: any) {
@@ -6428,7 +6577,7 @@ console.log('selectedTab checking',this.selectedTab)
     console.log('tempClient checking', tempClient);
   
     const createdDate = Math.ceil(new Date().getTime() / 1000); // Created date
-    const updatedDate = Math.ceil(new Date().getTime() / 1000); // Updated date
+    const updatedDate = Math.ceil(Date.now() / 1000); // Updated date
     // LiveDashboard:this.createSummaryField.value.LiveDashboard,
   
     // Prepare summary details using duplicateData
@@ -7242,38 +7391,34 @@ console.log('selectedTab checking',this.selectedTab)
           title: '<span style="color: black;">Updated</span>',
           data: 'P4',
           render: function (data) {
-            const updatedDate = new Date(data * 1000);
-            const formattedDate = new Intl.DateTimeFormat('en-US', {
-              weekday: 'short',
-              day: '2-digit',
-              month: 'short',
-            }).format(updatedDate);
-            const formattedTime = updatedDate.toLocaleTimeString('en-US', {
-              hour12: false,
-              hour: '2-digit',
-              minute: '2-digit',
-            });
-            return `<div class="wrap-text" style="width:150px;word-break:break-word;overflow-wrap:break-word">${formattedDate} ${formattedTime}</div>`; // Apply wrap-text here
+            const date = new Date(data * 1000);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const formattedDateTime = `${day}/${month}/${year} ${hours}:${minutes}`;
+            
+            return `<div class="wrap-text" style="width:150px;word-break:break-word;overflow-wrap:break-word">${formattedDateTime}</div>`;
           },
         },
+        
         {
           title: '<span style="color: black;">Created</span>',
           data: 'P5',
           render: function (data) {
-            const createdDate = new Date(data * 1000);
-            const formattedDate = new Intl.DateTimeFormat('en-US', {
-              weekday: 'short',
-              day: '2-digit',
-              month: 'short',
-            }).format(createdDate);
-            const formattedTime = createdDate.toLocaleTimeString('en-US', {
-              hour12: false,
-              hour: '2-digit',
-              minute: '2-digit',
-            });
-            return `<div class="wrap-text" style="width:150px;word-break:break-word;overflow-wrap:break-word">${formattedDate} ${formattedTime}</div>`; // Wrap text here
+            const date = new Date(data * 1000);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const formattedDateTime = `${day}/${month}/${year} ${hours}:${minutes}`;
+        
+            return `<div class="wrap-text" style="width:150px;word-break:break-word;overflow-wrap:break-word">${formattedDateTime}</div>`;
           },
-        },
+        }
+,        
         {
           title: '<span style="color: black;">Created UserName</span>',
           data: 'P6',
@@ -7534,12 +7679,22 @@ if (key !=='addPin'){
 
 
   // Set timestamps and users
-  const originalCreatedDate =
-    this.allCompanyDetails.crDate || Math.ceil(new Date().getTime() / 1000);
+  console.log('this.lookup_data_summaryCopy check from updateSummary',this.lookup_data_summaryCopy)
+  console.log('this.routeId check from updateSummary',this.routeId)
+  const matchedPacket = this.lookup_data_summaryCopy.find((packet: any) => packet.P1 === this.routeId);
+
+console.log('Matched Packet: lookup', matchedPacket);
+
+  const originalCreatedDate =matchedPacket.P5 ||this.allCompanyDetails.crDate || Math.ceil(Date.now()/1000)
+
+    
+    console.log('originalCreatedDate checking before update',originalCreatedDate)
   const originalCreatedUser =
     this.allCompanyDetails.createdUser || this.getLoggedUser.username;
 
-  const updatedDate = Math.ceil(new Date().getTime() / 1000);
+    const updatedDate = Math.ceil(Date.now() / 1000);
+    console.log("Stored:", updatedDate);  // ✅ Just store current epoch
+    console.log("Display: check before update", this.formatEpochToIST(updatedDate));
 
   // Construct tempObj for validation and submission
   let serializedQueryParams = JSON.stringify(this.updatedQueryPramas);
@@ -7605,6 +7760,20 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
 }
 
   
+ formatEpochToIST(data: number): string {
+  const date = new Date(data * 1000); // No offset needed if system is in IST
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+  const year = date.getFullYear();
+
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+}
+
+
   handlePin(receiveItem: any) {
     console.log('receiveItem check:', receiveItem);
     console.log("Pin clicked!"); // Debugging output
@@ -7906,7 +8075,7 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
 
 
     const createdDate = Math.ceil((new Date()).getTime() / 1000); // Created date
-    const updatedDate = Math.ceil((new Date()).getTime() / 1000); // Updated date
+    const updatedDate = Math.ceil(Date.now() / 1000); // Updated date
 
     // Prepare summary details
     this.allCompanyDetails = {
@@ -9901,100 +10070,147 @@ helperChartClickFunnel(event: any, modalChart: any) {
   });
 
 
-  async readdataTableCellInfo(readData: any, modalref: any) {
-    this.isLoading = true;
-    this.spinner.show('FormView');
+  // async readdataTableCellInfo(readData: any, modalref: any) {
+  //   this.isLoading = true;
+  //   this.spinner.show('FormView');
     
-    console.log('readData from parent:', readData);
+  //   console.log('readData from parent:', readData);
   
-    if (!readData?.data) {
-      console.error('Invalid readData object:', readData);
-      this.isLoading = false;
-      this.spinner.hide('FormView');
-      return;
-    }
+  //   if (!readData?.data) {
+  //     console.error('Invalid readData object:', readData);
+  //     this.isLoading = false;
+  //     this.spinner.hide('FormView');
+  //     return;
+  //   }
   
-    let formId = readData.data.PK ? readData.data.PK.split("#")[1] || "" : "";
-    console.log('formId checking from dataTableCell', formId);
+  //   let formId = readData.data.PK ? readData.data.PK.split("#")[1] || "" : "";
+  //   console.log('formId checking from dataTableCell', formId);
   
-    // Wait for the blobUrl to be generated and accessible
-    try {
-      this.blobUrl = await this.blobService.createBlobUrl(formId);
-    } catch (error) {
-      console.error("Error generating blob URL:", error);
-      this.isLoading = false;
-      this.spinner.hide('FormView');
-      return;
-    }
-    console.log('this.blobUrl checking from summary', this.blobUrl);
+  //   // Wait for the blobUrl to be generated and accessible
+  //   try {
+  //     this.blobUrl = await this.blobService.createBlobUrl(formId);
+  //   } catch (error) {
+  //     console.error("Error generating blob URL:", error);
+  //     this.isLoading = false;
+  //     this.spinner.hide('FormView');
+  //     return;
+  //   }
+  //   console.log('this.blobUrl checking from summary', this.blobUrl);
   
-    let SK = readData.data.SK;
+  //   let SK = readData.data.SK;
   
-    window.pk = `${this.SK_clientID}#${formId}#main`;
-    window.sk = typeof SK === 'number' ? SK : Number(SK);
+  //   window.pk = `${this.SK_clientID}#${formId}#main`;
+  //   window.sk = typeof SK === 'number' ? SK : Number(SK);
   
-    console.log('✅ Stored PK in window:', window.pk);
-    console.log('✅ Stored SK in window:', window.sk);
+  //   console.log('✅ Stored PK in window:', window.pk);
+  //   console.log('✅ Stored SK in window:', window.sk);
   
-    // Update iframe src to blobUrl after generating it
-    const iframe: any = document.querySelector("iframe");
-    console.log('iframe checking from summaryEngine',iframe)
+  //   // Update iframe src to blobUrl after generating it
+  //   const iframe: any = document.querySelector("iframe");
+  //   console.log('iframe checking from summaryEngine',iframe)
   
-    if (iframe) {
-      iframe.src = this.blobUrl;  // Ensure iframe source is updated with blobUrl
-      console.log("✅ Iframe src updated:", iframe.src);
-    } else {
-      console.warn("⚠️ Iframe not found for updating src.");
-    }
+  //   if (iframe) {
+  //     iframe.src = this.blobUrl;  // Ensure iframe source is updated with blobUrl
+  //     console.log("✅ Iframe src updated:", iframe.src);
+  //   } else {
+  //     console.warn("⚠️ Iframe not found for updating src.");
+  //   }
   
-    // Check if iframe is available and post the message to iframe
-    const iframeCheckInterval = setInterval(() => {
-      let iframe: any = document.querySelector("iframe");
+  //   // Check if iframe is available and post the message to iframe
+  //   const iframeCheckInterval = setInterval(() => {
+  //     let iframe: any = document.querySelector("iframe");
   
-      // Check if iframe is ready and blobUrl is available
-      if (iframe && iframe.contentWindow && this.blobUrl) {
-        clearInterval(iframeCheckInterval); // Stop checking once iframe is found and contentWindow is accessible
-        console.log('✅ iframe.contentWindow is available');
+  //     // Check if iframe is ready and blobUrl is available
+  //     if (iframe && iframe.contentWindow && this.blobUrl) {
+  //       clearInterval(iframeCheckInterval); // Stop checking once iframe is found and contentWindow is accessible
+  //       console.log('✅ iframe.contentWindow is available');
   
-        // Post the message to iframe if contentWindow is available
-        iframe.contentWindow?.postMessage({
-          pk: `${this.SK_clientID}#${formId}#main`,
-          sk: typeof SK === 'number' ? SK : Number(SK),
-          clientId: this.SK_clientID,
-          loginDetail: this.getLoggedUser,
-          blobUrl: this.blobUrl  // Include the blobUrl in the message
-        }, "*");  // '*' means the message can be received from any origin. You can replace '*' with the specific iframe origin if needed.
+  //       // Post the message to iframe if contentWindow is available
+  //       iframe.contentWindow?.postMessage({
+  //         pk: `${this.SK_clientID}#${formId}#main`,
+  //         sk: typeof SK === 'number' ? SK : Number(SK),
+  //         clientId: this.SK_clientID,
+  //         loginDetail: this.getLoggedUser,
+  //         blobUrl: this.blobUrl  // Include the blobUrl in the message
+  //       }, "*");  // '*' means the message can be received from any origin. You can replace '*' with the specific iframe origin if needed.
         
-        console.log("✅ Sent PK, SK & blobUrl to iframe via postMessage");
+  //       console.log("✅ Sent PK, SK & blobUrl to iframe via postMessage");
   
-      } else {
-        console.warn("⚠️ iframe.contentWindow or blobUrl not available, retrying...");
-      }
-    }, 500);  // Check every 500ms (adjust as needed)
+  //     } else {
+  //       console.warn("⚠️ iframe.contentWindow or blobUrl not available, retrying...");
+  //     }
+  //   }, 500);  // Check every 500ms (adjust as needed)
   
-    // Increase timeout for retrying iframe availability (increase from 10 to 20 seconds)
-    setTimeout(() => {
-      clearInterval(iframeCheckInterval); // Stop checking after timeout
-      console.error("⚠️ Timeout: iframe or blobUrl not available after retries.");
-      this.isLoading = false;
-      this.spinner.hide('FormView');
-    }, 20000);  // Timeout after 20 seconds (increased)
+  //   // Increase timeout for retrying iframe availability (increase from 10 to 20 seconds)
+  //   setTimeout(() => {
+  //     clearInterval(iframeCheckInterval); // Stop checking after timeout
+  //     console.error("⚠️ Timeout: iframe or blobUrl not available after retries.");
+  //     this.isLoading = false;
+  //     this.spinner.hide('FormView');
+  //   }, 20000);  // Timeout after 20 seconds (increased)
   
-    // Open modal after a short delay
-    setTimeout(() => {
+  //   // Open modal after a short delay
+  //   setTimeout(() => {
+  //     this.modalService.open(modalref, {
+  //       modalDialogClass: 'p-9',
+  //       centered: true,
+  //       fullscreen: true,
+  //       backdrop: 'static',  // Disable closing on backdrop click
+  //       keyboard: false
+  //     });
+  //   }, 1000);
+  
+  //   this.isLoading = false;
+  //   this.spinner.hide('FormView');
+  // }
+  
+  
+  
+  async readdataTableCellInfo(readData: any, modalref?: any) {
+    let queryParams: any = {};
+  
+    // Wait for query params
+    await new Promise<void>((resolve) => {
+      this.route.queryParams.subscribe((params) => {
+        if (params['uID']) this.userId = params['uID'];
+        if (params['pass']) this.userPass = params['pass'];
+        resolve();
+      });
+    });
+  
+    const storePk = readData.data.PK;
+    const formName = storePk.split('#')[1];
+  
+    const recordIdObj = {
+      type: "view",
+      fields: {},
+      mainTableKey: JSON.stringify(readData.data.SK)
+    };
+  
+    const jsonString = JSON.stringify(recordIdObj);
+    const escapedString = `"${jsonString.replace(/"/g, '\\"')}"`;
+    const encodedRecordId = encodeURIComponent(escapedString);
+  
+    const targetUrl = `/view-dreamboard/Forms/${formName}&recordId=${encodedRecordId}&isFullScreen=true`;
+    console.log('Final Target URL:', targetUrl);
+  
+    // ✅ If userId and pass exist → open modal with iframe
+    if (this.userId && this.userPass) {
+      // ✅ Open in modal iframe
+      this.iframeSafeUrl = targetUrl;
+  
       this.modalService.open(modalref, {
+        fullscreen: true,
         modalDialogClass: 'p-9',
         centered: true,
-        fullscreen: true,
-        backdrop: 'static',  // Disable closing on backdrop click
+        backdrop: 'static',
         keyboard: false
       });
-    }, 1000);
-  
-    this.isLoading = false;
-    this.spinner.hide('FormView');
+    } else {
+      // ✅ Open in new tab
+      window.open(targetUrl, '_blank');
+    }
   }
-  
   
   
 
@@ -10061,6 +10277,44 @@ receiveminiTableChart3(checkevent:any,modalref: any){
 
 }
 
+
+receiveminiTableStackedChart(checkevent:any,modalref: any){
+  console.log('checkevent checking',checkevent)
+  this.isLoading = true;
+
+  this.spinner.show('FormView')
+   
+  this.minitableDataStacked = checkevent
+
+
+  setTimeout(() => {
+    this.modalService.open(modalref,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
+  }, 500);
+
+  this.isLoading = false;
+  this.spinner.hide('FormView')
+
+}
+
+receiveminiTableFunnelChart(checkevent:any,modalref: any){
+  console.log('checkevent checking',checkevent)
+  this.isLoading = true;
+
+  this.spinner.show('FormView')
+   
+  this.minitableDataFunnelChart = checkevent
+
+
+  setTimeout(() => {
+    this.modalService.open(modalref,{  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false  });
+  }, 500);
+
+  this.isLoading = false;
+  this.spinner.hide('FormView')
+
+}
 
 
   
@@ -10314,7 +10568,7 @@ receiveminiTableChart3(checkevent:any,modalref: any){
     const originalCreatedUser =
       this.allCompanyDetails.createdUser || this.getLoggedUser.username;
   
-    const updatedDate = Math.ceil(new Date().getTime() / 1000);
+      const updatedDate = Math.ceil(Date.now() / 1000);
   
     // Construct tempObj for validation and submission
     let serializedQueryParams = JSON.stringify(this.updatedQueryPramas);
@@ -10393,7 +10647,7 @@ receiveminiTableChart3(checkevent:any,modalref: any){
 
 
     const createdDate = Math.ceil((new Date()).getTime() / 1000); // Created date
-    const updatedDate = Math.ceil((new Date()).getTime() / 1000); // Updated date
+    const updatedDate = Math.ceil(Date.now() / 1000); // Updated date
 
     // Prepare summary details
     this.allCompanyDetails = {

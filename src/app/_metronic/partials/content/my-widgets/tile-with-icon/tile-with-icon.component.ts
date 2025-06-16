@@ -2896,7 +2896,41 @@ openPrimaryValueInfoModal(stepperModal: TemplateRef<any>) {
 
   iconFontSizeTooltip: string = 'Set the font size for the icon. The icon will scale up or down based on the value entered.';
 
+  fontColorTooltip: string = 'This sets the font color for the label on the tile. Select a color to apply.';
+  valueFontSizeTooltip: string = 'This sets the font size for the value displayed on the tile. Enter a size between 8 and 72.';
+  valueFontColorTooltip: string = 'This sets the font color for the value shown on the tile. Choose a color to apply.';
+  tileBackgroundTooltip: string = 'Select a background theme. The chosen color or gradient will be applied as the tile\'s background.';
+  equationCountTooltip: string = 'Enter the number of equations you want to configure. Based on this count, dynamic form sections will be generated below.';
+  equationFormTooltip: string = 'Choose the form you want to use for building this equation. The fields and operations shown next will be based on the selected form.';
+  formFieldsTooltip: string = 'Select one or more fields from the chosen form. These fields will be used to build the equation below.';
+  
+  filterParameterTooltip: string = 'Select form fields to apply filter conditions. The chosen fields will be used to filter data based on matching or non-matching values.';
+filterEquationTooltip: string = 'Displays the generated filter equation based on selected fields. Field values are inserted dynamically in the format: Field Name - ${fieldId}. Example: Customer Name-${text-1732773051881} && Status-${single-select-1732769559973}';
+fontSizeTooltip: string = 'This sets the font size for the label on the tile. Enter a value between 8 and 72.';
+MiniformTooltip:string ='Select a minitable name to view and analyze data specific to that minitable only.'
+miniTableFieldsTooltip:string = 'Specify which minitable fields to analyze. Results will be based solely on your selection.'
+openWidgetFilterHelp(stepperModal: TemplateRef<any>){
+  this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+    keyboard: false    });
+
+}
 
 
+openFontStyleModal(stepperModal: TemplateRef<any>){
+  this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+    keyboard: false    });
+
+}
+openWidgetAdvanceEquationHelp(stepperModal: TemplateRef<any>){
+  this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+    keyboard: false    });
+
+}
+
+openEquationHelpTile(stepperModal: TemplateRef<any>){
+  this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+    keyboard: false    });
+
+}
 
 }

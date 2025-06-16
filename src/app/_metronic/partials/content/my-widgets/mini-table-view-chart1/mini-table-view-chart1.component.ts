@@ -138,6 +138,9 @@ export class MiniTableViewChart1Component {
     
   
       async processEvent(event:any) {
+        // Declare once at the top (outside the function or loop)
+    
+    
         console.log('event', event);
         this.dynamicTableValues = event.data.dynamic_table_values;
         console.log('this.dynamicTableValues checking', this.dynamicTableValues);
@@ -150,17 +153,7 @@ export class MiniTableViewChart1Component {
         console.log('this.assignFormName', this.assignFormName);
       
         // ✅ **KEEPING YOUR EXISTING LOGIC UNCHANGED**
-        for (const tableId of this.tableIds) {
-            console.log(`Data for ${tableId}:`);
-      
-            this.dynamicTableValues[tableId].forEach(async (row: any, index: number) => {
-                console.log(`Row ${index + 1}:`, row);
-      
-                // Wait for fetchMiniTableData to complete
-      
-            
-            });
-        }
+
       
       
         const tablesReceive = await this.fetchMiniTableData(this.assignFormName); 
@@ -188,7 +181,17 @@ export class MiniTableViewChart1Component {
                 const modifiedName = table.name.replace('-table', ''); // Remove the -table suffix from the table name
                 return modifiedName === modifiedTableId;
             });
+        console.log('foundTables checking from tile1',foundTables)
+        const tableLabels = foundTables.map((table: any) => table.label).filter(Boolean); // Remove undefined/empty
+        // this.allTableLabels.push(...tableLabels); // Spread into push to avoid concat
+        // console.log('Updated All Table Labels:', this.allTableLabels);
         
+    
+        // this.allTableLabels = this.allTableLabels.concat(tableLabels);
+        
+        // console.log('Accumulated Table Labels:', this.allTableLabels);
+        
+    
             // Add all found matching tables to the matchingTables array
             if (foundTables.length > 0) {
                 matchingTables.push(...foundTables);
@@ -204,17 +207,12 @@ export class MiniTableViewChart1Component {
             for (let matchedTableData of matchingTables) {
                 console.log('Matched Table Data:', matchedTableData);
         
-                // Accessing the validation field with a null check
-                const validation = matchedTableData?.validation ?? 'No validation field available';
-                console.log('Validation:', validation);
-        
-                // Ensure `validation.formName_table` exists and is being logged correctly for each table
-                const validateFormName = validation?.formName_table ?? 'No formName_table available';
-                console.log('validateFormName:', validateFormName);
+          
         
                 // Update TableName if it exists
-                this.tableNamesMap[matchedTableData.name] = validateFormName;
-                console.log('')
+                // console.log()
+                // this.tableNamesMap[matchedTableData.name] = minitableName;
+                // console.log('')
                 
         
                 // Fetch column definitions
@@ -222,15 +220,72 @@ export class MiniTableViewChart1Component {
                 console.log('tableId checking for columns', tableId);  // Log the updated tableId
                 
       
-                const receiveData:any = await this.fetchMiniTableHeaders(validateFormName);
+                const receiveData:any = await this.fetchMiniTableHeaders(matchedTableData);
                 console.log('receiveData checking',receiveData)
+                const receviveFieldsItself = receiveData.columnDefs
+                console.log('receviveFieldsItself checking from mini table chart1',receviveFieldsItself)
+
+
+                for (const tableId of this.tableIds) {
+                  console.log(`Data for ${tableId}:`);
+                
+                  const columnDefs = receiveData.columnDefs; // full packets
+                  const allFieldNames = columnDefs.map((col: any) => col.field); // just the field names
+                
+                  this.dynamicTableValues[tableId].forEach((row: any, index: number) => {
+                    console.log(`Row data checking from minitablechart1 ${index + 1}:`, row);
+                  
+                    const filteredDateFields: any = {};
+                  
+                    // Step 1: Extract only date/time related keys
+                    Object.keys(row).forEach((key) => {
+                      if (
+                        key.startsWith('date') ||
+                        key.startsWith('datetime') ||
+                        key.startsWith('epoch-date') ||
+                        key.startsWith('epoch-datetime-local') ||
+                        key === 'created_time' ||
+                        key === 'updated_time' ||
+                        key.startsWith('time')
+                      ) {
+                        filteredDateFields[key] = row[key];
+                      }
+                    });
+                  
+                    console.log(`Filtered date/time fields for Row ${index + 1}:`, filteredDateFields);
+                  
+                    // Step 2: Find the matching packets
+                    const matchedPackets = columnDefs.filter((col: any) =>
+                      Object.keys(filteredDateFields).includes(col.field)
+                    );
+                  
+                    console.log(`✅ Matched Packets for Row ${index + 1}:`, matchedPackets);
+                  
+                    // Step 3: Format the values
+                    const result = this.dynamicDateTimeFormat(filteredDateFields, matchedPackets);
+                  
+                    console.log('✅ Formatted result:', result);
+                  
+                    // Step 4: Inject the formatted values directly into the row
+                    Object.keys(result).forEach((key) => {
+                      row[key] = result[key]; // ✅ overwrite with formatted value
+                    });
+                  
+                    // ✅ Now AG Grid will use updated `this.dynamicTableValues[tableId]`
+                  });
+                  
+                }
+                
+                
+                
                 
                 // console.log('columnDefs checking from Tile mini',columnDefs)
     
       
                 this.columnDefsMap[tableId] = receiveData.columnDefs;
                 console.log('this.columnDefsMap[tableId] chgeck from tile1',this.columnDefsMap[tableId])
-                this.tableNamesMap[tableId] = receiveData.formLabel
+                this.tableNamesMap[tableId] = receiveData.minitableName
+                console.log('this.tableNamesMap[tableId] checking from tile1',this.tableNamesMap[tableId])
                 
                 this.columnDefsSet = receiveData.columnDefs;
                 // console.log('Received Column Definitions:', columnDefs);
@@ -241,7 +296,7 @@ export class MiniTableViewChart1Component {
         
         
       
-        // ✅ **Trigger fetchMiniTableHeaders() for multiple form names**
+    
         if (event.data && event.data.dynamic_table_values) {
             console.log('event.data.dynamic_table_values', event.data.dynamic_table_values);
         }
@@ -250,6 +305,101 @@ export class MiniTableViewChart1Component {
       }
     
     
+      dynamicDateTimeFormat(reciveData: any, receiveFields: any) {
+        const formattedResults: any = {};
+      
+        receiveFields.forEach((packet: any) => {
+          const fieldName = packet.field;
+          let fieldValue = reciveData[fieldName];
+      
+          if (fieldValue) {
+            const validation = packet.validation || {};
+            const key = fieldName.toLowerCase();
+      
+            const defaultDateFormat = 'DD/MM/YYYY';
+            const defaultTimeFormat = '24-hour (HH:mm)';
+      
+            const dateFormatType = (validation.dateFormatType || defaultDateFormat).toUpperCase();
+            const rawTimeFormatType = (validation.timeFormatType || defaultTimeFormat).toLowerCase();
+      
+            console.log('🕒 timeFormatType:', rawTimeFormatType);
+      
+            // ✅ Standardize time format
+            const timeFormat = rawTimeFormatType.includes('am/pm') || rawTimeFormatType.includes('12-hour')
+              ? 'hh:mm A'
+              : 'HH:mm';
+      
+            let format = '';
+      
+            // 🧠 Parse epoch fields
+            if (key.startsWith('epoch-date') || key.startsWith('epoch-datetime-local')) {
+              const epoch = typeof fieldValue === 'string' ? parseInt(fieldValue) : fieldValue;
+              fieldValue = new Date(epoch);
+            }
+      
+            // 🧠 Patch time-only strings (e.g. "13:40")
+            if (typeof fieldValue === 'string' && key.startsWith('time') && !key.startsWith('datetime')) {
+              fieldValue = `1970-01-01T${fieldValue}`;
+            }
+      
+            // ⏱️ Convert to valid Date
+            const parsedDate = fieldValue instanceof Date ? fieldValue : new Date(fieldValue);
+      
+            if (isNaN(parsedDate.getTime())) {
+              formattedResults[fieldName] = '';
+              return;
+            }
+      
+            // 🧩 Format type decision
+            if (key === 'updated_time') {
+              format = 'DD/MM/YYYY';
+            } else if (key.startsWith('time') && !key.startsWith('datetime')) {
+              format = timeFormat;
+            } else if (key.startsWith('datetime')) {
+              format = `${dateFormatType} ${timeFormat}`;
+            } else if (key.startsWith('date') && !key.startsWith('datetime')) {
+              format = dateFormatType;
+            } else if (key.startsWith('epoch-date')) {
+              format = dateFormatType;
+            } else if (key.startsWith('epoch-datetime-local')) {
+              format = `${dateFormatType} ${timeFormat}`;
+            }
+      
+            const formattedDate = this.formatDateByPattern(parsedDate, format);
+            formattedResults[fieldName] = formattedDate;
+          }
+        });
+      
+        console.log('✅ Final Formatted DateTime Fields:', formattedResults);
+        return formattedResults;
+      }
+      
+
+      formatDateByPattern(inputDate: string | number | Date, format: string): string {
+        const date = new Date(inputDate);
+        const pad = (num: number) => String(num).padStart(2, '0');
+      
+        const hours24 = date.getHours();
+        const hours12 = hours24 % 12 || 12;
+        const ampm = hours24 >= 12 ? 'PM' : 'AM';
+      
+        const replacements: Record<string, string> = {
+          YYYY: String(date.getFullYear()),
+          MM: pad(date.getMonth() + 1),
+          DD: pad(date.getDate()),
+          HH: pad(hours24),
+          hh: pad(hours12),
+          mm: pad(date.getMinutes()),
+          ss: pad(date.getSeconds()),
+          A: ampm,
+          a: ampm.toLowerCase()
+        };
+      
+        return format.replace(/YYYY|MM|DD|HH|hh|mm|ss|A|a/g, match => replacements[match]);
+      }
+      
+      
+      
     
     async fetchMiniTableData(item: any) {
       try {
@@ -282,77 +432,89 @@ export class MiniTableViewChart1Component {
     
     
     
-  
     async fetchMiniTableHeaders(items: any) {
-      try {
-        // Check if items is an array or a single value
-        const formNames = Array.isArray(items) ? items : [items];
-    
-        const allColumnDefs = [];
-        const results = [];
-    
-        // Iterate over each formName (whether single or multiple)
-        for (let formName of formNames) {
-          const resultHeaders: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#" + formName + "#main", 1);
-    
-          if (resultHeaders) {
-            console.log('forms checking', resultHeaders);
-            const helpherObjmainHeaders = JSON.parse(resultHeaders.metadata);
-            console.log('helpherObjmain checking', helpherObjmainHeaders);
-    
-            // Ensure formFields exist and is an array
-            if (helpherObjmainHeaders?.formFields && Array.isArray(helpherObjmainHeaders.formFields)) {
-    
-              // Initialize extractedTableHeaders as an object
-              if (!this.extractedTableHeaders) {
-                this.extractedTableHeaders = {};
-              }
-    
-              // Store extracted form fields by formLabel
-              const formLabel = helpherObjmainHeaders.formLabel;
-       
-    
-              if (!this.extractedTableHeaders[formLabel]) {
-                this.extractedTableHeaders[formLabel] = {
-                  formFields: helpherObjmainHeaders.formFields,
-                  formName:helpherObjmainHeaders.formLabel,
-  
-                  columnDefs: helpherObjmainHeaders.formFields.map((field: { label: string; name: string }) => ({
-                    headerName: field.label,
-                    field: field.name,
-                    sortable: true,
-                    filter: true,
-                    resizable: true
-                  }))
-                };
-              }
-    
-              console.log(`Extracted Form Fields for: ${formLabel}`);
-              
-              this.storeFormLabel = formLabel
-              console.log('Column Definitions:', this.extractedTableHeaders[formLabel].columnDefs);
-              console.log('this.storeFormLabel chcking',this.storeFormLabel)
-    
-              // Add columnDefs of this form to the allColumnDefs array
-              results.push({
-                formLabel,
-                columnDefs: this.extractedTableHeaders[formLabel].columnDefs
-              });
-            }
-          }
+
+      // Accessing the validation field with a null check
+      const validation = items?.validation ?? 'No validation field available';
+      console.log('Validation:', validation);
+
+      // Ensure `validation.formName_table` exists and is being logged correctly for each table
+      const validateFormName = validation?.formName_table ?? 'No formName_table available';
+      console.log('validateFormName:', validateFormName);
+      const minitableName = items.label
+try {
+  // Check if items is an array or a single value
+  const formNames = Array.isArray(validateFormName) ? validateFormName : [validateFormName];
+
+  const allColumnDefs = [];
+  const results = [];
+
+  // Iterate over each formName (whether single or multiple)
+  for (let formName of formNames) {
+    const resultHeaders: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#" + formName + "#main", 1);
+
+    if (resultHeaders) {
+      console.log('forms checking', resultHeaders);
+      const helpherObjmainHeaders = JSON.parse(resultHeaders.metadata);
+      console.log('helpherObjmain checking', helpherObjmainHeaders);
+
+      // Ensure formFields exist and is an array
+      if (helpherObjmainHeaders?.formFields && Array.isArray(helpherObjmainHeaders.formFields)) {
+
+        // Initialize extractedTableHeaders as an object
+        if (!this.extractedTableHeaders) {
+          this.extractedTableHeaders = {};
         }
-    
-        // Return all columnDefs for the forms (single or multiple)
-        return results.length > 1 ? results : results[0];
+
+        // Store extracted form fields by formLabel
+        const formLabel = helpherObjmainHeaders.formLabel;
+ 
+        if (!this.extractedTableHeaders[formLabel]) {
+          this.extractedTableHeaders[formLabel] = {
+            formFields: helpherObjmainHeaders.formFields,
+            formName: helpherObjmainHeaders.formLabel,
         
-  
-      } catch (err) {
-        console.log("Error fetching the dynamic form data", err);
+            columnDefs: helpherObjmainHeaders.formFields.map((field: { label: string; name: string; validation?: any }) => ({
+              headerName: field.label,
+              field: field.name,
+              sortable: true,
+              filter: true,
+              resizable: true,
+              validation: field.validation || {} // ✅ Include validation metadata
+            }))
+          };
+        }
+        
+
+        console.log(`Extracted Form Fields for: ${formLabel}`);
+        console.log('this.extractedTableHeaders[formLabel] checking before applying',this.extractedTableHeaders[formLabel])
+        this.storeFormLabel = formLabel
+        // const formNameMini=receiveActualTableNames
+
+        console.log('Column Definitions:', this.extractedTableHeaders[formLabel].columnDefs);
+        console.log('this.storeFormLabel chcking',this.storeFormLabel)
+
+        // Add columnDefs of this form to the allColumnDefs array
+        results.push({
+          minitableName,
+          columnDefs: this.extractedTableHeaders[formLabel].columnDefs
+
+        });
       }
-    
-      // In case no data is fetched, return an empty array
-      return [];
     }
+  }
+console.log('results checking from tile1',results)
+  // Return all columnDefs for the forms (single or multiple)
+  return results.length > 1 ? results : results[0];
+  
+
+} catch (err) {
+  console.log("Error fetching the dynamic form data", err);
+}
+
+// In case no data is fetched, return an empty array
+return [];
+}
     
     
     

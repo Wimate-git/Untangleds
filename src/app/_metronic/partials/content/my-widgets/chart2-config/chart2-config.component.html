@@ -11,7 +11,7 @@
           placement="top"
           container="body"
           style="cursor: pointer;">
-          <i class="bi bi-info-circle fs-5"></i>
+          <i class="bi bi-info-circle fs-5 text-primary"></i>
         </span>
         </label>
         <input type="number" class="
@@ -30,7 +30,7 @@
           placement="top"
           container="body"
           style="cursor: pointer;">
-      <i class="bi bi-info-circle fs-5"></i>
+      <i class="bi bi-info-circle fs-5 text-primary"></i>
     </span> </label>
   
         <input type="text" class="
@@ -85,7 +85,7 @@
           [ngbTooltip]="moduleNamesTooltip"
           placement="top"
           container="body">
-      <i class="bi bi-info-circle fs-5"></i>
+      <i class="bi bi-info-circle fs-5 text-primary"></i>
     </span>
 
   
@@ -108,7 +108,7 @@
           <span class="ms-2 text-primary"
           (mouseenter)="openRedirectionTypeInfoModal(Chart1RedirectionType)"
           style="cursor: pointer;">
-      <i class="bi bi-info-circle fs-5"></i>
+      <i class="bi bi-info-circle fs-5 text-primary"></i>
     </span>
         </label>
         <ngx-select
@@ -129,7 +129,7 @@
             [ngbTooltip]="redirectToTooltip"
             placement="top"
             container="body">
-        <i class="bi bi-info-circle fs-5"></i>
+        <i class="bi bi-info-circle fs-5 text-primary"></i>
       </span>
           </label>
           <ngx-select
@@ -208,7 +208,7 @@
                   (click)="selectedSettingsTab('settings-tab')">Settings</a>
               </li>
             </div> -->
-            <div class="col-2" role="Advanced">
+            <div class="col-3" role="Advanced">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="advanced-tabpane" data-bs-toggle="tab" role="tab"
                   aria-controls="advanced-tab" aria-selected="false"
@@ -216,15 +216,15 @@
               </li>
             </div>
 
-            <div class="col-2" role="drill">
+            <!-- <div class="col-2" role="drill">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="drill-tab" data-bs-toggle="tab" role="tab"
                   aria-controls="drill-tab" aria-selected="false" (click)="selectedSettingsTab('drill-tab')">Drill Down Type</a>
               </li>
-            </div>
+            </div> -->
 
 
-            <div class="col-2" role="Settings">
+            <div class="col-3" role="Settings">
               <li class="nav-item">
                 <a class="nav-link text-active-primary me-6" id="settings-tab" data-bs-toggle="tab" role="tab"
                   aria-controls="settings-tab" aria-selected="false" (click)="selectedSettingsTab('settings-tab')">Settings</a>
@@ -251,7 +251,7 @@
                           [ngbTooltip]="formTooltip"
                           placement="top"
                           container="body">
-                      <i class="bi bi-info-circle fs-5"></i>
+                      <i class="bi bi-info-circle fs-5 text-primary"></i>
                     </span>
                         </label>
                         <ngx-select id="formlist" [allowClear]="true" name="icon" formControlName="formlist"
@@ -269,7 +269,7 @@
                         [ngbTooltip]="parameterTooltip"
                         placement="top"
                         container="body">
-                    <i class="bi bi-info-circle fs-5"></i>
+                    <i class="bi bi-info-circle fs-5 text-primary"></i>
                   </span>
                       </label>
                       <p-multiSelect id="parameterName" formControlName="parameterName"
@@ -294,7 +294,7 @@
                           <span class="ms-2 text-primary"
                           (mouseenter)="openPrimaryValueInfoModal(Tile1HelpModal)"
                           style="cursor: pointer;">
-                      <i class="bi bi-info-circle fs-5"></i>
+                      <i class="bi bi-info-circle fs-5 text-primary"></i>
                     </span>
                         </label>
                         <ngx-select id="primaryValue" [allowClear]="true" formControlName="primaryValue"
@@ -327,7 +327,7 @@
                           container="body"
                           tooltipClass="custom-tooltip"
                           style="cursor: pointer;">
-                      <i class="bi bi-info-circle fs-5"></i>
+                      <i class="bi bi-info-circle fs-5 text-primary"></i>
                     </span>
                         </label>
                         <input id="undefinedCheckLabel" type="text" class="form-control form-control-solid" placeholder="Enter Value"
@@ -342,7 +342,7 @@
                           placement="top"
                           container="body"
                           tooltipClass="custom-tooltip">
-                      <i class="bi bi-info-circle fs-5"></i>
+                      <i class="bi bi-info-circle fs-5 text-primary"></i>
                     </span>
                         </label>
                         <input id="groupByFormat" type="text" class="form-control form-control-solid"
@@ -383,7 +383,7 @@
                           placement="top"
                           container="body"
                           style="cursor: pointer;">
-                      <i class="bi bi-info-circle fs-5"></i>
+                      <i class="bi bi-info-circle fs-5 text-primary"></i>
                     </span>
                         </label>
                         <ngx-select id="primaryValue" [allowClear]="true" formControlName="selectedRangeType"
@@ -410,7 +410,7 @@
                           [ngbTooltip]="columnVisibilityTooltip"
                           placement="top"
                           container="body">
-                      <i class="bi bi-info-circle fs-5"></i>
+                      <i class="bi bi-info-circle fs-5 text-primary"></i>
                     </span>
                         </label>
                         <p-multiSelect
@@ -430,7 +430,7 @@
                           placement="top"
                           container="body"
                           style="cursor: pointer;">
-                      <i class="bi bi-info-circle fs-5"></i>
+                      <i class="bi bi-info-circle fs-5 text-primary"></i>
                     </span>
                         </label>
                         <input type="text" class="form-control form-control-solid"  name="custom_Label"
@@ -446,7 +446,7 @@
                           
                           placement="top"
                           container="body">
-                      <i class="bi bi-info-circle fs-5"></i>
+                      <i class="bi bi-info-circle fs-5 text-primary"></i>
                     </span>
                         </label>
                         <ngx-select
@@ -483,7 +483,7 @@
                             container="body"
                             style="cursor: pointer;"
                           >
-                            <i class="bi bi-info-circle fs-5"></i>
+                            <i class="bi bi-info-circle fs-5 text-primary"></i>
                           </span>
                           </label>
                           <p-multiSelect
@@ -505,7 +505,7 @@
                               container="body"
                               style="cursor: pointer;"
                             >
-                              <i class="bi bi-info-circle fs-5"></i>
+                              <i class="bi bi-info-circle fs-5 text-primary"></i>
                             </span>
                       
                             </label>
@@ -541,7 +541,13 @@
          
               <form [formGroup]="createChart">
                 <div class="form-group">
-                  <label for="jsonInput" class="col-createChart-label fw-bold fs-6">Highcharts Options:</label>
+                  <label for="jsonInput" class="col-createChart-label fw-bold fs-6">Highcharts Options:
+                    <span class="ms-2 text-primary"
+                    (mouseenter)="openHelpChartOtions(chartOptionsHelp)"
+                    style="cursor: pointer;">
+                <i class="bi bi-info-circle fs-5 text-primary"></i>
+              </span>
+                  </label>
                   <textarea id="jsonInput" class="form-control" rows="8" formControlName="highchartsOptionsJson"
                             placeholder="Enter Highcharts options as JSON"></textarea>
                 </div>
@@ -571,7 +577,11 @@
                 </div> -->
                 <!-- Form Fields -->
                 <div class="col-md-4">
-                  <label for="parameterName" class="fw-bold fs-6">Form Fields</label>
+                  <label for="parameterName" class="fw-bold fs-6">Form Fields
+                    <span class="ms-2 text-primary" [ngbTooltip]="filterParameterTooltip" container="body" placement="top">
+                      <i class="bi bi-info-circle fs-5 text-primary"></i>
+                    </span>
+                  </label>
                   <p-multiSelect
                     id="parameterName"
                     formControlName="filterParameter"
@@ -602,7 +612,13 @@
               </div>
           
               <div class="col-md-12 mb-3">
-                <label for="description" class="col-createChart-label fw-bold fs-6">Equation</label>
+                <label for="description" class="col-createChart-label fw-bold fs-6">Equation
+                  <span class="ms-2 text-primary"
+                  (mouseenter)="openWidgetFilterHelp(WidgetFilterHelp)"
+                  style="cursor: pointer;">
+              <i class="bi bi-info-circle fs-5 text-primary"></i>
+            </span>
+                </label>
                 <textarea
                 id="description"
                 formControlName="filterDescription"  
@@ -685,7 +701,7 @@
               Primary Value
               <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top"
                 title="Show Value As">
-                <i class="bi bi-info-circle fs-5"></i>
+                <i class="bi bi-info-circle fs-5 text-primary"></i>
               </span>
             </label>
             <ngx-select id="primaryValue" [allowClear]="true" formControlName="drillTypePrimary"
@@ -739,7 +755,16 @@
   
             <div class="col-md-4 mt-5">
               <div class="color-picker-container d-flex align-items-center">
-                <label for="textColorPicker" class="col-createChart-label fw-bold fs-6">Data Label Font Color</label>
+                <label for="textColorPicker" class="col-createChart-label fw-bold fs-6">Data Label Font Color
+                  <span
+                  class="ms-2 text-primary"
+                  [ngbTooltip]="dataLabelFontColorTooltip"
+                  container="body"
+                  placement="top"
+                  style="cursor: pointer;">
+                  <i class="bi bi-info-circle fs-5 text-primary"></i>
+                </span>
+                </label>
                 <input
                   id="textColorPicker"
                   type="color"
@@ -751,7 +776,16 @@
             </div>
             <div class="col-md-4 mt-5">
               <div class="color-picker-container d-flex align-items-center">
-                <label for="textColorPicker" class="col-createChart-label fw-bold fs-6 mb-0 me-2">BG Gradient Top Color</label>
+                <label for="textColorPicker" class="col-createChart-label fw-bold fs-6 mb-0 me-2">BG Gradient Top Color
+                  <span
+                  class="ms-2 text-primary"
+                  [ngbTooltip]="bgGradientTopColorTooltip"
+                  container="body"
+                  placement="top"
+                  style="cursor: pointer;">
+                  <i class="bi bi-info-circle fs-5 text-primary"></i>
+                </span>
+                </label>
                 <input
                   id="textColorPicker"
                   type="color"
@@ -764,7 +798,16 @@
             
             <div class="col-md-4 mt-5">
               <div class="color-picker-container d-flex align-items-center">
-                <label for="textColorPicker" class="col-createChart-label fw-bold fs-6">BG Gradient Bottom Color</label>
+                <label for="textColorPicker" class="col-createChart-label fw-bold fs-6">BG Gradient Bottom Color
+                  <span
+                  class="ms-2 text-primary"
+                  [ngbTooltip]="bgGradientBottomColorTooltip"
+                  container="body"
+                  placement="top"
+                  style="cursor: pointer;">
+                  <i class="bi bi-info-circle fs-5 text-primary"></i>
+                </span>
+                </label>
                 <input
                   id="textColorPicker"
                   type="color"
@@ -991,4 +1034,32 @@
     <app-chart1-helpredirection-type
   
     ></app-chart1-helpredirection-type>
+  </ng-template>
+  <ng-template #chartOptionsHelp let-modal>
+    <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+        style="position: relative; top: 4px; right: 4px;">
+      </button>
+    </div>
+    <app-help-section-chart-options
+  
+    ></app-help-section-chart-options>
+  </ng-template>
+  <ng-template #WidgetFilterHelp let-modal>
+    <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+        style="position: relative; top: 4px; right: 4px;">
+      </button>
+    </div>
+    <app-help-section-filter
+  
+    ></app-help-section-filter>
   </ng-template>

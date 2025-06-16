@@ -1984,6 +1984,11 @@ validateFormArray(): boolean {
     this.isHovered = true;
   }
   
+    openHelpChartOtions(stepperModal: TemplateRef<any>){
+      this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false    });
+  
+    }
   onMouseLeave(): void {
     this.isHovered = false;
   }
@@ -2124,6 +2129,12 @@ validateFormArray(): boolean {
       });
   }
 
+  
+  openWidgetFilterHelp(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+
+  }
 
   dynamicparameterValue(event: any, index: any): void {
     console.log('Event check for dynamic param:', event);
@@ -2942,7 +2953,7 @@ return this.readFilterEquation
 }
 
 }
-tooltipContent: string = 'Group data by time periods like Today, Last 7 Days, This Month, etc. to view filtered insights based on the selected range.';
+tooltipContent: string = 'Group data by time periods such as Today, Last 7 Days, This Month, or This Year to view filtered insights based on the selected range. For example, "This Year" refers to data from January to December of the current year.';
 formTooltip: string = 'Select a form to view and analyze data specific to that form only.';
 parameterTooltip: string = 'Specify which form fields to analyze. Results will be based solely on your selection.';
 
@@ -2964,6 +2975,19 @@ ChartTitletooltipContent: string = 'This title will appear as the heading of the
 customLabelValue: string = 'Enter a custom label to display inside the donut chart along with the value. This label helps identify what the value represents.';
 CustomValueLabelFontSize: string = 'Defines the font size of the custom label shown inside the donut chart.';
 CustomLineColorTooltip: string = 'Defines the color of the line in the line chart. The selected color will be applied to the plotted line.';
+filterParameterTooltip: string = 'Select form fields to apply filter conditions. The chosen fields will be used to filter data based on matching or non-matching values.';
+filterEquationTooltip: string = 'Displays the generated filter equation based on selected fields. Field values are inserted dynamically in the format: Field Name - ${fieldId}. Example: Customer Name-${text-1732773051881} && Status-${single-select-1732769559973}';
+highchartsOptionsTooltip: string = 'This area shows the chart settings in JSON format. You can edit it to change how the chart looks, like its type, colors, title, and more.';
+MiniformTooltip:string ='Select a minitable name to view and analyze data specific to that minitable only.'
+miniTableFieldsTooltip:string = 'Specify which minitable fields to analyze. Results will be based solely on your selection.'
+minitableEquationTooltip: string = 'Displays a formatted equation using the selected mini-table fields. Example: Count MultiplePram(${Personal Info.dynamic_table_values.table-1736939655825.text-1730976463331}). The equation is auto-generated based on your selections.';
+drillDownTypeTooltip: string = 'Select the drill down type for the chart. Choosing "Multi Level Drill Down" will allow you to configure infinite-level drill down logic dynamically.';
+drillSelectFieldTooltip: string = 'Choose the field to display in the next drill down level. For example, selecting "Customer Name" will show customer-specific data when a chart slice is clicked.';
+
+drillCustomLabelTooltip: string = 'Enter a custom label that will be used as the chart title at this drill down level. This helps identify the data shown at each step.';
+dataLabelFontColorTooltip: string = 'Choose a custom font color for the data labels displayed on the chart.';
+bgGradientTopColorTooltip: string = 'Select the top color for the chart background gradient. This will blend with the bottom color to create a smooth background effect.';
+bgGradientBottomColorTooltip: string = 'Select the bottom color for the chart background gradient. It merges with the top color to form the gradient.';
 
 
 

@@ -74,16 +74,22 @@ const dateKeys: string[] = [];
 this.sendRowDynamic.forEach((row: any) => {
   Object.keys(row).forEach((key) => {
     if (
-      (key.startsWith('date') ||
-       key.startsWith('datetime') ||
-       key.startsWith('epoch-date') ||
-       key.startsWith('epoch-datetime-local')) &&
+      (
+        key.startsWith('date') ||
+        key.startsWith('datetime') ||
+        key.startsWith('epoch-date') ||
+        key.startsWith('epoch-datetime-local') ||
+        key === 'created_time' ||
+        key === 'updated_time' ||
+        key.startsWith('time')
+      ) &&
       !dateKeys.includes(key)
     ) {
       dateKeys.push(key);
     }
   });
 });
+
 
 console.log('Extracted date/datetime keys:', dateKeys);
 this.FormName = this.chartDataConfigExport.columnVisibility[0].formlist
@@ -129,34 +135,47 @@ this.parseChartConfig(this.chartDataConfigExport)
         const isDateTimeKey = key.startsWith('datetime-');
         const isEpochDate = key.startsWith('epoch-date-');
         const isEpochDateTime = key.startsWith('epoch-datetime-local-');
+        const isCreatedOrUpdated = key === 'created_time' || key === 'updated_time';
+        const isTime = key.startsWith('time-');
   
-        if (isDateKey || isDateTimeKey || isEpochDate || isEpochDateTime) {
-          const matchingField = receiveformatPckets.find(
-            (packet: any) => packet.name === key
-          );
+        // ✅ Handle created_time / updated_time
+        if (isCreatedOrUpdated) {
+          const epoch = parseInt(row[key], 10);
+          if (!isNaN(epoch)) {
+            const epochMs = epoch < 1e12 ? epoch * 1000 : epoch;
+            row[key] = this.formatDate(new Date(epochMs).toISOString(), 'DD/MM/YYYY');
+          }
+          return;
+        }
   
+        if (isDateKey || isDateTimeKey || isEpochDate || isEpochDateTime || isTime) {
+          const matchingField = receiveformatPckets.find((packet: any) => packet.name === key);
           if (matchingField) {
             const validation = matchingField.validation || {};
             const dateFormat = validation.dateFormatType || 'DD/MM/YYYY';
             const timeFormat = validation.timeFormatType || '12-hour (hh:mm AM/PM)';
   
-            console.log('Date Format Applied:', dateFormat);
-            console.log('Time Format Applied:', timeFormat);
+            // console.log('Date Format Applied:', dateFormat);
+            // console.log('Time Format Applied:', timeFormat);
   
             let rawValue = row[key];
   
-            // ✅ Convert epoch to ISO string (only if it's a number)
-            if ((isEpochDate || isEpochDateTime) && rawValue) {
+            // ✅ Convert epoch to ISO string if applicable
+            if ((isEpochDate || isEpochDateTime || isTime) && rawValue) {
               const epoch = parseInt(rawValue, 10);
               if (!isNaN(epoch)) {
-                const epochMs = epoch < 1e12 ? epoch * 1000 : epoch; // Detect seconds vs milliseconds
+                const epochMs = epoch < 1e12 ? epoch * 1000 : epoch;
                 rawValue = new Date(epochMs).toISOString();
               }
             }
   
-            // ✅ Apply formatting
-            const requiresTime = isDateTimeKey || isEpochDateTime;
-            row[key] = this.formatDate(rawValue, dateFormat, requiresTime ? timeFormat : null);
+            // ✅ Decide if time formatting is needed
+            const requiresTime = isDateTimeKey || isEpochDateTime || isTime;
+  
+            // ✅ If it's a pure time field, skip dateFormat
+            const finalDateFormat = isTime ? null : dateFormat;
+  
+            row[key] = this.formatDate(rawValue, finalDateFormat, requiresTime ? timeFormat : null);
           }
         }
       });
@@ -167,35 +186,40 @@ this.parseChartConfig(this.chartDataConfigExport)
   
   
   
-  private formatDate(dateStr: string, dateFormat: string = 'DD/MM/YYYY', timeFormat?: string): string {
-    if (!dateStr || typeof dateStr !== 'string') return '';
+  
+  private formatDate(dateStr: string, dateFormat?: string, timeFormat?: string): string {
+    if (!dateStr) return '';
   
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) return '';
   
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = String(date.getFullYear());
-  
     let formattedDate = '';
-    switch (dateFormat.toUpperCase()) {
-      case 'MM/DD/YYYY':
-        formattedDate = `${month}/${day}/${year}`;
-        break;
-      case 'YYYY/MM/DD':
-        formattedDate = `${year}/${month}/${day}`;
-        break;
-      case 'DD/MM/YYYY':
-      default:
-        formattedDate = `${day}/${month}/${year}`;
-        break;
+    if (dateFormat) {
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = String(date.getFullYear());
+  
+      switch (dateFormat.toUpperCase()) {
+        case 'MM/DD/YYYY':
+          formattedDate = `${month}/${day}/${year}`;
+          break;
+        case 'YYYY/MM/DD':
+          formattedDate = `${year}/${month}/${day}`;
+          break;
+        case 'DD/MM/YYYY':
+        default:
+          formattedDate = `${day}/${month}/${year}`;
+          break;
+      }
     }
   
-    const resolvedTimeFormat = (timeFormat || '12-hour (hh:mm AM/PM)').trim().toLowerCase();
-    let formattedTime = '';
+    if (!timeFormat) return formattedDate;
+  
+    const resolvedTimeFormat = timeFormat.trim().toLowerCase();
     const hours = date.getHours();
     const minutes = String(date.getMinutes()).padStart(2, '0');
   
+    let formattedTime = '';
     if (resolvedTimeFormat.includes('am/pm')) {
       const hour12 = (hours % 12) || 12;
       const meridian = hours >= 12 ? 'PM' : 'AM';
@@ -204,7 +228,7 @@ this.parseChartConfig(this.chartDataConfigExport)
       formattedTime = `${String(hours).padStart(2, '0')}:${minutes}`;
     }
   
-    return timeFormat ? `${formattedDate} ${formattedTime}` : formattedDate;
+    return formattedDate ? `${formattedDate} ${formattedTime}` : formattedTime;
   }
   
 
@@ -509,21 +533,49 @@ this.parseChartConfig(this.chartDataConfigExport)
 
   clickLock = false; // Lock flag to prevent multiple clicks
 
-  onCellClick(eventData: any) {
+  onCellClick(eventData: any, isIconClick: boolean = false) {
+    console.log('eventdata checking from cell', eventData);
+  
+    // If already locked, ignore further clicks
     if (this.clickLock) {
       console.log("Click ignored: Already processing a click.");
-      return; // Ignore repeated clicks
+      return;
     }
   
-    this.clickLock = true; // Lock the click
-    console.log("eventData check for", eventData);
+    // Lock the click immediately to prevent multiple triggers
+    this.clickLock = true;
   
-    this.dataTableCellInfo.emit(eventData);
+    const storeminiTableData = eventData.value;
   
-    // Unlock click after a short delay (e.g., 500ms)
+    if (Object.keys(storeminiTableData).some(key => key.startsWith('table'))) {
+      // this.miniTableIconChart1.emit(eventData);
+      // If keys start with 'table', do nothing
+      console.log("Data contains 'table' key, no action taken.", eventData);
+    } else {
+      // If no key starts with 'table', proceed with the else block
+      console.log("Row clicked, eventData: ", eventData);
+
+      setTimeout(() => {
+        // Emit the event after a delay (500ms here)
+        this.dataTableCellInfo.emit(eventData);
+      }, 500);
+    
+  
+
+      
+      
+      // window.open(targetUrl, '_blank');
+      
+      // setTimeout(() => {
+      //   // Emit the event after a delay (500ms here)
+      //   this.dataTableCellInfo.emit(eventData);
+      // }, 500);
+    }
+  
+    // Unlock click after processing (to prevent multiple triggers)
     setTimeout(() => {
       this.clickLock = false;
-    }, 500);
+    }, 500); // The same delay as the timeout for emitting data
   }
   getFilteredData() {
     // Get the filtered nodes (those that are rendered based on the applied filters)

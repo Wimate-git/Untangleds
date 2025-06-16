@@ -107,6 +107,15 @@ export class Tile3ConfigComponent implements OnInit{
   ];
 
   filteredSelectTypeSummary = [...this.SelectTypeSummary]; 
+  allDeviceIds: any;
+  userdetails: any;
+  userClient: string;
+  permissionsMetaData: any;
+  permissionIdRequest: any;
+  storeFormIdPerm: any;
+  parsedPermission: any;
+  readFilterEquation: any;
+  summaryPermission: any;
   ngOnInit(){
     this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
     console.log('this.getLoggedUser check', this.getLoggedUser)
@@ -117,9 +126,10 @@ export class Tile3ConfigComponent implements OnInit{
     this.SK_clientID = this.getLoggedUser.clientID;
     console.log('this.SK_clientID check', this.SK_clientID)
     this.initializeTileFields2()
-    this.dynamicData()
+
     this.dashboardIds(1)
     this.dynamicDataEquation()
+    this.fetchUserPermissions(1)
 
   this.createKPIWidget2.get('selectType')?.valueChanges.subscribe(value => {
     this.showColumnVisibility = value === 'drill down';
@@ -636,19 +646,208 @@ onSelectTypeChange() {
     })
   }
 
-  async dynamicData(){
+
+  async dynamicData(receiveFormIds?: any) {
+    console.log('receiveFormIds checlking from',receiveFormIds)
     try {
       const result: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#lookup", 1);
       if (result) {
+        console.log('forms checking', result);
         const helpherObj = JSON.parse(result.options);
-        this.formList = helpherObj.map((item: [string]) => item[0]); // Explicitly define the type
-        this.listofDeviceIds = this.formList.map((form: string) => ({ text: form, value: form })); // Explicitly define the type here too
-        console.log('this.formList check from location', this.formList);
+        console.log('helpherObj checking', helpherObj);
+  
+        this.formList = helpherObj.map((item: [string]) => item[0]);
+         this.allDeviceIds = this.formList.map((form: string) => ({ text: form, value: form }));
+        console.log('allDeviceIds checking from',this.allDeviceIds)
+  
+        // ✅ Conditionally filter only if receiveFormIds has items
+        if (Array.isArray(receiveFormIds) && receiveFormIds.length > 0) {
+          const receivedSet = new Set(receiveFormIds);
+          this.listofDeviceIds = this.allDeviceIds.filter((item: { value: any; }) => receivedSet.has(item.value));
+        } else {
+          console.log('i am checking forms from else cond',this.allDeviceIds)
+          this.listofDeviceIds = this.allDeviceIds; // No filtering — use all
+
+        }
+  
+        console.log('Final listofDeviceIds:', this.listofDeviceIds);
       }
     } catch (err) {
       console.log("Error fetching the dynamic form data", err);
     }
   }
+
+
+  async fetchUserPermissions(sk: any) {
+    try {
+        this.userdetails = this.getLoggedUser.username;
+        this.userClient = `${this.userdetails}#user#main`;
+        console.log("this.tempClient from form service check", this.userClient);
+
+        // Fetch user permissions
+        const permission = await this.api.GetMaster(this.userClient, sk);
+        
+        if (!permission) {
+            console.warn("No permission data received.");
+            return null; // Fix: Returning null instead of undefined
+        }
+
+        console.log("Data checking from add form", permission);
+
+        // Parse metadata
+        const metadataString: string | null | undefined = permission.metadata;
+        if (typeof metadataString !== "string") {
+            console.error("Invalid metadata format:", metadataString);
+            return null; // Fix: Ensuring the function returns a value
+        }
+        console.log('metadataString checking for',metadataString)
+
+        try {
+            this.permissionsMetaData = JSON.parse(metadataString);
+            console.log("Parsed Metadata Object from location", this.permissionsMetaData);
+
+            const permissionId = this.permissionsMetaData.permission_ID;
+            console.log("permission Id check from Tile1", permissionId);
+            this.permissionIdRequest = permissionId;
+            console.log('this.permissionIdRequest checking',this.permissionIdRequest)
+            this.storeFormIdPerm = this.permissionsMetaData.form_permission
+            console.log('this.storeFormIdPerm check',this.storeFormIdPerm)
+    
+
+            if(this.permissionIdRequest=='All' && this.storeFormIdPerm=='All'){
+              this.dynamicData()
+
+            }else if(this.permissionIdRequest=='All' && this.storeFormIdPerm !=='All'){
+              const StorePermissionIds = this.storeFormIdPerm
+              this.dynamicData(StorePermissionIds)
+            }
+            else if (this.permissionIdRequest != 'All' && this.storeFormIdPerm[0] != 'All') {
+              const readFilterEquationawait: any = await this.fetchPermissionIdMain(1, permissionId);
+              console.log('main permission check from Tile1', readFilterEquationawait);
+            
+              if (Array.isArray(readFilterEquationawait)) {
+                const hasAllPermission = readFilterEquationawait.some(
+                  (packet: any) => Array.isArray(packet.dynamicForm) && packet.dynamicForm.includes('All')
+                );
+            
+                if (hasAllPermission) {
+                  const StorePermissionIds = this.storeFormIdPerm;
+                  this.dynamicData(StorePermissionIds);
+                } else {
+                  // Match dynamicForm values with storeFormIdPerm
+                  const dynamicFormValues = readFilterEquationawait
+                    .map((packet: any) => packet.dynamicForm?.[0]) // Get each dynamicForm value
+                    .filter((v: string | undefined) => !!v);        // Remove undefined
+            
+                  const matchedStoreFormIds = this.storeFormIdPerm.filter((id: string) =>
+                    dynamicFormValues.includes(id)
+                  );
+            
+                  console.log('matchedStoreFormIds:', matchedStoreFormIds);
+            
+                  this.dynamicData(matchedStoreFormIds); // ⬅️ Use the filtered list
+                }
+              } else {
+                console.warn('fetchPermissionIdMain did not return an array.');
+              }
+            }
+            else if (this.permissionIdRequest !== 'All' && this.storeFormIdPerm[0] === 'All') {
+              const readFilterEquationawait: any = await this.fetchPermissionIdMain(1, permissionId);
+              console.log('main permission check from Tile1', readFilterEquationawait);
+            
+              if (Array.isArray(readFilterEquationawait)) {
+                const hasAllPermission = readFilterEquationawait.some(
+                  (packet: any) => Array.isArray(packet.dynamicForm) && packet.dynamicForm.includes('All')
+                );
+            
+                if (hasAllPermission) {
+                  // No filtering needed, show all
+                  this.dynamicData();
+                } else {
+                  // Extract dynamicForm[0] from each packet
+                  const filteredFormIds = readFilterEquationawait
+                    .map((packet: any) => packet.dynamicForm?.[0])  // Get first value from each dynamicForm
+                    .filter((formId: string | undefined) => !!formId); // Remove undefined/null
+            
+                  console.log('filteredFormIds (no "All" present):', filteredFormIds);
+            
+                  this.dynamicData(filteredFormIds);
+                }
+              } else {
+                console.warn('fetchPermissionIdMain did not return an array.');
+              }
+            }
+            
+            
+            
+            // **Fix: Ensure fetchPermissionIdMain is awaited**
+
+
+         
+
+        } catch (error) {
+            console.error("Error parsing JSON:", error);
+            return null; // Fix: Ensuring return on JSON parsing failure
+        }
+    } catch (error) {
+        console.error("Error fetching user permissions:", error);
+        return null; // Fix: Ensuring return on outer try-catch failure
+    }
+}
+
+
+async fetchPermissionIdMain(clientID: number, p1Value: string): Promise<void> {
+
+  try {
+    console.log("p1Value checking", p1Value);
+    console.log("clientID checking", clientID);
+    console.log("this.SK_clientID checking from permission", this.SK_clientID);
+
+    const pk = `${this.SK_clientID}#permission#${p1Value}#main`;
+    console.log(`Fetching main table data for PK: ${pk}`);
+
+    const result: any = await this.api.GetMaster(pk, clientID);
+
+    if (!result || !result.metadata) {
+      console.warn("Result metadata is null or undefined.");
+// Resolve even if no data is found
+      return;
+    }
+
+    // Parse metadata
+    this.parsedPermission = JSON.parse(result.metadata);
+    console.log("Parsed permission metadata:", this.parsedPermission);
+
+    this.readFilterEquation = JSON.parse(this.parsedPermission.dynamicEntries);
+    console.log("this.readFilterEquation check", this.readFilterEquation);
+
+    // Handling Dashboard Permissions
+    this.summaryPermission = this.parsedPermission.summaryList || [];
+    console.log("this.summaryPermission check", this.summaryPermission);
+
+    // if (this.summaryPermission.includes("All")) {
+    //   console.log("Permission is 'All'. Fetching all dashboards...");
+
+return this.readFilterEquation
+    // } else {
+    //   console.log("Fetching specific dashboards...");
+    //   const allData = await this.fetchCompanyLookupdata(1);
+    //   this.dashboardData = allData.filter((dashboard: any) =>
+    //     this.summaryPermission.includes(dashboard.P1)
+    //   );
+    //   console.log("Filtered Dashboards Data:", this.dashboardData);
+    // }
+
+    // Extract Permission List
+ 
+    
+// Resolve the Promise after all operations are complete
+  } catch (error) {
+    console.error(`Error fetching data for PK (${p1Value}):`, error);
+// Reject in case of API failure
+  }
+
+}
   addTile(key: any) {
 if (key === 'tile3') {
      const uniqueId = this.generateUniqueId();

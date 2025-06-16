@@ -13,7 +13,7 @@
             placement="top"
             container="body"
             style="cursor: pointer;">
-            <i class="bi bi-info-circle fs-5"></i>
+            <i class="bi bi-info-circle fs-5 text-primary"></i>
           </span>
           </label>
           <input type="number" class="
@@ -31,7 +31,7 @@
             placement="top"
             container="body"
             style="cursor: pointer;">
-        <i class="bi bi-info-circle fs-5"></i>
+        <i class="bi bi-info-circle fs-5 text-primary"></i>
       </span>
           </label>
     
@@ -157,7 +157,7 @@
                           [ngbTooltip]="formTooltip"
                           placement="top"
                           container="body">
-                      <i class="bi bi-info-circle fs-5"></i>
+                      <i class="bi bi-info-circle fs-5 text-primary"></i>
                     </span>
                         </label>
                         <ngx-select
@@ -182,7 +182,7 @@
                           [ngbTooltip]="parameterTooltip"
                           placement="top"
                           container="body">
-                      <i class="bi bi-info-circle fs-5"></i>
+                      <i class="bi bi-info-circle fs-5 text-primary"></i>
                     </span>
                         </label>
                         <ngx-select
@@ -207,7 +207,7 @@
                           [ngbTooltip]="markerTooltip"
                           placement="top"
                           container="body">
-                          <i class="bi bi-info-circle fs-5"></i>
+                          <i class="bi bi-info-circle fs-5 text-primary"></i>
                         </span>
                         </label>
                         <select
@@ -243,7 +243,7 @@
           <span class="ms-2 text-primary"
           (mouseenter)="openDateTypeHelper(dateTypeHelpModal)"
           style="cursor: pointer;">
-      <i class="bi bi-info-circle fs-5"></i>
+      <i class="bi bi-info-circle fs-5 text-primary"></i>
     </span>
                           </label>
                   
@@ -271,7 +271,15 @@
                       getDateType(fieldIndex)?.value === 'in the past'" 
                class="mb-7 col-md-4">
             <div class="form-group row ps-4 mb-2">
-              <label class="fw-bold fs-6 required">Number of Days</label>
+              <label class="fw-bold fs-6 required">Number of Days
+                <span class="ms-2 text-primary"
+                [ngbTooltip]="'Data from the past entered number of days will be displayed.'"
+                placement="top"
+                container="body">
+            <i class="bi bi-info-circle fs-6 text-primary"></i>
+          </span>
+      
+              </label>
               <div >
                 <input type="number" formControlName="daysAgo" class="form-control" placeholder="Enter number of days">
               </div>
@@ -283,7 +291,14 @@
 <!-- For "between time" and "between" -->
 
   <div class="form-group row ps-4 mt-3 mb-7 col-md-4" *ngIf="getDateType(fieldIndex)?.value === 'between time' || getDateType(fieldIndex)?.value === 'between'">
-    <label class="fw-bold fs-6 required">Start Date</label>
+    <label class="fw-bold fs-6 required">Start Date
+      <span class="ms-2 text-primary"
+      [ngbTooltip]="'Select the start date for filtering records in the selected date range.'"
+      placement="top"
+      container="body">
+  <i class="bi bi-info-circle fs-6 text-primary"></i>
+</span>
+    </label>
     <div >
       <input 
         [type]="dateTypeConfig[getDateType(fieldIndex)?.value]?.isBetweenTime ? 'datetime-local' : 'date'" 
@@ -293,7 +308,14 @@
   </div>
 
   <div class="form-group row ps-4 mt-3 mb-7 col-md-4" *ngIf="getDateType(fieldIndex)?.value === 'between time' || getDateType(fieldIndex)?.value === 'between'">
-    <label class="fw-bold fs-6 required">End Date</label>
+    <label class="fw-bold fs-6 required">End Date
+      <span class="ms-2 text-primary"
+      [ngbTooltip]="'Select the end date. Data will be filtered up to this date (inclusive).' "
+      placement="top"
+      container="body">
+  <i class="bi bi-info-circle fs-6 text-primary"></i>
+</span>
+    </label>
     <div >
       <input 
         [type]="dateTypeConfig[getDateType(fieldIndex)?.value]?.isBetweenTime ? 'datetime-local' : 'date'" 
@@ -308,7 +330,16 @@
             getDateType(fieldIndex)?.value === '>=' || 
             getDateType(fieldIndex)?.value === 'is'" class="mb-7 col-md-4">
   <div class="form-group row ps-4 mb-2">
-    <label class="fw-bold fs-6 required">Select Date</label>
+    <label class="fw-bold fs-6 required">Select Date
+      <span class="ms-2 text-primary"
+      [ngbTooltip]="'Select a date. Only records from this specific date will be displayed.'"
+
+      placement="top"
+      container="body">
+  <i class="bi bi-info-circle fs-6 text-primary"></i>
+</span>
+
+    </label>
     <div >
       <input 
         type="date" 
@@ -330,7 +361,7 @@
     [ngbTooltip]="infoWindowTooltip"
     placement="top"
     container="body">
-    <i class="bi bi-info-circle fs-5"></i>
+    <i class="bi bi-info-circle fs-5 text-primary"></i>
   </span>
   </label>
   <p-multiSelect
@@ -353,7 +384,14 @@
 
 
 <div *ngIf="dynamicparameterLabMap?.[fieldIndex] === 'Graphic Location'" class="col-md-12 mb-3">
-  <label for="description" class="col-createChart-label fw-bold fs-6">Description</label>
+  <label for="description" class="col-createChart-label fw-bold fs-6">Equation
+    <span class="ms-2 text-primary"
+    [ngbTooltip]="'The selected fields will be shown in the Equation box below in the format: FieldName-${fieldId}. This text will appear on the map marker popup for each record.'"
+    placement="top"
+    container="body">
+<i class="bi bi-info-circle fs-5 text-primary"></i>
+</span>
+  </label>
   <textarea
     id="description"
     formControlName="filterDescription1"
@@ -426,7 +464,11 @@
      
               
               <div class="col-md-5 mb-3">
-                <label for="parameterName" class="col-createChart-label fw-bold fs-6 ">Form Fields</label>
+                <label for="parameterName" class="col-createChart-label fw-bold fs-6 ">Form Fields
+                  <span class="ms-2 text-primary" [ngbTooltip]="filterParameterTooltip" container="body" placement="top">
+                    <i class="bi bi-info-circle fs-5 text-primary"></i>
+                  </span>
+                </label>
                 <p-multiSelect
                 id="parameterName"
             
@@ -447,7 +489,13 @@
             </div>
           
             <div class="col-md-12 mb-3">
-              <label for="description" class="col-createChart-label fw-bold fs-6">Description</label>
+              <label for="description" class="col-createChart-label fw-bold fs-6">Equation
+                <span class="ms-2 text-primary"
+                (mouseenter)="openWidgetFilterHelp(WidgetFilterHelp)"
+                style="cursor: pointer;">
+            <i class="bi bi-info-circle fs-5 text-primary"></i>
+          </span>
+              </label>
               <textarea
               id="description"
               formControlName="filterDescription"  
@@ -601,4 +649,18 @@
     <app-help-section-date-type
 
     ></app-help-section-date-type>
+  </ng-template>
+  <ng-template #WidgetFilterHelp let-modal>
+    <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+        style="position: relative; top: 4px; right: 4px;">
+      </button>
+    </div>
+    <app-help-section-filter
+  
+    ></app-help-section-filter>
   </ng-template>

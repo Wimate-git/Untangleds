@@ -55,7 +55,7 @@
                   [ngbTooltip]="formTooltip"
                   placement="top"
                   container="body">
-              <i class="bi bi-info-circle fs-5"></i>
+              <i class="bi bi-info-circle fs-5 text-primary"></i>
             </span>
                 </label>
                 <ngx-select
@@ -82,7 +82,7 @@
                   [ngbTooltip]="parameterTooltip"
                   placement="top"
                   container="body">
-              <i class="bi bi-info-circle fs-5"></i>
+              <i class="bi bi-info-circle fs-5 text-primary"></i>
             </span>
                 </label>
                 <div class="custom-multiselect">
@@ -124,7 +124,7 @@
                   [ngbTooltip]="customLabelTooltip"
                   placement="top"
                   container="body">
-              <i class="bi bi-info-circle fs-5"></i>
+              <i class="bi bi-info-circle fs-5 text-primary"></i>
             </span>
                 </label>
                 <input type="text" class="form-control form-control-solid"  name="custom_Label"
@@ -145,7 +145,7 @@
                   placement="top"
                   container="body"
                   tooltipClass="custom-tooltip">
-              <i class="bi bi-info-circle fs-5"></i>
+              <i class="bi bi-info-circle fs-5 text-primary"></i>
             </span>
                 </label>
                 <input
@@ -168,7 +168,7 @@
                   [ngbTooltip]="filterTooltip"
                   placement="top"
                   container="body">
-                  <i class="bi bi-info-circle fs-5"></i>
+                  <i class="bi bi-info-circle fs-5 text-primary"></i>
                 </span>
               
                 </label>
@@ -214,7 +214,11 @@
           <div class="row g-3 align-items-end mb-4">
             <!-- Form Fields -->
             <div class="col-md-4">
-              <label for="parameterName" class="fw-bold fs-6">Form Fields</label>
+              <label for="parameterName" class="fw-bold fs-6">Form Fields
+                <span class="ms-2 text-primary" [ngbTooltip]="filterParameterTooltip" container="body" placement="top">
+                  <i class="bi bi-info-circle fs-5 text-primary"></i>
+                </span>
+              </label>
               <p-multiSelect
                 id="parameterName"
                 formControlName="filterParameter1"
@@ -245,7 +249,13 @@
           </div>
         
           <div class="col-md-12 mb-3">
-            <label for="description" class="col-createChart-label fw-bold fs-6">Equation</label>
+            <label for="description" class="col-createChart-label fw-bold fs-6">Equation
+              <span class="ms-2 text-primary"
+              (mouseenter)="openWidgetFilterHelp(WidgetFilterHelp)"
+              style="cursor: pointer;">
+          <i class="bi bi-info-circle fs-5 text-primary"></i>
+        </span>
+            </label>
             <textarea
               id="description"
               formControlName="filterDescription1"
@@ -267,7 +277,14 @@
         <div class="row g-3 align-items-center mb-4">
           <!-- Column Label -->
           <div class="col-md-4">
-            <label for="constant-{{ i }}" class="col-createChart-label fw-bold fs-6">Column Label</label>
+            <label for="constant-{{ i }}" class="col-createChart-label fw-bold fs-6">Column Label
+              <span class="ms-2 text-primary"
+              [ngbTooltip]="'Enter a name for the new column. This label will be used as the header for the calculated data based on selected form fields.'"
+              placement="top"
+              container="body">
+          <i class="bi bi-info-circle fs-6 text-primary"></i>
+        </span>
+            </label>
             <input
               id="constant-{{ i }}"
               type="text"
@@ -279,7 +296,14 @@
         
           <!-- Form Fields -->
           <div class="col-md-4" style="margin-top: 30px;">
-            <label for="parameterName-{{ i }}" class="fw-bold fs-6">Form Fields</label>
+            <label for="parameterName-{{ i }}" class="fw-bold fs-6">Form Fields
+              <span class="ms-2 text-primary"
+              [ngbTooltip]="'Select form fields to be used for calculations such as aging, duration, or time-based conditions.'"
+              placement="top"
+              container="body">
+          <i class="bi bi-info-circle fs-6 text-primary"></i>
+        </span>
+            </label>
             <p-multiSelect
               id="parameterName-{{ i }}"
               formControlName="filterParameter"
@@ -294,9 +318,11 @@
           <div class="col-md-4" style="margin-top: 30px;">
             <label for="PredefinedScripts-{{ i }}" class="col-createChart-label fw-bold fs-6">
               Predefined Scripts
-              <span class="ms-2 text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Select Predefined Scripts from the list">
-                <i class="bi bi-info-circle fs-5"></i>
-              </span>
+              <span class="ms-2 text-primary"
+              (mouseenter)="openPreDefinedScriptsHelp(predefinedScriptsHelp)"
+              style="cursor: pointer;">
+          <i class="bi bi-info-circle fs-5 text-primary"></i>
+        </span>
             </label>
             <ngx-select
               id="PredefinedScripts-{{ i }}"
@@ -327,7 +353,14 @@
         
         
           <div class="col-md-12 mb-3">
-            <label for="description-{{ i }}" class="col-createChart-label fw-bold fs-6 ">Equation/HTML</label>
+            <label for="description-{{ i }}" class="col-createChart-label fw-bold fs-6 ">Equation/HTML
+              <span class="ms-2 text-primary"
+              [ngbTooltip]="'Displays the calculated expression based on the selected form fields. Example: ${Updated Time.updated_time} - ${Created Time.created_time}'"
+              placement="top"
+              container="body">
+          <i class="bi bi-info-circle fs-6 text-primary"></i>
+        </span>
+            </label>
             <textarea
               id="description-{{ i }}"
               formControlName="filterDescription"
@@ -394,6 +427,11 @@
                     <div class="col-md-4 mb-3">
                       <label for="rowCalType" class="col-createChart-label fw-bold fs-6 ">
                         Row Type
+                        <span class="ms-2 text-primary"
+                        (mouseenter)="openRowCalHelp(RowCalHelp)"
+                        style="cursor: pointer;">
+                    <i class="bi bi-info-circle fs-5 text-primary"></i>
+                  </span>
                       </label>
                       <ngx-select
                         id="rowCalType"
@@ -409,7 +447,14 @@
           
                     <div class="col-md-4">
                       <div class="d-flex flex-column">
-                        <label for="rowLabel" class="col-createChart-label fw-bold fs-6 ">Row Label</label>
+                        <label for="rowLabel" class="col-createChart-label fw-bold fs-6 ">Row Label
+                          <span class="ms-2 text-primary"
+                          [ngbTooltip]="'This will be the label for the calculated row (e.g., Total Sales, Average Score).'"
+                          placement="top"
+                          container="body">
+                      <i class="bi bi-info-circle fs-6 text-primary"></i>
+                    </span>
+                        </label>
                         <input
                           type="text"
                           class="form-control form-control-solid"
@@ -423,6 +468,11 @@
                     <div class="col-md-4 mb-3">
                       <label for="rowUnit" class="col-createChart-label fw-bold fs-6 ">
                         Row Unit
+                        <span class="ms-2 text-primary"
+                        (mouseenter)="openUnitHelp(RowUnitHelp)"
+                        style="cursor: pointer;">
+                    <i class="bi bi-info-circle fs-5 text-primary"></i>
+                  </span>
                       </label>
                       <ngx-select
                         id="rowUnit"
@@ -652,4 +702,67 @@
           </div>
         </div>
       </div>
+    </ng-template>
+    <ng-template #WidgetFilterHelp let-modal>
+      <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="modal.dismiss()"
+          style="position: relative; top: 4px; right: 4px;">
+        </button>
+      </div>
+      <app-help-section-filter
+    
+      ></app-help-section-filter>
+    </ng-template>
+
+
+    <ng-template #RowCalHelp let-modal>
+      <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="modal.dismiss()"
+          style="position: relative; top: 4px; right: 4px;">
+        </button>
+      </div>
+      <app-help-section-row-cal
+    
+      ></app-help-section-row-cal>
+    </ng-template>
+
+
+    <ng-template #predefinedScriptsHelp let-modal>
+      <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="modal.dismiss()"
+          style="position: relative; top: 4px; right: 4px;">
+        </button>
+      </div>
+      <app-help-section-predefined
+    
+      ></app-help-section-predefined>
+    </ng-template>
+
+
+
+    <ng-template #RowUnitHelp let-modal>
+      <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="modal.dismiss()"
+          style="position: relative; top: 4px; right: 4px;">
+        </button>
+      </div>
+      <app-help-section-row-unit
+    
+      ></app-help-section-row-unit>
     </ng-template>

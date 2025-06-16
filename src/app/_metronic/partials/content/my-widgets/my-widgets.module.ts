@@ -105,6 +105,16 @@ import { TileWithIconHelpFormatTypeComponent } from './tile-with-icon-help-forma
 import { TileWithIconRedirectionTypeComponent } from './tile-with-icon-redirection-type/tile-with-icon-redirection-type.component';
 import { TileWithIconPrimaryValueComponent } from './tile-with-icon-primary-value/tile-with-icon-primary-value.component';
 import { HelpSectionDateTypeComponent } from './help-section-date-type/help-section-date-type.component';
+import { HelpSectionChartOptionsComponent } from './help-section-chart-options/help-section-chart-options.component';
+import { HelpSectionFilterComponent } from './help-section-filter/help-section-filter.component';
+import { HelpSectionAdvanceEquationComponent } from './help-section-advance-equation/help-section-advance-equation.component';
+import { HelpSectionFontStyleComponent } from './help-section-font-style/help-section-font-style.component';
+import { HelpSectionEquationTilesComponent } from './help-section-equation-tiles/help-section-equation-tiles.component';
+import { HelpSectionRowCalComponent } from './help-section-row-cal/help-section-row-cal.component';
+import { HelpSectionRowUnitComponent } from './help-section-row-unit/help-section-row-unit.component';
+import { HelpSectionPredefinedComponent } from './help-section-predefined/help-section-predefined.component';
+import { MiniTableViewStackedbarComponent } from './mini-table-view-stackedbar/mini-table-view-stackedbar.component';
+import { MiniTableViewFunnelChartComponent } from './mini-table-view-funnel-chart/mini-table-view-funnel-chart.component';
 
 
 
@@ -191,7 +201,18 @@ import { HelpSectionDateTypeComponent } from './help-section-date-type/help-sect
  TileWithIconHelpFormatTypeComponent,
  TileWithIconRedirectionTypeComponent,
  TileWithIconPrimaryValueComponent,
- HelpSectionDateTypeComponent
+ HelpSectionDateTypeComponent,
+ HelpSectionChartOptionsComponent,
+ HelpSectionFilterComponent,
+ HelpSectionAdvanceEquationComponent,
+ HelpSectionFontStyleComponent,
+ HelpSectionEquationTilesComponent,
+ HelpSectionRowCalComponent,
+ HelpSectionRowUnitComponent,
+ HelpSectionPredefinedComponent,
+ MiniTableViewStackedbarComponent,
+ MiniTableViewFunnelChartComponent
+ 
     
 
 
@@ -315,7 +336,17 @@ import { HelpSectionDateTypeComponent } from './help-section-date-type/help-sect
     TileWithIconHelpFormatTypeComponent,
     TileWithIconRedirectionTypeComponent,
     TileWithIconPrimaryValueComponent,
-    HelpSectionDateTypeComponent
+    HelpSectionDateTypeComponent,
+    HelpSectionChartOptionsComponent,
+    HelpSectionFilterComponent,
+    HelpSectionAdvanceEquationComponent,
+    HelpSectionFontStyleComponent,
+    HelpSectionEquationTilesComponent,
+    HelpSectionRowCalComponent,
+    HelpSectionRowUnitComponent,
+    HelpSectionPredefinedComponent,
+    MiniTableViewStackedbarComponent,
+    MiniTableViewFunnelChartComponent
 
     
   

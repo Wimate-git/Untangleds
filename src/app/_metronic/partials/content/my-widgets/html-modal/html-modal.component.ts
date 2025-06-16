@@ -9,6 +9,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 export class HtmlModalComponent {
   @Input() blobUrl: any;
   @Input() modal: any;
+   @Input()  iframeSafeUrl: any;
 
   sanitizedBlobUrl: SafeResourceUrl | null = null;
 
@@ -18,8 +19,8 @@ export class HtmlModalComponent {
     console.log('blobUrl checking from child', this.blobUrl);
 
     // Sanitize blob URL before using it in iframe
-    if (this.blobUrl) {
-      this.sanitizedBlobUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.blobUrl);
+    if (this.iframeSafeUrl) {
+      this.sanitizedBlobUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.iframeSafeUrl);
     }
   }
 }

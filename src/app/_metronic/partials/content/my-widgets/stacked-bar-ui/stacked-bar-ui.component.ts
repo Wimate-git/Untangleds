@@ -401,252 +401,274 @@ export class StackedBarUiComponent {
       //     this.counter--; // Reset counter after emitting
       // }
 
-        if (storeconditionsLength === this.counter || storeconditionsLength === undefined) {
-          console.log('storeconditionsLength checking from donut',storeconditionsLength)
-          console.log('this.counter checking from donut',this.counter)
-          console.log('Emitting action, either conditions are empty or second bar clicked');
-          console.log('this.formTableConfig checking from donut',this.formTableConfig)
-          console.log('this.formTableConfig checking from donut', this.formTableConfig);
-          console.log('access columnVisibility',this.formTableConfig.columnVisibility);
-          const storeObject = this.formTableConfig.columnVisibility
-          const storeColumnVisibility:any =this.formTableConfig.columnVisibility[0]
-          console.log('storeColumnVisibility checking',storeColumnVisibility)
-         const columnVisibility = storeColumnVisibility?.columnVisibility || [];
-         console.log('columnVisibility check from donut',columnVisibility)
-         if (!columnVisibility.length) {
-          // Show SweetAlert with the updated message if columnVisibility is empty or undefined
-          Swal.fire({
-              icon: 'warning',
-              title: 'Final Stage',
-              text: 'columnVisibility is not configured.',
-              confirmButtonText: 'OK'
-          });
-          this.counter--; 
-      } 
-      else {
-          // Proceed with emitting events if columnVisibility is valid
-          const clickedPoint = event.point;
-          console.log('Clicked bar index:', clickedPoint.index);
-          console.log('Clicked bar',event.point.colorIndex)
-          const clickedColorIndex: any = event.point.colorIndex;
-
-          console.log('Clicked bar colorIndex:', clickedColorIndex);
-          
-          // Access the corresponding columnVisibility using the colorIndex
-          console.log('this.formTableConfig.columnVisibility check', this.formTableConfig.columnVisibility);
-          
-          // If columnVisibility has length greater than 0, use clickedColorIndex; otherwise, use 0
-          const indexToUse = this.formTableConfig.columnVisibility.length > 0 
-              ? (clickedColorIndex >= 0 && clickedColorIndex < this.formTableConfig.columnVisibility.length ? clickedColorIndex : 0)
-              : 0;
-          
-          const selectedColumn = this.formTableConfig.columnVisibility[indexToUse];
-          
-          console.log('Selected Column from formTableConfig:', selectedColumn);
-          
-
-          console.log('Selected Column from formTableConfig:', selectedColumn);
-
-          console.log('this.formTableConfig>>>>',this.formTableConfig)
-          this.emitChartConfigTable.emit(selectedColumn);
-          this.sendCellInfo.emit(event);
-          this.counter--; 
-      
-      
-      
-      
-      
-          const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
-        
-          const requestBody = {
-            body: JSON.stringify({
-              clientId: this.SK_clientID,
-              routeId: this.routeId,
-              widgetId: this.item.id,
-              chartData: pointData,
-              MsgType: 'DrillDown',
-              permissionId: this.permissionIdRequest,
-              permissionList: this.readFilterEquation,
-              userName: this.userdetails,
-              conditions: this.eventFilterConditions || [],
-              DrillFilter: this.storeDrillFilter || '',
-              DrillFilterLevel: this.DrillFilterLevel || '',
-              MainFilter:this.mainFilterCon ||''
-            }),
-          };
-        
-          console.log('requestBody checking chart1Drilldown', requestBody);
-        
-          // Send a POST request to the Lambda function
-          this.http.post(apiUrl, requestBody).subscribe(
-            (response: any) => {
-                if (response?.statusCode === 200) {
-                    console.log('Lambda function triggered successfully chart1 drilldown', response);
-                    this.checkResBody = response.body;
-                    this.parsedResBody.push(JSON.parse(this.checkResBody));
-                    console.log('this.parsedResBody checking', this.parsedResBody);
-        
-                    this.parsedResBody.forEach((item: { ChartData?: any; rowdata?: any; }, index: any) => {
-                        if (Object.keys(item).includes('ChartData')) {
-                            this.parseChartData = JSON.parse(item.ChartData);
-                            console.log(`this.parseChartDatav checking at index ${index}`, this.parseChartData);
-                            this.storeDrillFilter = this.parseChartData.DrillFilter;
-                            this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
-        
-                            this.summaryService.updatelookUpData(this.parseChartData);
-                        } else {
-                            this.processedData = JSON.parse(item.rowdata);
-                            console.log(`this.processedData check at index ${index}`, this.processedData);
-                            this.paresdDataEmit.emit(this.processedData);
-                        }
-                
-                    });
-                    // Hide the spinner after API processing
-                    this.spinner.hide('dataProcess' + index);
-                } else {
-                    // Hide the spinner in case of an error
-                    this.spinner.hide('dataProcess' + index);
-                    console.error('Unexpected statusCode:', response?.statusCode);
-                    Swal.fire({
-                        title: 'Error!',
-                        text: `Unexpected response received (Status Code: ${response?.statusCode}).`,
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            },
-            (error: any) => {
-                // Hide the spinner if there's an error
-                this.spinner.hide('dataProcess' + index);
-                console.error('Error triggering Lambda function:', error);
-        
-                if (error.status === 404) {
-                    console.log('Received 404 error - stopping loading and showing error message.');
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Data not found. Please check your inputs and try again.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Failed to trigger the Lambda function. Please try again.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            }
-        );
-      }
-      
-      
-          // this.emitChartConfigTable.emit(this.formTableConfig);
-          // this.sendCellInfo.emit(event);
-          // this.counter--; 
-      }
+  if (storeconditionsLength === this.counter || storeconditionsLength === undefined) {
+    console.log('storeconditionsLength checking from donut',storeconditionsLength)
+    console.log('this.counter checking from donut',this.counter)
+    console.log('Emitting action, either conditions are empty or second bar clicked');
+    console.log('this.formTableConfig checking from donut',this.formTableConfig)
+    console.log('this.formTableConfig checking from donut', this.formTableConfig);
+    console.log('access columnVisibility',this.formTableConfig.columnVisibility);
+    const storeObject = this.formTableConfig.columnVisibility
+    const storeColumnVisibility:any =this.formTableConfig.columnVisibility[0]
+    console.log('storeColumnVisibility checking',storeColumnVisibility)
+   const columnVisibility = storeColumnVisibility?.columnVisibility || [];
+   console.log('columnVisibility check from donut',columnVisibility)
+   if (!columnVisibility.length) {
+    // Show SweetAlert with the updated message if columnVisibility is empty or undefined
+    Swal.fire({
+        icon: 'warning',
+        title: 'Final Stage',
+        text: 'columnVisibility is not configured.',
+        confirmButtonText: 'OK'
+    });
+    this.counter--; 
+} 
+else {
 
 
+  const clickedPoint = event.point;
+  console.log('Clicked bar index:', clickedPoint.index);
+  console.log('Clicked bar',event.point.colorIndex)
+  const clickedColorIndex: any = event.point.colorIndex;
 
-      if(storeconditionsLength === undefined){
-        this.enableDrillButton = false
+  console.log('Clicked bar colorIndex:', clickedColorIndex);
   
-  }
-      
+  // Access the corresponding columnVisibility using the colorIndex
+  console.log('this.formTableConfig.columnVisibility check', this.formTableConfig.columnVisibility);
+  
+  // If columnVisibility has length greater than 0, use clickedColorIndex; otherwise, use 0
+  const indexToUse = this.formTableConfig.columnVisibility.length > 0 
+      ? (clickedColorIndex >= 0 && clickedColorIndex < this.formTableConfig.columnVisibility.length ? clickedColorIndex : 0)
+      : 0;
+  
+  const selectedColumn = this.formTableConfig.columnVisibility[indexToUse];
+  
+  console.log('Selected Column from formTableConfig:', selectedColumn);
+  
+
+  console.log('Selected Column from formTableConfig:', selectedColumn);
+
+  console.log('this.formTableConfig>>>>',this.formTableConfig)
+    // Proceed with emitting events if columnVisibility is valid
+    this.emitChartConfigTable.emit(selectedColumn);
+    this.sendCellInfo.emit(event);
+    this.counter--; 
+
+
 
 
 
     const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
-      
-    const requestBody = {
-        body: JSON.stringify({
-            clientId: this.SK_clientID,
-            routeId: this.routeId,
-            widgetId: this.item.id,
-            chartData: pointData,
-            MsgType: 'DrillDown',
-            permissionId: this.permissionIdRequest,
-            permissionList: this.readFilterEquation,
-            userName: this.userdetails,
-            conditions: this.eventFilterConditions || [],
-            DrillFilter: this.storeDrillFilter || '',
-            DrillFilterLevel: this.DrillFilterLevel || '',
-            MainFilter:this.mainFilterCon ||''
-        }),
-    };
-
-    console.log('requestBody checking chart1Drilldown', requestBody);
-
-    this.http.post(apiUrl, requestBody).subscribe(
-        (response: any) => {
-            if (response?.statusCode === 200) {
-                console.log('Lambda function triggered successfully:', response);
-                this.checkResBody = response.body;
-                this.parsedResBody.push(JSON.parse(this.checkResBody));
-                console.log('this.parsedResBody checking', this.parsedResBody);
-
-                this.parsedResBody.forEach((item: { ChartData?: any; rowdata?: any; }, index: any) => {
-                    if (Object.keys(item).includes('ChartData')) {
-                        this.parseChartData = JSON.parse(item.ChartData);
-                        console.log(`this.parseChartDatav checking at index ${index}`, this.parseChartData);
-                        this.storeDrillFilter = this.parseChartData.DrillFilter;
-                        this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
-
-                        this.summaryService.updatelookUpData(this.parseChartData);
-                    } else {
-                        this.processedData = JSON.parse(item.rowdata);
-                        console.log(`this.processedData check at index ${index}`, this.processedData);
-                        this.paresdDataEmit.emit(this.processedData);
-                    }
-            
-                });
-                // Hide the spinner after API processing
-                setTimeout(() => {
-                  this.spinner.hide('dataProcess' + index);
-                  
-                }, 2000);
-            } else {
-                // Hide the spinner in case of an error
-                this.spinner.hide('dataProcess' + index);
-                console.error('Unexpected statusCode:', response?.statusCode);
-                Swal.fire({
-                    title: 'Error!',
-                    text: `Unexpected response received (Status Code: ${response?.statusCode}).`,
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
-            }
-        },
-        (error: any) => {
-            // Hide the spinner if there's an error
-            this.spinner.hide('dataProcess' + index);
-            console.error('Error triggering Lambda function:', error);
-
-            if (error.status === 404) {
-                console.log('Received 404 error - stopping loading and showing error message.');
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Data not found. Please check your inputs and try again.',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
-            } else {
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Failed to trigger the Lambda function. Please try again.',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
-            }
-        }
-    );
-
-
-      // Show the spinner while API is processing
-
-      // Once the request is finished, hide the spinner
   
-      this.counter++;
+    const requestBody = {
+      body: JSON.stringify({
+        clientId: this.SK_clientID,
+        routeId: this.routeId,
+        widgetId: this.item.id,
+        chartData: pointData,
+        MsgType: 'DrillDown',
+        permissionId: this.permissionIdRequest,
+        permissionList: this.readFilterEquation,
+        userName: this.userdetails,
+        conditions: this.eventFilterConditions || [],
+        DrillFilter: this.storeDrillFilter || '',
+        DrillFilterLevel: this.DrillFilterLevel || '',
+        MainFilter:this.mainFilterCon ||''
+      }),
+    };
+  
+    console.log('requestBody checking chart1Drilldown data Table column visibility', requestBody);
+  
+    // Send a POST request to the Lambda function
+    this.http.post(apiUrl, requestBody).subscribe(
+      (response: any) => {
+        // alert('how many times request is going')
+          if (response?.statusCode === 200) {
+              console.log('Lambda function triggered successfully chart1 drilldown', response);
+              this.checkResBody = response.body;
+              console.log('this.checkResBody checking from column visibility', this.checkResBody);
+            
+              // Ensure parsedResBody is initialized
+              if (!this.parsedResBody) {
+                this.parsedResBody = [];
+              }
+            
+              this.parsedResBody.push(JSON.parse(this.checkResBody));
+              console.log('this.parsedResBody checking', this.parsedResBody);
+            
+  
+              this.parsedResBody.forEach((item: { ChartData?: any; rowdata?: any; }, index: any) => {
+                  if (Object.keys(item).includes('ChartData')) {
+                      this.parseChartData = JSON.parse(item.ChartData);
+                      console.log(`this.parseChartDatav checking at index ${index}`, this.parseChartData);
+                      this.storeDrillFilter = this.parseChartData.DrillFilter;
+                      this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
+  
+                      // this.summaryService.updatelookUpData(this.parseChartData);
+                  } else {
+                      this.processedData = JSON.parse(item.rowdata);
+                      console.log('this.processedData checking from stacked drill down row data',this.processedData)
+                      console.log(`this.processedData check at index ${index}`, this.processedData);
+                      this.paresdDataEmit.emit(this.processedData);
+                  }
+          
+              });
+              // Hide the spinner after API processing
+              this.spinner.hide('dataProcess' + index);
+          } else {
+              // Hide the spinner in case of an error
+              this.spinner.hide('dataProcess' + index);
+              console.error('Unexpected statusCode:', response?.statusCode);
+              Swal.fire({
+                  title: 'Error!',
+                  text: `Unexpected response received (Status Code: ${response?.statusCode}).`,
+                  icon: 'error',
+                  confirmButtonText: 'OK'
+              });
+          }
+      },
+      (error: any) => {
+          // Hide the spinner if there's an error
+          this.spinner.hide('dataProcess' + index);
+          console.error('Error triggering Lambda function:', error);
+  
+          if (error.status === 404) {
+              console.log('Received 404 error - stopping loading and showing error message.');
+              Swal.fire({
+                  title: 'Error!',
+                  text: 'Data not found. Please check your inputs and try again.',
+                  icon: 'error',
+                  confirmButtonText: 'OK'
+              });
+          } else {
+              Swal.fire({
+                  title: 'Error!',
+                  text: 'Failed to trigger the Lambda function. Please try again.',
+                  icon: 'error',
+                  confirmButtonText: 'OK'
+              });
+          }
+      }
+  );
+}
+
+
+    // this.emitChartConfigTable.emit(this.formTableConfig);
+    // this.sendCellInfo.emit(event);
+    // this.counter--; 
+}
+
+
+
+const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
+  
+const requestBody = {
+  body: JSON.stringify({
+    clientId: this.SK_clientID,
+    routeId: this.routeId,
+    widgetId: this.item.id,
+    chartData: pointData,
+    MsgType: 'DrillDown',
+    permissionId: this.permissionIdRequest,
+    permissionList: this.readFilterEquation,
+    userName: this.userdetails,
+    conditions: this.eventFilterConditions || [],
+    DrillFilter: this.storeDrillFilter || '',
+    DrillFilterLevel: this.DrillFilterLevel || '',
+    MainFilter:this.mainFilterCon ||''
+  }),
+};
+
+console.log('requestBody checking chart1Drilldown', requestBody);
+
+// Send a POST request to the Lambda function
+this.http.post(apiUrl, requestBody).subscribe(
+  (response: any) => {
+      if (response?.statusCode === 200) {
+          console.log('Lambda function triggered successfully chart1 drilldown', response);
+          this.checkResBody = response.body;
+          console.log('this.checkResBody checking from column visibility', this.checkResBody);
+        
+          // Ensure parsedResBody is initialized
+          if (!this.parsedResBody) {
+            this.parsedResBody = [];
+          }
+        
+          this.parsedResBody.push(JSON.parse(this.checkResBody));
+          console.log('this.parsedResBody checking', this.parsedResBody);
+
+          this.parsedResBody.forEach((item: { ChartData?: any; }, index: any) => {
+              if (Object.keys(item).includes('ChartData')) {
+                  this.parseChartData = JSON.parse(item.ChartData);
+                  console.log(`this.parseChartDatav checking at index ${index}`, this.parseChartData);
+                  this.storeDrillFilter = this.parseChartData.DrillFilter;
+                  this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
+
+                  
+
+                  this.summaryService.updatelookUpData(this.parseChartData);
+              } 
+              // else {
+              //     this.processedData = JSON.parse(item.rowdata);
+              //     console.log(`this.processedData check at index ${index}`, this.processedData);
+              //     this.paresdDataEmit.emit(this.processedData);
+              // }
+      
+          });
+          // Hide the spinner after API processing
+          setTimeout(() => {
+            this.spinner.hide('dataProcess' + index);
+            
+          }, 2000);
+   
+      } else {
+          // Hide the spinner in case of an error
+          this.spinner.hide('dataProcess' + index);
+          console.error('Unexpected statusCode:', response?.statusCode);
+          Swal.fire({
+              title: 'Error!',
+              text: `Unexpected response received (Status Code: ${response?.statusCode}).`,
+              icon: 'error',
+              confirmButtonText: 'OK'
+          });
+      }
+  },
+  (error: any) => {
+      // Hide the spinner if there's an error
+      this.spinner.hide('dataProcess' + index);
+      console.error('Error triggering Lambda function:', error);
+
+      if (error.status === 404) {
+          console.log('Received 404 error - stopping loading and showing error message.');
+          Swal.fire({
+              title: 'Error!',
+              text: 'Data not found. Please check your inputs and try again.',
+              icon: 'error',
+              confirmButtonText: 'OK'
+          });
+      } else {
+          Swal.fire({
+              title: 'Error!',
+              text: 'Failed to trigger the Lambda function. Please try again.',
+              icon: 'error',
+              confirmButtonText: 'OK'
+          });
+      }
+  }
+);
+
+
+if(storeconditionsLength === undefined){
+      this.enableDrillButton = false
+
+}
+
+  // Proceed with API request
+
+
+  // Emit the cell info if needed
+
+  this.counter++
     }
 
     // Show the spinner for the specific index

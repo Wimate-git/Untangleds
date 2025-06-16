@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -158,6 +158,30 @@ export class FunnelChartConfigComponent implements OnInit{
     {value:'Calender', text:'Calender'}
   
   ]
+
+  tooltipContent: string = 'Group data by time periods such as Today, Last 7 Days, This Month, or This Year to view filtered insights based on the selected range. For example, "This Year" refers to data from January to December of the current year.';
+formTooltip: string = 'Select a form to view and analyze data specific to that form only.';
+parameterTooltip: string = 'Specify which form fields to analyze. Results will be based solely on your selection.';
+
+formatTypeTooltip: string = 'Select a format to represent the output value appropriately, such as Rupee for money, Distance for measurements, or Percentage for ratios.';
+customLabelTooltip: string = 'Specify a custom label to be used as the title displayed on the widget.';
+moduleNamesTooltip: string = 'Select the module that the user will be redirected to when the widget is clicked.';
+selectTypeTooltip: string = 'Choose how the dashboard should open when the widget is clicked—open in a new tab, within a modal, on the same page.';
+
+redirectToTooltip: string = 'Select the specific dashboard or module to which the user should be redirected when the widget is clicked.';
+
+columnVisibilityTooltip: string = 'Select the fields you want to display in the drill-down table. Only the selected columns will be visible in the detailed view.';
+
+UndefinedtooltipContent: string = 'Enter the text to display when the output label is undefined. This will replace the default "undefined" label in the final result.';
+DateRangetooltipContent: string = 'Select how the date range should be labeled. "Any" supports flexible time grouping.';
+
+CustomLabeltooltipContent: string = 'This text will appear as a tooltip on the widget to describe the displayed value.';
+ParametertooltipContent: string = 'Specifies the number of parameters to configure.';
+ChartTitletooltipContent: string = 'This title will appear as the heading of the chart.';
+customLabelValue: string = 'Enter a custom label to display inside the donut chart along with the value. This label helps identify what the value represents.';
+CustomValueLabelFontSize: string = 'Defines the font size of the custom label shown inside the donut chart.';
+CustomColumnColorTooltip: string = 'Defines the color of the column in the column chart. The selected color will be applied to the plotted bar.';
+
 
   async moduleSelection(event: any): Promise<void> {
     const selectedValue = event[0].value;
@@ -703,7 +727,7 @@ export class FunnelChartConfigComponent implements OnInit{
     return [];
   }
   DrillDownTypeFields = [
-    { value: 'Table', text: 'Table' },
+    // { value: 'Table', text: 'Table' },
     { value: 'Multi Level', text: 'Multi Level Drill Down' },
   ]
   removeCondition(fieldIndex: number, conditionIndex: number) {
@@ -883,6 +907,13 @@ export class FunnelChartConfigComponent implements OnInit{
               value: 'updated_time',
               text: 'updated_time',
             });
+          }
+          if (parsedMetadata.updated_time) {
+            dynamicParamList.push({
+              value: `dynamic_table_values`,
+              text: 'Dynamic Table Values' // You can customize the label here if needed
+            });
+            
           }
 
           const formFieldsArray: FormField[] = Object.values(parsedMetadata.formFields) as FormField[];
@@ -1795,6 +1826,43 @@ themes = [
   { color: "linear-gradient(to right, #fc5c7d, #6a82fb)", selected: false }  // Pink to Blue
 ];
 
+  openFormatTypeModal(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+
+  }
+  openCustomValueModal(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+
+  }
+
+  openRedirectionTypeInfoModal(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+
+  }
+
+    openPrimaryValueInfoModal(stepperModal: TemplateRef<any>) {
+      this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false    });
+  
+    }
+  openHelpChartOtions(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+
+  }
+  openWidgetFilterHelp(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+
+  }
+  openWidgetAdvanceEquationHelp(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+
+  }
 
 openFunnelChartModal(tile: any, index: number) {
   console.log('Index checking:', index); // Log the index
@@ -2643,6 +2711,21 @@ toggleCheckbox1(themeOrEvent: any): void {
     );
   }
   
+
+filterParameterTooltip: string = 'Select form fields to apply filter conditions. The chosen fields will be used to filter data based on matching or non-matching values.';
+filterEquationTooltip: string = 'Displays the generated filter equation based on selected fields. Field values are inserted dynamically in the format: Field Name - ${fieldId}. Example: Customer Name-${text-1732773051881} && Status-${single-select-1732769559973}';
+highchartsOptionsTooltip: string = 'This area shows the chart settings in JSON format. You can edit it to change how the chart looks, like its type, colors, title, and more.';
+MiniformTooltip:string ='Select a minitable name to view and analyze data specific to that minitable only.'
+miniTableFieldsTooltip:string = 'Specify which minitable fields to analyze. Results will be based solely on your selection.'
+minitableEquationTooltip: string = 'Displays a formatted equation using the selected mini-table fields. Example: Count MultiplePram(${Personal Info.dynamic_table_values.table-1736939655825.text-1730976463331}). The equation is auto-generated based on your selections.';
+drillDownTypeTooltip: string = 'Select the drill down type for the chart. Choosing "Multi Level Drill Down" will allow you to configure infinite-level drill down logic dynamically.';
+drillSelectFieldTooltip: string = 'Choose the field to display in the next drill down level. For example, selecting "Customer Name" will show customer-specific data when a chart slice is clicked.';
+
+drillCustomLabelTooltip: string = 'Enter a custom label that will be used as the chart title at this drill down level. This helps identify the data shown at each step.';
+dataLabelFontColorTooltip: string = 'Choose a custom font color for the data labels displayed on the chart.';
+bgGradientTopColorTooltip: string = 'Select the top color for the chart background gradient. This will blend with the bottom color to create a smooth background effect.';
+bgGradientBottomColorTooltip: string = 'Select the bottom color for the chart background gradient. It merges with the top color to form the gradient.';
+
   
 
   handleModalClose(selectedValue: string) {

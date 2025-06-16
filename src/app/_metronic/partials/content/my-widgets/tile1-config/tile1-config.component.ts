@@ -207,7 +207,21 @@ export class Tile1ConfigComponent implements OnInit {
   columnVisibilityTooltip: string = 'Select the fields to display in the drill-down table. Only the selected columns will be visible in the detailed view.';
   redirectionType: string = 'Choose how the widget should open the target dashboard or module: "New Tab" opens it in a separate browser tab, "Modal (Pop Up)" displays it in a modal window, "Same Page Redirect" replaces the current view, and "Drill Down" shows detailed insights in Table.';
 
-  
+  filterParameterTooltip: string = 'Select form fields to apply filter conditions. The chosen fields will be used to filter data based on matching or non-matching values.';
+filterEquationTooltip: string = 'Displays the generated filter equation based on selected fields. Field values are inserted dynamically in the format: Field Name - ${fieldId}. Example: Customer Name-${text-1732773051881} && Status-${single-select-1732769559973}';
+highchartsOptionsTooltip: string = 'This area shows the chart settings in JSON format. You can edit it to change how the chart looks, like its type, colors, title, and more.';
+MiniformTooltip:string ='Select a minitable name to view and analyze data specific to that minitable only.'
+miniTableFieldsTooltip:string = 'Specify which minitable fields to analyze. Results will be based solely on your selection.'
+minitableEquationTooltip: string = 'Displays a formatted equation using the selected mini-table fields. Example: Count MultiplePram(${Personal Info.dynamic_table_values.table-1736939655825.text-1730976463331}). The equation is auto-generated based on your selections.';
+
+fontSizeTooltip: string = 'This sets the font size for the label on the tile. Enter a value between 8 and 72.';
+fontColorTooltip: string = 'This sets the font color for the label on the tile. Select a color to apply.';
+valueFontSizeTooltip: string = 'This sets the font size for the value displayed on the tile. Enter a size between 8 and 72.';
+valueFontColorTooltip: string = 'This sets the font color for the value shown on the tile. Choose a color to apply.';
+tileBackgroundTooltip: string = 'Select a background theme. The chosen color or gradient will be applied as the tile\'s background.';
+equationCountTooltip: string = 'Enter the number of equations you want to configure. Based on this count, dynamic form sections will be generated below.';
+equationFormTooltip: string = 'Choose the form you want to use for building this equation. The fields and operations shown next will be based on the selected form.';
+formFieldsTooltip: string = 'Select one or more fields from the chosen form. These fields will be used to build the equation below.';
 
 
   convertTo12HourFormat(time: string): string {
@@ -419,7 +433,17 @@ export class Tile1ConfigComponent implements OnInit {
     }
   }
   
-  
+  openWidgetAdvanceEquationHelp(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+
+  }
+
+  openEquationHelpTile(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+
+  }
 
   async dynamicDataEquation() {
     // Fetching data based on index if needed
@@ -1584,6 +1608,20 @@ repopulate_fields(getValues: any): FormArray {
 
   return this.all_fields;
 }
+
+  openWidgetFilterHelp(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+
+  }
+
+
+  openFontStyleModal(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+
+  }
+
 
 
 getFormControlValue(selectedTextConfi:any): void {

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -297,6 +297,30 @@ export class PieChartConfigComponent {
 
 
   }
+
+  tooltipContent: string = 'Group data by time periods such as Today, Last 7 Days, This Month, or This Year to view filtered insights based on the selected range. For example, "This Year" refers to data from January to December of the current year.';
+  formTooltip: string = 'Select a form to view and analyze data specific to that form only.';
+  parameterTooltip: string = 'Specify which form fields to analyze. Results will be based solely on your selection.';
+
+  formatTypeTooltip: string = 'Select a format to represent the output value appropriately, such as Rupee for money, Distance for measurements, or Percentage for ratios.';
+  customLabelTooltip: string = 'Specify a custom label to be used as the title displayed on the widget.';
+  moduleNamesTooltip: string = 'Select the module that the user will be redirected to when the widget is clicked.';
+  selectTypeTooltip: string = 'Choose how the dashboard should open when the widget is clicked—open in a new tab, within a modal, on the same page.';
+
+  redirectToTooltip: string = 'Select the specific dashboard or module to which the user should be redirected when the widget is clicked.';
+
+  columnVisibilityTooltip: string = 'Select the fields you want to display in the drill-down table. Only the selected columns will be visible in the detailed view.';
+
+  UndefinedtooltipContent: string = 'Enter the text to display when the output label is undefined. This will replace the default "undefined" label in the final result.';
+  DateRangetooltipContent: string = 'Select how the date range should be labeled. "Any" supports flexible time grouping.';
+
+  CustomLabeltooltipContent: string = 'This text will appear as a tooltip on the widget to describe the displayed value.';
+  ParametertooltipContent: string = 'Specifies the number of parameters to configure.';
+  ChartTitletooltipContent: string = 'This title will appear as the heading of the chart.';
+customLabelValue: string = 'Enter a custom label to display inside the donut chart along with the value. This label helps identify what the value represents.';
+CustomValueLabelFontSize: string = 'Defines the font size of the custom label shown inside the donut chart.';
+
+
   
   ngAfterViewInit(): void {
     this.onCombinedAddFieldsChange({event:{target:{value:1}}})
@@ -1711,9 +1735,58 @@ toggleCheckbox1(themeOrEvent: any): void {
       console.warn('Invalid event structure or missing value array:', event);
     }
   }
+
+    openFormatTypeModal(stepperModal: TemplateRef<any>){
+      this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false    });
   
+    }
+    openCustomValueModal(stepperModal: TemplateRef<any>){
+      this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false    });
   
+    }
   
+      openRedirectionTypeInfoModal(stepperModal: TemplateRef<any>){
+      this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false    });
+  
+    }
+  
+    openPrimaryValueInfoModal(stepperModal: TemplateRef<any>) {
+      this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false    });
+  
+    }
+  
+    openWidgetFilterHelp(stepperModal: TemplateRef<any>){
+      this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false    });
+  
+    }
+  
+    openWidgetAdvanceEquationHelp(stepperModal: TemplateRef<any>){
+      this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false    });
+  
+    }
+  
+    openHelpChartOtions(stepperModal: TemplateRef<any>){
+      this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+        keyboard: false    });
+  
+    }
+    filterParameterTooltip: string = 'Select form fields to apply filter conditions. The chosen fields will be used to filter data based on matching or non-matching values.';
+MiniformTooltip:string ='Select a minitable name to view and analyze data specific to that minitable only.'
+miniTableFieldsTooltip:string = 'Specify which minitable fields to analyze. Results will be based solely on your selection.'
+drillDownTypeTooltip: string = 'Select the drill down type for the chart. Choosing "Multi Level Drill Down" will allow you to configure infinite-level drill down logic dynamically.';
+drillSelectFieldTooltip: string = 'Choose the field to display in the next drill down level. For example, selecting "Customer Name" will show customer-specific data when a chart slice is clicked.';
+
+drillCustomLabelTooltip: string = 'Enter a custom label that will be used as the chart title at this drill down level. This helps identify the data shown at each step.';
+dataLabelFontColorTooltip: string = 'Choose a custom font color for the data labels displayed on the chart.';
+bgGradientTopColorTooltip: string = 'Select the top color for the chart background gradient. This will blend with the bottom color to create a smooth background effect.';
+bgGradientBottomColorTooltip: string = 'Select the bottom color for the chart background gradient. It merges with the top color to form the gradient.';
+
 
   onAdd(index: any): void {
     console.log('Index checking from onAdd:', index);
@@ -2475,7 +2548,7 @@ get drillFields(): FormArray {
   return this.createChart?.get('drill_fields') as FormArray || this.fb.array([]);
 }
 DrillDownTypeFields = [
-  { value: 'Table', text: 'Table' },
+  // { value: 'Table', text: 'Table' },
   { value: 'Multi Level', text: 'Multi Level Drill Down' },
 ]
 
@@ -2506,6 +2579,10 @@ onCombinedAddFieldsChange(event: any): void {
 
   this.addControls(1, 'html');
 }
+
+
+
+
 
 updateDrillFields(): void {
   const selectedType = this.createChart.get('DrillDownType')?.value;

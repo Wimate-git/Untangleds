@@ -1359,11 +1359,22 @@ addEquationControls(event: any, _type: string) {
           const parsedMetadata = JSON.parse(result.metadata);
           const formFields = parsedMetadata.formFields;
 
+
+          const dynamicParamList  = formFields
+          .filter((field: any) => {
+            // Filter out fields with type "heading" or with an empty placeholder
+            return field.type !== "heading" && field.type !== 'Empty Placeholder' && field.type !=='button' && field.type !=='table' && field.type !=='radio' && field.type !== 'checkbox' && field.type !== 'html code' && field.type !=='file' && field.type !=='range' && field.type !=='color' && field.type !=='password' && field.type !=='sub heading';
+          })
+          .map((field: any) => {
+            console.log('field check', field);
+            return {
+              value: field.name,
+              text: field.label
+            };
+          });
+
           // Prepare parameter list
-          const dynamicParamList = formFields.map((field: any) => ({
-            value: field.name,
-            text: field.label,
-          }));
+
 
           // Add created_time and updated_time
           if (parsedMetadata.created_time) {
@@ -2851,6 +2862,27 @@ fetchDynamicFormDataDrill(value: any) {
     });
 }
 
+filterParameterTooltip: string = 'Select form fields to apply filter conditions. The chosen fields will be used to filter data based on matching or non-matching values.';
+tileBackgroundTooltip: string = 'Select a background theme. The chosen color or gradient will be applied as the tile\'s background.';
+MiniformTooltip:string ='Select a minitable name to view and analyze data specific to that minitable only.'
+fontColorTooltip: string = 'This sets the font color for the label on the tile. Select a color to apply.';
+fontSizeTooltip: string = 'This sets the font size for the label on the tile. Enter a value between 8 and 72.';
+miniTableFieldsTooltip:string = 'Specify which minitable fields to analyze. Results will be based solely on your selection.'
+  openWidgetFilterHelp(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+  
+  }
+
+  openEquationHelpTile(stepperModal: TemplateRef<any>){
+    this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+      keyboard: false    });
+  
+  }
+
+  equationCountTooltip: string = 'Enter the number of equations you want to configure. Based on this count, dynamic form sections will be generated below.';
+  equationFormTooltip: string = 'Choose the form you want to use for building this equation. The fields and operations shown next will be based on the selected form.';
+  formFieldsTooltip: string = 'Select one or more fields from the chosen form. These fields will be used to build the equation below.';
 async dynamicDataDrill(){
   try {
     const result: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#lookup", 1);
