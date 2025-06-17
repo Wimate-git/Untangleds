@@ -10165,11 +10165,8 @@ helperChartClickFunnel(event: any, modalChart: any) {
   // }
   
   
-  
+  SECRET_KEY = 'mobile-encrypt-params-123';
   async readdataTableCellInfo(readData: any, modalref?: any) {
-    let queryParams: any = {};
-  
-    // Wait for query params
     await new Promise<void>((resolve) => {
       this.route.queryParams.subscribe((params) => {
         if (params['uID']) this.userId = params['uID'];
@@ -10191,14 +10188,19 @@ helperChartClickFunnel(event: any, modalChart: any) {
     const escapedString = `"${jsonString.replace(/"/g, '\\"')}"`;
     const encodedRecordId = encodeURIComponent(escapedString);
   
-    const targetUrl = `/view-dreamboard/Forms/${formName}&recordId=${encodedRecordId}&isFullScreen=true`;
+    // 🔐 Encrypt userId and pass
+    const encryptedUserId = this.userId ? this.encryptValue(this.userId) : '';
+    const encryptedPass = this.userPass ? this.encryptValue(this.userPass) : '';
+  
+    const queryString = `recordId=${encodedRecordId}&isFullScreen=true` +
+      (encryptedUserId ? `&uID=${encryptedUserId}` : '') +
+      (encryptedPass ? `&pass=${encryptedPass}` : '');
+  
+    const targetUrl = `/view-dreamboard/Forms/${formName}&${queryString}`;
     console.log('Final Target URL:', targetUrl);
   
-    // ✅ If userId and pass exist → open modal with iframe
     if (this.userId && this.userPass) {
-      // ✅ Open in modal iframe
       this.iframeSafeUrl = targetUrl;
-  
       this.modalService.open(modalref, {
         fullscreen: true,
         modalDialogClass: 'p-9',
@@ -10207,9 +10209,19 @@ helperChartClickFunnel(event: any, modalChart: any) {
         keyboard: false
       });
     } else {
-      // ✅ Open in new tab
       window.open(targetUrl, '_blank');
     }
+  }
+  
+  // ✅ AES + URI Safe Encryption
+  encryptValue(value: string): string {
+    return encodeURIComponent(CryptoJS.AES.encrypt(value, this.SECRET_KEY).toString());
+  }
+  
+  // ✅ Decryption (if needed on receiving side)
+  decryptValue(encryptedValue: string): string {
+    const bytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedValue), this.SECRET_KEY);
+    return bytes.toString(CryptoJS.enc.Utf8);
   }
   
   

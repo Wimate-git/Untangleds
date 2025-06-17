@@ -37,7 +37,7 @@ export class MultiTableUiComponent implements OnInit{
   
   pageSizeOptions = [10, 25, 50, 100];
 
-  
+  @Output() dataTableCellInfo = new EventEmitter<any>();
   
   @Output() customEvent = new EventEmitter<{ arg1: any; arg2: number }>();
   @Output() customEvent1 = new EventEmitter<{ data: { arg1: any; arg2: number }; all_Packet_store: any }>();
@@ -693,16 +693,81 @@ get shouldShowButton(): boolean {
 
 
 
-  onCellClick(event: any): void {
-    console.log('Cell clicked:', event);
+  // onCellClick(event: any): void {
+  //   console.log('Cell clicked:', event);
 
-    // Pass row data and column definitions to the modal
-    this.modalData = [event.data];
-    this.nestedColumnDefs = this.columnDefs; // You can use a different set of column definitions if needed
+  //   // Pass row data and column definitions to the modal
+  //   this.modalData = [event.data];
+  //   this.nestedColumnDefs = this.columnDefs; // You can use a different set of column definitions if needed
 
-    // Open the modal
-    // this.modalService.open(modalRef, { size: 'lg' });
-    this.sendCellInfo.emit(event)
+  //   // Open the modal
+  //   // this.modalService.open(modalRef, { size: 'lg' });
+  //   this.sendCellInfo.emit(event)
+  //   this.dataTableCellInfo.emit(event);
+  // }
+
+
+  clickLock = false;
+  onCellClick(eventData: any, isIconClick: boolean = false) {
+    console.log('eventdata checking from cell', eventData);
+  
+    // If already locked, ignore further clicks
+    if (this.clickLock) {
+      console.log("Click ignored: Already processing a click.");
+      return;
+    }
+  
+    // Lock the click immediately to prevent multiple triggers
+    this.clickLock = true;
+  
+    const storeminiTableData = eventData.value;
+  
+    if (Object.keys(storeminiTableData).some(key => key.startsWith('table'))) {
+      this.sendCellInfo.emit(eventData)
+      // If keys start with 'table', do nothing
+      console.log("Data contains 'table' key, no action taken.", eventData);
+    } else {
+      // If no key starts with 'table', proceed with the else block
+      console.log("Row clicked, eventData: ", eventData);
+      // console.log('check mobileViewUserId',this.userId)
+
+      // const recordIdObj = {
+      //   type: "view",
+      //   fields: {},
+      //   mainTableKey: JSON.stringify(eventData.data.SK)  // No prefix
+      // };
+      // console.log('recordIdObj checking from datatable chart1:', recordIdObj);
+  
+      // // 🔹 Step 2: Convert to JSON and escape quotes
+      // const jsonString = JSON.stringify(recordIdObj);
+      // const escapedString = `"${jsonString.replace(/"/g, '\\"')}"`;
+  
+      // // 🔹 Step 3: Encode for URL usage
+      // const encodedRecordId = encodeURIComponent(escapedString);
+  
+      // // 🔹 Step 4: Final URL
+      // const targetUrl = `/view-dreamboard/Forms/${this.FormName}&recordId=${encodedRecordId}`;
+      // console.log('targetUrl checking from datatable:', targetUrl);
+  
+      // // 🔹 Step 5: Open in new tab
+      // window.open(targetUrl, '_blank');
+    
+  
+
+      
+      
+      // window.open(targetUrl, '_blank');
+      
+      setTimeout(() => {
+        // Emit the event after a delay (500ms here)
+        this.dataTableCellInfo.emit(eventData);
+      }, 500);
+    }
+  
+    // Unlock click after processing (to prevent multiple triggers)
+    setTimeout(() => {
+      this.clickLock = false;
+    }, 500); // The same delay as the timeout for emitting data
   }
 
 
