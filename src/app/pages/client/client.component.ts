@@ -131,7 +131,7 @@ export class ClientComponent implements OnInit {
 
       this.getLoggedUser = this.companyconfig.getLoggedUserDetails()
       this.getLoggedUserPermissions =  this.companyconfig.getPermissionDetails()
-      this.getPermissionList = this.getLoggedUserPermissions.permissionsList
+      this.getPermissionList = this.getLoggedUserPermissions && this.getLoggedUserPermissions.permissionsList
 
       this.SK_clientID = this.getLoggedUser.clientID;
       this.username = this.getLoggedUser.username
