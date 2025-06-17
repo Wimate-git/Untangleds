@@ -86,7 +86,17 @@
   //   font-size: 12px !important;  /* Smaller font size */
   // }
 
-  .ag-theme-alpine .ag-paging-panel {
-    font-size: 11px !important;  /* Adjust size as needed */
+  .ag-theme-alpine  {
+    font-size: 13px !important;  /* Adjust size as needed */
   }
-  
+  @media (max-width: 760px) {
+
+
+    .ag-theme-alpine  {
+      font-size: 12px !important;  /* Adjust size as needed */
+    }
+
+    ::ng-deep .ag-paging-page-size {
+      display: none !important;
+    }
+  }

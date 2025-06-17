@@ -831,11 +831,12 @@ gridster-item {
     font-size: 16px;
   }
   .table-width-style {
-    display: block !important;  /* Allow for horizontal scrolling */
+    display: block !important;     /* Enables scroll */
     height: 500px !important;
-    overflow-y: auto;  /* Enable vertical scrolling */
-    overflow-x: auto;  /* Enable horizontal scrolling */
-    white-space: nowrap; /* Prevent wrapping of content */
+    overflow-y: auto;
+    overflow-x: auto;
+    white-space: nowrap;
+
   }
   
   table {
@@ -1184,12 +1185,12 @@ gridster-item {
   }
 
 
-  gridster-item {
-    user-select: auto !important;
-    -webkit-user-drag: auto !important;
-    touch-action: auto !important;
-    -webkit-tap-highlight-color: auto !important;
-  }
+  // gridster-item {
+  //   user-select: auto !important;
+  //   -webkit-user-drag: auto !important;
+  //   touch-action: auto !important;
+  //   -webkit-tap-highlight-color: auto !important;
+  // }
 
 
 
