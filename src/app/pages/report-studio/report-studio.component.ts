@@ -1842,10 +1842,10 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
             
                 for (const tempTableData of tempHolder) {
                   // Skip if a table with the same name already exists
-                  const hasExistingTable = Object.keys(tempTableData).some(key =>
-                    key.startsWith(tableName)
-                  );
-                  if (hasExistingTable) continue;
+                  // const hasExistingTable = Object.keys(tempTableData).some(key =>
+                  //   key.startsWith(tableName)
+                  // );
+                  // if (hasExistingTable) continue;
             
                   // Evaluate expression synchronously
                   const evaluatedResult = await this.evaluateTemplate(equation, tempTableData, 'split');
@@ -5589,10 +5589,10 @@ getLastWeekTimestamps() {
     
         for (const tempTableData of tempHolder) {
           // Skip if a table with the same name already exists
-          const hasExistingTable = Object.keys(tempTableData).some(key =>
-            key.startsWith(tableName)
-          );
-          if (hasExistingTable) continue;
+          // const hasExistingTable = Object.keys(tempTableData).some(key =>
+          //   key.startsWith(tableName)
+          // );
+          // if (hasExistingTable) continue;
     
           // Evaluate expression synchronously
           const evaluatedResult = await this.evaluateTemplate(equation, tempTableData, 'split');
