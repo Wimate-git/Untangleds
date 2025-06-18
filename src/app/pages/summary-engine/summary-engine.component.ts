@@ -2090,11 +2090,14 @@ invokeHelperDashboard(item: any, index: number, template: any, modaref: any): vo
 
 
 redirectModule(recieveItem: any) {
-  console.log('recieveItem check', recieveItem);
+  console.log('recieveItem check from module redirection', recieveItem);
 
   const moduleName = recieveItem.dashboardIds;
   const selectedModule = recieveItem.ModuleNames;
   const redirectType = recieveItem.selectType; // 'NewTab' or 'Same page Redirect'
+  const filterDescriptionAccess = recieveItem.filterDescription;
+  const formattedCondition = this.formatConditions(filterDescriptionAccess);
+  console.log('formattedCondition checking from module redirection', formattedCondition);
 
   console.log('moduleName:', moduleName);
   console.log('selectedModule:', selectedModule);
@@ -2105,7 +2108,13 @@ redirectModule(recieveItem: any) {
 
   switch (selectedModule) {
     case 'Forms':
-      targetUrl = `/view-dreamboard/Forms/${moduleName}`;
+      if (isNewTab) {
+        const encodedCondition = encodeURIComponent(formattedCondition);
+        targetUrl = `/view-dreamboard/Forms/${moduleName}?filter=${encodedCondition}`;
+      } else {
+        targetUrl = `/view-dreamboard/Forms/${moduleName}`;
+      }
+      console.log('targetUrl checking from module redirection', targetUrl);
       break;
 
     case 'Summary Dashboard':
@@ -2128,7 +2137,7 @@ redirectModule(recieveItem: any) {
       const tree = this.router.createUrlTree(['/reportStudio'], {
         queryParams: { savedQuery: moduleName }
       });
-      targetUrl = this.router.serializeUrl(tree); // already serialized
+      targetUrl = this.router.serializeUrl(tree);
       break;
 
     default:
@@ -2138,10 +2147,8 @@ redirectModule(recieveItem: any) {
 
   // 🔁 Navigation logic
   if (isNewTab) {
-    // Open serialized or regular route as full URL
     window.open(targetUrl, '_blank');
   } else {
-    // Same Page Navigation
     if (selectedModule === 'Report Studio') {
       this.router.navigateByUrl(targetUrl).catch(err => console.error('Navigation error:', err));
     } else {
@@ -2149,6 +2156,20 @@ redirectModule(recieveItem: any) {
     }
   }
 }
+
+
+formatConditions(expression: string): string {
+  // Match patterns like "Label-${fieldId}"
+  const regex = /([a-zA-Z0-9_ ]+)-\$\{([a-zA-Z0-9_-]+)\}/g;
+
+  // Replace with ${Label.fieldId}
+  return expression.replace(regex, (_match, label, value) => {
+    return `\${${label.trim()}.${value}}`;
+  }).replace(/(\s*)(\&\&|\|\|)(\s*)/g, ' $2 ');  // normalize spacing around && or ||
+}
+
+
+
 
 
 

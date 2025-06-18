@@ -72,6 +72,9 @@
                 <gridster-item
                 *ngFor="let item of dashboard; let i = index;"
                 [item]="item"
+                style="user-select: auto !important;touch-action: auto !important; overflow-y: auto !important; 
+    -webkit-overflow-scrolling: touch;"
+                
                 [style.background]="item.themeColor"
                 [attr.data-bs-target]="item.grid_type === 'filterTile' && (summaryDashboardView && summaryDashboardUpdate || summaryDashboardUpdate) ? '#filterDashModal' : null"
                 [attr.data-bs-toggle]="'modal'"
@@ -966,14 +969,17 @@
         <h4 class="modal-title">Summary Configuration</h4>
         <div class="d-flex align-items-center position-relative ms-auto">
           <app-keenicon name="magnifier" class="fs-3 position-absolute ms-2"></app-keenicon>
-          <input type="text" data-action="filter" class="form-control form-control-solid w-250px ps-12" placeholder="Search Dashboards">
+          <input type="text" data-action="filter" class="form-control form-control-solid searchbar w-250px ps-12" placeholder="Search Dashboards">
         </div>
         <button type="button" class="btn-close ms-3" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
       </div>
       
- 
+      <!-- <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
 
-      <div class="modal-body">
+      </div> -->
+      <!-- <div class="modal-body" style="height: 100%; overflow-y: auto;"> -->
+
+      <div class="modal-body modalbodyWidthSet">
         <div class="card-body pt-0">
           <app-crud-summary
             [datatableConfig]="datatableConfig"

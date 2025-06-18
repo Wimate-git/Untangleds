@@ -1246,6 +1246,11 @@ gridster-item {
     overflow-y: auto;
   }
 
+.searchbar {
+  width:150px !important;
+}
+
+
   .datatable-container table {
     width: 100%; /* Ensure the table spans the container */
     min-width: 600px; /* Set a minimum width for the table if needed */
@@ -1260,11 +1265,15 @@ gridster-item {
     overflow: hidden; /* Hides overflowed content */
   }
   gridster-item {
+    overflow-y: auto !important; /* or `overflow: auto` */
+    -webkit-overflow-scrolling: touch; /* for smooth scrolling on iOS */
     user-select: auto !important;
     -webkit-user-drag: auto !important;
     touch-action: auto !important;
-    -webkit-tap-highlight-color: auto !important;
+    -webkit-tap-highlight-color: transparent !important;
+
   }
+  
   
 }
 
