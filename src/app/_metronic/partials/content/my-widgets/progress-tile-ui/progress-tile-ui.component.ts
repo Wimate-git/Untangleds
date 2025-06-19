@@ -50,7 +50,11 @@ data.forEach((packet: any,matchedIndex:number) => {
   
   if(packet.grid_type == 'progressTile'&& this.index==matchedIndex && packet.id === this.item.id){
     tempCharts[matchedIndex] = packet
-    this.dynamicTileFormat(packet)
+    setTimeout(() => {
+      this.dynamicTileFormat(packet)
+      
+    }, 500);
+  
 
   }
 });
@@ -72,35 +76,62 @@ data.forEach((packet: any,matchedIndex:number) => {
     if(dinamicTileresponse){
       this.parsedTileConfig = JSON.parse(dinamicTileresponse.tileConfig)
       console.log('this.parsedTileConfig check',this.parsedTileConfig)
-      this.equationProcessValue = JSON.parse(dinamicTileresponse.equationProcess)
-      console.log('this.equationProcessValue checking',this.equationProcessValue)
-    }else
-    console.log('this.item checking progress',this.item )
-    this.parsedTileConfig = JSON.parse(this.item.tileConfig);
-    console.log('this.parsedTileConfig check', this.parsedTileConfig);
-    this.dataDisplay=this.parsedTileConfig[0]
-    console.log('this.dataDisplay checking',this.dataDisplay)
-    this.dataDisplay2 = this.parsedTileConfig[1]
-    
-    if (this.parsedTileConfig.length >= 2) {
-      const num1 = parseFloat(this.parsedTileConfig[0].processed_value) || 0; // Pending projects
-      const num2 = parseFloat(this.parsedTileConfig[1].processed_value) || 0; // Total projects
-      // const num1: number = 70; // Pending projects
-      // const num2: number = 100; // Total projects (assumed value for testing)
-    
-      if (num2 === 0) {
-        console.warn("Division by zero error! Setting percentage to 0.");
-        this.calculatedPercentage = 0;
-      } else {
-        this.calculatedPercentage = Math.round((num1 / num2) * 100); // Convert to percentage
-        if (this.calculatedPercentage > 100) {
-          this.calculatedPercentage = 100; // Cap at 100%
+      // this.equationProcessValue = JSON.parse(dinamicTileresponse.equationProcess)
+      // console.log('this.equationProcesValue checking',this.equationProcessValue)
+      this.dataDisplay=this.parsedTileConfig[0]
+      console.log('this.dataDisplay checking from live',this.dataDisplay)
+      this.dataDisplay2 = this.parsedTileConfig[1]
+      console.log('this.dataDisplay2 cjhecking from live',this.dataDisplay2)
+      if (this.parsedTileConfig.length >= 2) {
+        const num1 = parseFloat(this.parsedTileConfig[0].processed_value) || 0; // Pending projects
+        const num2 = parseFloat(this.parsedTileConfig[1].processed_value) || 0; // Total projects
+        // const num1: number = 70; // Pending projects
+        // const num2: number = 100; // Total projects (assumed value for testing)
+      
+        if (num2 === 0) {
+          console.warn("Division by zero error! Setting percentage to 0.");
+          this.calculatedPercentage = 0;
+        } else {
+          this.calculatedPercentage = Math.round((num1 / num2) * 100); // Convert to percentage
+          if (this.calculatedPercentage > 100) {
+            this.calculatedPercentage = 100; // Cap at 100%
+          }
+          console.log('this.calculatedPercentage', this.calculatedPercentage);
         }
-        console.log('this.calculatedPercentage', this.calculatedPercentage);
+      } else {
+        console.warn("Insufficient data to calculate percentage");
       }
-    } else {
-      console.warn("Insufficient data to calculate percentage");
     }
+    else{
+
+      console.log('this.item checking progress',this.item )
+      this.parsedTileConfig = JSON.parse(this.item.tileConfig);
+      console.log('this.parsedTileConfig check', this.parsedTileConfig);
+      this.dataDisplay=this.parsedTileConfig[0]
+      console.log('this.dataDisplay checking',this.dataDisplay)
+      this.dataDisplay2 = this.parsedTileConfig[1]
+      
+      if (this.parsedTileConfig.length >= 2) {
+        const num1 = parseFloat(this.parsedTileConfig[0].processed_value) || 0; // Pending projects
+        const num2 = parseFloat(this.parsedTileConfig[1].processed_value) || 0; // Total projects
+        // const num1: number = 70; // Pending projects
+        // const num2: number = 100; // Total projects (assumed value for testing)
+      
+        if (num2 === 0) {
+          console.warn("Division by zero error! Setting percentage to 0.");
+          this.calculatedPercentage = 0;
+        } else {
+          this.calculatedPercentage = Math.round((num1 / num2) * 100); // Convert to percentage
+          if (this.calculatedPercentage > 100) {
+            this.calculatedPercentage = 100; // Cap at 100%
+          }
+          console.log('this.calculatedPercentage', this.calculatedPercentage);
+        }
+      } else {
+        console.warn("Insufficient data to calculate percentage");
+      }
+    }
+
     
     
     
