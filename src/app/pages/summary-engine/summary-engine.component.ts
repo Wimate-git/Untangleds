@@ -2097,6 +2097,7 @@ redirectModule(recieveItem: any) {
   const redirectType = recieveItem.selectType; // 'NewTab' or 'Same page Redirect'
   const filterDescriptionAccess = recieveItem.filterDescription;
   const formattedCondition = this.formatConditions(filterDescriptionAccess);
+  // const quotedCondition = ${formattedCondition}; 
   console.log('formattedCondition checking from module redirection', formattedCondition);
 
   console.log('moduleName:', moduleName);
@@ -2110,9 +2111,11 @@ redirectModule(recieveItem: any) {
     case 'Forms':
       if (isNewTab) {
         const encodedCondition = encodeURIComponent(formattedCondition);
-        targetUrl = `/view-dreamboard/Forms/${moduleName}?filter=${encodedCondition}`;
+        console.log('encodedCondition checking',encodedCondition)
+        targetUrl = `/view-dreamboard/Forms/${moduleName}&filter=${encodedCondition}`;
+        console.log('targetUrl checking from summary',targetUrl)
       } else {
-        targetUrl = `/view-dreamboard/Forms/${moduleName}`;
+        targetUrl = `/view-dreamboard/Sanket test/${moduleName}`;
       }
       console.log('targetUrl checking from module redirection', targetUrl);
       break;

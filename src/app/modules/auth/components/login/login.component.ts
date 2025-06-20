@@ -171,17 +171,17 @@ export class LoginComponent implements OnInit, OnDestroy {
 
           console.log(`result is here ${clientID} != ${metaData.clientID}`);
 
-          if(this.baseUrl != 'https://untangled.cloudtesla.com' && this.baseUrl != 'http://localhost:4200' && this.baseUrl != 'http://10.0.1.53:4200'){
-            if(clientID != metaData.clientID && metaData.clientID != 'WIMATE_ADMIN'){
-              this.spinner.hide();
-              return Swal.fire({
-                title: '⚠️ Client Mismatch',
-                text: 'The username is not associated with this client ID and does not match the URL. Please ensure that you are logging in using the correct URL and credentials specific to your client.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-              });
-            }
-          }
+          // if(this.baseUrl != 'https://untangled.cloudtesla.com' && this.baseUrl != 'http://localhost:4200' && this.baseUrl != 'http://10.0.1.53:4200'){
+          //   if(clientID != metaData.clientID && metaData.clientID != 'WIMATE_ADMIN'){
+          //     this.spinner.hide();
+          //     return Swal.fire({
+          //       title: '⚠️ Client Mismatch',
+          //       text: 'The username is not associated with this client ID and does not match the URL. Please ensure that you are logging in using the correct URL and credentials specific to your client.',
+          //       icon: 'error',
+          //       confirmButtonText: 'OK'
+          //     });
+          //   }
+          // }
 
             this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', metaData.clientID)
 
