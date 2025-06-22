@@ -152,11 +152,15 @@ export class AdvancedFilterComponent {
 
   multiSelectChange(): void {
     this.selectedFilter = []
-    this.selectedFilter.push(...this.reportsFeildsAdvanced.get('miniTableEnable')?.value)
-    this.selectedFilter.push(...this.reportsFeildsAdvanced.get('trackEnable')?.value)
+    if(this.reportsFeildsAdvanced.get('miniTableEnable')?.value){
+      this.selectedFilter.push(...this.reportsFeildsAdvanced.get('miniTableEnable')?.value)
+    }
+    if(this.reportsFeildsAdvanced.get('trackEnable')?.value){
+      this.selectedFilter.push(...this.reportsFeildsAdvanced.get('trackEnable')?.value)
+    }  
 
     //Clear the form if the checkbox is deselected
-    console.log(this.reportsFeildsAdvanced.get('miniTableEnable')?.value,this.reportsFeildsAdvanced.get('trackEnable')?.value);
+    console.log("temp",this.reportsFeildsAdvanced.get('miniTableEnable')?.value,this.reportsFeildsAdvanced.get('trackEnable')?.value);
 
     if(this.reportsFeildsAdvanced.get('miniTableEnable')?.value == ''){
       this.reportsFeildsAdvanced.get('miniTableColumn')?.setValue('all')
@@ -270,17 +274,22 @@ export class AdvancedFilterComponent {
 
     this.initializeMiniTable();
 
+    try{
+      this.multiSelectChange()
 
-    this.multiSelectChange()
-
-    let i = 0
-    this.selectedForms.forEach((index:any) => {
-      const defaultOptions = advancedreportsFeildsAdvanced.filter_type[i];
-      this.formDataSelected.at(i).setValue(defaultOptions);
-      i++
-    });
-
-    this.selectedEnabledMiniTableFilters = advancedreportsFeildsAdvanced.filter_type
+      let i = 0
+      this.selectedForms.forEach((index:any) => {
+        const defaultOptions = advancedreportsFeildsAdvanced.filter_type[i];
+        this.formDataSelected.at(i).setValue(defaultOptions);
+        i++
+      });
+  
+      this.selectedEnabledMiniTableFilters = advancedreportsFeildsAdvanced.filter_type
+    }
+    catch(error){
+      console.log("Error in config ",error);
+    }
+   
 
    
 
@@ -308,7 +317,7 @@ export class AdvancedFilterComponent {
       this.addMiniTableCustomColumns = true
     }
 
-    if(advancedreportsFeildsAdvanced.miniTableCustomAdder  != 'no'){
+    if(advancedreportsFeildsAdvanced.miniTableCustomAdder  != 'no' && customMiniColumnsAdder && customMiniColumnsAdder.miniCustomColumnsAdder){
       await this.onMiniCustomColumnsAdder('onCondition','edit','')
       this.repopulateCustomMiniFilter1Adder(customMiniColumnsAdder.miniCustomColumnsAdder)
       this.addMiniTableCustomColumnsAdder = true
@@ -316,6 +325,8 @@ export class AdvancedFilterComponent {
     else{
       this.addMiniTableCustomColumnsAdder = false
     }
+
+    this.cd.detectChanges()
 
   }
   
