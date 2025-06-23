@@ -18,6 +18,11 @@ interface CustomPoint {
   y: number;
   colorIndex: number;
 }
+interface ColumnVisibilityPacket {
+  custom_Label?: string;
+  columnVisibility?: any[];
+  // Add other properties as needed
+}
 interface FormTableConfig {
   columnVisibility: Array<{
     formlist: string;
@@ -344,7 +349,7 @@ export class StackedBarUiComponent {
     
   }
 
-   onBarClick(event: Highcharts.PointClickEventObject, index: any): void {
+  onBarClick(event: Highcharts.PointClickEventObject, index: any): void {
     console.log('index checking from toggle', index);
 
     if(this.isEditModeView==true){
@@ -441,16 +446,35 @@ else {
       ? (clickedColorIndex >= 0 && clickedColorIndex < this.formTableConfig.columnVisibility.length ? clickedColorIndex : 0)
       : 0;
   
-  const selectedColumn = this.formTableConfig.columnVisibility[indexToUse];
+      const splitStackName = pointData.stackName;
+      const parts = splitStackName.split('-');
+      const extracted = parts[1]?.trim(); // optional chaining in case it's undefined
+      
+      console.log('splitStackName:', splitStackName);
+      console.log('Extracted part:', extracted);
+      console.log('indexToUse checking from stacked bar ui',indexToUse)
+
+ // e.g., "operational incidents"
+
+ const packets = this.formTableConfig.columnVisibility as ColumnVisibilityPacket[];
+
+ const matchedPacket = packets.find(packet =>
+   packet.custom_Label?.trim().toLowerCase() === extracted?.toLowerCase()
+ );
+ 
+
+console.log('Matched Packet:', matchedPacket);
+
+  // const selectedColumn = this.formTableConfig.columnVisibility[indexToUse];
   
-  console.log('Selected Column from formTableConfig:', selectedColumn);
+  // console.log('Selected Column from formTableConfig:', selectedColumn);
   
 
-  console.log('Selected Column from formTableConfig:', selectedColumn);
+
 
   console.log('this.formTableConfig>>>>',this.formTableConfig)
     // Proceed with emitting events if columnVisibility is valid
-    this.emitChartConfigTable.emit(selectedColumn);
+    this.emitChartConfigTable.emit(matchedPacket);
     this.sendCellInfo.emit(event);
     this.counter--; 
 
