@@ -99,9 +99,9 @@ export class ExcelValidatorService {
     'Mobile': {
       required: false,
       validate: (value: any) => {
-        // if (!this.isNumber(value)) return { isValid: false, error: 'Must be a number' };
-        // const phoneRegex = /^\d{10}$/;
-        // if (!phoneRegex.test(value.toString())) return { isValid: false, error: 'Must be exactly 10 digits' };
+        if (!this.isNumber(value)) return { isValid: false, error: 'Must be a number' };
+        const phoneRegex = /^\d{10}$/;
+        if (!phoneRegex.test(value.toString())) return { isValid: false, error: 'Must be exactly 10 digits' };
         return { isValid: true };
       }
     },
@@ -177,69 +177,92 @@ export class ExcelValidatorService {
     },
     'Enable Email': {
       required: false,
-      validate: (value: any) => {
-        if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
-        if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
-        // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+      
+      validate: (value: any, rowIndex: number) => {
+        if (value !== undefined && value !== null && value !== "") {
+          if (typeof value !== 'boolean' && value !== 'true' && value !== 'false') {
+            return { isValid: false, error: `must be boolean such as true/false` };
+          }
+        }
         return { isValid: true };
       }
     },
     'Enable SMS': {
       required: false,
-      validate: (value: any) => {
-        if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
-        if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
-        // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+     
+      validate: (value: any, rowIndex: number) => {
+        if (value !== undefined && value !== null && value !== "") {
+          if (typeof value !== 'boolean' && value !== 'true' && value !== 'false') {
+            return { isValid: false, error: `must be boolean such as true/false` };
+          }
+        }
         return { isValid: true };
       }
     },
     'Enable Telegram': {
       required: false,
-      validate: (value: any) => {
-        if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
-        // if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
-        if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
-        // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+    
+      validate: (value: any, rowIndex: number) => {
+        if (value !== undefined && value !== null && value !== "") {
+          if (typeof value !== 'boolean' && value !== 'true' && value !== 'false') {
+            return { isValid: false, error: `must be boolean such as true/false` };
+          }
+        }
         return { isValid: true };
       }
     },
     'Escalation Email': {
       required: false,
-      validate: (value: any) => {
-        if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
-        if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
-        // if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
-        // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+    
+      validate: (value: any, rowIndex: number) => {
+        if (value !== undefined && value !== null && value !== "") {
+          if (typeof value !== 'boolean' && value !== 'true' && value !== 'false') {
+            return { isValid: false, error: `must be boolean such as true/false` };
+          }
+        }
         return { isValid: true };
       }
     },
     'Escalation SMS': {
       required: false,
-      validate: (value: any) => {
-        if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
-        if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
-        // if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
-        // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+     
+      validate: (value: any, rowIndex: number) => {
+        if (value !== undefined && value !== null && value !== "") {
+          if (typeof value !== 'boolean' && value !== 'true' && value !== 'false') {
+            return { isValid: false, error: `must be boolean such as true/false` };
+          }
+        }
         return { isValid: true };
       }
     },
     'Escalation Telegram': {
       required: false,
-      validate: (value: any) => {
-        if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
-        if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
-        // if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
-        // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+   
+      validate: (value: any, rowIndex: number) => {
+        if (value !== undefined && value !== null && value !== "") {
+          if (typeof value !== 'boolean' && value !== 'true' && value !== 'false') {
+            return { isValid: false, error: `must be boolean such as true/false` };
+          }
+        }
         return { isValid: true };
       }
     },
     'Enable User': {
       required: false,
-      validate: (value: any) => {
-        if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
-        // if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
-        if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
-        // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+      // validate: (value: any) => {
+      //   if (value === undefined || value === null || value === '') return { isValid: true }; // Allow empty values
+      //   // if (!this.isString(value)) return { isValid: false, error: 'Must be text' };
+      //   if (typeof value != 'boolean') return { isValid: false, error: 'Must be boolean' };
+      //   // if (['true', 'false'].includes(value.toLowerCase()) === false) return { isValid: false, error: 'Must be Either true or false' };
+      //   return { isValid: true };
+      // }
+
+      validate: (value: any, rowIndex: number) => {
+        if (value !== undefined && value !== null && value !== "") {
+          if (typeof value !== 'boolean' && value !== 'true' && value !== 'false') {
+            return { isValid: false, error: `must be boolean such as true/false` };
+          }
+        }
         return { isValid: true };
       }
     },
@@ -336,7 +359,7 @@ export class ExcelValidatorService {
               
   
                 // Check for duplicate username
-                if (header === 'UserName' && validation.required && existingUsernames.includes(cellValue.toLowerCase())) {
+                if (header === 'UserName' && validation.required && cellValue && typeof cellValue == 'string' && existingUsernames.includes(cellValue.toLowerCase())) {
                   editOperation = true
                   console.log("User exisst here so Update this user");
 
@@ -415,6 +438,40 @@ export class ExcelValidatorService {
                     error: `${header} does not exist `
                   });
                 }
+
+              if (
+                header === 'Location Permission' ||
+                header === 'FormID Permission' 
+              ) {
+                if (cellValue !== undefined && cellValue !== "" && validation.required) {
+                  const validationConfig: { [key: string]: { list: string[], label: string } } = {
+                    'Location Permission': { list: uniqueList[6], label: 'Location Permission' },
+                    'FormID Permission': { list: uniqueList[7], label: 'FormID Permission' }
+                  };
+              
+                  const { list, label } = validationConfig[header];
+            
+                  const valuesToCheck = cellValue.includes(',') ? cellValue.split(',') : [cellValue];
+              
+                  valuesToCheck.forEach((item: string) => {
+                    const trimmedItem = item.trim();
+                    if (!list.includes(trimmedItem)) {
+                      errors.push({
+                        row: rowIndex + 1,
+                        column: header,
+                        columnLetter,
+                        value: cellValue,
+                        error: `${label} does not exist${valuesToCheck.length > 1 ? ` (${trimmedItem})` : ''}`
+                      });
+                    }
+                  });
+                }
+              }
+
+
+
+
+
 
 
                   //Check for Email

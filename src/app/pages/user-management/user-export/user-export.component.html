@@ -2,7 +2,7 @@
     Import
 </a>
 
-<a type="button"  class="btn fw-bold custom-primary me-2" (click)="exportTemplate('users_xlsx')" [ngbTooltip]="'Download the Excel template structure for users.'">
+<a type="button"  class="btn fw-bold custom-primary me-2" (click)="exportTemplateV2('users_xlsx')" [ngbTooltip]="'Download the Excel template structure for users.'">
     Template
 </a>
 
@@ -59,9 +59,10 @@
       </div>
 
       <span class="update-note">
-        <strong>Note:</strong> When updating the user, the following fields <strong>cannot</strong> be changed: Password, Email, and Client ID<br>
+        <strong>Note:</strong> When updating a user, the following fields <strong>cannot</strong> be changed: Password (it is hidden by default), Email, User ID, and Client ID.<br>
         All other fields can be updated as needed.
       </span>
+      
 
       <!-- Generic Error -->
       <div *ngIf="error" class="alert alert-danger">

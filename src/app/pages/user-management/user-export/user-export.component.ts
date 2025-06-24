@@ -12,6 +12,7 @@ import { AuthenticationDetails, CognitoUser, CognitoUserAttribute, CognitoUserPo
 import Swal from 'sweetalert2';
 import { AuditTrailService } from '../../services/auditTrail.service';
 import { UserFormsService } from '../../services/user-forms.service';
+import ExcelJS from 'exceljs';
 
 interface ListItem {
   [key: string]: {
@@ -46,6 +47,7 @@ export class UserExportComponent {
   userPool: any;
   username: any;
   avgLabourHistory: any = [];
+  listAllUsersCOgnito: any = [];
 
   constructor(private modalService: NgbModal, private excelValidator: ExcelValidatorService, private api: APIService, private sharedAPi: SharedService, private spinner: NgxSpinnerService,
     private DynamicApi: DynamicApiService, private loggedInUser: SharedService, private auditTrail: AuditTrailService, private userForm: UserFormsService
@@ -71,6 +73,8 @@ export class UserExportComponent {
 
     const logInUserData = this.loggedInUser.getLoggedUserDetails()
     this.username = logInUserData.username
+
+    this.listAllUsers()
   }
 
 
@@ -169,6 +173,159 @@ export class UserExportComponent {
 
 
 
+  exportTemplateV2(getType: any) {
+
+    console.log("This uniqueList ",this.uniqueList);
+  
+    let Heading: any;
+    let filename: any;
+    let dropdownConfigs: any = {};
+
+    if (getType == 'users_xlsx') {
+      Heading = [
+        ['UserName', 'Password', 'Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Mobile',
+          'Mobile Privacy', 'Telegram Channel ID', 'Permission ID', 'Location Permission', 'FormID Permission', 'Start Node', 'Default Module',
+          'Redirection ID', 'Average Labour Cost','Enable Email', 'Enable SMS', 'Enable Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram', "Enable User"
+        ],
+        ['', '', '', '', '', '', '',
+          '', '', '', '', '', '', '',
+          '', '', '', '', '', '',
+          '']
+      ];
+
+      dropdownConfigs = {
+        'Default Module': ['None','Forms','Dashboard','Dashboard - Group','Summary Dashboard','Projects','Project - Group','Project - Detail'],
+        'Mobile Privacy': ['Visible','Invisible']
+      };
+
+      filename = 'Users.xlsx';
+    }
+  
+    const requiredFields =['UserName', 'Password', 'Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Permission ID', 'Location Permission', 'FormID Permission'];
+  
+    const workbook: any = new ExcelJS.Workbook();
+    const worksheet: any = workbook.addWorksheet('USER');
+  
+    worksheet.addRows(Heading);
+    worksheet.columns = Heading[0].map(() => ({ width: 50 }));
+  
+    // ✅ Arrays from component
+    const locationPermissionOptions = this.uniqueList[6] || ["All"] ;
+    const formPermissionOptions =  this.uniqueList[7] || ["All"] ;
+    // const rdtPermssionOptions = this.rdtListWorkAround || ["All"] 
+    const permissionIDOptions:any = Array.from(this.uniqueList[5]) || ["All"] 
+    const companyOptions = this.uniqueList[1] || [] 
+    // const treeOptions = this.treeDataArray || ["World"]
+  
+    // Create hidden sheet for large dropdowns
+    const hiddenSheet = workbook.addWorksheet('DropdownOptions');
+    hiddenSheet.state = 'veryHidden';
+  
+    // Fill location permissions in column A
+    locationPermissionOptions.forEach((value: string, index: number) => {
+      hiddenSheet.getCell(`C${index + 1}`).value = value;
+    });
+  
+    // // Fill device permissions in column B
+    formPermissionOptions.forEach((value: string, index: number) => {
+      hiddenSheet.getCell(`D${index + 1}`).value = value;
+    });
+
+    // rdtPermssionOptions.forEach((value: string, index: number)=>{
+    //   hiddenSheet.getCell(`C${index + 1}`).value = value;
+    // })  
+
+    permissionIDOptions.forEach((value: string, index: number)=>{
+      hiddenSheet.getCell(`A${index + 1}`).value = value;
+    })  
+
+    companyOptions.forEach((value: string, index: number)=>{
+      hiddenSheet.getCell(`B${index + 1}`).value = value;
+    })  
+
+    // treeOptions.forEach((value: string, index: number)=>{
+    //   hiddenSheet.getCell(`F${index + 1}`).value = value;
+    // })  
+
+
+    // Create reference ranges
+    const locationListRange = `DropdownOptions!$C$1:$C$${locationPermissionOptions.length}`;
+    const deviceListRange = `DropdownOptions!$D$1:$D$${formPermissionOptions.length}`;
+    // const rdtListRange = `DropdownOptions!$C$1:$C$${rdtPermssionOptions.length}`;
+    const permissionRange = `DropdownOptions!$A$1:$A$${permissionIDOptions.length}`;
+    const companyRange = `DropdownOptions!$B$1:$B$${companyOptions.length}`;
+    // const treeRange = `DropdownOptions!$B$1:$B$${treeOptions.length}`;
+  
+    // Add dropdowns and styles to header row
+    Heading[0].forEach((header: string, columnIndex: number) => {
+      const cell = worksheet.getCell(1, columnIndex + 1);
+      const columnLetter = worksheet.getColumn(columnIndex + 1).letter;
+  
+      // Style header
+      cell.style = {
+        fill: {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: requiredFields.includes(header) ? 'FF0000' : 'FFA500' }
+        },
+        font: {
+          bold: true,
+          color: { argb: 'FFFFFF' }
+        }
+      };
+  
+      
+      if(header === 'Location Permission'){
+        worksheet.dataValidations.add(`${columnLetter}2:${columnLetter}1000`, {
+          type: 'list',
+          allowBlank: true,
+          formulae: [`=${locationListRange}`]
+        });
+      }
+      if(header === 'FormID Permission'){
+        worksheet.dataValidations.add(`${columnLetter}2:${columnLetter}1000`, {
+          type: 'list',
+          allowBlank: true,
+          formulae: [`=${deviceListRange}`]
+        });
+      }
+      if(header === 'Permission ID'){
+        worksheet.dataValidations.add(`${columnLetter}2:${columnLetter}1000`, {
+          type: 'list',
+          allowBlank: true,
+          formulae: [`=${permissionRange}`]
+        });
+      }
+      else if(header === 'Company ID'){
+        worksheet.dataValidations.add(`${columnLetter}2:${columnLetter}1000`, {
+          type: 'list',
+          allowBlank: true,
+          formulae: [`=${companyRange}`]
+        });
+      }
+
+      else if (dropdownConfigs[header]) {
+        worksheet.dataValidations.add(`${columnLetter}2:${columnLetter}1000`, {
+          type: 'list',
+          allowBlank: true,
+          formulae: [`"${dropdownConfigs[header].join(',')}"`]
+        });
+      }
+    });
+  
+    // Export the file
+    workbook.xlsx.writeBuffer().then((buffer: BlobPart) => {
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+    }).catch((error: any) => {
+      console.error('Error writing the file', error);
+    });
+  }
+
+
 
 
   exportTemplate(getType: any) {
@@ -180,7 +337,7 @@ export class UserExportComponent {
       Heading = [
         ['UserName', 'Password', 'Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Mobile',
           'Mobile Privacy', 'Telegram Channel ID', 'Permission ID', 'Location Permission', 'FormID Permission', 'Start Node', 'Default Module',
-          'Redirection ID', 'Average Labour Cost','Enable Email', 'Enable SMS', 'Enable Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram', 'Created Time', "Enable User"
+          'Redirection ID', 'Average Labour Cost','Enable Email', 'Enable SMS', 'Enable Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram', "Enable User"
         ],
         ['', '', '', '', '', '', '',
           '', '', '', '', '', '', '',
@@ -338,23 +495,31 @@ export class UserExportComponent {
   downloadExcell(fetchedData: any, getType: any) {
     let Heading: any;
     let filename: any;
+    let dropdownConfigs:any
 
     // SELECTED is parameters xlsx
     if (getType == 'users_xlsx') {
       Heading = [
         ['UserName', 'Password', 'Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Mobile',
           'Mobile Privacy', 'Telegram Channel ID', 'Permission ID', 'Location Permission', 'FormID Permission', 'Start Node', 'Default Module',
-          'Redirection ID', 'Average Labour Cost','Enable Email', 'Enable SMS', 'Enable Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram', 'Created Time', "Enable User"
+          'Redirection ID', 'Average Labour Cost','Enable Email', 'Enable SMS', 'Enable Telegram', 'Escalation Email', 'Escalation SMS', 'Escalation Telegram', "Enable User"
         ]
       ];
+
+      dropdownConfigs = {
+        'Default Module':['None','Forms','Dashboard','Dashboard - Group','Summary Dashboard','Projects','Project - Group','Project - Detail'],
+        'Mobile Privacy': ['Visible', 'Invisible']
+      }
       filename = 'Users.xlsx';
     }
+
+    const requiredFields =['UserName', 'Password', 'Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Permission ID', 'Location Permission', 'FormID Permission'];
 
     // Prepare the data for insertion into the worksheet
     const formattedData = fetchedData.flat().map((user: any) => {
       return [
         user.username || '',
-        user.password || '',
+        "Password@123",
         user.clientID || '',
         user.companyID || '',
         user.email || '',
@@ -376,52 +541,138 @@ export class UserExportComponent {
         user.escalation_email || '',
         user.escalation_sms || '',
         user.escalation_telegram || '',
-        user.created || '',
         user.enable_user || ''
       ];
     });
 
-    // Create a new workbook
-    const wb = XLSX.utils.book_new();
-    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet([]);
+    const workbook: any = new ExcelJS.Workbook();
+    const worksheet: any = workbook.addWorksheet('USER');
+  
+    worksheet.addRows(Heading);
+    worksheet.columns = Heading[0].map(() => ({ width: 50 }));
+  
+    // ✅ Arrays from component
+    const locationPermissionOptions = this.uniqueList[6] || ["All"] ;
+    const formPermissionOptions =  this.uniqueList[7] || ["All"] ;
+    // const rdtPermssionOptions = this.rdtListWorkAround || ["All"] 
+    const permissionIDOptions:any = Array.from(this.uniqueList[5]) || ["All"] 
+    const companyOptions = this.uniqueList[1] || [] 
+    // const treeOptions = this.treeDataArray || ["World"]
+  
+    // Create hidden sheet for large dropdowns
+    const hiddenSheet = workbook.addWorksheet('DropdownOptions');
+    hiddenSheet.state = 'veryHidden';
+  
+    // Fill location permissions in column A
+    locationPermissionOptions.forEach((value: string, index: number) => {
+      hiddenSheet.getCell(`C${index + 1}`).value = value;
+    });
+  
+    // // Fill device permissions in column B
+    formPermissionOptions.forEach((value: string, index: number) => {
+      hiddenSheet.getCell(`D${index + 1}`).value = value;
+    });
 
-    // Add headings to the sheet
-    let onlyHeading = XLSX.utils.sheet_add_aoa(ws, Heading, { origin: 'A1' });
+    // rdtPermssionOptions.forEach((value: string, index: number)=>{
+    //   hiddenSheet.getCell(`C${index + 1}`).value = value;
+    // })  
 
-    // Add data to the sheet
-    XLSX.utils.sheet_add_aoa(ws, formattedData, { origin: 'A2' });
+    permissionIDOptions.forEach((value: string, index: number)=>{
+      hiddenSheet.getCell(`A${index + 1}`).value = value;
+    })  
 
-    // Define column width for all columns (Set width to 50 for all columns)
-    let modifiedColumnWidth: any = [];
-    for (let allCells = 0; allCells < Heading[0].length; allCells++) {
-      modifiedColumnWidth[allCells] = { wch: 50 }; // Set width to 50 for all columns
-    }
-    ws['!cols'] = modifiedColumnWidth;
+    companyOptions.forEach((value: string, index: number)=>{
+      hiddenSheet.getCell(`B${index + 1}`).value = value;
+    })  
 
-    // Apply styles to the first row (headers)
-    for (let colIndex = 0; colIndex < Heading[0].length; colIndex++) {
-      const cellAddress = XLSX.utils.encode_cell({ r: 0, c: colIndex });
-      const cell = ws[cellAddress];
+    // treeOptions.forEach((value: string, index: number)=>{
+    //   hiddenSheet.getCell(`F${index + 1}`).value = value;
+    // })  
 
-      if (cell) {
-        const isRequired = ['UserName', 'Password', 'Client ID', 'Company ID', 'Email', 'User ID', 'Description', 'Permission ID', 'Location Permission', 'FormID Permission'].includes(Heading[0][colIndex]);
-        cell.s = {
-          fill: {
-            fgColor: { rgb: isRequired ? "FF0000" : "FFA500" }, // Red for required, orange for optional
-          },
-          font: {
-            color: { rgb: "FFFFFF" }, // White font color
-            bold: true, // Bold font
-          }
-        };
+
+    // Create reference ranges
+    const locationListRange = `DropdownOptions!$C$1:$C$${locationPermissionOptions.length}`;
+    const deviceListRange = `DropdownOptions!$D$1:$D$${formPermissionOptions.length}`;
+    // const rdtListRange = `DropdownOptions!$C$1:$C$${rdtPermssionOptions.length}`;
+    const permissionRange = `DropdownOptions!$A$1:$A$${permissionIDOptions.length}`;
+    const companyRange = `DropdownOptions!$B$1:$B$${companyOptions.length}`;
+    // const treeRange = `DropdownOptions!$B$1:$B$${treeOptions.length}`;
+  
+    // Add dropdowns and styles to header row
+    Heading[0].forEach((header: string, columnIndex: number) => {
+      const cell = worksheet.getCell(1, columnIndex + 1);
+      const columnLetter = worksheet.getColumn(columnIndex + 1).letter;
+  
+      // Style header
+      cell.style = {
+        fill: {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: requiredFields.includes(header) ? 'FF0000' : 'FFA500' }
+        },
+        font: {
+          bold: true,
+          color: { argb: 'FFFFFF' }
+        }
+      };
+  
+      
+      if(header === 'Location Permission'){
+        worksheet.dataValidations.add(`${columnLetter}2:${columnLetter}1000`, {
+          type: 'list',
+          allowBlank: true,
+          formulae: [`=${locationListRange}`]
+        });
       }
-    }
+      if(header === 'FormID Permission'){
+        worksheet.dataValidations.add(`${columnLetter}2:${columnLetter}1000`, {
+          type: 'list',
+          allowBlank: true,
+          formulae: [`=${deviceListRange}`]
+        });
+      }
+      if(header === 'Permission ID'){
+        worksheet.dataValidations.add(`${columnLetter}2:${columnLetter}1000`, {
+          type: 'list',
+          allowBlank: true,
+          formulae: [`=${permissionRange}`]
+        });
+      }
+      else if(header === 'Company ID'){
+        worksheet.dataValidations.add(`${columnLetter}2:${columnLetter}1000`, {
+          type: 'list',
+          allowBlank: true,
+          formulae: [`=${companyRange}`]
+        });
+      }
 
-    // Append the worksheet to the workbook
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+      else if (dropdownConfigs[header]) {
+        worksheet.dataValidations.add(`${columnLetter}2:${columnLetter}1000`, {
+          type: 'list',
+          allowBlank: true,
+          formulae: [`"${dropdownConfigs[header].join(',')}"`]
+        });
+      }
+    });
 
-    // Export the file as Users.xlsx
-    XLSX.writeFile(wb, filename);
+
+       // Add grid data (excluding header row)
+       const temGridDataHolder = formattedData && JSON.parse(JSON.stringify(formattedData));
+       if (temGridDataHolder) {
+         temGridDataHolder.forEach((dataRow: any) => {
+           worksheet.addRow(dataRow);
+         });
+       }
+     
+       workbook.xlsx.writeBuffer().then((buffer: BlobPart) => {
+         const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+         const link = document.createElement('a');
+         link.href = URL.createObjectURL(blob);
+         link.download = filename;
+         link.click();
+       }).catch((error: any) => {
+         console.error("Error exporting Excel file", error);
+       });
 
     this.spinner.hide();
   }
@@ -518,6 +769,9 @@ export class UserExportComponent {
 
 
   async uploadFile(modal: any): Promise<void> {
+
+  
+
     if (!this.selectedFile || this.validationErrors.length > 0) return;
 
     try {
@@ -527,6 +781,9 @@ export class UserExportComponent {
       const tempupdateHolder = this.validExcelData.updateRows
 
       this.spinner.show()
+
+
+      await this.listAllUsers()
 
 
       if (tempcreateHolder && Array.isArray(tempcreateHolder) && tempcreateHolder.length > 0) {
@@ -601,15 +858,19 @@ export class UserExportComponent {
       let tempObj: any = {}
 
 
+      const getPassword = this.listAllUsersCOgnito.find((user:any)=>user.username == userFields[0].toLowerCase())
+      
+      console.log("GEt Passerod is jhere ",getPassword);
+
       this.allUserDetails = {}
 
       this.allUserDetails = {
         username: userFields[0].toLowerCase(),
-        password: userFields[1],
-        clientID: userFields[2],
+        password: getPassword.password,
+        clientID: this.SK_clientID || userFields[2],
         companyID: userFields[3],
-        email: userFields[4],
-        userID: userFields[5].toLowerCase(),
+        email: getPassword.email || userFields[4],
+        userID: getPassword.userID || userFields[5].toLowerCase(),
         description: userFields[6],
         mobile: userFields[7],
         mobile_privacy: userFields[8],
@@ -621,15 +882,36 @@ export class UserExportComponent {
         default_module: userFields[14],
         redirectionURL: userFields[15],
         avg_labour_cost: userFields[16],
-        alert_email: userFields[17],
-        alert_sms: userFields[18],
-        alert_telegram: userFields[19],
-        escalation_email: userFields[20],
-        escalation_sms: userFields[21],
-        escalation_telegram: userFields[22],
-        created: userFields[23] == '' || userFields[23] == undefined ? Date.now() : userFields[23],
+        alert_email: userFields[17] ? (typeof userFields[17] === 'string' && (userFields[17].toLowerCase() === "true" || userFields[17].toLowerCase() === "false"))
+        ? JSON.parse(userFields[17].toString().toLowerCase())
+        : userFields[17]
+        : false,
+        alert_sms:userFields[18] ? (typeof userFields[18] === 'string' && (userFields[18].toLowerCase() === "true" || userFields[18].toLowerCase() === "false"))
+        ? JSON.parse(userFields[18].toString().toLowerCase())
+        : userFields[18]
+        : false,
+        alert_telegram:  userFields[19] ? (typeof userFields[17] === 'string' && (userFields[19].toLowerCase() === "true" || userFields[19].toLowerCase() === "false"))
+        ? JSON.parse(userFields[19].toString().toLowerCase())
+        : userFields[19]
+        : false,
+        escalation_email: userFields[20] ? (typeof userFields[20] === 'string' && (userFields[20].toLowerCase() === "true" || userFields[20].toLowerCase() === "false"))
+        ? JSON.parse(userFields[20].toString().toLowerCase())
+        : userFields[20]
+        : false,
+        escalation_sms: userFields[21] ? (typeof userFields[21] === 'string' && (userFields[21].toLowerCase() === "true" || userFields[21].toLowerCase() === "false"))
+        ? JSON.parse(userFields[21].toString().toLowerCase())
+        : userFields[21]
+        : false,
+        escalation_telegram: userFields[22] ? (typeof userFields[22] === 'string' && (userFields[22].toLowerCase() === "true" || userFields[22].toLowerCase() === "false"))
+        ? JSON.parse(userFields[22].toString().toLowerCase())
+        : userFields[22]
+        : false,
+        // created: userFields[23] == '' || userFields[23] == undefined ? Date.now() : userFields[23],
         // cognito_update:userFields[21] ,
-        enable_user: userFields[24],
+        enable_user: userFields[23] ? (typeof userFields[23] === 'string' && (userFields[23].toLowerCase() === "true" || userFields[23].toLowerCase() === "false"))
+        ? JSON.parse(userFields[23].toString().toLowerCase())
+        : userFields[23]
+        : false,
         updated: new Date()
       }
 
@@ -1043,12 +1325,30 @@ export class UserExportComponent {
         default_module: userFields[14],
         redirectionURL: userFields[15],
         avg_labour_cost: userFields[16],
-        alert_email: userFields[17],
-        alert_sms: userFields[18],
-        alert_telegram: userFields[19],
-        escalation_email: userFields[20],
-        escalation_sms: userFields[21],
-        escalation_telegram: userFields[22],
+        alert_email: userFields[17] ? (typeof userFields[17] === 'string' && (userFields[17].toLowerCase() === "true" || userFields[17].toLowerCase() === "false"))
+        ? JSON.parse(userFields[17].toString().toLowerCase())
+        : userFields[17]
+        : false,
+        alert_sms:userFields[18] ? (typeof userFields[18] === 'string' && (userFields[18].toLowerCase() === "true" || userFields[18].toLowerCase() === "false"))
+        ? JSON.parse(userFields[18].toString().toLowerCase())
+        : userFields[18]
+        : false,
+        alert_telegram:  userFields[19] ? (typeof userFields[17] === 'string' && (userFields[19].toLowerCase() === "true" || userFields[19].toLowerCase() === "false"))
+        ? JSON.parse(userFields[19].toString().toLowerCase())
+        : userFields[19]
+        : false,
+        escalation_email: userFields[20] ? (typeof userFields[20] === 'string' && (userFields[20].toLowerCase() === "true" || userFields[20].toLowerCase() === "false"))
+        ? JSON.parse(userFields[20].toString().toLowerCase())
+        : userFields[20]
+        : false,
+        escalation_sms: userFields[21] ? (typeof userFields[21] === 'string' && (userFields[21].toLowerCase() === "true" || userFields[21].toLowerCase() === "false"))
+        ? JSON.parse(userFields[21].toString().toLowerCase())
+        : userFields[21]
+        : false,
+        escalation_telegram: userFields[22] ? (typeof userFields[22] === 'string' && (userFields[22].toLowerCase() === "true" || userFields[22].toLowerCase() === "false"))
+        ? JSON.parse(userFields[22].toString().toLowerCase())
+        : userFields[22]
+        : false,
         avg_labour_history: this.avgLabourHistory,
         // cognito_update:userFields[21] ,
         // enable_user: userFields[22] ,
@@ -1549,6 +1849,42 @@ export class UserExportComponent {
     const encryptedData = AES.encrypt(data, secretKey).toString();
     console.log('My_key', encryptedData)
     return encryptedData;
+  }
+
+
+  async listAllUsers(){
+    let storedResponse:any;
+
+    const body = { "type": "cognitoServices",
+      "event":{
+          "path": "/listAllUsers",
+          "queryStringParameters": {},
+          "clientID":this.SK_clientID
+      }
+    }
+    try {
+
+      const response = await this.DynamicApi.getData(body);
+      console.log("Response is here ",JSON.parse(response.body));
+
+      storedResponse = JSON.parse(response.body).users
+      .map((item: any) => {
+        if (item.attributes.email_verified !== 'true') {
+          // Return the user data for unverified users
+          return { username: item.username,password: item.attributes['custom:password'],email: item.attributes['email'],
+            userID: item.attributes['custom:userID']
+          };
+        }
+        return null; 
+      })
+      .filter((user: any) => user !== null); 
+
+      console.log("Strored Response is here ",storedResponse);
+      this.listAllUsersCOgnito = JSON.parse(JSON.stringify(storedResponse))
+
+    } catch (error) {
+      console.error('Error calling dynamic lambda:', error);
+    }
   }
 
 }

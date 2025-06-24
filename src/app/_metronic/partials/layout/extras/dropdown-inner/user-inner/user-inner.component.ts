@@ -107,7 +107,6 @@ export class UserInnerComponent implements OnInit, OnDestroy {
         console.log("Cognito signout ");
       })
       .catch(err => console.error(err));
-
       this.auth.logout();
       document.location.reload();
   }

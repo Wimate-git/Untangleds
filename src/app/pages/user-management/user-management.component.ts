@@ -182,6 +182,7 @@ rdtListWorkAround :any =[{
   lookup_data_Options: any = [];
   permissionIDRef: any = [];
   privacyVisibility: boolean = false;
+  listAllUsersCOgnito: any = [];
 
   constructor(private apiService: UserService,private configService:SharedService,private fb:FormBuilder
     ,private cd:ChangeDetectorRef,private api:APIService,private toast:MatSnackBar,private spinner:NgxSpinnerService,private modalService: NgbModal,private DynamicApi:DynamicApiService,
@@ -266,6 +267,7 @@ rdtListWorkAround :any =[{
 
 
     // await this.recordUserDetails(userDetails,'add',Date.now())
+
 
   }
 
@@ -4275,6 +4277,42 @@ fetchDynamicLookupData(pk:any,sk:any):any {
     modalRef.componentInstance.username = this.username
     modalRef.componentInstance.SK_clientID = this.SK_clientID
 
+  }
+
+
+
+
+  async listAllUsers(){
+    let storedResponse:any;
+
+    const body = { "type": "cognitoServices",
+      "event":{
+          "path": "/listAllUsers",
+          "queryStringParameters": {},
+          "clientID":this.SK_clientID
+      }
+    }
+    try {
+
+      const response = await this.DynamicApi.getData(body);
+      console.log("Response is here ",JSON.parse(response.body));
+
+      storedResponse = JSON.parse(response.body).users
+      .map((item: any) => {
+        if (item.attributes.email_verified !== 'true') {
+          // Return the user data for unverified users
+          return { username: item.username,password: item.attributes['custom:password']};
+        }
+        return null; 
+      })
+      .filter((user: any) => user !== null); 
+
+      console.log("Strored Response is here ",storedResponse);
+      this.listAllUsersCOgnito = JSON.parse(JSON.stringify(storedResponse))
+
+    } catch (error) {
+      console.error('Error calling dynamic lambda:', error);
+    }
   }
 
 } 

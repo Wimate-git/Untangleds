@@ -25,7 +25,7 @@
 
                 <button  class="btn fw-bold btn-danger me-2" [ngbTooltip]="'View all unverified users.'" (click)="showUnverifiedUsers()"><i class="bi bi-person-fill-exclamation fs-2"></i></button>
 
-                <app-user-export [listofSK]="listofSK" [uniqueList]="[listofClientIDs,listofCompanyIDs,listofEmails,listofUserID,listofMobileID,listofPermissionIDs]" [adminLogin]="adminLogin" [SK_clientID]="SK_clientID" [lookup_data_user]="lookup_data_user" [combinationOfUser]="combinationOfUser" (newItemEvent)="reloadTable()" ></app-user-export>
+                <app-user-export [listofSK]="listofSK" [uniqueList]="[listofClientIDs,listofCompanyIDs,listofEmails,listofUserID,listofMobileID,listofPermissionIDs,locationPermissionArray,formList]" [adminLogin]="adminLogin" [SK_clientID]="SK_clientID" [lookup_data_user]="lookup_data_user" [combinationOfUser]="combinationOfUser" (newItemEvent)="reloadTable()" ></app-user-export>
 
                 <!--begin::Add user-->
                 <a [ngbTooltip]="'Add new user'" type="button" class="btn btn-primary" data-action="create">
@@ -818,3 +818,4 @@
     </form>
 
 </ng-template> 
+
