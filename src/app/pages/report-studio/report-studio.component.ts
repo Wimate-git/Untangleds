@@ -1753,6 +1753,8 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
       console.log("Request body is here ", (JSON.parse(JSON.stringify(body))));
 
+      body.limitExceeded = 'allow'
+
       try {
 
         const response = await this.scheduleAPI.sendDataV2(body);
@@ -1761,7 +1763,19 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
         if (!groupedData[formFilter]) {
           groupedData[formFilter] = [];
         }
-        groupedData[formFilter].push(response);
+        if(response && response.rows){
+          groupedData[formFilter].push(response.rows);
+        }
+
+        if(response && response.limitExceeded == true){
+          Swal.fire({
+            title: "Limited Results",
+            text: "To ensure smooth performance, only a portion of the data is being shown. Use the 'Column Visibility' option to refine your view and see all records or exclude some columns from 'Column Visibility'.",
+            icon: "info",
+            confirmButtonText: "Understood"
+          });
+        }
+
       } catch (error) {
         console.error('Error calling dynamic lambda:', error);
         this.spinner.hide();
@@ -2519,7 +2533,7 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
 
       // Merge static columns with dynamic columns
       for (let key in dynamicColumns) {
-        if (key !== 'formFilter' && key !== 'PK' && key !== 'SK' && key != 'Updated Date' && key != 'id') {
+        if (key !== 'formFilter' && key !== 'PK' && key !== 'SK'  && key != 'id') {
           const { isBase64Image, isLocation, isTrackLocation, isMiniTable, isApprovalHistory, isOverview } = dynamicColumns[key];
 
           // Choose renderer based on conditions
@@ -2557,18 +2571,18 @@ export class ReportStudioComponent implements AfterViewInit, OnDestroy {
       }
 
       // Check if 'Updated Date' field exists and sort it
-      if (sampleRow.hasOwnProperty('Updated Date')) {
-        columns.push({
-          headerName: 'Updated Date',
-          field: 'Updated Date',
-          flex: 1,
-          filter: 'agDateColumnFilter',
-          sortable: true,
-          minWidth: 200,
-          sort: 'desc',
-          FormName: formName
-        });
-      }
+      // if (sampleRow.hasOwnProperty('Created Date')) {
+      //   columns.push({
+      //     headerName: 'Created Date',
+      //     field: 'Created Date',
+      //     flex: 1,
+      //     filter: 'agDateColumnFilter',
+      //     sortable: true,
+      //     minWidth: 200,
+      //     sort: 'desc',
+      //     FormName: formName
+      //   });
+      // }
     }
 
     return columns;
