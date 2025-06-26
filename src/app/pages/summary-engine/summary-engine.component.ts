@@ -2154,7 +2154,7 @@ switch (selectedModule) {
       (encryptedPass ? `&pass=${encodeURIComponent(encryptedPass)}` : '');
 
     if (isNewTab) {
-      targetUrl = `/view-dreamboard/Forms/${moduleName}?filter=${encodedCondition}&${queryString}`;
+      targetUrl = `/view-dreamboard/Forms/${moduleName}&filter=${encodedCondition}&${queryString}`;
 
       // ✅ Open in modal if credentials are available
       if (this.userId && this.userPass) {
