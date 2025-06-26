@@ -845,14 +845,14 @@ CustomColumnColorTooltip: string = 'Defines the color of the column in the colum
           // Include created_time and updated_time
           if (parsedMetadata.created_time) {
             this.columnVisisbilityFields.push({
-              value: parsedMetadata.created_time.toString(),
+              value: 'created_time',
               text: 'Created Time' // You can customize the label here if needed
             });
           }
 
           if (parsedMetadata.updated_time) {
             this.columnVisisbilityFields.push({
-              value: parsedMetadata.updated_time.toString(),
+              value: 'updated_time',
               text: 'Updated Time' // You can customize the label here if needed
             });
           }
@@ -899,13 +899,13 @@ CustomColumnColorTooltip: string = 'Defines the color of the column in the colum
           if (parsedMetadata.created_time) {
             dynamicParamList.push({
               value: 'created_time',
-              text: 'created_time',
+              text: 'Created Time',
             });
           }
           if (parsedMetadata.updated_time) {
             dynamicParamList.push({
               value: 'updated_time',
-              text: 'updated_time',
+              text: 'Updated Time',
             });
           }
           if (parsedMetadata.updated_time) {
@@ -933,11 +933,11 @@ CustomColumnColorTooltip: string = 'Defines the color of the column in the colum
           });
           dateFieldsList.push({
             value: 'created_time',
-            text: 'created_time',
+            text: 'Created Time',
           });
           dateFieldsList.push({
             value: 'updated_time',
-            text: 'updated_time',
+            text: 'Updated Time',
           });
           
           this.dynamicDateParamMap.set(index,dateFieldsList)
@@ -2362,14 +2362,14 @@ toggleCheckbox1(themeOrEvent: any): void {
           // Include created_time and updated_time
           if (parsedMetadata.created_time) {
             this.listofDynamicParamFilter.push({
-              value: parsedMetadata.created_time.toString(),
+              value: 'created_time',
               text: 'Created Time' // You can customize the label here if needed
             });
           }
 
           if (parsedMetadata.updated_time) {
             this.listofDynamicParamFilter.push({
-              value: parsedMetadata.updated_time.toString(),
+              value: 'updated_time',
               text: 'Updated Time' // You can customize the label here if needed
             });
           }

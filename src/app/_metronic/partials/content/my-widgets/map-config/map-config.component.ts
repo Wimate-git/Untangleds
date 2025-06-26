@@ -350,13 +350,13 @@ console.log('Cleaned-up formlist values:', this.formlistValues);
           // Add created_time and updated_time if present
           if (parsedMetadata.created_time) {
             dynamicParamList.push({
-              value: parsedMetadata.created_time.toString(),
+              value: 'created_time',
               text: 'Created Time',
             });
           }
           if (parsedMetadata.updated_time) {
             dynamicParamList.push({
-              value: parsedMetadata.updated_time.toString(),
+              value: 'updated_time',
               text: 'Updated Time',
             });
           }
@@ -1292,14 +1292,14 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
           // Include created_time and updated_time
           if (parsedMetadata.created_time) {
             this.listofDynamicParamFilter.push({
-              value: parsedMetadata.created_time.toString(),
+              value: 'created_time',
               text: 'Created Time' // You can customize the label here if needed
             });
           }
 
           if (parsedMetadata.updated_time) {
             this.listofDynamicParamFilter.push({
-              value: parsedMetadata.updated_time.toString(),
+              value: 'updated_time',
               text: 'Updated Time' // You can customize the label here if needed
             });
           }

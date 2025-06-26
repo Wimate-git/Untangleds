@@ -844,7 +844,7 @@ export class ChartUi3Component implements OnInit{
     
       // Loop through the data array
       dataArray.forEach((packet: any, matchedIndex: number) => {
-        console.log('packet:', packet); // Log each packet to ensure it is as expected
+        // console.log('packet:', packet); // Log each packet to ensure it is as expected
     
         // If data is a single item, skip the check for this.index == matchedIndex
         if (packet.grid_type == 'Columnchart' && packet.id === this.item.id) {

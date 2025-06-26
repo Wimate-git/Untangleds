@@ -316,53 +316,57 @@ modalRef: NgbModalRef | undefined;
                 const validation = packet.validation || {};
                 const key = fieldName.toLowerCase();
           
+                // ✅ Allowed format options
+                const allowedDateFormats = ['DD/MM/YYYY', 'MM/DD/YYYY', 'YYYY/MM/DD'];
+                const allowedTimeFormats = ['12-hour (hh:mm AM/PM)', '24-hour (hh:mm)'];
+          
                 const defaultDateFormat = 'DD/MM/YYYY';
-                const defaultTimeFormat = '24-hour (HH:mm)';
+                const defaultTimeFormat = '24-hour (hh:mm)';
           
-                const dateFormatType = (validation.dateFormatType || defaultDateFormat).toUpperCase();
-                const rawTimeFormatType = (validation.timeFormatType || defaultTimeFormat).toLowerCase();
+                // ✅ Use format only if valid, else fallback
+                const rawDateFormat = validation.dateFormatType;
+                const rawTimeFormat = validation.timeFormatType;
           
-                console.log('🕒 timeFormatType:', rawTimeFormatType);
+                const dateFormatType = allowedDateFormats.includes(rawDateFormat) ? rawDateFormat : defaultDateFormat;
+                const rawTimeFormatType = allowedTimeFormats.includes(rawTimeFormat) ? rawTimeFormat : defaultTimeFormat;
           
-                // ✅ Standardize time format
-                const timeFormat = rawTimeFormatType.includes('am/pm') || rawTimeFormatType.includes('12-hour')
-                  ? 'hh:mm A'
-                  : 'HH:mm';
+                // 🕒 Resolve time format string
+                const timeFormat = rawTimeFormatType.includes('12-hour') ? 'hh:mm A' : 'HH:mm';
           
                 let format = '';
           
-                // 🧠 Parse epoch fields
-                if (key.startsWith('epoch-date') || key.startsWith('epoch-datetime-local')) {
-                  const epoch = typeof fieldValue === 'string' ? parseInt(fieldValue) : fieldValue;
+                // 🧠 Convert epoch to Date (in ms if necessary)
+                if (key.startsWith('epoch-datetime-local') || key.startsWith('epoch-date')) {
+                  let epoch = typeof fieldValue === 'string' ? parseInt(fieldValue) : fieldValue;
+                  if (epoch < 10000000000) epoch *= 1000; // seconds to milliseconds
                   fieldValue = new Date(epoch);
                 }
           
-                // 🧠 Patch time-only strings (e.g. "13:40")
+                // 🧠 Patch time-only strings (e.g., "13:45")
                 if (typeof fieldValue === 'string' && key.startsWith('time') && !key.startsWith('datetime')) {
                   fieldValue = `1970-01-01T${fieldValue}`;
                 }
           
-                // ⏱️ Convert to valid Date
+                // ⏱️ Parse final Date object
                 const parsedDate = fieldValue instanceof Date ? fieldValue : new Date(fieldValue);
-          
                 if (isNaN(parsedDate.getTime())) {
                   formattedResults[fieldName] = '';
                   return;
                 }
           
-                // 🧩 Format type decision
-                if (key === 'updated_time') {
-                  format = 'DD/MM/YYYY';
-                } else if (key.startsWith('time') && !key.startsWith('datetime')) {
-                  format = timeFormat;
-                } else if (key.startsWith('datetime')) {
-                  format = `${dateFormatType} ${timeFormat}`;
-                } else if (key.startsWith('date') && !key.startsWith('datetime')) {
-                  format = dateFormatType;
-                } else if (key.startsWith('epoch-date')) {
-                  format = dateFormatType;
+                // 🧩 Format resolution (specific to general order)
+                if (key === 'created_time' || key === 'updated_time') {
+                  format = 'DD/MM/YYYY HH:mm';
                 } else if (key.startsWith('epoch-datetime-local')) {
                   format = `${dateFormatType} ${timeFormat}`;
+                } else if (key.startsWith('epoch-date')) {
+                  format = dateFormatType;
+                } else if (key.startsWith('datetime')) {
+                  format = `${dateFormatType} ${timeFormat}`;
+                } else if (key.startsWith('time') && !key.startsWith('datetime')) {
+                  format = timeFormat;
+                } else if (key.startsWith('date') && !key.startsWith('datetime')) {
+                  format = dateFormatType;
                 }
           
                 const formattedDate = this.formatDateByPattern(parsedDate, format);
@@ -374,7 +378,9 @@ modalRef: NgbModalRef | undefined;
             return formattedResults;
           }
           
-    
+          
+          
+          
           formatDateByPattern(inputDate: string | number | Date, format: string): string {
             const date = new Date(inputDate);
             const pad = (num: number) => String(num).padStart(2, '0');

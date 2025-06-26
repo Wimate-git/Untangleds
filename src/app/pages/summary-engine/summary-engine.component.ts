@@ -593,7 +593,7 @@ export class SummaryEngineComponent implements OnInit, AfterViewInit, OnDestroy 
     this.gridApi = params.api; // Initialize Grid API
     this.gridColumnApi = params.columnApi; // Initialize Column API
     params.api.sizeColumnsToFit(); 
-    console.log('Grid API initialized:', this.gridApi); // Debugging
+    //console.log('Grid API initialized:', this.gridApi); // Debugging
   }
   
 
@@ -1104,7 +1104,7 @@ Highcharts.chart('MixedChart', barchartOptions);
     this.chartIdsFromChild1 = ids;
     let dialIDobj = []
     dialIDobj.push(this.chartIdsFromChild1);
-    //console.log('life obh',dialIDobj);
+    ////console.log('life obh',dialIDobj);
 
 
   }
@@ -1335,12 +1335,12 @@ Highcharts.chart('MixedChart', barchartOptions);
   //         // ✅ Ensure we await the resolved value of permissionfromOnInit
   //         const resolvedPermission = await permissionfromOnInit;
           
-  //         console.log("✅ Resolved permissionfromOnInit check:", resolvedPermission);
+  //         //console.log("✅ Resolved permissionfromOnInit check:", resolvedPermission);
 
   //         // ✅ Extract values safely after resolving the Promise
   //         const permissionId = resolvedPermission?.permissionId || "";
   //         const permissionList = resolvedPermission?.readFilterEquationawait || [];
-  //         console.log('permissionList check',permissionList)
+  //         //console.log('permissionList check',permissionList)
   //         const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
 
   //         // ✅ Construct the request body
@@ -1354,21 +1354,21 @@ Highcharts.chart('MixedChart', barchartOptions);
   //             }),
   //         };
 
-  //         console.log("🚀 Final requestBody: liveTrigger", requestBody);
+  //         //console.log("🚀 Final requestBody: liveTrigger", requestBody);
   //         this.http.post(apiUrl, requestBody).subscribe(
   //           (response: any) => {
-  //             console.log('Lambda function triggered successfully:', response);
+  //             //console.log('Lambda function triggered successfully:', response);
           
   //             // Ensure response status is 200 before processing
   //             if (response?.statusCode === 200) {
   //               try {
   //                 const constLiveData = JSON.parse(response.body); // Parse the JSON body
-  //                 console.log('constLiveData check', constLiveData);
+  //                 //console.log('constLiveData check', constLiveData);
           
   //                 // Ensure Processed_Data exists in response
   //                 if (constLiveData?.Processed_Data?.metadata?.grid_details) {
   //                   const processedData = constLiveData.Processed_Data.metadata.grid_details;
-  //                   console.log('processedData check liveData', processedData);
+  //                   //console.log('processedData check liveData', processedData);
   //                   this.summaryService.updatelookUpData(processedData)
 
   //                 } else {
@@ -1421,7 +1421,7 @@ Highcharts.chart('MixedChart', barchartOptions);
           
   //             // Handle different error codes
   //             if (error.status === 404) {
-  //               console.log('Received 404 error - stopping loading and showing error message.');
+  //               //console.log('Received 404 error - stopping loading and showing error message.');
   //               Swal.fire({
   //                 title: 'Error!',
   //                 text: 'Data not found. Please check your inputs and try again.',
@@ -1472,11 +1472,11 @@ Highcharts.chart('MixedChart', barchartOptions);
   
       // ✅ Await permission
       const resolvedPermission = await permissionfromOnInit;
-      console.log("✅ Resolved permissionfromOnInit check:", resolvedPermission);
+      //console.log("✅ Resolved permissionfromOnInit check:", resolvedPermission);
   
       const permissionId = resolvedPermission?.permissionId || "";
       const permissionList = resolvedPermission?.readFilterEquationawait || [];
-      console.log('permissionList check', permissionList);
+      ////console.log('permissionList check', permissionList);
   
       const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
   
@@ -1490,21 +1490,21 @@ Highcharts.chart('MixedChart', barchartOptions);
         }),
       };
   
-      console.log("🚀 Final requestBody: liveTrigger", requestBody);
+      ////console.log("🚀 Final requestBody: liveTrigger", requestBody);
   
       this.http.post(apiUrl, requestBody).subscribe(
         (response: any) => {
           clearTimeout(lambdaTimeout); // ✅ Clear timeout on success
-          console.log('Lambda function triggered successfully:', response);
+          ////console.log('Lambda function triggered successfully:', response);
   
           if (response?.statusCode === 200) {
             try {
               const constLiveData = JSON.parse(response.body);
-              console.log('constLiveData check', constLiveData);
+              ////console.log('constLiveData check', constLiveData);
   
               if (constLiveData?.Processed_Data?.metadata?.grid_details) {
                 const processedData = constLiveData.Processed_Data.metadata.grid_details;
-                console.log('processedData check liveData', processedData);
+                ////console.log('processedData check liveData', processedData);
                 setTimeout(() => {
                   this.summaryService.updatelookUpData(processedData);
                   
@@ -1588,13 +1588,13 @@ Highcharts.chart('MixedChart', barchartOptions);
   
   else if(key=='html'){
       this.isLoading = true; // Set loading state to true
-      console.log('this.routeId check', this.routeId);
-      console.log('client id check', this.SK_clientID);
+      ////console.log('this.routeId check', this.routeId);
+      ////console.log('client id check', this.SK_clientID);
       this.spinner.show('dataProcess')
   
-  console.log('this.readFilterEquation checking',this.readFilterEquation)
-    console.log('this.parsedPermission',this.parsedPermission)
-    console.log('this.userdetails from request',this.userdetails)
+  ////console.log('this.readFilterEquation checking',this.readFilterEquation)
+    ////console.log('this.parsedPermission',this.parsedPermission)
+    ////console.log('this.userdetails from request',this.userdetails)
       // Define the API Gateway URL
       const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
     
@@ -1612,26 +1612,26 @@ Highcharts.chart('MixedChart', barchartOptions);
         }),
       };
     
-      console.log('requestBody checking', requestBody);
+      ////console.log('requestBody checking', requestBody);
     
       // Send a POST request to the Lambda function with the body
       this.http.post(apiUrl, requestBody).subscribe(
         (response: any) => {
-          console.log('Lambda function triggered successfully:', response);
+          ////console.log('Lambda function triggered successfully:', response);
       
           // Ensure response status is 200 before processing
           if (response?.statusCode === 200) {
             try {
               const constLiveData = JSON.parse(response.body); // Parse the JSON body
-              console.log('constLiveData check', constLiveData);
+              ////console.log('constLiveData check', constLiveData);
       
               // Ensure Processed_Data exists in response
               if (constLiveData?.Processed_Data?.metadata?.grid_details) {
                 const processedData = constLiveData.Processed_Data.metadata.grid_details;
-                console.log('processedData check', processedData);
+                ////console.log('processedData check', processedData);
                 if (this.all_Packet_store?.LiveDashboard === true ) {
       
-                  console.log('this.all_Packet_store?.LiveDashboard from lambda',this.all_Packet_store?.LiveDashboard)
+                  ////console.log('this.all_Packet_store?.LiveDashboard from lambda',this.all_Packet_store?.LiveDashboard)
       this.liveDashboardDataFormat(processedData);
   }else{
   
@@ -1685,7 +1685,7 @@ Highcharts.chart('MixedChart', barchartOptions);
       
           // Handle different error codes
           if (error.status === 404) {
-            console.log('Received 404 error - stopping loading and showing error message.');
+            ////console.log('Received 404 error - stopping loading and showing error message.');
             Swal.fire({
               title: 'Error!',
               text: 'Data not found. Please check your inputs and try again.',
@@ -1721,6 +1721,8 @@ Highcharts.chart('MixedChart', barchartOptions);
   @ViewChild('dataTableModalTile2', { static: false }) dataTableModalTile2: TemplateRef<any>;
   @ViewChild('dataTableModalDynamicTile', { static: false }) dataTableModalDynamicTile: TemplateRef<any>;
   @ViewChild('TitleModal', { static: false }) TitleModal: TemplateRef<any>;
+  @ViewChild('htmlModal', { static: false }) htmlModal: TemplateRef<any>;
+  
 
 
 
@@ -1728,7 +1730,7 @@ Highcharts.chart('MixedChart', barchartOptions);
     // this.isEditModeView = false
     this.FilterTileConfigComponent.isEditMode =true;
     this.FilterTileConfigComponent.openFilterModal(item, index);
-    console.log('this.isEditModeView checling filter',this.isEditModeView)
+    ////console.log('this.isEditModeView checling filter',this.isEditModeView)
     if (this.isEditModeView) {
       this.handleClick(item, index, event);
     }
@@ -1743,8 +1745,8 @@ Highcharts.chart('MixedChart', barchartOptions);
   handleClick(item: any, i: number, event: MouseEvent) {
     this.FilterTileConfigComponent.isEditMode =true;
 
-    // console.log('item is checking from handleclick',item)
-    // console.log('index is checking from i',i)
+    // ////console.log('item is checking from handleclick',item)
+    // ////console.log('index is checking from i',i)
     if (item.grid_type === 'filterTile') {
       if (this.summaryDashboardView && this.summaryDashboardUpdate || this.summaryDashboardUpdate){
         this.justReadStyles(item, i);
@@ -1753,14 +1755,14 @@ Highcharts.chart('MixedChart', barchartOptions);
    
     } else if (item.grid_type === 'tile') {
       if (this.isEditModeView && !this.hideButton && (this.summaryDashboardUpdate || this.summaryDashboardView)) {
-        console.log('Triggering the function'); // Log to confirm condition
-        this.invokeHelperDashboard(item, i, this.modalContent, this.dataTableModalTile1);
+        ////console.log('Triggering the function'); // Log to confirm condition
+        this.invokeHelperDashboard(item, i, this.modalContent, this.dataTableModalTile1,this.htmlModal);
       } else {
-        console.log('Condition not met'); // Log if the condition isn't met
+        ////console.log('Condition not met'); // Log if the condition isn't met
       }
       
       // else if (!this.isEditModeView) {
-      //   console.log('i am triggering helperTile')
+      //   ////console.log('i am triggering helperTile')
       //   // this.helperTile($event, this.KPIModal);
       //   this.helperEditModalOpen(item,i,this.KPIModal)
       // }
@@ -1784,7 +1786,7 @@ Highcharts.chart('MixedChart', barchartOptions);
         this.invokeHelperDashboard(item, i, this.modalContent, this.dataTableModalDynamicTile);
       }
       // else if (!this.isEditModeView) {
-      //   console.log('i am triggering helperTile')
+      //   ////console.log('i am triggering helperTile')
       //   // this.helperTile($event, this.KPIModal);
       //   this.helperEditModalOpen(item,i,this.DynamicTileModal)
       // }
@@ -1815,16 +1817,16 @@ Highcharts.chart('MixedChart', barchartOptions);
   
   setFullscreen(): void {
     localStorage.setItem('fullscreen', 'true');
-    console.log('Fullscreen enabled');
+    ////console.log('Fullscreen enabled');
 }
 liveFilterDataProcess(liveFilterData:any){
-  console.log('liveFilterData from live check', liveFilterData);
+  ////console.log('liveFilterData from live check', liveFilterData);
 
   if (liveFilterData && liveFilterData.length > 0) {
     this.liveDataFilterCheck =  true
       this.summaryService.updatelookUpData(liveFilterData);
   } else {
-      console.log('liveFilterData is empty, skipping update');
+      ////console.log('liveFilterData is empty, skipping update');
   }
   
 
@@ -1834,7 +1836,7 @@ liveFilterDataProcess(liveFilterData:any){
 }
 
 liveDashboardDataFormat(processedData: any) {
-  console.log('Processed Data:', processedData);
+  ////console.log('Processed Data:', processedData);
 
   let chartData: any = [];
   let tileData: any = [];
@@ -1848,81 +1850,81 @@ liveDashboardDataFormat(processedData: any) {
     switch (packet.grid_type) {
       case "chart":
      
-        console.log("Matched Chart Packet:", packet);
+        ////console.log("Matched Chart Packet:", packet);
         chartData.push(packet);
-        console.log('chartData after push',chartData)
+        ////console.log('chartData after push',chartData)
   
 
         this.liveDataChart = chartData
 
         break;
       case "tile":
-        console.log("Matched Tile Packet:", packet);
+        ////console.log("Matched Tile Packet:", packet);
  
         tileData.push(packet);
-        console.log('tileData after push',tileData)
+        ////console.log('tileData after push',tileData)
     
 
  
         this.liveDataTile = tileData
-        console.log('this.liveDataTile chec',this.liveDataTile)
+        ////console.log('this.liveDataTile chec',this.liveDataTile)
         break;
         case "Linechart":
-          console.log("Matched Tile Packet:", packet);
+          ////console.log("Matched Tile Packet:", packet);
    
           lineChart.push(packet);
-          console.log('lineChart after push',lineChart)
+          ////console.log('lineChart after push',lineChart)
       
   
    
           this.liveDataLineChart = lineChart
-          console.log('this.liveDataLineChart chec',this.liveDataLineChart)
+          ////console.log('this.liveDataLineChart chec',this.liveDataLineChart)
           break;
           case "Columnchart":
-            console.log("Matched Tile Packet:", packet);
+            ////console.log("Matched Tile Packet:", packet);
      
             columnChart.push(packet);
-            console.log('columnChart after push',columnChart)
+            ////console.log('columnChart after push',columnChart)
         
     
      
             this.liveDataColumnChart = columnChart
-            console.log('this.liveDataLineChart chec',this.liveDataLineChart)
+            ////console.log('this.liveDataLineChart chec',this.liveDataLineChart)
             break;
             case "dynamicTile":
-              console.log("Matched Tile Packet:", packet);
+              ////console.log("Matched Tile Packet:", packet);
        
               dynamicTile.push(packet);
-              console.log('dynamicTile after push',dynamicTile)
+              ////console.log('dynamicTile after push',dynamicTile)
           
       
        
               this.liveDataDynamicTile = dynamicTile
-              console.log('this.liveDataLineChart chec',this.liveDataDynamicTile)
+              ////console.log('this.liveDataLineChart chec',this.liveDataDynamicTile)
               break;
 
 
               case "TableWidget":
-                console.log("Matched Tile Packet:", packet);
+                ////console.log("Matched Tile Packet:", packet);
          
                 TableWidget.push(packet);
-                console.log('TableWidget after push',TableWidget)
+                ////console.log('TableWidget after push',TableWidget)
             
         
          
                 this.liveDataTableTile = TableWidget
-                console.log('this.liveDataLineChart chec',this.liveDataTableTile)
+                ////console.log('this.liveDataLineChart chec',this.liveDataTableTile)
                 break;
                 case "Map":
-                  console.log("Matched Tile Packet:", packet);
+                  ////console.log("Matched Tile Packet:", packet);
            
                   MapWidget.push(packet);
-                  console.log('MapWidget after push',MapWidget)
+                  ////console.log('MapWidget after push',MapWidget)
               
           
            
                   this.liveDataMapTile = MapWidget
-                  console.log('this.liveDataMapTile chec',this.liveDataTableTile)
+                  ////console.log('this.liveDataMapTile chec',this.liveDataTableTile)
                   break;
 
 
@@ -1939,8 +1941,8 @@ liveDashboardDataFormat(processedData: any) {
     }
   });
 
-  console.log("Final Chart Data:", chartData);
-  console.log("Final Tile Data:", tileData);
+  ////console.log("Final Chart Data:", chartData);
+  ////console.log("Final Tile Data:", tileData);
 
   return { chartData, tileData };
 }
@@ -1948,7 +1950,7 @@ liveDashboardDataFormat(processedData: any) {
 
 checkAndSetFullscreen(receiveFullScreenCheck:any): void {
     const isFullscreen = receiveFullScreenCheck
-    console.log('isFullscreen check:', isFullscreen);
+    ////console.log('isFullscreen check:', isFullscreen);
 
     // Update the fullscreen state and related flags
     this.isFullscreen = isFullscreen;
@@ -1961,23 +1963,23 @@ checkAndSetFullscreen(receiveFullScreenCheck:any): void {
     //     this.toggleFullScreenFullView(false); // Exit fullscreen
     // }
 }
-invokeHelperDashboard(item: any, index: number, template: any, modaref: any): void {
-  console.log('item check for switch case', item);
+invokeHelperDashboard(item: any, index: number, template: any, modaref: any,htmlModalRef?:any): void {
+  ////console.log('item check for switch case', item);
 
   const selectedType = item.selectType;
   const redirectionId = item.ModuleNames;
 
-  console.log('selectedType checking', selectedType);
-  console.log('modaref check', modaref);
-  console.log('this.userId checking from redirectModal', this.userId);
-  console.log('this.userPass checking from redirectModal', this.userPass);
+  ////console.log('selectedType checking', selectedType);
+  ////console.log('modaref check', modaref);
+  ////console.log('this.userId checking from redirectModal', this.userId);
+  ////console.log('this.userPass checking from redirectModal', this.userPass);
 
   this.currentModalIndex = index;
   this.currentItem = item;
 
   // 🧠 If redirectionId is not 'Summary Dashboard', skip switch and default to redirect
   if (redirectionId !== 'Summary Dashboard') {
-    this.redirectModule(item);
+    this.redirectModule(item,htmlModalRef);
   } else {
     switch (selectedType) {
       case 'drill down':
@@ -2014,14 +2016,14 @@ invokeHelperDashboard(item: any, index: number, template: any, modaref: any): vo
 
 
 // redirectModule(recieveItem: any) {
-//   console.log('recieveItem check', recieveItem);
+//   ////console.log('recieveItem check', recieveItem);
 //   const moduleName = recieveItem.dashboardIds;
-//   console.log('moduleName checking',moduleName)
+//   ////console.log('moduleName checking',moduleName)
 //   let dashUrl = '/dashboard';
 //   let projecturl = '/project-dashboard';
 //   const selectedModule = recieveItem.ModuleNames;
 
-//   console.log("I am triggered here", selectedModule);
+//   ////console.log("I am triggered here", selectedModule);
 
 
 //   switch (selectedModule) {
@@ -2070,7 +2072,7 @@ invokeHelperDashboard(item: any, index: number, template: any, modaref: any): vo
     
 //         case 'Calender':
 //           this.redirectionURL = `/view-dreamboard/Calendar/${moduleName}`;
-//           console.log('this.redirectionURL checking',this.redirectionURL)
+//           ////console.log('this.redirectionURL checking',this.redirectionURL)
    
 //           this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
 //           // this.router.navigate(['/reportStudio'], { queryParams: { savedQuery: moduleName } });
@@ -2084,13 +2086,13 @@ invokeHelperDashboard(item: any, index: number, template: any, modaref: any): vo
 //   }
 
 //   // // Ensure the redirection is triggered
-//   // console.log("Redirecting to:", this.redirectionURL);
+//   // ////console.log("Redirecting to:", this.redirectionURL);
 //   // this.router.navigate([this.redirectionURL]).catch(err => console.error("Navigation error:", err));
 // }
 
-
-redirectModule(recieveItem: any) {
-  console.log('recieveItem check from module redirection', recieveItem);
+SECRET_KEY = 'mobile-encrypt-params-123';
+redirectModule(recieveItem: any,htmlModalRef:any) {
+  ////console.log('recieveItem check from module redirection', recieveItem);
 
   const moduleName = recieveItem.dashboardIds;
   const selectedModule = recieveItem.ModuleNames;
@@ -2098,66 +2100,117 @@ redirectModule(recieveItem: any) {
   const filterDescriptionAccess = recieveItem.filterDescription;
   const formattedCondition = this.formatConditions(filterDescriptionAccess);
   // const quotedCondition = ${formattedCondition}; 
-  console.log('formattedCondition checking from module redirection', formattedCondition);
+  ////console.log('formattedCondition checking from module redirection', formattedCondition);
 
-  console.log('moduleName:', moduleName);
-  console.log('selectedModule:', selectedModule);
-  console.log('selectType (redirectType):', redirectType);
+  ////console.log('moduleName:', moduleName);
+  ////console.log('selectedModule:', selectedModule);
+  ////console.log('selectType (redirectType):', redirectType);
 
-  let targetUrl: string = '';
-  const isNewTab = redirectType === 'NewTab';
+  // let targetUrl: string = '';
+  // const isNewTab = redirectType === 'NewTab';
 
-  switch (selectedModule) {
-    case 'Forms':
-      if (isNewTab) {
-        const encodedCondition = encodeURIComponent(formattedCondition);
-        console.log('encodedCondition checking',encodedCondition)
-        targetUrl = `/view-dreamboard/Forms/${moduleName}&filter=${encodedCondition}`;
-        console.log('targetUrl checking from summary',targetUrl)
+  this.route.queryParams.subscribe(async (params) => {
+    //console.log('userparams checking from onInit',params)
+  if(params['uID']){
+    //console.log('uid checking',params['uID'])
+    this.userId = params['uID']
+
+    
+  }
+  if(params['pass']){
+    //console.log('pass checking',params['pass'])
+    this.userPass = params['pass']
+    // const user = await this.authservice.signIn((this.userId).toLowerCase(), this.userPass);
+    //console.log('user check query',user)
+    // this.hideSummaryGridster = true
+    
+  }
+
+
+  // if(params['clientID']){
+  //   //console.log('clientID checking',params['clientID'])
+
+  // }
+});
+
+// const encryptedUserId = this.userId ? this.encryptValue(this.userId) : '';
+// const encryptedPass = this.userPass ? this.encryptValue(this.userPass) : '';
+
+// const queryString = `recordId=${encodedRecordId}&isFullScreen=true` +
+//   (encryptedUserId ? `&uID=${encryptedUserId}` : '') +
+//   (encryptedPass ? `&pass=${encryptedPass}` : '');
+
+const isNewTab = redirectType === 'NewTab';
+let targetUrl = '';
+
+switch (selectedModule) {
+  case 'Forms': {
+    const encodedCondition = encodeURIComponent(formattedCondition);
+    const encryptedUserId = this.userId ? this.encryptValue(this.userId) : '';
+    const encryptedPass = this.userPass ? this.encryptValue(this.userPass) : '';
+
+    const queryString = `isFullScreen=true` +
+      (encryptedUserId ? `&uID=${encodeURIComponent(encryptedUserId)}` : '') +
+      (encryptedPass ? `&pass=${encodeURIComponent(encryptedPass)}` : '');
+
+    if (isNewTab) {
+      targetUrl = `/view-dreamboard/Forms/${moduleName}?filter=${encodedCondition}&${queryString}`;
+
+      // ✅ Open in modal if credentials are available
+      if (this.userId && this.userPass) {
+        this.iframeSafeUrl = targetUrl;
+        this.modalService.open(htmlModalRef, {
+          fullscreen: true,
+          modalDialogClass: 'p-9',
+          centered: true,
+          backdrop: 'static',
+          keyboard: false
+        });
+        return;
       } else {
-        targetUrl = `/view-dreamboard/Sanket test/${moduleName}`;
+        // ✅ Open in new browser tab if credentials missing
+        window.open(targetUrl, '_blank');
+        return;
       }
-      console.log('targetUrl checking from module redirection', targetUrl);
-      break;
-
-    case 'Summary Dashboard':
-      targetUrl = `/summary-engine/${moduleName}`;
-      break;
-
-    case 'Dashboard':
-      targetUrl = `/dashboard/dashboardFrom/Forms/${moduleName}`;
-      break;
-
-    case 'Projects':
-      targetUrl = `/project-dashboard/project-template-dashboard/${moduleName}`;
-      break;
-
-    case 'Calender':
-      targetUrl = `/view-dreamboard/Calendar/${moduleName}`;
-      break;
-
-    case 'Report Studio':
-      const tree = this.router.createUrlTree(['/reportStudio'], {
-        queryParams: { savedQuery: moduleName }
-      });
-      targetUrl = this.router.serializeUrl(tree);
-      break;
-
-    default:
-      console.error('Unknown module:', selectedModule);
-      return;
-  }
-
-  // 🔁 Navigation logic
-  if (isNewTab) {
-    window.open(targetUrl, '_blank');
-  } else {
-    if (selectedModule === 'Report Studio') {
-      this.router.navigateByUrl(targetUrl).catch(err => console.error('Navigation error:', err));
     } else {
-      this.router.navigate([targetUrl]).catch(err => console.error('Navigation error:', err));
+      // ✅ Same tab navigation
+      targetUrl = `/view-dreamboard/Forms/${moduleName}`;
     }
+    break;
   }
+
+  case 'Summary Dashboard':
+    targetUrl = `/summary-engine/${moduleName}`;
+    break;
+
+  case 'Dashboard':
+    targetUrl = `/dashboard/dashboardFrom/Forms/${moduleName}`;
+    break;
+
+  case 'Projects':
+    targetUrl = `/project-dashboard/project-template-dashboard/${moduleName}`;
+    break;
+
+  case 'Calender':
+    targetUrl = `/view-dreamboard/Calendar/${moduleName}`;
+    break;
+
+  case 'Report Studio': {
+    const tree = this.router.createUrlTree(['/reportStudio'], {
+      queryParams: { savedQuery: moduleName }
+    });
+    targetUrl = this.router.serializeUrl(tree);
+    break;
+  }
+
+  default:
+    console.error('Unknown module:', selectedModule);
+    return;
+}
+
+// ✅ Navigate in same tab (for all non-new tab cases)
+this.router.navigateByUrl(targetUrl).catch(err => console.error('Navigation error:', err));
+
 }
 
 
@@ -2213,25 +2266,25 @@ fetchCalender(){
    this.api.GetMaster(this.SK_clientID + "#systemCalendarQuery#lookup", 1).then((result: any) => {
     if (result) {
         this.helpherObjCalender = JSON.parse(result.options)
-        console.log('this.helpherObjCalender check',this.helpherObjCalender)
+        ////console.log('this.helpherObjCalender check',this.helpherObjCalender)
 
         this.formList = this.helpherObjCalender.map((item: any) => item)
 
-        console.log("DYNAMIC FORMLIST:", this.formList)
+        //console.log("DYNAMIC FORMLIST:", this.formList)
     }
 }).catch((error) => {
-    console.log("Error:", error)
+    //console.log("Error:", error)
 })
 }
 showDrillDownData(dynamicDrill:any,modalref:any){
-  console.log('dynamicDrill checking',dynamicDrill)
+  //console.log('dynamicDrill checking',dynamicDrill)
   this.storeDrillDown = dynamicDrill
-  console.log('this.storeDrillDown checking',this.storeDrillDown)
+  //console.log('this.storeDrillDown checking',this.storeDrillDown)
   const drilldownColumnVisibility =JSON.parse(this.storeDrillDown.columnVisibility)
-  console.log('drilldownColumnVisibility checking',drilldownColumnVisibility)
+  //console.log('drilldownColumnVisibility checking',drilldownColumnVisibility)
 
   if (!Array.isArray(drilldownColumnVisibility) || drilldownColumnVisibility.length === 0) {
-      console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
+      //console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
       return;
   }else {
     setTimeout(() => {
@@ -2249,16 +2302,16 @@ showDrillDownData(dynamicDrill:any,modalref:any){
   }
 
 
-  console.log('this.storeDrillDown',this.storeDrillDown.id)
+  //console.log('this.storeDrillDown',this.storeDrillDown.id)
   const pointData ={
     name:this.storeDrillDown.multi_value[0].value,
     value:this.storeDrillDown.multi_value[0].processed_value
   }
 
-  console.log('pointData for Tile',pointData)
-  console.log('this.permissionIdRequest check drilldown',this.permissionIdRequest)
+  //console.log('pointData for Tile',pointData)
+  //console.log('this.permissionIdRequest check drilldown',this.permissionIdRequest)
 
-console.log('this.eventFilterConditions checking',this.eventFilterConditions)
+//console.log('this.eventFilterConditions checking',this.eventFilterConditions)
         // Define the API Gateway URL
         const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
     
@@ -2279,16 +2332,16 @@ console.log('this.eventFilterConditions checking',this.eventFilterConditions)
           }),
         };
       
-        console.log('requestBody Tile', requestBody);
+        //console.log('requestBody Tile', requestBody);
       
         // Send a POST request to the Lambda function with the body
         this.http.post(apiUrl, requestBody).subscribe(
           (response: any) => {
-            console.log('Lambda function triggered successfully:', response);
+            //console.log('Lambda function triggered successfully:', response);
             this.responseBody = JSON.parse(response.body)
-            console.log('this.responseBody checking',this.responseBody )
+            //console.log('this.responseBody checking',this.responseBody )
             this.responseRowData = JSON.parse(this.responseBody.rowdata)
-            console.log('this.responseRowData checking',this.responseRowData)
+            //console.log('this.responseRowData checking',this.responseRowData)
         
             
             
@@ -2323,7 +2376,7 @@ console.log('this.eventFilterConditions checking',this.eventFilterConditions)
 }
 
 helperTileClick(event:any,modalChart:any){
-  console.log('event checking',event)
+  //console.log('event checking',event)
   this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
     keyboard: false  });
 
@@ -2331,9 +2384,9 @@ helperTileClick(event:any,modalChart:any){
 
 
   async setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): Promise<void> {
-  console.log('modaref checking:', modaref);
-  console.log('packet checking:', packet);
-  console.log('dashboard filterCheck', this.dashboard);
+  //console.log('modaref checking:', modaref);
+  //console.log('packet checking:', packet);
+  //console.log('dashboard filterCheck', this.dashboard);
 
   let filterTileQueryParam = '';
 
@@ -2344,7 +2397,7 @@ helperTileClick(event:any,modalChart:any){
 
   
   filterTileQueryParam = `&filterTileConfig=${JSON.stringify(validatedFilterConfig)}`;
-  console.log('filterTileQueryParam checking after stringify',filterTileQueryParam)
+  //console.log('filterTileQueryParam checking after stringify',filterTileQueryParam)
 const mainFilterQueryParam  = `&mainFilterCon=${JSON.stringify(validateMainFilter)}`
 
   const viewMode = true;
@@ -2354,14 +2407,14 @@ const mainFilterQueryParam  = `&mainFilterCon=${JSON.stringify(validateMainFilte
 
   // this.userPass = params['pass']
   this.toRouteId = modulePath
-  console.log('modulePath checking:', modulePath);
+  //console.log('modulePath checking:', modulePath);
 
   localStorage.setItem('isFullScreen', JSON.stringify(true));
 
   // Append parsedFilterTileConfig to queryParams
-  console.log('filterTileQueryParam',filterTileQueryParam)
+  //console.log('filterTileQueryParam',filterTileQueryParam)
   const queryParams = `?viewMode=${viewMode}&disableMenu=${disableMenu}${filterTileQueryParam}${mainFilterQueryParam}&from_routerID=${this.routeId}`;
-  console.log('queryParams checking for modal',queryParams)
+  //console.log('queryParams checking for modal',queryParams)
 
   this.currentItem = packet;
   this.currentModalIndex = selectedMarkerIndex;
@@ -2369,12 +2422,13 @@ const mainFilterQueryParam  = `&mainFilterCon=${JSON.stringify(validateMainFilte
   if (packet.selectType === 'NewTab') {
     this.route.queryParams.pipe(take(1)).subscribe(async (params) => {  // Ensure subscription runs once
       if (params['uID'] && params['pass']) {
-        console.log('Authentication Params Found:', params);
+        //console.log('Authentication Params Found:', params);
         this.userId = params['uID'];
         this.userPass = params['pass'];
     
         const user = await this.authservice.signIn(this.userId.toLowerCase(), this.userPass);
-        console.log('User authentication result:', user);
+        
+        //console.log('User authentication result:', user);
     
         // 🚫 Do not navigate if authentication params exist
       } else {
@@ -2384,15 +2438,15 @@ const mainFilterQueryParam  = `&mainFilterCon=${JSON.stringify(validateMainFilte
     
         // Wait for the storeCheck value
         this.openModalHelpher(packet.dashboardIds).then((data) => {
-          console.log('✅ this.all_Packet_store permissions:', data);
+          //console.log('✅ this.all_Packet_store permissions:', data);
           const readMainData = data;
-          console.log('readMainData checking', readMainData);
+          //console.log('readMainData checking', readMainData);
           this.storeCheck = readMainData.fullScreenModeCheck;
-          console.log('this.storeCheck checking', this.storeCheck);
+          //console.log('this.storeCheck checking', this.storeCheck);
     
           // Construct the final URL with isFullScreen
           const fullSafeUrl = `${safeUrl}?isFullScreen=${this.storeCheck}`;
-          console.log('Opening new tab with URL:', fullSafeUrl);
+          //console.log('Opening new tab with URL:', fullSafeUrl);
     
           // Open the URL in a new tab
           window.open(fullSafeUrl, '_blank');
@@ -2408,25 +2462,25 @@ const mainFilterQueryParam  = `&mainFilterCon=${JSON.stringify(validateMainFilte
 
     this.route.queryParams.subscribe(async (params) => {
       if(params['uID']){
-        console.log('uid checking',params['uID'])
+        //console.log('uid checking',params['uID'])
         this.userId = params['uID']
 
         
       }
       if(params['pass']){
-        console.log('pass checking',params['pass'])
+        //console.log('pass checking',params['pass'])
         this.userPass = params['pass']
         const user = await this.authservice.signIn((this.userId).toLowerCase(), this.userPass);
-        console.log('user check query',user)
+        //console.log('user check query',user)
         
       }
       // if(params['clientID']){
-      //   console.log('clientID checking',params['clientID'])
+      //   //console.log('clientID checking',params['clientID'])
 
       // }
     });
 
-    console.log('packet checking from queryparams', packet);
+    //console.log('packet checking from queryparams', packet);
     this.modalCheck = packet.selectType;
 
     // Hide the navigation menu
@@ -2434,7 +2488,7 @@ const mainFilterQueryParam  = `&mainFilterCon=${JSON.stringify(validateMainFilte
     const disableMenuQP = true;
     // window.location.reload();
     if (this.modalContent) {
-      console.log('modalContent checking', this.modalContent);
+      //console.log('modalContent checking', this.modalContent);
       this.modalService.open(this.modalContent, {
         fullscreen: true,
 
@@ -2446,7 +2500,7 @@ const mainFilterQueryParam  = `&mainFilterCon=${JSON.stringify(validateMainFilte
 
       const queryParams = new URLSearchParams();
 
-console.log('this.eventFilterConditions checking', this.eventFilterConditions);
+//console.log('this.eventFilterConditions checking', this.eventFilterConditions);
 
 if (this.eventFilterConditions && this.eventFilterConditions.length > 0) {
 queryParams.append('filters', encodeURIComponent(JSON.stringify(this.eventFilterConditions)));
@@ -2465,20 +2519,20 @@ queryParams.append('routeId', this.routeId);
 }
 this.route.queryParams.subscribe(async (params) => {
 if(params['uID']){
-  console.log('uid checking',params['uID'])
+  //console.log('uid checking',params['uID'])
   this.userId = params['uID']
 
   
 }
 if(params['pass']){
-  console.log('pass checking',params['pass'])
+  //console.log('pass checking',params['pass'])
   this.userPass = params['pass']
   const user = await this.authservice.signIn((this.userId).toLowerCase(), this.userPass);
-  console.log('user check query',user)
+  //console.log('user check query',user)
   
 }
 // if(params['clientID']){
-//   console.log('clientID checking',params['clientID'])
+//   //console.log('clientID checking',params['clientID'])
 
 // }
 });
@@ -2489,8 +2543,8 @@ queryParams.append('viewMode', String(viewMode));
 queryParams.append('disableMenu', String(disableMenu));
 
 // Add userId and userPass to query params
-console.log('this.userId checking from redirectModal', this.userId);
-console.log('this.userPass checking from redirectModal', this.userPass);
+//console.log('this.userId checking from redirectModal', this.userId);
+//console.log('this.userPass checking from redirectModal', this.userPass);
 
 if (this.userId) {
 queryParams.append('uID', this.userId);
@@ -2518,7 +2572,7 @@ this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
 
 
       
-      // console.log('this.currentiframeUrl checking', this.currentiframeUrl);
+      // //console.log('this.currentiframeUrl checking', this.currentiframeUrl);
       
       
       localStorage.setItem('viewMode', 'true');
@@ -2526,7 +2580,7 @@ this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
 
       this.cdr.detectChanges();
 
-      console.log('Opening modal with iframe URL:', this.currentiframeUrl);
+      //console.log('Opening modal with iframe URL:', this.currentiframeUrl);
   } else {
       console.error('Modal content is undefined');
   }
@@ -2539,28 +2593,28 @@ if (packet.selectType === 'Same page Redirect') {
 
   if (queryParams['uID']) {
     this.userId = decodeURIComponent(queryParams['uID']);
-    console.log('User ID:', this.userId);
+    //console.log('User ID:', this.userId);
   }
 
   if (queryParams['pass']) {
     this.userPass = decodeURIComponent(queryParams['pass']);
-    console.log('Password:', this.userPass);
+    //console.log('Password:', this.userPass);
 
     // Authenticate user
     this.authservice.signIn(this.userId.toLowerCase(), this.userPass)
       .then(user => {
-        console.log('User check query:', user);
+        //console.log('User check query:', user);
       })
       .catch(err => console.error('Authentication error:', err));
   }
 
-  console.log('User ID from redirectModal:', this.userId);
-  console.log('User Password from redirectModal:', this.userPass);
-  console.log('modulePath checking from same page',modulePath)
+  //console.log('User ID from redirectModal:', this.userId);
+  //console.log('User Password from redirectModal:', this.userPass);
+  //console.log('modulePath checking from same page',modulePath)
 
   // Ensure modulePath is properly decoded to avoid double encoding
   const modulePathCheck = decodeURIComponent(modulePath);
-console.log('Decoded modulePath:', modulePathCheck);
+//console.log('Decoded modulePath:', modulePathCheck);
 
 
 // Ensure query parameters exist before navigating
@@ -2572,10 +2626,10 @@ if (this.userPass) {
   queryParamsToSend.pass = this.userPass;
 }
 
-console.log('Final query params:', queryParamsToSend);
+//console.log('Final query params:', queryParamsToSend);
 // this.router.navigate(['/summary-engine', modulePathCheck], { queryParams: queryParamsToSend })
 //   .then(() => {
-//     console.log('Navigation successful:', `/summary-engine/${modulePathCheck}`, queryParamsToSend);
+//     //console.log('Navigation successful:', `/summary-engine/${modulePathCheck}`, queryParamsToSend);
 //     window.location.reload(); // Reload after navigation
 //   })
 //   .catch(err => console.error('Navigation error:', err));
@@ -2584,7 +2638,7 @@ console.log('Final query params:', queryParamsToSend);
 this.fetchCompanyLookupdataOnit(1)
   .then((data: any) => {
     const readLookupSummary = data; // Assign fetched data to the component property
-    console.log('readLookupSummary:', readLookupSummary);
+    //console.log('readLookupSummary:', readLookupSummary);
 
     const dashboardIds = packet.dashboardIds; // Assuming this is defined
 
@@ -2592,21 +2646,21 @@ this.fetchCompanyLookupdataOnit(1)
     const matchingPacket = readLookupSummary.find((packet: any) => dashboardIds.includes(packet.P1));
 
     if (matchingPacket) {
-      console.log('Matching Packet:', matchingPacket);
+      //console.log('Matching Packet:', matchingPacket);
       this.storeCheck = matchingPacket.P11;
-      console.log('storeCheck:', this.storeCheck);
+      //console.log('storeCheck:', this.storeCheck);
 
       const queryParams = new URLSearchParams();
       queryParams.append('isFullScreen', 'true');
       const finalUrl = `${window.location.origin}/summary-engine/${modulePath}?${queryParams.toString()}`;
-      console.log('finalUrl:', finalUrl);
+      //console.log('finalUrl:', finalUrl);
 
       this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
-      console.log('this.currentiframeUrl:', this.currentiframeUrl);
+      //console.log('this.currentiframeUrl:', this.currentiframeUrl);
 
       // Proceed with further actions using matchingPacket or storeCheck
     } else {
-      console.log('No matching packet found');
+      //console.log('No matching packet found');
     }
   })
   .catch((error: any) => {
@@ -2614,21 +2668,21 @@ this.fetchCompanyLookupdataOnit(1)
   });
 this.modalService.dismissAll();
 this.storeCheck = true;
-console.log('this.storeCheck checking', this.storeCheck);
+//console.log('this.storeCheck checking', this.storeCheck);
 
 // Append isFullScreen based on storeCheck AFTER getting it
 queryParamsToSend.isFullScreen = String(this.storeCheck);
 this.router.navigate(['/summary-engine', modulePathCheck], { queryParams: queryParamsToSend }).then(() => {
-  console.log('Navigation successful:', `/summary-engine/${modulePathCheck}`, queryParamsToSend);
+  //console.log('Navigation successful:', `/summary-engine/${modulePathCheck}`, queryParamsToSend);
 
   this.openModalHelpher(modulePath)
   .then((data) => {
-    console.log('✅ this.all_Packet_store permissions:', data);
+    //console.log('✅ this.all_Packet_store permissions:', data);
     const readMainData = data;
-    console.log('readMainData checking', readMainData);
+    //console.log('readMainData checking', readMainData);
 
     this.storeCheck = readMainData.fullScreenModeCheck;
-    console.log('this.storeCheck checking', this.storeCheck);
+    //console.log('this.storeCheck checking', this.storeCheck);
 
     // Append isFullScreen based on storeCheck AFTER getting it
     queryParamsToSend.isFullScreen = String(this.storeCheck);
@@ -2657,7 +2711,7 @@ this.router.navigate(['/summary-engine', modulePathCheck], { queryParams: queryP
   
   else if (packet.selectType === 'drill down') {
     if (modaref && modaref instanceof TemplateRef) {
-      console.log('Opening modal with modaref:', modaref);
+      //console.log('Opening modal with modaref:', modaref);
       this.modalService.open(modaref, {
         fullscreen: true,
 
@@ -2689,7 +2743,7 @@ decryptData(encryptedData: string): string {
 }
 
 storeFilterTileConfig(config: any, index: number): void {
-  console.log(`Storing filterTileConfig for packet ${index}:`, config);
+  //console.log(`Storing filterTileConfig for packet ${index}:`, config);
 
   // Example: Store the parsed config in a class-level variable or process further
   this.parsedConfigs = this.parsedConfigs || []; // Ensure the variable exists
@@ -2718,11 +2772,11 @@ toggleFullScreenFullView(enterFullscreen: boolean): void {
   //   this.isFullScreen = !this.isFullScreen; // Toggle fullscreen
   // }
 
-  console.log('Fullscreen state updated:', this.isFullScreen);
+  //console.log('Fullscreen state updated:', this.isFullScreen);
   this.updateOptions();
 
   // if (this.isFullScreen) {
-  //   console.log('Entered fullscreen mode');
+  //   //console.log('Entered fullscreen mode');
   //   this.enterFullScreen();
   // } else {
   //   this.exitFullScreen(); // Call existing exit function
@@ -2745,7 +2799,7 @@ exitFullScreen(): void {
   // localStorage.removeItem('fullscreen');
   this.isFullScreen = false;
   this.hidingLink = false;
-  console.log('Exited fullscreen mode');
+  //console.log('Exited fullscreen mode');
   this.updateOptions();
 
   // if (document.exitFullscreen) {
@@ -2760,7 +2814,7 @@ exitFullScreen(): void {
 // Listen for 'Escape' or 'F11' key presses to exit fullscreen
 @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent): void {
-    console.log('Event checking from fullscreen:', event);
+    //console.log('Event checking from fullscreen:', event);
 
     // Check for Ctrl + Shift + F
     if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'f') {
@@ -2839,14 +2893,14 @@ exitFullScreen(): void {
       draggable: {
         enabled: !this.isEditModeView, // Draggable only in edit mode
         stop: () => {
-          console.log('Grid moved');
+          //console.log('Grid moved');
           // this.isGirdMoved = true; // Set flag to indicate grid was moved
         },
       },
       resizable: {
         enabled: !this.isEditModeView, // Resizable only in edit mode
         stop: () => {
-          console.log('Grid resized');
+          //console.log('Grid resized');
           this.isGirdMoved = true; // Set flag to indicate grid was resized
         },
       },
@@ -2855,7 +2909,7 @@ exitFullScreen(): void {
       // itemChangeCallback: this.onPositionChange.bind(this),
       // itemResizeCallbackMap: this.itemResizeMap.bind(this),
       itemChangeCallback: () => {
-        console.log('Grid item changed');
+        //console.log('Grid item changed');
         this.isGirdMoved = true; // Set flag to indicate grid item changed
       },
       gridType: GridType.ScrollVertical,
@@ -2907,7 +2961,7 @@ exitFullScreen(): void {
       scrollToNewItems: false, // Enables resizing of elements
     };
   
-    console.log('Options updated:', this.options); // Debugging log
+    //console.log('Options updated:', this.options); // Debugging log
   }
   
   
@@ -2932,18 +2986,18 @@ exitFullScreen(): void {
 
 
   onGridChange(): void {
-    console.log('Grid change detected');
+    //console.log('Grid change detected');
     this.isGirdMoved = true; // Set the grid state to moved
   }
   // gridChanged(): void {
-  //   console.log('Grid change detected');
+  //   //console.log('Grid change detected');
   //   this.isGirdMoved = true; // Set the grid state to moved
   // }
   
   // Save method to persist the layout (your existing function)
   saveGridLayout(): void {
     this.grid_details = this.dashboard;
-    console.log('this.grid_details from global save', this.grid_details);
+    //console.log('this.grid_details from global save', this.grid_details);
 
     if (this.grid_details) {
       this.updateSummary('', 'saveDashboard');
@@ -2967,7 +3021,7 @@ exitFullScreen(): void {
 
 
   onItemInit(item: GridsterItem) {
-    //console.log('New item initialized:', item);
+    ////console.log('New item initialized:', item);
     // Calculate item width and height based on grid cell size
     const cellWidth = this.options?.fixedColWidth; // Grid cell width with optional chaining
     const cellHeight = this.options?.fixedRowHeight; // Grid cell height with optional chaining
@@ -2976,8 +3030,8 @@ exitFullScreen(): void {
       const itemWidth = item.cols * cellWidth; // Calculate width
       const itemHeight = item.rows * cellHeight; // Calculate height
 
-      //console.log('Item width:', itemWidth);
-      //console.log('Item height:', itemHeight);
+      ////console.log('Item width:', itemWidth);
+      ////console.log('Item height:', itemHeight);
 
 
 
@@ -2986,9 +3040,9 @@ exitFullScreen(): void {
 
   public itemResize(item: GridsterItem, itemComponent: GridsterItemComponentInterface): void {
     // alert('grid is moved')
-    console.log('item resized')
+    //console.log('item resized')
     if(item){
-      console.log('item is there or not',item)
+      //console.log('item is there or not',item)
       // this.isGirdMoved = true;
     }
 
@@ -3019,10 +3073,10 @@ exitFullScreen(): void {
         this.chartHeight[index] = Math.max(0, itemComponentHeight ); // Adjust height
         this.chartWidth[index] = Math.max(0, itemComponentWidth);
   
-        console.log(
-          `Updated chart dimensions at index ${index}:`,
-          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
-        );
+        // //console.log(
+        //   `Updated chart dimensions at index ${index}:`,
+        //   `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        // );
       }
       if (item.grid_type === 'Barchart') {
         const baseHeight = 400; // Base height for the chart
@@ -3031,10 +3085,10 @@ exitFullScreen(): void {
         this.chartHeight[index] = Math.max(0, itemComponentHeight + extraHeight); // Adjust height
         this.chartWidth[index] = Math.max(0, itemComponentWidth);
   
-        console.log(
-          `Updated chart dimensions at index ${index}:`,
-          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
-        );
+        // //console.log(
+        //   `Updated chart dimensions at index ${index}:`,
+        //   `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        // );
       }
       else if (item.grid_type === 'Piechart') {
         const baseHeight = 400; // Base height for the chart
@@ -3043,10 +3097,10 @@ exitFullScreen(): void {
         this.chartHeight[index] = Math.max(0, itemComponentHeight); // Adjust height
         this.chartWidth[index] = Math.max(0, itemComponentWidth);
   
-        console.log(
-          `Updated chart dimensions at index ${index}:`,
-          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
-        );
+        // //console.log(
+        //   `Updated chart dimensions at index ${index}:`,
+        //   `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        // );
       }
       else if (item.grid_type === 'Stackedchart') {
         const baseHeight = 400; // Base height for the chart
@@ -3055,10 +3109,10 @@ exitFullScreen(): void {
         this.chartHeight[index] = Math.max(0, itemComponentHeight); // Adjust height
         this.chartWidth[index] = Math.max(0, itemComponentWidth);
   
-        console.log(
-          `Updated chart dimensions at index ${index}:`,
-          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
-        );
+        // //console.log(
+        //   `Updated chart dimensions at index ${index}:`,
+        //   `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        // );
       }
 
 
@@ -3069,10 +3123,10 @@ exitFullScreen(): void {
         this.chartHeight[index] = Math.max(0, itemComponentHeight); // Adjust height
         this.chartWidth[index] = Math.max(0, itemComponentWidth);
   
-        console.log(
-          `Updated chart dimensions at index ${index}:`,
-          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
-        );
+        // //console.log(
+        //   `Updated chart dimensions at index ${index}:`,
+        //   `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        // );
       }
 
       else if (item.grid_type === 'chart') {
@@ -3082,10 +3136,10 @@ exitFullScreen(): void {
         this.chartHeight[index] = Math.max(0, itemComponentHeight); // Adjust height
         this.chartWidth[index] = Math.max(0, itemComponentWidth);
   
-        console.log(
-          `Updated chart dimensions at index ${index}:`,
-          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
-        );
+        // //console.log(
+        //   `Updated chart dimensions at index ${index}:`,
+        //   `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        // );
       }
       else if (item.grid_type === 'semiDonut') {
         const baseHeight = 400; // Base height for the chart
@@ -3094,10 +3148,10 @@ exitFullScreen(): void {
         this.chartHeight[index] = Math.max(0, itemComponentHeight); // Adjust height
         this.chartWidth[index] = Math.max(0, itemComponentWidth);
   
-        console.log(
-          `Updated chart dimensions at index ${index}:`,
-          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
-        );
+        // //console.log(
+        //   `Updated chart dimensions at index ${index}:`,
+        //   `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        // );
       }
 
       else if (item.grid_type === 'Funnelchart') {
@@ -3107,10 +3161,10 @@ exitFullScreen(): void {
         this.chartHeight[index] = Math.max(0, itemComponentHeight); // Adjust height
         this.chartWidth[index] = Math.max(0, itemComponentWidth);
   
-        console.log(
-          `Updated chart dimensions at index ${index}:`,
-          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
-        );
+        // //console.log(
+        //   `Updated chart dimensions at index ${index}:`,
+        //   `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        // );
       }
       else if (item.grid_type === 'Columnchart') {
         const baseHeight = 400; // Base height for the chart
@@ -3119,10 +3173,10 @@ exitFullScreen(): void {
         this.chartHeight[index] = Math.max(0, itemComponentHeight ); // Adjust height
         this.chartWidth[index] = Math.max(0, itemComponentWidth);
   
-        console.log(
-          `Updated chart dimensions at index ${index}:`,
-          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
-        );
+        // //console.log(
+        //   `Updated chart dimensions at index ${index}:`,
+        //   `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        // );
       }
 
       else if (item.grid_type === 'Areachart') {
@@ -3132,10 +3186,10 @@ exitFullScreen(): void {
         this.chartHeight[index] = Math.max(0, itemComponentHeight + extraHeight); // Adjust height
         this.chartWidth[index] = Math.max(0, itemComponentWidth);
   
-        console.log(
-          `Updated chart dimensions at index ${index}:`,
-          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
-        );
+        // //console.log(
+        //   `Updated chart dimensions at index ${index}:`,
+        //   `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        // );
       }
       else if (item.grid_type === 'Barchart') {
         const baseHeight = 400; // Base height for the chart
@@ -3144,10 +3198,10 @@ exitFullScreen(): void {
         this.chartHeight[index] = Math.max(0, itemComponentHeight + extraHeight); // Adjust height
         this.chartWidth[index] = Math.max(0, itemComponentWidth);
   
-        console.log(
-          `Updated chart dimensions at index ${index}:`,
-          `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
-        );
+        // //console.log(
+        //   `Updated chart dimensions at index ${index}:`,
+        //   `Height: ${this.chartHeight[index]}px, Width: ${this.chartWidth[index]}px`
+        // );
       }
       
       else if (item.grid_type === 'Map') {
@@ -3157,10 +3211,10 @@ exitFullScreen(): void {
         this.mapHeight[index] = itemComponentHeight - 10 ; // Subtract additional top margin
         this.mapWidth[index] = itemComponentWidth - 10; // Subtract margin/padding for width
       
-        console.log(
-          `Resized ${item.grid_type} at index ${index}:`,
-          `Height: ${this.mapHeight[index]}, Width: ${this.mapWidth[index]}, Top Margin: }`
-        );
+        // //console.log(
+        //   `Resized ${item.grid_type} at index ${index}:`,
+        //   `Height: ${this.mapHeight[index]}, Width: ${this.mapWidth[index]}, Top Margin: }`
+        // );
       }
       else if (item.grid_type === 'tile') {
         // const topMargin = 20; // Define the top margin value
@@ -3169,10 +3223,10 @@ exitFullScreen(): void {
         this.tileHeight[index] = itemComponentHeight ; // Subtract additional top margin
         this.tileWidth[index] = itemComponentWidth ; // Subtract margin/padding for width
       
-        console.log(
-          `Resized ${item.grid_type} at index ${index}:`,
-          `Height: ${this.tileHeight[index]}, Width: ${this.tileWidth[index]}, Top Margin: }`
-        );
+        // //console.log(
+        //   `Resized ${item.grid_type} at index ${index}:`,
+        //   `Height: ${this.tileHeight[index]}, Width: ${this.tileWidth[index]}, Top Margin: }`
+        // );
       }
 
       else if (item.grid_type === 'tileWithIcon') {
@@ -3182,10 +3236,10 @@ exitFullScreen(): void {
         this.tileHeight[index] = itemComponentHeight ; // Subtract additional top margin
         this.tileWidth[index] = itemComponentWidth ; // Subtract margin/padding for width
       
-        console.log(
-          `Resized ${item.grid_type} at index ${index}:`,
-          `Height: ${this.tileHeight[index]}, Width: ${this.tileWidth[index]}, Top Margin: }`
-        );
+        // //console.log(
+        //   `Resized ${item.grid_type} at index ${index}:`,
+        //   `Height: ${this.tileHeight[index]}, Width: ${this.tileWidth[index]}, Top Margin: }`
+        // );
       }
       else if (item.grid_type === 'TableWidget') {
         // const topMargin = 20; // Define the top margin value
@@ -3194,10 +3248,10 @@ exitFullScreen(): void {
         this.tableHeight[index] = itemComponentHeight ; // Subtract additional top margin
         this.tableWidth[index] = itemComponentWidth ; // Subtract margin/padding for width
       
-        console.log(
-          `Resized ${item.grid_type} at index ${index}:`,
-          `Height: ${this.tableHeight[index]}, Width: ${this.tableWidth[index]}, Top Margin: }`
-        );
+        // //console.log(
+        //   `Resized ${item.grid_type} at index ${index}:`,
+        //   `Height: ${this.tableHeight[index]}, Width: ${this.tableWidth[index]}, Top Margin: }`
+        // );
       }
       else if (item.grid_type === 'title') {
         // const topMargin = 20; // Define the top margin value
@@ -3208,10 +3262,10 @@ exitFullScreen(): void {
         this.titleHeight[index] = itemComponentHeight+extraHeight ; // Subtract additional top margin
         this.titleWidth[index] = itemComponentWidth ; // Subtract margin/padding for width
       
-        console.log(
-          `Resized ${item.grid_type} at index ${index}:`,
-          `Height: ${this.titleHeight[index]}, Width: ${this.titleWidth[index]}, Top Margin: }`
-        );
+        // //console.log(
+        //   `Resized ${item.grid_type} at index ${index}:`,
+        //   `Height: ${this.titleHeight[index]}, Width: ${this.titleWidth[index]}, Top Margin: }`
+        // );
       }
       else if (item.grid_type === 'dynamicTile') {
         // const topMargin = 20; // Define the top margin value
@@ -3220,10 +3274,10 @@ exitFullScreen(): void {
         this.DynamicTileHeight[index] = itemComponentHeight ; // Subtract additional top margin
         this.DynamicTileWidth[index] = itemComponentWidth ; // Subtract margin/padding for width
       
-        console.log(
-          `Resized ${item.grid_type} at index ${index}:`,
-          `Height: ${this.DynamicTileHeight[index]}, Width: ${this.DynamicTileWidth[index]}, Top Margin: }`
-        );
+        // //console.log(
+        //   `Resized ${item.grid_type} at index ${index}:`,
+        //   `Height: ${this.DynamicTileHeight[index]}, Width: ${this.DynamicTileWidth[index]}, Top Margin: }`
+        // );
       }
 
       else if (item.grid_type === 'progressTile') {
@@ -3233,19 +3287,19 @@ exitFullScreen(): void {
         this.DynamicTileHeight[index] = itemComponentHeight ; // Subtract additional top margin
         this.DynamicTileWidth[index] = itemComponentWidth ; // Subtract margin/padding for width
       
-        console.log(
-          `Resized ${item.grid_type} at index ${index}:`,
-          `Height: ${this.DynamicTileHeight[index]}, Width: ${this.DynamicTileWidth[index]}, Top Margin: }`
-        );
+        // //console.log(
+        //   `Resized ${item.grid_type} at index ${index}:`,
+        //   `Height: ${this.DynamicTileHeight[index]}, Width: ${this.DynamicTileWidth[index]}, Top Margin: }`
+        // );
       }
       else if (item.grid_type === 'HTMLtile') {
         this.HTMLtileHeight[index] = item.itemComponentHeight;
         this.HTMLtileWidth[index] = item.itemComponentWidth;
     
-        console.log(
-          `Resized ${item.grid_type} at index ${index}:`,
-          `Height: ${this.HTMLtileHeight[index]}, Width: ${this.HTMLtileWidth[index]}`
-        );
+        // //console.log(
+        //   `Resized ${item.grid_type} at index ${index}:`,
+        //   `Height: ${this.HTMLtileHeight[index]}, Width: ${this.HTMLtileWidth[index]}`
+        // );
       }
   
       else if (item.grid_type === 'filterTile') {
@@ -3255,10 +3309,10 @@ exitFullScreen(): void {
         this.filterTileHeight[index] = itemComponentHeight ; // Subtract additional top margin
         this.filterTileWidth[index] = itemComponentWidth ; // Subtract margin/padding for width
       
-        console.log(
-          `Resized ${item.grid_type} at index ${index}:`,
-          `Height: ${this.filterTileHeight[index]}, Width: ${this.filterTileWidth[index]}, Top Margin: }`
-        );
+        // //console.log(
+        //   `Resized ${item.grid_type} at index ${index}:`,
+        //   `Height: ${this.filterTileHeight[index]}, Width: ${this.filterTileWidth[index]}, Top Margin: }`
+        // );
     }
     else if (item.grid_type === 'tile2') {
       // const topMargin = 20; // Define the top margin value
@@ -3267,10 +3321,10 @@ exitFullScreen(): void {
       this.tile2Height[index] = itemComponentHeight ; // Subtract additional top margin
       this.tile2Width[index] = itemComponentWidth ; // Subtract margin/padding for width
     
-      console.log(
-        `Resized ${item.grid_type} at index ${index}:`,
-        `Height: ${this.tile2Height[index]}, Width: ${this.tile2Width[index]}, Top Margin: }`
-      );
+      // //console.log(
+      //   `Resized ${item.grid_type} at index ${index}:`,
+      //   `Height: ${this.tile2Height[index]}, Width: ${this.tile2Width[index]}, Top Margin: }`
+      // );
 
 
 
@@ -3300,7 +3354,7 @@ exitFullScreen(): void {
   
     if (chartElement) {
       // Trigger chart resize/update logic depending on the library you're using
-      console.log(`Redrawing chart for index ${index}`);
+      //console.log(`Redrawing chart for index ${index}`);
       // Example for Highcharts:
       Highcharts.charts[index]?.reflow(); // Adjust this for your specific charting library
     } else {
@@ -3333,7 +3387,7 @@ exitFullScreen(): void {
   //     }
      
 
-  //     //console.log('AFTER this.isGirdMoved', this.isGirdMoved)
+  //     ////console.log('AFTER this.isGirdMoved', this.isGirdMoved)
   //   }
 
   // }
@@ -3349,18 +3403,18 @@ exitFullScreen(): void {
       cancelButtonText: 'Cancel',
     }).then((result) => {
       if (result.isConfirmed) {
-        console.log('Before deletion:', this.dashboard);
-        console.log('all_Packet_store test before deleteTile',all_Packet_store)
+        //console.log('Before deletion:', this.dashboard);
+        //console.log('all_Packet_store test before deleteTile',all_Packet_store)
   
         // Step 1: Validate the index and remove the tile
         if (index >= 0 && index < this.dashboard.length) {
           this.dashboard = this.dashboard.filter((_, i) => i !== index);
-          console.log('After deletion:', this.dashboard);
+          //console.log('After deletion:', this.dashboard);
   
           // Step 2: Update grid_details in all_Packet_store
           all_Packet_store.grid_details = [...this.dashboard];
-          console.log('Updated all_Packet_store.grid_details:', all_Packet_store.grid_details);
-          console.log('all_Packet_store test from deleteTile',all_Packet_store)
+          //console.log('Updated all_Packet_store.grid_details:', all_Packet_store.grid_details);
+          //console.log('all_Packet_store test from deleteTile',all_Packet_store)
   
     
           this.updateSummary(all_Packet_store, 'delete_tile');
@@ -3423,7 +3477,7 @@ exitFullScreen(): void {
 
   deleteItem(item: any) {
     // Logic for deleting the item
-    console.log('Delete:', item);
+    //console.log('Delete:', item);
   }
 
 
@@ -3454,7 +3508,7 @@ exitFullScreen(): void {
     const localeService = this.injector.get(NgxDaterangepickerLocaleService);
   }
   onWidthChange(newWidth: number) {
-    // console.log('Container width changed:', newWidth);
+    // //console.log('Container width changed:', newWidth);
     this.changedOptions()
   
   }
@@ -3507,19 +3561,19 @@ exitFullScreen(): void {
 
   @HostListener('unloaded')
   ngOnDestroy(): void {
-    console.log('SummaryEngineComponent destroyed.');
+    //console.log('SummaryEngineComponent destroyed.');
     // document.removeEventListener('keydown', this.handleKeyDown);
   }
   ngAfterViewInit(): void {
     // this.spinner.show('mainLoading');
-    console.log('this.allCompanyDetails',this.createSummaryField.value)
+    //console.log('this.allCompanyDetails',this.createSummaryField.value)
     // const getFormFelds = this.createKPIWidget.get('filterParameter')?.value;
     const getfullScreenValue = this.createSummaryField.get('fullScreenModeCheck')?.value
-    console.log('ngAfterViewInit check data', getfullScreenValue);
+    //console.log('ngAfterViewInit check data', getfullScreenValue);
     if (this.routeId) {
       
      
-      // console.log('temp check from afterViewInit',temp)
+      // //console.log('temp check from afterViewInit',temp)
       this.checkAndSetFullscreen(this.storeFullScreen);
       this.editButtonCheck = true
 
@@ -3534,14 +3588,14 @@ exitFullScreen(): void {
     // this.adjustMenuPosition();
   
 
-    console.log("this.lookup_data_summary1", this.lookup_data_summary1)
-    console.log('create summary fields',this.createSummaryField.value)
+    //console.log("this.lookup_data_summary1", this.lookup_data_summary1)
+    //console.log('create summary fields',this.createSummaryField.value)
     // this.createChartGauge();
 
     this.createKPIWidget.statusChanges.subscribe(status => {
       // Log form validity status to track changes
-      console.log('Form status changed:', status);
-      console.log('Form validity:', this.createKPIWidget.valid);
+      //console.log('Form status changed:', status);
+      //console.log('Form validity:', this.createKPIWidget.valid);
     });
 
 
@@ -3553,7 +3607,7 @@ exitFullScreen(): void {
 
     // $(document).on('click', '[data-action="view"]', (event) => {
     //   const id = $(event.target).closest('[data-id]').attr('data-id');
-    //   console.log('id checking summary',id)
+    //   //console.log('id checking summary',id)
     //   if (id) {
     //     this.viewItem(id);
     //   }
@@ -3706,16 +3760,16 @@ exitFullScreen(): void {
       this.titleService.setTitle(data['title']); // Set tab title dynamically
     });
     // this.createSummaryField.get('fullScreenModeCheck')?.valueChanges.subscribe((newValue) => {
-    //   console.log('Always Full Screen changed:', newValue);
+    //   //console.log('Always Full Screen changed:', newValue);
     // });
     this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
-    console.log('this.getLoggedUser read for redirect',this.getLoggedUser)
+    //console.log('this.getLoggedUser read for redirect',this.getLoggedUser)
 
 
     this.SK_clientID = this.getLoggedUser.clientID;
-    console.log('this.SK_clientID check', this.SK_clientID)
+    //console.log('this.SK_clientID check', this.SK_clientID)
     this.userdetails = this.getLoggedUser.username;
-    console.log('user name permissions check',this.userdetails)
+    //console.log('user name permissions check',this.userdetails)
     // const isFullscreen = this.summaryService.getFullscreen();
     // if (isFullscreen) {
     //   this.enterFullscreenMode(); // Your logic to make it fullscreen (e.g., adding class, resizing layout etc.)
@@ -3725,10 +3779,10 @@ exitFullScreen(): void {
       if (this.routeId) {
         const permissionId =this.fetchUserPermissions(1)
         this.route.queryParams.subscribe((params) => {
-          console.log('params check', params);
+          //console.log('params check', params);
           this.queryParams = params;
         
-          console.log('this.queryParams checking', this.queryParams);
+          //console.log('this.queryParams checking', this.queryParams);
           // this.openQueryParams(this.queryParams)
           // this.isEditModeView = false;
         
@@ -3740,31 +3794,31 @@ exitFullScreen(): void {
         
           if (params['disableMenu']) {
             this.disableMenuQP = params['disableMenu'] === 'true';
-            console.log('this.disableMenuQP check',this.disableMenuQP)
+            //console.log('this.disableMenuQP check',this.disableMenuQP)
             sessionStorage.setItem('disableMenu', this.disableMenuQP.toString());
           }
         if(params['routeId']){
-          console.log(params['routeId'])
+          //console.log(params['routeId'])
           this.fromRouterID = params['routeId']
         }
         if(params['dashboardId']){
-          console.log(params['dashboardId'])
+          //console.log(params['dashboardId'])
           this.toRouterID = params['dashboardId']
-          console.log('this.toRouterID checking',this.toRouterID)
+          //console.log('this.toRouterID checking',this.toRouterID)
         }
         if(params['MainFilter']){
-          console.log(params['MainFilter'])
+          //console.log(params['MainFilter'])
           const decodedMainFilters = JSON.parse(decodeURIComponent(params['MainFilter']));
           this.filterMainConditions = decodedMainFilters;
           // this.mainFilterCondition = params['MainFilter']
-          console.log('this.toRouterID checking',this.toRouterID)
+          //console.log('this.toRouterID checking',this.toRouterID)
         }
 
         if (params['filters']) {
           try {
             // Decode and parse the filters parameter
             const decodedFilters = JSON.parse(decodeURIComponent(params['filters']));
-            console.log('Decoded Filters:', decodedFilters);
+            //console.log('Decoded Filters:', decodedFilters);
         
             this.filterConditions = decodedFilters;
             this.QueryParamsRead(this.fromRouterID, this.toRouterID, this.filterConditions,permissionId,this.filterMainConditions);
@@ -3782,33 +3836,33 @@ exitFullScreen(): void {
        
        
           
-          console.log('fullScreen checking from onInit',typeof this.storeFullScreen)
+          //console.log('fullScreen checking from onInit',typeof this.storeFullScreen)
 
         }
         if(params['modalWidth']){
-          console.log('check width Modal',params['modalWidth'])
+          //console.log('check width Modal',params['modalWidth'])
           this.modalWidth = params['modalWidth'];
 
         }
 
-          console.log('params', params['filterTileConfig']);
+          //console.log('params', params['filterTileConfig']);
           if (params['filterTileConfig']) {
-            console.log('Raw filterTileConfig:', params['filterTileConfig']);
+            //console.log('Raw filterTileConfig:', params['filterTileConfig']);
         
             try {
               // Ensure the value is a valid JSON string
               const parsedFilterTileConfig = JSON.parse(params['filterTileConfig'].trim());
-              console.log('Parsed filterTileConfig:', parsedFilterTileConfig);
+              //console.log('Parsed filterTileConfig:', parsedFilterTileConfig);
         
               // Flatten the nested array structure if necessary
               const flattenedConfig = parsedFilterTileConfig.flat();
-              console.log('Flattened filterTileConfig:', flattenedConfig);
+              //console.log('Flattened filterTileConfig:', flattenedConfig);
         
               // Check if flattenedConfig is an array and has elements
               if (Array.isArray(flattenedConfig) && flattenedConfig.length > 0) {
-                console.log('Triggering updateSummary with add_tile');
+                //console.log('Triggering updateSummary with add_tile');
                 // alert('I am triggered');
-                console.log('all_Packet_store checking',this.all_Packet_store)
+                //console.log('all_Packet_store checking',this.all_Packet_store)
               this.isFilterdetail=true
               this.storeFilterDetail = flattenedConfig
               // this.updateSummary(flattenedConfig, 'add_tile');
@@ -3823,24 +3877,24 @@ exitFullScreen(): void {
             this.isFilterdetail= false
           }
         });
-        console.log('permissionId onInit',permissionId)
-        console.log('this.routeId checking from ngOnIOnit',this.routeId)
+        //console.log('permissionId onInit',permissionId)
+        //console.log('this.routeId checking from ngOnIOnit',this.routeId)
         this.openModalHelpher(this.routeId)
 
     .then((data) => {
-    console.log('✅ this.all_Packet_store permissions:', data); // ✅ Now you will get the correct data
+    //console.log('✅ this.all_Packet_store permissions:', data); // ✅ Now you will get the correct data
     const livedatacheck = data
-    console.log('livedatacheck',livedatacheck)
+    //console.log('livedatacheck',livedatacheck)
     this.checkLiveDashboard = livedatacheck.LiveDashboard
     this.viewFullScreenCheck = livedatacheck.fullScreenModeCheck
-    console.log('this.viewFullScreenCheck checking',this.viewFullScreenCheck)
+    //console.log('this.viewFullScreenCheck checking',this.viewFullScreenCheck)
     if(this.viewFullScreenCheck==true){
       // this.checkAndSetFullscreen();
 
     }
 
 
-    console.log('this.checkLiveDashboard check',this.checkLiveDashboard)
+    //console.log('this.checkLiveDashboard check',this.checkLiveDashboard)
     if(this.checkLiveDashboard==true){
     this.reloadPage("from_ts",permissionId) 
         
@@ -3857,14 +3911,14 @@ exitFullScreen(): void {
 
   //   this.openModalHelpher(this.routeId)
   // .then((data) => {
-  //   console.log('✅ this.all_Packet_store permissions:', data);
+  //   //console.log('✅ this.all_Packet_store permissions:', data);
   //   const livedatacheck = data;
-  //   console.log('livedatacheck', livedatacheck);
+  //   //console.log('livedatacheck', livedatacheck);
 
   //   if (livedatacheck) {
   //     this.checkLiveDashboard = livedatacheck.LiveDashboard;
   //     this.viewFullScreenCheck = livedatacheck.fullScreenModeCheck;
-  //     console.log('this.viewFullScreenCheck checking', this.viewFullScreenCheck);
+  //     //console.log('this.viewFullScreenCheck checking', this.viewFullScreenCheck);
 
   //     if (this.viewFullScreenCheck === true) {
   //       // Uncomment to invoke fullscreen logic
@@ -3880,37 +3934,37 @@ exitFullScreen(): void {
       }
       else{
         this.route.queryParams.subscribe(async (params) => {
-          console.log('userparams checking from onInit',params)
+          //console.log('userparams checking from onInit',params)
         if(params['uID']){
-          console.log('uid checking',params['uID'])
+          //console.log('uid checking',params['uID'])
           this.userId = params['uID']
  
           
         }
         if(params['pass']){
-          console.log('pass checking',params['pass'])
+          //console.log('pass checking',params['pass'])
           this.userPass = params['pass']
           const user = await this.authservice.signIn((this.userId).toLowerCase(), this.userPass);
-          console.log('user check query',user)
+          //console.log('user check query',user)
           this.hideSummaryGridster = true
           
         }
 
 
         // if(params['clientID']){
-        //   console.log('clientID checking',params['clientID'])
+        //   //console.log('clientID checking',params['clientID'])
 
         // }
       });
       }
     
-      //console.log(this.routeId)
+      ////console.log(this.routeId)
       // Use this.itemId to fetch and display item details
     });
 
-console.log('this.route checing on top',this.route)
+//console.log('this.route checing on top',this.route)
 if (this.userId && this.userPass) {
-  console.log('this.userId checking ngOnINIT',this.userId)
+  //console.log('this.userId checking ngOnINIT',this.userId)
   
   // Show the spinner if both userId and userPass have values
   this.spinner.show('mainLoading');
@@ -3924,7 +3978,7 @@ if (this.userId && this.userPass) {
 
 this.fetchCompanyLookupdata(1)
     .then((data: any) => {
-      console.log("Final lookup data received in ngOnInit:", data);
+      //console.log("Final lookup data received in ngOnInit:", data);
       // Use `data` as needed here
     })
     .catch((error: any) => {
@@ -3937,7 +3991,7 @@ const fullUrl = this.router.routerState.snapshot.url; // Get full URL string
   const summaryIndex = segments.indexOf('summary-engine');
   if (summaryIndex !== -1 && segments.length > summaryIndex + 1) {
     const id = segments[summaryIndex + 1]; // Get the next segment after 'summary-engine'
-    console.log('Extracted ID:', id);
+    //console.log('Extracted ID:', id);
 
 this.fetchSummaryMain(id)
 
@@ -3948,12 +4002,12 @@ this.fetchSummaryMain(id)
 this.filterDuplucateIds(this.routeId)
     
      this.fetchUserPermissions(1)
-    // console.log('readPermission_Id checking initialize',readPermission_Id)
+    // //console.log('readPermission_Id checking initialize',readPermission_Id)
     
     this.initializeCompanyFields();
   
 
-    console.log('this.getLoggedUser check', this.getLoggedUser)
+    //console.log('this.getLoggedUser check', this.getLoggedUser)
 
   
 
@@ -3967,11 +4021,11 @@ this.filterDuplucateIds(this.routeId)
 
 
     const savedMode = localStorage.getItem('editModeState');
-    console.log('savedMode from ngOnInit',savedMode)
+    //console.log('savedMode from ngOnInit',savedMode)
     this.isEditModeView = savedMode ? JSON.parse(savedMode) : false;
-    console.log('this.isEditModeView from ngOnInit',this.isEditModeView )
+    //console.log('this.isEditModeView from ngOnInit',this.isEditModeView )
     this.assignGridMode = this.isEditModeView 
-    console.log('this.assignGridMode',this.assignGridMode)
+    //console.log('this.assignGridMode',this.assignGridMode)
     // Update options based on the retrieved mode
  
 
@@ -3999,7 +4053,7 @@ this.filterDuplucateIds(this.routeId)
     this.lastSavedTime = null;
   }
   this.router.events.subscribe(event => { if (event instanceof NavigationEnd) { 
-    console.log('Navigation ended, reloading window...');
+    //console.log('Navigation ended, reloading window...');
      window.location.reload(); // Reload the window on navigation end } }); } 
   }
 });
@@ -4007,29 +4061,29 @@ this.filterDuplucateIds(this.routeId)
 this.auditTrail.getFormInputData('SYSTEM_AUDIT_TRAIL', this.SK_clientID)
 
 this.sendFullScreenCheck = this.isFullScreen
-console.log('this.sendFullScreenCheck  checking',this.sendFullScreenCheck )
+//console.log('this.sendFullScreenCheck  checking',this.sendFullScreenCheck )
 
 // this.handlePin()
 // document.removeEventListener('keydown', this.handleKeyDown);
 
 // if(params['routeId']){
-//   console.log(params['routeId'])
+//   //console.log(params['routeId'])
 //   this.fromRouterID = params['routeId']
 // }
 // if(params['dashboardId']){
-//   console.log(params['dashboardId'])
+//   //console.log(params['dashboardId'])
 //   this.toRouterID = params['dashboardId']
 // }
 // if(params['filters']){
-//   console.log(params['filters'])
+//   //console.log(params['filters'])
 //   this.filterConditions = params['filters']
 
 
-// console.log('this.permissionsMetaData from initialize',this.permissionIdRequest)
-// console.log('permissionList',this.readFilterEquation)
-// console.log('this.permissionsMetaData',this.permissionIdRequest)
+// //console.log('this.permissionsMetaData from initialize',this.permissionIdRequest)
+// //console.log('permissionList',this.readFilterEquation)
+// //console.log('this.permissionsMetaData',this.permissionIdRequest)
 
-// console.log('check live',this.checkLiveDashboard )
+// //console.log('check live',this.checkLiveDashboard )
 
 // this.spinner.hide('mainLoading')
 
@@ -4041,7 +4095,7 @@ console.log('this.sendFullScreenCheck  checking',this.sendFullScreenCheck )
   //   document.body.classList.add('fullscreen-layout');
   // }
   fetchSummaryMain(receiveId:any){
-    console.log('receiveId checking',receiveId)
+    //console.log('receiveId checking',receiveId)
 
 
 
@@ -4051,24 +4105,24 @@ console.log('this.sendFullScreenCheck  checking',this.sendFullScreenCheck )
       if (result && result.metadata) {
         const parsedMetadata = JSON.parse(result.metadata);
        this.storeSummaryMainData = parsedMetadata
-        console.log('parsedMetadata check', this.storeSummaryMainData);
+        //console.log('parsedMetadata check', this.storeSummaryMainData);
         const readFullScreenCheck = this.storeSummaryMainData.fullScreenModeCheck
 
         // const readFormControl =this.createSummaryField.get('fullScreenModeCheck')?.value
-        // console.log('readFormControl checking',readFormControl)
+        // //console.log('readFormControl checking',readFormControl)
         if(readFullScreenCheck==true){
             //  this.toggleFullScreenFullView(true);
 
 
         }
-        console.log('readFullScreenCheck checking',readFullScreenCheck)
+        //console.log('readFullScreenCheck checking',readFullScreenCheck)
 
       }else{
   
       }
     })
     .catch((err) => {
-      console.log("Can't fetch", err);
+      //console.log("Can't fetch", err);
     });
 
 
@@ -4085,19 +4139,19 @@ console.log('this.sendFullScreenCheck  checking',this.sendFullScreenCheck )
 
   const resolvedPermission = await permissionId;
           
-  console.log("✅ Resolved permissionfromOnInit check:", resolvedPermission);
+  //console.log("✅ Resolved permissionfromOnInit check:", resolvedPermission);
 
   // ✅ Extract values safely after resolving the Promise
   const permissionIdRead = resolvedPermission?.permissionId || "";
   const permissionList = resolvedPermission?.readFilterEquationawait || [];
-  console.log('permissionList check',permissionList)
+  //console.log('permissionList check',permissionList)
   const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
-console.log('this.fromRouterID checking',routeId)
-console.log('this.routeId checking',toRouterId)
-console.log('this.eventFilterConditions checking',eventFilterConditions)
+//console.log('this.fromRouterID checking',routeId)
+//console.log('this.routeId checking',toRouterId)
+//console.log('this.eventFilterConditions checking',eventFilterConditions)
 const queryParamsCheck = eventFilterConditions
 this.queryParamsSend = eventFilterConditions
-console.log(' this.queryParamsSend', this.queryParamsSend)
+//console.log(' this.queryParamsSend', this.queryParamsSend)
 // const queryparams = JSON.parse(eventFilterConditions)
 // const toRouterId = packet.dashboardIds
 // Prepare the request body
@@ -4118,33 +4172,33 @@ const requestBody = {
   }),
 };
 
-console.log('requestBody for dashboardFilter', requestBody);
+//console.log('requestBody for dashboardFilter', requestBody);
 
 // Send a POST request to the Lambda function with the body
-console.log('this.all_Packet_store clearing',this.all_Packet_store)
+//console.log('this.all_Packet_store clearing',this.all_Packet_store)
 this.http.post(apiUrl, requestBody).subscribe(
   
   (response: any) => {
-    console.log('Lambda function triggered successfully:', response);
+    //console.log('Lambda function triggered successfully:', response);
     this.responseBody = JSON.parse(response.body)
-    console.log('this.responseBody checking',this.responseBody )
+    //console.log('this.responseBody checking',this.responseBody )
     const processedDataFilter = this.responseBody.Processed_Data.metadata.grid_details
 
-    console.log('processedData checking from queryParams',processedDataFilter)
+    //console.log('processedData checking from queryParams',processedDataFilter)
     this.eventFilterConditions= eventFilterConditions
     const CombinedConditions = {...eventFilterConditions, ...receiveMainFilterCondition};
-    console.log('CombinedConditions checking',CombinedConditions)
+    //console.log('CombinedConditions checking',CombinedConditions)
     this.summaryService.updatelookUpData(processedDataFilter)
     this.summaryService.queryPramsFunction(CombinedConditions)
     // const viewModeQP = true;
     // const disableMenuQP = true;
-    console.log('disableMenuQP check from modal',this.disableMenuQP)
-    console.log('viewModeQP checking from modal',this.viewModeQP)
+    //console.log('disableMenuQP check from modal',this.disableMenuQP)
+    //console.log('viewModeQP checking from modal',this.viewModeQP)
   
 
 // if(this.disableMenuQP==false && this.viewModeQP==false ){
 
-// // console.log('queryParamsCheck checking',packet.selectType)
+// // //console.log('queryParamsCheck checking',packet.selectType)
 // this.summaryService.queryPramsFunction(processedDataFilter)
 
 // }
@@ -4153,7 +4207,7 @@ this.http.post(apiUrl, requestBody).subscribe(
     // this.summaryService.updatelookUpData(processedDataFilter)
     this.responseRowData1 = JSON.parse(this.responseBody.Processed_Data
     )
-    console.log('this.responseRowData checking',this.responseRowData)
+    //console.log('this.responseRowData checking',this.responseRowData)
 
     
     
@@ -4188,14 +4242,14 @@ this.http.post(apiUrl, requestBody).subscribe(
 }
 
   openQueryParams(paramsRead:any){
-    console.log('paramsRead',paramsRead)
+    //console.log('paramsRead',paramsRead)
     this.paramsReadExport = paramsRead
 
   }
   selectFormParams(event: any) {
     if (event && event[0] && event[0].data) {
       const selectedText = event[0].data.text;  // Adjust based on the actual structure
-      console.log('Selected Form Text:', selectedText);
+      //console.log('Selected Form Text:', selectedText);
 
       if (selectedText) {
         this.fetchDynamicFormData(selectedText);
@@ -4205,19 +4259,19 @@ this.http.post(apiUrl, requestBody).subscribe(
     }
   }
   loadReportData(savedQuery: string) {
-    console.log('Loading report data for:', savedQuery);
+    //console.log('Loading report data for:', savedQuery);
     // Add logic to load the report data based on savedQuery
   }
 
   async permissionIds(sk: any) {
-    console.log("I am called Bro");
+    //console.log("I am called Bro");
     try {
         const response = await this.api.GetMaster(this.SK_clientID + "#permission#lookup", sk);
 
         if (response && response.options) {
             if (typeof response.options === 'string') {
                 let data = JSON.parse(response.options);
-                console.log("d1 =", data);
+                //console.log("d1 =", data);
 
                 if (Array.isArray(data)) {
                     for (let index = 0; index < data.length; index++) {
@@ -4235,8 +4289,8 @@ this.http.post(apiUrl, requestBody).subscribe(
                             // Check if P1 exists before pushing
                             if (P1 !== undefined && P1 !== null) {
                                 this.permissionIdsList.push({ P1, P2, P3 });
-                                console.log("Pushed to dashboardIdsList: ", { P1, P2, P3 });
-                                console.log('this.dashboardIdsList check', this.permissionIdsList);
+                                //console.log("Pushed to dashboardIdsList: ", { P1, P2, P3 });
+                                //console.log('this.dashboardIdsList check', this.permissionIdsList);
                             } else {
                                 console.warn("Skipping element because P1 is not defined or null");
                             }
@@ -4247,7 +4301,7 @@ this.http.post(apiUrl, requestBody).subscribe(
 
                     // Fetch permission data for each P1 value
                     this.p1ValuesSummaryPemission = this.permissionIdsList.map((item: { P1: any; }) => item.P1);
-                    console.log('P1 values: dashboard permission', this.p1ValuesSummaryPemission);
+                    //console.log('P1 values: dashboard permission', this.p1ValuesSummaryPemission);
 
                     // Call fetchPermissionIdMain for each P1 value
                     for (const p1Value of this.p1ValuesSummaryPemission) {
@@ -4263,7 +4317,7 @@ this.http.post(apiUrl, requestBody).subscribe(
                 console.error('response.options is not a string.');
             }
         } else {
-            console.log("Lookup to be displayed", this.permissionIdsList);
+            //console.log("Lookup to be displayed", this.permissionIdsList);
         }
     } catch (error) {
         console.error('Error:', error);
@@ -4275,12 +4329,12 @@ this.http.post(apiUrl, requestBody).subscribe(
   async fetchPermissionIdMain(clientID: number, p1Value: string): Promise<void> {
 
     try {
-      console.log("p1Value checking", p1Value);
-      console.log("clientID checking", clientID);
-      console.log("this.SK_clientID checking from permission", this.SK_clientID);
+      //console.log("p1Value checking", p1Value);
+      //console.log("clientID checking", clientID);
+      //console.log("this.SK_clientID checking from permission", this.SK_clientID);
 
       const pk = `${this.SK_clientID}#permission#${p1Value}#main`;
-      console.log(`Fetching main table data for PK: ${pk}`);
+      //console.log(`Fetching main table data for PK: ${pk}`);
 
       const result: any = await this.api.GetMaster(pk, clientID);
 
@@ -4292,49 +4346,49 @@ this.http.post(apiUrl, requestBody).subscribe(
 
       // Parse metadata
       this.parsedPermission = JSON.parse(result.metadata);
-      console.log("Parsed permission metadata:", this.parsedPermission);
+      //console.log("Parsed permission metadata:", this.parsedPermission);
 
       this.readFilterEquation = this.parsedPermission;
-      console.log("this.readFilterEquation check", this.readFilterEquation);
+      //console.log("this.readFilterEquation check", this.readFilterEquation);
 
       // Handling Dashboard Permissions
       this.summaryPermission = this.parsedPermission.summaryList || [];
-      console.log("this.summaryPermission check", this.summaryPermission);
+      //console.log("this.summaryPermission check", this.summaryPermission);
 
       if (this.summaryPermission.includes("All")) {
-        console.log("Permission is 'All'. Fetching all dashboards...");
+        //console.log("Permission is 'All'. Fetching all dashboards...");
         this.dashboardData = await this.fetchCompanyLookupdata(1);
         this.updateOptions();
       } else {
-        console.log("Fetching specific dashboards...");
+        //console.log("Fetching specific dashboards...");
         const allData = await this.fetchCompanyLookupdata(1);
         this.dashboardData = allData.filter((dashboard: any) =>
           this.summaryPermission.includes(dashboard.P1)
         );
-        console.log("Filtered Dashboards Data:", this.dashboardData);
+        //console.log("Filtered Dashboards Data:", this.dashboardData);
       }
 
       // Extract Permission List
       this.permissionIdsListList = this.parsedPermission.permissionsList || [];
-      console.log("Parsed permission list:", this.permissionIdsListList);
+      //console.log("Parsed permission list:", this.permissionIdsListList);
 
       // Check 'Summary Dashboard' Permission
       const summaryDashboardItem = this.permissionIdsListList.find(
         (item: { name: string; update: boolean; view: boolean }) =>
           item.name === "Summary Dashboard"
       );
-      console.log("Summary Dashboard Item:", summaryDashboardItem);
+      //console.log("Summary Dashboard Item:", summaryDashboardItem);
       // localStorage.setItem('editModeState', this.isEditModeView.toString());
 
       if (summaryDashboardItem) {
         this.summaryDashboardUpdate = summaryDashboardItem.update;
         this.summaryDashboardView = summaryDashboardItem.view;
-        console.log("this.summaryDashboardUpdate check", this.summaryDashboardUpdate);
+        //console.log("this.summaryDashboardUpdate check", this.summaryDashboardUpdate);
 
         this.isEditModeView = this.summaryDashboardView && !this.summaryDashboardUpdate || this.summaryDashboardUpdate;
-        console.log('this.isEditModeView checking from permission', this.isEditModeView);
+        //console.log('this.isEditModeView checking from permission', this.isEditModeView);
         
-                              console.log('this.isEditModeView checking from permission',this.isEditModeView)
+                              //console.log('this.isEditModeView checking from permission',this.isEditModeView)
         this.updateOptions();
       }
 
@@ -4351,7 +4405,7 @@ this.http.post(apiUrl, requestBody).subscribe(
 
 
 fetchCompanyLookupdata(sk: any): Promise<any[]> {
-  console.log("I am called Bro");
+  //console.log("I am called Bro");
 
   return new Promise((resolve, reject) => {
     this.api.GetMaster(this.SK_clientID + "#summary" + "#lookup", sk)
@@ -4359,7 +4413,7 @@ fetchCompanyLookupdata(sk: any): Promise<any[]> {
         if (response && response.options) {
           if (typeof response.options === 'string') {
             let data = JSON.parse(response.options);
-            console.log("d1 =", data);
+            //console.log("d1 =", data);
 
             if (Array.isArray(data) && data.length > 0) {
               for (let index = 0; index < data.length; index++) {
@@ -4371,7 +4425,7 @@ fetchCompanyLookupdata(sk: any): Promise<any[]> {
                 }
               }
 
-              console.log("d2 =", this.lookup_data_summary);
+              //console.log("d2 =", this.lookup_data_summary);
 
               this.lookup_data_summary.sort((a: { P5: number; }, b: { P5: number; }) => b.P5 - a.P5);
 
@@ -4380,7 +4434,7 @@ fetchCompanyLookupdata(sk: any): Promise<any[]> {
                 .then(() => resolve(this.lookup_data_summary))
                 .catch(reject);
             } else {
-              console.log("No more data to fetch.");
+              //console.log("No more data to fetch.");
               this.listofSK = this.lookup_data_summary.map((item: { P1: any; }) => item.P1);
               resolve(this.lookup_data_summary);
             }
@@ -4389,7 +4443,7 @@ fetchCompanyLookupdata(sk: any): Promise<any[]> {
           }
         } else {
           // Base condition when no options are present
-          console.log("All the users are here", this.lookup_data_summary);
+          //console.log("All the users are here", this.lookup_data_summary);
           this.listofSK = this.lookup_data_summary.map((item: { P1: any; }) => item.P1);
           resolve(this.lookup_data_summary);
         }
@@ -4411,7 +4465,7 @@ processFetchedData(result: any): void {
   }
 
   // Example: Log the result
-  console.log('Processing fetched data:', result);
+  //console.log('Processing fetched data:', result);
 
   // Example: Add the fetched data to a local array
   if (!this.fetchedData) {
@@ -4526,12 +4580,12 @@ processFetchedData(result: any): void {
   ];
   
   tileChange(event: any): void {
-    console.log('Tile changed:', event);
+    //console.log('Tile changed:', event);
 
     if (event && event.length > 0) {
       this.selectedTile = event[0].value;
 
-      console.log('Selected tile:', this.selectedTile);
+      //console.log('Selected tile:', this.selectedTile);
 
 
       // Update visibility based on the selected tile
@@ -4629,7 +4683,7 @@ setTimeout(() => {
   
   positionSave(): void {
     // Save the grid position
-    console.log('Grid position saved');
+    //console.log('Grid position saved');
     this.isGirdMoved = false; // Reset the moved flag
     this.lastSavedTime = new Date(); // Update the last saved time
   
@@ -4644,24 +4698,24 @@ setTimeout(() => {
       let queryParams: any = {}; // Object to hold query params
   
       if (params['uID']) {
-        console.log('uid checking', params['uID']);
+        //console.log('uid checking', params['uID']);
         this.userId = params['uID'];
         queryParams.uID = this.userId;
       }
   
       if (params['pass']) {
-        console.log('pass checking', params['pass']);
+        //console.log('pass checking', params['pass']);
         this.userPass = params['pass'];
         queryParams.pass = this.userPass;
   
         // Perform authentication
         // const user = await this.authservice.signIn((this.userId).toLowerCase(), this.userPass);
-        // console.log('user check query', user);
+        // //console.log('user check query', user);
         this.hideSummaryGridster = true;
       }
   
-      console.log('this.userId query params check from home redirection', this.userId);
-      console.log('this.userPass query params check from home redirection', this.userPass);
+      //console.log('this.userId query params check from home redirection', this.userId);
+      //console.log('this.userPass query params check from home redirection', this.userPass);
   
       // Navigate to summary-engine with or without query params
       if (this.router.url !== '/summary-engine') {
@@ -4720,13 +4774,13 @@ setTimeout(() => {
   }
 
   viewItem(id: string, receivePacket?: any): void {
-    console.log('this.userId checking from redirect', this.userId);
-    console.log('this.userPass checking from redirect', this.userPass);
-    console.log('this.all_Packet_store check viewItem', this.lookup_data_summaryCopy);
-    console.log('receivePacket checvking', receivePacket);
-    // console.log('this.lookup_data_summaryCopy checking from viewItem',this.lookup_data_summaryCopy)
+    //console.log('this.userId checking from redirect', this.userId);
+    //console.log('this.userPass checking from redirect', this.userPass);
+    //console.log('this.all_Packet_store check viewItem', this.lookup_data_summaryCopy);
+    //console.log('receivePacket checvking', receivePacket);
+    // //console.log('this.lookup_data_summaryCopy checking from viewItem',this.lookup_data_summaryCopy)
     // const checkP12 = receivePacket?.P12;
-    // console.log('check p12 key from lookup', checkP12);
+    // //console.log('check p12 key from lookup', checkP12);
     
     // if (checkP12) {
     //     Swal.fire({
@@ -4744,7 +4798,7 @@ setTimeout(() => {
 
   
     const checkP11 = receivePacket?.P11 ?? false;
-    console.log('checkP11 checking', checkP11);
+    //console.log('checkP11 checking', checkP11);
           this.isGirdMoved = false;
   
     // Always include isFullScreen in queryParams
@@ -4796,54 +4850,39 @@ setTimeout(() => {
 
   
   dashboardOpen(id: string): void {
-    // Save state in sessionStorage to trigger modal after reload
-    // sessionStorage.setItem('openModalAfterReload', JSON.stringify({
-    //   modalId: 'edit_ts',
-    //   packetStore: this.all_Packet_store,
-    //   modalReference: 'summaryModal',
-    // }));
-  
-    // Navigate to the new URL and reload the page
     this.route.queryParams.subscribe(async (params) => {
       let queryParams: any = {};  // Initialize queryParams object
-      
-      // Conditionally add userId and userPass if they exist
+  
       if (this.userId) {
-        queryParams.uID = this.userId; // Add uID to queryParams
+        queryParams.uID = this.userId;
       }
       if (this.userPass) {
-        queryParams.pass = this.userPass; // Add pass to queryParams
+        queryParams.pass = this.userPass;
       }
   
-      // Fetch the storeCheck value asynchronously and update the queryParams
-      this.openModalHelpher(id).then((data) => {
-        console.log('✅ this.all_Packet_store permissions:', data);
-        const readMainData = data;
-        this.storeCheck = readMainData.fullScreenModeCheck;
-        console.log('this.storeCheck checking', this.storeCheck);
+      console.log('id checking from dashboard redirection', id);
   
-        // Append 'isFullScreen' to the query parameters after resolving the promise
-        queryParams.isFullScreen = String(this.storeCheck);  // Ensure it's a string
-  
-        // Merge the queryParams and navigate
-        this.router.navigate([`/summary-engine/${id}`], { 
-          queryParams: queryParams, 
-          queryParamsHandling: 'merge'  // Merges the query parameters without encoding
-        }).then(() => {
-          window.location.reload(); // Reload the window after navigation
-        }).catch(err => {
-          console.error('Error in navigation:', err);
-        });
-      }).catch(err => {
+      try {
+        const data = await this.openModalHelpher(id);
+        this.storeCheck = data?.fullScreenModeCheck ?? false;
+        queryParams.isFullScreen = String(this.storeCheck);
+      } catch (err) {
         console.error('Error in openModalHelpher:', err);
+        queryParams.isFullScreen = 'false';  // Fallback value
+      }
+  
+      // Always navigate regardless of whether data was returned
+      this.router.navigate([`/summary-engine/${id}`], {
+        queryParams: queryParams,
+        queryParamsHandling: 'merge'
+      }).then(() => {
+        window.location.reload();
+      }).catch(err => {
+        console.error('Error in navigation:', err);
       });
     });
-
-    // setTimeout(() => {
-
-    // }, 3000);
-
   }
+  
   
   
   
@@ -4851,7 +4890,7 @@ setTimeout(() => {
 
   
   redirectDashboard(id: string): void {
-    console.log('I am redirecting to the dashboard');
+    //console.log('I am redirecting to the dashboard');
     this.isLoading = true;
   
     // Dismiss all modals
@@ -4871,10 +4910,10 @@ setTimeout(() => {
   
       // Fetch the storeCheck value asynchronously and update the queryParams
       this.openModalHelpher(id).then((data) => {
-        console.log('✅ this.all_Packet_store permissions:', data);
+        //console.log('✅ this.all_Packet_store permissions:', data);
         const readMainData = data;
         this.storeCheck = readMainData.fullScreenModeCheck;
-        console.log('this.storeCheck checking', this.storeCheck);
+        //console.log('this.storeCheck checking', this.storeCheck);
   
         // Append 'isFullScreen' to the query parameters after resolving the promise
         queryParams.isFullScreen = String(this.storeCheck);  // Ensure it's a string
@@ -4943,21 +4982,21 @@ setTimeout(() => {
   onIconSelect(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
     this.selectedIcon = selectElement.value; // Set selectedIcon to the selected value
-    console.log('Selected icon:', this.selectedIcon); // Debugging line
+    //console.log('Selected icon:', this.selectedIcon); // Debugging line
   }
 
 
   updateDisplayLabel(selectedDropdown: string): void {
     // Format the display label with the selected dropdown text
     this.displayLabel = `${selectedDropdown} (selected value)`;
-    console.log('Updated Display Label:', this.displayLabel);
+    //console.log('Updated Display Label:', this.displayLabel);
   }
 
 
 
   someOtherFunction(combinedValue: string): void {
     // Use the combined value as needed
-    console.log('Using Combined Value:', combinedValue);
+    //console.log('Using Combined Value:', combinedValue);
   }
 
 
@@ -4966,7 +5005,7 @@ setTimeout(() => {
   }
 
   edit(event: any): void {
-    console.log('event checking',event)
+    //console.log('event checking',event)
     this.redirectDashboard(event)
     
   
@@ -4993,7 +5032,7 @@ setTimeout(() => {
     { color: "linear-gradient(to right, #fc5c7d, #6a82fb)", selected: false }  // Pink to Blue
   ];
   // async openModalHelpher(getValue: any): Promise<any> {
-  //   console.log("Data from lookup:", getValue);
+  //   //console.log("Data from lookup:", getValue);
   
   //   return new Promise(async (resolve, reject) => {
   //     try {
@@ -5003,7 +5042,7 @@ setTimeout(() => {
   //       if (result && result.metadata) {
   //         const parsedMetadata = JSON.parse(result.metadata);
   //         this.parsedSummaryData = parsedMetadata;
-  //         console.log('Parsed Metadata:', this.parsedSummaryData);
+  //         //console.log('Parsed Metadata:', this.parsedSummaryData);
   
   //         this.all_Packet_store = parsedMetadata;
   //         this.createdTime = this.all_Packet_store.created;
@@ -5012,7 +5051,7 @@ setTimeout(() => {
   //         // Handling date formatting
   //         const formattedDate = new Date(this.all_Packet_store.LastUpdate);
   //         this.lastUpdatedTime = formattedDate.toLocaleString(); 
-  //         console.log('Formatted Date:', this.lastUpdatedTime);
+  //         //console.log('Formatted Date:', this.lastUpdatedTime);
   
   //         // Check grid details
   //         if (this.all_Packet_store.grid_details?.length === 0 && !this.modalOpened) {
@@ -5029,7 +5068,7 @@ setTimeout(() => {
   //                 gridItem.multi_value = Array.isArray(multiValueString)
   //                   ? multiValueString
   //                   : JSON.parse(multiValueString);
-  //                 console.log(`After Parsing for item ${index}:`, gridItem);
+  //                 //console.log(`After Parsing for item ${index}:`, gridItem);
   //               } catch (error) {
   //                 console.error(`Error parsing multi_value for item ${index}:`, error);
   //               }
@@ -5038,7 +5077,7 @@ setTimeout(() => {
   
   //           // Reassign the updated grid_details to dashboard
   //           this.dashboard = this.all_Packet_store.grid_details;
-  //           console.log('Dashboard after parsing:', this.dashboard);
+  //           //console.log('Dashboard after parsing:', this.dashboard);
   //         }
   
   //         // Theme matching logic
@@ -5051,7 +5090,7 @@ setTimeout(() => {
   //               }
   //             });
   //             matchingTheme.selected = true;
-  //             console.log('Matching theme found and selected:', matchingTheme);
+  //             //console.log('Matching theme found and selected:', matchingTheme);
   //           }
   //         });
   
@@ -5059,7 +5098,7 @@ setTimeout(() => {
   //         this.cdr.detectChanges();
   //         this.bindDataToGridster(this.all_Packet_store); // Pass the object to bindDataToGridster
   //         this.openModal('Edit_ts', this.all_Packet_store); // Open modal with the data
-  //         console.log('this.all_Packet_store check resolve', this.all_Packet_store);
+  //         //console.log('this.all_Packet_store check resolve', this.all_Packet_store);
   
   //         // Resolve only after all operations are done
   //         resolve(this.all_Packet_store);
@@ -5087,19 +5126,19 @@ justReadStyles(data:any,index:any){
   this.FilterTileConfigComponent.isEditMode =true;
   this.FilterTileConfigComponent.openFilterModal(data, index);
 }
-async openModalHelpher(getValue: any): Promise<any> {
-  console.log("Data from lookup:", getValue);
+async openModalHelpher(getValue: any,modalFlag?:any): Promise<any> {
+  //console.log("Data from lookup:", getValue);
 
   return new Promise(async (resolve, reject) => {
     try {
       // Fetching data from API
       const result: any = await this.api.GetMaster(`${this.SK_clientID}#${getValue}#summary#main`, 1);
-      console.log('API Result:', result);
+      //console.log('API Result:', result);
 
       if (result && result.metadata) {
         const parsedMetadata = JSON.parse(result.metadata);
         this.parsedSummaryData = parsedMetadata;
-        console.log('Parsed Metadata:', this.parsedSummaryData);
+        //console.log('Parsed Metadata:', this.parsedSummaryData);
 
         this.all_Packet_store = parsedMetadata;
         this.createdTime = this.all_Packet_store.created;
@@ -5108,12 +5147,19 @@ async openModalHelpher(getValue: any): Promise<any> {
         // Handling date formatting
         const formattedDate = new Date(this.all_Packet_store.LastUpdate);
         this.lastUpdatedTime = formattedDate.toLocaleString();
-        console.log('Formatted Date:', this.lastUpdatedTime);
+        //console.log('Formatted Date:', this.lastUpdatedTime);
 
         // Check if modal needs to be opened due to empty grid details
         if (this.all_Packet_store.grid_details?.length === 0 && !this.modalOpened) {
           this.modalOpened = true; // Prevent multiple openings
-          this.openModal('edit_ts', this.all_Packet_store, this.summaryModal);
+          if(modalFlag=='handlingPin'){
+    
+
+          }else {
+
+            this.openModal('edit_ts', this.all_Packet_store, this.summaryModal);
+          }
+    
         }
         resolve(this.all_Packet_store);
         // Parsing multi_value entries in grid details if present
@@ -5125,7 +5171,7 @@ async openModalHelpher(getValue: any): Promise<any> {
             //   //   gridItem.multi_value = Array.isArray(multiValueString)
             //   //     ? multiValueString
             //   //     : JSON.parse(multiValueString);
-            //   //   console.log(`After Parsing for item ${index}:`, gridItem);
+            //   //   //console.log(`After Parsing for item ${index}:`, gridItem);
             //   // } catch (error) {
             //   //   console.error(`Error parsing multi_value for item ${index}:`, error);
             //   // }
@@ -5134,7 +5180,7 @@ async openModalHelpher(getValue: any): Promise<any> {
 
           // Update dashboard property with parsed grid details
           this.dashboard = this.all_Packet_store.grid_details;
-          console.log('Dashboard after parsing:', this.dashboard);
+          //console.log('Dashboard after parsing:', this.dashboard);
         }
 
         // Theme matching logic to select/deselect themes based on grid details
@@ -5148,7 +5194,7 @@ async openModalHelpher(getValue: any): Promise<any> {
                 }
               });
               matchingTheme.selected = true;
-              console.log('Matching theme found and selected:', matchingTheme);
+              //console.log('Matching theme found and selected:', matchingTheme);
             }
           });
         }
@@ -5157,9 +5203,10 @@ async openModalHelpher(getValue: any): Promise<any> {
         if (this.cdr) {
           this.cdr.detectChanges();
         }
+        //console.log('this.all_Packet_store check resolve', this.all_Packet_store);
         this.bindDataToGridster(this.all_Packet_store);
         this.openModal('Edit_ts', this.all_Packet_store);
-        console.log('this.all_Packet_store check resolve', this.all_Packet_store);
+  
 
         // Resolve the Promise with full data
         // resolve(this.all_Packet_store);
@@ -5207,8 +5254,8 @@ async openModalHelpher(getValue: any): Promise<any> {
   }
 
   helperTile(event: any, KPIModal: TemplateRef<any>) {
-    console.log('event checking from helperTile',event)
-    console.log('KPIModal check',KPIModal)
+    //console.log('event checking from helperTile',event)
+    //console.log('KPIModal check',KPIModal)
 
 
     if(event.arg1.grid_type=='tile'){
@@ -5296,10 +5343,10 @@ async openModalHelpher(getValue: any): Promise<any> {
 
     
     else if(event.arg1.grid_type=='tile2'){
-      console.log('modal check',KPIModal)
+      //console.log('modal check',KPIModal)
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check', event)
+      //console.log('event check', event)
       setTimeout(() => {
         this.tileConfig2Component.openKPIModal1(event.arg1, event.arg2)
       }, 500);
@@ -5307,7 +5354,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     else if(event.arg1.grid_type=='tile3'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check', event)
+      //console.log('event check', event)
   
       setTimeout(() => {
         this.tileConfig3Component.edit_Tile3(event.arg1, event.arg2)
@@ -5317,7 +5364,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     else if (event.arg1.grid_type=='tile4'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check', event)
+      //console.log('event check', event)
       setTimeout(() => {
         this.tileConfig4Component?.openKPIModal3(event.arg1, event.arg2)
       }, 500);
@@ -5325,7 +5372,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     else if(event.arg1.grid_type=='tile5'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check', event)
+      //console.log('event check', event)
       setTimeout(() => {
         this.tileConfig5Component?.openKPIModal4(event.arg1, event.arg2)
       }, 500);
@@ -5334,7 +5381,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     else if(event.arg1.grid_type=='tile6'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check', event)
+      //console.log('event check', event)
       setTimeout(() => {
         this.tileConfig6Component?.openKPIModal5(event.arg1, event.arg2)
       }, 500);
@@ -5342,7 +5389,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     else if(event.arg1.grid_type=='title'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check', event)
+      //console.log('event check', event)
       setTimeout(() => {
         this.titleConfigComponent.openTitleModal(event.arg1, event.arg2)
       }, 500);
@@ -5352,7 +5399,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     else if(event.arg1.grid_type=='chart'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check', event)
+      //console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig1Component.openChartModal1(event.arg1, event.arg2)
       }, 500);
@@ -5362,7 +5409,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     else if(event.arg1.grid_type=='semiDonut'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check', event)
+      //console.log('event check', event)
       setTimeout(() => {
         this.SemiDonutConfigComponent.opensemiDonutModal(event.arg1, event.arg2)
       }, 500);
@@ -5371,7 +5418,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     else if(event.arg1.grid_type=='Stackedchart'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check', event)
+      //console.log('event check', event)
       setTimeout(() => {
         this.StackedBarConfigComponent.openStackedChartModal(event.arg1, event.arg2)
       }, 500);
@@ -5381,7 +5428,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     else if(event.arg1.grid_type=='dailChart'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check from dail chart', event)
+      //console.log('event check from dail chart', event)
       setTimeout(() => {
         this.GaugeChartConfigComponent.opengaugeChartModal(event.arg1, event.arg2)
       }, 500);
@@ -5392,7 +5439,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     else if(event.arg1.grid_type=='Piechart'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check', event)
+      //console.log('event check', event)
       setTimeout(() => {
         this.PieChartConfigComponent.openPieChartModal(event.arg1, event.arg2)
       }, 500);
@@ -5402,7 +5449,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     else if(event.arg1.grid_type=='Linechart'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check', event)
+      //console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig2Component.openChartModal2(event.arg1, event.arg2)
       }, 500);
@@ -5412,7 +5459,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     else if(event.arg1.grid_type=='Funnelchart'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check', event)
+      //console.log('event check', event)
       setTimeout(() => {
         this.FunnelChartConfigComponent.openFunnelChartModal(event.arg1, event.arg2)
       }, 500);
@@ -5422,7 +5469,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     else if(event.arg1.grid_type=='Columnchart'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check', event)
+      //console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig3Component.openChartModal3(event.arg1, event.arg2)
       }, 500);
@@ -5431,7 +5478,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     else if(event.arg1.grid_type=='mixedChart'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check', event)
+      //console.log('event check', event)
       setTimeout(() => {
         this.MixedChartConfigComponent.openMixedChartModal(event.arg1, event.arg2)
       }, 500);
@@ -5442,7 +5489,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     else if(event.arg1.grid_type=='Areachart'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check', event)
+      //console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig4Component.openChartModal4(event.arg1, event.arg2)
       }, 500);
@@ -5451,7 +5498,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     else if(event.arg1.grid_type=='Barchart'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check', event)
+      //console.log('event check', event)
       setTimeout(() => {
         this.ChartConfig5Component.openChartModal5(event.arg1, event.arg2)
       }, 500);
@@ -5461,7 +5508,7 @@ async openModalHelpher(getValue: any): Promise<any> {
 
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check dynamic tile', event)
+      //console.log('event check dynamic tile', event)
     
       // Access the component instance and trigger `openKPIModal`
       setTimeout(() => {
@@ -5474,7 +5521,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     else if(event.arg1.grid_type=='title'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check dynamic tile', event)
+      //console.log('event check dynamic tile', event)
     
       // Access the component instance and trigger `openKPIModal`
       setTimeout(() => {
@@ -5486,9 +5533,9 @@ async openModalHelpher(getValue: any): Promise<any> {
     else if(event.arg1.grid_type=='filterTile'){
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check dynamic tile', event)
-      console.log('event.arg1 checking',event.arg1)
-      console.log('event.arg2 checking',event.arg2)
+      //console.log('event check dynamic tile', event)
+      //console.log('event.arg1 checking',event.arg1)
+      //console.log('event.arg2 checking',event.arg2)
     
       // Access the component instance and trigger `openKPIModal`
       setTimeout(() => {
@@ -5500,10 +5547,10 @@ async openModalHelpher(getValue: any): Promise<any> {
 
 
     else if(event.arg1.grid_type=='progressTile'){
-      console.log('i am openining')
+      //console.log('i am openining')
       this.modalService.open(KPIModal, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check progress', event)
+      //console.log('event check progress', event)
     
       // Access the component instance and trigger `openKPIModal`
       setTimeout(() => {
@@ -5521,7 +5568,7 @@ async openModalHelpher(getValue: any): Promise<any> {
 
     helperEditModalOpen(argument1:any,argument2:any,modalReference: TemplateRef<any>,gridCheck?:any){
       // this.isGirdMoved = gridCheck;
-      console.log('i am entered to tile 1 edit modal')
+      //console.log('i am entered to tile 1 edit modal')
       if(argument1.grid_type=='tile'){
         this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
           keyboard: false  });
@@ -5534,10 +5581,10 @@ async openModalHelpher(getValue: any): Promise<any> {
         }, 500);
       }
       else if(argument1.grid_type=='tile2'){
-        console.log('modal check',modalReference)
+        //console.log('modal check',modalReference)
       this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
-      console.log('event check', event)
+      //console.log('event check', event)
       setTimeout(() => {
         this.tileConfig2Component.openKPIModal1(argument1, argument2)
       }, 500);
@@ -5547,7 +5594,7 @@ async openModalHelpher(getValue: any): Promise<any> {
       else if (argument1.grid_type=='dynamicTile'){
         this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
           keyboard: false  });
-      console.log('event check dynamic tile', event)
+      //console.log('event check dynamic tile', event)
     
       // Access the component instance and trigger `openKPIModal`
       setTimeout(() => {
@@ -5560,7 +5607,7 @@ async openModalHelpher(getValue: any): Promise<any> {
       else if(argument1.grid_type=='title'){
         this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
           keyboard: false  });
-        console.log('event check dynamic tile', event)
+        //console.log('event check dynamic tile', event)
       
         // Access the component instance and trigger `openKPIModal`
         setTimeout(() => {
@@ -5584,10 +5631,10 @@ async openModalHelpher(getValue: any): Promise<any> {
         }, 500);
       }
       else if(argument1.grid_type=='progressTile'){
-        console.log('i am openining')
+        //console.log('i am openining')
         this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
           keyboard: false  });
-        console.log('event check progress', event)
+        //console.log('event check progress', event)
       
         // Access the component instance and trigger `openKPIModal`
         setTimeout(() => {
@@ -5601,7 +5648,7 @@ async openModalHelpher(getValue: any): Promise<any> {
       else if(argument1.grid_type=='chart'){
         this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
           keyboard: false  });
-        console.log('event check', event)
+        //console.log('event check', event)
         setTimeout(() => {
           this.ChartConfig1Component.openChartModal1(argument1, argument2)
         }, 500);
@@ -5613,7 +5660,7 @@ async openModalHelpher(getValue: any): Promise<any> {
       else if(argument1.grid_type=='Linechart'){
         this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
           keyboard: false  });
-        console.log('event check', event)
+        //console.log('event check', event)
         setTimeout(() => {
           this.ChartConfig2Component.openChartModal2(argument1, argument2)
         }, 500);
@@ -5624,7 +5671,7 @@ async openModalHelpher(getValue: any): Promise<any> {
       else if(argument1.grid_type=='Columnchart'){
         this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
           keyboard: false  });
-        console.log('event check', event)
+        //console.log('event check', event)
         setTimeout(() => {
           this.ChartConfig3Component.openChartModal3(argument1, argument2)
         }, 500);
@@ -5633,7 +5680,7 @@ async openModalHelpher(getValue: any): Promise<any> {
       else if(argument1.grid_type=='Funnelchart'){
         this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
           keyboard: false  });
-        console.log('event check', event)
+        //console.log('event check', event)
         setTimeout(() => {
           this.FunnelChartConfigComponent.openFunnelChartModal(argument1, argument2)
         }, 500);
@@ -5643,7 +5690,7 @@ async openModalHelpher(getValue: any): Promise<any> {
       else if(argument1.grid_type=='Piechart'){
         this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
           keyboard: false  });
-        console.log('event check', event)
+        //console.log('event check', event)
         setTimeout(() => {
           this.PieChartConfigComponent.openPieChartModal(argument1, argument2)
         }, 500);
@@ -5653,7 +5700,7 @@ async openModalHelpher(getValue: any): Promise<any> {
       else if(argument1.grid_type=='Stackedchart'){
         this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
           keyboard: false  });
-        console.log('event check', event)
+        //console.log('event check', event)
         setTimeout(() => {
           this.StackedBarConfigComponent.openStackedChartModal(argument1, argument2)
         }, 500);
@@ -5665,7 +5712,7 @@ async openModalHelpher(getValue: any): Promise<any> {
       else if(argument1.grid_type=='dailChart'){
         this.modalService.open(modalReference, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
           keyboard: false  });
-        console.log('event check', event)
+        //console.log('event check', event)
         setTimeout(() => {
           this.GaugeChartConfigComponent.opengaugeChartModal(argument1, argument2)
         }, 500);
@@ -5713,14 +5760,14 @@ async openModalHelpher(getValue: any): Promise<any> {
     const { arg1, arg2 } = event.data;
     const { all_Packet_store } = event;
     if(event.data.arg1.grid_type=='tile'){
-      // console.log('event check', event)
+      // //console.log('event check', event)
       this.isGirdMoved = false; 
   // this.dashboard.push(arg1)
 
-  // console.log('event check chart1', event);
+  // //console.log('event check chart1', event);
     
   // Store all company details
-  console.log('event.all_Packet_store checking',event.all_Packet_store)
+  //console.log('event.all_Packet_store checking',event.all_Packet_store)
   this.allCompanyDetails = event.all_Packet_store;
   this.updateSummary('','duplicateWidget')
 
@@ -5730,7 +5777,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
   });
 
-  console.log('event.data.arg1', event.data.arg1);
+  //console.log('event.data.arg1', event.data.arg1);
   // window.location.reload();
 
  
@@ -5739,11 +5786,11 @@ async openModalHelpher(getValue: any): Promise<any> {
 
 
     if(event.data.arg1.grid_type=='tileWithIcon'){
-      // console.log('event check', event)
+      // //console.log('event check', event)
       this.isGirdMoved = false; 
   // this.dashboard.push(arg1)
 
-  // console.log('event check chart1', event);
+  // //console.log('event check chart1', event);
     
   // Store all company details
   this.allCompanyDetails = event.all_Packet_store;
@@ -5754,122 +5801,122 @@ async openModalHelpher(getValue: any): Promise<any> {
     id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
   });
 
-  console.log('event.data.arg1', event.data.arg1);
+  //console.log('event.data.arg1', event.data.arg1);
  
 
     }
     else if(event.data.arg1.grid_type=='TableWidget'){
-      console.log('event check', event)
+      //console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push({
         ...event.data.arg1,
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
+      //console.log('event.data.arg1', event.data.arg1);
  
     }
     else if(event.data.arg1.grid_type=='HTMLtile'){
-      console.log('event check', event)
+      //console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push({
         ...event.data.arg1,
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
+      //console.log('event.data.arg1', event.data.arg1);
  
     }
 
     else if(event.data.arg1.grid_type=='logo'){
-      console.log('event check', event)
+      //console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push({
         ...event.data.arg1,
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
+      //console.log('event.data.arg1', event.data.arg1);
  
     }
     else if(event.data.arg1.grid_type=='MultiTableWidget'){
-      console.log('event check', event)
+      //console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push({
         ...event.data.arg1,
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
+      //console.log('event.data.arg1', event.data.arg1);
  
     }
     else if(event.data.arg1.grid_type=='Map'){
-      console.log('event check', event)
+      //console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push({
         ...event.data.arg1,
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
+      //console.log('event.data.arg1', event.data.arg1);
      
     }
     else if(event.data.arg1.grid_type=='tile2'){
-      console.log('event check', event)
+      //console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push({
         ...event.data.arg1,
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
+      //console.log('event.data.arg1', event.data.arg1);
 
     }
     else if(event.data.arg1.grid_type=='filterTile'){
-      console.log('event check', event)
+      //console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push({
         ...event.data.arg1,
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
+      //console.log('event.data.arg1', event.data.arg1);
    
     }
     else if(event.data.arg1.grid_type=='tile3'){
-      console.log('event check', event)
+      //console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push({
         ...event.data.arg1,
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
+      //console.log('event.data.arg1', event.data.arg1);
 
     }
     else if(event.data.arg1.grid_type=='tile4'){
-      console.log('event check', event)
+      //console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
 
 
     }
     else if(event.data.arg1.grid_type=='tile5'){
-      console.log('event check', event)
+      //console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
     
 
     }
     else if(event.data.arg1.grid_type=='tile6'){
-      console.log('event check', event)
+      //console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
 
 
     }
     else if (event.data.arg1.grid_type === 'chart') {
-      console.log('event check chart1', event);
+      //console.log('event check chart1', event);
     
       // Store all company details
       this.allCompanyDetails = event.all_Packet_store;
@@ -5880,11 +5927,11 @@ async openModalHelpher(getValue: any): Promise<any> {
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
+      //console.log('event.data.arg1', event.data.arg1);
     }
 
     else if (event.data.arg1.grid_type === 'semiDonut') {
-      console.log('event check chart1', event);
+      //console.log('event check chart1', event);
     
       // Store all company details
       this.allCompanyDetails = event.all_Packet_store;
@@ -5895,7 +5942,7 @@ async openModalHelpher(getValue: any): Promise<any> {
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
+      //console.log('event.data.arg1', event.data.arg1);
     }
 
 
@@ -5903,7 +5950,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     
 
     else if (event.data.arg1.grid_type === 'Piechart') {
-      console.log('event check chart1', event);
+      //console.log('event check chart1', event);
     
       // Store all company details
       this.allCompanyDetails = event.all_Packet_store;
@@ -5914,13 +5961,13 @@ async openModalHelpher(getValue: any): Promise<any> {
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
+      //console.log('event.data.arg1', event.data.arg1);
     }
 
     
 
     else if (event.data.arg1.grid_type === 'Funnelchart') {
-      console.log('event check chart1', event);
+      //console.log('event check chart1', event);
     
       // Store all company details
       this.allCompanyDetails = event.all_Packet_store;
@@ -5931,45 +5978,45 @@ async openModalHelpher(getValue: any): Promise<any> {
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
+      //console.log('event.data.arg1', event.data.arg1);
     }
     
     
     
     
     else if(event.data.arg1.grid_type=='Linechart'){
-      console.log('event check', event)
+      //console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push({
         ...event.data.arg1,
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
+      //console.log('event.data.arg1', event.data.arg1);
     
 
     }
         else if(event.data.arg1.grid_type=='Columnchart'){
-      console.log('event check', event)
+      //console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push({
         ...event.data.arg1,
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
+      //console.log('event.data.arg1', event.data.arg1);
 
 
     }
     else if(event.data.arg1.grid_type=='mixedChart'){
-      console.log('event check', event)
+      //console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push({
         ...event.data.arg1,
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
+      //console.log('event.data.arg1', event.data.arg1);
 
 
     }
@@ -5978,14 +6025,14 @@ async openModalHelpher(getValue: any): Promise<any> {
 
     
         else if(event.data.arg1.grid_type=='Areachart'){
-      console.log('event check', event)
+      //console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
 
 
     }
     else if(event.data.arg1.grid_type=='Barchart'){
-      console.log('event check', event)
+      //console.log('event check', event)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push(event.data.arg1)
 
@@ -5994,15 +6041,15 @@ async openModalHelpher(getValue: any): Promise<any> {
 
 
     else if(event.data.arg1.grid_type=='dynamicTile'){
-      console.log('event check from dynamic', event.data.arg1)
+      //console.log('event check from dynamic', event.data.arg1)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push({
         ...event.data.arg1,
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
-      console.log('this.dashboard from dynamic',event.all_Packet_store)
+      //console.log('event.data.arg1', event.data.arg1);
+      //console.log('this.dashboard from dynamic',event.all_Packet_store)
 
 
     }
@@ -6010,42 +6057,42 @@ async openModalHelpher(getValue: any): Promise<any> {
 
 
     else if(event.data.arg1.grid_type=='progressTile'){
-      console.log('event check from dynamic', event.data.arg1)
+      //console.log('event check from dynamic', event.data.arg1)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push({
         ...event.data.arg1,
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
-      console.log('this.dashboard from dynamic',event.all_Packet_store)
+      //console.log('event.data.arg1', event.data.arg1);
+      //console.log('this.dashboard from dynamic',event.all_Packet_store)
 
 
     }
     else if(event.data.arg1.grid_type=='title'){
-      console.log('event check from dynamic', event.data.arg1)
+      //console.log('event check from dynamic', event.data.arg1)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push({
         ...event.data.arg1,
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
-      console.log('this.dashboard from dynamic',event.all_Packet_store)
+      //console.log('event.data.arg1', event.data.arg1);
+      //console.log('this.dashboard from dynamic',event.all_Packet_store)
 
 
 
     }
     else if(event.data.arg1.grid_type=='Stackedchart'){
-      console.log('event check from dynamic', event.data.arg1)
+      //console.log('event check from dynamic', event.data.arg1)
       this.allCompanyDetails = event.all_Packet_store;
       this.dashboard.push({
         ...event.data.arg1,
         id: Date.now() + Math.floor(Math.random() * 1000) // Update the id inline
       });
     
-      console.log('event.data.arg1', event.data.arg1);
-      console.log('this.dashboard from dynamic',event.all_Packet_store)
+      //console.log('event.data.arg1', event.data.arg1);
+      //console.log('this.dashboard from dynamic',event.all_Packet_store)
 
 
 
@@ -6059,7 +6106,7 @@ async openModalHelpher(getValue: any): Promise<any> {
 
 
   emitDuplicateTitle(event: any) {
-    console.log('event check ', event)
+    //console.log('event check ', event)
     this.dashboard.push(event.arg1)
     this.updateSummary('','update_tile')
 
@@ -6067,46 +6114,46 @@ async openModalHelpher(getValue: any): Promise<any> {
 
 
   // emitDelete1(event: any) {
-  //   console.log('event check', event)
+  //   //console.log('event check', event)
   //   this.deleteTile(event.arg1, event.arg2)
 
   // }
 
   // emitDelete2(event: any) {
-  //   console.log('event check', event)
+  //   //console.log('event check', event)
   //   this.deleteTile(event.arg1, event.arg2)
 
   // }
 
   // emitDelete3(event: any) {
-  //   console.log('event check', event)
+  //   //console.log('event check', event)
   //   this.deleteTile(event.arg1, event.arg2)
 
   // }
   // emitDelete4(event: any) {
-  //   console.log('event check', event)
+  //   //console.log('event check', event)
   //   this.deleteTile(event.arg1, event.arg2)
 
   // }
   // emitDelete5(event: any) {
-  //   console.log('event check', event)
+  //   //console.log('event check', event)
   //   this.deleteTile(event.arg1, event.arg2)
 
   // }
   emitDelete6(event: { data: { arg1: any; arg2: number }; all_Packet_store: any }) {
-    console.log('event check from delete', event.all_Packet_store)
-    console.log('event.data.arg1 check',event.data.arg1)
+    //console.log('event check from delete', event.all_Packet_store)
+    //console.log('event.data.arg1 check',event.data.arg1)
     this.deleteTile(event.data.arg1, event.data.arg2,event.all_Packet_store)
 
   }
   // emitDeleteTitle(event: any) {
-  //   console.log('event check', event)
+  //   //console.log('event check', event)
   //   this.deleteTile(event.arg1, event.arg2)
 
   // }
 
   bindDataToGridster(data: any) {
-    console.log('bindDataToGridster data checking', data);
+    //console.log('bindDataToGridster data checking', data);
   
     // Check if data is an object and has the 'jsonData' property as an array
     if (data && typeof data === 'object' && Array.isArray(data.jsonData)) {
@@ -6120,7 +6167,7 @@ async openModalHelpher(getValue: any): Promise<any> {
           ...item // Spread the item properties into the dashboard item
         };
       });
-      console.log('this.dashboard for gridster check', this.dashboard);
+      //console.log('this.dashboard for gridster check', this.dashboard);
     } else {
       // Additional check for data structure
       if (!data) {
@@ -6163,8 +6210,8 @@ async openModalHelpher(getValue: any): Promise<any> {
   selectIcon(event: any, source: string): void {
     // Retrieve the selected icon from the event
     const selectedIcon = event; // This will be the selected icon object
-    console.log('Selected Icon:', selectedIcon);
-    console.log('Source:', source);
+    //console.log('Selected Icon:', selectedIcon);
+    //console.log('Source:', source);
 
     // Implement your logic here, for example:
     if (selectedIcon) {
@@ -6173,12 +6220,12 @@ async openModalHelpher(getValue: any): Promise<any> {
       // this.someOtherControl.setValue(selectedIcon.value);
     } else {
       // Handle the case when no icon is selected (if needed)
-      console.log('No icon selected.');
+      //console.log('No icon selected.');
     }
   }
 
   openModal(flag: string, getValues?: any, content?: any): void {
-    console.log('getValues inside openModal', getValues);
+    //console.log('getValues inside openModal', getValues);
   
     // Reset the common modal state
     this.errorForUniqueID = '';
@@ -6201,7 +6248,7 @@ async openModalHelpher(getValue: any): Promise<any> {
     }
   
     // Check if the "Add Dashboard" tab is configured before switching to "Add Widgets"
-console.log('selectedTab checking',this.selectedTab)
+//console.log('selectedTab checking',this.selectedTab)
   
     // Proceed with opening the modal as usual
     this.showAddWidgetsTab = true;
@@ -6239,14 +6286,14 @@ console.log('selectedTab checking',this.selectedTab)
   
 
   private handleEditModal(getValues: any, content: any): void {
-    console.log('getValueschecking',getValues)
+    //console.log('getValueschecking',getValues)
     if (getValues) {
       this.showHeading = false;
       this.showModal = true;
       this.cd.detectChanges();
          this.tilesListDefault = 'Tiles'
 
-      console.log('this.createSummaryField from editModal', this.createSummaryField);
+      //console.log('this.createSummaryField from editModal', this.createSummaryField);
 
       // Parse iconObject if it's a string
       this.previewObjDisplay = typeof getValues.iconObject === 'string'
@@ -6271,7 +6318,7 @@ console.log('selectedTab checking',this.selectedTab)
   }
 
   previewIcon(event: any) {
-    console.log('event checking from preview', event);
+    //console.log('event checking from preview', event);
   
     // Access the selected option from the event
     const selectedValue = event[0]?.value; // The selected value (e.g., 'youtube')
@@ -6282,7 +6329,7 @@ console.log('selectedTab checking',this.selectedTab)
     // Perform a deep copy if selectedIcon is found
     if (selectedIcon) {
       this.previewObjDisplay = JSON.parse(JSON.stringify(selectedIcon)); // Deep copy
-      console.log("this.previewObjDisplay", this.previewObjDisplay);
+      //console.log("this.previewObjDisplay", this.previewObjDisplay);
     } else {
       console.warn("No matching icon found.");
     }
@@ -6291,7 +6338,7 @@ console.log('selectedTab checking',this.selectedTab)
   }
   
   private handleEditModalHtml(getValues: any, content: any): void {
-    console.log('getValues checking for ', getValues);
+    //console.log('getValues checking for ', getValues);
     if (getValues) {
       this.showHeading = false;
       this.showModal = true;
@@ -6311,7 +6358,7 @@ console.log('selectedTab checking',this.selectedTab)
 
           // Assign the entire icon object here
       });
-      console.log('this.createSummaryField from editModal', this.createSummaryField);
+      //console.log('this.createSummaryField from editModal', this.createSummaryField);
       if (typeof getValues.iconObject == "string") {
         this.previewObjDisplay = JSON.parse(getValues.iconObject)
       } else {
@@ -6332,14 +6379,14 @@ console.log('selectedTab checking',this.selectedTab)
 
     this.summarySK = value;
 
-    console.log("Delete this :", value);
+    //console.log("Delete this :", value);
 
     this.allCompanyDetails = {
       PK: this.SK_clientID + "#" + value + "#summary#main",
       SK: 1
     }
 
-    console.log("All summary Details :", this.allCompanyDetails);
+    //console.log("All summary Details :", this.allCompanyDetails);
 
     const date = Math.ceil(((new Date()).getTime()) / 1000)
     const items = {
@@ -6378,13 +6425,13 @@ console.log('selectedTab checking',this.selectedTab)
       this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
 
     }).catch(err => {
-      console.log('error for deleting', err);
+      //console.log('error for deleting', err);
     })
   }
 
 
   delete(id: number) {
-    console.log("Deleted username will be", id);
+    //console.log("Deleted username will be", id);
     this.deleteCompany(id);
   }
   create() {
@@ -6422,7 +6469,7 @@ console.log('selectedTab checking',this.selectedTab)
       // this.modal.dismiss();
       this.modalService.dismissAll();
     } else {
-      console.log("Form is invalid or there are duplicate values.");
+      //console.log("Form is invalid or there are duplicate values.");
     }
   }
   
@@ -6434,10 +6481,10 @@ console.log('selectedTab checking',this.selectedTab)
   saveKPIWidget() {
     if (this.createKPIWidget.valid) {
       // Logic to save the KPI Widget data
-      console.log('Form Data:', this.createKPIWidget.value);
+      //console.log('Form Data:', this.createKPIWidget.value);
       // Close the modal or handle success feedback
     } else {
-      console.log('Form is invalid');
+      //console.log('Form is invalid');
     }
   }
   generateUniqueId(): number {
@@ -6491,7 +6538,7 @@ console.log('selectedTab checking',this.selectedTab)
     // Add the cloned tile to the dashboard at the correct position
     this.dashboard.splice(index + 1, 0, clonedTile);
 
-    console.log('this.dashboard after duplicating a tile:', this.dashboard);
+    //console.log('this.dashboard after duplicating a tile:', this.dashboard);
 
     // Trigger change detection to ensure the UI updates
     this.cdr.detectChanges();
@@ -6501,23 +6548,23 @@ console.log('selectedTab checking',this.selectedTab)
   }
 
   getGridDetails(data: any) {
-    console.log('data checking before',data)
+    //console.log('data checking before',data)
     this.dashboard = data;
-    console.log('this.dashboard check', this.dashboard)
-    //console.log('myh grid',this.grid_details)
+    //console.log('this.dashboard check', this.dashboard)
+    ////console.log('myh grid',this.grid_details)
 
   }
   getGridDetails1(data: any) {
     this.dashboard = data;
-    console.log('this.dashboard check', this.dashboard)
-    //console.log('myh grid',this.grid_details)
+    //console.log('this.dashboard check', this.dashboard)
+    ////console.log('myh grid',this.grid_details)
 
   }
   getGridDetails2(data: any) {
-    console.log('data checking from emit',data)
+    //console.log('data checking from emit',data)
     this.dashboard = data;
-    console.log('this.dashboard check', this.dashboard)
-    //console.log('myh grid',this.grid_details)
+    //console.log('this.dashboard check', this.dashboard)
+    ////console.log('myh grid',this.grid_details)
 
   }
 
@@ -6537,23 +6584,23 @@ console.log('selectedTab checking',this.selectedTab)
 
 
   updateSummaryHelper(event: any) {
-    console.log('event check for save', event)
+    //console.log('event check for save', event)
     this.updateSummary('', event)
 
   }
   updateSummaryHelper1(event: any) {
-    console.log('event check for save', event)
+    //console.log('event check for save', event)
     this.updateSummary('', event)
   }
 
   updateSummaryHelper2(event: { data: any; arg2: any }) {
-    console.log('Data received:', event.data);
-    console.log('Arg2 received:', event.arg2);
+    //console.log('Data received:', event.data);
+    //console.log('Arg2 received:', event.arg2);
   
     // Reinitialize this.allCompanyDetails using the received data
     this.allCompanyDetails = event.data;
   
-    console.log('Updated allCompanyDetails before updateSummary:', this.allCompanyDetails);
+    //console.log('Updated allCompanyDetails before updateSummary:', this.allCompanyDetails);
   
     // Pass the unpacked arguments to updateSummary
     this.isGirdMoved = true;
@@ -6567,29 +6614,29 @@ console.log('selectedTab checking',this.selectedTab)
   
 
   allPacketStoreReceiver(event: any) {
-    console.log(event)
+    //console.log(event)
     this.all_Packet_store = event
 
   }
 
   allPacketStoreReceiver1(event: any) {
-    console.log(event)
+    //console.log(event)
     this.all_Packet_store = event
 
   }
   allPacketStoreReceiver2(event: any) {
-    console.log(event)
+    //console.log(event)
     this.all_Packet_store = event
 
   }
   duplicateSummaryDashboardData(event: any) {
-    console.log('Duplicate dashboard event:', event);
+    //console.log('Duplicate dashboard event:', event);
   
     // Call the summary creation function with the duplicated data
     this.createNewSummaryDuplicate(event);
   }
   createNewSummaryDuplicate(duplicateData: any) {
-    console.log('duplicateData check',duplicateData)
+    //console.log('duplicateData check',duplicateData)
     this.defaultValue = 'Tiles';
   
     // Validate the input
@@ -6598,7 +6645,7 @@ console.log('selectedTab checking',this.selectedTab)
     }
   
     const tempClient = `${this.SK_clientID}#summary#lookup`;
-    console.log('tempClient checking', tempClient);
+    //console.log('tempClient checking', tempClient);
   
     const createdDate = Math.ceil(new Date().getTime() / 1000); // Created date
     const updatedDate = Math.ceil(Date.now() / 1000); // Updated date
@@ -6619,7 +6666,7 @@ console.log('selectedTab checking',this.selectedTab)
       createdUser: this.getLoggedUser.username, // Set the creator's username
 };
   
-    console.log('Summary data:', this.allCompanyDetails);
+    //console.log('Summary data:', this.allCompanyDetails);
   
     const createdDateISO = new Date(createdDate * 1000).toISOString();
     const updatedDateISO = new Date(updatedDate * 1000).toISOString();
@@ -6645,7 +6692,7 @@ console.log('selectedTab checking',this.selectedTab)
       }),
     };
   
-    console.log('TempObj is here:', tempObj);
+    //console.log('TempObj is here:', tempObj);
   
     const items = {
       P1: this.allCompanyDetails.summaryID,
@@ -6668,7 +6715,7 @@ console.log('selectedTab checking',this.selectedTab)
       .then(async (value: any) => {
         await this.createLookUpSummary(items, 1, tempClient);
   
-        console.log('Value from create master:', value);
+        //console.log('Value from create master:', value);
   
         if (items || value) {
           Swal.fire({
@@ -6699,7 +6746,7 @@ console.log('selectedTab checking',this.selectedTab)
         }
       })
       .catch((err) => {
-        console.log('Error in creation:', err);
+        //console.log('Error in creation:', err);
         this.toast.open('Error in adding new Summary Configuration', 'Check again', {
           duration: 5000,
           horizontalPosition: 'right',
@@ -6779,7 +6826,7 @@ console.log('selectedTab checking',this.selectedTab)
       // Push the new tile to dashboard
       this.dashboard.push(newTile6);
 
-      console.log('this.dashboard after adding new tile', this.dashboard);
+      //console.log('this.dashboard after adding new tile', this.dashboard);
 
       this.updateSummary('', 'add_tile');
       this.createKPIWidget6.patchValue({
@@ -6811,16 +6858,16 @@ console.log('selectedTab checking',this.selectedTab)
 
 
   onModeChange(event: Event): void {
-    console.log('Event:', event);
+    //console.log('Event:', event);
 
     // If you want to see specific properties:
-    console.log('Event Type:', event.type); // Should log "click"
-    console.log('Target Element:', event.target); // Logs the clicked element
-    console.log('Current Target:', event.currentTarget); // Logs the element the event listener is attached to
+    //console.log('Event Type:', event.type); // Should log "click"
+    //console.log('Target Element:', event.target); // Logs the clicked element
+    //console.log('Current Target:', event.currentTarget); // Logs the element the event listener is attached to
 
     // Cast the target to HTMLElement if you need to access its properties
     const targetElement = event.target as HTMLElement;
-    console.log('Target Element Classes:', targetElement.className);
+    //console.log('Target Element Classes:', targetElement.className);
   }
 
 
@@ -6874,14 +6921,14 @@ console.log('selectedTab checking',this.selectedTab)
 
 
   async createLookUpSummary(item: any, pageNumber: number, tempclient: any) {
-    console.log('temp client checking from lookupsummary', tempclient)
-    console.log('item checking from lookup', item)
+    //console.log('temp client checking from lookupsummary', tempclient)
+    //console.log('item checking from lookup', item)
 
 
     try {
-      console.log("iam a calleddd dude", item, pageNumber);
+      //console.log("iam a calleddd dude", item, pageNumber);
       const response = await this.api.GetMaster(tempclient, pageNumber);
-      console.log('response check', response)
+      //console.log('response check', response)
 
       let checklength: any[] = [];
       if (response != null && response.options && typeof response.options === 'string') {
@@ -6907,7 +6954,7 @@ console.log('selectedTab checking',this.selectedTab)
           return { [`L${index + 1}`]: data };
         });
 
-        console.log('newdata 11111111 :>> ', newdata);
+        //console.log('newdata 11111111 :>> ', newdata);
 
         let Look_data: any = {
           PK: tempclient,
@@ -6916,7 +6963,7 @@ console.log('selectedTab checking',this.selectedTab)
         };
 
         const createResponse = await this.api.UpdateMaster(Look_data);
-        console.log('createResponse :>> ', createResponse);
+        //console.log('createResponse :>> ', createResponse);
       } else if (response == null) {
         let newdata: any[] = [];
         newdata.push(item);
@@ -6930,15 +6977,15 @@ console.log('selectedTab checking',this.selectedTab)
           options: JSON.stringify(newdata),
         };
 
-        console.log(Look_data);
+        //console.log(Look_data);
 
         const createResponse = await this.api.CreateMaster(Look_data);
-        console.log(createResponse);
+        //console.log(createResponse);
       } else {
         await this.createLookUpSummary(item, pageNumber + 1, tempclient);
       }
     } catch (err) {
-      console.log('err :>> ', err);
+      //console.log('err :>> ', err);
       // Handle errors appropriately, e.g., show an error message to the user
     }
   }
@@ -6968,7 +7015,7 @@ console.log('selectedTab checking',this.selectedTab)
     this.fetchCompanyLookupdataOnit(1)
       .then((data: any) => {
         this.lookup_data_summaryCopy = data; // Assign fetched data to the component property
-        console.log('this.lookup_data_summaryCopy check', this.lookup_data_summaryCopy);
+        //console.log('this.lookup_data_summaryCopy check', this.lookup_data_summaryCopy);
   
         // Multi-level sorting: First by P10 (latest first), then by P4
         this.lookup_data_summaryCopy.sort((a, b) => {
@@ -6984,24 +7031,24 @@ console.log('selectedTab checking',this.selectedTab)
           return b.P4 - a.P4;
         });
   
-        console.log('Sorted Data (P10 first, then P4):', this.lookup_data_summaryCopy);
+        //console.log('Sorted Data (P10 first, then P4):', this.lookup_data_summaryCopy);
   
         // Check the permission ID before applying the filter
         if (this.userPermission === "All") {
-          console.log("Permission is 'All'. Displaying all dashboards...");
+          //console.log("Permission is 'All'. Displaying all dashboards...");
           // No filtering needed, show all data
         } else {
-          console.log('Restricted permissions. Filtering dashboards...', this.summaryPermission);
+          //console.log('Restricted permissions. Filtering dashboards...', this.summaryPermission);
           
           if (this.summaryPermission.includes('None')) {
             this.lookup_data_summaryCopy = []; 
             this.isNone = true;
-            console.log("Permission includes 'None'. No dashboards will be displayed.");
+            //console.log("Permission includes 'None'. No dashboards will be displayed.");
           } else if (this.summaryPermission.includes('All')) {
-            console.log("Permission is 'All'. Displaying all dashboards...");
+            //console.log("Permission is 'All'. Displaying all dashboards...");
             // No filtering needed, show all data
           } else {
-            console.log("Restricted permissions. Filtering dashboards...");
+            //console.log("Restricted permissions. Filtering dashboards...");
             this.lookup_data_summaryCopy = this.lookup_data_summaryCopy
               .filter((item: any) => this.summaryPermission.includes(item.P1))
               .reduce((uniqueItems: any[], currentItem: any) => {
@@ -7020,14 +7067,14 @@ console.log('selectedTab checking',this.selectedTab)
             try {
               // Parse the P8 property
               const parsedIcon = JSON.parse(item.P8);
-              console.log('Parsed Icon Object:', parsedIcon);
+              //console.log('Parsed Icon Object:', parsedIcon);
   
               // Store the parsed icon back into the object
               item.parsedIcon = parsedIcon;
   
               // Access the properties if needed
-              console.log('Icon Value:', parsedIcon.value);
-              console.log('Icon Label:', parsedIcon.label);
+              //console.log('Icon Value:', parsedIcon.value);
+              //console.log('Icon Label:', parsedIcon.label);
             } catch (error) {
               console.error('Error parsing P8:', error);
             }
@@ -7036,7 +7083,7 @@ console.log('selectedTab checking',this.selectedTab)
           }
         });
   
-        console.log('Final parsed and filtered data:', this.lookup_data_summaryCopy);
+        //console.log('Final parsed and filtered data:', this.lookup_data_summaryCopy);
   
         this.cdr.detectChanges(); // Ensure UI updates
       })
@@ -7051,7 +7098,7 @@ console.log('selectedTab checking',this.selectedTab)
 
 
   // checkUniqueIdentifier(enteredID: string): void {
-  //   console.log('Entered Value check',enteredID)
+  //   //console.log('Entered Value check',enteredID)
   //   if (!enteredID) {
   //     this.errorForUniqueID = null; // Reset error if input is empty
   //     this.isDuplicateID = false;
@@ -7059,7 +7106,7 @@ console.log('selectedTab checking',this.selectedTab)
   //   }
 
   //   const isDuplicateID = this.lookup_data_summaryCopy.some(item => item.P1 === enteredID);
-  //   console.log('Validation for ID:', enteredID, this.lookup_data_summaryCopy);
+  //   //console.log('Validation for ID:', enteredID, this.lookup_data_summaryCopy);
 
   //   if (isDuplicateID) {
   //     this.errorForUniqueID = `ID "${enteredID}" is already Exist. Please enter a unique ID.`;
@@ -7078,7 +7125,7 @@ console.log('selectedTab checking',this.selectedTab)
   // }
   // onIDChange(event: Event): void {
   //   let currentID = (event.target as HTMLInputElement).value;
-  //   console.log('currentID checking', currentID);
+  //   //console.log('currentID checking', currentID);
   
   //   // Trim the value first to remove any leading or trailing spaces
   //   const trimmedID = currentID.trim();
@@ -7115,7 +7162,7 @@ console.log('selectedTab checking',this.selectedTab)
 
   onIDChange(event: Event): void {
     let currentID = (event.target as HTMLInputElement).value;
-    console.log('currentID checking', currentID);
+    //console.log('currentID checking', currentID);
   
     // Trim the value first to remove any leading or trailing spaces
     const trimmedID = currentID.trim();
@@ -7152,7 +7199,7 @@ console.log('selectedTab checking',this.selectedTab)
   }
   
   checkUniqueIdentifier(enteredID: string): void {
-    console.log('Entered Value check', enteredID);
+    //console.log('Entered Value check', enteredID);
   
     if (!enteredID) {
       this.errorForUniqueID = null; // Reset error if input is empty
@@ -7161,7 +7208,7 @@ console.log('selectedTab checking',this.selectedTab)
     }
   
     const isDuplicateID = this.lookup_data_summaryCopy.some(item => item.P1 === enteredID);
-    console.log('Validation for ID:', enteredID, this.lookup_data_summaryCopy);
+    //console.log('Validation for ID:', enteredID, this.lookup_data_summaryCopy);
   
     if (isDuplicateID) {
       this.errorForUniqueID = `ID "${enteredID}" already exists. Please enter a unique ID.`;
@@ -7205,8 +7252,8 @@ console.log('selectedTab checking',this.selectedTab)
   //   this.isDuplicateName = false;  // Reset duplicate flag
   // }
   fetchCompanyLookupdataOnit(sk: any): Promise<any> {
-    console.log("Fetching company lookup data with SK:", sk);
-    console.log('this.SK_clientID check lookup', this.SK_clientID);
+    //console.log("Fetching company lookup data with SK:", sk);
+    //console.log('this.SK_clientID check lookup', this.SK_clientID);
   
     return new Promise((resolve, reject) => {
       this.api.GetMaster(`${this.SK_clientID}#summary#lookup`, sk)
@@ -7222,7 +7269,7 @@ console.log('selectedTab checking',this.selectedTab)
                 return reject(new Error('Failed to parse response.options'));
               }
   
-              console.log("Parsed data:", data);
+              //console.log("Parsed data:", data);
   
               if (Array.isArray(data)) {
                 // Process and add data to lookup_data_summary1
@@ -7231,7 +7278,7 @@ console.log('selectedTab checking',this.selectedTab)
                     const key = Object.keys(element)[0];
                     const { P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11 } = element[key];
                     this.lookup_data_summary1.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11 });
-                    console.log("Updated lookup_data_summary1:", this.lookup_data_summary1);
+                    //console.log("Updated lookup_data_summary1:", this.lookup_data_summary1);
                   }
                 });
   
@@ -7254,7 +7301,7 @@ console.log('selectedTab checking',this.selectedTab)
               reject(new Error('response.options is not a string.'));
             }
           } else {
-            console.log("No response data, returning collected data:", this.lookup_data_summary1);
+            //console.log("No response data, returning collected data:", this.lookup_data_summary1);
             resolve(this.lookup_data_summary1); // Resolve with existing data if no valid response
           }
         })
@@ -7267,13 +7314,13 @@ console.log('selectedTab checking',this.selectedTab)
   goToPage(page: number) {
     if (page < 1 || page > this.totalPages) return; // Prevent invalid page changes
     this.page = page;
-    console.log('Current Page:', this.page);
+    //console.log('Current Page:', this.page);
     this.showTable(); // Reload data when page changes
 }
 
 
   async showTable() {
-    console.log("Show DataTable is called BTW");
+    //console.log("Show DataTable is called BTW");
   
     this.datatableConfig = {};
   this.lookup_data_summary = [];
@@ -7286,25 +7333,25 @@ console.log('selectedTab checking',this.selectedTab)
 
       this.fetchCompanyLookupdata(1)
         .then((resp: any) => {
-          console.log("resp check", resp);
+          //console.log("resp check", resp);
           let responseData = resp || []; // Default to an empty array if resp is null
-          console.log("responseData", responseData);
+          //console.log("responseData", responseData);
 
           // Apply Permission-Based Filtering
           if (this.userPermission === "All") {
-            console.log('permissionIdCheck', this.permissionIdCheck)
-            console.log("Permission is 'All'. Displaying all data.");
+            //console.log('permissionIdCheck', this.permissionIdCheck)
+            //console.log("Permission is 'All'. Displaying all data.");
             // No filtering needed, show all data
           } else {
-            console.log("Restricted permissions. Filtering data...");
+            //console.log("Restricted permissions. Filtering data...");
             if (this.summaryPermission.includes('None')) {
-              console.log("Permission includes 'None'. No data will be displayed.");
+              //console.log("Permission includes 'None'. No data will be displayed.");
               responseData = []; // Set responseData to an empty array
             } else if (this.summaryPermission.includes('All')) {
-              console.log("Permission is 'All'. Displaying all data.");
+              //console.log("Permission is 'All'. Displaying all data.");
               // No filtering needed
             } else {
-              console.log("Restricted permissions. Filtering data...");
+              //console.log("Restricted permissions. Filtering data...");
               responseData = responseData.filter((item: any) =>
                 this.summaryPermission.includes(item.P1)
               );
@@ -7321,15 +7368,15 @@ console.log('selectedTab checking',this.selectedTab)
             )
           ).map((item: any) => JSON.parse(item)); // Parse back to object
 
-          console.log('filteredData checkinbg', filteredData)
+          //console.log('filteredData checkinbg', filteredData)
 
-          console.log("Filtered Data after permissions and search:", filteredData);
+          //console.log("Filtered Data after permissions and search:", filteredData);
 
           // Implement pagination by slicing the filtered data
 
           const paginatedData = filteredData.slice(start, start + length);
           this.paginationDataStore = paginatedData
-          console.log('this.paginationDataStore checking',this.paginationDataStore)
+          //console.log('this.paginationDataStore checking',this.paginationDataStore)
 
           this.totalRecords = filteredData.length;
           this.displayedRecords = paginatedData.length;
@@ -7350,7 +7397,7 @@ console.log('selectedTab checking',this.selectedTab)
             data: paginatedData, // Data for the current page
           });
 
-          console.log("Paginated Data for current page", paginatedData);
+          //console.log("Paginated Data for current page", paginatedData);
         })
         .catch((error: any) => {
           console.error("Error fetching user lookup data:", error);
@@ -7472,7 +7519,7 @@ console.log('selectedTab checking',this.selectedTab)
   
   
   SummaryIdRedirect(id: string): void {
-    console.log('this.all_Packet_store check viewItem',this.lookup_data_summaryCopy)
+    //console.log('this.all_Packet_store check viewItem',this.lookup_data_summaryCopy)
    
     this.setFullscreen()
     this.router.navigate([`/summary-engine/${id}`]);
@@ -7496,10 +7543,10 @@ console.log('selectedTab checking',this.selectedTab)
   // updateSummary(value: any, key: any) {
   //   this.createSummaryField.get('summaryID')?.enable();
   //   this.allCompanyDetails = this.constructAllCompanyDetails();
-  //   console.log('Updated allCompanyDetails:', this.allCompanyDetails);
+  //   //console.log('Updated allCompanyDetails:', this.allCompanyDetails);
   
   //   this.formattedDashboard = this.formatDashboardTiles(this.dashboard);
-  //   console.log('Formatted Dashboard:', this.formattedDashboard);
+  //   //console.log('Formatted Dashboard:', this.formattedDashboard);
   
   //   let tempObj = {
   //     PK: `${this.SK_clientID}#${this.allCompanyDetails.summaryID}#summary#main`,
@@ -7515,23 +7562,23 @@ console.log('selectedTab checking',this.selectedTab)
 //   updateSummary(value: any,key: any,pinValue?:any) {
 //     if(key=='addPin'){
 //       this.PinCheck =pinValue
-//       console.log('PinCheck from updateSummary',this.PinCheck)
+//       //console.log('PinCheck from updateSummary',this.PinCheck)
 //     }
-// console.log('value checking summary',value)
+// //console.log('value checking summary',value)
 
   
-//     console.log('this.getLoggedUser check update', this.getLoggedUser);
+//     //console.log('this.getLoggedUser check update', this.getLoggedUser);
   
 //     // Extract username for later use
 //     this.extractUserName = this.getLoggedUser.username;
-//     console.log('this.extractUserName checking', this.extractUserName);
+//     //console.log('this.extractUserName checking', this.extractUserName);
   
-//     console.log('all_Packet_store checking', this.all_Packet_store);
+//     //console.log('all_Packet_store checking', this.all_Packet_store);
   
 //     // Construct allCompanyDetails if missing
 //     if (!this.allCompanyDetails) {
 //       this.allCompanyDetails = this.constructAllCompanyDetails();
-//       console.log('Constructed allCompanyDetails:', this.allCompanyDetails);
+//       //console.log('Constructed allCompanyDetails:', this.allCompanyDetails);
 //     }
   
 //     // Only populate missing fields to avoid overwriting existing values
@@ -7545,7 +7592,7 @@ console.log('selectedTab checking',this.selectedTab)
 //         LiveDashboard:this.allCompanyDetails.LiveDashboard ||'',
 //         fullScreenModeCheck:this.allCompanyDetails.fullScreenModeCheck ||''
 //       };
-//       console.log('Updated allCompanyDetails with Packet Store:', this.allCompanyDetails);
+//       //console.log('Updated allCompanyDetails with Packet Store:', this.allCompanyDetails);
 //     }
 
   
@@ -7555,14 +7602,14 @@ console.log('selectedTab checking',this.selectedTab)
 //     this.allCompanyDetails.summaryDesc = this.allCompanyDetails.summaryDesc 
 
   
-//     console.log('Final allCompanyDetails:', this.allCompanyDetails);
+//     //console.log('Final allCompanyDetails:', this.allCompanyDetails);
   
 //     // Enable summaryID field
 //     this.createSummaryField.get('summaryID')?.enable();
   
 //     // Format dashboard tiles
 //     this.formattedDashboard = this.formatDashboardTiles(this.dashboard) || [];
-//     console.log('Formatted Dashboard:', this.formattedDashboard);
+//     //console.log('Formatted Dashboard:', this.formattedDashboard);
   
 //     // Set timestamps and users
 //     const originalCreatedDate =
@@ -7574,7 +7621,7 @@ console.log('selectedTab checking',this.selectedTab)
   
 //     // Construct tempObj for validation and submission
 //     let serializedQueryParams = JSON.stringify(this.updatedQueryPramas);
-// console.log('Serialized Query Params:', serializedQueryParams);
+// //console.log('Serialized Query Params:', serializedQueryParams);
 //     let tempObj = {
 //       PK: `${this.SK_clientID}#${this.allCompanyDetails.summaryID}#summary#main`,
 //       SK: 1,
@@ -7585,7 +7632,7 @@ console.log('selectedTab checking',this.selectedTab)
 //       }),
 //     };
   
-//     console.log('TempObj being validated and submitted:', tempObj);
+//     //console.log('TempObj being validated and submitted:', tempObj);
   
 //     // Validate and submit the object
 
@@ -7606,7 +7653,7 @@ console.log('selectedTab checking',this.selectedTab)
 //     };
     
   
-//     console.log('Items prepared for fetchTimeMachineById:', items);
+//     //console.log('Items prepared for fetchTimeMachineById:', items);
 //     const UserDetails = {
 //       "User Name": this.userdetails,
 //       "Action": "Updated",
@@ -7623,7 +7670,7 @@ console.log('selectedTab checking',this.selectedTab)
   
 //     // Trigger fetchTimeMachineById
 //     if (items.P1) {
-//       console.log('check items inupdate',items)
+//       //console.log('check items inupdate',items)
 //       this.fetchTimeMachineById(1, items.P1, 'update', items);
 //     } else {
 //       console.warn('fetchTimeMachineById skipped: Missing summaryID (P1).');
@@ -7638,54 +7685,54 @@ console.log('selectedTab checking',this.selectedTab)
 updateSummary(value: any,key: any,pinValue?:any) {
   if(key=='addPin'){
     this.PinCheck =pinValue
-    console.log('PinCheck from updateSummary',this.PinCheck)
+    //console.log('PinCheck from updateSummary',this.PinCheck)
   }
-console.log('value checking summary',value)
+//console.log('value checking summary',value)
 
 
-  console.log('this.getLoggedUser check update', this.getLoggedUser);
+  //console.log('this.getLoggedUser check update', this.getLoggedUser);
 
   // Extract username for later use
   this.extractUserName = this.getLoggedUser.username;
-  console.log('this.extractUserName checking', this.extractUserName);
+  //console.log('this.extractUserName checking', this.extractUserName);
 
-  console.log('all_Packet_store checking', this.all_Packet_store);
+  //console.log('all_Packet_store checking', this.all_Packet_store);
 
   // Construct allCompanyDetails if missing
   if (!this.allCompanyDetails) {
     this.allCompanyDetails = this.constructAllCompanyDetails();
-    console.log('Constructed allCompanyDetails:', this.allCompanyDetails);
+    //console.log('Constructed allCompanyDetails:', this.allCompanyDetails);
   }
 
   // Only populate missing fields to avoid overwriting existing values
   if (this.all_Packet_store) {
     this.allCompanyDetails = {
       ...this.allCompanyDetails, // Preserve existing data
-      summaryID: this.allCompanyDetails.summaryID || this.all_Packet_store.summaryID,
-      summaryName: this.allCompanyDetails.summaryName || this.all_Packet_store.summaryName,
-      summaryDesc: this.allCompanyDetails.summaryDesc || this.all_Packet_store.summaryDesc,
-      iconObject: this.allCompanyDetails.iconObject || this.all_Packet_store.iconObject,
+      summaryID: this.allCompanyDetails.summaryID || this.all_Packet_store.summaryID || value.P1,
+      summaryName: this.allCompanyDetails.summaryName || this.all_Packet_store.summaryName || value.P2,
+      summaryDesc: this.allCompanyDetails.summaryDesc || this.all_Packet_store.summaryDesc || value.P3,
+      iconObject: this.allCompanyDetails.iconObject || this.all_Packet_store.iconObject || value.parsedIcon ||'',
       LiveDashboard:this.allCompanyDetails.LiveDashboard ||'',
       fullScreenModeCheck:this.allCompanyDetails.fullScreenModeCheck ||'',
       // DashboardRestriction:this.allCompanyDetails.DashboardRestriction ||''
     };
-    console.log('Updated allCompanyDetails with Packet Store:', this.allCompanyDetails);
+    //console.log('Updated allCompanyDetails with Packet Store:', this.allCompanyDetails);
   }
 
   // Ensure critical fields have default fallbacks without altering existing logic
-  this.allCompanyDetails.summaryID = this.allCompanyDetails.summaryID ;
-  this.allCompanyDetails.summaryName = this.allCompanyDetails.summaryName ;
-  this.allCompanyDetails.summaryDesc = this.allCompanyDetails.summaryDesc ;
+  this.allCompanyDetails.summaryID = this.allCompanyDetails.summaryID || value.P1 ;
+  this.allCompanyDetails.summaryName = this.allCompanyDetails.summaryName || value.P2 ;
+  this.allCompanyDetails.summaryDesc = this.allCompanyDetails.summaryDesc || value.P3 ;
 
 
-  console.log('Final allCompanyDetails:', this.allCompanyDetails);
+  //console.log('Final allCompanyDetails:', this.allCompanyDetails);
 
   // Enable summaryID field
   this.createSummaryField.get('summaryID')?.enable();
 
   // Format dashboard tiles
   this.formattedDashboard = this.formatDashboardTiles(this.dashboard) || [];
-  console.log('Formatted Dashboard:', this.formattedDashboard);
+  //console.log('Formatted Dashboard:', this.formattedDashboard);
 if (key !=='addPin'){
 
   if (this.formattedDashboard.length === 0) {
@@ -7703,26 +7750,26 @@ if (key !=='addPin'){
 
 
   // Set timestamps and users
-  console.log('this.lookup_data_summaryCopy check from updateSummary',this.lookup_data_summaryCopy)
-  console.log('this.routeId check from updateSummary',this.routeId)
-  const matchedPacket = this.lookup_data_summaryCopy.find((packet: any) => packet.P1 === this.routeId);
+  //console.log('this.lookup_data_summaryCopy check from updateSummary',this.lookup_data_summaryCopy)
+  //console.log('this.routeId check from updateSummary',this.routeId)
+  const matchedPacket = this.lookup_data_summaryCopy.find((packet: any) => packet.P1);
 
-console.log('Matched Packet: lookup', matchedPacket);
+//console.log('Matched Packet: lookup', matchedPacket);
 
-  const originalCreatedDate =matchedPacket.P5 ||this.allCompanyDetails.crDate || Math.ceil(Date.now()/1000)
+  const originalCreatedDate =matchedPacket.P5 ||this.allCompanyDetails.crDate ||value.P5|| Math.ceil(Date.now()/1000)
 
     
-    console.log('originalCreatedDate checking before update',originalCreatedDate)
+    //console.log('originalCreatedDate checking before update',originalCreatedDate)
   const originalCreatedUser =
     this.allCompanyDetails.createdUser || this.getLoggedUser.username;
 
     const updatedDate = Math.ceil(Date.now() / 1000);
-    console.log("Stored:", updatedDate);  // ✅ Just store current epoch
-    console.log("Display: check before update", this.formatEpochToIST(updatedDate));
+    //console.log("Stored:", updatedDate);  // ✅ Just store current epoch
+    //console.log("Display: check before update", this.formatEpochToIST(updatedDate));
 
   // Construct tempObj for validation and submission
   let serializedQueryParams = JSON.stringify(this.updatedQueryPramas);
-console.log('Serialized Query Params:', serializedQueryParams);
+//console.log('Serialized Query Params:', serializedQueryParams);
   let tempObj = {
     PK: `${this.SK_clientID}#${this.allCompanyDetails.summaryID}#summary#main`,
     SK: 1,
@@ -7733,12 +7780,12 @@ console.log('Serialized Query Params:', serializedQueryParams);
     }),
   };
 
-  console.log('TempObj being validated and submitted:', tempObj);
+  //console.log('TempObj being validated and submitted:', tempObj);
 const storeFullScreenValue = this.allCompanyDetails.fullScreenModeCheck
   // Validate and submit the object
   this.validateAndSubmit(tempObj, key,storeFullScreenValue);
 
-console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
+//console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
   // Prepare items for fetchTimeMachineById
   const items = {
     P1: this.allCompanyDetails.summaryID || value.P1,
@@ -7756,7 +7803,7 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
   };
   
 
-  console.log('Items prepared for fetchTimeMachineById:', items);
+  //console.log('Items prepared for fetchTimeMachineById:', items);
   const UserDetails = {
     "User Name": this.userdetails,
     "Action": "Updated",
@@ -7773,7 +7820,7 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
 
   // Trigger fetchTimeMachineById
   if (items.P1) {
-    console.log('check items inupdate',items)
+    //console.log('check items inupdate',items)
     this.fetchTimeMachineById(1, items.P1, 'update', items);
   } else {
     console.warn('fetchTimeMachineById skipped: Missing summaryID (P1).');
@@ -7799,45 +7846,92 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
 
 
   handlePin(receiveItem: any) {
-    console.log('receiveItem check:', receiveItem);
-    console.log("Pin clicked!"); // Debugging output
+    //console.log('receiveItem check:', receiveItem);
+    //console.log("Pin clicked!"); // Debugging output
   
     // Get latest epoch timestamp
     this.PinValue = Date.now(); // This will store the current epoch time
   
-    console.log("Latest Epoch Timestamp:", this.PinValue);
-    console.log('checking griddetails',this.dashboard)
+    //console.log("Latest Epoch Timestamp:", this.PinValue);
+    //console.log('checking griddetails',this.dashboard)
   
     // Read summary ID from formGroup
     const readSummaryId = this.createSummaryField.get('summaryID')?.value;
-    console.log('readSummaryId checking from the form:', readSummaryId);
-    console.log('this.createSummaryField.value checking:', this.createSummaryField.value);
+    //console.log('readSummaryId checking from the form:', readSummaryId);
+    //console.log('this.createSummaryField.value checking:', this.createSummaryField.value);
+    this.openModalHelpher(receiveItem.P1,'handlingPin').then((data) => {
+      //console.log('✅ this.all_Packet_store permissions:', data);
+      const readMainData = data;
+      //console.log('readMainData checking', readMainData);
+      if (data.grid_details.length === 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Cannot update Pin',
+          text: 'To add or remove a pin, the Dashboard must contain at least one widget.',
+          showConfirmButton: true,
+          confirmButtonText: 'OK',
+          position: 'center'
+        });
+        return;
+      } else if (data.grid_details.length > 0) {
+        this.updateSummary(receiveItem, 'addPin', this.PinValue);
+      }
+      
+      
+      
+
+    }).catch(err => {
+      console.error('Error in openModalHelpher:', err);
+    });
   
     // Call update function with latest epoch timestamp
-    this.updateSummary(receiveItem, 'addPin', this.PinValue);
+ 
   
     // Your logic for pin action
   }
   
+  
 
   handleUnpin(receive: any) {
-    console.log('receive checking', receive);
-    console.log("Unpin clicked!"); // Debugging output
+    //console.log('receive checking', receive);
+    //console.log("Unpin clicked!"); // Debugging output
   
     // Manually clear P10
     receive.P10 = ''; // Or use undefined if required
   
-    console.log('Updated receive object after unpin:', receive);
+    //console.log('Updated receive object after unpin:', receive);
+    this.openModalHelpher(receive.P1,'handlingPin').then((data) => {
+      //console.log('✅ this.all_Packet_store permissions:', data);
+      const readMainData = data;
+      //console.log('readMainData checking', readMainData);
+      if (data.grid_details.length === 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Cannot update Pin',
+          text: 'To add or remove a pin, the Dashboard must contain at least one widget.',
+          showConfirmButton: true,
+          confirmButtonText: 'OK',
+          position: 'center'
+        });
+        return;
+      } else if (data.grid_details.length > 0) {
+        this.updateSummary(receive, 'addPin');
+      }
+  
+
+    }).catch(err => {
+      console.error('Error in openModalHelpher:', err);
+    });
   
     // Call update function with the modified object
-    this.updateSummary(receive, 'addPin');
+    // this.updateSummary(receive, 'addPin');
   }
   
   
   
   private validateAndSubmit(tempObj: any, actionKey: string, receiveFullScreenValue?: any) {
     this.isGirdMoved = false;
-    console.log('actionKey checking', actionKey);
+    //console.log('actionKey checking', actionKey);
   
     if (!tempObj.PK || !tempObj.SK) {
       Swal.fire({
@@ -7851,7 +7945,7 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
     }
   
     this.api.UpdateMaster(tempObj).then(response => {
-      console.log('API Response:', response);
+      //console.log('API Response:', response);
       if (response && response.metadata) {
         const successTitle = {
           create: 'Summary created',
@@ -7880,7 +7974,7 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
 
         }[actionKey] || 'Summary Updated';
   
-        console.log('Action key condition check:', actionKey);
+        //console.log('Action key condition check:', actionKey);
 
   
         // Check if actionKey is 'duplicateWidget', if so, skip SweetAlert
@@ -7911,7 +8005,7 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
               } else if (actionKey === 'importUpdate') {
                 window.location.reload();
               } else if (actionKey === 'editSummary') {
-                console.log('receiveFullScreenValue checking from summary', receiveFullScreenValue);
+                //console.log('receiveFullScreenValue checking from summary', receiveFullScreenValue);
   
                 let queryParams: any = {
                   isFullScreen: receiveFullScreenValue
@@ -7924,7 +8018,7 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
                 if (this.userPass) {
                   queryParams.pass = this.userPass;
                 }
-                console.log('checking router id from validation', this.routeId);
+                //console.log('checking router id from validation', this.routeId);
   
                 // Navigate
                 if (this.userId || this.userPass) {
@@ -7953,7 +8047,7 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
             if (this.routeId) {
               this.openModalHelpher(this.routeId);
               this.editButtonCheck = false;
-              console.log('Route ID found, opening modal:', this.routeId);
+              //console.log('Route ID found, opening modal:', this.routeId);
             }
           });
         }
@@ -8057,6 +8151,7 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
       table_rowConfig:this.formatField(tile.table_rowConfig),
       DrillConfig:this.formatField(tile.DrillConfig),
       filter_duplicate_data:this.formatField(tile.filter_duplicate_data),
+      customColumnConfig:this.formatField(tile.customColumnConfig)
   
       // parameterName:this.formatField(tile.parameterName)
 
@@ -8095,7 +8190,7 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
 
 
     let tempClient = this.SK_clientID + "#summary" + "#lookup";
-    console.log('tempClient checking', tempClient);
+    //console.log('tempClient checking', tempClient);
 
 
     const createdDate = Math.ceil((new Date()).getTime() / 1000); // Created date
@@ -8108,8 +8203,8 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
       summaryDesc: this.createSummaryField.value.summarydesc,
 
       // jsonData: parsedJsonData,
-      summaryIcon: this.createSummaryField.value.iconSelect,
-      iconObject: this.previewObjDisplay,
+      summaryIcon: this.createSummaryField.value.iconSelect ||'',
+      iconObject: this.previewObjDisplay ||'',
       LiveDashboard:this.createSummaryField.value.LiveDashboard,
       fullScreenModeCheck:this.createSummaryField.value.fullScreenModeCheck,
       // DashboardRestriction:this.createSummaryField.value.DashboardRestriction,
@@ -8121,7 +8216,7 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
       grid_details: []
     };
 
-    console.log("summary data ", this.allCompanyDetails);
+    //console.log("summary data ", this.allCompanyDetails);
 
     // Prepare ISO date strings
     const createdDateISO = new Date(this.allCompanyDetails.crDate * 1000).toISOString();
@@ -8136,7 +8231,7 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
         summaryName: this.allCompanyDetails.summaryName,
         summaryDesc: this.allCompanyDetails.summaryDesc,
         // jsonData: this.allCompanyDetails.jsonData,
-        summaryIcon: this.createSummaryField.value.iconSelect,
+        summaryIcon: this.createSummaryField.value.iconSelect ||'',
         LiveDashboard:this.createSummaryField.value.LiveDashboard,
         fullScreenModeCheck:this.createSummaryField.value.fullScreenModeCheck,
         // DashboardRestriction:this.createSummaryField.value.DashboardRestriction,
@@ -8144,7 +8239,7 @@ console.log('value.P11 checking',this.allCompanyDetails.fullScreenModeCheck)
         created: createdDateISO, // Created date in ISO format
         updated: updatedDateISO,   // Updated date in ISO format
         createdUser: this.allCompanyDetails.createdUser, // Use the persisted createdUser
-        iconObject: this.allCompanyDetails.iconObject,
+        iconObject: this.allCompanyDetails.iconObject ||'',
         tilesList:this.defaultValue ,
         grid_details:[],
         queryParams:[],
@@ -8157,11 +8252,11 @@ this.createSummaryField.patchValue({
   tilesList: this.defaultValue // Set the value to 'Widget'
 });
 
-    console.log("TempObj is here ", tempObj);
+    //console.log("TempObj is here ", tempObj);
     const temobj1: any = JSON.stringify(this.createSummaryField.value.iconSelect)
     // Prepare items for further processing
-    console.log("this.createSummaryField.value.iconSelec", this.createSummaryField.value.iconSelect)
-    console.log("temobj1", temobj1)
+    //console.log("this.createSummaryField.value.iconSelec", this.createSummaryField.value.iconSelect)
+    //console.log("temobj1", temobj1)
     const items = {
       P1: this.createSummaryField.value.summaryID,
       P2: this.createSummaryField.value.summaryName,
@@ -8176,8 +8271,8 @@ this.createSummaryField.patchValue({
       P11:this.createSummaryField.value.fullScreenModeCheck,
       // P12:this.createSummaryField.value.DashboardRestriction,
     };
-    console.log('items checking from create Summary',items)
-
+    //console.log('items checking from create Summary',items)
+console.log('lookupitems check from createnewsummary',items)
     // API call to create the summary
     this.api.CreateMaster(tempObj).then(async (value: any) => {
       await this.createLookUpSummary(items, 1, tempClient);
@@ -8185,9 +8280,9 @@ this.createSummaryField.patchValue({
       this.datatableConfig = {};
       this.lookup_data_summary = [];
 
-      console.log('value check from create master', value);
+      //console.log('value check from create master', value);
       if (items || value) {
-        console.log('items check from create master', items);
+        //console.log('items check from create master', items);
 
         // Call the loadData function
         this.loadData();
@@ -8203,6 +8298,7 @@ this.createSummaryField.patchValue({
         }).then((result) => {
           if (result.isConfirmed) {
             // This block is executed when the "OK" button is clicked
+            console.log('checkitems.P1 from createnewsummary',items.P1)
             if (items && items.P1) {
               this.dashboardOpen(items.P1);
        
@@ -8240,7 +8336,7 @@ this.createSummaryField.patchValue({
       this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
 
     }).catch(err => {
-      console.log('err for creation', err);
+      //console.log('err for creation', err);
       this.toast.open("Error in adding new Summary Configuration ", "Check again", {
         duration: 5000,
         horizontalPosition: 'right',
@@ -8259,9 +8355,9 @@ this.createSummaryField.patchValue({
 
 
   onAddWidgetTabClick() {
-    console.log('showAddWidgetsTab:', this.showAddWidgetsTab);
-    console.log('showModal:', this.showModal);
-    console.log('selectedTab:', this.selectedTab);
+    //console.log('showAddWidgetsTab:', this.showAddWidgetsTab);
+    //console.log('showModal:', this.showModal);
+    //console.log('selectedTab:', this.selectedTab);
     
     if (this.showAddWidgetsTab && !this.showModal) {
       Swal.fire({
@@ -8314,22 +8410,22 @@ this.createSummaryField.patchValue({
 
 
   async fetchTimeMachineById(sk: any, id: any, type: any, item: any) {
-    console.log('item check from update',item)
+    //console.log('item check from update',item)
     const tempClient = this.SK_clientID + '#summary' + '#lookup';
-    console.log("Temp client is ", tempClient);
-    console.log("Type of client", typeof tempClient);
-    console.log("item check from fetchTimeMachine", item);
+    //console.log("Temp client is ", tempClient);
+    //console.log("Type of client", typeof tempClient);
+    //console.log("item check from fetchTimeMachine", item);
   
     try {
       const response = await this.api.GetMaster(tempClient, sk);
-      console.log('response check from timeMachine', response);
+      //console.log('response check from timeMachine', response);
   
       if (response && response.options) {
         let data: ListItem[] = await JSON.parse(response.options);
   
         // Find the index of the item with the matching id
         let findIndex = data.findIndex((obj) => obj[Object.keys(obj)[0]].P1 === id);
-        console.log('findIndex checking',findIndex)
+        //console.log('findIndex checking',findIndex)
   
         if (findIndex !== -1) { // If item found
           if (type === 'update') {
@@ -8400,7 +8496,7 @@ this.createSummaryField.patchValue({
             location.reload()
             this.cd.detectChanges();
           }
-  console.log('lookup data check from summary',data)
+  //console.log('lookup data check from summary',data)
 
           
         } else { // If item not found
@@ -8424,7 +8520,7 @@ this.createSummaryField.patchValue({
 
 refreshFunction(){
   if (this.routeId) {
-    console.log('this.routeId check',this.routeId)
+    //console.log('this.routeId check',this.routeId)
     // this.checkAndSetFullscreen();
     this.editButtonCheck = true
 
@@ -8450,24 +8546,24 @@ refreshFunction(){
 
       this.listofClientIDs = Array.from(new Set(this.listofClientIDs))
 
-      console.log("All the clients data is here ", this.listofClientIDs)
+      //console.log("All the clients data is here ", this.listofClientIDs)
 
     }
     catch (err) {
-      console.log("Error fetching all the clients ");
+      //console.log("Error fetching all the clients ");
     }
   }
 
 
   async fetchTMClientLookup(sk: any) {
-    console.log("Iam called Bro");
+    //console.log("Iam called Bro");
     try {
       const response = await this.api.GetMaster("client" + "#lookup", sk);
 
       if (response && response.options) {
         if (typeof response.options === 'string') {
           let data = JSON.parse(response.options);
-          console.log("d1 =", data);
+          //console.log("d1 =", data);
 
           if (Array.isArray(data)) {
             for (let index = 0; index < data.length; index++) {
@@ -8477,14 +8573,14 @@ refreshFunction(){
                 const key = Object.keys(element)[0];
                 const { P1, P2, P3, P4, P5, P6, P7, P8, P9,P10,P11 } = element[key];
                 this.lookup_data_client.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9,P10,P11});
-                console.log("d2 =", this.lookup_data_client);
+                //console.log("d2 =", this.lookup_data_client);
               } else {
                 break;
               }
             }
 
             // this.lookup_data_client.sort((a: any, b: any) => b.P5 - a.P5);
-            // console.log("Lookup sorting", this.lookup_data_client);
+            // //console.log("Lookup sorting", this.lookup_data_client);
 
             // Continue fetching recursively with fetchTMClientLookup itself
             await this.fetchTMClientLookup(sk + 1);
@@ -8495,7 +8591,7 @@ refreshFunction(){
           console.error('response.options is not a string.');
         }
       } else {
-        console.log("Lookup to be displayed", this.lookup_data_client);
+        //console.log("Lookup to be displayed", this.lookup_data_client);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -8504,7 +8600,7 @@ refreshFunction(){
 
 
   remove(index: any) {
-    console.log('remove', index);
+    //console.log('remove', index);
     const addFields = this.createSummaryField.get('metadata') as UntypedFormArray
     addFields.removeAt(index);
   }
@@ -8536,7 +8632,7 @@ refreshFunction(){
     const keyLocation = location_permission.length === 1 && location_permission[0] === "All" ? "All" : "Not all";
     const keyDevices = form_permissions.length === 1 && form_permissions[0] === "All" ? "All" : "Not all";
 
-    console.log("modify", `${keyLocation}--${keyDevices}`);
+    //console.log("modify", `${keyLocation}--${keyDevices}`);
 
     // Concatenate data based on the keys
     switch (`${keyLocation}-${keyDevices}`) {
@@ -8545,7 +8641,7 @@ refreshFunction(){
         return "All-All";
 
       default:
-        console.log("Unrecognized case");
+        //console.log("Unrecognized case");
         return '';
     }
   }
@@ -8556,22 +8652,22 @@ refreshFunction(){
       const result: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#lookup", 1);
       if (result) {
         const helpherObj = JSON.parse(result.options);
-        console.log('helpherObj checking',helpherObj)
+        //console.log('helpherObj checking',helpherObj)
         this.formList = helpherObj.map((item: [string]) => item[0]); // Explicitly define the type
         this.listofDeviceIds = this.formList.map((form: string) => ({ text: form, value: form })); // Explicitly define the type here too
-        console.log('this.formList check from location', this.formList);
+        //console.log('this.formList check from location', this.formList);
       }
     } catch (err) {
-      console.log("Error fetching the dynamic form data", err);
+      //console.log("Error fetching the dynamic form data", err);
     }
 
     this.userdetails = this.getLoggedUser.username;
     this.userClient = this.userdetails + "#user" + "#main"
-    console.log('this.tempClient from form service check', this.userClient)
+    //console.log('this.tempClient from form service check', this.userClient)
     this.All_button_permissions = await this.api.GetMaster(this.userClient, 1).then(data => {
 
       if (data) {
-        console.log('data checking from add form', data)
+        //console.log('data checking from add form', data)
         const metadataString: string | null | undefined = data.metadata;
 
         // Check if metadataString is a valid string before parsing
@@ -8579,28 +8675,28 @@ refreshFunction(){
           try {
             // Parse the JSON string into a JavaScript object
             this.metadataObject = JSON.parse(metadataString);
-            console.log('Parsed Metadata Object from location', this.metadataObject);
+            //console.log('Parsed Metadata Object from location', this.metadataObject);
           } catch (error) {
             console.error('Error parsing JSON:', error);
           }
         } else {
-          console.log('Metadata is not a valid string:', this.metadataObject);
+          //console.log('Metadata is not a valid string:', this.metadataObject);
         }
-        // console.log("userPermissions iside",this.modifyList(data.location_permission,data.device_type_permission,data.device_permission))
+        // //console.log("userPermissions iside",this.modifyList(data.location_permission,data.device_type_permission,data.device_permission))
         return this.modifyList(this.metadataObject.location_permission, this.metadataObject.form_permission) === "All-All" ? false : true
 
       }
 
     })
 
-    console.log("this.All_button_permissions", this.All_button_permissions)
+    //console.log("this.All_button_permissions", this.All_button_permissions)
     this.locationPermissionService.fetchGlobalLocationTree()
       .then((jsonModified: any) => {
         if (!jsonModified) {
           throw new Error("No data returned");
         }
 
-        console.log("Data from location: check", jsonModified);
+        //console.log("Data from location: check", jsonModified);
         this.temp = jsonModified
         const jstreeData = jsonModified.map((treeNode: TreeNode) => ({
           id: treeNode.id, // Use 'id' for jstree node ID
@@ -8650,7 +8746,7 @@ refreshFunction(){
       "plugins": ["contextmenu", "dnd", "search"],
       "contextmenu": {
         "items": function ($node: any) {
-          //console.log('selected node', $node.selected);
+          ////console.log('selected node', $node.selected);
 
           let tree = (<any>$("#SimpleJSTree")).jstree(true);
           return {
@@ -8710,17 +8806,17 @@ refreshFunction(){
       .on("changed.jstree", (e: any, data: any) => {
         // let node, selected_node = [];
         if (data && data.node && data.node.text) {
-          console.log('data checking from tree', data)
-          //console.log('data in tree', data);
+          //console.log('data checking from tree', data)
+          ////console.log('data in tree', data);
 
           this.parentID_selected_node = data.node.parent
           // for (node = 0, selected_node = data.selected.length; node < selected_node; node++) {
 
           // }
           this.final_list = data.instance.get_node(data.selected);
-          console.log('this.final_list check', this.final_list)
+          //console.log('this.final_list check', this.final_list)
 
-          //console.log('CHK THE NODE', this.final_list);
+          ////console.log('CHK THE NODE', this.final_list);
 
           // if (this.final_list.original && this.final_list.original.powerboard_view && this.final_list.original.powerboard_view !== undefined && this.final_list.original.powerboard_view.id
           //   && this.final_list.original.powerboard_view.id !== null && this.final_list.original.powerboard_view.id !== "" && this.final_list.original.powerboard_view.id !== undefined) {
@@ -8761,14 +8857,14 @@ refreshFunction(){
 
   LocationSummary() {
     let navId: any
-    //console.log('CHECK THIS LOCATION THING ', this.final_list)
+    ////console.log('CHECK THIS LOCATION THING ', this.final_list)
     if (this.final_list.original.node_type == "location") {
       navId = this.final_list.original.summaryView;
     } else {
       navId = this.final_list.original.powerboard_view_device.id;
     }
 
-    console.log('navId check from summary', navId)
+    //console.log('navId check from summary', navId)
     let navIdList = { id: navId }
     if (navId !== '') {
 
@@ -8788,7 +8884,7 @@ refreshFunction(){
   }
 
   fetchDynamicFormData(value: any) {
-    console.log("Data from lookup:", value);
+    //console.log("Data from lookup:", value);
 
     this.api
       .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
@@ -8820,25 +8916,25 @@ refreshFunction(){
             });
           }
 
-          console.log('Transformed dynamic parameters:', this.listofDynamicParam);
+          //console.log('Transformed dynamic parameters:', this.listofDynamicParam);
 
           // Trigger change detection to update the view
           this.cdr.detectChanges();
         }
       })
       .catch((err) => {
-        console.log("Can't fetch", err);
+        //console.log("Can't fetch", err);
       });
   }
 
 
   parameterValue(event:any){
-    console.log('event for parameter check',event)
+    //console.log('event for parameter check',event)
 
   }
 
   editItem(item: any) {
-    console.log('Editing item:', item);
+    //console.log('Editing item:', item);
 
     // Open edit modal or perform the edit action here
     // Example: this.openEditModal(item);
@@ -8848,11 +8944,11 @@ refreshFunction(){
     const modalRef = this.modalService.open(this.calendarModal);
     modalRef.result.then(
       (result) => {
-        console.log('Closed with:', result);
+        //console.log('Closed with:', result);
         this.handleModalClose(result); // Handle logic when modal closes
       },
       (reason) => {
-        console.log('Dismissed with:', reason);
+        //console.log('Dismissed with:', reason);
       }
     );
   }
@@ -8860,17 +8956,17 @@ refreshFunction(){
     const modalRef = this.modalService.open(this.calendarModal1);
     modalRef.result.then(
       (result) => {
-        console.log('Closed with:', result);
+        //console.log('Closed with:', result);
         this.handleModalClose(result); // Handle logic when modal closes
       },
       (reason) => {
-        console.log('Dismissed with:', reason);
+        //console.log('Dismissed with:', reason);
       }
     );
   }
 
   selectValue(value: string, modal: any) {
-    console.log('Selected value:', value);
+    //console.log('Selected value:', value);
 
     // Set the value to the form control
     this.groupByFormatControl.setValue(value);
@@ -8887,7 +8983,7 @@ refreshFunction(){
   }
   handleModalClose(selectedValue: string) {
     // Logic to handle what happens after the modal closes
-    console.log('Handling post modal close logic with value:', selectedValue);
+    //console.log('Handling post modal close logic with value:', selectedValue);
     // You can update your UI or state here based on the selectedValue
   }
 
@@ -8918,11 +9014,11 @@ refreshFunction(){
 
   onValueChange(selectedValue: any): void {
     // Handle any logic here if needed when the value changes
-    console.log(selectedValue); // Optional: log the selected value
+    //console.log(selectedValue); // Optional: log the selected value
   }
   onRangeSelect(selectedValue: any): void {
     // Handle any logic here if needed when the value changes
-    console.log('selectedValue checking', selectedValue); // Optional: log the selected value
+    //console.log('selectedValue checking', selectedValue); // Optional: log the selected value
   }
 
 
@@ -8938,28 +9034,28 @@ refreshFunction(){
   }
   onValueChangeMaxRange1(selectedValue: any): void {
     // Handle any logic here if needed when the value changes
-    console.log(selectedValue); // Optional: log the selected value
+    //console.log(selectedValue); // Optional: log the selected value
   }
 
   onValueChange6(selectedValue: any): void {
     // Handle any logic here if needed when the value changes
-    console.log(selectedValue); // Optional: log the selected value
+    //console.log(selectedValue); // Optional: log the selected value
   }
 
 
 
   onValue(value: any) {
     // Logic to handle value change, if needed
-    console.log("Selected Value:", value);
+    //console.log("Selected Value:", value);
   }
   onTarget(value: any) {
     // Logic to handle value change, if needed
-    console.log("Selected Value:", value);
+    //console.log("Selected Value:", value);
   }
 
   onMaxRange1(value: any) {
     // Logic to handle value change, if needed
-    console.log("Selected Value:", value);
+    //console.log("Selected Value:", value);
   }
 
 
@@ -8973,7 +9069,7 @@ refreshFunction(){
  
 
   selectValue6(value: string, modal: any) {
-    console.log('Selected value:', value);
+    //console.log('Selected value:', value);
 
     // Set the value to the form control
     this.groupByFormatControl6.setValue(value);
@@ -8990,11 +9086,11 @@ refreshFunction(){
     const modalRef = this.modalService.open(this.calendarModal2);
     modalRef.result.then(
       (result) => {
-        console.log('Closed with:', result);
+        //console.log('Closed with:', result);
         this.handleModalClose(result); // Handle logic when modal closes
       },
       (reason) => {
-        console.log('Dismissed with:', reason);
+        //console.log('Dismissed with:', reason);
       }
     );
   }
@@ -9003,11 +9099,11 @@ refreshFunction(){
     const modalRef = this.modalService.open(this.calendarModal3);
     modalRef.result.then(
       (result) => {
-        console.log('Closed with:', result);
+        //console.log('Closed with:', result);
         this.handleModalClose(result); // Handle logic when modal closes
       },
       (reason) => {
-        console.log('Dismissed with:', reason);
+        //console.log('Dismissed with:', reason);
       }
     );
   }
@@ -9016,11 +9112,11 @@ refreshFunction(){
     const modalRef = this.modalService.open(this.calendarModal4);
     modalRef.result.then(
       (result) => {
-        console.log('Closed with:', result);
+        //console.log('Closed with:', result);
         this.handleModalClose(result); // Handle logic when modal closes
       },
       (reason) => {
-        console.log('Dismissed with:', reason);
+        //console.log('Dismissed with:', reason);
       }
     );
   }
@@ -9029,11 +9125,11 @@ refreshFunction(){
     const modalRef = this.modalService.open(this.calendarModal5);
     modalRef.result.then(
       (result) => {
-        console.log('Closed with:', result);
+        //console.log('Closed with:', result);
         this.handleModalClose(result); // Handle logic when modal closes
       },
       (reason) => {
-        console.log('Dismissed with:', reason);
+        //console.log('Dismissed with:', reason);
       }
     );
   }
@@ -9041,11 +9137,11 @@ refreshFunction(){
     const modalRef = this.modalService.open(this.calendarModal6);
     modalRef.result.then(
       (result) => {
-        console.log('Closed with:', result);
+        //console.log('Closed with:', result);
         this.handleModalClose(result); // Handle logic when modal closes
       },
       (reason) => {
-        console.log('Dismissed with:', reason);
+        //console.log('Dismissed with:', reason);
       }
     );
   }
@@ -9055,11 +9151,11 @@ refreshFunction(){
 
   updateTile6() {
     if (this.editTileIndex6 !== null) {
-      console.log('this.editTileIndex check', this.editTileIndex6);
-      console.log('Tile checking for update:', this.dashboard[this.editTileIndex6]); // Log the tile being checked
+      //console.log('this.editTileIndex check', this.editTileIndex6);
+      //console.log('Tile checking for update:', this.dashboard[this.editTileIndex6]); // Log the tile being checked
 
       // Log the current details of the tile before update
-      console.log('Current Tile Details Before Update:', this.dashboard[this.editTileIndex6]);
+      //console.log('Current Tile Details Before Update:', this.dashboard[this.editTileIndex6]);
 
       // Update the properties of the tile with the new values from the form
       this.dashboard[this.editTileIndex6] = {
@@ -9080,7 +9176,7 @@ refreshFunction(){
       };
 
       // Log the updated details of the tile
-      console.log('Updated Tile Details:', this.dashboard[this.editTileIndex6]);
+      //console.log('Updated Tile Details:', this.dashboard[this.editTileIndex6]);
 
       // Also update the grid_details array to reflect changes
       this.all_Packet_store.grid_details[this.editTileIndex6] = {
@@ -9090,9 +9186,9 @@ refreshFunction(){
       // this.openModal('Edit_ts', this.all_Packet_store)
 
       this.updateSummary('', 'update_tile');
-      console.log('his.dashboard check from updateTile', this.dashboard)
+      //console.log('his.dashboard check from updateTile', this.dashboard)
 
-      console.log("Updated all_Packet_store.grid_details:", this.all_Packet_store.grid_details);
+      //console.log("Updated all_Packet_store.grid_details:", this.all_Packet_store.grid_details);
 
 
       // Reset the editTileIndex after the update
@@ -9106,7 +9202,7 @@ refreshFunction(){
 
 
   selectValue3(value: string, modal: any) {
-    console.log('Selected value:', value);
+    //console.log('Selected value:', value);
 
     // Set the value to the form control
     this.groupByFormatControl3.setValue(value);
@@ -9137,20 +9233,20 @@ refreshFunction(){
         if (typeof response.options === 'string') {
           try {
             data = JSON.parse(response.options);
-            console.log("Parsed data =", data);
+            //console.log("Parsed data =", data);
 
             // Validate if parsed data is an array
             if (Array.isArray(data)) {
               for (let index = 0; index < data.length; index++) {
                 const element = data[index];
-                console.log("Processing element:", element);
+                //console.log("Processing element:", element);
 
                 this.lookupId = element[0];
-                console.log('Original lookupId:', this.lookupId);
+                //console.log('Original lookupId:', this.lookupId);
 
                 // Split the lookupId to get the numeric part
                 const splitLookupId = this.lookupId.split('#')[1];
-                console.log('Split lookupId (numeric part):', splitLookupId);
+                //console.log('Split lookupId (numeric part):', splitLookupId);
                 this.fetchLiveContractMain(1, splitLookupId)
 
                 // You can now use splitLookupId as needed
@@ -9168,7 +9264,7 @@ refreshFunction(){
           console.error('response.options is not a string.');
         }
       } else {
-        console.log('No more options to fetch or invalid response. Stopping recursion.');
+        //console.log('No more options to fetch or invalid response. Stopping recursion.');
         // Stop recursion if response.options is not available
       }
     } catch (error) {
@@ -9190,16 +9286,16 @@ refreshFunction(){
         if (typeof response.options === 'string') {
           try {
             data = JSON.parse(response.options);
-            console.log("Parsed data contract order master", data);
+            //console.log("Parsed data contract order master", data);
 
             // Validate if parsed data is an array
             if (Array.isArray(data)) {
               for (let index = 0; index < data.length; index++) {
                 const element = data[index];
-                console.log("Processing element:", element);
+                //console.log("Processing element:", element);
                 this.contractLookupId = element[0]
                 const splitContractLookupId = this.contractLookupId.split('#')[1];
-                console.log('Split lookupId (numeric part):', splitContractLookupId);
+                //console.log('Split lookupId (numeric part):', splitContractLookupId);
                 this.fetchContractOrderMasterMain(1, splitContractLookupId)
 
                 // Process the element as needed
@@ -9217,7 +9313,7 @@ refreshFunction(){
           console.error('response.options is not a string.');
         }
       } else {
-        console.log('No more options to fetch or invalid response. Stopping recursion.');
+        //console.log('No more options to fetch or invalid response. Stopping recursion.');
         // Stop recursion if response.options is not available
       }
     } catch (error) {
@@ -9232,11 +9328,11 @@ refreshFunction(){
       const result: any = await this.api.GetMaster(this.SK_clientID + "#Live Contract#" + splitLookupId + "#main", 1);
       if (result) {
         const helpherObj = JSON.parse(result.metadata);
-        console.log('helpherObj checking ', helpherObj)
+        //console.log('helpherObj checking ', helpherObj)
 
       }
     } catch (err) {
-      console.log("Error fetching the dynamic form data", err);
+      //console.log("Error fetching the dynamic form data", err);
     }
   }
 
@@ -9245,17 +9341,17 @@ refreshFunction(){
       const result: any = await this.api.GetMaster(this.SK_clientID + "#Contract Order Master#" + splitContractLookupId + "#main", 1);
       if (result) {
         const helpherObj = JSON.parse(result.metadata);
-        console.log('helpherObj checking contract order ', helpherObj)
+        //console.log('helpherObj checking contract order ', helpherObj)
 
       }
     } catch (err) {
-      console.log("Error fetching the dynamic form data", err);
+      //console.log("Error fetching the dynamic form data", err);
     }
   }
 
   modeMessage: string = 'View Mode'; 
   toggleMode(): void {
-    console.log('Current Mode (Before Toggle):', this.isEditModeView ? 'Edit Mode' : 'View Mode');
+    //console.log('Current Mode (Before Toggle):', this.isEditModeView ? 'Edit Mode' : 'View Mode');
   
     // Show spinner while toggling mode
     this.spinner.show();
@@ -9277,7 +9373,7 @@ refreshFunction(){
     this.updateOptions(); 
     this.setCheck(!this.isEditModeView);  // Update grid options based on mode
   
-    console.log('Current Mode (After Toggle):', this.isEditModeView );
+    //console.log('Current Mode (After Toggle):', this.isEditModeView );
   
     // Store the mode in localStorage
     localStorage.setItem('editModeState', this.isEditModeView.toString());
@@ -9288,7 +9384,7 @@ refreshFunction(){
   }
 
   get gridsterStyles() {
-    // console.log('this.check i am checking',this.check)
+    // //console.log('this.check i am checking',this.check)
     // Check the value of `check` and update the background color accordingly
     const backgroundColor = this.check ? '#333333' : '#FFFFFF';  // Gray if check is true, White if false
     
@@ -9306,7 +9402,7 @@ refreshFunction(){
     } else {
       this.check = this.isEditModeView ? true : false;  // Fallback to the state of `isEditModeView`
     }
-    console.log('Checking icon view:', this.check);
+    //console.log('Checking icon view:', this.check);
   }
   
   
@@ -9317,7 +9413,7 @@ refreshFunction(){
 
   applyTheme() {
     const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    console.log('isDarkMode',isDarkMode)
+    //console.log('isDarkMode',isDarkMode)
     const root = document.documentElement;
 
     if (isDarkMode) {
@@ -9537,7 +9633,7 @@ refreshFunction(){
 
   }
   helperInfo(event: any, templateref: any) {
-    console.log('event checking', event);
+    //console.log('event checking', event);
     this.modalService.open(templateref, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
       keyboard: false  });
   
@@ -9548,7 +9644,7 @@ refreshFunction(){
   }
   
   helperminiTableData(helperminiTableData:any){
-    console.log('event checking mini table',helperminiTableData)
+    //console.log('event checking mini table',helperminiTableData)
 
     this.miniTableData = helperminiTableData
     
@@ -9563,7 +9659,7 @@ refreshFunction(){
 
   miniTableDataReceive(receiveData:any){
 
-      console.log('this.miniTableData checking mini table',this.minitableDataTile1)
+      //console.log('this.miniTableData checking mini table',this.minitableDataTile1)
       
 
 
@@ -9571,7 +9667,7 @@ refreshFunction(){
 
   miniTableDataReceiveChart1(receiveData:any){
 
-    console.log('this.miniTableData checking mini table',this.minitableDataChart1)
+    //console.log('this.miniTableData checking mini table',this.minitableDataChart1)
     
 
 
@@ -9584,35 +9680,35 @@ refreshFunction(){
   helperChartClick(event:any,modalChart:any){
   
  
-    console.log('event checking:', event);
-    console.log('modalChart reference:', modalChart);
-    console.log('this.chartDataConfigExport check from chart3', this.chartDataConfigExport);
+    //console.log('event checking:', event);
+    //console.log('modalChart reference:', modalChart);
+    //console.log('this.chartDataConfigExport check from chart3', this.chartDataConfigExport);
   
   
     // ✅ Step 1: Check if modal opening is manually stopped
     if (this.preventModalOpening) {
-        console.log("🚫 Modal opening is manually disabled. Not opening modal.");
+        //console.log("🚫 Modal opening is manually disabled. Not opening modal.");
         return;
     }
   
     // ✅ Step 2: Ensure this.chartDataConfigExport exists and is an object
     if (!this.chartDataConfigExport || typeof this.chartDataConfigExport !== 'object') {
-        console.log("❌ chartDataConfigExport is undefined or not an object, not opening the modal.");
+        //console.log("❌ chartDataConfigExport is undefined or not an object, not opening the modal.");
         return;
     }
   
     // ✅ Step 3: Extract columnVisibility safely
     const columnVisibility = this.chartDataConfigExport.columnVisibility;
-    console.log('columnVisibility checking',columnVisibility)
+    //console.log('columnVisibility checking',columnVisibility)
     const columnVisibilityRead = columnVisibility
-    console.log('columnVisibilityRead checki',columnVisibilityRead)
+    //console.log('columnVisibilityRead checki',columnVisibilityRead)
   
     // ✅ Step 4: Ensure columnVisibility exists and has values
     if (!Array.isArray(columnVisibilityRead) || columnVisibilityRead.length === 0) {
-        console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
+        //console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
         return;
     }else if(this.isEditModeView == true){
-      console.log('this.isEditModeView checking chart3', this.isEditModeView);
+      //console.log('this.isEditModeView checking chart3', this.isEditModeView);
       setTimeout(() => {
         this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
           keyboard: false  });
@@ -9620,7 +9716,7 @@ refreshFunction(){
    
     }
   
-    console.log("✅ columnVisibility has data, opening modal...");
+    //console.log("✅ columnVisibility has data, opening modal...");
   
     // ✅ Step 5: Try to open the modal
     try {
@@ -9635,35 +9731,35 @@ refreshFunction(){
   helperStackedChartClick(event:any,modalChart:any){
   
  
-    console.log('event checking:', event);
-    console.log('modalChart reference:', modalChart);
-    console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
+    //console.log('event checking:', event);
+    //console.log('modalChart reference:', modalChart);
+    //console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
   
   
     // ✅ Step 1: Check if modal opening is manually stopped
     if (this.preventModalOpening) {
-        console.log("🚫 Modal opening is manually disabled. Not opening modal.");
+        //console.log("🚫 Modal opening is manually disabled. Not opening modal.");
         return;
     }
   
     // ✅ Step 2: Ensure this.chartDataConfigExport exists and is an object
     if (!this.chartDataConfigExport || typeof this.chartDataConfigExport !== 'object') {
-        console.log("❌ chartDataConfigExport is undefined or not an object, not opening the modal.");
+        //console.log("❌ chartDataConfigExport is undefined or not an object, not opening the modal.");
         return;
     }
   
     // ✅ Step 3: Extract columnVisibility safely
     const columnVisibility = this.chartDataConfigExport.columnVisibility;
-    console.log('columnVisibility checking',columnVisibility)
+    //console.log('columnVisibility checking',columnVisibility)
     const columnVisibilityRead = columnVisibility
-    console.log('columnVisibilityRead checki',columnVisibilityRead)
+    //console.log('columnVisibilityRead checki',columnVisibilityRead)
   
     // ✅ Step 4: Ensure columnVisibility exists and has values
     if (!Array.isArray(columnVisibilityRead) || columnVisibilityRead.length === 0) {
-        console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
+        //console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
         return;
     }else if(this.isEditModeView == true){
-      console.log('this.isEditModeView checking chart3', this.isEditModeView);
+      //console.log('this.isEditModeView checking chart3', this.isEditModeView);
       setTimeout(() => {
         this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
           keyboard: false  });
@@ -9671,7 +9767,7 @@ refreshFunction(){
    
     }
   
-    console.log("✅ columnVisibility has data, opening modal...");
+    //console.log("✅ columnVisibility has data, opening modal...");
   
     // ✅ Step 5: Try to open the modal
     try {
@@ -9685,58 +9781,58 @@ refreshFunction(){
 
 // Function to capture the emitted chart data
 emitchartDatatable(configChartTable: any) {
-    console.log('configChartTable', configChartTable);
+    //console.log('configChartTable', configChartTable);
     this.chartDataConfigExport = configChartTable;
 }
 
 // Function to open the modal if columnVisibility is not empty
 helperChartClickChart1(event: any, modalChart: any) {
-  console.log('this.assignGridMode from chartDrill', this.assignGridMode);
-  console.log('this.isEditModeView checking chart1', this.isEditModeView);
-  console.log('event checking:', event);
-  console.log('modalChart reference:', modalChart);
-  console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
+  //console.log('this.assignGridMode from chartDrill', this.assignGridMode);
+  //console.log('this.isEditModeView checking chart1', this.isEditModeView);
+  //console.log('event checking:', event);
+  //console.log('modalChart reference:', modalChart);
+  //console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
 
   // ✅ Step 1: Check if modal opening is manually stopped
   if (this.preventModalOpening) {
-    console.log("🚫 Modal opening is manually disabled. Not opening modal.");
+    //console.log("🚫 Modal opening is manually disabled. Not opening modal.");
     return;
   }
 
   // ✅ Step 2: Ensure chartDataConfigExport exists and is an object
   if (!this.chartDataConfigExport || typeof this.chartDataConfigExport !== 'object') {
-    console.log("❌ chartDataConfigExport is undefined or not an object, not opening the modal.");
+    //console.log("❌ chartDataConfigExport is undefined or not an object, not opening the modal.");
     return;
   }
 
   // ✅ Step 3: Extract columnVisibility safely
   const columnVisibility = this.chartDataConfigExport.columnVisibility;
-  console.log('columnVisibility checking', columnVisibility);
+  //console.log('columnVisibility checking', columnVisibility);
   
   if (!Array.isArray(columnVisibility) || columnVisibility.length === 0) {
-    console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
+    //console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
     return;
   }
 
   const columnVisibilityRead = columnVisibility[0]?.columnVisibility;
-  console.log('columnVisibilityRead check:', columnVisibilityRead);
+  //console.log('columnVisibilityRead check:', columnVisibilityRead);
 
   if (!Array.isArray(columnVisibilityRead) || columnVisibilityRead.length === 0) {
-    console.log("❌ columnVisibilityRead is empty or not an array, modal will NOT open.");
+    //console.log("❌ columnVisibilityRead is empty or not an array, modal will NOT open.");
     return;
   }
 
   // ✅ Step 4: Ensure modalChart is not undefined before opening modal
   if (!modalChart) {
-    console.log("❌ Modal reference is undefined, cannot open modal.");
+    //console.log("❌ Modal reference is undefined, cannot open modal.");
     return;
   }
 
   if (this.isEditModeView === true) {
 
-    console.log('this.assignGridMode checking',this.assignGridMode)
-    console.log('this.isEditModeView checking',this.isEditModeView)
-    console.log("✅ columnVisibility has data, opening modal...");
+    //console.log('this.assignGridMode checking',this.assignGridMode)
+    //console.log('this.isEditModeView checking',this.isEditModeView)
+    //console.log("✅ columnVisibility has data, opening modal...");
     setTimeout(() => {
       this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
@@ -9752,52 +9848,52 @@ helperChartClickChart1(event: any, modalChart: any) {
 
 
 helperChartClickFunnel(event: any, modalChart: any) {
-  console.log('this.assignGridMode from chartDrill', this.assignGridMode);
-  console.log('this.isEditModeView checking chart1', this.isEditModeView);
-  console.log('event checking:', event);
-  console.log('modalChart reference:', modalChart);
-  console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
+  //console.log('this.assignGridMode from chartDrill', this.assignGridMode);
+  //console.log('this.isEditModeView checking chart1', this.isEditModeView);
+  //console.log('event checking:', event);
+  //console.log('modalChart reference:', modalChart);
+  //console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
 
   // ✅ Step 1: Check if modal opening is manually stopped
   if (this.preventModalOpening) {
-    console.log("🚫 Modal opening is manually disabled. Not opening modal.");
+    //console.log("🚫 Modal opening is manually disabled. Not opening modal.");
     return;
   }
 
   // ✅ Step 2: Ensure chartDataConfigExport exists and is an object
   if (!this.chartDataConfigExport || typeof this.chartDataConfigExport !== 'object') {
-    console.log("❌ chartDataConfigExport is undefined or not an object, not opening the modal.");
+    //console.log("❌ chartDataConfigExport is undefined or not an object, not opening the modal.");
     return;
   }
 
   // ✅ Step 3: Extract columnVisibility safely
   const columnVisibility = this.chartDataConfigExport.columnVisibility;
-  console.log('columnVisibility checking', columnVisibility);
+  //console.log('columnVisibility checking', columnVisibility);
   
   if (!Array.isArray(columnVisibility) || columnVisibility.length === 0) {
-    console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
+    //console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
     return;
   }
 
   const columnVisibilityRead = columnVisibility[0]?.columnVisibility;
-  console.log('columnVisibilityRead check:', columnVisibilityRead);
+  //console.log('columnVisibilityRead check:', columnVisibilityRead);
 
   if (!Array.isArray(columnVisibilityRead) || columnVisibilityRead.length === 0) {
-    console.log("❌ columnVisibilityRead is empty or not an array, modal will NOT open.");
+    //console.log("❌ columnVisibilityRead is empty or not an array, modal will NOT open.");
     return;
   }
 
   // ✅ Step 4: Ensure modalChart is not undefined before opening modal
   if (!modalChart) {
-    console.log("❌ Modal reference is undefined, cannot open modal.");
+    //console.log("❌ Modal reference is undefined, cannot open modal.");
     return;
   }
 
   if (this.isEditModeView === true) {
 
-    console.log('this.assignGridMode checking',this.assignGridMode)
-    console.log('this.isEditModeView checking',this.isEditModeView)
-    console.log("✅ columnVisibility has data, opening modal...");
+    //console.log('this.assignGridMode checking',this.assignGridMode)
+    //console.log('this.isEditModeView checking',this.isEditModeView)
+    //console.log("✅ columnVisibility has data, opening modal...");
     setTimeout(() => {
       this.modalService.open(modalChart, {  modalDialogClass:'p-9',  centered: true ,  fullscreen: true,   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false  });
@@ -9814,31 +9910,31 @@ helperChartClickFunnel(event: any, modalChart: any) {
 
 
   helperChartClickChart2(event:any,modalChart:any){
-    console.log('event checking:', event);
-    console.log('modalChart reference:', modalChart);
-    console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
+    //console.log('event checking:', event);
+    //console.log('modalChart reference:', modalChart);
+    //console.log('this.chartDataConfigExport check:', this.chartDataConfigExport);
   
     // ✅ Step 1: Check if modal opening is manually stopped
     if (this.preventModalOpening) {
-        console.log("🚫 Modal opening is manually disabled. Not opening modal.");
+        //console.log("🚫 Modal opening is manually disabled. Not opening modal.");
         return;
     }
   
     // ✅ Step 2: Ensure this.chartDataConfigExport exists and is an object
     if (!this.chartDataConfigExport || typeof this.chartDataConfigExport !== 'object') {
-        console.log("❌ chartDataConfigExport is undefined or not an object, not opening the modal.");
+        //console.log("❌ chartDataConfigExport is undefined or not an object, not opening the modal.");
         return;
     }
   
     // ✅ Step 3: Extract columnVisibility safely
     const columnVisibility = this.chartDataConfigExport.columnVisibility;
-    console.log('columnVisibility checking',columnVisibility)
+    //console.log('columnVisibility checking',columnVisibility)
     const columnVisibilityRead = columnVisibility[0].columnVisibility
-    console.log('columnVisibilityRead checki',columnVisibilityRead)
+    //console.log('columnVisibilityRead checki',columnVisibilityRead)
   
     // ✅ Step 4: Ensure columnVisibility exists and has values
     if (!Array.isArray(columnVisibilityRead) || columnVisibilityRead.length === 0) {
-        console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
+        //console.log("❌ columnVisibility is empty or not an array, modal will NOT open.");
         return;
     }else if(this.isEditModeView == true){
       setTimeout(() => {
@@ -9848,7 +9944,7 @@ helperChartClickFunnel(event: any, modalChart: any) {
 
     }
   
-    console.log("✅ columnVisibility has data, opening modal...");
+    //console.log("✅ columnVisibility has data, opening modal...");
   
     // ✅ Step 5: Try to open the modal
     try {
@@ -9858,9 +9954,9 @@ helperChartClickFunnel(event: any, modalChart: any) {
     }
   }
   helperRow(rowDynamic:any){
-    console.log('rowDynamic checking',rowDynamic)
+    //console.log('rowDynamic checking',rowDynamic)
     this.sendRowDynamic = rowDynamic
-    console.log('this.sendRowDynamic',this.sendRowDynamic)
+    //console.log('this.sendRowDynamic',this.sendRowDynamic)
 
   }
 
@@ -9868,7 +9964,7 @@ helperChartClickFunnel(event: any, modalChart: any) {
     try {
         this.userdetails = this.getLoggedUser.username;
         this.userClient = `${this.userdetails}#user#main`;
-        console.log("this.tempClient from form service check", this.userClient);
+        //console.log("this.tempClient from form service check", this.userClient);
 
         // Fetch user permissions
         const permission = await this.api.GetMaster(this.userClient, sk);
@@ -9878,7 +9974,7 @@ helperChartClickFunnel(event: any, modalChart: any) {
             return null; // Fix: Returning null instead of undefined
         }
 
-        console.log("Data checking from add form", permission);
+        //console.log("Data checking from add form", permission);
 
         // Parse metadata
         const metadataString: string | null | undefined = permission.metadata;
@@ -9886,21 +9982,21 @@ helperChartClickFunnel(event: any, modalChart: any) {
             console.error("Invalid metadata format:", metadataString);
             return null; // Fix: Ensuring the function returns a value
         }
-        console.log('metadataString checking for',metadataString)
+        //console.log('metadataString checking for',metadataString)
 
         try {
             this.permissionsMetaData = JSON.parse(metadataString);
-            console.log("Parsed Metadata Object from location", this.permissionsMetaData);
+            //console.log("Parsed Metadata Object from location", this.permissionsMetaData);
 
             const permissionId = this.permissionsMetaData.permission_ID;
-            console.log("this.permissionIdRequest check from function", permissionId);
+            //console.log("this.permissionIdRequest check from function", permissionId);
             this.permissionIdRequest = permissionId;
 
             // **Fix: Ensure fetchPermissionIdMain is awaited**
             const readFilterEquationawait = await this.fetchPermissionIdMain(1, permissionId);
 
             if (permissionId !== "All") {
-                console.log("Stored permission ID:", permissionId);
+                //console.log("Stored permission ID:", permissionId);
                 this.loadData();
             
 
@@ -9910,11 +10006,11 @@ helperChartClickFunnel(event: any, modalChart: any) {
 
                 this.isEditModeView = true
                 this.updateOptions()
-                console.log("this.userPermission checking", this.userPermission);
+                //console.log("this.userPermission checking", this.userPermission);
                 this.summaryDashboardUpdate = true;
                 this.loadData();
                 this.spinner.hide('mainLoading')
-                console.log("Permission ID is 'All', skipping action.");
+                //console.log("Permission ID is 'All', skipping action.");
             }
 
             // ✅ Fix: Always returning a valid object
@@ -10073,7 +10169,7 @@ helperChartClickFunnel(event: any, modalChart: any) {
     }, 100);
   }
   liveFilterConditions(eventFilterCon:any){
-    console.log('eventFilterCon check',eventFilterCon)
+    //console.log('eventFilterCon check',eventFilterCon)
     this.eventFilterConditions = eventFilterCon
 
 
@@ -10083,7 +10179,7 @@ helperChartClickFunnel(event: any, modalChart: any) {
   }
 
   mainFilterConditions(receiveMainFilter:any){
-    console.log('receiveMainFilter checking',receiveMainFilter)
+    //console.log('receiveMainFilter checking',receiveMainFilter)
     this.mainFilterCon = receiveMainFilter
 
   }
@@ -10098,7 +10194,7 @@ helperChartClickFunnel(event: any, modalChart: any) {
   //   this.isLoading = true;
   //   this.spinner.show('FormView');
     
-  //   console.log('readData from parent:', readData);
+  //   //console.log('readData from parent:', readData);
   
   //   if (!readData?.data) {
   //     console.error('Invalid readData object:', readData);
@@ -10108,7 +10204,7 @@ helperChartClickFunnel(event: any, modalChart: any) {
   //   }
   
   //   let formId = readData.data.PK ? readData.data.PK.split("#")[1] || "" : "";
-  //   console.log('formId checking from dataTableCell', formId);
+  //   //console.log('formId checking from dataTableCell', formId);
   
   //   // Wait for the blobUrl to be generated and accessible
   //   try {
@@ -10119,23 +10215,23 @@ helperChartClickFunnel(event: any, modalChart: any) {
   //     this.spinner.hide('FormView');
   //     return;
   //   }
-  //   console.log('this.blobUrl checking from summary', this.blobUrl);
+  //   //console.log('this.blobUrl checking from summary', this.blobUrl);
   
   //   let SK = readData.data.SK;
   
   //   window.pk = `${this.SK_clientID}#${formId}#main`;
   //   window.sk = typeof SK === 'number' ? SK : Number(SK);
   
-  //   console.log('✅ Stored PK in window:', window.pk);
-  //   console.log('✅ Stored SK in window:', window.sk);
+  //   //console.log('✅ Stored PK in window:', window.pk);
+  //   //console.log('✅ Stored SK in window:', window.sk);
   
   //   // Update iframe src to blobUrl after generating it
   //   const iframe: any = document.querySelector("iframe");
-  //   console.log('iframe checking from summaryEngine',iframe)
+  //   //console.log('iframe checking from summaryEngine',iframe)
   
   //   if (iframe) {
   //     iframe.src = this.blobUrl;  // Ensure iframe source is updated with blobUrl
-  //     console.log("✅ Iframe src updated:", iframe.src);
+  //     //console.log("✅ Iframe src updated:", iframe.src);
   //   } else {
   //     console.warn("⚠️ Iframe not found for updating src.");
   //   }
@@ -10147,7 +10243,7 @@ helperChartClickFunnel(event: any, modalChart: any) {
   //     // Check if iframe is ready and blobUrl is available
   //     if (iframe && iframe.contentWindow && this.blobUrl) {
   //       clearInterval(iframeCheckInterval); // Stop checking once iframe is found and contentWindow is accessible
-  //       console.log('✅ iframe.contentWindow is available');
+  //       //console.log('✅ iframe.contentWindow is available');
   
   //       // Post the message to iframe if contentWindow is available
   //       iframe.contentWindow?.postMessage({
@@ -10158,7 +10254,7 @@ helperChartClickFunnel(event: any, modalChart: any) {
   //         blobUrl: this.blobUrl  // Include the blobUrl in the message
   //       }, "*");  // '*' means the message can be received from any origin. You can replace '*' with the specific iframe origin if needed.
         
-  //       console.log("✅ Sent PK, SK & blobUrl to iframe via postMessage");
+  //       //console.log("✅ Sent PK, SK & blobUrl to iframe via postMessage");
   
   //     } else {
   //       console.warn("⚠️ iframe.contentWindow or blobUrl not available, retrying...");
@@ -10189,7 +10285,7 @@ helperChartClickFunnel(event: any, modalChart: any) {
   // }
   
   
-  SECRET_KEY = 'mobile-encrypt-params-123';
+
   async readdataTableCellInfo(readData: any, modalref?: any) {
     await new Promise<void>((resolve) => {
       this.route.queryParams.subscribe((params) => {
@@ -10221,7 +10317,7 @@ helperChartClickFunnel(event: any, modalChart: any) {
       (encryptedPass ? `&pass=${encryptedPass}` : '');
   
     const targetUrl = `/view-dreamboard/Forms/${formName}&${queryString}`;
-    console.log('Final Target URL:', targetUrl);
+    //console.log('Final Target URL:', targetUrl);
   
     if (this.userId && this.userPass) {
       this.iframeSafeUrl = targetUrl;
@@ -10254,7 +10350,7 @@ helperChartClickFunnel(event: any, modalChart: any) {
 
 
 receiveminiTableIcon(checkevent:any,modalref: any){
-  console.log('checkevent checking',checkevent)
+  //console.log('checkevent checking',checkevent)
   this.isLoading = true;
 
   this.spinner.show('FormView')
@@ -10273,7 +10369,7 @@ receiveminiTableIcon(checkevent:any,modalref: any){
 }
 
 receiveminiTableChart1(checkevent:any,modalref: any){
-  console.log('checkevent checking',checkevent)
+  //console.log('checkevent checking',checkevent)
   this.isLoading = true;
 
   this.spinner.show('FormView')
@@ -10295,7 +10391,7 @@ receiveminiTableChart1(checkevent:any,modalref: any){
 
 
 receiveminiTableChart3(checkevent:any,modalref: any){
-  console.log('checkevent checking',checkevent)
+  //console.log('checkevent checking',checkevent)
   this.isLoading = true;
 
   this.spinner.show('FormView')
@@ -10315,7 +10411,7 @@ receiveminiTableChart3(checkevent:any,modalref: any){
 
 
 receiveminiTableStackedChart(checkevent:any,modalref: any){
-  console.log('checkevent checking',checkevent)
+  //console.log('checkevent checking',checkevent)
   this.isLoading = true;
 
   this.spinner.show('FormView')
@@ -10334,7 +10430,7 @@ receiveminiTableStackedChart(checkevent:any,modalref: any){
 }
 
 receiveminiTableFunnelChart(checkevent:any,modalref: any){
-  console.log('checkevent checking',checkevent)
+  //console.log('checkevent checking',checkevent)
   this.isLoading = true;
 
   this.spinner.show('FormView')
@@ -10355,7 +10451,7 @@ receiveminiTableFunnelChart(checkevent:any,modalref: any){
 
   
   fetchFormBuilderData(receiveValue:any){
-    console.log('receiveValue checking',receiveValue)
+    //console.log('receiveValue checking',receiveValue)
 
     this.api
     .GetMaster(`${this.SK_clientID}#dynamic_form#${receiveValue}#main`, 1)
@@ -10366,21 +10462,21 @@ receiveminiTableFunnelChart(checkevent:any,modalref: any){
 
 
 
-        console.log('Transformed dynamic parameters:', parsedMetadata);
+        //console.log('Transformed dynamic parameters:', parsedMetadata);
 
         // Trigger change detection to update the view
         this.cdr.detectChanges();
       }
     })
     .catch((err) => {
-      console.log("Can't fetch", err);
+      //console.log("Can't fetch", err);
     });
 
   }
   pinnedItems: Map<string, boolean> = new Map(); // Use Map instead of Set
 
   togglePin(item: any): void {
-    console.log('item checking togglePin', item);
+    //console.log('item checking togglePin', item);
   
     const itemId = item.P1; // Using P1 as the unique identifier
     if (!itemId) {
@@ -10416,7 +10512,7 @@ receiveminiTableFunnelChart(checkevent:any,modalref: any){
 
 
   fetchSummaryDashboardConfig(dashboardId: any) {
-    console.log('dashboardId received', dashboardId);
+    //console.log('dashboardId received', dashboardId);
   
     this.api
       .GetMaster(`${this.SK_clientID}#${dashboardId}#summary#main`, 1)
@@ -10424,23 +10520,23 @@ receiveminiTableFunnelChart(checkevent:any,modalref: any){
         if (result && result.metadata) {
           const parsedMetadata = JSON.parse(result.metadata);
           this.summaryDashboardData = parsedMetadata;
-          console.log('summary dashboard Data', this.summaryDashboardData);
+          //console.log('summary dashboard Data', this.summaryDashboardData);
   
   
   
           // Export the data as a .json file
           this.exportToJson(this.summaryDashboardData,dashboardId);
         } else {
-          console.log('No data found');
+          //console.log('No data found');
         }
       })
       .catch((err) => {
-        console.log("Can't fetch", err);
+        //console.log("Can't fetch", err);
       });
   }
   
   exportToJson(data: any,receiveId:any) {
-    console.log('exporting data checking',data)
+    //console.log('exporting data checking',data)
     const jsonData = JSON.stringify(data, null, 4);  // Convert data to JSON with pretty formatting
   
     const blob = new Blob([jsonData], { type: 'application/json;charset=utf-8;' });  // Ensure UTF-8 encoding for the file
@@ -10467,11 +10563,11 @@ receiveminiTableFunnelChart(checkevent:any,modalref: any){
   
   
   onFileSelectedfromSystem(event: any,receiveKey:any): void {
-    console.log('receiveKey checking',receiveKey)
+    //console.log('receiveKey checking',receiveKey)
     const file = event.target.files[0]; // Get the first selected file
 
     if (file) {
-      console.log('File selected:', file);
+      //console.log('File selected:', file);
       // You can process the file here
       // For example, reading the content of the file:
       this.readFileContent(file,receiveKey);
@@ -10488,12 +10584,12 @@ receiveminiTableFunnelChart(checkevent:any,modalref: any){
       try {
         // Parse the file content to get a JavaScript object
         const parsedContent = JSON.parse(fileContent);
-        console.log('Parsed content:', parsedContent);
+        //console.log('Parsed content:', parsedContent);
   
         // Exclude the specified properties: summaryID, summaryName, summaryDesc
         const { summaryID, summaryName, summaryDesc, ...filteredContent } = parsedContent;
   
-        console.log('Filtered content (without summaryID, summaryName, summaryDesc):', filteredContent);
+        //console.log('Filtered content (without summaryID, summaryName, summaryDesc):', filteredContent);
         if(receivedKey=='onUpdateImport'){
           this.updateimporteddashboardData(filteredContent,'importUpdate')
         }else if(receivedKey=='onSaveImport'){
@@ -10509,17 +10605,17 @@ receiveminiTableFunnelChart(checkevent:any,modalref: any){
         // const extractGridDetails = filteredContent.grid_details;
   
         // // Log the grid_details
-        // console.log('Grid Details:', extractGridDetails);
+        // //console.log('Grid Details:', extractGridDetails);
   
         // // You can process the grid details here
         // // For example, you could do something like:
         // if (extractGridDetails && extractGridDetails.length > 0) {
         //   // Handle the grid details if available
         //   extractGridDetails.forEach((gridDetail: any, index: number) => {
-        //     console.log(`Grid Detail ${index + 1}:`, gridDetail);
+        //     //console.log(`Grid Detail ${index + 1}:`, gridDetail);
         //   });
         // } else {
-        //   console.log('No grid details found in the file.');
+        //   //console.log('No grid details found in the file.');
         // }
   
       } catch (error) {
@@ -10534,23 +10630,23 @@ receiveminiTableFunnelChart(checkevent:any,modalref: any){
   updateimporteddashboardData(importData:any,key:any) {
     // if(key=='addPin'){
     //   this.PinCheck =pinValue
-    //   console.log('PinCheck from updateSummary',this.PinCheck)
+    //   //console.log('PinCheck from updateSummary',this.PinCheck)
     // }
-  // console.log('value checking summary',value)
+  // //console.log('value checking summary',value)
   
   
-    console.log('this.getLoggedUser check update', this.getLoggedUser);
+    //console.log('this.getLoggedUser check update', this.getLoggedUser);
   
     // Extract username for later use
     this.extractUserName = this.getLoggedUser.username;
-    console.log('this.extractUserName checking', this.extractUserName);
+    //console.log('this.extractUserName checking', this.extractUserName);
   
-    console.log('all_Packet_store checking', this.all_Packet_store);
+    //console.log('all_Packet_store checking', this.all_Packet_store);
   
     // Construct allCompanyDetails if missing
     if (!this.allCompanyDetails) {
       this.allCompanyDetails = this.constructAllCompanyDetails();
-      console.log('Constructed allCompanyDetails:', this.allCompanyDetails);
+      //console.log('Constructed allCompanyDetails:', this.allCompanyDetails);
     }
   
     // Only populate missing fields to avoid overwriting existing values
@@ -10565,7 +10661,7 @@ receiveminiTableFunnelChart(checkevent:any,modalref: any){
         fullScreenModeCheck:importData.fullScreenModeCheck ||'',
         // DashboardRestriction:importData.DashboardRestriction ||'',
       };
-      console.log('Updated allCompanyDetails with Packet Store:', this.allCompanyDetails);
+      //console.log('Updated allCompanyDetails with Packet Store:', this.allCompanyDetails);
     }
   
     // Ensure critical fields have default fallbacks without altering existing logic
@@ -10574,14 +10670,14 @@ receiveminiTableFunnelChart(checkevent:any,modalref: any){
     this.allCompanyDetails.summaryDesc = this.allCompanyDetails.summaryDesc ;
   
   
-    console.log('Final allCompanyDetails:', this.allCompanyDetails);
+    //console.log('Final allCompanyDetails:', this.allCompanyDetails);
   
     // Enable summaryID field
     this.createSummaryField.get('summaryID')?.enable();
   
     // Format dashboard tiles
     this.formattedDashboard = this.formatDashboardTiles(importData.grid_details) || [];
-    console.log('Formatted Dashboard:', this.formattedDashboard);
+    //console.log('Formatted Dashboard:', this.formattedDashboard);
 
   
     if (this.formattedDashboard.length === 0) {
@@ -10608,7 +10704,7 @@ receiveminiTableFunnelChart(checkevent:any,modalref: any){
   
     // Construct tempObj for validation and submission
     let serializedQueryParams = JSON.stringify(this.updatedQueryPramas);
-  console.log('Serialized Query Params:', serializedQueryParams);
+  //console.log('Serialized Query Params:', serializedQueryParams);
     let tempObj = {
       PK: `${this.SK_clientID}#${this.allCompanyDetails.summaryID}#summary#main`,
       SK: 1,
@@ -10619,7 +10715,7 @@ receiveminiTableFunnelChart(checkevent:any,modalref: any){
       }),
     };
   
-    console.log('TempObj being validated and submitted:', tempObj);
+    //console.log('TempObj being validated and submitted:', tempObj);
   
     // Validate and submit the object
     this.validateAndSubmit(tempObj, key);
@@ -10641,7 +10737,7 @@ receiveminiTableFunnelChart(checkevent:any,modalref: any){
     };
     
   
-    console.log('Items prepared for fetchTimeMachineById:', items);
+    //console.log('Items prepared for fetchTimeMachineById:', items);
     const UserDetails = {
       "User Name": this.userdetails,
       "Action": "Updated",
@@ -10658,7 +10754,7 @@ receiveminiTableFunnelChart(checkevent:any,modalref: any){
   
     // Trigger fetchTimeMachineById
     if (items.P1) {
-      console.log('check items inupdate',items)
+      //console.log('check items inupdate',items)
       this.fetchTimeMachineById(1, items.P1, 'update', items);
     } else {
       console.warn('fetchTimeMachineById skipped: Missing summaryID (P1).');
@@ -10679,7 +10775,7 @@ receiveminiTableFunnelChart(checkevent:any,modalref: any){
 
 
     let tempClient = this.SK_clientID + "#summary" + "#lookup";
-    console.log('tempClient checking', tempClient);
+    //console.log('tempClient checking', tempClient);
 
 
     const createdDate = Math.ceil((new Date()).getTime() / 1000); // Created date
@@ -10705,7 +10801,7 @@ receiveminiTableFunnelChart(checkevent:any,modalref: any){
       grid_details: importData.grid_details
     };
 
-    console.log("summary data ", this.allCompanyDetails);
+    //console.log("summary data ", this.allCompanyDetails);
 
     // Prepare ISO date strings
     const createdDateISO = new Date(this.allCompanyDetails.crDate * 1000).toISOString();
@@ -10741,11 +10837,11 @@ this.createSummaryField.patchValue({
   tilesList: this.defaultValue // Set the value to 'Widget'
 });
 
-    console.log("TempObj is here ", tempObj);
+    //console.log("TempObj is here ", tempObj);
     const temobj1: any = JSON.stringify(this.createSummaryField.value.iconSelect)
     // Prepare items for further processing
-    console.log("this.createSummaryField.value.iconSelec", this.createSummaryField.value.iconSelect)
-    console.log("temobj1", temobj1)
+    //console.log("this.createSummaryField.value.iconSelec", this.createSummaryField.value.iconSelect)
+    //console.log("temobj1", temobj1)
     const items = {
       P1: this.createSummaryField.value.summaryID,
       P2: this.createSummaryField.value.summaryName,
@@ -10760,7 +10856,7 @@ this.createSummaryField.patchValue({
       P11:this.createSummaryField.value.fullScreenModeCheck,
       // P12:this.createSummaryField.value.DashboardRestriction
     };
-    console.log('items checking from create Summary',items)
+    //console.log('items checking from create Summary',items)
 
     // API call to create the summary
     this.api.CreateMaster(tempObj).then(async (value: any) => {
@@ -10769,9 +10865,9 @@ this.createSummaryField.patchValue({
       this.datatableConfig = {};
       this.lookup_data_summary = [];
 
-      console.log('value check from create master', value);
+      //console.log('value check from create master', value);
       if (items || value) {
-        console.log('items check from create master', items);
+        //console.log('items check from create master', items);
 
         // Call the loadData function
         this.loadData();
@@ -10824,7 +10920,7 @@ this.createSummaryField.patchValue({
       this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
 
     }).catch(err => {
-      console.log('err for creation', err);
+      //console.log('err for creation', err);
       this.toast.open("Error in adding new Summary Configuration ", "Check again", {
         duration: 5000,
         horizontalPosition: 'right',
@@ -10836,7 +10932,7 @@ this.createSummaryField.patchValue({
 
 
   filterDuplucateIds(routerId: any) {
-    console.log('dashboardId received', routerId);
+    //console.log('dashboardId received', routerId);
   
     this.api
       .GetMaster(`${this.SK_clientID}#${routerId}#summary#main`, 1)
@@ -10845,14 +10941,14 @@ this.createSummaryField.patchValue({
           const parsedMetadata = JSON.parse(result.metadata);
           this.summaryDashboardDataFetch = parsedMetadata;
           const extractGridDetails = this.summaryDashboardDataFetch.grid_details;
-          console.log('summary extractGridDetails', extractGridDetails);
+          //console.log('summary extractGridDetails', extractGridDetails);
   
           // Extract the IDs from grid details
           const ids = extractGridDetails.map((item: any) => item.id);
   
           // Check for duplicate IDs
           const duplicateIds = this.findDuplicates(ids);
-          console.log('duplicateIds checking', duplicateIds);
+          //console.log('duplicateIds checking', duplicateIds);
   
           // If duplicateIds contains undefined or is empty, don't show the alert
           const filteredDuplicates = duplicateIds.filter(id => id !== undefined && id !== null);
@@ -10868,15 +10964,15 @@ this.createSummaryField.patchValue({
               timer: 3000, // The alert will disappear after 3 seconds
             });
           } else {
-            console.log('No duplicates found or duplicates are undefined');
+            //console.log('No duplicates found or duplicates are undefined');
           }
   
         } else {
-          console.log('No data found');
+          //console.log('No data found');
         }
       })
       .catch((err) => {
-        console.log("Can't fetch", err);
+        //console.log("Can't fetch", err);
       });
   }
   
@@ -10933,11 +11029,11 @@ currentPage = 1;
 pageLength = 10;
 
 changePage(page: number) {
-  // console.log('changePage checking', page);
+  // //console.log('changePage checking', page);
   // this.currentPage = page;
 
   // const dtInstance = this.crudSummaryComp?.getDataTableInstance();
-  // console.log('dtInstance checking',dtInstance)
+  // //console.log('dtInstance checking',dtInstance)
 
   // if (dtInstance) {
   //   dtInstance.page(page - 1).draw('page');
@@ -10949,7 +11045,7 @@ changePage(page: number) {
 
 onDatatableReady() {
   this.datatableReady = true;
-  console.log('✅ DataTable is initialized in child');
+  //console.log('✅ DataTable is initialized in child');
 }
 
   

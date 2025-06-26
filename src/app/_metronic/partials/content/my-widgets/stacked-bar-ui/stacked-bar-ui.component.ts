@@ -23,6 +23,7 @@ interface ColumnVisibilityPacket {
   columnVisibility?: any[];
   // Add other properties as needed
 }
+
 interface FormTableConfig {
   columnVisibility: Array<{
     formlist: string;
@@ -115,9 +116,9 @@ export class StackedBarUiComponent {
   toggleCheck(isChecked: boolean,index:any) {
     this.counter =0; 
     this.isChecked = isChecked;
-    console.log('this.isChecked checking', this.isChecked);
-    console.log('this.storeDrillFilter  checking from initial',this.storeDrillFilter )
-    console.log('this.DrillFilterLevel checking from initial',this.DrillFilterLevel)
+    // console.log('this.isChecked checking', this.isChecked);
+    // console.log('this.storeDrillFilter  checking from initial',this.storeDrillFilter )
+    // console.log('this.DrillFilterLevel checking from initial',this.DrillFilterLevel)
     if(this.storeDrillFilter !== undefined && this.storeDrillFilter !== '' && 
       this.DrillFilterLevel !== undefined && this.DrillFilterLevel !== ''){
         
@@ -126,7 +127,7 @@ export class StackedBarUiComponent {
   
   
       const chartConfig =JSON.parse(this.item.chartConfig)
-      console.log('chartConfig check from chart ui',chartConfig)
+      // console.log('chartConfig check from chart ui',chartConfig)
       const extractcolumnVisibility = chartConfig
       
           this.formTableConfig = {
@@ -163,7 +164,7 @@ export class StackedBarUiComponent {
               (response: any) => {
                 console.log('Lambda function triggered successfully:', response);
                 this.checkResBody = response.body
-                console.log('this.checkResBody',this.checkResBody)
+                // console.log('this.checkResBody',this.checkResBody)
                 const storeparsedResBody=JSON.parse(this.checkResBody)
     
     
@@ -222,7 +223,7 @@ export class StackedBarUiComponent {
     this.counter =0; 
   
     this.isHomeChecked = isChecked;
-    console.log('this.isChecked checking', this.isHomeChecked);
+    // console.log('this.isChecked checking', this.isHomeChecked);
 
 
     if(this.storeDrillFilter !== undefined && this.storeDrillFilter !== '' && 
@@ -230,7 +231,7 @@ export class StackedBarUiComponent {
         this.spinner.show('dataProcess' + index);
 
         const chartConfig =JSON.parse(this.item.chartConfig)
-        console.log('chartConfig check from chart ui',chartConfig)
+        // console.log('chartConfig check from chart ui',chartConfig)
         const extractcolumnVisibility = chartConfig
         
             this.formTableConfig = {
@@ -268,7 +269,7 @@ export class StackedBarUiComponent {
               // Send a POST request to the Lambda function with the body
               this.http.post(apiUrl, requestBody).subscribe(
                 (response: any) => {
-                  console.log('Lambda function triggered successfully:', response);
+                  // console.log('Lambda function triggered successfully:', response);
                   this.checkResBody = response.body
                   console.log('this.checkResBody',this.checkResBody)
                   const storeparsedResBody=JSON.parse(this.checkResBody)
@@ -327,19 +328,19 @@ export class StackedBarUiComponent {
 
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('dashboardChange dynamic ui',this.all_Packet_store)
+    // console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
-      console.log("check chart3 data",this.item)
+      // console.log("check chart3 data",this.item)
       this.storeDrillPacket = JSON.parse(this.item.DrillConfig)
-      console.log('this.storeDrillPacket checking',this.storeDrillPacket)
+      // console.log('this.storeDrillPacket checking',this.storeDrillPacket)
           // Check if storeDrillPacket is not empty
     this.isDrillPacketAvailable = this.storeDrillPacket && this.storeDrillPacket.length > 0;
 
 
-      console.log('this.storeDrillPacket checking',this.storeDrillPacket )
+      // console.log('this.storeDrillPacket checking',this.storeDrillPacket )
       this.storeRedirectionCheck = this.item.toggleCheck
-      console.log('liveDataColumnChart check',this.liveDataColumnChart)
-      console.log('eventFilterConditions chart ui1',this.eventFilterConditions)
+      // console.log('liveDataColumnChart check',this.liveDataColumnChart)
+      // console.log('eventFilterConditions chart ui1',this.eventFilterConditions)
       console.log('this.storeDrillFilter checking',this.storeDrillFilter)
      
       if(this.storeDrillFilter==undefined && this.DrillFilterLevel==undefined){
@@ -349,8 +350,8 @@ export class StackedBarUiComponent {
     
   }
 
-  onBarClick(event: Highcharts.PointClickEventObject, index: any): void {
-    console.log('index checking from toggle', index);
+   onBarClick(event: Highcharts.PointClickEventObject, index: any): void {
+    // console.log('index checking from toggle', index);
 
     if(this.isEditModeView==true){
 
@@ -358,14 +359,14 @@ export class StackedBarUiComponent {
 
       this.spinner.show('dataProcess' + index);
 
-      console.log('event check for column chart', event);
+      // console.log('event check for column chart', event);
 
-      console.log('Bar clicked:', {
-          category: event.point.category,
-          value: event.point.y,
-          colorIndex: event.point.colorIndex,
-          stackName: event.point.series.name
-      });
+      // console.log('Bar clicked:', {
+      //     category: event.point.category,
+      //     value: event.point.y,
+      //     colorIndex: event.point.colorIndex,
+      //     stackName: event.point.series.name
+      // });
   
       const pointData = {
           name: event.point.category,
@@ -381,7 +382,7 @@ export class StackedBarUiComponent {
       console.log('chartConfig check from chart ui', chartConfig);
   
       this.cdr.detectChanges();
-      console.log('this.isLoading checking', this.isLoading);
+      // console.log('this.isLoading checking', this.isLoading);
   
       const extractcolumnVisibility = chartConfig;
   
@@ -391,11 +392,11 @@ export class StackedBarUiComponent {
       };
   
       this.storeDrillConfig = JSON.parse(this.item.DrillConfig);
-      console.log('this.storeDrillConfig checking', this.storeDrillConfig);
+      // console.log('this.storeDrillConfig checking', this.storeDrillConfig);
   
       const storeconditionsLength = this.storeDrillConfig[0]?.conditions.length;
-      console.log('storeconditionsLength checking', storeconditionsLength);
-      console.log('this.counter checking', this.counter);
+      // console.log('storeconditionsLength checking', storeconditionsLength);
+      // console.log('this.counter checking', this.counter);
   
       // if (storeconditionsLength === this.counter || storeconditionsLength === undefined) {
       //     console.log('Emitting action, either conditions are empty or second bar clicked');
@@ -407,17 +408,17 @@ export class StackedBarUiComponent {
       // }
 
   if (storeconditionsLength === this.counter || storeconditionsLength === undefined) {
-    console.log('storeconditionsLength checking from donut',storeconditionsLength)
-    console.log('this.counter checking from donut',this.counter)
-    console.log('Emitting action, either conditions are empty or second bar clicked');
-    console.log('this.formTableConfig checking from donut',this.formTableConfig)
+    // console.log('storeconditionsLength checking from donut',storeconditionsLength)
+    // console.log('this.counter checking from donut',this.counter)
+    // console.log('Emitting action, either conditions are empty or second bar clicked');
+    // console.log('this.formTableConfig checking from donut',this.formTableConfig)
     console.log('this.formTableConfig checking from donut', this.formTableConfig);
-    console.log('access columnVisibility',this.formTableConfig.columnVisibility);
+    // console.log('access columnVisibility',this.formTableConfig.columnVisibility);
     const storeObject = this.formTableConfig.columnVisibility
     const storeColumnVisibility:any =this.formTableConfig.columnVisibility[0]
-    console.log('storeColumnVisibility checking',storeColumnVisibility)
+    // console.log('storeColumnVisibility checking',storeColumnVisibility)
    const columnVisibility = storeColumnVisibility?.columnVisibility || [];
-   console.log('columnVisibility check from donut',columnVisibility)
+  //  console.log('columnVisibility check from donut',columnVisibility)
    if (!columnVisibility.length) {
     // Show SweetAlert with the updated message if columnVisibility is empty or undefined
     Swal.fire({
@@ -432,11 +433,11 @@ else {
 
 
   const clickedPoint = event.point;
-  console.log('Clicked bar index:', clickedPoint.index);
-  console.log('Clicked bar',event.point.colorIndex)
+  // console.log('Clicked bar index:', clickedPoint.index);
+  // console.log('Clicked bar',event.point.colorIndex)
   const clickedColorIndex: any = event.point.colorIndex;
 
-  console.log('Clicked bar colorIndex:', clickedColorIndex);
+  // console.log('Clicked bar colorIndex:', clickedColorIndex);
   
   // Access the corresponding columnVisibility using the colorIndex
   console.log('this.formTableConfig.columnVisibility check', this.formTableConfig.columnVisibility);
@@ -446,24 +447,57 @@ else {
       ? (clickedColorIndex >= 0 && clickedColorIndex < this.formTableConfig.columnVisibility.length ? clickedColorIndex : 0)
       : 0;
   
-      const splitStackName = pointData.stackName;
-      const parts = splitStackName.split('-');
-      const extracted = parts[1]?.trim(); // optional chaining in case it's undefined
+
       
-      console.log('splitStackName:', splitStackName);
-      console.log('Extracted part:', extracted);
-      console.log('indexToUse checking from stacked bar ui',indexToUse)
+      // console.log('splitStackName:', splitStackName);
+      // console.log('Extracted part:', extracted);
+      //console.log('indexToUse checking from stacked bar ui',indexToUse)
 
  // e.g., "operational incidents"
 
  const packets = this.formTableConfig.columnVisibility as ColumnVisibilityPacket[];
-
- const matchedPacket = packets.find(packet =>
-   packet.custom_Label?.trim().toLowerCase() === extracted?.toLowerCase()
- );
+ console.log('packets checking from stacked bar ui', packets);
+ 
+ let matchedPacket: ColumnVisibilityPacket | undefined;
+ 
+ if (packets.length === 1) {
+   // ✅ Only one packet — directly use it
+   matchedPacket = packets[0];
+ } else {
+   // 👉 Multiple packets — extract stack name and match with custom_Label
+   const pointStackName = pointData.stackName;
+   let extracted: string | undefined;
+   
+   if (pointStackName?.includes('-')) {
+     const parts = pointStackName.split('-');
+   
+     if (parts.length >= 3) {
+       // 👉 Case: In-Progress-work status → pick index 2
+       extracted = parts[2]?.trim();
+     } else {
+       // 👉 Case: Something like "Total-Count" → pick index 1
+       extracted = parts[1]?.trim();
+     }
+   } else {
+     // 👉 No dash, use the whole name
+     extracted = pointStackName?.trim();
+   }
+   
+   console.log('extracted checking from stacked bar ui', extracted);
+   
+ 
+   console.log('extracted checking from stacked bar ui', extracted);
+ 
+   matchedPacket = packets.find(packet =>
+     packet.custom_Label?.trim().toLowerCase() === extracted?.toLowerCase()
+   );
+ }
+ 
+ console.log('Matched Packet:', matchedPacket);
  
 
-console.log('Matched Packet:', matchedPacket);
+
+// console.log('Matched Packet:', matchedPacket);
 
   // const selectedColumn = this.formTableConfig.columnVisibility[indexToUse];
   
@@ -472,7 +506,7 @@ console.log('Matched Packet:', matchedPacket);
 
 
 
-  console.log('this.formTableConfig>>>>',this.formTableConfig)
+  // console.log('this.formTableConfig>>>>',this.formTableConfig)
     // Proceed with emitting events if columnVisibility is valid
     this.emitChartConfigTable.emit(matchedPacket);
     this.sendCellInfo.emit(event);
@@ -508,9 +542,9 @@ console.log('Matched Packet:', matchedPacket);
       (response: any) => {
         // alert('how many times request is going')
           if (response?.statusCode === 200) {
-              console.log('Lambda function triggered successfully chart1 drilldown', response);
+              // console.log('Lambda function triggered successfully chart1 drilldown', response);
               this.checkResBody = response.body;
-              console.log('this.checkResBody checking from column visibility', this.checkResBody);
+              // console.log('this.checkResBody checking from column visibility', this.checkResBody);
             
               // Ensure parsedResBody is initialized
               if (!this.parsedResBody) {
@@ -518,13 +552,13 @@ console.log('Matched Packet:', matchedPacket);
               }
             
               this.parsedResBody.push(JSON.parse(this.checkResBody));
-              console.log('this.parsedResBody checking', this.parsedResBody);
+              // console.log('this.parsedResBody checking', this.parsedResBody);
             
   
               this.parsedResBody.forEach((item: { ChartData?: any; rowdata?: any; }, index: any) => {
                   if (Object.keys(item).includes('ChartData')) {
                       this.parseChartData = JSON.parse(item.ChartData);
-                      console.log(`this.parseChartDatav checking at index ${index}`, this.parseChartData);
+                      // console.log(`this.parseChartDatav checking at index ${index}`, this.parseChartData);
                       this.storeDrillFilter = this.parseChartData.DrillFilter;
                       this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
   
@@ -609,9 +643,9 @@ console.log('requestBody checking chart1Drilldown', requestBody);
 this.http.post(apiUrl, requestBody).subscribe(
   (response: any) => {
       if (response?.statusCode === 200) {
-          console.log('Lambda function triggered successfully chart1 drilldown', response);
+          // console.log('Lambda function triggered successfully chart1 drilldown', response);
           this.checkResBody = response.body;
-          console.log('this.checkResBody checking from column visibility', this.checkResBody);
+          // console.log('this.checkResBody checking from column visibility', this.checkResBody);
         
           // Ensure parsedResBody is initialized
           if (!this.parsedResBody) {
@@ -619,12 +653,12 @@ this.http.post(apiUrl, requestBody).subscribe(
           }
         
           this.parsedResBody.push(JSON.parse(this.checkResBody));
-          console.log('this.parsedResBody checking', this.parsedResBody);
+          // console.log('this.parsedResBody checking', this.parsedResBody);
 
           this.parsedResBody.forEach((item: { ChartData?: any; }, index: any) => {
               if (Object.keys(item).includes('ChartData')) {
                   this.parseChartData = JSON.parse(item.ChartData);
-                  console.log(`this.parseChartDatav checking at index ${index}`, this.parseChartData);
+                  // console.log(`this.parseChartDatav checking at index ${index}`, this.parseChartData);
                   this.storeDrillFilter = this.parseChartData.DrillFilter;
                   this.DrillFilterLevel = this.parseChartData.DrillFilterLevel;
 
@@ -723,13 +757,13 @@ if(storeconditionsLength === undefined){
 
   edit_each_tileUI(value1: any,value2: number) {
     const data = { arg1: value1, arg2: value2 }; // Two arguments
-    console.log('data checking from tile1',data)
+    // console.log('data checking from tile1',data)
   this.customEvent.emit(data); // Emitting an event with two arguments
 
   }
   edit_each_duplicate(value1: any, value2: number) {
     const data = { arg1: value1, arg2: value2 }; // Two arguments
-    console.log('Data check from dynamic UI:', data);
+    // console.log('Data check from dynamic UI:', data);
   
     // Combine data with all_Packet_store
     const payload = {
@@ -737,7 +771,7 @@ if(storeconditionsLength === undefined){
       all_Packet_store: this.all_Packet_store, // Include all_Packet_store
     };
   
-    console.log('Combined payload:', payload);
+    // console.log('Combined payload:', payload);
   
     // Emit the payload
     this.customEvent1.emit(payload);
@@ -754,10 +788,10 @@ if(storeconditionsLength === undefined){
   }
   ngOnInit(){
 
-    console.log('item chacke',this.item.grid_details)
+    // console.log('item chacke',this.item.grid_details)
 
     this.summaryService.lookUpData$.subscribe((data: any) => {
-      console.log('data check from chart3', data);
+      // console.log('data check from chart3', data);
     
       let tempCharts: any[] = [];
     
@@ -766,7 +800,7 @@ if(storeconditionsLength === undefined){
     
       // Loop through the data array
       dataArray.forEach((packet: any, matchedIndex: number) => {
-        console.log('packet:', packet); // Log each packet to ensure it is as expected
+        // console.log('packet:', packet); // Log each packet to ensure it is as expected
     
         // If data is a single item, skip the check for this.index == matchedIndex
         if (packet.grid_type == 'Stackedchart' && packet.id === this.item.id) {
@@ -792,10 +826,10 @@ if(storeconditionsLength === undefined){
 
 
     this.summaryService.queryParamsData$.subscribe((data: any)=>{
-      console.log('data check filterConditions',data)
+      // console.log('data check filterConditions',data)
 
       if (data) {
-        console.log('data checking from chart1', data);
+        // console.log('data checking from chart1', data);
       
         // Extract indexed data (all indexes) and assign to eventFilterConditions
         this.eventFilterConditions = [];
@@ -815,8 +849,8 @@ if(storeconditionsLength === undefined){
           singleDate
         };
       
-        console.log('Indexed conditions assigned to eventFilterConditions', this.eventFilterConditions);
-        console.log('Non-indexed conditions assigned to mainFilterCon', this.mainFilterCon);
+        // console.log('Indexed conditions assigned to eventFilterConditions', this.eventFilterConditions);
+        // console.log('Non-indexed conditions assigned to mainFilterCon', this.mainFilterCon);
       }
       
       
@@ -859,10 +893,10 @@ if (chartdata) {
           const seriesName = event.point.series.name;
           const value = event.point.y;
           
-          console.log('Click event triggered!');
-          console.log('Category:', category);
-          console.log('Series Name:', seriesName);
-          console.log('Value:', value);
+          // console.log('Click event triggered!');
+          // console.log('Category:', category);
+          // console.log('Series Name:', seriesName);
+          // console.log('Value:', value);
           
           // Call your custom handler function
           this.onBarClick(event, this.index);
@@ -876,7 +910,7 @@ if (chartdata) {
 }
 
 else {
-  console.log('this.items checking', this.item);
+  // console.log('this.items checking', this.item);
   const extractOptions = this.item.highchartsOptionsJson;
   console.log('extractOptions checking', extractOptions);
 
@@ -959,9 +993,9 @@ else {
     ){}
 
     helperDashboard(item: any, index: any, modalContent: any, selectType: any, ModuleNames: any) {
-      console.log('selectType checking dashboard', selectType);
-      console.log('item checking from', item);
-      console.log('ModuleNames:', ModuleNames);
+      // console.log('selectType checking dashboard', selectType);
+      // console.log('item checking from', item);
+      // console.log('ModuleNames:', ModuleNames);
     
       // ✅ Only handle custom logic for Summary Dashboard
       if (selectType && ModuleNames === 'Summary Dashboard') {
@@ -1003,9 +1037,9 @@ else {
       const selectedModule = recieveItem.ModuleNames;
       const redirectType = recieveItem.selectType; // 'NewTab' or 'Same page Redirect'
     
-      console.log('moduleName:', moduleName);
-      console.log('selectedModule:', selectedModule);
-      console.log('selectType (redirectType):', redirectType);
+      // console.log('moduleName:', moduleName);
+      // console.log('selectedModule:', selectedModule);
+      // console.log('selectType (redirectType):', redirectType);
     
       let targetUrl: string = '';
       const isNewTab = redirectType === 'NewTab';

@@ -72,7 +72,7 @@
                   placeholder="Select Form">
                 </ngx-select>
                 <div *ngIf="createKPIWidget.get('formlist')?.touched && createKPIWidget.get('formlist')?.invalid" class="text-danger">
-                  <div *ngIf="createKPIWidget.get('formlist')?.errors?.required">Form Fields is required.</div>
+                  <div *ngIf="createKPIWidget.get('formlist')?.errors?.required">Form is required.</div>
                 </div>
               </div>
         
@@ -183,6 +183,87 @@
 
                 </div>
               </div>
+              <div class="col-md-4 mb-3">
+                <label  class="col-createChart-label fw-bold fs-6 ">Data Type 
+
+                  <span class="ms-2 text-primary"
+        
+                  
+                  placement="top"
+                  container="body">
+              <i class="bi bi-info-circle fs-5 text-primary"></i>
+            </span>
+                </label>
+                <ngx-select
+                  id="DataType"
+                  [allowClear]="true"
+                  formControlName="DataType"
+                  [items]="DataTypeValues"
+                  optionValueField="value"
+                  optionTextField="text"
+                  placeholder="Select Parameter"
+              
+                  style="width: 100%;">
+                </ngx-select>
+
+              </div>
+
+
+              <form [formGroup]="createKPIWidget">
+                <div *ngIf="isProcessedDataSelected" formArrayName="customColumnFields">
+                  <div *ngFor="let field of customColumnFields.controls; let fieldIndex=index">
+                    <div [formGroupName]="fieldIndex"
+                         style="border: 2px solid rgb(201, 228, 239); padding: 10px; margin: 5px; border-radius: 5px;">
+
+                        
+                    
+                      <div class="row g-3">
+                        <div class="col-md-2 d-flex align-items-center justify-content-center">
+                          <h3 class="text-primary fw-semibold text-center mb-0">
+                            {{ createKPIWidget.get('form_data_selected')?.value[fieldIndex]?.text || 'Untitled Field' }}:
+                          </h3>
+                        </div>
+
+                        <!-- Row Type Field -->
+                        <div class="col-md-5 mb-3">
+
+                          <label class="col-createChart-label fw-bold fs-6">Column Type
+                            <span class="ms-2 text-primary" (mouseenter)="openRowCalHelp(RowCalHelp)" style="cursor: pointer;">
+                              <i class="bi bi-info-circle fs-5 text-primary"></i>
+                            </span>
+                          </label>
+                          <ngx-select
+                            formControlName="columnType"
+                            [items]="selectType"
+                            bindValue="value"
+                            bindLabel="text"
+                            placeholder="Select Type"
+                            [allowClear]="true">
+                          </ngx-select>
+                        </div>
+              
+                        <!-- Row Unit Field -->
+                        <div class="col-md-5 mb-3">
+                          <label class="col-createChart-label fw-bold fs-6">Column Unit
+                            <span class="ms-2 text-primary" (mouseenter)="openUnitHelp(RowUnitHelp)" style="cursor: pointer;">
+                              <i class="bi bi-info-circle fs-5 text-primary"></i>
+                            </span>
+                          </label>
+                          <ngx-select
+                            formControlName="columnUnit"
+                            [items]="selectUnits"
+                            bindValue="value"
+                            bindLabel="text"
+                            placeholder="Select Unit"
+                            [allowClear]="true">
+                          </ngx-select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+              
 
 
 

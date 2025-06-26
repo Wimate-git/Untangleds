@@ -143,16 +143,16 @@ makeTrueCheck:any = false
     this.getLoggedUser = this.summaryConfiguration.getLoggedUserDetails()
     this.SK_clientID = this.getLoggedUser.clientID;
     this.username = this.getLoggedUser.username;
-    console.log('this.SK_clientID check', this.SK_clientID)
-    console.log('this.getLoggedUser check', this.getLoggedUser)
+    ////////////////console.log('this.SK_clientID check', this.SK_clientID)
+    //////////////////console.log('this.getLoggedUser check', this.getLoggedUser)
  
 
     // Check if the page was reloaded
 
-    // console.log('dashboardChange ngOnInit',this.all_Packet_store)
+    // //////////////////console.log('dashboardChange ngOnInit',this.all_Packet_store)
 
     // this.getWorkFlowDetails = this.summaryConfiguration.getLoggedUserDetails()
-    // console.log('this.getLoggedUser check',this.getWorkFlowDetails)
+    // //////////////////console.log('this.getLoggedUser check',this.getWorkFlowDetails)
 
 
   
@@ -187,7 +187,7 @@ makeTrueCheck:any = false
     });
 
     const allFieldsArray = this.createChart.get('all_fields') as FormArray;
-    console.log("allFieldsArray from Filter",allFieldsArray.value)
+    //////////////////console.log("allFieldsArray from Filter",allFieldsArray.value)
   
 
 
@@ -243,7 +243,7 @@ makeTrueCheck:any = false
   };
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('dashboardChange ngonchanges',this.all_Packet_store)
+    //////////////////console.log('dashboardChange ngonchanges',this.all_Packet_store)
     this.checkData()
     // this.fetchDynamic(this.formValueSave)
 
@@ -264,7 +264,7 @@ makeTrueCheck:any = false
   }
   checkData() {
     this.gridDetailExtract = this.all_Packet_store.grid_details;
-    console.log('this.gridDetailExtract check', this.gridDetailExtract);
+    //////////////////console.log('this.gridDetailExtract check', this.gridDetailExtract);
   
     // Initialize the formlistValues array
     this.formlistValues = [];
@@ -272,7 +272,7 @@ makeTrueCheck:any = false
     // Extract formlist directly from gridDetailExtract
     if (this.gridDetailExtract && Array.isArray(this.gridDetailExtract)) {
       this.formlistValues = this.gridDetailExtract.map((packet: { formlist: any }) => packet.formlist);
-      console.log('this.formlistValues check', this.formlistValues);
+      //////////////////console.log('this.formlistValues check', this.formlistValues);
     }
   
     // Ensure formlistValues is an empty array if not initialized
@@ -290,7 +290,7 @@ makeTrueCheck:any = false
                 (config: { formlist: any }) => config.formlist
               );
               this.formlistValues = [...this.formlistValues, ...chartConfigFormlist];
-              console.log('this.formlistValues after chartConfig extract', this.formlistValues);
+              //////////////////console.log('this.formlistValues after chartConfig extract', this.formlistValues);
             } else {
               console.warn('Parsed chartConfig is not an array:', parsedChartConfig);
             }
@@ -303,13 +303,13 @@ makeTrueCheck:any = false
         if (packet.MapConfig && packet.MapConfig !== "[]") {
           try {
             const parsedMapConfig = JSON.parse(packet.MapConfig);
-            console.log('parsedMapConfig check',parsedMapConfig)
+            //////////////////console.log('parsedMapConfig check',parsedMapConfig)
             if (Array.isArray(parsedMapConfig)) {
               const mapConfigFormlist = parsedMapConfig.map(
                 (config: { formlist: any }) => config.formlist
               );
               this.formlistValues = [...this.formlistValues, ...mapConfigFormlist];
-              console.log('this.formlistValues after mapConfig extract', this.formlistValues);
+              //////////////////console.log('this.formlistValues after mapConfig extract', this.formlistValues);
             } else {
               console.warn('Parsed mapConfig is not an array:', parsedMapConfig);
             }
@@ -325,7 +325,7 @@ makeTrueCheck:any = false
                 (config: { formlist: any }) => config.formlist
               );
               this.formlistValues = [...this.formlistValues, ...mapConfigFormlist];
-              console.log('this.formlistValues after dynamicTile extract', this.formlistValues);
+              //////////////////console.log('this.formlistValues after dynamicTile extract', this.formlistValues);
             } else {
               console.warn('Parsed mapConfig is not an array:', parsedDynamicTileConfig);
             }
@@ -345,7 +345,7 @@ makeTrueCheck:any = false
       this.fetchDynamicFormDataForAll(this.formlistValues);
   
       // Log the cleaned-up formlistValues
-      console.log('Cleaned-up formlist values:', this.formlistValues);
+      //////////////////console.log('Cleaned-up formlist values:', this.formlistValues);
     } else {
       console.warn('gridDetailExtract is not an array or is undefined.');
     }
@@ -359,7 +359,7 @@ makeTrueCheck:any = false
     });
   }
   fetchDynamicFormData(value: string, index: number) {
-    console.log("Fetching data for:", value);
+    //////////////////console.log("Fetching data for:", value);
 
     const apiUrl = `${this.SK_clientID}#dynamic_form#${value}#main`;
     this.api.GetMaster(apiUrl, 1)
@@ -368,7 +368,7 @@ makeTrueCheck:any = false
         if (result && result.metadata) {
           const parsedMetadata = JSON.parse(result.metadata);
           const formFields = parsedMetadata.formFields;
-          console.log('formFields checking from filter', formFields);
+          //////////////////console.log('formFields checking from filter', formFields);
 
           // Define the unwanted types to filter out
           const unwantedTypes = [
@@ -401,7 +401,7 @@ makeTrueCheck:any = false
           // }
 
           // Store the filtered dynamicParamList in a map by index
-          console.log('dynamicParamList checking', dynamicParamList);
+          //////////////////console.log('dynamicParamList checking', dynamicParamList);
           this.dynamicParamMap.set(index, dynamicParamList);
           this.cdr.detectChanges();
         } else {
@@ -443,7 +443,7 @@ makeTrueCheck:any = false
   initializeTileFields(): void {
     const defaultTheme = { color: "linear-gradient(to right, #A1045A, #A1045A)", selected: true };
     this.selectedColor = defaultTheme.color;
-    console.log('i am initialize')
+    //////////////////console.log('i am initialize')
     // Initialize the form group
     this.createChart = this.fb.group({
       add_fields:[''],
@@ -489,32 +489,32 @@ makeTrueCheck:any = false
   }
   
   async dynamicData(receiveFormIds?: any) {
-    console.log('receiveFormIds checlking from',receiveFormIds)
+    //////////////////console.log('receiveFormIds checlking from',receiveFormIds)
     try {
       const result: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#lookup", 1);
       if (result) {
-        console.log('forms checking', result);
+        //////////////////console.log('forms checking', result);
         const helpherObj = JSON.parse(result.options);
-        console.log('helpherObj checking', helpherObj);
+        //////////////////console.log('helpherObj checking', helpherObj);
   
         this.formList = helpherObj.map((item: [string]) => item[0]);
          this.allDeviceIds = this.formList.map((form: string) => ({ text: form, value: form }));
-        console.log('allDeviceIds checking from',this.allDeviceIds)
+        //////////////////console.log('allDeviceIds checking from',this.allDeviceIds)
   
         // ✅ Conditionally filter only if receiveFormIds has items
         if (Array.isArray(receiveFormIds) && receiveFormIds.length > 0) {
           const receivedSet = new Set(receiveFormIds);
           this.listofDeviceIds = this.allDeviceIds.filter((item: { value: any; }) => receivedSet.has(item.value));
         } else {
-          console.log('i am checking forms from else cond',this.allDeviceIds)
+          //////////////////console.log('i am checking forms from else cond',this.allDeviceIds)
           this.listofDeviceIds = this.allDeviceIds; // No filtering — use all
 
         }
   
-        console.log('Final listofDeviceIds:', this.listofDeviceIds);
+        //////////////////console.log('Final listofDeviceIds:', this.listofDeviceIds);
       }
     } catch (err) {
-      console.log("Error fetching the dynamic form data", err);
+      //////////////////console.log("Error fetching the dynamic form data", err);
     }
   }
 
@@ -541,8 +541,8 @@ makeTrueCheck:any = false
   }
 
   // addControls(event: any, _type: string,count:any) {
-  //   // console.log('this.dynamicparameterLabMap before adding controls:', this.dynamicparameterLabMap);
-  //   console.log('Event received in addControls:', event);
+  //   // //////////////////console.log('this.dynamicparameterLabMap before adding controls:', this.dynamicparameterLabMap);
+  //   //////////////////console.log('Event received in addControls:', event);
   
   //   let noOfParams: any = '';
   
@@ -561,14 +561,14 @@ makeTrueCheck:any = false
   //       noOfParams = event;
   //     }
   //   }
-  //   console.log('noOfParams check:', noOfParams);
+  //   //////////////////console.log('noOfParams check:', noOfParams);
   
   //   // Ensure all_fields has the correct number of controls
   //   if (this.createChart.value.all_fields.length < noOfParams) {
   //     for (let i = this.all_fields.length; i < noOfParams; i++) {
   //       // Access the dynamic label for the current index
   //       // const dynamicLabel = this.dynamicparameterLabMap?.[i] || ''; // Default to empty if not found
-  //       // console.log(`Index: ${i}, dynamicLabel: ${dynamicLabel}`);
+  //       // //////////////////console.log(`Index: ${i}, dynamicLabel: ${dynamicLabel}`);
   
   //       this.all_fields.push(
   //         this.fb.group({
@@ -596,22 +596,22 @@ makeTrueCheck:any = false
   // }
   async addControls(event: any, _type: string, count: number, formValue: any): Promise<void> {
 
-    console.log('i am triggered',event)
+    //////////////////console.log('i am triggered',event)
     // const isChecked = event.target.checked;
     // this.createChart.get('add_fields')?.setValue(isChecked);
-    console.log('event checking for filter',event)
-    console.log('checking form value',this.formlistValues)
-    console.log('formValue checking', formValue);
+    //////////////////console.log('event checking for filter',event)
+    //////////////////console.log('checking form value',this.formlistValues)
+    //////////////////console.log('formValue checking', formValue);
   
     this.formValueSave = formValue;
-    console.log('this.formValueSave add', this.formValueSave);
+    //////////////////console.log('this.formValueSave add', this.formValueSave);
   
     // try {
     //   // Call fetchDynamic and handle the Promise
     //   this.fetchDynamic(this.formValueSave)
     //     .then((values) => {
     //       this.fetchedValues = values; // Assign the resolved values
-    //       console.log('Fetched Values:', this.fetchedValues);
+    //       //////////////////console.log('Fetched Values:', this.fetchedValues);
     //     })
     //     .catch((error) => {
     //       console.error('Error fetching values:', error);
@@ -623,7 +623,7 @@ makeTrueCheck:any = false
   
     // Determine checkbox state
     this.makeTrueCheck = event.target.checked;
-    console.log('Checkbox State:', this.makeTrueCheck);
+    //////////////////console.log('Checkbox State:', this.makeTrueCheck);
   
     let noOfParams = count;
   
@@ -678,7 +678,7 @@ makeTrueCheck:any = false
       allFieldsArray.removeAt(allFieldsArray.length - 1);
     }
   
-    console.log('Updated all_fields:', allFieldsArray.controls);
+    //////////////////console.log('Updated all_fields:', allFieldsArray.controls);
   }
   
   onTypeChange() {
@@ -693,14 +693,14 @@ makeTrueCheck:any = false
   
   addCondition(fieldIndex: number, condition:any, formFieldControl:any): void {
     this.fetchDynamic([],this.formlistValues,fieldIndex, condition, formFieldControl);
-    console.log('Final populateFormBuilder:', this.populateFormBuilder);
+    //////////////////console.log('Final populateFormBuilder:', this.populateFormBuilder);
   
     const parentGroup = this.all_fields.controls[fieldIndex] as FormGroup;
     const conditions = parentGroup.get('conditions') as FormArray;
   
     const formName = this.formlistValues[fieldIndex];
 
-    console.log('formName check from addCondition:', formName);
+    //////////////////console.log('formName check from addCondition:', formName);
   
     if (!formName) {
       console.warn(`Form name is missing for fieldIndex ${fieldIndex}`);
@@ -728,19 +728,19 @@ makeTrueCheck:any = false
 
     });
   
-    console.log('newCondition before push:', newConditionPush.value);
+    //////////////////console.log('newCondition before push:', newConditionPush.value);
   
     // Push the new condition into the conditions array
     conditions.push(newConditionPush);
   
-    console.log('Conditions after push:', conditions.value);
+    //////////////////console.log('Conditions after push:', conditions.value);
   
 
   
     const conditionIndex = conditions.length - 1;
     this.globalFieldData[fieldIndex][conditionIndex] = { type: 'text', options: null };
   
-    console.log(`Condition added at fieldIndex ${fieldIndex}, conditionIndex ${conditionIndex}`);
+    //////////////////console.log(`Condition added at fieldIndex ${fieldIndex}, conditionIndex ${conditionIndex}`);
   }
   
   
@@ -753,7 +753,7 @@ makeTrueCheck:any = false
     // Remove the condition at the specified index
     conditions.removeAt(conditionIndex);
   
-    console.log(`Condition removed from index ${fieldIndex}, condition ${conditionIndex}`);
+    //////////////////console.log(`Condition removed from index ${fieldIndex}, condition ${conditionIndex}`);
   }
   
   
@@ -798,12 +798,12 @@ makeTrueCheck:any = false
 
   addTile(key: any) {
     
-    console.log('this.createChart.value.all_fields', this.createChart.value.all_fields);
-    console.log('this.fieldlabelShow check', this.fieldLabelsShow);
+    //////////////////console.log('this.createChart.value.all_fields', this.createChart.value.all_fields);
+    //////////////////console.log('this.fieldlabelShow check', this.fieldLabelsShow);
 
     if (key === 'filterTile') {
         const uniqueId = this.generateUniqueId();
-        console.log('this.createChart.value:', this.createChart.value); // Log form values for debugging
+        //////////////////console.log('this.createChart.value:', this.createChart.value); // Log form values for debugging
         this.fields = this.createChart.value.all_fields;
 
         // Map through fields and conditions
@@ -812,7 +812,7 @@ makeTrueCheck:any = false
                 // Retrieve the correct label from fieldLabelsShow using fieldIndex and conditionIndex
                 const label = this.fieldLabelsShow.get(fieldIndex)?.get(conditionIndex) || '';
 
-                console.log(`Label for fieldIndex ${fieldIndex}, conditionIndex ${conditionIndex}:`, label);
+                //////////////////console.log(`Label for fieldIndex ${fieldIndex}, conditionIndex ${conditionIndex}:`, label);
                 if (!this.globalFieldData[fieldIndex]) {
                   this.globalFieldData[fieldIndex] = {}; // Or however you need it structured
               }
@@ -821,7 +821,7 @@ makeTrueCheck:any = false
               }
                 // Access the correct fieldData based on the fieldIndex
                 const fieldData = this.globalFieldData[fieldIndex][conditionIndex];
-                console.log('fieldData checking', fieldData);
+                //////////////////console.log('fieldData checking', fieldData);
 
                 return {
                     ...condition,
@@ -832,8 +832,8 @@ makeTrueCheck:any = false
             });
         });
 
-        console.log('this.conditionsFilter', this.conditionsFilter);
-        console.log('this.fields check before label update', this.fields);
+        //////////////////console.log('this.conditionsFilter', this.conditionsFilter);
+        //////////////////console.log('this.fields check before label update', this.fields);
 
         const newTile = {
             id: uniqueId,
@@ -861,15 +861,15 @@ makeTrueCheck:any = false
             noOfParams: this.noOfParams || 0, // Ensure noOfParams has a valid value
         };
 
-        console.log('New Tile Object:', newTile);
+        //////////////////console.log('New Tile Object:', newTile);
 
         if (!this.dashboard) {
-            console.log('Initializing dashboard array');
+            //////////////////console.log('Initializing dashboard array');
             this.dashboard = [];
         }
 
         this.dashboard.push(newTile);
-        console.log('Updated Dashboard:', this.dashboard);
+        //////////////////console.log('Updated Dashboard:', this.dashboard);
 
         this.grid_details = this.dashboard;
         this.dashboardChange.emit(this.grid_details);
@@ -890,7 +890,7 @@ makeTrueCheck:any = false
   
 
   betweenoperator(event:any){
-    console.log('event checking ',event)
+    //////////////////console.log('event checking ',event)
 
   }
   trackByOption(index: number, option: any): any {
@@ -904,11 +904,11 @@ makeTrueCheck:any = false
   }
   
   updateTile(key: any) {
-    console.log('key checking from update', key);
+    //////////////////console.log('key checking from update', key);
   
     if (this.editTileIndex !== null) {
-      console.log('this.editTileIndex check', this.editTileIndex);
-      console.log('Tile checking for update:', this.dashboard[this.editTileIndex]);
+      //////////////////console.log('this.editTileIndex check', this.editTileIndex);
+      //////////////////console.log('Tile checking for update:', this.dashboard[this.editTileIndex]);
   
       // Map `all_fields` to `filterTileConfig`
       const fields = this.createChart.value.all_fields || [];
@@ -930,7 +930,7 @@ makeTrueCheck:any = false
         }));
       });
   
-      console.log('Mapped conditionsFilter for update:', conditionsFilter);
+      //////////////////console.log('Mapped conditionsFilter for update:', conditionsFilter);
   
       // Create the updated tile object
       const updatedTile = {
@@ -949,7 +949,7 @@ makeTrueCheck:any = false
         // singleDate: this.createChart.value.singleDate,
       };
   
-      console.log('updatedTile checking', updatedTile);
+      //////////////////console.log('updatedTile checking', updatedTile);
   
       // Update the dashboard array with the modified tile
       this.dashboard = [
@@ -958,7 +958,7 @@ makeTrueCheck:any = false
         ...this.dashboard.slice(this.editTileIndex + 1),
       ];
   
-      console.log('Updated Tile Details:', this.dashboard[this.editTileIndex]);
+      //////////////////console.log('Updated Tile Details:', this.dashboard[this.editTileIndex]);
   
       // Update `grid_details` to reflect the updated tile
       this.all_Packet_store.grid_details[this.editTileIndex] = {
@@ -966,10 +966,10 @@ makeTrueCheck:any = false
         ...updatedTile,
       };
   
-      console.log(
-        'this.all_Packet_store.grid_details[this.editTileIndex]',
-        this.all_Packet_store.grid_details[this.editTileIndex]
-      );
+      // //////////////////console.log(
+      //   'this.all_Packet_store.grid_details[this.editTileIndex]',
+      //   this.all_Packet_store.grid_details[this.editTileIndex]
+      // );
   
       // Emit the updated dashboard
       this.grid_details = this.dashboard;
@@ -980,7 +980,7 @@ makeTrueCheck:any = false
         this.updateSummary(this.all_Packet_store, 'update_Dashboard');
       }
   
-      console.log('Updated all_Packet_store.grid_details:', this.all_Packet_store.grid_details);
+      //////////////////console.log('Updated all_Packet_store.grid_details:', this.all_Packet_store.grid_details);
   
       // Reset the editTileIndex after the update
       this.editTileIndex = null;
@@ -1066,24 +1066,24 @@ makeTrueCheck:any = false
       singleDate: this.createChart.value.singleDate || '',
       dateType: this.createChart.value.dateType || '',
     }
-    console.log('mainConditions checking',mainConditions)
-    console.log('conditionsFilter check inside the requestbody',conditionsFilter)
+    //////////////////console.log('mainConditions checking',mainConditions)
+    //////////////////console.log('conditionsFilter check inside the requestbody',conditionsFilter)
 
-    console.log('conditionsFilter checking', conditionsFilter);
+    //////////////////console.log('conditionsFilter checking', conditionsFilter);
     const CombinedConditions = {...mainConditions, ...conditionsFilter};
 
 
 
   
     this.ConditionsFormat = conditionsFilter;
-    console.log('this.ConditionsFormat checking',this.ConditionsFormat)
+    //////////////////console.log('this.ConditionsFormat checking',this.ConditionsFormat)
     this.liveFilterConditions.emit(this.ConditionsFormat);
     this.mainFilterConditions.emit(mainConditions)
 
     this.isLoading = true;
   
-    console.log('this.routeId check', this.routeId);
-    console.log('client id check', this.SK_clientID);
+    //////////////////console.log('this.routeId check', this.routeId);
+    //////////////////console.log('client id check', this.SK_clientID);
     this.spinner.show('dataProcess');
   
     const apiUrl = 'https://1vbfzdjly6.execute-api.ap-south-1.amazonaws.com/stage1';
@@ -1103,17 +1103,17 @@ makeTrueCheck:any = false
       }),
     };
   
-    console.log('requestBody checking from filter', requestBody);
+    //////////////////console.log('requestBody checking from filter', requestBody);
   
     this.http.post(apiUrl, requestBody).subscribe(
       (response) => {
-        console.log('Lambda function triggered successfully:', response);
+        //////////////////console.log('Lambda function triggered successfully:', response);
         
         const constLiveData = JSON.parse((response as any)?.body);
-        console.log('constLiveData check', constLiveData);
+        //////////////////console.log('constLiveData check', constLiveData);
         const processedData = constLiveData.Processed_Data.metadata.grid_details;
   
-        console.log('processedData check', processedData);
+        //////////////////console.log('processedData check', processedData);
         this.storeliveFilterData = processedData
         this.liveFilterData.emit(this.storeliveFilterData);
 
@@ -1141,14 +1141,14 @@ makeTrueCheck:any = false
   
   toggleAddFields(event: any, tile: any) {
     tile.addFieldsEnabled = event.target.checked;
-    console.log('Updated tile state:', tile);
+    //////////////////console.log('Updated tile state:', tile);
   }
   
   
 
   selectedSettingsTab(tab: string) {
     this.selectedTabset = tab;
-    // console.log()
+    // //////////////////console.log()
   }
 
 
@@ -1183,7 +1183,7 @@ makeTrueCheck:any = false
     this.dashboard.splice(index + 1, 0, clonedTile);
 
     // Log the updated dashboard for debugging
-    console.log('this.dashboard after duplicating a tile:', this.dashboard);
+    //////////////////console.log('this.dashboard after duplicating a tile:', this.dashboard);
     this.grid_details = this.dashboard;
 
     
@@ -1377,8 +1377,8 @@ makeTrueCheck:any = false
 
 openFilterModal(tile: any, index: number) {
 
-  console.log('Tile checking data from openFilterModal', tile);
-  console.log('this.formlistValues check', this.formlistValues);
+  //////////////////console.log('Tile checking data from openFilterModal', tile);
+  //////////////////console.log('this.formlistValues check', this.formlistValues);
 
   const fontSizeValue = tile.fontSize ? parseInt(tile.fontSize.replace('px', ''), 10) : 14;
   const storedToggle = localStorage.getItem('dashboardFilter');
@@ -1412,13 +1412,13 @@ openFilterModal(tile: any, index: number) {
  this.addControls({ target: { checked: true } }, 'html', this.formlistValues.length, this.formlistValues)
 
   if (tile) {
-    console.log('tile object checking', tile);
+    //////////////////console.log('tile object checking', tile);
     this.selectedTile = tile;
     this.editTileIndex = index !== undefined ? index : null;
     this.paramCount = tile.noOfParams || 1;
     // this.parsedfilterTileConfig = JSON.parse(tile.filterTileConfig || '[]');
 
-    console.log('this.parsedfilterTileConfig check', this.parsedfilterTileConfig);
+    //////////////////console.log('this.parsedfilterTileConfig check', this.parsedfilterTileConfig);
 
     // Retrieve stored filter data from localStorage
     const storedFilterData = localStorage.getItem(`filterData_${tile.id}`);
@@ -1439,7 +1439,7 @@ openFilterModal(tile: any, index: number) {
       theme.selected = theme.color === (filterValues.themeColor || tile.themeColor);
     });
 
-    console.log('Updated themes:', this.themes);
+    //////////////////console.log('Updated themes:', this.themes);
     this.isEditMode = true;
   } else {
     this.selectedTile = null;
@@ -1474,7 +1474,7 @@ closeFilterModal() {
 
 
 preDefinedRange(preDefined:any){
-  console.log('preDefined check',preDefined)
+  //////////////////console.log('preDefined check',preDefined)
 
 }
 
@@ -1494,14 +1494,14 @@ repopulate_fields(getValues: any) {
       } else {
         parsedtileConfig = Array.isArray(getValues.tileConfig) ? getValues.tileConfig : [];
       }
-      console.log('Parsed tileConfig:', parsedtileConfig);
+      //////////////////console.log('Parsed tileConfig:', parsedtileConfig);
     } catch (error) {
       console.error('Error parsing tileConfig:', error);
     }
 
     if (parsedtileConfig.length > 0) {
       for (let i = 0; i < parsedtileConfig.length; i++) {
-        console.log('parsedtileConfig checking', parsedtileConfig[i]);
+        //////////////////console.log('parsedtileConfig checking', parsedtileConfig[i]);
 
         // Ensure filterParameter exists and is being read correctly
         const filterParameterValue = parsedtileConfig[i].filterParameter;
@@ -1528,9 +1528,9 @@ repopulate_fields(getValues: any) {
           filterForm: parsedtileConfig[i].filterForm || '',
           filterParameter: filterParameterValue, // Directly assign the original value
         }));
-console.log('this.all_fields checking',)
+//////////////////console.log('this.all_fields checking',)
         // Log to confirm the field was added correctly
-        console.log('Field added:', this.all_fields.at(this.all_fields.length - 1).value);
+        //////////////////console.log('Field added:', this.all_fields.at(this.all_fields.length - 1).value);
       }
     } else {
       // Adjust the form fields if no config exists
@@ -1542,7 +1542,7 @@ console.log('this.all_fields checking',)
     }
   }
 
-  console.log('Final fields:', this.all_fields);
+  //////////////////console.log('Final fields:', this.all_fields);
 
   return this.all_fields;
 }
@@ -1552,11 +1552,11 @@ console.log('this.all_fields checking',)
 
 
   // checkPrimary(event: any): void {
-  //   console.log('Event checking primary:', event);
+  //   //////////////////console.log('Event checking primary:', event);
   
   //   // Extract the value property from the selected data
   //   const selectedValuePrimary = event[0]?.value || null;
-  //   console.log('selectedValuePrimary check',selectedValuePrimary)
+  //   //////////////////console.log('selectedValuePrimary check',selectedValuePrimary)
   
   //   if (selectedValuePrimary === 'Constant') {
   //     this.shouldShowProcessedValue = false; // Hide Processed Value field
@@ -1569,14 +1569,14 @@ console.log('this.all_fields checking',)
     this.isHovered = true;
   }
   async dashboardIds(sk: any) {
-    console.log("Iam called Bro");
+    //////////////////console.log("Iam called Bro");
     try {
       const response = await this.api.GetMaster(this.SK_clientID + "#summary#lookup", sk);
 
       if (response && response.options) {
         if (typeof response.options === 'string') {
           let data = JSON.parse(response.options);
-          console.log("d1 =", data);
+          //////////////////console.log("d1 =", data);
 
           if (Array.isArray(data)) {
             for (let index = 0; index < data.length; index++) {
@@ -1594,10 +1594,10 @@ console.log('this.all_fields checking',)
                 // Check if P1 exists before pushing
                 if (P1 !== undefined && P1 !== null) {
                   this.dashboardIdsList.push({ P1, P2, P3, P4, P5, P6, P7, P8, P9 });
-                  console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5, P6, P7, P8, P9 });
-                  console.log('this.dashboardIdsList check',this.dashboardIdsList)
+                  //////////////////console.log("Pushed to dashboardIdsList: ", { P1, P2, P3, P4, P5, P6, P7, P8, P9 });
+                  //////////////////console.log('this.dashboardIdsList check',this.dashboardIdsList)
                   this.p1ValuesSummary = this.dashboardIdsList.map((item: { P1: any; }) => item.P1);
-console.log('P1 values: dashboard', this.p1ValuesSummary);
+//////////////////console.log('P1 values: dashboard', this.p1ValuesSummary);
                 } else {
                   console.warn("Skipping element because P1 is not defined or null");
                 }
@@ -1615,7 +1615,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
           console.error('response.options is not a string.');
         }
       } else {
-        console.log("Lookup to be displayed", this.dashboardIdsList);
+        //////////////////console.log("Lookup to be displayed", this.dashboardIdsList);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -1630,20 +1630,20 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   
 
   fetchDynamicFormDataFilter(value: any) {
-    console.log("Data from lookup:", value);
+    //////////////////console.log("Data from lookup:", value);
 
     this.api
       .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
       .then((result: any) => {
         if (result && result.metadata) {
           const parsedMetadata = JSON.parse(result.metadata);
-          console.log('parsedMetadata check dynamic',parsedMetadata)
+          //////////////////console.log('parsedMetadata check dynamic',parsedMetadata)
           const formFields = parsedMetadata.formFields;
-          console.log('formFields check',formFields)
+          //////////////////console.log('formFields check',formFields)
 
           // Initialize the list with formFields labels
           this.listofDynamicParamFilter = formFields.map((field: any) => {
-            console.log('field check',field)
+            //////////////////console.log('field check',field)
             return {
               value: field.name,
               text: field.label
@@ -1665,14 +1665,14 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
             });
           }
 
-          console.log('Transformed dynamic parameters:', this.listofDynamicParamFilter);
+          //////////////////console.log('Transformed dynamic parameters:', this.listofDynamicParamFilter);
 
           // Trigger change detection to update the view
           this.cdr.detectChanges();
         }
       })
       .catch((err) => {
-        console.log("Can't fetch", err);
+        //////////////////console.log("Can't fetch", err);
       });
   }
 
@@ -1681,8 +1681,8 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     { value: 'Modal', text: 'Modal' },
   ]
   dynamicparameterValue(event: any, index: any): void {
-    console.log('Event check for dynamic param:', event);
-    console.log('event[0].text check:', event[0]?.text);
+    //////////////////console.log('Event check for dynamic param:', event);
+    //////////////////console.log('event[0].text check:', event[0]?.text);
   
     // Access the specific FormGroup from the FormArray
     const formDynamicParam = this.all_fields.at(index) as FormGroup;
@@ -1694,11 +1694,11 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   
     // Access the filterParameter FormControl
     const filterParameter = formDynamicParam.get('filterParameter');
-    console.log('filterParameter check:', filterParameter);
+    //////////////////console.log('filterParameter check:', filterParameter);
   
     if (event && event[0] && event[0].text) {
       this.filterParamevent = event[0].text;
-      console.log('this.filterParamevent check:', this.filterParamevent);
+      //////////////////console.log('this.filterParamevent check:', this.filterParamevent);
   
       if (filterParameter) {
         // Patch the value to the FormControl
@@ -1708,25 +1708,25 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
         console.warn(`filterParameter control not found in FormGroup for index ${index}`);
       }
     } else {
-      console.log('Failed to set value: event structure is invalid or missing text property.');
+      //////////////////console.log('Failed to set value: event structure is invalid or missing text property.');
     }
   
     // Format and set the selectedParameterValue
     if (event && event[0] && event[0].value) {
       const formattedValue = `\${${event[0].value}}`; // Custom formatting
-      console.log('formattedValue check:', formattedValue);
+      //////////////////console.log('formattedValue check:', formattedValue);
       this.selectedParameterValue = formattedValue;
   
-      console.log('Formatted Selected Item:', this.selectedParameterValue);
+      //////////////////console.log('Formatted Selected Item:', this.selectedParameterValue);
     } else {
-      console.log('Event structure is different or missing value property:', event);
+      //////////////////console.log('Event structure is different or missing value property:', event);
     }
   }
   
 
   dynamicparameterLabel(event: any, index: any) {
-    console.log('event checking dynamicparameterLabel', event);
-    console.log('index checking dynamicparameterLabel', index);
+    //////////////////console.log('event checking dynamicparameterLabel', event);
+    //////////////////console.log('index checking dynamicparameterLabel', index);
   
     // Ensure the variable is initialized as an array or object
     if (!this.dynamicparameterLabMap) {
@@ -1735,14 +1735,14 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   
     // Store the value for the specific index
     this.dynamicparameterLabMap[index] = event[0]?.text || '';
-    console.log('dynamicparameterLabMap after update:', this.dynamicparameterLabMap[index]);
+    //////////////////console.log('dynamicparameterLabMap after update:', this.dynamicparameterLabMap[index]);
   
-    console.log('dynamicparameterLabMap after update:', this.dynamicparameterLabMap);
+    //////////////////console.log('dynamicparameterLabMap after update:', this.dynamicparameterLabMap);
   }
   
 
   onAdd(index: any): void {
-    console.log('index checking from onAdd', index);
+    //////////////////console.log('index checking from onAdd', index);
   
     // Access the specific form group from the form array
     const formDescParam = this.all_fields.at(index) as FormGroup;
@@ -1751,15 +1751,15 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     const groupByFormatControl = formDescParam.get('filterDescription');
   
     // Set the `selectedParameterValue` to the `name` of the selected parameter
-    console.log('this.selectedParameterValue check', this.selectedParameterValue);
+    //////////////////console.log('this.selectedParameterValue check', this.selectedParameterValue);
   
     // Update the specific form control value for `filterDescription`
     if (groupByFormatControl) {
       groupByFormatControl.patchValue(`${this.selectedParameterValue}`);
-      console.log(
-        `Patched value for index ${index}:`,
-        `${this.selectedParameterValue}`
-      );
+      // //////////////////console.log(
+      //   `Patched value for index ${index}:`,
+      //   `${this.selectedParameterValue}`
+      // );
     } else {
       console.warn(
         `filterDescription control not found for index ${index}.`
@@ -1784,11 +1784,11 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     const groupByFormatControl = formGroupparam.get('parameterName');
 
    
-    console.log('event for parameter check',event)
+    //////////////////console.log('event for parameter check',event)
     if (event && event[0] && event[0].value) {
       if (groupByFormatControl) {
         groupByFormatControl.setValue(event[0].text);
-        console.log('Value set successfully:', groupByFormatControl.value);
+        //////////////////console.log('Value set successfully:', groupByFormatControl.value);
       } else {
         console.error('groupByFormat control does not exist in the form group!');
       }
@@ -1800,7 +1800,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   selectFormParams(event: any, index: number) {
     if (event && event[0] && event[0].data) {
       const selectedText = event[0].data.text; // Adjust based on the actual structure
-      console.log('Selected Form Text:', selectedText);
+      //////////////////console.log('Selected Form Text:', selectedText);
   
       if (selectedText) {
         // Fetch parameters dynamically for the specific field index
@@ -1818,7 +1818,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   selectFormParamsFilter(event: any) {
     if (event && event[0] && event[0].data) {
       const selectedFilterText = event[0].data.text;  // Adjust based on the actual structure
-      console.log('Selected Form Text:', selectedFilterText);
+      //////////////////console.log('Selected Form Text:', selectedFilterText);
 
       if (selectedFilterText) {
         this.fetchDynamicFormDataFilter(selectedFilterText);
@@ -1881,7 +1881,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
     { value: 'Yearly', text: 'Yearly' }
   ];
   onValueChange(selectedValue: any): void {
-    console.log('selectedValue check', selectedValue[0].value);  // Log the selected value
+    //////////////////console.log('selectedValue check', selectedValue[0].value);  // Log the selected value
   
     // Set the primaryValue form control to the selected value
     this.createChart.get('primaryValue')?.setValue(selectedValue[0].value);
@@ -1891,7 +1891,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   }
 
   onValueSelect(onSelectValue:any){
-    console.log('selectedValue check', onSelectValue[0].value);  // Log the selected value
+    //////////////////console.log('selectedValue check', onSelectValue[0].value);  // Log the selected value
   
     // Set the primaryValue form control to the selected value
     this.createChart.get('selectedRangeType')?.setValue(onSelectValue[0].value);
@@ -1913,8 +1913,8 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   //   }
   // }
   selectValue(value: string, modal: any): void {
-    console.log('Selected value:', value);
-    console.log('Current calenderIndex:', this.calenderIndex);
+    //////////////////console.log('Selected value:', value);
+    //////////////////console.log('Current calenderIndex:', this.calenderIndex);
   
     if (
       this.calenderIndex !== undefined &&
@@ -1926,7 +1926,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
   
       if (groupByFormatControl) {
         groupByFormatControl.setValue(value);
-        console.log('Value set successfully:', groupByFormatControl.value);
+        //////////////////console.log('Value set successfully:', groupByFormatControl.value);
       } else {
         console.error('groupByFormat control does not exist in the form group!');
       }
@@ -1952,7 +1952,7 @@ console.log('P1 values: dashboard', this.p1ValuesSummary);
 
   handleModalClose(selectedValue: string) {
     // Logic to handle what happens after the modal closes
-    console.log('Handling post modal close logic with value:', selectedValue);
+    //////////////////console.log('Handling post modal close logic with value:', selectedValue);
     // You can update your UI or state here based on the selectedValue
   }
 
@@ -1975,7 +1975,7 @@ datesUpdatedRange($event: any,index:any): void {
     );
   });
 
-  console.log('Selected Range Check:', selectedRange);
+  //////////////////console.log('Selected Range Check:', selectedRange);
 
   if (selectedRange) {
     const control = this.createChart.get('predefinedSelectRange');
@@ -1984,7 +1984,7 @@ datesUpdatedRange($event: any,index:any): void {
     }
 
     // Debugging: Log before setting the value
-    console.log('Setting selectedRangeType:', selectedRange[0]);
+    //////////////////console.log('Setting selectedRangeType:', selectedRange[0]);
     
     const controlSelectedRangeType = this.all_fields.at(index).get('selectedRangeType');
     if (controlSelectedRangeType) {
@@ -1992,7 +1992,7 @@ datesUpdatedRange($event: any,index:any): void {
     }
 
     // Debugging: Log after setting the value
-    console.log('selectedRangeType after setting:', this.createChart.get('selectedRangeType')?.value);
+    //////////////////console.log('selectedRangeType after setting:', this.createChart.get('selectedRangeType')?.value);
   }
 }
 
@@ -2015,7 +2015,7 @@ toggleCheckbox(theme: any) {
     const colorInput = event.target as HTMLInputElement;
     this.createChart.get('themeColor')?.setValue(colorInput.value)
 
-    console.log('Color changed:', this.createChart.get('themeColor')?.value);
+    //////////////////console.log('Color changed:', this.createChart.get('themeColor')?.value);
   }
 
 
@@ -2084,13 +2084,13 @@ toggleCheckbox(theme: any) {
               reject(new Error('response.options is not a string.'));
             }
           } else {
-            console.log("All the users are here", JSON.parse(JSON.stringify(this.lookup_data_savedQuery)));
+            //////////////////console.log("All the users are here", JSON.parse(JSON.stringify(this.lookup_data_savedQuery)));
 
             this.original_lookup_data = this.lookup_data_savedQuery
 
             this.listofSavedIds = this.lookup_data_savedQuery.map((item:any)=>item.P1)
 
-            // console.log("All the unique IDs are here ",this.listofSavedIds);
+            // //////////////////console.log("All the unique IDs are here ",this.listofSavedIds);
 
             this.lookup_data_savedQuery = this.lookup_data_savedQuery.map((item: any) => {
               let tempHolder:any = {}
@@ -2144,11 +2144,11 @@ toggleCheckbox(theme: any) {
 
   async fetchDynamic(eventValue: any[], formValueSave: string[], fieldIndex: any, conditionIndex: any, formField: any): Promise<any[]> {
     this.cd.detectChanges();
-    console.log('eventValue checking', eventValue);
-    console.log('fieldIndex checking', fieldIndex);
-    console.log('eventValue[0].value',formField)
+    //////////////////console.log('eventValue checking', eventValue);
+    //////////////////console.log('fieldIndex checking', fieldIndex);
+    //////////////////console.log('eventValue[0].value',formField)
     let formFieldControl = eventValue[0].value;
-    console.log('formFieldControl extract', formFieldControl);
+    //////////////////console.log('formFieldControl extract', formFieldControl);
 
     // Initialize the map for storing labels if it doesn't exist
     if (!this.fieldLabelsShow) {
@@ -2163,29 +2163,29 @@ toggleCheckbox(theme: any) {
     // Retrieve the map for the current fieldIndex and set the label for the current conditionIndex
     const indexLabels = this.fieldLabelsShow.get(fieldIndex);
     indexLabels.set(conditionIndex, eventValue[0].text);
-    console.log(`Label for fieldIndex ${fieldIndex}, conditionIndex ${conditionIndex}:`, indexLabels.get(conditionIndex));
+    //////////////////console.log(`Label for fieldIndex ${fieldIndex}, conditionIndex ${conditionIndex}:`, indexLabels.get(conditionIndex));
 
  
 
-    console.log('formValueSave check', formValueSave);
+    ////////////////console.log('formValueSave check', formValueSave);
     const fetchedData = []; // Initialize an array to store the fetched values
 
     try {
         this.populateFormBuilder = []; // Initialize to ensure a clean state
 
         for (const [index, formName] of formValueSave.entries()) {
-            console.log(`Processing form at index ${index}:`, formName);
+            ////////////////console.log(`Processing form at index ${index}:`, formName);
 
             const result = await this.api.GetMaster(
                 `${this.SK_clientID}#dynamic_form#${formName}#main`,
                 1
             );
 
-            console.log('Result from API:', result);
+            ////////////////console.log('Result from API:', result);
 
             if (result) {
                 const tempResult = JSON.parse(result.metadata || '{}').formFields;
-                console.log('Parsed form fields:', tempResult);
+                ////////////////console.log('Parsed form fields:', tempResult);
 
                 const tempMetadata = {
                     [formName]: tempResult.map((field: any) => ({
@@ -2197,18 +2197,18 @@ toggleCheckbox(theme: any) {
                         validation: field.validation,
                     })),
                 };
-console.log('tempMetadata',tempMetadata)
+////////////////console.log('tempMetadata',tempMetadata)
                 this.populateFormBuilder[index] = JSON.parse(JSON.stringify(tempMetadata));
                 fetchedData.push(tempMetadata); // Push to the fetched data array
             }
         }
         // Dynamically fetch options and set globalFieldData
-        console.log('formFieldControl checking from dynamic',formFieldControl)
+        ////////////////console.log('formFieldControl checking from dynamic',formFieldControl)
         
 
         this.getOptionsForField(fieldIndex, conditionIndex, formFieldControl);
 
-        console.log('Final populateFormBuilder:', this.populateFormBuilder);
+        ////////////////console.log('Final populateFormBuilder:', this.populateFormBuilder);
         return fetchedData; // Return the fetched data
     } catch (error) {
         console.error('Error in fetching form Builder data:', error);
@@ -2229,11 +2229,11 @@ console.log('tempMetadata',tempMetadata)
 
 
   async getOptionsForField(fieldIndex: number, conditionIndex: number, formFieldValue: string): Promise<void> {
-    console.log('fieldIndex check:', fieldIndex);
-    console.log('conditionIndex check:', conditionIndex);
-    console.log('formFieldValue check:', formFieldValue);
-    console.log('Final populateFormBuilder dynamic:', this.populateFormBuilder);
-    console.log('globalFieldData checking from option', this.globalFieldData);
+    ////////////////console.log('fieldIndex check:', fieldIndex);
+    ////////////////console.log('conditionIndex check:', conditionIndex);
+    ////////////////console.log('formFieldValue check:', formFieldValue);
+    ////////////////console.log('Final populateFormBuilder dynamic:', this.populateFormBuilder);
+    ////////////////console.log('globalFieldData checking from option', this.globalFieldData);
   
     try {
       if (!this.globalFieldData[fieldIndex]) {
@@ -2263,7 +2263,7 @@ console.log('tempMetadata',tempMetadata)
       }
   
       const formName = this.formlistValues[fieldIndex];
-      console.log('formName from formlistValues:', formName);
+      ////////////////console.log('formName from formlistValues:', formName);
       if (!formName) {
         console.warn(`Form name is missing for fieldIndex ${fieldIndex} in formlistValues`);
         conditions.controls[conditionIndex].get('type')?.setValue('text');
@@ -2272,7 +2272,7 @@ console.log('tempMetadata',tempMetadata)
       }
   
       const metadataAtFieldIndex = this.populateFormBuilder[fieldIndex];
-      console.log('metadataAtFieldIndex check:', metadataAtFieldIndex);
+      ////////////////console.log('metadataAtFieldIndex check:', metadataAtFieldIndex);
       if (!metadataAtFieldIndex || !metadataAtFieldIndex[formName]) {
         console.error(`Form name '${formName}' not found in metadataAtFieldIndex. Available forms:`, Object.keys(metadataAtFieldIndex || {}));
         conditions.controls[conditionIndex].get('type')?.setValue('text');
@@ -2281,11 +2281,11 @@ console.log('tempMetadata',tempMetadata)
       }
   
       const matchingMetadata = metadataAtFieldIndex[formName];
-      console.log('matchingMetadata check:', matchingMetadata);
+      ////////////////console.log('matchingMetadata check:', matchingMetadata);
   
       const foundField = matchingMetadata.find((field: Field) => field.name === formFieldValue);
       if (foundField) {
-        console.log(`Found field for ${formFieldValue}:`, foundField);
+        ////////////////console.log(`Found field for ${formFieldValue}:`, foundField);
   
         // Set the type and options in the global variable
         if (foundField.type === 'select') {
@@ -2335,7 +2335,7 @@ console.log('tempMetadata',tempMetadata)
             // Set fieldTypeCheck property
             this.conditionfilter[fieldIndex][conditionIndex].fieldTypeCheck = false;
               const lookupKey = `${this.SK_clientID}#user#lookup`;
-              console.log('lookupKey',lookupKey)
+              ////////////////console.log('lookupKey',lookupKey)
 
      
                 // Ensure that you are awaiting the async function to get the resolved value
@@ -2343,7 +2343,7 @@ console.log('tempMetadata',tempMetadata)
                 const transformedOptions = optionsSet.map((option: any) => ({ label: option, value: option }));
 
               
-                console.log('this.userlistCheck check', optionsSet); // Log the resolved value
+                ////////////////console.log('this.userlistCheck check', optionsSet); // Log the resolved value
               
                 // Ensure the 'type' form control exists and is being updated properly
                 const typeControl = conditions.controls[conditionIndex].get('type');
@@ -2362,7 +2362,7 @@ console.log('tempMetadata',tempMetadata)
  
               
               // Handle the logic for the user dropdown here
-              console.log("User list dropdown is here");
+              ////////////////console.log("User list dropdown is here");
             }
             else if(foundField.validation?.lookup === true && foundField.validation?.form){
               if (!this.conditionfilter[fieldIndex]) {
@@ -2380,7 +2380,7 @@ console.log('tempMetadata',tempMetadata)
 
               const extractedIds = await this.fetchLookupFormData(lookupKey, 1, foundField.validation?.field);
               const transformedOptions = extractedIds.map((option: any) => ({ label: option, value: option }));
-              console.log('Received Extracted IDs:', extractedIds);
+              ////////////////console.log('Received Extracted IDs:', extractedIds);
               const typeControl = conditions.controls[conditionIndex].get('type');
               if (typeControl) {
                 typeControl.setValue(foundField.type); // Set the 'type' value
@@ -2435,7 +2435,7 @@ console.log('tempMetadata',tempMetadata)
             // else if()
           }
         }else if (foundField.type === 'date') {
-          console.log('my type is date', foundField.type);
+          ////////////////console.log('my type is date', foundField.type);
       
           // Ensure fieldIndex exists in conditionfilter array
           if (!this.conditionfilter[fieldIndex]) {
@@ -2450,12 +2450,12 @@ console.log('tempMetadata',tempMetadata)
           // Set fieldTypeCheck property
           this.conditionfilter[fieldIndex][conditionIndex].fieldTypeCheck = true;
       
-          console.log(
-              'this.conditionfilter[fieldIndex][conditionIndex].fieldTypeCheck:',
-              this.conditionfilter[fieldIndex][conditionIndex].fieldTypeCheck
-          );
-          console.log('conditionIndex from filter', conditionIndex);
-          console.log('fieldIndex check from filter', fieldIndex);
+          // ////////////////console.log(
+          //     'this.conditionfilter[fieldIndex][conditionIndex].fieldTypeCheck:',
+          //     this.conditionfilter[fieldIndex][conditionIndex].fieldTypeCheck
+          // );
+          ////////////////console.log('conditionIndex from filter', conditionIndex);
+          ////////////////console.log('fieldIndex check from filter', fieldIndex);
       }
       else {
 
@@ -2490,7 +2490,7 @@ console.log('tempMetadata',tempMetadata)
         }
 
         console.warn(`Field with name ${formFieldValue} not found in metadata for index ${fieldIndex}`);
-        console.log('Available field names:', matchingMetadata.map((field: Field) => field.name));
+        ////////////////console.log('Available field names:', matchingMetadata.map((field: Field) => field.name));
         conditions.controls[conditionIndex].get('type')?.setValue('text');
         this.globalFieldData[fieldIndex][conditionIndex] = { type: 'text', options: null };
       }
@@ -2501,14 +2501,14 @@ console.log('tempMetadata',tempMetadata)
   
   
   async fetchLookupUser(lookupKey: any, sk: any) {
-    console.log("Iam called Bro");
+    ////////////////console.log("Iam called Bro");
     try {
       const response = await this.api.GetMaster(lookupKey, sk);
   
       if (response && response.options) {
         if (typeof response.options === 'string') {
           let data = JSON.parse(response.options);
-          console.log("d1 =", data);
+          ////////////////console.log("d1 =", data);
   
           if (Array.isArray(data)) {
             for (let index = 0; index < data.length; index++) {
@@ -2526,9 +2526,9 @@ console.log('tempMetadata',tempMetadata)
                 // Check if P1 exists before pushing
                 if (P1 !== undefined && P1 !== null) {
                   this.userList.push({ P1, P2, P3, P4, P5, P6, P7 });
-                  console.log("Pushed to userList: ", { P1, P2, P3, P4, P5, P6, P7 });
+                  ////////////////console.log("Pushed to userList: ", { P1, P2, P3, P4, P5, P6, P7 });
                   this.userlistRead = this.userList.map((item: { P1: any; }) => item.P1);
-                  console.log('this.userlistRead', this.userlistRead);
+                  ////////////////console.log('this.userlistRead', this.userlistRead);
                 } else {
                   console.warn("Skipping element because P1 is not defined or null");
                 }
@@ -2547,7 +2547,7 @@ console.log('tempMetadata',tempMetadata)
           console.error('response.options is not a string.');
         }
       } else {
-        console.log("Lookup to be displayed", this.userlistRead);
+        ////////////////console.log("Lookup to be displayed", this.userlistRead);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -2559,8 +2559,8 @@ console.log('tempMetadata',tempMetadata)
 
 
   async fetchLookupFormData(lookupKey: any, sk: number, readField: any, accumulatedData: any[] = []): Promise<any[]> {
-    console.log('Fetching data for sk:', sk);
-    console.log('readField checking', readField);
+    ////////////////console.log('Fetching data for sk:', sk);
+    ////////////////console.log('readField checking', readField);
   
     try {
       // Fetch data for the current sk
@@ -2569,7 +2569,7 @@ console.log('tempMetadata',tempMetadata)
       if (response && response.options) {
         if (typeof response.options === 'string') {
           let data = JSON.parse(response.options);
-          console.log("form data check", data);
+          ////////////////console.log("form data check", data);
   
           let extractedValues: any[] = [];
   
@@ -2584,24 +2584,24 @@ console.log('tempMetadata',tempMetadata)
             });
           });
   
-          console.log('Extracted IDs:', extractedValues);
+          ////////////////console.log('Extracted IDs:', extractedValues);
   
           // Append extracted values to the accumulated data
           accumulatedData = accumulatedData.concat(extractedValues);
   
           // Check if more data is available (assuming an empty array means no more data)
           if (data.length > 0) {
-            console.log(`Fetching next batch for sk: ${sk + 1}`);
+            ////////////////console.log(`Fetching next batch for sk: ${sk + 1}`);
             return await this.fetchLookupFormData(lookupKey, sk + 1, readField, accumulatedData);
           }
-          console.log('accumulatedData checking',accumulatedData)
+          ////////////////console.log('accumulatedData checking',accumulatedData)
   
           return accumulatedData; // Return all accumulated records
         } else {
           console.error('response.options is not a string.');
         }
       } else {
-        console.log("Lookup to be displayed", this.userlistRead);
+        ////////////////console.log("Lookup to be displayed", this.userlistRead);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -2613,8 +2613,8 @@ console.log('tempMetadata',tempMetadata)
   
 
   async fetchLookupIsDerivedUser(lookupKey: any, sk: any, readField: any): Promise<any[]> {
-    console.log('readField checking', readField);
-    console.log("Iam called Bro");
+    ////////////////console.log('readField checking', readField);
+    ////////////////console.log("Iam called Bro");
     
     try {
       const response = await this.api.GetMaster(lookupKey, sk);
@@ -2622,7 +2622,7 @@ console.log('tempMetadata',tempMetadata)
       if (response && response.options) {
         if (typeof response.options === 'string') {
           let data = JSON.parse(response.options);
-          console.log("is Derived user Data", data);
+          ////////////////console.log("is Derived user Data", data);
           let extractedDerivedUsers: any[] = [];
           
           // Loop through data to find the matching value
@@ -2636,7 +2636,7 @@ console.log('tempMetadata',tempMetadata)
             });
           });
   
-          console.log('Extracted IDs:', extractedDerivedUsers);
+          ////////////////console.log('Extracted IDs:', extractedDerivedUsers);
   
           // Return the extracted IDs
           return extractedDerivedUsers;
@@ -2649,7 +2649,7 @@ console.log('tempMetadata',tempMetadata)
           console.error('response.options is not a string.');
         }
       } else {
-        console.log("Lookup to be displayed", this.userlistRead);
+        ////////////////console.log("Lookup to be displayed", this.userlistRead);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -2692,8 +2692,8 @@ console.log('tempMetadata',tempMetadata)
 
     // this.isLoadingFilter = true;
   
-    console.log('this.routeId check', this.routeId);
-    console.log('client id check', this.SK_clientID);
+    ////////////////console.log('this.routeId check', this.routeId);
+    ////////////////console.log('client id check', this.SK_clientID);
     this.spinner.show('clearFilterProcess');
     this.createChart.reset();
 
@@ -2714,18 +2714,18 @@ console.log('tempMetadata',tempMetadata)
       }),
     };
   
-    console.log('requestBody checking from clear Filter', requestBody);
+    ////////////////console.log('requestBody checking from clear Filter', requestBody);
   
     this.http.post(apiUrl, requestBody).subscribe(
       (response) => {
-        console.log('Lambda function triggered successfully:', response);
+        ////////////////console.log('Lambda function triggered successfully:', response);
 
         
         const constLiveData = JSON.parse((response as any)?.body);
-        console.log('constLiveData check', constLiveData);
+        ////////////////console.log('constLiveData check', constLiveData);
         const processedData = constLiveData.Processed_Data.metadata.grid_details;
   
-        console.log('processedData check', processedData);
+        ////////////////console.log('processedData check', processedData);
         this.storeliveFilterData = processedData
         this.liveFilterData.emit('');
 
@@ -2763,8 +2763,8 @@ console.log('tempMetadata',tempMetadata)
     return field.get('dateType')?.value === type;
   }
   getDateType(fieldIndex: number, conditionIndex: number): string | null {
-    // console.log('fieldIndex from dataType:', fieldIndex);
-    // console.log('conditionIndex from dataType:', conditionIndex);
+    // ////////////////console.log('fieldIndex from dataType:', fieldIndex);
+    // ////////////////console.log('conditionIndex from dataType:', conditionIndex);
 
     if (
         this.all_fields &&
@@ -2835,7 +2835,7 @@ console.log('tempMetadata',tempMetadata)
     try {
         this.userdetails = this.getLoggedUser.username;
         this.userClient = `${this.userdetails}#user#main`;
-        console.log("this.tempClient from form service check", this.userClient);
+        ////////////////console.log("this.tempClient from form service check", this.userClient);
   
         // Fetch user permissions
         const permission = await this.api.GetMaster(this.userClient, sk);
@@ -2845,7 +2845,7 @@ console.log('tempMetadata',tempMetadata)
             return null; // Fix: Returning null instead of undefined
         }
   
-        console.log("Data checking from add form", permission);
+        ////////////////console.log("Data checking from add form", permission);
   
         // Parse metadata
         const metadataString: string | null | undefined = permission.metadata;
@@ -2853,18 +2853,18 @@ console.log('tempMetadata',tempMetadata)
             console.error("Invalid metadata format:", metadataString);
             return null; // Fix: Ensuring the function returns a value
         }
-        console.log('metadataString checking for',metadataString)
+        ////////////////console.log('metadataString checking for',metadataString)
   
         try {
             this.permissionsMetaData = JSON.parse(metadataString);
-            console.log("Parsed Metadata Object from location", this.permissionsMetaData);
+            ////////////////console.log("Parsed Metadata Object from location", this.permissionsMetaData);
   
             const permissionId = this.permissionsMetaData.permission_ID;
-            console.log("permission Id check from Tile1", permissionId);
+            ////////////////console.log("permission Id check from Tile1", permissionId);
             this.permissionIdRequest = permissionId;
-            console.log('this.permissionIdRequest checking',this.permissionIdRequest)
+            ////////////////console.log('this.permissionIdRequest checking',this.permissionIdRequest)
             this.storeFormIdPerm = this.permissionsMetaData.form_permission
-            console.log('this.storeFormIdPerm check',this.storeFormIdPerm)
+            ////////////////console.log('this.storeFormIdPerm check',this.storeFormIdPerm)
     
   
             if(this.permissionIdRequest=='All' && this.storeFormIdPerm=='All'){
@@ -2876,7 +2876,7 @@ console.log('tempMetadata',tempMetadata)
             }
             else if (this.permissionIdRequest != 'All' && this.storeFormIdPerm[0] != 'All') {
               const readFilterEquationawait: any = await this.fetchPermissionIdMain(1, permissionId);
-              console.log('main permission check from Tile1', readFilterEquationawait);
+              ////////////////console.log('main permission check from Tile1', readFilterEquationawait);
             
               if (Array.isArray(readFilterEquationawait)) {
                 const hasAllPermission = readFilterEquationawait.some(
@@ -2896,7 +2896,7 @@ console.log('tempMetadata',tempMetadata)
                     dynamicFormValues.includes(id)
                   );
             
-                  console.log('matchedStoreFormIds:', matchedStoreFormIds);
+                  ////////////////console.log('matchedStoreFormIds:', matchedStoreFormIds);
             
                   this.dynamicData(matchedStoreFormIds); // ⬅️ Use the filtered list
                 }
@@ -2906,7 +2906,7 @@ console.log('tempMetadata',tempMetadata)
             }
             else if (this.permissionIdRequest !== 'All' && this.storeFormIdPerm[0] === 'All') {
               const readFilterEquationawait: any = await this.fetchPermissionIdMain(1, permissionId);
-              console.log('main permission check from Tile1', readFilterEquationawait);
+              ////////////////console.log('main permission check from Tile1', readFilterEquationawait);
             
               if (Array.isArray(readFilterEquationawait)) {
                 const hasAllPermission = readFilterEquationawait.some(
@@ -2922,7 +2922,7 @@ console.log('tempMetadata',tempMetadata)
                     .map((packet: any) => packet.dynamicForm?.[0])  // Get first value from each dynamicForm
                     .filter((formId: string | undefined) => !!formId); // Remove undefined/null
             
-                  console.log('filteredFormIds (no "All" present):', filteredFormIds);
+                  ////////////////console.log('filteredFormIds (no "All" present):', filteredFormIds);
             
                   this.dynamicData(filteredFormIds);
                 }
@@ -2952,12 +2952,12 @@ console.log('tempMetadata',tempMetadata)
   async fetchPermissionIdMain(clientID: number, p1Value: string): Promise<void> {
   
   try {
-    console.log("p1Value checking", p1Value);
-    console.log("clientID checking", clientID);
-    console.log("this.SK_clientID checking from permission", this.SK_clientID);
+    ////////////////console.log("p1Value checking", p1Value);
+    ////////////////console.log("clientID checking", clientID);
+    ////////////////console.log("this.SK_clientID checking from permission", this.SK_clientID);
   
     const pk = `${this.SK_clientID}#permission#${p1Value}#main`;
-    console.log(`Fetching main table data for PK: ${pk}`);
+    ////////////////console.log(`Fetching main table data for PK: ${pk}`);
   
     const result: any = await this.api.GetMaster(pk, clientID);
   
@@ -2969,26 +2969,26 @@ console.log('tempMetadata',tempMetadata)
   
     // Parse metadata
     this.parsedPermission = JSON.parse(result.metadata);
-    console.log("Parsed permission metadata:", this.parsedPermission);
+    ////////////////console.log("Parsed permission metadata:", this.parsedPermission);
   
     this.readFilterEquation = JSON.parse(this.parsedPermission.dynamicEntries);
-    console.log("this.readFilterEquation check", this.readFilterEquation);
+    ////////////////console.log("this.readFilterEquation check", this.readFilterEquation);
   
     // Handling Dashboard Permissions
     this.summaryPermission = this.parsedPermission.summaryList || [];
-    console.log("this.summaryPermission check", this.summaryPermission);
+    ////////////////console.log("this.summaryPermission check", this.summaryPermission);
   
     // if (this.summaryPermission.includes("All")) {
-    //   console.log("Permission is 'All'. Fetching all dashboards...");
+    //   ////////////////console.log("Permission is 'All'. Fetching all dashboards...");
   
   return this.readFilterEquation
     // } else {
-    //   console.log("Fetching specific dashboards...");
+    //   ////////////////console.log("Fetching specific dashboards...");
     //   const allData = await this.fetchCompanyLookupdata(1);
     //   this.dashboardData = allData.filter((dashboard: any) =>
     //     this.summaryPermission.includes(dashboard.P1)
     //   );
-    //   console.log("Filtered Dashboards Data:", this.dashboardData);
+    //   ////////////////console.log("Filtered Dashboards Data:", this.dashboardData);
     // }
   
     // Extract Permission List

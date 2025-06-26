@@ -2570,8 +2570,10 @@ style="width: 350px; height: 250px; display: flex; justify-content: center; alig
   
   <!-- </ng-template> -->
   <ng-template #tableModal let-modal >
+    <div class="modal-body" style="height: 100%; overflow-y: auto;">
   
     <app-table-widget-config (send_all_Packet_store)="allPacketStoreReceiver($event)"  [modal]="modal" [dashboard]="dashboard" (dashboardChange)="getGridDetails($event)" [all_Packet_store]="all_Packet_store" (update_PowerBoard_config)="updateSummaryHelper2($event)" [isGirdMoved]="isGirdMoved"></app-table-widget-config >
+    </div>
   
   </ng-template>
   <ng-template #KPIModal1 let-modal >

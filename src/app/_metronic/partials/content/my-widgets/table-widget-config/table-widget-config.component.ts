@@ -85,6 +85,13 @@ this.fetchUserPermissions(1)
         this.formValidationFailed = true;
       }
     });
+
+    this.createKPIWidget.get('DataType')?.valueChanges.subscribe(value => {
+      console.log('DataType changed:', value);
+      if (value === 'Processed Data') {
+        this.CustomColumnCal();
+      }
+    });
     // this.dashboardIds(1)
   }
   constructor(private summaryConfiguration: SharedService, private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
@@ -92,8 +99,30 @@ this.fetchUserPermissions(1)
     private spinner: NgxSpinnerService,private zone: NgZone
   ){
 
+    
+
 
   }
+
+
+
+
+
+
+  CustomColumnCal() {
+
+    const formArray = this.createKPIWidget.get('customColumnFields') as FormArray;
+    const readFormFieldsControl = this.createKPIWidget.get('form_data_selected')?.value
+    console.log('readFormFieldsControl checking',readFormFieldsControl)
+  
+
+      formArray.controls.forEach((control) => {
+        control.enable(); // Enable the controls if checkbox is checked
+      });
+      this.addCustomColumnControls(readFormFieldsControl, 'ts'); // Call addControls when enabled
+
+  }
+  
   ngAfterViewInit(): void {
     this.addCondition();
   }
@@ -104,6 +133,7 @@ this.fetchUserPermissions(1)
 
       // all_fields:new FormArray([]),
       all_fields: new FormArray([]),
+      customColumnFields:new FormArray([]),
       conditions: this.fb.array([]), 
       formlist: ['', Validators.required],
       form_data_selected: ['', Validators.required],
@@ -117,11 +147,23 @@ this.fetchUserPermissions(1)
       filterParameter1:[''],
       // custom_Label1:[''],
       filterDescription1:[''],
-      enableRowCal:['']
+      enableRowCal:[''],
+      DataType:['']
   
     });
   }
 
+
+
+  DataTypeValues = [
+    { value: 'Processed Data', text: 'Processed Data' },
+    { value: 'Normal Data', text: 'Normal Data' },
+
+
+]
+get isProcessedDataSelected(): boolean {
+  return this.createKPIWidget?.get('DataType')?.value === 'Processed Data';
+}
 
     openWidgetFilterHelp(stepperModal: TemplateRef<any>){
       this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
@@ -187,6 +229,38 @@ this.fetchUserPermissions(1)
     console.log('Updated Form Array:', formArray.value);
   }
 
+
+
+  addCustomColumnControls(selectedFields: any[], _type: string) {
+    console.log('Selected Fields:', selectedFields);
+  
+    const noOfParams = selectedFields.length;
+    const formArray = this.createKPIWidget.get('customColumnFields') as FormArray;
+  
+    // Add or remove controls dynamically
+    if (formArray.length < noOfParams) {
+      for (let i = formArray.length; i < noOfParams; i++) {
+        const field = selectedFields[i]; // 👈 pick only one field per control
+  
+        formArray.push(
+          this.fb.group({
+            columnType: [''],
+            columnUnit: [''],
+            columnHeading: [[field]] // 👈 wrap in array to match original format
+          })
+        );
+      }
+    } else {
+      // Remove extra controls
+      while (formArray.length > noOfParams) {
+        formArray.removeAt(formArray.length - 1);
+      }
+    }
+  
+    console.log('Updated Form Array:', formArray.value);
+  }
+  
+
   selectType = [
     { value: 'sum', text: 'Sum' },
     { value: 'min', text: 'Minimum' },
@@ -194,12 +268,27 @@ this.fetchUserPermissions(1)
     { value: 'average', text: 'Average' },
     { value: 'latest', text: 'Latest' },
     { value: 'previous', text: 'Previous' },
+    { value: 'Count', text: 'Count' },
     // { value: 'default', text: 'Default' }
   ];
   
 
 
   selectUnits = [
+    { value: 'Default', text: 'Default' },
+    { value: 'Rupee', text: 'Rupee' },
+    { value: 'Distance', text: 'Distance' },
+    { value: 'Minutes', text: 'Minutes' },
+    { value: 'Hours', text: 'Hours' },
+    { value: 'Days', text: 'Days' },
+    { value: 'Days & Hours', text: 'Days & Hours' },
+  
+  
+    { value: 'Months', text: 'Months' },
+    { value: 'Years', text: 'Years' },
+    {value:'Label With Value',text:'Label With Value'},
+    { value: 'Percentage', text: 'Percentage' },
+    { value: 'Rupee with Percentage', text: 'Rupee with Percentage' },
     { value: 'Rupee with Value', text: 'Rupee with Value' },
     { value: 'Dollar with Value', text: 'Dollar with Value' },
     { value: 'Coma with Unit', text: 'Coma with Unit' }
@@ -208,6 +297,11 @@ this.fetchUserPermissions(1)
 
   get all_fields() {
     return this.createKPIWidget.get('all_fields') as FormArray;
+  }
+
+  get customColumnFields(){
+       return this.createKPIWidget.get('customColumnFields') as FormArray;
+
   }
 
   // Handle dynamic parameter value changes
@@ -379,10 +473,13 @@ this.fetchUserPermissions(1)
       conditions: conditionsArray, // Use the updated conditions array
       filterParameter1:this.createKPIWidget.value.filterParameter1,
       table_rowConfig: this.createKPIWidget.value.all_fields || [],
+      customColumnConfig:this.createKPIWidget.value.customColumnFields ||[],
       // custom_Label1:this.createKPIWidget.value.custom_Label1,
       filterDescription1:this.createKPIWidget.value.filterDescription1,
       enableRowCal:this.createKPIWidget.value.enableRowCal,
       filter_duplicate_data:this.createKPIWidget.value.filter_duplicate_data,
+      DataType:this.createKPIWidget.value.DataType ||'',
+
 
       // PredefinedScripts:this.createKPIWidget.value.PredefinedScripts
 
@@ -703,6 +800,7 @@ return this.readFilterEquation
 
     this.parameterValue(event);
     this.CustomRowCal();
+    
   }
 
 
@@ -886,7 +984,10 @@ return this.readFilterEquation
         filterDescription1: tile.filterDescription1,
         enableRowCal:tile.enableRowCal,
         filter_duplicate_data:parsedFilterFields,
+        DataType:tile.DataType,
         all_fields: this.repopulate_fields(tile),
+        customColumnFields:this.repopulate_CustomColumnFields(tile)
+
         // custom_Label1: tile.custom_Label1,
       });
   
@@ -971,6 +1072,70 @@ return this.readFilterEquation
   
     return this.all_fields;
   }
+
+
+  repopulate_CustomColumnFields(getValues: any): FormArray {
+    if (!getValues || getValues === null) {
+      console.warn('No data to repopulate');
+      return this.customColumnFields;
+    }
+  
+    // Clear existing fields in the FormArray
+    this.customColumnFields.clear();
+  
+    // Parse `chartConfig` safely
+    let parsedChartConfig: any[] = [];
+    try {
+      if (typeof getValues.customColumnConfig === 'string') {
+        parsedChartConfig = JSON.parse(getValues.customColumnConfig || '[]');
+      } else if (Array.isArray(getValues.customColumnConfig)) {
+        parsedChartConfig = getValues.customColumnConfig;
+      }
+    } catch (error) {
+      console.error('Error parsing chartConfig:', error);
+      parsedChartConfig = [];
+    }
+  
+    console.log('Parsed chartConfig:', parsedChartConfig);
+  
+    // Populate FormArray based on parsedChartConfig
+    if (parsedChartConfig.length > 0) {
+      parsedChartConfig.forEach((configItem, index) => {
+        console.log(`Processing index ${index} - Full Object:`, configItem);
+  
+        // Handle columnVisibility as a simple array initialization
+
+     
+  
+        // Create and push FormGroup into FormArray
+        this.customColumnFields.push(
+          this.fb.group({
+            columnType: configItem.columnType || '',
+      
+            columnUnit: configItem.columnUnit || '',
+            columnHeading: configItem.columnHeading || '',
+        
+            
+  
+          })
+        );
+  
+        // Log the added FormGroup for debugging
+        console.log(`FormGroup at index ${index}:`, this.customColumnFields.at(index).value);
+      });
+    } else {
+      console.warn('No parsed data to populate fields');
+    }
+  
+    console.log('Final FormArray Values:', this.customColumnFields.value);
+  
+    return this.customColumnFields;
+  }
+  
+
+
+
+
   
   showTooltip(item: string) {
     this.tooltip = item;
@@ -1013,7 +1178,9 @@ return this.readFilterEquation
         filterDescription1: this.createKPIWidget.value.filterDescription1 ||'',
         table_rowConfig: this.createKPIWidget.value.all_fields || '',
         enableRowCal:this.createKPIWidget.value.enableRowCal || '',
-        filter_duplicate_data:this.createKPIWidget.value.filter_duplicate_data || ''
+        filter_duplicate_data:this.createKPIWidget.value.filter_duplicate_data || '',
+        DataType:this.createKPIWidget.value.DataType || '',
+        customColumnConfig:this.createKPIWidget.value.customColumnFields ||''
         // custom_Label1: this.createKPIWidget.value.custom_Label1,
       };
   

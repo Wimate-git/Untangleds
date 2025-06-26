@@ -155,7 +155,8 @@ this.parseChartConfig(this.all_Packet_store)
   }
 
   private formatDateFields(data: any[], receiveformatPckets: any[]): any[] {
-    console.log('receiveformatPckets checking', receiveformatPckets);
+    const allowedDateFormats = ['DD/MM/YYYY', 'MM/DD/YYYY', 'YYYY/MM/DD'];
+    const allowedTimeFormats = ['12-hour (hh:mm AM/PM)', '24-hour (hh:mm)'];
   
     return data.map(row => {
       Object.keys(row).forEach(key => {
@@ -166,30 +167,34 @@ this.parseChartConfig(this.all_Packet_store)
         const isCreatedOrUpdated = key === 'created_time' || key === 'updated_time';
         const isTime = key.startsWith('time-');
   
-        // ✅ Handle created_time / updated_time
         if (isCreatedOrUpdated) {
           const epoch = parseInt(row[key], 10);
           if (!isNaN(epoch)) {
             const epochMs = epoch < 1e12 ? epoch * 1000 : epoch;
-            row[key] = this.formatDate(new Date(epochMs).toISOString(), 'DD/MM/YYYY');
+            row[key] = this.formatDate(new Date(epochMs).toISOString(), 'DD/MM/YYYY', '24-hour (hh:mm)');
           }
           return;
         }
+        
   
         if (isDateKey || isDateTimeKey || isEpochDate || isEpochDateTime || isTime) {
           const matchingField = receiveformatPckets.find((packet: any) => packet.name === key);
           if (matchingField) {
             const validation = matchingField.validation || {};
-            const dateFormat = validation.dateFormatType || 'DD/MM/YYYY';
-            const timeFormat = validation.timeFormatType || '12-hour (hh:mm AM/PM)';
   
-            // console.log('Date Format Applied:', dateFormat);
-            // console.log('Time Format Applied:', timeFormat);
+            // ✅ Validate and select date/time formats
+            const dateFormat = allowedDateFormats.includes(validation.dateFormatType)
+              ? validation.dateFormatType
+              : 'DD/MM/YYYY';
+  
+            const timeFormat = allowedTimeFormats.includes(validation.timeFormatType)
+              ? validation.timeFormatType
+              : '12-hour (hh:mm AM/PM)';
   
             let rawValue = row[key];
   
-            // ✅ Convert epoch to ISO string if applicable
-            if ((isEpochDate || isEpochDateTime || isTime) && rawValue) {
+            // ✅ Handle epoch fields
+            if ((isEpochDate || isEpochDateTime) && rawValue) {
               const epoch = parseInt(rawValue, 10);
               if (!isNaN(epoch)) {
                 const epochMs = epoch < 1e12 ? epoch * 1000 : epoch;
@@ -197,10 +202,12 @@ this.parseChartConfig(this.all_Packet_store)
               }
             }
   
-            // ✅ Decide if time formatting is needed
-            const requiresTime = isDateTimeKey || isEpochDateTime || isTime;
+            // ✅ Handle time-only values like "13:45"
+            if (isTime && typeof rawValue === 'string' && /^\d{1,2}:\d{2}$/.test(rawValue)) {
+              rawValue = `1970-01-01T${rawValue}`;
+            }
   
-            // ✅ If it's a pure time field, skip dateFormat
+            const requiresTime = isDateTimeKey || isEpochDateTime || isTime;
             const finalDateFormat = isTime ? null : dateFormat;
   
             row[key] = this.formatDate(rawValue, finalDateFormat, requiresTime ? timeFormat : null);
@@ -211,33 +218,7 @@ this.parseChartConfig(this.all_Packet_store)
     });
   }
   
-  async fetchDynamicFormData(value: any, receiveDateKeys: any): Promise<any[]> {
-    console.log("Data from lookup:", value);
-    console.log('receiveDateKeys checking table ui', receiveDateKeys);
   
-    try {
-      const result: any = await this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1);
-  
-      if (result && result.metadata) {
-        const parsedMetadata = JSON.parse(result.metadata);
-        const formFields = parsedMetadata.formFields;
-        console.log('fields checking table ui', formFields);
-  
-        const receiveSet = new Set(receiveDateKeys);
-  
-        const filteredFields = formFields.filter(
-          (field: any) => receiveSet.has(field.name)
-        );
-  
-        console.log('Matched date fields:', filteredFields);
-        return filteredFields;
-      }
-    } catch (err) {
-      console.log("Can't fetch", err);
-    }
-  
-    return []; // fallback if error or no metadata
-  }
   
   
   private formatDate(dateStr: string, dateFormat?: string, timeFormat?: string): string {
@@ -283,6 +264,37 @@ this.parseChartConfig(this.all_Packet_store)
   
     return formattedDate ? `${formattedDate} ${formattedTime}` : formattedTime;
   }
+  
+  async fetchDynamicFormData(value: any, receiveDateKeys: any): Promise<any[]> {
+    console.log("Data from lookup:", value);
+    console.log('receiveDateKeys checking table ui', receiveDateKeys);
+  
+    try {
+      const result: any = await this.api.GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1);
+  
+      if (result && result.metadata) {
+        const parsedMetadata = JSON.parse(result.metadata);
+        const formFields = parsedMetadata.formFields;
+        console.log('fields checking table ui', formFields);
+  
+        const receiveSet = new Set(receiveDateKeys);
+  
+        const filteredFields = formFields.filter(
+          (field: any) => receiveSet.has(field.name)
+        );
+  
+        console.log('Matched date fields:', filteredFields);
+        return filteredFields;
+      }
+    } catch (err) {
+      console.log("Can't fetch", err);
+    }
+  
+    return []; // fallback if error or no metadata
+  }
+  
+  
+
   parseChartConfig(data: any) {
     console.log('datachecking', data);
     // Iterate through the grid_details array

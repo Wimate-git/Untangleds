@@ -1564,14 +1564,14 @@ fetchDynamicFormDataConfig(value: any) {
         // Include created_time and updated_time
         if (parsedMetadata.created_time) {
           this.columnVisisbilityFields.push({
-            value: parsedMetadata.created_time.toString(),
+            value: 'created_time',
             text: 'Created Time' // You can customize the label here if needed
           });
         }
 
         if (parsedMetadata.updated_time) {
           this.columnVisisbilityFields.push({
-            value: parsedMetadata.updated_time.toString(),
+            value: 'updated_time',
             text: 'Updated Time' // You can customize the label here if needed
           });
         }
@@ -1648,14 +1648,14 @@ fetchDynamicFormDataConfig(value: any) {
           // Include created_time and updated_time
           if (parsedMetadata.created_time) {
             this.listofDynamicParam.push({
-              value: parsedMetadata.created_time.toString(),
+              value: 'created_time',
               text: 'Created Time' // You can customize the label here if needed
             });
           }
 
           if (parsedMetadata.updated_time) {
             this.listofDynamicParam.push({
-              value: parsedMetadata.updated_time.toString(),
+              value: 'updated_time',
               text: 'Updated Time' // You can customize the label here if needed
             });
           }
