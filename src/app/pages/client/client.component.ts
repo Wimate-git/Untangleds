@@ -125,12 +125,15 @@ export class ClientComponent implements OnInit {
   getPermissionList: any = [];
 
   permissionAll: any = {};
+
+  permissionID:any;
   
 
     async ngOnInit(){
 
       this.getLoggedUser = this.companyconfig.getLoggedUserDetails()
       this.getLoggedUserPermissions =  this.companyconfig.getPermissionDetails()
+      this.permissionID = this.companyconfig.getLoggedUserDetails().permission_ID
       this.getPermissionList = this.getLoggedUserPermissions && this.getLoggedUserPermissions.permissionsList
 
       this.SK_clientID = this.getLoggedUser.clientID;
@@ -154,14 +157,17 @@ export class ClientComponent implements OnInit {
 
 
     checkPermission(ModuleName:any){
-      if(this.SK_clientID == 'WIMATE_ADMIN'){
+      let tempPermission
+      this.adminLogin = false
+
+      if(this.SK_clientID == 'WIMATE_ADMIN' && this.permissionID == 'All'){
         this.adminLogin = true
-      }
+        tempPermission = {view:true,update:true}
+      } 
       else{
-        this.adminLogin = false
+        tempPermission = this.getPermissionList && this.getPermissionList.find((item:any)=>item.name == ModuleName)
       }
 
-      const tempPermission = this.getPermissionList.find((item:any)=>item.name == ModuleName)
       if(tempPermission && tempPermission.view && tempPermission.update){
         this.permissionAll = tempPermission
         this.permissionAll.update = this.adminLogin
