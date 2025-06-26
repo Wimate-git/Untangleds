@@ -1769,7 +1769,7 @@ Highcharts.chart('MixedChart', barchartOptions);
     } 
     else if (item.grid_type === 'tile2') {
       if (this.isEditModeView && !this.hideButton) {
-        this.invokeHelperDashboard(item, i, this.modalContent, this.dataTableModalTile2);
+        this.invokeHelperDashboard(item, i, this.modalContent, this.dataTableModalTile2,this.htmlModal);
       } 
 
     } 
@@ -1777,13 +1777,13 @@ Highcharts.chart('MixedChart', barchartOptions);
 
     else if (item.grid_type === 'tile3') {
       if (this.isEditModeView && !this.hideButton) {
-        this.invokeHelperDashboard(item, i, this.modalContent, this.dataTableModalTile2);
+        this.invokeHelperDashboard(item, i, this.modalContent, this.dataTableModalTile2,this.htmlModal);
       } 
 
     } 
     else if (item.grid_type === 'dynamicTile') {
       if (this.isEditModeView && !this.hideButton) {
-        this.invokeHelperDashboard(item, i, this.modalContent, this.dataTableModalDynamicTile);
+        this.invokeHelperDashboard(item, i, this.modalContent, this.dataTableModalDynamicTile,this.htmlModal);
       }
       // else if (!this.isEditModeView) {
       //   ////console.log('i am triggering helperTile')
@@ -1791,18 +1791,18 @@ Highcharts.chart('MixedChart', barchartOptions);
       //   this.helperEditModalOpen(item,i,this.DynamicTileModal)
       // }
     } else if (item.grid_type === 'title') {
-      if (this.isEditModeView && !this.hideButton) {
-        this.invokeHelperDashboard(item, i, this.modalContent, this.TitleModal);
+      if (this.isEditModeView && !this.hideButton && (this.summaryDashboardUpdate || this.summaryDashboardView)) {
+        this.invokeHelperDashboard(item, i, this.modalContent, this.TitleModal,this.htmlModal);
       }
     } else if (item.grid_type === 'progressTile') {
       if (this.isEditModeView && !this.hideButton) {
-        this.invokeHelperDashboard(item, i, this.modalContent, '');
+        this.invokeHelperDashboard(item, i, this.modalContent, '',this.htmlModal);
       }
     } 
     
     else if (item.grid_type === 'tileWithIcon') {
       if (this.isEditModeView && !this.hideButton) {
-        this.invokeHelperDashboard(item, i, this.modalContent, '');
+        this.invokeHelperDashboard(item, i, this.modalContent, '',this.htmlModal);
       }
       
 
@@ -2091,138 +2091,104 @@ invokeHelperDashboard(item: any, index: number, template: any, modaref: any,html
 // }
 
 SECRET_KEY = 'mobile-encrypt-params-123';
-redirectModule(recieveItem: any,htmlModalRef:any) {
-  ////console.log('recieveItem check from module redirection', recieveItem);
-
-  const moduleName = recieveItem.dashboardIds;
-  const selectedModule = recieveItem.ModuleNames;
-  const redirectType = recieveItem.selectType; // 'NewTab' or 'Same page Redirect'
-  const filterDescriptionAccess = recieveItem.filterDescription;
+redirectModule(receiveItem: any, htmlModalRef: any) {
+  const moduleName = receiveItem.dashboardIds;
+  const selectedModule = receiveItem.ModuleNames;
+  const redirectType = receiveItem.selectType; // 'NewTab' or 'Same page Redirect'
+  const filterDescriptionAccess = receiveItem.filterDescription;
   const formattedCondition = this.formatConditions(filterDescriptionAccess);
-  // const quotedCondition = ${formattedCondition}; 
-  ////console.log('formattedCondition checking from module redirection', formattedCondition);
 
-  ////console.log('moduleName:', moduleName);
-  ////console.log('selectedModule:', selectedModule);
-  ////console.log('selectType (redirectType):', redirectType);
+  this.route.queryParams.subscribe((params) => {
+    if (params['uID']) this.userId = params['uID'];
+    if (params['pass']) this.userPass = params['pass'];
+  });
 
-  // let targetUrl: string = '';
-  // const isNewTab = redirectType === 'NewTab';
+  const isNewTab = redirectType === 'NewTab';
+  const encodedCondition = encodeURIComponent(formattedCondition);
+  const encryptedUserId = this.userId ? this.encryptValue(this.userId) : '';
+  const encryptedPass = this.userPass ? this.encryptValue(this.userPass) : '';
 
-  this.route.queryParams.subscribe(async (params) => {
-    //console.log('userparams checking from onInit',params)
-  if(params['uID']){
-    //console.log('uid checking',params['uID'])
-    this.userId = params['uID']
+  const queryString = `isFullScreen=true` +
+    (encryptedUserId ? `&uID=${encodeURIComponent(encryptedUserId)}` : '') +
+    (encryptedPass ? `&pass=${encodeURIComponent(encryptedPass)}` : '');
 
-    
-  }
-  if(params['pass']){
-    //console.log('pass checking',params['pass'])
-    this.userPass = params['pass']
-    // const user = await this.authservice.signIn((this.userId).toLowerCase(), this.userPass);
-    //console.log('user check query',user)
-    // this.hideSummaryGridster = true
-    
-  }
+  let baseUrl = '';
 
+  switch (selectedModule) {
+    case 'Forms':
+      baseUrl = `/view-dreamboard/Forms/${moduleName}?filter=${encodedCondition}`;
+      break;
 
-  // if(params['clientID']){
-  //   //console.log('clientID checking',params['clientID'])
+    case 'Summary Dashboard':
+      baseUrl = `/summary-engine/${moduleName}`;
+      break;
 
-  // }
-});
+    case 'Dashboard':
+      baseUrl = `/dashboard/dashboardFrom/Forms/${moduleName}`;
+      break;
 
-// const encryptedUserId = this.userId ? this.encryptValue(this.userId) : '';
-// const encryptedPass = this.userPass ? this.encryptValue(this.userPass) : '';
+    case 'Projects':
+      baseUrl = `/project-dashboard/project-template-dashboard/${moduleName}`;
+      break;
 
-// const queryString = `recordId=${encodedRecordId}&isFullScreen=true` +
-//   (encryptedUserId ? `&uID=${encryptedUserId}` : '') +
-//   (encryptedPass ? `&pass=${encryptedPass}` : '');
+    case 'Calender':
+      baseUrl = `/view-dreamboard/Calendar/${moduleName}`;
+      break;
 
-const isNewTab = redirectType === 'NewTab';
-let targetUrl = '';
-
-switch (selectedModule) {
-  case 'Forms': {
-    const encodedCondition = encodeURIComponent(formattedCondition);
-    const encryptedUserId = this.userId ? this.encryptValue(this.userId) : '';
-    const encryptedPass = this.userPass ? this.encryptValue(this.userPass) : '';
-
-    const queryString = `isFullScreen=true` +
-      (encryptedUserId ? `&uID=${encodeURIComponent(encryptedUserId)}` : '') +
-      (encryptedPass ? `&pass=${encodeURIComponent(encryptedPass)}` : '');
-
-    if (isNewTab) {
-      targetUrl = `/view-dreamboard/Forms/${moduleName}&filter=${encodedCondition}&${queryString}`;
-
-      // ✅ Open in modal if credentials are available
-      if (this.userId && this.userPass) {
-        this.iframeSafeUrl = targetUrl;
-        this.modalService.open(htmlModalRef, {
-          fullscreen: true,
-          modalDialogClass: 'p-9',
-          centered: true,
-          backdrop: 'static',
-          keyboard: false
-        });
-        return;
-      } else {
-        // ✅ Open in new browser tab if credentials missing
-        window.open(targetUrl, '_blank');
-        return;
-      }
-    } else {
-      // ✅ Same tab navigation
-      targetUrl = `/view-dreamboard/Forms/${moduleName}`;
+    case 'Report Studio': {
+      const tree = this.router.createUrlTree(['/reportStudio'], {
+        queryParams: { savedQuery: moduleName }
+      });
+      baseUrl = this.router.serializeUrl(tree);
+      break;
     }
-    break;
+
+    default:
+      console.error('Unknown module:', selectedModule);
+      return;
   }
 
-  case 'Summary Dashboard':
-    targetUrl = `/summary-engine/${moduleName}`;
-    break;
-
-  case 'Dashboard':
-    targetUrl = `/dashboard/dashboardFrom/Forms/${moduleName}`;
-    break;
-
-  case 'Projects':
-    targetUrl = `/project-dashboard/project-template-dashboard/${moduleName}`;
-    break;
-
-  case 'Calender':
-    targetUrl = `/view-dreamboard/Calendar/${moduleName}`;
-    break;
-
-  case 'Report Studio': {
-    const tree = this.router.createUrlTree(['/reportStudio'], {
-      queryParams: { savedQuery: moduleName }
-    });
-    targetUrl = this.router.serializeUrl(tree);
-    break;
+  // ✅ Append queryString to baseUrl properly
+  let targetUrl = baseUrl.includes('?')
+    ? `${baseUrl}&${queryString}`
+    : `${baseUrl}?${queryString}`;
+console.log('targetUrl checking from module redirect',targetUrl)
+  // ✅ Redirection behavior
+  if (isNewTab) {
+    if (this.userId && this.userPass) {
+      this.iframeSafeUrl = targetUrl;
+      this.modalService.open(htmlModalRef, {
+        fullscreen: true,
+        modalDialogClass: 'p-9',
+        centered: true,
+        backdrop: 'static',
+        keyboard: false
+      });
+    } else {
+      window.open(targetUrl, '_blank');
+    }
+  } else {
+    this.router.navigateByUrl(targetUrl).catch(err =>
+      console.error('Navigation error:', err)
+    );
   }
-
-  default:
-    console.error('Unknown module:', selectedModule);
-    return;
-}
-
-// ✅ Navigate in same tab (for all non-new tab cases)
-this.router.navigateByUrl(targetUrl).catch(err => console.error('Navigation error:', err));
-
 }
 
 
-formatConditions(expression: string): string {
-  // Match patterns like "Label-${fieldId}"
+formatConditions(expression: string | undefined | null): string {
+  if (!expression || typeof expression !== 'string') {
+    return '';
+  }
+
   const regex = /([a-zA-Z0-9_ ]+)-\$\{([a-zA-Z0-9_-]+)\}/g;
 
-  // Replace with ${Label.fieldId}
-  return expression.replace(regex, (_match, label, value) => {
-    return `\${${label.trim()}.${value}}`;
-  }).replace(/(\s*)(\&\&|\|\|)(\s*)/g, ' $2 ');  // normalize spacing around && or ||
+  return expression
+    .replace(regex, (_match, label, value) => {
+      return `\${${label.trim()}.${value}}`;
+    })
+    .replace(/(\s*)(\&\&|\|\|)(\s*)/g, ' $2 ');
 }
+
 
 
 

@@ -1081,17 +1081,17 @@ console.log('enable checking from  chart3',enable)
             selectFromTime: [''],
             selectToTime: [''],
             parameterValue: [''],
-            columnVisibility: [[]],
+            columnVisibility: [firstFieldValues.columnVisibility || []],
             rowData: [''],
             formatType: [firstFieldValues.formatType || '', Validators.required],
-            undefinedCheckLabel: [''],
+            undefinedCheckLabel: [firstFieldValues.undefinedCheckLabel || ''],
             custom_Label: [firstFieldValues.custom_Label || '', Validators.required],
             filterParameter: [[]],
             filterDescription: [''],
-            XaxisFormat: [''],
+            XaxisFormat: [firstFieldValues.XaxisFormat ||''],
             drillTypeFields: [[]],
             drillTypeCustomLable: [''],
-            CustomColumnColor: ['']
+            CustomColumnColor: [firstFieldValues.CustomColumnColor ||'']
           })
         );
         console.log('this.all_fields check', this.all_fields);
