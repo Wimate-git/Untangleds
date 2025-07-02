@@ -115,6 +115,7 @@ import { HelpSectionRowUnitComponent } from './help-section-row-unit/help-sectio
 import { HelpSectionPredefinedComponent } from './help-section-predefined/help-section-predefined.component';
 import { MiniTableViewStackedbarComponent } from './mini-table-view-stackedbar/mini-table-view-stackedbar.component';
 import { MiniTableViewFunnelChartComponent } from './mini-table-view-funnel-chart/mini-table-view-funnel-chart.component';
+import { MiniTableViewPieChartComponent } from './mini-table-view-pie-chart/mini-table-view-pie-chart.component';
 
 
 
@@ -211,7 +212,8 @@ import { MiniTableViewFunnelChartComponent } from './mini-table-view-funnel-char
  HelpSectionRowUnitComponent,
  HelpSectionPredefinedComponent,
  MiniTableViewStackedbarComponent,
- MiniTableViewFunnelChartComponent
+ MiniTableViewFunnelChartComponent,
+ MiniTableViewPieChartComponent
  
     
 
@@ -346,7 +348,8 @@ import { MiniTableViewFunnelChartComponent } from './mini-table-view-funnel-char
     HelpSectionRowUnitComponent,
     HelpSectionPredefinedComponent,
     MiniTableViewStackedbarComponent,
-    MiniTableViewFunnelChartComponent
+    MiniTableViewFunnelChartComponent,
+    MiniTableViewPieChartComponent
 
     
   

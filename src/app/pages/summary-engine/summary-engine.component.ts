@@ -79,6 +79,7 @@ import { GaugeChartConfigComponent } from 'src/app/_metronic/partials/content/my
 import { Location } from '@angular/common';
 import { CrudSummaryComponent } from './crud-summary/crud-summary.component';
 type Tabs = 'Board' | 'Widgets' | 'Datatype' | 'Settings' | 'Advanced' | 'Action';
+import { PageInfoService  } from 'src/app/_metronic/layout/core/page-info.service';
 
 
 
@@ -1724,7 +1725,9 @@ Highcharts.chart('MixedChart', barchartOptions);
   @ViewChild('htmlModal', { static: false }) htmlModal: TemplateRef<any>;
   
 
-
+  receiveIframeUrl(receivedUrl:SafeResourceUrl){
+    this.iframeSafeUrl = receivedUrl;
+  }
 
   onItemClick(item: any, index: number, event: any): void {
     // this.isEditModeView = false
@@ -1989,7 +1992,7 @@ invokeHelperDashboard(item: any, index: number, template: any, modaref: any,html
       case 'NewTab':
       case 'Same page Redirect':
       case 'Modal':
-        this.setModuleID(item, index, modaref);
+        this.setModuleID(item, index, modaref,htmlModalRef);
         break;
 
       // case '':
@@ -2116,7 +2119,7 @@ redirectModule(receiveItem: any, htmlModalRef: any) {
 
   switch (selectedModule) {
     case 'Forms':
-      baseUrl = `/view-dreamboard/Forms/${moduleName}?filter=${encodedCondition}`;
+      baseUrl = `/view-dreamboard/Forms/${moduleName}&filter=${encodedCondition}`;
       break;
 
     case 'Summary Dashboard':
@@ -2149,10 +2152,12 @@ redirectModule(receiveItem: any, htmlModalRef: any) {
   }
 
   // ✅ Append queryString to baseUrl properly
-  let targetUrl = baseUrl.includes('?')
-    ? `${baseUrl}&${queryString}`
-    : `${baseUrl}?${queryString}`;
-console.log('targetUrl checking from module redirect',targetUrl)
+//   let targetUrl = baseUrl.includes('?')
+//     ? `${baseUrl}&${queryString}`
+//     : `${baseUrl}?${queryString}`;
+// console.log('targetUrl checking from module redirect',targetUrl)
+const targetUrl = `${baseUrl}?${queryString}`;
+console.log('targetUrl checking from module redirect', targetUrl);
   // ✅ Redirection behavior
   if (isNewTab) {
     if (this.userId && this.userPass) {
@@ -2349,7 +2354,7 @@ helperTileClick(event:any,modalChart:any){
 }
 
 
-  async setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>): Promise<void> {
+  async setModuleID(packet: any, selectedMarkerIndex: any, modaref: TemplateRef<any>,receiveHtmlModal:any): Promise<void> {
   //console.log('modaref checking:', modaref);
   //console.log('packet checking:', packet);
   //console.log('dashboard filterCheck', this.dashboard);
@@ -2386,44 +2391,47 @@ const mainFilterQueryParam  = `&mainFilterCon=${JSON.stringify(validateMainFilte
   this.currentModalIndex = selectedMarkerIndex;
 
   if (packet.selectType === 'NewTab') {
-    this.route.queryParams.pipe(take(1)).subscribe(async (params) => {  // Ensure subscription runs once
-      if (params['uID'] && params['pass']) {
-        //console.log('Authentication Params Found:', params);
-        this.userId = params['uID'];
-        this.userPass = params['pass'];
-    
-        const user = await this.authservice.signIn(this.userId.toLowerCase(), this.userPass);
-        
-        //console.log('User authentication result:', user);
-    
-        // 🚫 Do not navigate if authentication params exist
-      } else {
-        // ✅ If 'uID' and 'pass' are NOT present, open the new tab
-        // Get the value for isFullScreen before constructing the URL
-        const safeUrl = `${window.location.origin}/summary-engine/${modulePath}`;
-    
-        // Wait for the storeCheck value
-        this.openModalHelpher(packet.dashboardIds).then((data) => {
-          //console.log('✅ this.all_Packet_store permissions:', data);
-          const readMainData = data;
-          //console.log('readMainData checking', readMainData);
-          this.storeCheck = readMainData.fullScreenModeCheck;
-          //console.log('this.storeCheck checking', this.storeCheck);
-    
-          // Construct the final URL with isFullScreen
-          const fullSafeUrl = `${safeUrl}?isFullScreen=${this.storeCheck}`;
-          //console.log('Opening new tab with URL:', fullSafeUrl);
-    
-          // Open the URL in a new tab
-          window.open(fullSafeUrl, '_blank');
-          window.location.reload();
-        }).catch(err => {
-          console.error('Error in openModalHelpher:', err);
-        });
-      }
-    });
-    
+    setTimeout(() => {
+      this.route.queryParams.pipe(take(1)).subscribe(async (params) => {
+        const safeUrl = `${window.location.origin}/summary-engine/${packet.dashboardIds}`;
+  
+        try {
+          // const readMainData = await this.openModalHelpher(packet.dashboardIds);
+          // this.storeCheck = readMainData.fullScreenModeCheck;
+          const fullSafeUrl = `${safeUrl}?isFullScreen=${true}`;
+  
+          if (params['uID'] && params['pass']) {
+            this.userId = params['uID'];
+            this.userPass = params['pass'];
+  
+            console.log('✅ Opening in modal. UserId:', this.userId);
+  
+            this.iframeSafeUrl = fullSafeUrl;
+            this.modalService.open(receiveHtmlModal, {
+              fullscreen: true,
+              modalDialogClass: 'p-9',
+              centered: true,
+              backdrop: 'static',
+              keyboard: false
+            });
+          } else {
+            console.log('🌐 Opening in new tab:', fullSafeUrl);
+            const newTab = window.open('', '_blank');
+            if (newTab) {
+              newTab.location.href = fullSafeUrl;
+            } else {
+              console.warn('⚠️ Popup blocked. Could not open new tab.');
+            }
+          }
+        } catch (err) {
+          console.error('❌ Error in openModalHelpher:', err);
+        }
+      });
+    }, 0); // Prevent Angular zone-triggered side effects
   }
+  
+  
+  
     if (packet.selectType === 'Modal') {
 
     this.route.queryParams.subscribe(async (params) => {
@@ -3453,6 +3461,7 @@ exitFullScreen(): void {
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector, private auditTrail: AuditTrailService,
     private spinner: NgxSpinnerService, private zone: NgZone,private http: HttpClient,  private sanitizer: DomSanitizer, // Inject DomSanitizer
     private titleService: Title, private summaryService: SummaryEngineService,private blobService: BlobService,private renderer: Renderer2,private authservice: AuthService, private fullscreenService: FullscreenService,private el: ElementRef,private location: Location
+    ,private pageInfoService: PageInfoService
   ) {
     this.resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
@@ -3537,8 +3546,15 @@ exitFullScreen(): void {
     const getfullScreenValue = this.createSummaryField.get('fullScreenModeCheck')?.value
     //console.log('ngAfterViewInit check data', getfullScreenValue);
     if (this.routeId) {
+      console.log('this.routeId checking from ngAfter',this.routeId)
       
+      setTimeout(() => {
+        this.pageInfoService.setTitle(( this.routeId as any))
+      }, 500);
+  
      
+   
+
       // //console.log('temp check from afterViewInit',temp)
       this.checkAndSetFullscreen(this.storeFullScreen);
       this.editButtonCheck = true
@@ -8117,7 +8133,8 @@ const storeFullScreenValue = this.allCompanyDetails.fullScreenModeCheck
       table_rowConfig:this.formatField(tile.table_rowConfig),
       DrillConfig:this.formatField(tile.DrillConfig),
       filter_duplicate_data:this.formatField(tile.filter_duplicate_data),
-      customColumnConfig:this.formatField(tile.customColumnConfig)
+      customColumnConfig:this.formatField(tile.customColumnConfig),
+      tableDrillDownFields:this.formatField(tile.tableDrillDownFields)
   
       // parameterName:this.formatField(tile.parameterName)
 

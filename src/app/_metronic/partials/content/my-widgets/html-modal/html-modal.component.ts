@@ -1,5 +1,6 @@
 import { Component, Input, SimpleChanges } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-html-modal',
@@ -13,7 +14,7 @@ export class HtmlModalComponent {
 
   sanitizedBlobUrl: SafeResourceUrl | null = null;
 
-  constructor(private sanitizer: DomSanitizer) {} // Inject DomSanitizer
+  constructor(private sanitizer: DomSanitizer, private modalService: NgbModal,) {} // Inject DomSanitizer
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log('blobUrl checking from child', this.blobUrl);
@@ -22,6 +23,12 @@ export class HtmlModalComponent {
     if (this.iframeSafeUrl) {
       this.sanitizedBlobUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.iframeSafeUrl);
     }
+  }
+
+
+  closeModal() {
+    this.modalService.dismissAll(); // Close the modal programmatically
+    // window.location.reload()
   }
 }
 

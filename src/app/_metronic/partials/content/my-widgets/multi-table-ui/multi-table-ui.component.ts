@@ -68,6 +68,9 @@ export class MultiTableUiComponent implements OnInit{
   formName: any;
   customLabel: any;
   finalColumns: any;
+  extractedTables: unknown[];
+  extractedTableHeaders: any;
+  storeFormLabel: any;
 
   
   ngOnInit(){
@@ -586,54 +589,54 @@ removeDuplicatePacketsBasedOnFilterFields(rowData: any[], filterFields: any[]): 
   }
 
 
-//   ngOnChanges(changes: SimpleChanges): void {
-//     console.log('dashboardChange dynamic ui',this.all_Packet_store)
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('dashboardChange dynamic ui',this.all_Packet_store)
  
  
 
 
-
+    // this.FormName = this.storeDrillDown.formlist
 
   
     
-//     // Split the description by '&&'
-//     // let conditions = description.split('&&').map((cond: string) => cond.trim());
+    // Split the description by '&&'
+    // let conditions = description.split('&&').map((cond: string) => cond.trim());
     
-//     // Iterate over each condition to extract values
-//     // let extractedValues: any[] = [];
+    // Iterate over each condition to extract values
+    // let extractedValues: any[] = [];
     
-//     // conditions.forEach((condition: string) => {
-//     //   // Use regex to capture the value after "=="
-//     //   let regex = /\$\{[^\}]+\}==(['"]?)(.+?)\1/;
-//     //   let match = condition.match(regex);
+    // conditions.forEach((condition: string) => {
+    //   // Use regex to capture the value after "=="
+    //   let regex = /\$\{[^\}]+\}==(['"]?)(.+?)\1/;
+    //   let match = condition.match(regex);
       
-//     //   if (match) {
-//     //     let value = match[2].trim(); // Extract the value after ==
-//     //     extractedValues.push(value); // Store the extracted value
-//     //   }
-//     // });
+    //   if (match) {
+    //     let value = match[2].trim(); // Extract the value after ==
+    //     extractedValues.push(value); // Store the extracted value
+    //   }
+    // });
     
-//     // // Assign the first extracted value to descriptionData
-//     // if (extractedValues.length > 0) {
-//     //   this.descriptionData = extractedValues[0];
-//     //   console.log('this.descriptionData check', this.descriptionData);
-//     // } else {
-//     //   this.primaryValue = this.item.multi_value[0].value;
-//     // }
+    // // Assign the first extracted value to descriptionData
+    // if (extractedValues.length > 0) {
+    //   this.descriptionData = extractedValues[0];
+    //   console.log('this.descriptionData check', this.descriptionData);
+    // } else {
+    //   this.primaryValue = this.item.multi_value[0].value;
+    // }
     
-//     // // Log all extracted values
-//     // console.log('Extracted Values:', extractedValues);
+    // // Log all extracted values
+    // console.log('Extracted Values:', extractedValues);
     
 
 
 
-//     // this.tile1Config = this.item
+    // this.tile1Config = this.item
 
   
  
 
   
-// }
+}
 
 
 // exportToCSV(): void {
@@ -852,53 +855,480 @@ get shouldShowButton(): boolean {
       // alert('Unable to export to Excel. Please ensure the grid is loaded.');
     }
   }
-  exportAllTablesAsExcel() {
-    if (!this.rowData || this.rowData.length === 0) {
-      console.error('No data available for export.');
-      // alert('No data available for export.');
-      return; // Exit if there's no data to export
-    }
-  
-    const wb = XLSX.utils.book_new(); // Create a new workbook
-  
-    // Extract column headers dynamically from the first object
-    const columnHeaders = Object.keys(this.rowData[0]);
-    if (columnHeaders.length === 0) {
-      console.error('No columns available for export.');
-      // alert('No columns available for export.');
-      return;
-    }
-  
-    // Build the Excel data: column headers + row data
-    const excelData = [
-      columnHeaders, // Add headers as the first row
-      ...this.rowData.map((row: Record<string, any>) =>
-        columnHeaders.map((col) =>
-          row[col] !== null && row[col] !== undefined ? row[col].toString() : '' // Handle null/undefined
-        )
-      ),
-    ];
-  
-    // Convert data to a worksheet
-    const ws = XLSX.utils.aoa_to_sheet(excelData);
-  
-    // Add the worksheet to the workbook
-    XLSX.utils.book_append_sheet(wb, ws, 'TableData');
-  
-    // Generate the Excel file
-    const excelFile = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  
-    // Create a Blob and trigger the download
-    const blob = new Blob([excelFile], { type: 'application/octet-stream' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `${this.extractFormName}`+'.xlsx';
-    link.click();
-  }
-  
-  
-  
 
+
+
+
+          async exportAllTablesAsExcel() {
+            let dataToExport: any[] = [];
+          
+            const isFilterApplied = this.gridApi && Object.keys(this.gridApi.getFilterModel()).length > 0;
+            const displayedRowCount = this.gridApi.getDisplayedRowCount();
+          
+            if (isFilterApplied && displayedRowCount > 0) {
+              this.gridApi.forEachNodeAfterFilter((node: any) => {
+                if (node.data) dataToExport.push(node.data);
+              });
+            } else {
+              dataToExport = this.rowData || [];
+            }
+          
+            // ✅ Limit export to 10,000 rows
+            const exportLimit = 10000;
+            if (dataToExport.length > exportLimit) {
+              console.warn(`⚠️ Data exceeds export limit (${exportLimit}). Trimming.`);
+              dataToExport = dataToExport.slice(0, exportLimit);
+            }
+          
+            if (!dataToExport.length) {
+              console.error('❌ No data to export.');
+              return;
+            }
+          
+            // ✅ Collect date-related keys
+            const dateKeys: string[] = [];
+            dataToExport.forEach((row: any) => {
+              if (typeof row !== 'object' || row === null) return;
+              Object.keys(row).forEach((key) => {
+                if (
+                  (key.startsWith('date') ||
+                    key.startsWith('datetime') ||
+                    key.startsWith('epoch-date') ||
+                    key.startsWith('epoch-datetime-local') ||
+                    key === 'created_time' ||
+                    key === 'updated_time' ||
+                    key.startsWith('time')) &&
+                  !dateKeys.includes(key)
+                ) {
+                  dateKeys.push(key);
+                }
+              });
+            });
+          
+            // ✅ Format date fields
+            const matchedDateFields = await this.fetchDynamicFormData(this.extractFormName, dateKeys);
+            dataToExport = await this.formatDateFields(dataToExport, matchedDateFields);
+            console.log('dataToExport checking from exportExcel',dataToExport)
+          
+            // ✅ Fetch mini table metadata and headers ONCE
+            const tablesReceive:any = await this.fetchMiniTableData(this.extractFormName);
+            console.log('tablesReceive check',tablesReceive)
+            const tableHeaderMap: any = {};
+          
+            if (Array.isArray(tablesReceive)) {
+              for (const table of tablesReceive) {
+                const headerData = await this.fetchMiniTableHeaders(table);
+                console.log('headerData check',headerData)
+                if (Array.isArray(headerData)) {
+                  tableHeaderMap[table.name] = headerData[0]?.columnDefs || [];
+                } else {
+                  tableHeaderMap[table.name] = headerData?.columnDefs || [];
+                }
+              }
+            }
+          
+            // ✅ Extract mini-tables using cached metadata
+            const extractedDynamicTables = await this.extractDynamicTables(
+              dataToExport,
+              tablesReceive || [],  // ensure it's an array
+              tableHeaderMap
+            );
+            console.log('extractedDynamicTables checking',extractedDynamicTables)
+            
+            // ✅ Create Excel workbook
+            const wb = XLSX.utils.book_new();
+          
+            // ✅ Main sheet (excluding dynamic_table_values)
+            const visibleColumns = this.columnDefs.filter((col: any) => col.field !== 'dynamic_table_values');
+            const columnHeaders = visibleColumns.map((col: any) => col.headerName);
+            const columnFields = visibleColumns.map((col: any) => col.field);
+          
+            const mainData = [
+              columnHeaders,
+              ...dataToExport.map(row => {
+                try {
+                  return columnFields.map((field: string) =>
+                    row && field in row && row[field] != null ? String(row[field]) : ''
+                  );
+                } catch (err) {
+                  console.warn('⚠️ Row export failed:', row, err);
+                  return columnFields.map(() => '');
+                }
+              })
+            ];
+          
+            const mainSheet = XLSX.utils.aoa_to_sheet(mainData);
+            XLSX.utils.book_append_sheet(wb, mainSheet, this.extractFormName);
+          
+            // ✅ Append mini-table sheets
+            Object.entries(extractedDynamicTables).forEach(([label, data]) => {
+              const { headers, rows } = data;
+              if (!Array.isArray(rows) || rows.length === 0) return;
+          
+              const columnTitles = headers.map(h => h.header);
+              const fieldKeys = headers.map(h => h.field);
+          
+              const sheetData = [
+                columnTitles,
+                ...rows.map(row => fieldKeys.map(field => row[field] ?? ''))
+              ];
+          
+              const safeLabel = label.slice(0, 31).replace(/[\\/?*[\]:]/g, '');
+              const sheet = XLSX.utils.aoa_to_sheet(sheetData);
+              XLSX.utils.book_append_sheet(wb, sheet, safeLabel);
+            });
+          
+            // ✅ Trigger download
+            const excelFile = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([excelFile], { type: 'application/octet-stream' });
+          
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${this.extractFormName || 'ExportedData'}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }
+        
+        
+          async fetchMiniTableData(item: any) {
+            try {
+                this.extractedTables = []; // Initialize as an empty array to prevent undefined errors
+          
+                const resultMain: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#" + item + "#main", 1);
+                if (resultMain) {
+                    // console.log('forms chaecking', resultMain);
+                    const helpherObjmain = JSON.parse(resultMain.metadata);
+                    // console.log('helpherObjmain checking', helpherObjmain);
+          
+                    const extractFormFields = helpherObjmain.formFields;
+          
+                    // Ensure extractedTables is set properly
+                    this.extractedTables = Object.values(extractFormFields).filter((item: any) =>
+                        typeof item === 'object' &&
+                        item !== null &&
+                        'name' in item &&
+                        typeof item.name === 'string' &&
+                        item.name.startsWith("table-")
+                    );
+          
+                    // console.log('Extracted Table Records:', this.extractedTables);
+                    return this.extractedTables;
+                }
+            } catch (err) {
+                console.log("Error fetching the dynamic form data", err);
+            }
+          }
+        
+          async fetchMiniTableHeaders(items: any) {
+            console.log('items checking from fetchminitable headers',items)
+        
+            // Accessing the validation field with a null check
+            const validation = items?.validation ?? 'No validation field available';
+            console.log('Validation:', validation);
+        
+            // Ensure `validation.formName_table` exists and is being logged correctly for each table
+            const validateFormName = validation?.formName_table ?? 'No formName_table available';
+            console.log('validateFormName:', validateFormName);
+            const minitableName = items.label
+        try {
+        // Check if items is an array or a single value
+        const formNames = Array.isArray(validateFormName) ? validateFormName : [validateFormName];
+        
+        const allColumnDefs = [];
+        const results = [];
+        
+        // Iterate over each formName (whether single or multiple)
+        for (let formName of formNames) {
+          const resultHeaders: any = await this.api.GetMaster(this.SK_clientID + "#dynamic_form#" + formName + "#main", 1);
+        
+          if (resultHeaders) {
+            // console.log('forms checking', resultHeaders);
+            const helpherObjmainHeaders = JSON.parse(resultHeaders.metadata);
+            console.log('helpherObjmain checking', helpherObjmainHeaders);
+        
+            // Ensure formFields exist and is an array
+            if (helpherObjmainHeaders?.formFields && Array.isArray(helpherObjmainHeaders.formFields)) {
+        
+              // Initialize extractedTableHeaders as an object
+              if (!this.extractedTableHeaders) {
+                this.extractedTableHeaders = {};
+              }
+        
+              // Store extracted form fields by formLabel
+              const formLabel = helpherObjmainHeaders.formLabel;
+        
+        
+              if (!this.extractedTableHeaders[formLabel]) {
+                this.extractedTableHeaders[formLabel] = {
+                  formFields: helpherObjmainHeaders.formFields,
+                  formName: helpherObjmainHeaders.formLabel,
+              
+                  columnDefs: helpherObjmainHeaders.formFields.map((field: { label: string; name: string; validation?: any }) => ({
+                    headerName: field.label,
+                    field: field.name,
+                    sortable: true,
+                    filter: true,
+                    resizable: true,
+                    validation: field.validation || {} // ✅ Include validation metadata
+                  }))
+                };
+              }
+        
+              // console.log(`Extracted Form Fields for: ${formLabel}`);
+              // console.log('this.extractedTableHeaders[formLabel] checking before applying',this.extractedTableHeaders[formLabel])
+              this.storeFormLabel = formLabel
+              // const formNameMini=receiveActualTableNames
+        
+              // console.log('Column Definitions:', this.extractedTableHeaders[formLabel].columnDefs);
+              // console.log('this.storeFormLabel chcking',this.storeFormLabel)
+        
+              // Add columnDefs of this form to the allColumnDefs array
+              results.push({
+                minitableName,
+                columnDefs: this.extractedTableHeaders[formLabel].columnDefs
+              });
+            }
+          }
+        }
+        console.log('results checking from tile1',results)
+        // Return all columnDefs for the forms (single or multiple)
+        return results.length > 1 ? results : results[0];
+        
+        
+        } catch (err) {
+        console.log("Error fetching the dynamic form data", err);
+        }
+        
+        // In case no data is fetched, return an empty array
+        return [];
+        }
+          async extractDynamicTables(
+            dataArray: any[],
+            tablesReceive: any[],
+            tableHeaderMap: { [name: string]: any }
+          ): Promise<{
+            [label: string]: { headers: { header: string; field: string }[]; rows: any[] };
+          }> {
+            const extractedTables: {
+              [label: string]: { headers: { header: string; field: string }[]; rows: any[] };
+            } = {};
+        
+        
+            console.log('tablesReceive from extractDynamic',tablesReceive)
+          
+            for (const packet of dataArray) {
+              const dynamicTables = packet?.dynamic_table_values || {};
+              const tableIds = Object.keys(dynamicTables);
+          
+              for (const tableId of tableIds) {
+                const modifiedTableId = tableId.replace('-table', '');
+          
+                const matchedTable = tablesReceive.find((table: any) => {
+                  const nameWithoutSuffix = table.name.replace('-table', '');
+                  return nameWithoutSuffix === modifiedTableId;
+                });
+          
+                if (!matchedTable) {
+                  console.warn(`❌ No matched table for tableId: ${tableId}`);
+                  continue;
+                }
+          
+                const columnDefs: any[] = tableHeaderMap[matchedTable.name] || [];
+                if (!Array.isArray(columnDefs) || columnDefs.length === 0) {
+                  console.warn(`⚠️ No columnDefs for table: ${matchedTable.name}`);
+                  continue;
+                }
+          
+                const fieldNames = columnDefs.map(col => col.field);
+                const tableLabel = matchedTable.label || matchedTable.name || modifiedTableId;
+                let rows = dynamicTables[tableId] || dynamicTables[matchedTable.name];
+          
+                if (!Array.isArray(rows)) {
+                  console.warn(`⚠️ Rows for ${tableId} is not an array`);
+                  continue;
+                }
+          
+                // Format date/time fields
+                rows = rows.map((row: any) => {
+                  if (typeof row !== 'object' || row === null) return row;
+                  try {
+                    const filteredDateFields: any = {};
+                    for (const key of Object.keys(row)) {
+                      if (
+                        key.startsWith('date') ||
+                        key.startsWith('datetime') ||
+                        key.startsWith('epoch-date') ||
+                        key.startsWith('epoch-datetime-local') ||
+                        key === 'created_time' ||
+                        key === 'updated_time' ||
+                        key.startsWith('time')
+                      ) {
+                        filteredDateFields[key] = row[key];
+                      }
+                    }
+          
+                    if (Object.keys(filteredDateFields).length === 0) return row;
+          
+                    const matchedPackets = columnDefs.filter((col: any) =>
+                      Object.keys(filteredDateFields).includes(col.field)
+                    );
+          
+                    const result = this.dynamicDateTimeFormat(filteredDateFields, matchedPackets);
+                    for (const key of Object.keys(result)) {
+                      row[key] = result[key];
+                    }
+          
+                    return row;
+                  } catch (err) {
+                    console.warn('⚠️ Date formatting error:', row, err);
+                    return row;
+                  }
+                });
+          
+                // Final cleaned rows
+                // const processedRows = rows.map((row: any) => {
+                //   const filtered: any = {};
+                //   fieldNames.forEach((field: string) => {
+                //     filtered[field] = row[field] ?? '';
+                //   });
+                //   return filtered;
+                // });
+        
+                const processedRows = Array.isArray(rows)
+          ? rows.map((row: any) => {
+              const filtered: any = {};
+              if (row && typeof row === 'object') {
+                fieldNames.forEach((field: string) => {
+                  filtered[field] = row[field] ?? '';
+                });
+              } else {
+                // If row is null or not an object, assign empty values
+                fieldNames.forEach((field: string) => {
+                  filtered[field] = '';
+                });
+              }
+              return filtered;
+            })
+          : [];
+        
+          
+                const headers = columnDefs.map(col => ({
+                  header: col.headerName,
+                  field: col.field,
+                }));
+                console.log('final headers checking',headers)
+          
+                if (!extractedTables[tableLabel]) {
+                  extractedTables[tableLabel] = { headers, rows: [] };
+                }
+          
+                extractedTables[tableLabel].rows.push(...processedRows);
+              }
+            }
+          
+            return extractedTables;
+          }
+  
+  
+  
+          dynamicDateTimeFormat(reciveData: any, receiveFields: any) {
+            const formattedResults: any = {};
+          
+            receiveFields.forEach((packet: any) => {
+              const fieldName = packet.field;
+              let fieldValue = reciveData[fieldName];
+          
+              if (fieldValue) {
+                const validation = packet.validation || {};
+                const key = fieldName.toLowerCase();
+          
+                // ✅ Allowed format options
+                const allowedDateFormats = ['DD/MM/YYYY', 'MM/DD/YYYY', 'YYYY/MM/DD'];
+                const allowedTimeFormats = ['12-hour (hh:mm AM/PM)', '24-hour (hh:mm)'];
+          
+                const defaultDateFormat = 'DD/MM/YYYY';
+                const defaultTimeFormat = '24-hour (hh:mm)';
+          
+                // ✅ Use format only if valid, else fallback
+                const rawDateFormat = validation.dateFormatType;
+                const rawTimeFormat = validation.timeFormatType;
+          
+                const dateFormatType = allowedDateFormats.includes(rawDateFormat) ? rawDateFormat : defaultDateFormat;
+                const rawTimeFormatType = allowedTimeFormats.includes(rawTimeFormat) ? rawTimeFormat : defaultTimeFormat;
+          
+                // 🕒 Resolve time format string
+                const timeFormat = rawTimeFormatType.includes('12-hour') ? 'hh:mm A' : 'HH:mm';
+          
+                let format = '';
+          
+                // 🧠 Convert epoch to Date (in ms if necessary)
+                if (key.startsWith('epoch-datetime-local') || key.startsWith('epoch-date')) {
+                  let epoch = typeof fieldValue === 'string' ? parseInt(fieldValue) : fieldValue;
+                  if (epoch < 10000000000) epoch *= 1000; // seconds to milliseconds
+                  fieldValue = new Date(epoch);
+                }
+          
+                // 🧠 Patch time-only strings (e.g., "13:45")
+                if (typeof fieldValue === 'string' && key.startsWith('time') && !key.startsWith('datetime')) {
+                  fieldValue = `1970-01-01T${fieldValue}`;
+                }
+          
+                // ⏱️ Parse final Date object
+                const parsedDate = fieldValue instanceof Date ? fieldValue : new Date(fieldValue);
+                if (isNaN(parsedDate.getTime())) {
+                  formattedResults[fieldName] = '';
+                  return;
+                }
+          
+                // 🧩 Format resolution (specific to general order)
+                if (key === 'created_time' || key === 'updated_time') {
+                  format = 'DD/MM/YYYY HH:mm';
+                }
+                 else if (key.startsWith('epoch-datetime-local')) {
+                  format = `${dateFormatType} ${timeFormat}`;
+                } else if (key.startsWith('epoch-date')) {
+                  format = dateFormatType;
+                } else if (key.startsWith('datetime')) {
+                  format = `${dateFormatType} ${timeFormat}`;
+                } else if (key.startsWith('time') && !key.startsWith('datetime')) {
+                  format = timeFormat;
+                } else if (key.startsWith('date') && !key.startsWith('datetime')) {
+                  format = dateFormatType;
+                }
+          
+                const formattedDate = this.formatDateByPattern(parsedDate, format);
+                formattedResults[fieldName] = formattedDate;
+              }
+            });
+          
+            console.log('✅ Final Formatted DateTime Fields:', formattedResults);
+            return formattedResults;
+          }
+          formatDateByPattern(inputDate: string | number | Date, format: string): string {
+            const date = new Date(inputDate);
+            const pad = (num: number) => String(num).padStart(2, '0');
+          
+            const hours24 = date.getHours();
+            const hours12 = hours24 % 12 || 12;
+            const ampm = hours24 >= 12 ? 'PM' : 'AM';
+          
+            const replacements: Record<string, string> = {
+              YYYY: String(date.getFullYear()),
+              MM: pad(date.getMonth() + 1),
+              DD: pad(date.getDate()),
+              HH: pad(hours24),
+              hh: pad(hours12),
+              mm: pad(date.getMinutes()),
+              ss: pad(date.getSeconds()),
+              A: ampm,
+              a: ampm.toLowerCase()
+            };
+          
+            return format.replace(/YYYY|MM|DD|HH|hh|mm|ss|A|a/g, match => replacements[match]);
+          }
   exportAllTablesAsPDF() {
     if (!this.rowData || this.rowData.length === 0) {
       console.error('No data available for export.');

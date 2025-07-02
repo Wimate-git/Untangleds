@@ -2824,6 +2824,13 @@ fetchDynamicFormData(value: any, index: number) {
             text: 'Updated Time',
           });
         }
+        if (parsedMetadata.updated_time) {
+          dynamicParamList.push({
+            value: `dynamic_table_values`,
+            text: 'Dynamic Table Values' // You can customize the label here if needed
+          });
+          
+        }
 console.log('dynamicParamList checking',dynamicParamList)
 const formFieldsArray: FormField[] = Object.values(parsedMetadata.formFields) as FormField[];
 

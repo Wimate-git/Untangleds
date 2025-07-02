@@ -1,11 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { Router } from '@angular/router';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import Highcharts from 'highcharts';
 import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engine.service';
 import Swal from 'sweetalert2';
+import * as CryptoJS from 'crypto-js';
 
 @Component({
   selector: 'app-chart-ui2',
@@ -45,6 +46,11 @@ export class ChartUi2Component implements OnInit{
   selectedMarkerIndex: any;
   storeRedirectionCheck: any;
   tile1Config: any;
+  @Input() userId:any;
+  @Input() userPass:any;
+  @Output() emitIframeUrlCharts = new EventEmitter<any>()
+    @ViewChild('htmlModal', { static: false }) htmlModal: TemplateRef<any>;
+        iframeSafeUrl: SafeResourceUrl = ''; 
   ngOnChanges(changes: SimpleChanges): void {
     console.log('dashboardChange dynamic ui',this.all_Packet_store)
     console.log('eventFilterConditions chart ui1',this.eventFilterConditions)
@@ -125,7 +131,7 @@ export class ChartUi2Component implements OnInit{
     
   }
   constructor(
-    private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient,private summaryService:SummaryEngineService
+    private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient,private summaryService:SummaryEngineService,private route: ActivatedRoute,
     
    ){}
   ngAfterViewInit(){
@@ -365,10 +371,15 @@ this.formTableConfig = {
 
   }
 
-  helperDashboard(item: any, index: any, modalContent: any, selectType: any, ModuleNames: any) {
+  helperDashboard(item: any, index: any, modalContent: any, selectType: any, ModuleNames: any, receiveModal: any) {
     console.log('selectType checking dashboard', selectType);
     console.log('item checking from', item);
     console.log('ModuleNames:', ModuleNames);
+  
+    this.route.queryParams.subscribe((params) => {
+      if (params['uID']) this.userId = params['uID'];
+      if (params['pass']) this.userPass = params['pass'];
+    });
   
     // ✅ Only handle custom logic for Summary Dashboard
     if (selectType && ModuleNames === 'Summary Dashboard') {
@@ -388,83 +399,154 @@ this.formTableConfig = {
   
       this.selectedMarkerIndex = index;
   
+      // ✅ Updated logic for 'NewTab'
       if (selectType === 'NewTab') {
-        window.open(this.iframeUrl.changingThisBreaksApplicationSecurity, '_blank');
+        const rawUrl = (this.iframeUrl as any)?.changingThisBreaksApplicationSecurity || window.location.origin + fullUrl;
+  console.log('this.iframeUrl checking from chartui1',this.iframeUrl)
+        if (this.userId && this.userPass) {
+          this.iframeSafeUrl = rawUrl;
+  
+          this.modalService.open(receiveModal, {
+            fullscreen: true,
+            modalDialogClass: 'p-9',
+            centered: true,
+            backdrop: 'static',
+            keyboard: false
+          });
+        } else {
+          window.open(rawUrl, '_blank');
+        }
+  
       } else if (selectType === 'Modal') {
         this.modalService.open(modalContent, { size: 'xl' });
+  
       } else if (selectType === 'Same page Redirect') {
         this.router.navigateByUrl(fullUrl).catch(err => console.error('Navigation error:', err));
       }
-    } 
-    // ✅ If module is NOT Summary Dashboard, delegate to general redirect
-    else if (selectType && ModuleNames !== 'Summary Dashboard') {
-      this.redirectModule(item);
+  
+    } else if (selectType && ModuleNames !== 'Summary Dashboard') {
+      // ✅ General redirect for other modules
+      this.redirectModule(item, this.htmlModal);
     }
   }
   
   
-  redirectModule(recieveItem: any) {
-    console.log('recieveItem check', recieveItem);
   
-    const moduleName = recieveItem.dashboardIds;
-    const selectedModule = recieveItem.ModuleNames;
-    const redirectType = recieveItem.selectType; // 'NewTab' or 'Same page Redirect'
+  SECRET_KEY = 'mobile-encrypt-params-123';
+  redirectModule(receiveItem: any, htmlModalRef: any) {
+    const moduleName = receiveItem.dashboardIds;
+    const selectedModule = receiveItem.ModuleNames;
+    const redirectType = receiveItem.selectType; // 'NewTab' or 'Same page Redirect'
+    const filterDescriptionAccess = receiveItem.filterDescription;
+    const formattedCondition = this.formatConditions(filterDescriptionAccess);
   
-    console.log('moduleName:', moduleName);
-    console.log('selectedModule:', selectedModule);
-    console.log('selectType (redirectType):', redirectType);
+    this.route.queryParams.subscribe((params) => {
+      if (params['uID']) this.userId = params['uID'];
+      if (params['pass']) this.userPass = params['pass'];
+    });
   
-    let targetUrl: string = '';
     const isNewTab = redirectType === 'NewTab';
+    const encodedCondition = encodeURIComponent(formattedCondition);
+    const encryptedUserId = this.userId ? this.encryptValue(this.userId) : '';
+    const encryptedPass = this.userPass ? this.encryptValue(this.userPass) : '';
+  
+    const queryString = `isFullScreen=true` +
+      (encryptedUserId ? `&uID=${encodeURIComponent(encryptedUserId)}` : '') +
+      (encryptedPass ? `&pass=${encodeURIComponent(encryptedPass)}` : '');
+  
+    let baseUrl = '';
   
     switch (selectedModule) {
       case 'Forms':
-        targetUrl = `/view-dreamboard/Forms/${moduleName}`;
+        baseUrl = `/view-dreamboard/Forms/${moduleName}&filter=${encodedCondition}`;
         break;
   
       case 'Summary Dashboard':
-        targetUrl = `/summary-engine/${moduleName}`;
+        baseUrl = `/summary-engine/${moduleName}`;
         break;
   
       case 'Dashboard':
-        targetUrl = `/dashboard/dashboardFrom/Forms/${moduleName}`;
+        baseUrl = `/dashboard/dashboardFrom/Forms/${moduleName}`;
         break;
   
       case 'Projects':
-        targetUrl = `/project-dashboard/project-template-dashboard/${moduleName}`;
+        baseUrl = `/project-dashboard/project-template-dashboard/${moduleName}`;
         break;
   
       case 'Calender':
-        targetUrl = `/view-dreamboard/Calendar/${moduleName}`;
+        baseUrl = `/view-dreamboard/Calendar/${moduleName}`;
         break;
   
-      case 'Report Studio':
+      case 'Report Studio': {
         const tree = this.router.createUrlTree(['/reportStudio'], {
           queryParams: { savedQuery: moduleName }
         });
-        targetUrl = this.router.serializeUrl(tree); // already serialized
+        baseUrl = this.router.serializeUrl(tree);
         break;
+      }
   
       default:
         console.error('Unknown module:', selectedModule);
         return;
     }
   
-    // 🔁 Navigation logic
+    // ✅ Append queryString to baseUrl properly
+  //   let targetUrl = baseUrl.includes('?')
+  //     ? `${baseUrl}&${queryString}`
+  //     : `${baseUrl}?${queryString}`;
+  // console.log('targetUrl checking from module redirect',targetUrl)
+  const targetUrl = `${baseUrl}?${queryString}`;
+  console.log('targetUrl checking from module redirect', targetUrl);
+    // ✅ Redirection behavior
     if (isNewTab) {
-      // Open serialized or regular route as full URL
-      window.open(targetUrl, '_blank');
-    } else {
-      // Same Page Navigation
-      if (selectedModule === 'Report Studio') {
-        this.router.navigateByUrl(targetUrl).catch(err => console.error('Navigation error:', err));
+      if (this.userId && this.userPass) {
+        this.iframeSafeUrl = targetUrl;
+        this.emitIframeUrlCharts.emit(this.iframeSafeUrl);
+
+        this.modalService.open(htmlModalRef, {
+          fullscreen: true,
+          modalDialogClass: 'p-9',
+          centered: true,
+          backdrop: 'static',
+          keyboard: false
+        });
       } else {
-        this.router.navigate([targetUrl]).catch(err => console.error('Navigation error:', err));
+        window.open(targetUrl, '_blank');
       }
+    } else {
+      this.router.navigateByUrl(targetUrl).catch(err =>
+        console.error('Navigation error:', err)
+      );
     }
   }
+
+
+
+
+formatConditions(expression: string | undefined | null): string {
+if (!expression || typeof expression !== 'string') {
+  return '';
+}
+
+const regex = /([a-zA-Z0-9_ ]+)-\$\{([a-zA-Z0-9_-]+)\}/g;
+
+return expression
+  .replace(regex, (_match, label, value) => {
+    return `\${${label.trim()}.${value}}`;
+  })
+  .replace(/(\s*)(\&\&|\|\|)(\s*)/g, ' $2 ');
+}
   closeModal() {
     this.modalService.dismissAll(); // Close the modal programmatically
   }
+    encryptValue(value: string): string {
+      return encodeURIComponent(CryptoJS.AES.encrypt(value, this.SECRET_KEY).toString());
+    }
+    
+    // ✅ Decryption (if needed on receiving side)
+    decryptValue(encryptedValue: string): string {
+      const bytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedValue), this.SECRET_KEY);
+      return bytes.toString(CryptoJS.enc.Utf8);
+    }
 
 }

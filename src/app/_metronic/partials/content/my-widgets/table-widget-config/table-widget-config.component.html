@@ -11,18 +11,18 @@
         <!-- Tab Navigation -->
         <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder flex-nowrap"
         id="myTab_settings" role="tablist">
-        <div class="col-3" role="Data">
+        <div class="col-2" role="Data">
           <li class="nav-item">
             <a class="nav-link text-active-primary me-6" id="home-tab" data-bs-toggle="tab" role="tab"
               aria-controls="dataTab" aria-selected="false" (click)="selectedSettingsTab('dataTab')">Data</a>
           </li>
         </div>
-        <div class="col-3" role="Settings">
+        <div class="col-2" role="Settings">
           <li class="nav-item">
             <a class="nav-link text-active-primary me-6" id="settings-tabpane" data-bs-toggle="tab" role="tab" aria-controls="settings-tab" aria-selected="false" (click)="selectedSettingsTab('settings-tab')">Filter</a>
           </li>
         </div>
-        <div class="col-3" role="Filter">
+        <div class="col-2" role="Filter">
           <li class="nav-item">
             <a class="nav-link text-active-primary me-6" id="filter-tab" data-bs-toggle="tab" role="tab"
               aria-controls="filter-tab" aria-selected="false" (click)="selectedSettingsTab('filter-tab')">Function</a>
@@ -35,6 +35,13 @@
               aria-controls="custom-row" aria-selected="false" (click)="selectedSettingsTab('custom-row')">Custom Row</a>
           </li>
         </div> 
+
+        <div class="col-3" role="drill">
+          <li class="nav-item">
+            <a class="nav-link text-active-primary me-6" id="drill-tab" data-bs-toggle="tab" role="tab"
+              aria-controls="drill-tab" aria-selected="false" (click)="selectedSettingsTab('drill-tab')">Drill Down Type</a>
+          </li>
+        </div>
 
 
 
@@ -208,6 +215,110 @@
 
               </div>
 
+
+              <div class="row g-3" *ngIf="createKPIWidget.get('DataType')?.value === 'Drill Down Data'" style="border: 2px solid rgb(201, 228, 239); padding: 10px; margin: 5px; border-radius: 5px;">
+                <!-- Forms - Only show when DataType is 'Drill Down Data' -->
+<div class="col-md-4 mb-3" *ngIf="createKPIWidget.get('DataType')?.value === 'Drill Down Data'">
+  <label for="formlist" class="col-createChart-label fw-bold fs-6 ">Forms
+    <span class="ms-2 text-primary" [ngbTooltip]="formTooltip" placement="top" container="body">
+      <i class="bi bi-info-circle fs-5 text-primary"></i>
+    </span>
+  </label>
+  <ngx-select id="formlist"
+              [allowClear]="true"
+              name="icon"
+              formControlName="tableDrillDownForm"
+              [items]="listofDeviceIds"
+              optionValueField="value"
+              optionTextField="text"
+              (selectionChanges)="selectDrillFormParams($event)"
+              placeholder="Select createChart">
+  </ngx-select>
+
+</div>
+
+<!-- Form Fields - Only show when DataType is 'Drill Down Data' -->
+<div class="col-md-4 mb-3" *ngIf="createKPIWidget.get('DataType')?.value === 'Drill Down Data'">
+  <label for="parameterName" class="col-createChart-label fw-bold fs-6 ">Form Fields
+    <span class="ms-2 text-primary" [ngbTooltip]="parameterTooltip" placement="top" container="body">
+      <i class="bi bi-info-circle fs-5 text-primary"></i>
+    </span>
+  </label>
+  <p-multiSelect id="parameterName"
+                 formControlName="tableDrillDownFields"
+                 [options]="listofDynamicDrillParam"
+                 optionLabel="text"
+                 placeholder="Select Parameter"
+                >
+  </p-multiSelect>
+
+</div>
+
+<div class="col-md-4 mb-3" *ngIf="createKPIWidget.get('DataType')?.value === 'Drill Down Data'">
+  <label for="primaryValue" class="col-createChart-label fw-bold fs-6 ">
+    Primary Value
+    <span class="ms-2 text-primary"
+    (mouseenter)="openPrimaryValueInfoModal(Chart1PrimaryValueModal)"
+    style="cursor: pointer;">
+<i class="bi bi-info-circle fs-5 text-primary"></i>
+</span>
+  </label>
+  <ngx-select id="primaryValue" [allowClear]="true" formControlName="tableDrillDownPrimaryValue"
+    [items]="showValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
+    (selectionChanges)="onValueChange($event)" class="w-100"></ngx-select>
+
+</div>
+<div class="col-md-4 mb-3" *ngIf="createKPIWidget.get('DataType')?.value === 'Drill Down Data'" >
+  <label  class="col-createChart-label fw-bold fs-6 ">Undefined Format
+    <span class="ms-2 text-primary"
+    [ngbTooltip]="UndefinedtooltipContent"
+    placement="top"
+    container="body"
+    tooltipClass="custom-tooltip"
+    style="cursor: pointer;">
+<i class="bi bi-info-circle fs-5 text-primary"></i>
+</span>
+
+  </label>
+  <input id="undefinedCheckLabel" type="text" class="form-control form-control-solid" placeholder="Enter Value"
+    formControlName="tableDrillDownUndefinedLabel">
+</div>
+
+<div class="col-md-4 mb-3" *ngIf="createKPIWidget.get('DataType')?.value === 'Drill Down Data'">
+  <label for="groupByFormatDrillDown" class="col-createChart-label fw-bold fs-6 ">Group By Format
+    <span class="ms-2 text-primary"
+    [ngbTooltip]="tooltipContent"
+    placement="top"
+    container="body"
+    tooltipClass="custom-tooltip">
+<i class="bi bi-info-circle fs-5 text-primary"></i>
+</span>
+  </label>
+  <input id="groupByFormatDrillDown" type="text" class="form-control form-control-solid"
+  placeholder="Select groupByFormatDrillDown" [formControlName]="'tableDrillDownGroupByFormat'"
+  (click)="openModalCalenderDrillDown()" readonly>
+
+
+</div>
+<div class="col-md-4 mb-3" *ngIf="createKPIWidget.get('DataType')?.value === 'Drill Down Data'">
+  <label class="col-createChart-label fw-bold fs-6 ">Date Range Label
+    <span class="ms-2 text-primary"
+    [ngbTooltip]="DateRangetooltipContent"
+    placement="top"
+    container="body"
+    style="cursor: pointer;">
+<i class="bi bi-info-circle fs-5 text-primary"></i>
+</span>
+
+  </label>
+  <ngx-select id="primaryValue" [allowClear]="true" formControlName="tableDrillDownSelectedRangeType"
+  [items]="showCustomValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
+  (selectionChanges)="onValueSelect($event)" class="w-100"   ></ngx-select>
+
+
+</div>
+
+              </div>
 
               <form [formGroup]="createKPIWidget">
                 <div *ngIf="isProcessedDataSelected" formArrayName="customColumnFields">
@@ -574,6 +685,123 @@
           
           
         </div>
+        <div [ngClass]="{'tab-pane fade': true, 'show active': selectedTabset === 'drill-tab'}" id="drill-tab"
+        role="tabpanel" aria-labelledby="drill-tabpane">
+        <div class="col-md-4 mb-3">
+          <label for="parameterName" class="col-createChart-label fw-bold fs-6 ">Drill Down Type
+            <span
+            class="ms-2 text-primary"
+            [ngbTooltip]="drillDownTypeTooltip"
+            container="body"
+            placement="top"
+            style="cursor: pointer;">
+            <i class="bi bi-info-circle fs-5 text-primary"></i>
+          </span>
+          </label>
+          <ngx-select
+            id="parameterName"
+            [allowClear]="true"
+            formControlName="DrillDownType"
+            [items]="DrillDownTypeFields"
+            optionValueField="value"
+            optionTextField="text"
+            placeholder="Select Parameter"
+        
+            style="width: 100%;">
+
+          </ngx-select>
+ 
+        </div>
+
+<!-- Drill Fields Form Array - Only show if selected value is 'Multi Level' -->
+<form [formGroup]="createKPIWidget">
+  <div *ngIf="drillFields?.length" formArrayName="drill_fields">
+
+    <div *ngFor="let field of drill_fields.controls; let fieldIndex = index" [formGroupName]="fieldIndex"
+      style="border: 2px solid rgb(21, 163, 219); padding: 10px; margin: 5px; border-radius: 5px;">
+      
+      <h5 class="fw-bold mb-3">{{ drillDownHeading || 'No Heading' }}:</h5>
+
+      <div formArrayName="conditions">
+        <div *ngFor="let condition of getFormArrayControls(field); let conditionIndex = index"
+          [formGroupName]="conditionIndex">
+          
+          <div class="row g-3 align-items-center"
+            style="border: 2px solid rgb(157, 159, 159); padding: 10px; margin: 5px; border-radius: 5px;">
+
+            <!-- Custom Label -->
+            <div class="col-md-4">
+              <label class="col-createChart-label fw-bold fs-6 ">Custom Label
+                <span class="ms-2 text-primary" [ngbTooltip]="drillCustomLabelTooltip" container="body"
+                  placement="top" style="cursor: pointer;">
+                  <i class="bi bi-info-circle fs-5 text-primary"></i>
+                </span>
+              </label>
+              <input type="text" class="form-control form-control-solid" formControlName="drillTypeLabel" />
+            </div>
+
+            <!-- Select Field -->
+            <div class="col-md-4">
+              <label class="col-createChart-label fw-bold fs-6 ">Select Field
+                <span class="ms-2 text-primary" [ngbTooltip]="drillSelectFieldTooltip" container="body"
+                  placement="top" style="cursor: pointer;">
+                  <i class="bi bi-info-circle fs-5 text-primary"></i>
+                </span>
+              </label>
+              <ngx-select [items]="listofDynamicDrillParam || []" formControlName="drillTypeFields"
+                optionValueField="value" optionTextField="text" placeholder="Select Field">
+              </ngx-select>
+            </div>
+
+            <!-- Primary Value -->
+            <div class="col-md-4 mb-3">
+              <label class="col-createChart-label fw-bold fs-6 required">Primary Value
+                <span class="ms-2 text-primary" (mouseenter)="openPrimaryValueInfoModal(Chart1PrimaryValueModal)"
+                  style="cursor: pointer;">
+                  <i class="bi bi-info-circle fs-5 text-primary"></i>
+                </span>
+              </label>
+              <ngx-select id="primaryValue" [allowClear]="true" formControlName="drillTypePrimary"
+                [items]="showValues" optionValueField="value" optionTextField="text" placeholder="Select Group"
+                (selectionChanges)="onValueChange($event)" class="w-100">
+              </ngx-select>
+            </div>
+
+            <!-- Remove Condition -->
+            <div class="col-md-2 mt-12 d-flex justify-content-end">
+              <button *ngIf="conditionIndex > 0" type="button" class="btn btn-danger btn-sm mt-4"
+                (click)="removeConditionDrill(fieldIndex, conditionIndex)">
+                Remove Condition
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="d-flex mt-3">
+        <button type="button" class="btn btn-primary btn-sm me-4" (click)="addConditionDrillDown(fieldIndex)">
+          Add Condition
+        </button>
+        <button type="button" class="btn btn-danger btn-sm me-4" (click)="remove(fieldIndex)">
+          Remove
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
+
+
+
+
+
+      
+      <!-- Add Condition Button -->
+
+      
+
+   
+        </div>
   
       </div>
   
@@ -784,6 +1012,124 @@
         </div>
       </div>
     </ng-template>
+
+
+
+    <ng-template #calendarModalDrillDownTable let-modal>
+      <div class="modal-header">
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+      </div>
+      <div class="modal-body right-side-modal">
+        <div class="card-body pt-0">
+          <div class="container1">
+            <div class="list-row">
+              <div class="list-column">
+                <div class="list-item active" (click)="selectValueDrill('Last 24 Hours', modal)" (mouseenter)="showTooltip('Last 24 Hours')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last 24 Hours</div>
+                  <div class="example">E.g., Last 24 hours of data</div>
+                </div>
+                <div class="list-item" (click)="selectValueDrill('Today', modal)" (mouseenter)="showTooltip('Today')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Today</div>
+                  <div class="example">E.g., Data from 00:00 hrs to now</div>
+                </div>
+                <div class="list-item" (click)="selectValueDrill('Yesterday', modal)" (mouseenter)="showTooltip('Yesterday')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Yesterday</div>
+                  <div class="example">E.g., Data from previous day</div>
+                </div>
+                <div class="list-item" (click)="selectValueDrill('Last 7 days', modal)" (mouseenter)="showTooltip('Last 7 days')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last 7 days</div>
+                  <div class="example">E.g., Data for past 7 days</div>
+                </div>
+                <div class="list-item" (click)="selectValueDrill('Last 30 days', modal)" (mouseenter)="showTooltip('Last 30 days')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last 30 days</div>
+                  <div class="example">E.g., Data for the past 30 days</div>
+                </div>
+                <div class="list-item" (click)="selectValueDrill('This Week', modal)" (mouseenter)="showTooltip('This Week')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">This Week</div>
+                  <div class="example">E.g., Current week (Sunday to Saturday)</div>
+                </div>
+                <div class="list-item" (click)="selectValueDrill('Last Week', modal)" (mouseenter)="showTooltip('Last 5 Weeks')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last Week</div>
+                  <div class="example">E.g., Data for last week</div>
+                </div>
+                <div class="list-item" (click)="selectValueDrill('This Month', modal)" (mouseenter)="showTooltip('This Month')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">This Month</div>
+                  <div class="example">E.g., Data for current month</div>
+                </div>
+                <div class="list-item" (click)="selectValueDrill('any', modal)" (mouseenter)="showTooltip('any')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">Any</div>
+                <div class="example">E.g., Any</div>
+              </div>
+              <div class="list-item" (click)="selectValueDrill('Last financial year', modal)" (mouseenter)="showTooltip('Last financial year')"
+              (mouseleave)="hideTooltip()">
+              <div class="title">Last financial year</div>
+              <div class="example">E.g., Data from the last financial year</div>
+            </div>
+              </div>
+            
+              <div class="list-column">
+                <div class="list-item" (click)="selectValueDrill('Last Month', modal)" (mouseenter)="showTooltip('Last Month')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last Month</div>
+                  <div class="example">E.g., Data for previous month</div>
+                </div>
+                <div class="list-item" (click)="selectValueDrill('This Quarter', modal)" (mouseenter)="showTooltip('This Quarter')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">This Quarter</div>
+                  <div class="example">E.g., Current quarter (Q1/Q2/Q3/Q4)</div>
+                </div>
+                <div class="list-item" (click)="selectValueDrill('Last Quarter', modal)" (mouseenter)="showTooltip('Last Quarter')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last Quarter</div>
+                  <div class="example">E.g., Data from the previous quarter</div>
+                </div>
+                <div class="list-item" (click)="selectValueDrill('This BiAnnual', modal)" (mouseenter)="showTooltip('This BiAnnual')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">This BiAnnual</div>
+                  <div class="example">E.g., Current half-year period</div>
+                </div>
+                <div class="list-item" (click)="selectValueDrill('Last BiAnnual', modal)" (mouseenter)="showTooltip('Last BiAnnual')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last BiAnnual</div>
+                  <div class="example">E.g., Previous half-year period</div>
+                </div>
+                <div class="list-item" (click)="selectValueDrill('This Year', modal)" (mouseenter)="showTooltip('This Year')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">This Year</div>
+                  <div class="example">E.g., Data for the current year</div>
+                </div>
+                <div class="list-item" (click)="selectValueDrill('Last Year', modal)" (mouseenter)="showTooltip('Last Year')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last Year</div>
+                  <div class="example">E.g., Data from the previous year</div>
+                </div>
+                <div class="list-item" (click)="selectValueDrill('Last 5 Weeks', modal)" (mouseenter)="showTooltip('Last 5 Years')"
+                  (mouseleave)="hideTooltip()">
+                  <div class="title">Last 5 Weeks</div>
+                  <div class="example">E.g., Data for the last 5 weeks</div>
+                </div>
+                <div class="list-item" (click)="selectValueDrill('This financial year', modal)" (mouseenter)="showTooltip('This financial year')"
+                (mouseleave)="hideTooltip()">
+                <div class="title">This financial year</div>
+                <div class="example">E.g., Data for the this financial year</div>
+              </div>
+              </div>
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+    </ng-template>
     <ng-template #WidgetFilterHelp let-modal>
       <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
         <button
@@ -846,4 +1192,18 @@
       <app-help-section-row-unit
     
       ></app-help-section-row-unit>
+    </ng-template>
+    <ng-template #Chart1PrimaryValueModal let-modal>
+      <div class="d-flex justify-content-end" style="padding: 16px 24px 0 0;">
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="modal.dismiss()"
+          style="position: relative; top: 4px; right: 4px;">
+        </button>
+      </div>
+      <app-chart1-help-primary-value
+    
+      ></app-chart1-help-primary-value>
     </ng-template>

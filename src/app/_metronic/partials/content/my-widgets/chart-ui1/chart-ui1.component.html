@@ -35,7 +35,7 @@ class="mat-icon-button btn btn-primary btn-icon btn-custom btn-active-light btn-
 *ngIf="isEditModeView && shouldShowButton && !hideButton &&  storeRedirectionCheck &&(summaryDashboardUpdate || (summaryDashboardUpdate && !summaryDashboardView))"
 class="mat-icon-button btn btn-warning btn-icon btn-custom btn-active-light btn-active-color-primary w-50px h-30px w-md-40px h-md-30px mb-4"
 
-(click)="helperDashboard(item, index,modalContent,item.selectType,item.ModuleNames)"
+(click)="helperDashboard(item, index,modalContent,item.selectType,item.ModuleNames,htmlModal)"
 
 aria-haspopup="menu" 
 aria-expanded="false" 
@@ -101,6 +101,10 @@ aria-expanded="false"
   </app-custom-info-ui>
 </ng-template>
 
-
+<ng-template #htmlModal let-modal>
+  <app-html-modal
+  [modal]="modal" [iframeSafeUrl]="iframeSafeUrl"
+  ></app-html-modal>
+</ng-template>
 
 

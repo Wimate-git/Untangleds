@@ -1295,6 +1295,9 @@ bgGradientBottomColorTooltip: string = 'Select the bottom color for the chart ba
       return { groupByFormat: '', selectedRangeType: '' ,formatType:'',formlist:'',parameterName:'',primaryValue:'',custom_Label:'',columnVisibility:'',undefinedCheckLabel:'',drillTypeCustomLable:'',drillTypeFields:'',XaxisFormat:''};  // Return default empty values
     }
   }
+
+
+  
   subscribeToValueChanges(fieldIndex: number) {
     const group = this.all_fields.at(fieldIndex);
     

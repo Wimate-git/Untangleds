@@ -1103,17 +1103,17 @@ makeTrueCheck:any = false
       }),
     };
   
-    //////////////////console.log('requestBody checking from filter', requestBody);
+    console.log('requestBody checking from filter', requestBody);
   
     this.http.post(apiUrl, requestBody).subscribe(
       (response) => {
-        //////////////////console.log('Lambda function triggered successfully:', response);
+        console.log('Lambda function triggered successfully:', response);
         
         const constLiveData = JSON.parse((response as any)?.body);
-        //////////////////console.log('constLiveData check', constLiveData);
+        console.log('constLiveData check', constLiveData);
         const processedData = constLiveData.Processed_Data.metadata.grid_details;
   
-        //////////////////console.log('processedData check', processedData);
+        console.log('processedData check', processedData);
         this.storeliveFilterData = processedData
         this.liveFilterData.emit(this.storeliveFilterData);
 

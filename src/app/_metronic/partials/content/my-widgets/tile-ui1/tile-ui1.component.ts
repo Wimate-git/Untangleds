@@ -60,8 +60,14 @@ export class TileUi1Component implements OnInit{
     console.log('this.liveDataTile check',this.liveDataTile)
     console.log('this.queryParamsSend checking',this.queryParamsSend)
     console.log('this.item i am checking from ng onchanges',this.item)
-    this.item.multi_value = JSON.parse(this.item.multi_value)
-    console.log('this.item in else condition',this.item)
+    if (typeof this.item.multi_value === 'string') {
+      try {
+        this.item.multi_value = JSON.parse(this.item.multi_value);
+      } catch (e) {
+        console.error('❌ Failed to parse multi_value:', e);
+      }
+    }
+    
 
 }
 

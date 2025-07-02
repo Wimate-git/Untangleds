@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Injector, Input, NgZone, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
-import { FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormControl, FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -8,7 +8,15 @@ import { APIService } from 'src/app/API.service';
 import { LocationPermissionService } from 'src/app/location-permission.service';
 import { SharedService } from 'src/app/pages/shared.service';
 import { ColDef } from 'ag-grid-community';
-
+interface FormField {
+  columnWidth?: number;
+  label?: string;
+  name?: string;
+  options?: string[];
+  placeholder?: string;
+  type?: string;
+  validation?: any;
+}
 @Component({
   selector: 'app-table-widget-config',
 
@@ -46,6 +54,7 @@ export class TableWidgetConfigComponent implements OnInit,AfterViewInit{
   userIsChanging: boolean = false;
   tooltip: string | null = null;
   @ViewChild('calendarModal') calendarModal: any;
+  @ViewChild('calendarModalDrillDownTable') calendarModalDrillDownTable: any;
   selectedTabset: string = 'dataTab';
   dynamicParamMap = new Map<number, any[]>();
   selectedParameterValue: any;
@@ -65,6 +74,9 @@ export class TableWidgetConfigComponent implements OnInit,AfterViewInit{
   parsedPermission: any;
   readFilterEquation: any;
   summaryPermission: any;
+  listofDynamicDrillParam: any;
+  dynamicDateParamMap: any;
+  drillDownHeading: any;
 
 
   ngOnInit(): void {
@@ -92,8 +104,27 @@ this.fetchUserPermissions(1)
         this.CustomColumnCal();
       }
     });
+
+
+
+    this.createKPIWidget.get('DrillDownType')?.valueChanges.subscribe((selectedValue) => {
+      if (selectedValue === 'Multi Level') {
+        this.addDrillFields(); // Generate the form array
+      } else {
+        this.clearDrillFields(); // Clear the form array when 'Table' is selected
+      }
+    });
     // this.dashboardIds(1)
   }
+
+
+
+    addDrillFields() {
+      const drillFieldsArray = this.createKPIWidget.get('drill_fields') as FormArray;
+      if (drillFieldsArray.length === 0) {  // Prevent duplicate generation
+        this.addNewDrillField();  // Add an initial field
+      }
+    }
   constructor(private summaryConfiguration: SharedService, private api: APIService, private fb: UntypedFormBuilder, private cd: ChangeDetectorRef,
     private toast: MatSnackBar, private router: Router, private modalService: NgbModal, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private locationPermissionService: LocationPermissionService, private devicesList: SharedService, private injector: Injector,
     private spinner: NgxSpinnerService,private zone: NgZone
@@ -135,9 +166,11 @@ this.fetchUserPermissions(1)
       all_fields: new FormArray([]),
       customColumnFields:new FormArray([]),
       conditions: this.fb.array([]), 
+      drill_fields: new FormArray([]),
       formlist: ['', Validators.required],
       form_data_selected: ['', Validators.required],
       filter_duplicate_data:[''],
+  
     
       custom_Label:['',Validators.required],
       groupByFormat: ['', Validators.required],
@@ -148,8 +181,23 @@ this.fetchUserPermissions(1)
       // custom_Label1:[''],
       filterDescription1:[''],
       enableRowCal:[''],
-      DataType:['']
+      DataType:[''],
+      tableDrillDownForm:[''],
+      tableDrillDownFields:[''],
+      tableDrillDownPrimaryValue:[''],
+      tableDrillDownUndefinedLabel:[''],
+      tableDrillDownGroupByFormat:[''],
+      tableDrillDownSelectedRangeType:[''],
+      DrillDownType: [''],
+
+
+
+
   
+    });
+
+    this.createKPIWidget.get('DrillDownType')?.valueChanges.subscribe(() => {
+      this.updateDrillFields();
     });
   }
 
@@ -158,6 +206,7 @@ this.fetchUserPermissions(1)
   DataTypeValues = [
     { value: 'Processed Data', text: 'Processed Data' },
     { value: 'Normal Data', text: 'Normal Data' },
+    {value:'Drill Down Data',text: 'Drill Down Data'}
 
 
 ]
@@ -165,12 +214,221 @@ get isProcessedDataSelected(): boolean {
   return this.createKPIWidget?.get('DataType')?.value === 'Processed Data';
 }
 
+get drillFields(): FormArray {
+  return this.createKPIWidget?.get('drill_fields') as FormArray || this.fb.array([]);
+}
+
+updateDrillFields(): void {
+  const selectedType = this.createKPIWidget.get('DrillDownType')?.value;
+  const count = 1;
+  console.log('Updating drill fields based on count:', count);
+
+  if (selectedType !== 'Multi Level' || isNaN(count) || count <= 0) {
+    this.drillFields.clear();
+    return;
+  }
+
+  const currentLength = this.drillFields.length;
+
+  // Add fields
+  if (count > currentLength) {
+    for (let i = currentLength; i < count; i++) {
+      this.drillFields.push(this.createDrillField());
+    }
+  }
+
+  // Remove extra fields
+  else if (count < currentLength) {
+    for (let i = currentLength - 1; i >= count; i--) {
+      this.drillFields.removeAt(i);
+    }
+  }
+}
+
+
+createDrillField(): FormGroup {
+  return this.fb.group({
+    conditions: this.fb.array([this.createCondition()])
+  });
+}
+
+createCondition(): FormGroup {
+  return this.fb.group({
+    drillTypeFields: [''],
+    drillTypeLabel: [''],
+    drillTypePrimary:[''],
+  });
+}
+drillDownTypeTooltip: string = 'Select the drill down type for the chart. Choosing "Multi Level Drill Down" will allow you to configure infinite-level drill down logic dynamically.';
+drillSelectFieldTooltip: string = 'Choose the field to display in the next drill down level. For example, selecting "Customer Name" will show customer-specific data when a chart slice is clicked.';
+
+drillCustomLabelTooltip: string = 'Enter a custom label that will be used as the chart title at this drill down level. This helps identify the data shown at each step.';
+dataLabelFontColorTooltip: string = 'Choose a custom font color for the data labels displayed on the chart.';
+
     openWidgetFilterHelp(stepperModal: TemplateRef<any>){
       this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false    });
     
     }
 
+
+    openPrimaryValueInfoModal(stepperModal: TemplateRef<any>) {
+        this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
+          keyboard: false    });
+    
+      }
+
+
+
+
+      repopulateDrill_fields(tile: any): FormArray {
+        const drillFieldArray = this.fb.array([]);
+      
+        let parsedConfig = [];
+        try {
+          parsedConfig = typeof tile.DrillConfig === 'string'
+            ? JSON.parse(tile.DrillConfig || '[]')
+            : tile.DrillConfig || [];
+        } catch (error) {
+          console.error('Error parsing DrillConfig:', error);
+          parsedConfig = [];
+        }
+      
+        parsedConfig.forEach((configItem: { conditions: any; }) => {
+          const conditionArray = this.fb.array([]);
+          const conditions = Array.isArray(configItem.conditions) ? configItem.conditions : [];
+      
+          conditions.forEach((condition: any) => {
+            conditionArray.push(this.fb.group({
+              drillTypeFields: [condition.drillTypeFields || ''],
+              drillTypeLabel: [condition.drillTypeLabel || ''],
+              drillTypePrimary: [condition.drillTypePrimary || '']
+            }));
+          });
+      
+          drillFieldArray.push(this.fb.group({
+            conditions: conditionArray
+          }));
+        });
+       
+        console.log('drillFieldArray:', drillFieldArray.value);
+        return drillFieldArray;
+      }
+      
+
+  DrillDownTypeFields = [
+    // { value: 'Table', text: 'Table' },
+    { value: 'Multi Level', text: 'Multi Level Drill Down' },
+  ]
+
+  get drill_fields() {
+    return this.createKPIWidget.get('drill_fields') as FormArray;
+  }
+
+
+
+
+
+  addNewDrillField() {
+    const drillFieldsArray = this.createKPIWidget.get('drill_fields') as FormArray;
+  
+    // Create a new drill field group
+    const fieldGroup = this.fb.group({
+      conditions: this.fb.array([]), // Initialize conditions array
+      
+    });
+  
+    // Push it to the form array
+    drillFieldsArray.push(fieldGroup);
+  
+    // Ensure at least one condition is added
+    this.addConditionDrillDown(drillFieldsArray.length - 1, '', '');
+  }
+  
+  remove(fieldIndex: number): void {
+    // Access the specific field group
+    const parentGroup = this.drill_fields.at(fieldIndex) as FormGroup;
+  
+    // Access the conditions FormArray within the field group
+    const conditions = parentGroup.get('conditions') as FormArray;
+  
+    // Check if there are any conditions to remove
+    if (conditions && conditions.length > 0) {
+      // Remove the last condition in the array
+      conditions.removeAt(conditions.length - 1);
+    } else {
+      console.warn(`No conditions available to remove for field index ${fieldIndex}`);
+    }
+  }
+
+  addConditionDrillDown(fieldIndex: number, initialValue: string = '', fieldValue: string = '') {
+    const drillFieldsArray = this.createKPIWidget.get('drill_fields') as FormArray;
+    const conditionsArray = drillFieldsArray.at(fieldIndex).get('conditions') as FormArray;
+  
+    const newConditionGroup = this.fb.group({
+      drillTypeFields: [fieldValue], // Ensure ngx-select control is properly initialized
+      drillTypeLabel:[''],
+      drillTypePrimary:[''],
+    });
+  
+    conditionsArray.push(newConditionGroup);
+  }
+
+  removeConditionDrill(fieldIndex: number, conditionIndex: number) {
+    const drillFieldsArray = this.createKPIWidget.get('drill_fields') as FormArray;
+    const parentGroup = drillFieldsArray.at(fieldIndex) as FormGroup;
+    const conditions = parentGroup.get('conditions') as FormArray;
+  
+    if (conditions && conditions.length > conditionIndex) {
+      conditions.removeAt(conditionIndex);
+      console.log(`Condition removed from index ${fieldIndex}, condition ${conditionIndex}`);
+    } else {
+      console.warn('Condition index out of range or conditions not found');
+    }
+  }
+  
+
+
+  
+  // Function to clear the form array when 'Table' is selected
+  clearDrillFields() {
+    this.createKPIWidget.setControl('drill_fields', this.fb.array([])); // Reset the array
+  }
+
+      showValues = [
+        // { value: 'sum', text: 'Sum' },
+        // { value: 'min', text: 'Minimum' },
+        // { value: 'max', text: 'Maximum' },
+        // { value: 'average', text: 'Average' },
+        // { value: 'latest', text: 'Latest' },
+        // { value: 'previous', text: 'Previous' },
+        // { value: 'DifferenceFrom-Previous', text: 'DifferenceFrom-Previous' },
+        // { value: 'DifferenceFrom-Latest', text: 'DifferenceFrom-Latest' },
+        // { value: '%ofDifferenceFrom-Previous', text: '%ofDifferenceFrom-Previous' },
+        // { value: '%ofDifferenceFrom-Latest', text: '%ofDifferenceFrom-Latest' },
+        // { value: 'Constant', text: 'Constant' },
+      
+        // { value: 'Count', text: 'Count' },
+        // { value: 'Count_Multiple', text: 'Count Multiple' },
+        // { value: 'Count Dynamic', text: 'Count Dynamic' },
+        { value: 'Count MultiplePram', text: 'Count Multiple Parameter' },
+        { value: 'Sum MultiplePram', text: 'Sum Multiple Parameter' },
+        { value: 'Average Multiple Parameter', text: 'Average Multiple Parameter' },
+        {value:'count with sum MultipleParameter' , text:'Count With Sum Multiple Parameter'},
+        {value:'sum with count MultipleParameter' , text:'Sum With Count Multiple Parameter'},
+        { value: 'sumArray', text: 'SumArray' },
+        { value: 'Advance Equation', text: 'Advance Equation' },
+        { value: 'sum_difference', text: 'Sum Difference' },
+        { value: 'distance_sum', text: 'Distance Sum' },
+        { value: 'Count Multiple Minitable', text: 'Count Multiple Minitable' },
+        {value:'Avg_Utilization_wise_multiple',text:'Avg_Utilization_wise_multiple'}
+        
+        
+    
+    
+    
+      ]
+    
 
     openRowCalHelp(stepperModal: TemplateRef<any>){
       this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
@@ -187,14 +445,47 @@ get isProcessedDataSelected(): boolean {
     }
 
 
+    onValueChange(selectedValue: any): void {
+      console.log('selectedValue check', selectedValue[0].value);  // Log the selected value
+    
+      // Set the primaryValue form control to the selected value
+      this.createKPIWidget.get('primaryValue')?.setValue(selectedValue[0].value);
+    
+      // Trigger change detection to ensure the UI updates immediately (optional)
+      this.cd.detectChanges();
+    }
+
     openUnitHelp(stepperModal: TemplateRef<any>){
       this.modalService.open(stepperModal, {   backdrop: 'static',  // Disable closing on backdrop click
         keyboard: false    });
     
     }
 
+    onValueSelect(onSelectValue:any){
+      console.log('selectedValue check', onSelectValue[0].value);  // Log the selected value
+    
+      // Set the primaryValue form control to the selected value
+      this.createKPIWidget.get('selectedRangeType')?.setValue(onSelectValue[0].value);
+    
+      // Trigger change detection to ensure the UI updates immediately (optional)
+      this.cd.detectChanges();
+  
+    }
+    showCustomValues = [
 
+      // { value: 'Hourly', text: 'Hourly' },
+      // { value: 'Daily', text: 'Daily' },
+      // { value: 'Hour of the Day', text: 'Hour of the Day' },
+      // { value: 'Weekly', text: 'Weekly' },
+      // { value: 'Day of Week', text: 'Day of Week' },
+      // { value: 'Monthly', text: 'Monthly' },
+      // { value: 'Day of Month', text: 'Day of Month' },
+      // { value: 'Yearly', text: 'Yearly' },
+      { value: 'Any', text: 'any' }
+    ];
 
+    UndefinedtooltipContent: string = 'Enter the text to display when the output label is undefined. This will replace the default "undefined" label in the final result.';
+    DateRangetooltipContent: string = 'Select how the date range should be labeled. "Any" supports flexible time grouping.';
 
 
   filterParameterTooltip: string = 'Select form fields to apply filter conditions. The chosen fields will be used to filter data based on matching or non-matching values.';
@@ -228,6 +519,11 @@ get isProcessedDataSelected(): boolean {
   
     console.log('Updated Form Array:', formArray.value);
   }
+
+  getFormArrayControls(field: AbstractControl): FormGroup[] {
+    return (field.get('conditions') as FormArray).controls as FormGroup[];
+  }
+  
 
 
 
@@ -433,6 +729,30 @@ get isProcessedDataSelected(): boolean {
     // Close the modal after selection
     this.closeModal(modal);
   }
+
+  selectValueDrill(value: string, modal: any): void {
+    console.log('Selected value drill down:', value);
+  
+    const control = this.createKPIWidget.get('tableDrillDownGroupByFormat');
+    console.log('control checking from table',control)
+    
+    if (control) {
+      control.setValue(value);
+      control.markAsDirty();
+      control.markAsTouched();
+      control.updateValueAndValidity();
+    } else {
+      console.warn('Form control "tableDrillDownGroupByFormat" not found!');
+    }
+  
+    this.closeModal(modal); // Make sure this method handles null safely
+  }
+  
+
+
+
+
+  
   closeModal(modal: any) {
     if (modal) {
       modal.close(); // Close the modal
@@ -443,6 +763,11 @@ get isProcessedDataSelected(): boolean {
   get groupByFormatControl(): FormControl {
     return this.createKPIWidget.get('groupByFormat') as FormControl; // Cast to FormControl
   }
+  get tableDrillDownGroupByFormat(): FormControl {
+    return this.createKPIWidget.get('groupByFormatDrillDown') as FormControl; // Cast to FormControl
+  }
+
+  
   addTile(key: any) {
     console.log('Selected Form Data:', this.createKPIWidget.value.form_data_selected);
   
@@ -479,6 +804,14 @@ get isProcessedDataSelected(): boolean {
       enableRowCal:this.createKPIWidget.value.enableRowCal,
       filter_duplicate_data:this.createKPIWidget.value.filter_duplicate_data,
       DataType:this.createKPIWidget.value.DataType ||'',
+      tableDrillDownForm:this.createKPIWidget.value.tableDrillDownForm,
+      tableDrillDownFields:this.createKPIWidget.value.tableDrillDownFields,
+      tableDrillDownPrimaryValue:this.createKPIWidget.value.tableDrillDownPrimaryValue,
+      tableDrillDownUndefinedLabel:this.createKPIWidget.value.tableDrillDownUndefinedLabel,
+      tableDrillDownGroupByFormat:this.createKPIWidget.value.tableDrillDownGroupByFormat,
+      tableDrillDownSelectedRangeType:this.createKPIWidget.value.tableDrillDownSelectedRangeType,
+      DrillConfig:this.createKPIWidget.value.drill_fields || [],
+      DrillDownType:this.createKPIWidget.value.DrillDownType ||''
 
 
       // PredefinedScripts:this.createKPIWidget.value.PredefinedScripts
@@ -782,6 +1115,85 @@ return this.readFilterEquation
         console.log("Can't fetch", err);
       });
   }
+
+
+
+
+  fetchDynamicFormDataDrillDown(value: any) {
+    console.log("Data from lookup:", value);
+    this.drillDownHeading = value
+
+    this.api
+      .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
+      .then((result: any) => {
+        if (result && result.metadata) {
+          const parsedMetadata = JSON.parse(result.metadata);
+          const formFields = parsedMetadata.formFields;
+          console.log('formFields check from table',formFields)
+
+          // Initialize the list with formFields labels
+          this.listofDynamicDrillParam   = formFields
+          .filter((field: any) => {
+            // Filter out fields with type "heading" or with an empty placeholder
+            return field.type !== "heading" && field.type !== 'Empty Placeholder' && field.type !=='button' && field.type !=='table' && field.type !=='radio' && field.type !== 'checkbox' && field.type !== 'html code' && field.type !=='file' && field.type !=='range' && field.type !=='color' && field.type !=='password' && field.type !=='sub heading';
+          })
+          .map((field: any) => {
+            console.log('field check', field);
+            return {
+              value: field.name,
+              text: field.label
+            };
+          });
+
+          // Include created_time and updated_time
+          if (parsedMetadata.created_time) {
+            this.listofDynamicDrillParam.push({
+              value: `created_time`,
+              text: 'Created Time' // You can customize the label here if needed
+            });
+          }
+          
+          if (parsedMetadata.updated_time) {
+            this.listofDynamicDrillParam.push({
+              value: `updated_time`,
+              text: 'Updated Time' // You can customize the label here if needed
+            });
+          }
+          
+
+          // console.log('Transformed dynamic parameters:', this.listofDynamicDrillParam);
+          // this.dynamicParamMap.set(index, dynamicParamList);
+
+          // Trigger change detection to update the view
+          this.cdr.detectChanges();
+        }
+      })
+      .catch((err) => {
+        console.log("Can't fetch", err);
+      });
+  }
+
+
+  selectDrillFormParams(event: any) {
+    if (event && event[0] && event[0].data) {
+      const selectedText = event[0].data.text; 
+      if(this.userIsChanging){
+        // alert("check")
+        this.createKPIWidget.get("tableDrillDownFields")?.setValue('')
+      }
+
+       // Adjust based on the actual structure
+      console.log('Selected Form Text:', selectedText);
+
+      if (selectedText) {
+        this.fetchDynamicFormDataDrillDown(selectedText);
+      }
+      this.userIsChanging = false
+    } else {
+      console.error('Event data is not in the expected format:', event);
+      this.userIsChanging =  false
+    }
+  }
   parameterValue(event: any) {
     console.log('event for parameter check', event);
     
@@ -895,124 +1307,115 @@ return this.readFilterEquation
   
     return columns;
   }
-  openTableModal(tile: any, index: number) {
-    console.log('Index checking:', index); // Log the index
-    
-    if (tile) {
-      this.isEditMode = true;
-      this.selectedTile = tile;
-      this.editTileIndex = index !== undefined ? index : null;
-      console.log('this.editTileIndex checking from openkpi', this.editTileIndex); // Store the index, default to null if undefined
-      console.log('Tile Object:', tile); // Log the tile object
-  
-      // Parse tableWidget_Config if it is a string
-      let parsedTableWidgetConfig = [];
-      if (typeof tile.tableWidget_Config === 'string') {
-        try {
-          parsedTableWidgetConfig = JSON.parse(tile.tableWidget_Config);
-          console.log('Parsed tableWidget_Config:', parsedTableWidgetConfig);
-          const textValues = parsedTableWidgetConfig.map((item: { text: any }) => item.text);
-          console.log('Extracted Text Values:', textValues);
-          this.table.columnDefs = this.createColumnDefs(textValues);
-        } catch (error) {
-          console.error('Error parsing tableWidget_Config:', error);
-        }
-      } else {
-        parsedTableWidgetConfig = tile.tableWidget_Config;
-      }
-  
-      // Parse conditions if it is a string
-      let parsedConditions = [];
-      if (typeof tile.conditions === 'string') {
-        try {
-          parsedConditions = JSON.parse(tile.conditions);
-          console.log('Parsed conditions:', parsedConditions);
-        } catch (error) {
-          console.error('Error parsing conditions:', error);
-        }
-      } else {
-        parsedConditions = tile.conditions;
-      }
-  
-      // Parse filterParameter1 if it is a string
-      let parsedFilterParameter1 = [];
-      if (typeof tile.filterParameter1 === 'string') {
-        try {
-          parsedFilterParameter1 = JSON.parse(tile.filterParameter1);
-          console.log('Parsed filterParameter1:', parsedFilterParameter1);
-        } catch (error) {
-          console.error('Error parsing filterParameter1:', error);
-        }
-      } else {
-        parsedFilterParameter1 = tile.filterParameter1;
-      }
-      let parsedFilterFields = [];
-      if (typeof tile.filter_duplicate_data === 'string') {
-        try {
-          parsedFilterFields = JSON.parse(tile.filter_duplicate_data);
-          console.log('Parsed filterParameter1:', parsedFilterFields);
-        } catch (error) {
-          console.error('Error parsing filterParameter1:', error);
-        }
-      } else {
-        parsedFilterFields = tile.filter_duplicate_data;
-      }
-  
-      // Set parsedConditions into FormArray
-      const formArray = this.conditions;
-      formArray.clear(); // Clear existing FormArray controls
-      parsedConditions.forEach((condition: any, i: number) => {
-        formArray.push(this.fb.group({
-          columnLabel: [condition.columnLabel || ''],
-          filterParameter: [condition.filterParameter || []],
-          filterDescription: [condition.filterDescription || ''],
-          PredefinedScripts:[condition.PredefinedScripts || '']
-
-        }));
-      });
-  
-      console.log('FormArray after readback:', formArray.value);
-  
-      // Patch other form values
-      this.createKPIWidget.patchValue({
-    
-        formlist: tile.formlist,
-        form_data_selected: parsedTableWidgetConfig,
-        groupByFormat: tile.groupByFormat,
-        custom_Label: tile.custom_Label,
-        filterParameter1: parsedFilterParameter1, // Parsed array
-        filterDescription1: tile.filterDescription1,
-        enableRowCal:tile.enableRowCal,
-        filter_duplicate_data:parsedFilterFields,
-        DataType:tile.DataType,
-        all_fields: this.repopulate_fields(tile),
-        customColumnFields:this.repopulate_CustomColumnFields(tile)
-
-        // custom_Label1: tile.custom_Label1,
-      });
-  
-       // Set to edit mode
-    } else {
-      this.selectedTile = null; // No tile selected for adding
-      this.isEditMode = false; // Set to add mode
-      this.createKPIWidget.reset(); // Reset the form for new entry
-      this.conditions.clear(); // Clear the FormArray
+  openTableModal(tile: any, index: number): void {
+    if (!tile) {
+      this.selectedTile = null;
+      this.isEditMode = false;
+      this.createKPIWidget.reset();
+      this.conditions.clear();
+      return;
     }
   
-    // Clear the 'selected' state for all themes
-    this.themes.forEach((theme: { selected: boolean }) => {
-      theme.selected = false; // Deselect all themes
+    this.isEditMode = true;
+    this.selectedTile = tile;
+    this.editTileIndex = index ?? null;
+  
+    // Parse tableWidget_Config
+    let parsedTableWidgetConfig = [];
+    try {
+      parsedTableWidgetConfig = typeof tile.tableWidget_Config === 'string'
+        ? JSON.parse(tile.tableWidget_Config)
+        : tile.tableWidget_Config;
+    } catch (error) {
+      console.error('Error parsing tableWidget_Config:', error);
+    }
+  
+    // Parse conditions
+    let parsedConditions = [];
+    try {
+      parsedConditions = typeof tile.conditions === 'string'
+        ? JSON.parse(tile.conditions)
+        : tile.conditions;
+    } catch (error) {
+      console.error('Error parsing conditions:', error);
+    }
+  
+    // Parse filterParameter1
+    let parsedFilterParameter1 = [];
+    try {
+      parsedFilterParameter1 = typeof tile.filterParameter1 === 'string'
+        ? JSON.parse(tile.filterParameter1)
+        : tile.filterParameter1;
+    } catch (error) {
+      console.error('Error parsing filterParameter1:', error);
+    }
+  
+    // Parse filter_duplicate_data
+    let parsedFilterFields = [];
+    try {
+      parsedFilterFields = typeof tile.filter_duplicate_data === 'string'
+        ? JSON.parse(tile.filter_duplicate_data)
+        : tile.filter_duplicate_data;
+    } catch (error) {
+      console.error('Error parsing filter_duplicate_data:', error);
+    }
+  
+    // Parse tableDrillDownFields
+    let parseDrillDownFields = [];
+    try {
+      parseDrillDownFields = typeof tile.tableDrillDownFields === 'string'
+        ? JSON.parse(tile.tableDrillDownFields)
+        : tile.tableDrillDownFields;
+    } catch (error) {
+      console.error('Error parsing tableDrillDownFields:', error);
+    }
+  
+    // Repopulate drill_fields using setControl (✅ fix applied here)
+    const populatedDrillFields = this.repopulateDrill_fields(tile);
+    this.createKPIWidget.setControl('drill_fields', populatedDrillFields);
+  
+    // Set conditions array
+    this.conditions.clear();
+    parsedConditions.forEach((condition: any) => {
+      this.conditions.push(this.fb.group({
+        columnLabel: [condition.columnLabel || ''],
+        filterParameter: [condition.filterParameter || []],
+        filterDescription: [condition.filterDescription || ''],
+        PredefinedScripts: [condition.PredefinedScripts || '']
+      }));
     });
   
-    // Find the theme that matches the tile's themeColor
-    const matchingTheme = this.themes.find((theme: { color: any }) => theme.color === tile?.themeColor);
+    // Patch flat form fields
+    this.createKPIWidget.patchValue({
+      formlist: tile.formlist,
+      form_data_selected: parsedTableWidgetConfig,
+      groupByFormat: tile.groupByFormat,
+      custom_Label: tile.custom_Label,
+      filterParameter1: parsedFilterParameter1,
+      filterDescription1: tile.filterDescription1,
+      enableRowCal: tile.enableRowCal,
+      filter_duplicate_data: parsedFilterFields,
+      DataType: tile.DataType,
+      tableDrillDownForm: tile.tableDrillDownForm,
+      tableDrillDownFields: parseDrillDownFields,
+      tableDrillDownPrimaryValue: tile.tableDrillDownPrimaryValue,
+      tableDrillDownUndefinedLabel: tile.tableDrillDownUndefinedLabel,
+      tableDrillDownGroupByFormat: tile.tableDrillDownGroupByFormat,
+      tableDrillDownSelectedRangeType: tile.tableDrillDownSelectedRangeType,
+      DrillDownType: tile.DrillDownType,
+      all_fields: this.repopulate_fields(tile),
+      customColumnFields: this.repopulate_CustomColumnFields(tile),
+    });
   
-    // If a matching theme is found, set it as selected
+    // Set theme
+    this.themes.forEach((theme: { selected: boolean; }) => theme.selected = false);
+    const matchingTheme = this.themes.find((theme: { color: any; }) => theme.color === tile?.themeColor);
     if (matchingTheme) {
       matchingTheme.selected = true;
-      console.log('Matching theme found and selected:', matchingTheme);
     }
   }
+  
+  
   
   
   repopulate_fields(getValues: any): FormArray {
@@ -1180,7 +1583,16 @@ return this.readFilterEquation
         enableRowCal:this.createKPIWidget.value.enableRowCal || '',
         filter_duplicate_data:this.createKPIWidget.value.filter_duplicate_data || '',
         DataType:this.createKPIWidget.value.DataType || '',
-        customColumnConfig:this.createKPIWidget.value.customColumnFields ||''
+        customColumnConfig:this.createKPIWidget.value.customColumnFields ||'',
+        tableDrillDownForm:this.createKPIWidget.value.tableDrillDownForm ||'',
+        tableDrillDownFields:this.createKPIWidget.value.tableDrillDownFields ||'',
+        tableDrillDownPrimaryValue:this.createKPIWidget.value.tableDrillDownPrimaryValue ||'',
+        tableDrillDownUndefinedLabel:this.createKPIWidget.value.tableDrillDownUndefinedLabel ||'',
+        groupByFormatDrillDown:this.createKPIWidget.value.groupByFormatDrillDown ||'',
+        tableDrillDownSelectedRangeType:this.createKPIWidget.value.tableDrillDownSelectedRangeType ||'', 
+        tableDrillDownGroupByFormat:this.createKPIWidget.value.tableDrillDownGroupByFormat ||'',
+        DrillConfig:this.createKPIWidget.value.drill_fields || [],
+        DrillDownType:this.createKPIWidget.value.DrillDownType ||'' 
         // custom_Label1: this.createKPIWidget.value.custom_Label1,
       };
   
@@ -1221,6 +1633,22 @@ return this.readFilterEquation
   
   openModalCalender() {
     const modalRef = this.modalService.open(this.calendarModal);
+    modalRef.result.then(
+      (result) => {
+        console.log('Closed with:', result);
+        this.handleModalClose(result); // Handle logic when modal closes
+      },
+      (reason) => {
+        console.log('Dismissed with:', reason);
+      }
+    );
+  }
+
+
+
+
+  openModalCalenderDrillDown() {
+    const modalRef = this.modalService.open(this.calendarModalDrillDownTable);
     modalRef.result.then(
       (result) => {
         console.log('Closed with:', result);
@@ -1309,6 +1737,111 @@ return this.readFilterEquation
     } else {
       console.warn('Invalid event structure:', event);
     }
+  }
+
+
+
+  formHeadings: Map<number, string> = new Map(); 
+  fetchDynamicDataDrillDown(value: any, index: number) {
+    this.formHeadings.set(index, value);  
+    console.log("Fetching data for:", value);
+
+    // Simulating API call
+    this.api
+      .GetMaster(`${this.SK_clientID}#dynamic_form#${value}#main`, 1)
+      .then((result: any) => {
+        if (result && result.metadata) {
+          const parsedMetadata = JSON.parse(result.metadata);
+          const formFields = parsedMetadata.formFields;
+          console.log('formFields type check data',formFields)
+
+          // Prepare parameter list
+          // const dynamicParamList = formFields.map((field: any) => ({
+          //   value: field.name,
+          //   text: field.label,
+          // }));
+
+
+         const dynamicParamList = formFields
+          .filter((field: any) => {
+            // Filter out fields with type "heading" or with an empty placeholder
+            return field.type !== "heading" && field.type !== 'Empty Placeholder' && field.type !=='button' && field.type !=='table' && field.type !=='radio' && field.type !== 'checkbox' && field.type !== 'html code' && field.type !=='file' && field.type !=='range' && field.type !=='color' && field.type !=='password' && field.type !=='sub heading';
+          })
+          .map((field: any) => {
+            console.log('field check', field);
+            return {
+              value: field.name,
+              text: field.label
+            };
+          });
+          // Add created_time and updated_time
+          if (parsedMetadata.created_time) {
+            dynamicParamList.push({
+              value: 'created_time',
+              text: 'Created Time',
+            });
+          }
+          if (parsedMetadata.updated_time) {
+            dynamicParamList.push({
+              value: 'updated_time',
+              text: 'Updated Time',
+            });
+          }
+
+          if (parsedMetadata.updated_time) {
+            dynamicParamList.push({
+              value: `dynamic_table_values`,
+              text: 'Dynamic Table Values' // You can customize the label here if needed
+            });
+            
+          }
+console.log('dynamicParamList checking from chart1',dynamicParamList)
+const formFieldsArray: FormField[] = Object.values(parsedMetadata.formFields) as FormField[];
+
+const dateFields = formFieldsArray.filter((field: FormField) => field.type === "date");
+console.log("Date Fields:", dateFields);
+
+
+const dateFieldsList = dateFields.map((field: any) => ({
+  value: field.name,
+  text: field.label,
+}));
+
+dateFieldsList.push({
+  value: 'Default',
+  text: 'Default',
+});
+
+dateFieldsList.push({
+  value: 'created_time',
+  text: 'Created Time',
+});
+dateFieldsList.push({
+  value: 'updated_time',
+  text: 'Updated Time',
+});
+
+this.dynamicDateParamMap.set(index,dateFieldsList)
+          // Store parameters in the map
+          this.dynamicParamMap.set(index, dynamicParamList);
+
+
+          // const formArray = this.createChart.get('all_fields') as FormArray;
+          // const fieldGroup = formArray.at(index) as FormGroup;
+        
+          // // Clear previous parameterName field value
+          // fieldGroup.get('parameterName')?.reset();
+        
+        
+
+
+          // Trigger change detection
+          this.cdr.detectChanges();
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching data:", err);
+      });
   }
 
 
