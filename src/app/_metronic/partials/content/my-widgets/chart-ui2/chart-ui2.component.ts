@@ -7,6 +7,7 @@ import Highcharts from 'highcharts';
 import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engine.service';
 import Swal from 'sweetalert2';
 import * as CryptoJS from 'crypto-js';
+import { PageInfoService } from 'src/app/_metronic/layout';
 
 @Component({
   selector: 'app-chart-ui2',
@@ -131,7 +132,7 @@ export class ChartUi2Component implements OnInit{
     
   }
   constructor(
-    private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient,private summaryService:SummaryEngineService,private route: ActivatedRoute,
+    private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient,private summaryService:SummaryEngineService,private route: ActivatedRoute,private pageInfoService: PageInfoService
     
    ){}
   ngAfterViewInit(){
@@ -421,6 +422,9 @@ this.formTableConfig = {
         this.modalService.open(modalContent, { size: 'xl' });
   
       } else if (selectType === 'Same page Redirect') {
+        setTimeout(() => {
+          this.pageInfoService.setTitle(( modulePath as any))
+        }, 500);
         this.router.navigateByUrl(fullUrl).catch(err => console.error('Navigation error:', err));
       }
   

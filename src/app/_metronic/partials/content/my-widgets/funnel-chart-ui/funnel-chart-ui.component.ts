@@ -8,6 +8,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engine.service';
 import Swal from 'sweetalert2';
 import * as CryptoJS from 'crypto-js';
+import { PageInfoService } from 'src/app/_metronic/layout';
 
 interface CustomPointOptions {
   customIndex: number;
@@ -618,7 +619,7 @@ DrillDownTypeFields = [
   }
   
     constructor(
-     private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient,private summaryService:SummaryEngineService,private spinner: NgxSpinnerService,private cdr: ChangeDetectorRef,private route: ActivatedRoute,
+     private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient,private summaryService:SummaryEngineService,private spinner: NgxSpinnerService,private cdr: ChangeDetectorRef,private route: ActivatedRoute,private pageInfoService: PageInfoService
      
     ){}
 helperDashboard(item: any, index: any, modalContent: any, selectType: any, ModuleNames: any, receiveModal: any) {
@@ -671,6 +672,9 @@ console.log('this.iframeUrl checking from chartui1',this.iframeUrl)
       this.modalService.open(modalContent, { size: 'xl' });
 
     } else if (selectType === 'Same page Redirect') {
+      setTimeout(() => {
+        this.pageInfoService.setTitle(( modulePath as any))
+      }, 500);
       this.router.navigateByUrl(fullUrl).catch(err => console.error('Navigation error:', err));
     }
 

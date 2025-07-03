@@ -8,6 +8,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engine.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import * as CryptoJS from 'crypto-js';
+import { PageInfoService } from 'src/app/_metronic/layout';
 interface CustomPointOptions {
   customIndex: number;
   // Other properties of options if needed
@@ -448,7 +449,7 @@ export class ChartUi3Component implements OnInit{
     
   }
   constructor(
-    private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient,private summaryService:SummaryEngineService,private spinner: NgxSpinnerService,private cdr: ChangeDetectorRef,private route: ActivatedRoute,
+    private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient,private summaryService:SummaryEngineService,private spinner: NgxSpinnerService,private cdr: ChangeDetectorRef,private route: ActivatedRoute,private pageInfoService: PageInfoService
     
    ){}
 
@@ -1023,6 +1024,9 @@ console.log('this.iframeUrl checking from chartui1',this.iframeUrl)
       this.modalService.open(modalContent, { size: 'xl' });
 
     } else if (selectType === 'Same page Redirect') {
+      setTimeout(() => {
+        this.pageInfoService.setTitle(( modulePath as any))
+      }, 500);
       this.router.navigateByUrl(fullUrl).catch(err => console.error('Navigation error:', err));
     }
 

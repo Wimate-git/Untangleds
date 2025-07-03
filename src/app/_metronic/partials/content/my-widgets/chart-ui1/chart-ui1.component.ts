@@ -9,6 +9,7 @@ import { SummaryEngineService } from 'src/app/pages/summary-engine/summary-engin
 import { NgxSpinnerService } from 'ngx-spinner';
 
 import * as CryptoJS from 'crypto-js';
+import { PageInfoService } from 'src/app/_metronic/layout';
 
 interface CustomPointOptions {
   customIndex: number;
@@ -861,7 +862,7 @@ if(storeconditionsLength === undefined){
 
   
     constructor(
-     private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient,private summaryService:SummaryEngineService,private spinner: NgxSpinnerService,private route: ActivatedRoute,
+     private modalService: NgbModal,private router: Router,private sanitizer: DomSanitizer,private http: HttpClient,private summaryService:SummaryEngineService,private spinner: NgxSpinnerService,private route: ActivatedRoute,private pageInfoService: PageInfoService
      
     ){}
 
@@ -915,6 +916,9 @@ if(storeconditionsLength === undefined){
           this.modalService.open(modalContent, { size: 'xl' });
     
         } else if (selectType === 'Same page Redirect') {
+          setTimeout(() => {
+            this.pageInfoService.setTitle(( modulePath as any))
+          }, 500);
           this.router.navigateByUrl(fullUrl).catch(err => console.error('Navigation error:', err));
         }
     

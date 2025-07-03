@@ -2170,6 +2170,10 @@ console.log('targetUrl checking from module redirect', targetUrl);
         keyboard: false
       });
     } else {
+      console.log('moduleName checking from module redirect',moduleName)
+      // setTimeout(() => {
+      //   this.pageInfoService.setTitle(( moduleName as any))
+      // }, 500);
       window.open(targetUrl, '_blank');
     }
   } else {
@@ -2561,6 +2565,10 @@ this.currentiframeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
 
 }
 if (packet.selectType === 'Same page Redirect') {
+
+  setTimeout(() => {
+    this.pageInfoService.setTitle(( modulePath as any))
+  }, 500);
   // alert('same page redirect')
   // Extract query parameters once (avoid repeated subscription)
   const queryParams = this.route.snapshot.queryParams;
