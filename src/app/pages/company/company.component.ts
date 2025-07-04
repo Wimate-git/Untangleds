@@ -24,16 +24,16 @@ interface ListItem {
   templateUrl: './company.component.html',
   styleUrl: './company.component.scss'
 })
-export class CompanyComponent implements OnInit{
+export class CompanyComponent implements OnInit {
   reloadEvent: EventEmitter<boolean> = new EventEmitter();
   datatableConfig: Config = {};
   swalOptions: SweetAlertOptions = {};
-  isLoading:boolean = false
+  isLoading: boolean = false
 
   @ViewChild('noticeSwal')
   noticeSwal!: SwalComponent;
 
-  
+
 
 
   createCompanyField: UntypedFormGroup;
@@ -59,9 +59,9 @@ export class CompanyComponent implements OnInit{
   //default defaultLocation for all clients
   jsondata = [
 
-    { "id": "node1", "parent": "#", "text": "World", "node_type": "location", "area": null, "summary_enable": null, "summary_types": null, "dashboard_view": {id:null}, "leadership_view":  {id:null}, "mobile_view":  {id:null} },
-    { "id": "node2", "parent": "node1", "text": "Asia", "node_type": "location", "area": null, "summary_enable": null, "summary_types": null, "dashboard_view":  {id:null}, "leadership_view":  {id:null}, "mobile_view":  {id:null} },
-    { "id": "India", "parent": "node2", "text": "India", "node_type": "location", "area": null, "summary_enable": null, "summary_types": null, "dashboard_view":  {id:null}, "leadership_view":  {id:null}, "mobile_view":  {id:null} }
+    { "id": "node1", "parent": "#", "text": "World", "node_type": "location", "area": null, "summary_enable": null, "summary_types": null, "dashboard_view": { id: null }, "leadership_view": { id: null }, "mobile_view": { id: null } },
+    { "id": "node2", "parent": "node1", "text": "Asia", "node_type": "location", "area": null, "summary_enable": null, "summary_types": null, "dashboard_view": { id: null }, "leadership_view": { id: null }, "mobile_view": { id: null } },
+    { "id": "India", "parent": "node2", "text": "India", "node_type": "location", "area": null, "summary_enable": null, "summary_types": null, "dashboard_view": { id: null }, "leadership_view": { id: null }, "mobile_view": { id: null } }
 
   ];
 
@@ -72,12 +72,12 @@ export class CompanyComponent implements OnInit{
   listofSK: any = [];
   companySK: any;
 
-  allPermissions_user:any;
+  allPermissions_user: any;
 
   hideUpdateButton: any = false;
   hideDeleteButton: any = false;
 
-  columnDatatable:any = [];
+  columnDatatable: any = [];
   clientID: any;
   dataform: any = [];
   lookup_data_user: any = [];
@@ -89,14 +89,15 @@ export class CompanyComponent implements OnInit{
   lookup_data_company: any = [];
   editOperation: boolean = false;
   username: any;
+  lookup_All_Company: any = [];
 
 
   constructor(private fb: UntypedFormBuilder, private companyConfiguration: SharedService,
     private api: APIService, private toast: MatSnackBar, private sanitizer: DomSanitizer,
-    private router:Router,private cd:ChangeDetectorRef,private auditTrail:AuditTrailService) { }
+    private router: Router, private cd: ChangeDetectorRef, private auditTrail: AuditTrailService) { }
 
   ngOnInit() {
-    
+
     this.getLoggedUser = this.companyConfiguration.getLoggedUserDetails()
 
     this.SK_clientID = this.getLoggedUser.clientID;
@@ -109,6 +110,8 @@ export class CompanyComponent implements OnInit{
     this.initializeCompanyFields();
 
     this.showTable()
+
+    this.fetchAllCompanyData(1)
   }
 
 
@@ -131,7 +134,7 @@ export class CompanyComponent implements OnInit{
     this.openModalHelpher(P1)
 
 
-    try{
+    try {
       const UserDetails = {
         "User Name": this.username,
         "Action": "View",
@@ -143,31 +146,31 @@ export class CompanyComponent implements OnInit{
         "created_time": Date.now(),
         "updated_time": Date.now()
       }
-  
-      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+
+      this.auditTrail.mappingAuditTrailData(UserDetails, this.SK_clientID)
     }
-    catch(error){
-      console.log("Error while creating audit trails ",error);
+    catch (error) {
+      console.log("Error while creating audit trails ", error);
     }
   }
 
 
 
 
-  onSubmit(event:any){
+  onSubmit(event: any) {
 
-    if (this.createCompanyField.invalid || this.errorForUniqueID =='Company ID already exists' ||
+    if (this.createCompanyField.invalid || this.errorForUniqueID == 'Company ID already exists' ||
       this.errorForInvalidEmail == 'Invalid Email Address') {
       this.markAllFieldsTouched(this.createCompanyField);
       return;
     }
-     
-    console.log("All fields have been filled completly ",event);
-    if(event.type == 'submit' && this.editOperation == false){
+
+    console.log("All fields have been filled completly ", event);
+    if (event.type == 'submit' && this.editOperation == false) {
       this.createNewCompany('')
     }
-    else{
-      this.updateCompany(this.createCompanyField.value,'editCompany')
+    else {
+      this.updateCompany(this.createCompanyField.value, 'editCompany')
     }
   }
 
@@ -192,29 +195,29 @@ export class CompanyComponent implements OnInit{
     this.lookup_data_company = []
     this.datatableConfig = {
       serverSide: true,
-      ajax: (dataTablesParameters:any, callback) => {
+      ajax: (dataTablesParameters: any, callback) => {
         this.datatableConfig = {}
         this.lookup_data_company = []
         this.fetchCompanyLookupdata(1)
-          .then((resp:any) => {
+          .then((resp: any) => {
             const responseData = resp || []; // Default to an empty array if resp is null
-             // Example filtering for search
-             const searchValue = dataTablesParameters.search.value.toLowerCase();
-             const filteredData = Array.from(new Set(
+            // Example filtering for search
+            const searchValue = dataTablesParameters.search.value.toLowerCase();
+            const filteredData = Array.from(new Set(
               responseData
                 .filter((item: { P1: string }) => item.P1.toLowerCase().includes(searchValue.toLowerCase()))
                 .map((item: any) => JSON.stringify(item)) // Stringify the object to make it unique
             )).map((item: any) => JSON.parse(item)); // Parse back to object
 
-             callback({
-                 draw: dataTablesParameters.draw,
-                 recordsTotal: responseData.length,
-                 recordsFiltered: filteredData.length,
-                 data: filteredData // Return filtered data
-             });
+            callback({
+              draw: dataTablesParameters.draw,
+              recordsTotal: responseData.length,
+              recordsFiltered: filteredData.length,
+              data: filteredData // Return filtered data
+            });
 
-             console.log("Response is in this form ", filteredData);
-                               
+            console.log("Response is in this form ", filteredData);
+
           })
           .catch((error: any) => {
             console.error('Error fetching user lookup data:', error);
@@ -229,26 +232,26 @@ export class CompanyComponent implements OnInit{
       },
       columns: [
         {
-          title: 'Company ID', 
-          data: 'P1', 
+          title: 'Company ID',
+          data: 'P1',
           render: function (data, type, full) {
             const colorClasses = ['success', 'info', 'warning', 'danger'];
             const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
-            
+
             const initials = data[0].toUpperCase();
             const symbolLabel = `
               <div class="symbol-label fs-3 bg-light-${randomColorClass} text-${randomColorClass}">
                 ${initials}
               </div>
             `;
-  
+
             const nameAndEmail = `
               <div class="d-flex flex-column">
                 <a href="javascript:;" class="clicable-href text-gray-800 text-hover-primary mb-1 view-item" data-action="edit" data-id="${full.P1}">${data}</a>
                 <span>${full.P3}</span> <!-- Assuming P3 is the email -->
               </div>
             `;
-  
+
             return `
               <div class="symbol symbol-circle symbol-50px overflow-hidden me-3" data-action="view" data-id="${full.id}">
                 <a href="javascript:;" class="view-item" data-action="edit">
@@ -272,14 +275,14 @@ export class CompanyComponent implements OnInit{
           }
         }
       ],
-      createdRow: (row, data:any, dataIndex) => {
+      createdRow: (row, data: any, dataIndex) => {
         $('td:eq(0)', row).addClass('d-flex align-items-center');
         $(row)
-        .find(".view-item")
-        .on("click", () => {
-          console.log("Event is triggered for:", data.P1);
-          this.edit(data.P1); // `this` now correctly refers to the component
-        });
+          .find(".view-item")
+          .on("click", () => {
+            console.log("Event is triggered for:", data.P1);
+            this.edit(data.P1); // `this` now correctly refers to the component
+          });
       },
     };
 
@@ -287,7 +290,7 @@ export class CompanyComponent implements OnInit{
 
 
 
-    try{
+    try {
       const UserDetails = {
         "User Name": this.username,
         "Action": "View",
@@ -299,19 +302,19 @@ export class CompanyComponent implements OnInit{
         "created_time": Date.now(),
         "updated_time": Date.now()
       }
-  
-      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
-    }
-    catch(error){
-      console.log("Error while creating audit trails ",error);
-    }
-  
-  }
-  
 
-  fetchCompanyLookupdata(sk:any):any {
+      this.auditTrail.mappingAuditTrailData(UserDetails, this.SK_clientID)
+    }
+    catch (error) {
+      console.log("Error while creating audit trails ", error);
+    }
+
+  }
+
+
+  fetchCompanyLookupdata(sk: any): any {
     console.log("I am called Bro");
-    
+
     return new Promise((resolve, reject) => {
       this.api.GetMaster(this.SK_clientID + "#company" + "#lookup", sk)
         .then(response => {
@@ -320,13 +323,13 @@ export class CompanyComponent implements OnInit{
             if (typeof response.options === 'string') {
               let data = JSON.parse(response.options);
               console.log("d1 =", data);
-              
+
               if (Array.isArray(data)) {
                 const promises = []; // Array to hold promises for recursive calls
-  
+
                 for (let index = 0; index < data.length; index++) {
                   const element = data[index];
-  
+
                   if (element !== null && element !== undefined) {
                     // Extract values from each element and push them to lookup_data_user
                     const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
@@ -337,14 +340,14 @@ export class CompanyComponent implements OnInit{
                     break;
                   }
                 }
-  
+
                 // Sort the lookup_data_user array based on P5 values in descending order
                 this.lookup_data_company.sort((a: { P5: number; }, b: { P5: number; }) => b.P5 - a.P5);
                 console.log("Lookup sorting", this.lookup_data_company);
-  
+
                 // Continue fetching recursively
                 promises.push(this.fetchCompanyLookupdata(sk + 1)); // Store the promise for the recursive call
-                
+
                 // Wait for all promises to resolve
                 Promise.all(promises)
                   .then(() => resolve(this.lookup_data_company)) // Resolve with the final lookup data
@@ -358,9 +361,9 @@ export class CompanyComponent implements OnInit{
               reject(new Error('response.options is not a string.'));
             }
           } else {
-            console.log("All the users are here", this.lookup_data_company);
+            // console.log("All the users are here", this.lookup_data_company);
 
-            this.listofSK = this.lookup_data_company.map((item:any)=>item.P1)
+            this.listofSK = this.lookup_data_company.map((item: any) => item.P1)
 
             resolve(this.lookup_data_company); // Resolve with the current lookup data
           }
@@ -371,14 +374,14 @@ export class CompanyComponent implements OnInit{
         });
     });
   }
-  
+
 
   // async fetchTMLookupData(sk: any) {
 
   //   // console.log("Iam called Bro");
   //   // try {
   //   //   const response = await this.api.GetLookupMasterTable(this.clientID, sk);
-   
+
   //   //   if (response && response.items) {
   //   //     // Check if response.listOfItems is a string
   //   //     if (typeof response.items === 'string') {
@@ -387,7 +390,7 @@ export class CompanyComponent implements OnInit{
   //   //       if (Array.isArray(data)) {
   //   //         for (let index = 0; index < data.length; index++) {
   //   //           const element = data[index];
-  
+
   //   //           if (element !== null && element !== undefined) {
   //   //             // Extract values from each element and push them to lookup_data_temp1
   //   //             const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
@@ -414,15 +417,15 @@ export class CompanyComponent implements OnInit{
   //   //   } else {
   //   //     // Sort the lookup_data_temp1 array based on the third element (P3)
   //   //   console.log()
-     
+
   //   //     // Extract the IDs and display the datatable
   //   //     // this.listofPowerboardIds = this.lookup_data_temp1.map((item: any) => item[0]);
   //   //     // this.showDatatable(this.lookup_data_temp1);
-        
+
   //   //     console.log("Permissions to be displayed",this.lookup_data_user);
   //   //     this.getTableUser(this.lookup_data_user);
-       
-        
+
+
   //   //     // for(let i = 0;i<this.lookup_data_temp1.length;i++){
   //   //     //   this.paramsBasedOnRDT.push(this.lookup_data_temp1[i].P2);
   //   //     // }
@@ -439,14 +442,14 @@ export class CompanyComponent implements OnInit{
   // getTableUser(getData: any) {
   //   // let editButton = 'btn btn-sm btn-primary editclasscompany '
   //   // let deleteButton = 'btn btn-sm btn-danger editclasscompany ';
-  
-  
+
+
   //   // if (typeof getData !== 'undefined') {
-  
+
   //   //   for (let allData = 0; allData < getData.length; allData++) {
-        
-        
-  
+
+
+
   //   //       this.dataform.push({
   //   //         company_id:getData[allData].P1,
   //   //         client_id:getData[allData].P2,
@@ -454,27 +457,27 @@ export class CompanyComponent implements OnInit{
   //   //         //grid_details: grid_details
   //   //       })
   //   //   }
-  
+
   //   // }
   //   // else {
   //   //   this.dataform = [];
   //   // }
   //   // let temp = [];
-  
+
   //   // if (typeof getData !== 'undefined') {
   //   //   for (let formattedDate = 0; formattedDate < getData.length; formattedDate++) {
-  
+
   //   //     temp[formattedDate] = new Date(getData[formattedDate].updatedTime).toLocaleString();
   //   //     getData[formattedDate].updatedTime = temp[formattedDate];
   //   //   }
-  
+
   //   // }
-  
+
   //   // else {
   //   //   getData = []
   //   // }
-  
-  
+
+
   //   // //update
   //   // if (this.hideDeleteButton === true) {
   //   //   this.columnTableData.push(
@@ -484,51 +487,51 @@ export class CompanyComponent implements OnInit{
   //   //     {
   //   //       defaultContent: "<button class='" + deleteButton + "'><i class='fa fa-trash'></i></button>"
   //   //     }
-  
+
   //   //   )
-  
-  
+
+
   //   // }
-  
+
   //   // //view
   //   // else {
   //   //   this.columnTableData.push(
-  
+
   //   //     {
   //   //       defaultContent: "<button class='" + editButton + "' data-bs-target='#companyModal' data-bs-toggle='modal''><i class='fa fa-edit'></i></i></button>"
   //   //     }
-  
+
   //   //   )
-  
-  
+
+
   //   // }
-  
+
   //   // console.log("columnDatatable",this.columnTableData);
-  
+
   //   // console.log("dataform",this.dataform);
-  
-  
+
+
   //   // $('#company_lookup_table').off('click');
   //   // $('#company_lookup_table').on('click', '.editclasscompany', function () {
-  
+
   //   //   //get row for data
   //   //   let tr = $(this).closest('tr');
   //   //   let row =_currClassRef.deviceTableData.row(tr);
-  
+
   //   //   if (this.className == deleteButton) {
   //   //     // _currClassRef.deleteUser(row.data(), 'delete');
   //   //     _currClassRef.deleteCompany(row.data());
   //   //   }
-  
+
   //   //   if (this.className == editButton) {
   //   //     _currClassRef.openModalHelpher(row.data());
-  
+
   //   //   }
-  
+
   //   // })
-  
-   
-   
+
+
+
   //   //   this.getLookupTableData(this.dataform,this.columnTableData)
   //   //   this.addFromService();
   //   //     let _currClassRef = this;
@@ -536,35 +539,35 @@ export class CompanyComponent implements OnInit{
 
 
 
-    openModalHelpher(getValue:any){
-      console.log("Data from llokup :",getValue);
-  
-      this.api
-        .GetMaster(`${getValue}#company#main`,1)
-        .then((result :any) => {
-          if (result && result !== undefined) {
-      
-            if(result){ 
-              this.openModal(JSON.parse(result.metadata))
-            }
+  openModalHelpher(getValue: any) {
+    console.log("Data from llokup :", getValue);
+
+    this.api
+      .GetMaster(`${getValue}#company#main`, 1)
+      .then((result: any) => {
+        if (result && result !== undefined) {
+
+          if (result) {
+            this.openModal(JSON.parse(result.metadata))
+          }
         }
       })
       .catch((err) => {
         console.log("cant fetch", err);
       });
   }
-  
+
 
   addFromService() {
     this.getClientID()
   }
 
-  getCompanies(){
+  getCompanies() {
 
   }
 
 
-  checkPermission(){
+  checkPermission() {
     // let hasDeviceUpdate = false;
     // let hasDeviceView = false;
     // // let permissionFound = false;
@@ -581,7 +584,7 @@ export class CompanyComponent implements OnInit{
     //   }
     // }
 
-    
+
     // if (hasDeviceUpdate && hasDeviceView) {
     //   this.hideDeleteButton = true;
     // }
@@ -619,20 +622,20 @@ export class CompanyComponent implements OnInit{
 
 
   async getClientID() {
-    try{
+    try {
 
       await this.fetchTMClientLookup(1)
 
-      for(let i = 0;i<this.lookup_data_client.length;i++){
+      for (let i = 0; i < this.lookup_data_client.length; i++) {
         this.listofClientIDs.push(this.lookup_data_client[i].P1);
-      } 
+      }
 
-      this.listofClientIDs = Array.from(new Set(this.listofClientIDs)) 
+      this.listofClientIDs = Array.from(new Set(this.listofClientIDs))
 
-      console.log("All the clients data is here ",this.listofClientIDs)
+      console.log("All the clients data is here ", this.listofClientIDs)
 
     }
-    catch(err){
+    catch (err) {
       console.log("Error fetching all the clients ");
     }
   }
@@ -642,32 +645,32 @@ export class CompanyComponent implements OnInit{
 
     console.log("Iam called Bro");
     try {
-      const response = await this.api.GetMaster("client"+"#lookup", sk);
-   
+      const response = await this.api.GetMaster("client" + "#lookup", sk);
+
       if (response && response.options) {
         // Check if response.listOfItems is a string
         if (typeof response.options === 'string') {
           let data = JSON.parse(response.options);
-          console.log("d1 =",data)
+          console.log("d1 =", data)
           if (Array.isArray(data)) {
             for (let index = 0; index < data.length; index++) {
               const element = data[index];
-  
+
               if (element !== null && element !== undefined) {
                 // Extract values from each element and push them to lookup_data_temp1
                 const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
-                const { P1, P2, P3,P4 ,P5,P6} = element[key]; // Extract values from the nested object
-                this.lookup_data_client.push({P1, P2, P3,P4,P5,P6 }); // Push an array containing P1, P2, and P3 values
-                console.log("d2 =",this.lookup_data_client)
+                const { P1, P2, P3, P4, P5, P6 } = element[key]; // Extract values from the nested object
+                this.lookup_data_client.push({ P1, P2, P3, P4, P5, P6 }); // Push an array containing P1, P2, and P3 values
+                console.log("d2 =", this.lookup_data_client)
               } else {
                 break;
               }
             }
             //this.lookup_data_temp1.sort((a, b) => b.P5 - a.P5);
-            this.lookup_data_client.sort((a:any, b:any) => {
+            this.lookup_data_client.sort((a: any, b: any) => {
               return b.P5 - a.P5; // Compare P5 values in descending order
             });
-            console.log("Lookup sorting",this.lookup_data_client);
+            console.log("Lookup sorting", this.lookup_data_client);
             // Continue fetching recursively
             await this.fetchTMClientLookup(sk + 1);
           } else {
@@ -678,8 +681,8 @@ export class CompanyComponent implements OnInit{
         }
       } else {
         // Sort the lookup_data_temp1 array based on the third element (P3)
-      console.log()
-        console.log("Lookup to be displayed",this.lookup_data_client);   
+        console.log()
+        console.log("Lookup to be displayed", this.lookup_data_client);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -723,9 +726,9 @@ export class CompanyComponent implements OnInit{
   checkUniqueIdentifier(getID: any) {
     console.log('getID', getID);
     this.errorForUniqueID = '';
-    for (let uniqueID = 0; uniqueID < this.listofSK.length; uniqueID++) {
-      if (getID.target.value.toLowerCase() == this.listofSK[uniqueID].toLowerCase()) {
-        this.errorForUniqueID = "Company ID already exists";
+    for (let uniqueID = 0; uniqueID < this.lookup_All_Company.length; uniqueID++) {
+      if (getID.target.value.toLowerCase() == this.lookup_All_Company[uniqueID].P1.toLowerCase()) {
+        this.errorForUniqueID = `Company ID already exists in ${this.lookup_All_Company[uniqueID].P2}`;
       }
     }
   }
@@ -770,16 +773,16 @@ export class CompanyComponent implements OnInit{
       //disabling RDT id field on edit,becas its shoukd be unique and making showmodal as true
       this.createCompanyField.get('companyID')?.disable();
 
-//       for (let checkPermission = 0; checkPermission < this.allPermissions_user.length; checkPermission++) {
-//         if (this.allPermissions_user[checkPermission] === 'Company - Update') {
-//           this.hideUpdateButton = false;
-// break;        }
+      //       for (let checkPermission = 0; checkPermission < this.allPermissions_user.length; checkPermission++) {
+      //         if (this.allPermissions_user[checkPermission] === 'Company - Update') {
+      //           this.hideUpdateButton = false;
+      // break;        }
 
-//         else if (this.allPermissions_user[checkPermission] === 'Company - View') {
-//           this.hideUpdateButton = true;
-//         }
-//       }
-    this.editOperation = true;
+      //         else if (this.allPermissions_user[checkPermission] === 'Company - View') {
+      //           this.hideUpdateButton = true;
+      //         }
+      //       }
+      this.editOperation = true;
       this.showHeading = false;
       this.showModal = true;
       this.base64textString_temp = getValues.logo1;
@@ -794,7 +797,7 @@ export class CompanyComponent implements OnInit{
         'logo1': getValues.logo1,
         'logo2': getValues.logo2,
         'clientID': { value: getValues.clientID, disabled: true },
-        'companyID':{ value:  getValues.companyID, disabled: true },
+        'companyID': { value: getValues.companyID, disabled: true },
         'companyName': getValues.companyName,
         'companydesc': getValues.companyDesc,
         'mobile': getValues.mobile,
@@ -810,7 +813,7 @@ export class CompanyComponent implements OnInit{
       })
 
     }
-    this.cd.detectChanges()    
+    this.cd.detectChanges()
   }
 
 
@@ -1010,16 +1013,16 @@ export class CompanyComponent implements OnInit{
       icon: 'success',
       title: 'Success!',
       text: this.editOperation ? 'Company updated successfully!' : 'Company created successfully!',
-  };
+    };
     const errorAlert: SweetAlertOptions = {
-        icon: 'error',
-        title: 'Company ID already Exist!',
-        text: '',
+      icon: 'error',
+      title: 'Company ID already Exist!',
+      text: '',
     };
 
     //console.log('allUserDetails', this.createCompanyField.value);
 
-    let tempClient = this.createCompanyField.value.clientID+"#company"+"#lookup";
+    let tempClient = this.createCompanyField.value.clientID + "#company" + "#lookup";
 
     this.allCompanyDetails = {
       companyID: this.createCompanyField.value.companyID,
@@ -1043,33 +1046,44 @@ export class CompanyComponent implements OnInit{
     }
 
     const tempObj = {
-      PK: this.createCompanyField.value.companyID+"#company"+"#main",
+      PK: this.createCompanyField.value.companyID + "#company" + "#main",
       SK: 1,
-      metadata:JSON.stringify(this.allCompanyDetails)
+      metadata: JSON.stringify(this.allCompanyDetails)
     }
 
-    console.log("Temp obj is here ",tempObj);
+    console.log("Temp obj is here ", tempObj);
 
 
     const date = Math.ceil(((new Date()).getTime()) / 1000)
-    const items ={
-    P1: this.createCompanyField.value.companyID,
-    P2: this.createCompanyField.value.clientID,
-    P3:this.createCompanyField.value.email,
-    P4: date
+    const items = {
+      P1: this.createCompanyField.value.companyID,
+      P2: this.createCompanyField.value.clientID,
+      P3: this.createCompanyField.value.email,
+      P4: date
     }
 
 
-    console.log("Items are here ",items);
+    const masterCompany = {
+      P1: this.createCompanyField.value.companyID,
+      P2: this.createCompanyField.value.clientID,
+      P3: this.createCompanyField.value.email,
+      P4: date
+    }
+    
+
+
+    console.log("Items are here ", items);
 
     console.log('newly added Company config', this.allCompanyDetails);
 
     this.api.CreateMaster(tempObj).then(async (value: any) => {
 
-      await this.createLookUpRdt(items,1,tempClient)
+      await this.createLookUpRdt(items, 1, tempClient)
+
+      await this.createLookUpRdt(masterCompany, 1, "#company#All");
 
       this.datatableConfig = {}
-      
+
       this.lookup_data_company = []
 
       // await this.loading()
@@ -1141,92 +1155,95 @@ export class CompanyComponent implements OnInit{
         // })
 
 
-        const temp:any=[
+        const temp: any = [
           {
             tree: JSON.stringify(this.jsondata)
           }
         ]
         const obj = {
-          PK: items.P2+"#"+ this.createCompanyField.value.companyID + "#location" + "#main",
+          PK: items.P2 + "#" + this.createCompanyField.value.companyID + "#location" + "#main",
           SK: 1,
           metadata: JSON.stringify(temp)
         };
-        
-        
-                
-        
-                this.api.CreateMaster(obj).then((value: any) => {
-        
-                  //need to refresh table so this is called 
-                  //this.addFromService();
-        
-                  if (value) {
-        
-                    // this.toast.open("New Location Configuration created successfully", " ", {
-                    //   //panelClass: 'error-alert-snackbar',
-        
-                    //   duration: 2000,
-                    //   horizontalPosition: 'right',
-                    //   verticalPosition: 'top',
-                    // })
-
-                    this.showAlert(successAlert)
-
-                    try{
-                      const UserDetails = {
-                        "User Name": this.username,
-                        "Action": "Created",
-                        "Module Name": "Company",
-                        "Form Name": 'Company',
-                        "Description": `${items.P1} Company was Created`,
-                        "User Id": this.username,
-                        "Client Id": this.SK_clientID,
-                        "created_time": Date.now(),
-                        "updated_time": Date.now()
-                      }
-                  
-                      this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
-                    }
-                    catch(error){
-                      console.log("Error while creating audit trails ",error);
-                    }
-      
 
 
 
 
-                    this.reloadEvent.next(true)
-        
-        
-        
-                  }
-                  else {
-                    Swal.fire({
-                      customClass: {
-                        container: 'swal2-container'
-                      },
-                      position: 'center',
-                      icon: 'warning',
-                      title: 'Error in adding Location Configuration',
-                      showCancelButton: true,
-                      allowOutsideClick: false,////prevents outside click
-                    })
-                  }
-        
-                }).catch((err: any) => {
+        this.api.CreateMaster(obj).then(async (value: any) => {
 
-                  this.showAlert(errorAlert)
 
-                  console.log('err for creation', err);
-                  // this.toast.open("Error in adding new Location Configuration ", "Check again", {
-                  //   //panelClass: 'error-alert-snackbar',
-        
-                  //   duration: 5000,
-                  //   horizontalPosition: 'right',
-                  //   verticalPosition: 'top',
-                  //   //   //panelClass: ['blue-snackbar']
-                  // })
-                })
+          //need to refresh table so this is called 
+          //this.addFromService();
+
+          if (value) {
+
+            this.fetchAllCompanyData(1)
+
+            // this.toast.open("New Location Configuration created successfully", " ", {
+            //   //panelClass: 'error-alert-snackbar',
+
+            //   duration: 2000,
+            //   horizontalPosition: 'right',
+            //   verticalPosition: 'top',
+            // })
+
+            this.showAlert(successAlert)
+
+            try {
+              const UserDetails = {
+                "User Name": this.username,
+                "Action": "Created",
+                "Module Name": "Company",
+                "Form Name": 'Company',
+                "Description": `${items.P1} Company was Created`,
+                "User Id": this.username,
+                "Client Id": this.SK_clientID,
+                "created_time": Date.now(),
+                "updated_time": Date.now()
+              }
+
+              this.auditTrail.mappingAuditTrailData(UserDetails, this.SK_clientID)
+            }
+            catch (error) {
+              console.log("Error while creating audit trails ", error);
+            }
+
+
+
+
+
+            this.reloadEvent.next(true)
+
+
+
+          }
+          else {
+            Swal.fire({
+              customClass: {
+                container: 'swal2-container'
+              },
+              position: 'center',
+              icon: 'warning',
+              title: 'Error in adding Location Configuration',
+              showCancelButton: true,
+              allowOutsideClick: false,////prevents outside click
+            })
+          }
+
+        }).catch((err: any) => {
+
+          this.showAlert(errorAlert)
+
+          console.log('err for creation', err);
+          // this.toast.open("Error in adding new Location Configuration ", "Check again", {
+          //   //panelClass: 'error-alert-snackbar',
+
+          //   duration: 5000,
+          //   horizontalPosition: 'right',
+          //   verticalPosition: 'top',
+          //   //   //panelClass: ['blue-snackbar']
+          // })
+        })
 
       }
       else {
@@ -1259,21 +1276,21 @@ export class CompanyComponent implements OnInit{
   }
 
 
-  async createLookUpRdt(item: any, pageNumber: number,tempclient:any){
+  async createLookUpRdt(item: any, pageNumber: number, tempclient: any) {
     try {
       console.log("iam a calleddd dude", item, pageNumber);
       const response = await this.api.GetMaster(tempclient, pageNumber);
-  
+
       let checklength: any[] = [];
       if (response != null && response.options && typeof response.options === 'string') {
         checklength = JSON.parse(response.options);
       }
-  
+
       if (response != null && checklength.length < this.maxlength) {
         let newdata: any[] = [];
         if (response.options && typeof response.options === 'string') {
           const parsedData = JSON.parse(response.options);
-  
+
           parsedData.forEach((item: any) => {
             for (const key in item) {
               if (Object.prototype.hasOwnProperty.call(item, key)) {
@@ -1282,20 +1299,20 @@ export class CompanyComponent implements OnInit{
             }
           });
         }
-  
+
         newdata.unshift(item);
         newdata = newdata.map((data, index) => {
           return { [`L${index + 1}`]: data };
         });
-  
+
         console.log('newdata 11111111 :>> ', newdata);
-  
+
         let Look_data: any = {
           PK: tempclient,
           SK: response.SK,
           options: JSON.stringify(newdata),
         };
-  
+
         const createResponse = await this.api.UpdateMaster(Look_data);
         console.log('createResponse :>> ', createResponse);
       } else if (response == null) {
@@ -1304,19 +1321,19 @@ export class CompanyComponent implements OnInit{
         newdata = newdata.map((data, index) => {
           return { [`L${index + 1}`]: data };
         });
-  
+
         let Look_data = {
           SK: pageNumber,
           PK: tempclient,
           options: JSON.stringify(newdata),
         };
-  
+
         console.log(Look_data);
-  
+
         const createResponse = await this.api.CreateMaster(Look_data);
         console.log(createResponse);
       } else {
-        await this.createLookUpRdt(item, pageNumber + 1,tempclient);
+        await this.createLookUpRdt(item, pageNumber + 1, tempclient);
       }
     } catch (err) {
       console.log('err :>> ', err);
@@ -1351,22 +1368,22 @@ export class CompanyComponent implements OnInit{
       icon: 'success',
       title: 'Success!',
       text: this.editOperation ? 'Company updated successfully!' : 'Comapany created successfully!',
-  };
+    };
     const errorAlert: SweetAlertOptions = {
-        icon: 'error',
-        title: 'Error!',
-        text: '',
+      icon: 'error',
+      title: 'Error!',
+      text: '',
     };
 
 
 
     //for editing reading Device type fields
-    var tempObj:any= []
+    var tempObj: any = []
 
     if (key == "editCompany") {
       this.allCompanyDetails = {
         companyID: this.createCompanyField.get('companyID')?.value,
-        clientID:  this.createCompanyField.get('clientID')?.value,
+        clientID: this.createCompanyField.get('clientID')?.value,
         companyName: this.createCompanyField.value.companyName,
         companyDesc: this.createCompanyField.value.companydesc,
         enableCompany: this.createCompanyField.value.enableCompany,
@@ -1387,35 +1404,44 @@ export class CompanyComponent implements OnInit{
 
       tempObj = {
         PK: `${this.createCompanyField.get('companyID')?.value}#company#main`,
-        SK:  1,
+        SK: 1,
         metadata: JSON.stringify(this.allCompanyDetails)
       }
     }
     console.log('after updating', this.allCompanyDetails);
 
     const date = Math.ceil(((new Date()).getTime()) / 1000)
-    const items ={
-    P1: this.createCompanyField.get('companyID')?.value,
-    P2: this.createCompanyField.get('clientID')?.value,
-    P3:this.createCompanyField.value.email,
-    P4: date
+    const items = {
+      P1: this.createCompanyField.get('companyID')?.value,
+      P2: this.createCompanyField.get('clientID')?.value,
+      P3: this.createCompanyField.value.email,
+      P4: date
     }
 
-    console.log("Tempobj is here ",tempObj);
+    const masterUser = {
+      P1: this.createCompanyField.get('companyID')?.value,
+      P2: this.createCompanyField.get('clientID')?.value,
+      P3: this.createCompanyField.value.email,
+      P4: date
+    }
 
-    console.log("Item for lookup is ",items);
+    console.log("Tempobj is here ", tempObj);
+
+    console.log("Item for lookup is ", items);
 
     this.api.UpdateMaster(tempObj).then(async value => {
 
       if (value) {
-        await this.fetchTimeMachineById(1,items.P1, 'update', items);
+        await this.fetchTimeMachineById(1, items.P1, 'update', items);
+
+        await this.fetchAllusersData(1,items.P1,'update',masterUser)
 
         this.datatableConfig = {}
 
         this.lookup_data_company = []
 
 
-        try{
+        try {
           const UserDetails = {
             "User Name": this.username,
             "Action": "Edited",
@@ -1427,11 +1453,11 @@ export class CompanyComponent implements OnInit{
             "created_time": Date.now(),
             "updated_time": Date.now()
           }
-      
-          this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
+
+          this.auditTrail.mappingAuditTrailData(UserDetails, this.SK_clientID)
         }
-        catch(error){
-          console.log("Error while creating audit trails ",error);
+        catch (error) {
+          console.log("Error while creating audit trails ", error);
         }
 
 
@@ -1471,8 +1497,232 @@ export class CompanyComponent implements OnInit{
     })
   }
 
-  async   fetchTimeMachineById(sk: any, id: any, type: any, item: any) {
-    const tempClient = this.SK_clientID+'#company'+"#lookup";
+  async fetchTimeMachineById(sk: any, id: any, type: any, item: any) {
+    const tempClient = this.SK_clientID + '#company' + "#lookup";
+    console.log("Temp client is ", tempClient);
+    console.log("Type of client", typeof tempClient);
+    try {
+      const response = await this.api.GetMaster(tempClient, sk);
+
+      if (response && response.options) {
+        let data: ListItem[] = await JSON.parse(response.options);
+
+        // Find the index of the item with the matching id
+        let findIndex = data.findIndex((obj) => obj[Object.keys(obj)[0]].P1 === id);
+
+        if (findIndex !== -1) { // If item found
+          if (type === 'update') {
+            data[findIndex][`L${findIndex + 1}`] = item;
+
+            // Create a new array to store the re-arranged data without duplicates
+            const newData = [];
+
+            // Loop through each object in the data array
+            for (let i = 0; i < data.length; i++) {
+              const originalKey = Object.keys(data[i])[0]; // Get the original key (e.g., L1, L2, ...)
+              const newKey = `L${i + 1}`; // Generate the new key based on the current index
+
+              // Check if the original key exists before renaming
+              if (originalKey) {
+                // Create a new object with the new key and the data from the original object
+                const newObj = { [newKey]: data[i][originalKey] };
+
+                // Check if the new key already exists in the newData array
+                const existingIndex = newData.findIndex(obj => Object.keys(obj)[0] === newKey);
+
+                if (existingIndex !== -1) {
+                  // Merge the properties of the existing object with the new object
+                  Object.assign(newData[existingIndex][newKey], data[i][originalKey]);
+                } else {
+                  // Add the new object to the newData array
+                  newData.push(newObj);
+                }
+              } else {
+                console.error(`Original key not found for renaming in data[${i}].`);
+                // Handle the error or log a message accordingly
+              }
+            }
+
+            // Replace the original data array with the newData array
+            data = newData;
+
+          } else if (type === 'delete') {
+            // Remove the item at the found index
+            data.splice(findIndex, 1);
+          }
+
+          // Prepare the updated data for API update
+          let updateData = {
+            PK: tempClient,
+            SK: response.SK,
+            options: JSON.stringify(data)
+          };
+
+          // Update the data in the API
+          await this.api.UpdateMaster(updateData);
+
+        } else { // If item not found
+          await new Promise(resolve => setTimeout(resolve, 500)); // Wait before retrying
+          await this.fetchTimeMachineById(sk + 1, id, type, item); // Retry with next SK
+
+        }
+      } else { // If response or listOfItems is null
+        Swal.fire({
+          position: "top-right",
+          icon: "error",
+          title: `ID ${id} not found`,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+
+  deleteCompany(value: any) {
+
+    this.companySK = value;
+
+    console.log("Delete this :", value);
+
+    this.allCompanyDetails = {
+      PK: value + "#company#main",
+      SK: 1
+    }
+
+
+    const locationObj = {
+      PK: `${this.SK_clientID}#${value}#location#main`,
+      SK: 1
+    }
+
+    console.log("All company Details :", this.allCompanyDetails);
+
+    const date = Math.ceil(((new Date()).getTime()) / 1000)
+    const items = {
+      P1: value,
+    }
+
+
+    this.api.DeleteMaster(this.allCompanyDetails).then(async value => {
+
+      if (value) {
+
+        await this.fetchTimeMachineById(1, items.P1, 'delete', items);
+
+        await this.fetchAllusersData(1, items.P1, 'delete', items);
+
+        await this.api.DeleteMaster(locationObj)
+
+        this.fetchAllCompanyData(1)
+
+        try {
+          const UserDetails = {
+            "User Name": this.username,
+            "Action": "Deleted",
+            "Module Name": "Company",
+            "Form Name": 'Company',
+            "Description": `${items.P1} Company was Deleted`,
+            "User Id": this.username,
+            "Client Id": this.SK_clientID,
+            "created_time": Date.now(),
+            "updated_time": Date.now()
+          }
+
+          this.auditTrail.mappingAuditTrailData(UserDetails, this.SK_clientID)
+        }
+        catch (error) {
+          console.log("Error while creating audit trails ", error);
+        }
+
+        this.reloadEvent.next(true)
+
+        Swal.fire(
+          'Removed!',
+          'Company configuration successfully.',
+          'success'
+        );
+      }
+
+    }).catch(err => {
+      console.log('error for deleting', err);
+    })
+  }
+
+
+
+
+
+
+
+
+  fetchAllCompanyData(sk: any): any {
+    console.log("I am called Bro");
+
+    return new Promise((resolve, reject) => {
+      this.api.GetMaster("#company" + "#All", sk)
+        .then(response => {
+          if (response && response.options) {
+            // Check if response.options is a string
+            if (typeof response.options === 'string') {
+              let data = JSON.parse(response.options);
+              console.log("d1 =", data);
+
+              if (Array.isArray(data)) {
+                const promises = []; // Array to hold promises for recursive calls
+
+                for (let index = 0; index < data.length; index++) {
+                  const element = data[index];
+
+                  if (element !== null && element !== undefined) {
+                    // Extract values from each element and push them to lookup_data_user
+                    const key = Object.keys(element)[0]; // Extract the key (e.g., "L1", "L2")
+                    const { P1, P2, P3, P4 } = element[key]; // Extract values from the nested object
+                    this.lookup_All_Company.push({ P1, P2, P3, P4}); // Push an array containing P1, P2, P3, P4, P5, P6
+                    // console.log("d2 =", this.lookup_All_User);
+                  } else {
+                    break;
+                  }
+                }
+
+                // Sort the lookup_data_user array based on P5 values in descending order
+                this.lookup_All_Company.sort((a: { P5: number; }, b: { P5: number; }) => b.P5 - a.P5);
+                console.log("Lookup sorting", this.lookup_All_Company);
+
+                // Continue fetching recursively
+                promises.push(this.fetchAllCompanyData(sk + 1)); // Store the promise for the recursive call
+
+                // Wait for all promises to resolve
+                Promise.all(promises)
+                  .then(() => resolve(this.lookup_All_Company)) // Resolve with the final lookup data
+                  .catch(reject); // Handle any errors from the recursive calls
+              } else {
+                console.error('Invalid data format - not an array.');
+                reject(new Error('Invalid data format - not an array.'));
+              }
+            } else {
+              console.error('response.options is not a string.');
+              reject(new Error('response.options is not a string.'));
+            }
+          } else {
+            console.log("All the company are here", this.lookup_All_Company);
+            this.cd.detectChanges()
+            resolve(this.lookup_All_Company); // Resolve with the current lookup data
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          reject(error); // Reject the promise on error
+        });
+    });
+  }
+
+
+
+  async   fetchAllusersData(sk: any, id: any, type: any, item: any) {
+    const tempClient = '#company'+"#All";
     console.log("Temp client is ",tempClient);
     console.log("Type of client",typeof tempClient);
     try {
@@ -1537,7 +1787,7 @@ export class CompanyComponent implements OnInit{
   
         } else { // If item not found
           await new Promise(resolve => setTimeout(resolve, 500)); // Wait before retrying
-          await this.fetchTimeMachineById(sk + 1, id, type, item); // Retry with next SK
+          await this.fetchAllusersData(sk + 1, id, type, item); // Retry with next SK
   
         }
       } else { // If response or listOfItems is null
@@ -1553,72 +1803,5 @@ export class CompanyComponent implements OnInit{
       console.error('Error:', error);
     }
   }
-
-
-  deleteCompany(value: any) {
-
-    this.companySK = value;
-
-    console.log("Delete this :",value);
-
-      this.allCompanyDetails = {
-        PK: value+"#company#main",
-        SK: 1
-      }
-
-
-      const locationObj = {
-        PK:`${this.SK_clientID}#${value}#location#main`,
-        SK:1
-      }
-
-      console.log("All company Details :",this.allCompanyDetails);
-
-          const date = Math.ceil(((new Date()).getTime()) / 1000)
-          const items ={
-          P1: value,
-          }
-
-
-          this.api.DeleteMaster(this.allCompanyDetails).then(async value => {
-
-            if (value) {
-
-              await this.fetchTimeMachineById(1,items.P1, 'delete', items);
-
-              await this.api.DeleteMaster(locationObj)
-
-              try{
-                const UserDetails = {
-                  "User Name": this.username,
-                  "Action": "Deleted",
-                  "Module Name": "Company",
-                  "Form Name": 'Company',
-                  "Description": `${items.P1} Company was Deleted`,
-                  "User Id": this.username,
-                  "Client Id": this.SK_clientID,
-                  "created_time": Date.now(),
-                  "updated_time": Date.now()
-                }
-            
-                this.auditTrail.mappingAuditTrailData(UserDetails,this.SK_clientID)
-              }
-              catch(error){
-                console.log("Error while creating audit trails ",error);
-              }
-
-              this.reloadEvent.next(true)
-
-              Swal.fire(
-                'Removed!',
-                'Company configuration successfully.',
-                'success'
-              );
-            }
-
-          }).catch(err => {
-            console.log('error for deleting', err);
-          })
-        }
-  }
+}
 
